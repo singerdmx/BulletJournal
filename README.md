@@ -15,7 +15,7 @@
 ## Quick Start
 Please open the terminal and execute the command below. Make sure you have installed docker-compose in advance.
 ```bash
-git clone https://github.com/crawlab-team/crawlab
+git clone https://github.com/singerdmx/BulletJournal.git
 cd BulletJournal
 chmod +x start.sh
 
@@ -46,7 +46,7 @@ Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the UI
 ```
 ## Architecture
 
-<b>BulletJournal</b> adopts THREE TIER ARCHITECTURE using React (Presentation Layer, a.k.a static files) + Spring Boot (Application Layer, a.k.a controller) + Postgres (Persistence Layer, a.k.a database).
+<b>BulletJournal</b> adopts THREE TIER ARCHITECTURE using React (Presentation Layer, a.k.a static files) + Spring Boot (Application Layer, a.k.a controller) + PostgreSQL (Persistence Layer, a.k.a database).
 
 ```
 +--------+    proxy-url   +---------+    listen-url    +----------------------+
