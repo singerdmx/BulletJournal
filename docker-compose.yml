@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 services:
   controller:
     image: mwangxx/bulletjournal-backend:latest
@@ -6,7 +6,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
   database:
     image: postgres
@@ -21,3 +22,8 @@ services:
     volumes:
       - $HOME/docker/volumes/postgres:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
