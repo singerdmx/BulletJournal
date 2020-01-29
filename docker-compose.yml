@@ -1,5 +1,13 @@
 version: '2.1'
 services:
+  frontend:
+    image: mwangxx/bulletjournal-frontend:latest
+    container_name: react_app
+    ports:
+      - "80:80"
+    depends_on:
+      - controller
+
   controller:
     image: mwangxx/bulletjournal-backend:latest
     container_name: springboot_app
