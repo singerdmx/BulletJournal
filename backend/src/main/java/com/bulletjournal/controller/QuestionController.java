@@ -5,10 +5,14 @@ import com.bulletjournal.model.Question;
 import com.bulletjournal.repository.QuestionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+
 import javax.validation.Valid;
 
 @RestController
@@ -16,6 +20,9 @@ public class QuestionController {
 
     @Autowired
     private QuestionRepository questionRepository;
+    
+    @Autowired
+    private Environment environment;
 
     @CrossOrigin
     @GetMapping("/questions")
@@ -26,6 +33,9 @@ public class QuestionController {
     @CrossOrigin
     @PostMapping("/questions")
     public Question createQuestion(@Valid @RequestBody Question question) {
+        if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
+        	question.setTitle(question.getTitle() + "-prod");
+        }
         return questionRepository.save(question);
     }
 
