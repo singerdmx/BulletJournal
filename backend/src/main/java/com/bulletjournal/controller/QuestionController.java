@@ -1,5 +1,6 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.exception.ResourceNotFoundException;
 import com.bulletjournal.model.Question;
 import com.bulletjournal.repository.QuestionRepository;
@@ -23,6 +24,9 @@ public class QuestionController {
     
     @Autowired
     private Environment environment;
+    
+    @Autowired
+    private AuthConfig authConfigProperties;
 
     @CrossOrigin
     @GetMapping("/questions")
@@ -35,6 +39,9 @@ public class QuestionController {
     public Question createQuestion(@Valid @RequestBody Question question) {
         if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
         	question.setTitle(question.getTitle() + "-prod");
+        }
+        if (this.authConfigProperties.isEnableDefaultUser()) {
+        	question.setTitle(question.getTitle() + this.authConfigProperties.getDefaultUsername());
         }
         return questionRepository.save(question);
     }
