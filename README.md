@@ -28,48 +28,4 @@ Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the UI
 ./start.sh
 ```
 
-## Authentication
-
-<b>BulletJournal</b> uses Discourse as an SSO endpoint for authentication based on [Discourse Auth Proxy](https://github.com/discourse/discourse-auth-proxy).
-
-```
-+--------+    proxy-url   +---------+    listen-url    +----------------------+
-|  User  |  ============> |  Nginx  |  ==============> | discourse-auth-proxy |
-+--------+                +---------+                  +----------------------+
-    |                                                             |
-    | sso-url                                          origin-url |
-    |                                                             |
-    v                                                             v
-+-----------+                                          +----------------------+
-| Discourse |                                          | Protected web server |
-+-----------+                                          +----------------------+
-```
-## Architecture
-
-<b>BulletJournal</b> adopts THREE TIER ARCHITECTURE using React (Presentation Layer, a.k.a static files) + Spring Boot (Application Layer, a.k.a controller) + PostgreSQL (Persistence Layer, a.k.a database).
-
-```
-+--------+    proxy-url   +---------+    listen-url    +----------------------+
-|  User  |  ============> |  Nginx  |  ==============> | discourse-auth-proxy |
-+--------+                +---------+                  +----------------------+
-    |                                                             |
-    | sso-url                                          origin-url |
-    |                                                             |
-    v                                                             v
-+-----------+                                          +----------------------+
-| Discourse |                                          |     static assets    |
-+-----------+                                          +----------------------+
-                                                                  |
-                                                                  |
-                                                                  v
-                                                       +----------------------+
-                                                       |      Spring Boot     |
-                                                       +----------------------+
-                                                                  |
-                                                                  |
-                                                                  v
-                                                       +----------------------+
-                                                       |      PostgreSQL      |
-                                                       +----------------------+
-```
 
