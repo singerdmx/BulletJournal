@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bulletjournal.exception.ResourceNotFoundException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.AnswerRepository;
 import com.bulletjournal.repository.QuestionRepository;
-import com.bulletjournal.repository.model.Answer;
+import com.bulletjournal.repository.models.Answer;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

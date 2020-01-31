@@ -1,4 +1,4 @@
-package com.bulletjournal.repository.model;
+package com.bulletjournal.repository.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;

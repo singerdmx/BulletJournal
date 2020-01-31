@@ -1,4 +1,4 @@
-package com.bulletjournal.repository.model;
+package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

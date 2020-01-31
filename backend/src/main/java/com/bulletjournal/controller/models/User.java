@@ -1,4 +1,4 @@
-package com.bulletjournal.controller.model;
+package com.bulletjournal.controller.models;
 
 public class User {
 	private String name;

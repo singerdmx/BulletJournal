@@ -1,4 +1,4 @@
-package com.bulletjournal.repository.model;
+package com.bulletjournal.repository.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;

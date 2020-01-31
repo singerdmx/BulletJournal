@@ -1,4 +1,4 @@
-package com.bulletjournal.exception;
+package com.bulletjournal.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

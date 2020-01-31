@@ -3,7 +3,7 @@ package com.bulletjournal.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.bulletjournal.repository.model.Answer;
+import com.bulletjournal.repository.models.Answer;
 
 import java.util.List;
 
