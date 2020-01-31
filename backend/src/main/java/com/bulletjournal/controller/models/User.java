@@ -2,9 +2,17 @@ package com.bulletjournal.controller.models;
 
 public class User {
 	private String name;
-	private String email;
+	private String thumbnail;
 	private String avatar;
-	private String timezone;
+	
+	public User() {
+	}
+
+	public User(String name, String thumbnail, String avatar) {
+		this.name = name;
+		this.thumbnail = thumbnail;
+		this.avatar = avatar;
+	}
 
 	public String getName() {
 		return name;
@@ -14,12 +22,12 @@ public class User {
 		this.name = name;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getThumbnail() {
+		return thumbnail;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 
 	public String getAvatar() {
@@ -28,14 +36,6 @@ public class User {
 
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
-	}
-
-	public String getTimezone() {
-		return timezone;
-	}
-
-	public void setTimezone(String timezone) {
-		this.timezone = timezone;
 	}
 
 }

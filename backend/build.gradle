@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.3.0.M1'
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
 }
@@ -7,6 +7,9 @@ plugins {
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
+
+ext.versions = [
+]
 
 configurations {
     developmentOnly
@@ -31,9 +34,6 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.8.0'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.8.0'
@@ -42,8 +42,11 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
+	testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
 }
 
 test {
-    useJUnitPlatform()
+    useJUnit()
+
+    maxHeapSize = '5G'
 }
