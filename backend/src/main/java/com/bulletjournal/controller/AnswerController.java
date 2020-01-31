@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bulletjournal.exception.ResourceNotFoundException;
-import com.bulletjournal.model.Answer;
 import com.bulletjournal.repository.AnswerRepository;
 import com.bulletjournal.repository.QuestionRepository;
+import com.bulletjournal.repository.model.Answer;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;

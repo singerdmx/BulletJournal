@@ -2,8 +2,8 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.exception.ResourceNotFoundException;
-import com.bulletjournal.model.Question;
 import com.bulletjournal.repository.QuestionRepository;
+import com.bulletjournal.repository.model.Question;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
