@@ -22,8 +22,8 @@ public class UserClient {
 	private final URI ssoEndPoint;
 	
 	@Autowired
-	public UserClient(RestTemplate restClient, SSOConfig ssoConfig) throws URISyntaxException {
-		this.restClient = restClient;
+	public UserClient(SSOConfig ssoConfig) throws URISyntaxException {
+		this.restClient = new RestTemplate();
 		this.ssoEndPoint = new URI(ssoConfig.getEndpoint());
 	}
 

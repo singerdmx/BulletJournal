@@ -2,7 +2,6 @@ package com.bulletjournal.clients;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.web.client.RestTemplate;
 
 import com.bulletjournal.config.SSOConfig;
 import com.bulletjournal.controller.models.User;
@@ -14,7 +13,7 @@ public class UserClientTests {
 
 	@Test
 	public void testGetUser() throws Exception {
-		UserClient userClient = new UserClient(new RestTemplate(), new SSOConfig("https://1o24bbs.com"));
+		UserClient userClient = new UserClient(new SSOConfig("https://1o24bbs.com"));
 		String username = "BulletJournal";
 		User user = userClient.getUser(username);
 		Assert.assertEquals(user.getName(), username);
