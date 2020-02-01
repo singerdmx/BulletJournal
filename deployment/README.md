@@ -8,6 +8,16 @@ Run the following command to bring up all containers using online deployment con
 ../start.sh
 ```
 
+## Frontend Image
+
+Use `nginx.conf` under `deployment` folder to override the one under `frontend` folder. Go to `frontend` folder and run the following commands.
+```bash
+# docker build -t {dockerhub_name}/{image_name} .
+
+docker build -t xcode1024/bulletjournal-frontend .
+docker push xcode1024/bulletjournal-frontend
+```
+
 ## Authentication
 
 <b>BulletJournal</b> uses Discourse as an SSO endpoint for authentication based on [Discourse Auth Proxy](https://github.com/discourse/discourse-auth-proxy).
