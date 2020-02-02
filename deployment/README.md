@@ -8,24 +8,14 @@ Run the following command to bring up all containers using online deployment con
 ../start.sh
 ```
 
-## Frontend Image
-
-Go to `frontend` folder and run the following commands.
-```bash
-# docker build -t {dockerhub_name}/{image_name} .
-
-docker build -t xcode1024/bulletjournal-frontend .
-docker push xcode1024/bulletjournal-frontend
-```
-
 ## Authentication
 
-<b>BulletJournal</b> uses Discourse as an SSO endpoint for authentication based on [Discourse Auth Proxy](https://github.com/discourse/discourse-auth-proxy).
+<b>BulletJournal</b> uses Discourse as an SSO endpoint for authentication based on [Discourse Auth Proxy](https://github.com/discourse/discourse-auth-proxy). This repo is copied to `../discourse-auth-proxy`.
 
 ```
-+--------+    proxy-url   +---------+    listen-url    +----------------------+
-|  User  |  ============> |  Nginx  |  ==============> | discourse-auth-proxy |
-+--------+                +---------+                  +----------------------+
++--------+                 proxy-url                   +----------------------+
+|  User  |  =========================================> | discourse-auth-proxy |
++--------+                listen-url                   +----------------------+
     |                                                             |
     | sso-url                                          origin-url |
     |                                                             |
@@ -35,7 +25,7 @@ docker push xcode1024/bulletjournal-frontend
 +-----------+                                          +----------------------+
 ```
 
-The image of auth-proxy is from [Discourse Auth Proxy](https://github.com/discourse/discourse-auth-proxy). The following commands show how you can build the image.
+Go to `../discourse-auth-proxy` and run the following commands to build the image.
 ```bash
 # docker build -t {dockerhub_name}/{image_name} .
 
@@ -45,18 +35,18 @@ docker push xcode1024/auth-proxy
 
 ## Architecture
 
-<b>BulletJournal</b> adopts THREE TIER ARCHITECTURE using React (Presentation Layer, a.k.a static files) + Spring Boot (Application Layer, a.k.a controller) + PostgreSQL (Persistence Layer, a.k.a database).
+<b>BulletJournal</b> adopts THREE TIER ARCHITECTURE using React (Presentation Layer, a.k.a Frontend with static assets) + Spring Boot (Application Layer, a.k.a controller) + PostgreSQL (Persistence Layer, a.k.a database).
 
 ```
-+--------+    proxy-url   +---------+    listen-url    +----------------------+
-|  User  |  ============> |  Nginx  |  ==============> | discourse-auth-proxy |
-+--------+                +---------+                  +----------------------+
++--------+                 proxy-url                   +----------------------+
+|  User  |  =========================================> | discourse-auth-proxy |
++--------+                listen-url                   +----------------------+
     |                                                             |
     | sso-url                                          origin-url |
     |                                                             |
     v                                                             v
 +-----------+                                          +----------------------+
-| Discourse |                                          |     static assets    |
+| Discourse |                                          |       Frontend       |
 +-----------+                                          +----------------------+
                                                                   |
                                                                   |
@@ -70,4 +60,14 @@ docker push xcode1024/auth-proxy
                                                        +----------------------+
                                                        |      PostgreSQL      |
                                                        +----------------------+
+```
+
+## Frontend Image
+
+Go to `frontend` folder and run the following commands.
+```bash
+# docker build -t {dockerhub_name}/{image_name} .
+
+docker build -t xcode1024/bulletjournal-frontend .
+docker push xcode1024/bulletjournal-frontend
 ```
