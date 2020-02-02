@@ -10,7 +10,7 @@ Run the following command to bring up all containers using online deployment con
 
 ## Frontend Image
 
-Use `nginx.conf` under `deployment` folder to override the one under `frontend` folder. Go to `frontend` folder and run the following commands.
+Go to `frontend` folder and run the following commands.
 ```bash
 # docker build -t {dockerhub_name}/{image_name} .
 
@@ -39,8 +39,8 @@ The image of auth-proxy is from [Discourse Auth Proxy](https://github.com/discou
 ```bash
 # docker build -t {dockerhub_name}/{image_name} .
 
-docker build -t xcode1024/auth-proxy:v1 .
-docker push xcode1024/auth-proxy:v1
+docker build -t xcode1024/auth-proxy .
+docker push xcode1024/auth-proxy
 ```
 
 ## Architecture
