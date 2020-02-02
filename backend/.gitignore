@@ -33,5 +33,4 @@ out/
 
 ### backend ###
 bin/
-*.bat
-logs
+logs/
