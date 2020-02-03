@@ -155,6 +155,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 	}
 
 	if err == nil {
+		logger.Printf("Setting headers: username %s, groups %s", username, groups)
 		r.Header.Set(config.UsernameHeader, username)
 		r.Header.Set(config.GroupsHeader, groups)
 		handler.ServeHTTP(w, r)
