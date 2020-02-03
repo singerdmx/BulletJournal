@@ -9,7 +9,7 @@ services:
       - frontend
 
   frontend:
-    image: xcode1024/bulletjournal-frontend:latest
+    image: mwangxx/bulletjournal-frontend:latest
     container_name: react_app
     ports:
       - "3000:3000"
