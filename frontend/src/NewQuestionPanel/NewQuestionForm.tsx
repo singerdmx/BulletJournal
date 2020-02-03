@@ -23,7 +23,7 @@ class NewQuestionForm extends React.Component {
       const config = {
         method: 'post',
         headers: { 'content-type': 'application/json', 'accept': '*/*' },
-        url: 'http://localhost:8080/questions',
+        url: 'http://localhost/api/questions',
         data: postBody,
         timeout: 3000 // timeout in ms
       };

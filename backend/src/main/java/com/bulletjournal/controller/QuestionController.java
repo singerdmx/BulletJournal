@@ -29,13 +29,13 @@ public class QuestionController {
     private AuthConfig authConfigProperties;
 
     @CrossOrigin
-    @GetMapping("/questions")
+    @GetMapping("/api/questions")
     public Page<Question> getQuestions(Pageable pageable) {
         return questionRepository.findAll(pageable);
     }
 
     @CrossOrigin
-    @PostMapping("/questions")
+    @PostMapping("/api/questions")
     public Question createQuestion(@Valid @RequestBody Question question) {
         if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
         	question.setTitle(question.getTitle() + "-prod");
@@ -46,7 +46,7 @@ public class QuestionController {
         return questionRepository.save(question);
     }
 
-    @PutMapping("/questions/{questionId}")
+    @PutMapping("/api/questions/{questionId}")
     public Question updateQuestion(@PathVariable Long questionId,
                                    @Valid @RequestBody Question questionRequest) {
         return questionRepository.findById(questionId)
@@ -57,7 +57,7 @@ public class QuestionController {
                 }).orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionId));
     }
 
-    @DeleteMapping("/questions/{questionId}")
+    @DeleteMapping("/api/questions/{questionId}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long questionId) {
         return questionRepository.findById(questionId)
                 .map(question -> {

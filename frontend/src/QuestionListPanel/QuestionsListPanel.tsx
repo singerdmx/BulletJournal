@@ -20,7 +20,7 @@ class QuestionListPanel extends React.Component {
     const config = {
         method: 'get',
         headers: { 'content-type': 'application/json', 'accept': '*/*' },
-        url: 'http://localhost:8080/questions',
+        url: 'http://localhost/api/questions',
         timeout: 3000
     };
     console.log("fetching ...");
