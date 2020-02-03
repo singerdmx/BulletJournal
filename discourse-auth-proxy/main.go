@@ -277,11 +277,11 @@ func parseCookie(data, secret string) (username string, groups string, err error
 	} else {
 		username, err = url.QueryUnescape(split[0])
 		if err != nil {
-			fmt.Errorf("QueryUnescape error %v", err)
+			logger.Printf("username QueryUnescape error %v", err)
 		}
 		groups, err = url.QueryUnescape(split[1])
 		if err != nil {
-			fmt.Errorf("QueryUnescape error %v", err)
+			logger.Printf("groups QueryUnescape error %v", err)
 		}
 	}
 
