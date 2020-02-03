@@ -215,7 +215,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		// we have a valid auth
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 
-		cookieData := strings.Join([]string{username[0], strings.Join(groupsArray, "|")}, ",")
+		cookieData := url.QueryEscape(username[0]) + "," + url.QueryEscape(strings.Join(groupsArray, "|"))
 		cookie := http.Cookie{Name: "__discourse_proxy", Value: signCookie(cookieData, config.CookieSecret), Expires: expiration, HttpOnly: true, Path: "/"}
 		http.SetCookie(w, &cookie)
 
@@ -259,7 +259,6 @@ func parseCookie(data, secret string) (username string, groups string, err error
 	err = nil
 	username = ""
 	groups = ""
-
 	split := strings.Split(data, ",")
 
 	if len(split) < 2 {
@@ -276,8 +275,14 @@ func parseCookie(data, secret string) (username string, groups string, err error
 		err = fmt.Errorf("Expecting signature to match")
 		return
 	} else {
-		username = strings.Split(parsed, ",")[0]
-		groups = strings.Split(parsed, ",")[1]
+		username, err = url.QueryUnescape(split[0])
+		if err != nil {
+			fmt.Errorf("QueryUnescape error %v", err)
+		}
+		groups, err = url.QueryUnescape(split[1])
+		if err != nil {
+			fmt.Errorf("QueryUnescape error %v", err)
+		}
 	}
 
 	return

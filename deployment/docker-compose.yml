@@ -1,10 +1,18 @@
 version: '2.1'
 services:
-  frontend:
-    image: mwangxx/bulletjournal-frontend:latest
-    container_name: react_app
+  auth-proxy:
+    image: xcode1024/auth-proxy:latest
+    container_name: auth-proxy
     ports:
       - "80:80"
+    depends_on:
+      - frontend
+
+  frontend:
+    image: xcode1024/bulletjournal-frontend:latest
+    container_name: react_app
+    ports:
+      - "3000:3000"
     depends_on:
       - controller
 
