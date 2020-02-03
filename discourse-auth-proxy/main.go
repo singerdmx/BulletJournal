@@ -276,14 +276,8 @@ func parseCookie(data, secret string) (username string, groups string, err error
 		err = fmt.Errorf("Expecting signature to match")
 		return
 	} else {
-		username, err = url.QueryUnescape(split[0])
-		if err != nil {
-			logger.Printf("username QueryUnescape error %v", err)
-		}
-		groups, err = url.QueryUnescape(split[1])
-		if err != nil {
-			logger.Printf("groups QueryUnescape error %v", err)
-		}
+		username = split[0]
+		groups = split[1]
 	}
 
 	return
