@@ -29,7 +29,7 @@ public class UserClient {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public User getUser(String username) throws URISyntaxException {
+	public User getUser(String username) {
 		// TODO: get user info from redis
 
 		String url = this.ssoEndPoint.resolve("/u/" + username + ".json").toString();
