@@ -1,5 +1,5 @@
 cd ./discourse-auth-proxy
-docker build -t xcode1024/auth-proxy .
+docker build -t mwangxx/auth-proxy .
 cd ..
 
 cd ./frontend
@@ -9,4 +9,3 @@ cd ..
 cd ./backend
 DOCKER_BUILDKIT=1 docker build -t mwangxx/bulletjournal-backend .
 cd ..
-

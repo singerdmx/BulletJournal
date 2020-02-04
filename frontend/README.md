@@ -1,8 +1,9 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## How to build image
+## How to build and push image
 ```
 docker build -t mwangxx/bulletjournal-frontend .
+docker push mwangxx/bulletjournal-frontend:latest
 ```
 
 ## Available Scripts
