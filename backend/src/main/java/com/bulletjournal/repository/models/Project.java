@@ -18,12 +18,12 @@ public class Project extends AuditModel {
 
     @NotBlank
     @Size(min = 1, max = 100)
-    @Column(columnDefinition = "text")
+    @Column
     private String name;
 
     @NotBlank
     @Size(min = 2, max = 100)
-    @Column(columnDefinition = "text")
+    @Column
     private String owner;
 
     public Project() {
