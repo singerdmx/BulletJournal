@@ -11,8 +11,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.config.AuthConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,6 +25,9 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AuthFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilter.class);
+
+    @Autowired
+    private AuthConfig authConfig;
 
     //this method will be called by container when we send any request
     @Override
@@ -36,6 +43,10 @@ public class AuthFilter implements Filter {
                 String name = headerNames.nextElement();
                 LOGGER.info("Header: " + name + " value:" + httpRequest.getHeader(name));
             }
+        }
+
+        if (this.authConfig.isEnableDefaultUser()) {
+            MDC.put(UserClient.USER_NAME_KEY, this.authConfig.getDefaultUsername());
         }
         chain.doFilter(req, res);
 

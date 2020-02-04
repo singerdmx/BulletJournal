@@ -1,8 +1,18 @@
 package com.bulletjournal.controller.models;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class Project {
     private Long id;
+
+    @NotBlank
+    @Size(min = 1, max = 100)
     private String name;
+    
+    @NotBlank
+    @Size(min = 1, max = 100)
     private String owner;
 
     public Project() {
