@@ -13,7 +13,8 @@ import com.bulletjournal.controller.models.User;
 
 @Component
 public class UserClient {
-	
+
+	public static final String USER_NAME_KEY = "discourse-user-name";
 	private static final String AVATAR_SIZE = "75";
 	private static final String THUMBNAIL_SIZE = "37";
 	private static final String SIZE_HOLDER = "{size}";
