@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 @Table(name = "projects",
         indexes = {@Index(name = "project_owner_index", columnList = "owner", unique = false)})
 public class Project extends AuditModel {
+    @Id
     @GeneratedValue(generator = "project_generator")
     @SequenceGenerator(
             name = "project_generator",

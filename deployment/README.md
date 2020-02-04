@@ -71,6 +71,6 @@ Go to `frontend` folder and run the following commands.
 ```bash
 # docker build -t {dockerhub_name}/{image_name} .
 
-docker build -t xcode1024/bulletjournal-frontend .
-docker push xcode1024/bulletjournal-frontend
+docker build -t mwangxx/bulletjournal-frontend .
+docker push mwangxx/bulletjournal-frontend
 ```
