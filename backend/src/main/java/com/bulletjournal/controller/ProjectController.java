@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.repository.ProjectRepository;
 
@@ -16,28 +17,34 @@ import java.util.stream.Collectors;
 @RestController
 public class ProjectController {
 
+    protected static final String PROJECTS_ROUTE = "/api/projects";
+
     @Autowired
     private ProjectRepository projectRepository;
 
-    @GetMapping("/api/projects")
+    @GetMapping(PROJECTS_ROUTE)
     public List<Project> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return projectRepository.findByOwner(username)
                 .stream().map(this::convert).collect(Collectors.toList());
     }
 
-    @PostMapping("/api/projects")
+    @PostMapping(PROJECTS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Project createProject(@Valid @RequestBody Project project) {
-        return convert(projectRepository.save(convert(project)));
+    public Project createProject(@Valid @RequestBody CreateProjectParams project) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return convert(projectRepository.save(convert(project.getName(), username)));
     }
 
     private Project convert(com.bulletjournal.repository.models.Project project) {
         return new Project(project.getId(), project.getName(), project.getOwner());
     }
 
-    private com.bulletjournal.repository.models.Project convert(Project project) {
-        return new com.bulletjournal.repository.models.Project(
-                project.getId(), project.getName(), project.getOwner());
+    private com.bulletjournal.repository.models.Project convert(String projectName, String owner) {
+        com.bulletjournal.repository.models.Project project =
+                new com.bulletjournal.repository.models.Project();
+        project.setOwner(owner);
+        project.setName(projectName);
+        return project;
     }
 }
