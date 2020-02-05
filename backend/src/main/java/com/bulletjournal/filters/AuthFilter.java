@@ -29,6 +29,9 @@ public class AuthFilter implements Filter {
     @Autowired
     private AuthConfig authConfig;
 
+    @Autowired
+    private UserClient userClient;
+
     //this method will be called by container when we send any request
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -38,16 +41,25 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         Enumeration<String> headerNames = httpRequest.getHeaderNames();
 
+        String username = null;
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
                 String name = headerNames.nextElement();
+                if (UserClient.USER_NAME_KEY.equals(name)) {
+                    username = httpRequest.getHeader(name);
+                }
                 LOGGER.info("Header: " + name + " value:" + httpRequest.getHeader(name));
             }
         }
 
-        if (this.authConfig.isEnableDefaultUser()) {
-            MDC.put(UserClient.USER_NAME_KEY, this.authConfig.getDefaultUsername());
+        if (username == null && this.authConfig.isEnableDefaultUser()) {
+            username = this.authConfig.getDefaultUsername();
         }
+
+        if (username == null) {
+            // 401
+        }
+        MDC.put(UserClient.USER_NAME_KEY, username);
         chain.doFilter(req, res);
 
     }
