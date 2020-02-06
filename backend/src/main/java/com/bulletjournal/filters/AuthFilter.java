@@ -29,9 +29,6 @@ public class AuthFilter implements Filter {
     @Autowired
     private AuthConfig authConfig;
 
-    @Autowired
-    private UserClient userClient;
-
     //this method will be called by container when we send any request
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -57,7 +54,7 @@ public class AuthFilter implements Filter {
         }
 
         if (username == null) {
-            // 401
+            ((HttpServletResponse) res).sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
         MDC.put(UserClient.USER_NAME_KEY, username);
         chain.doFilter(req, res);
