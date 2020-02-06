@@ -34,18 +34,18 @@ public class AuthFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
-
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        Enumeration<String> headerNames = httpRequest.getHeaderNames();
+        Enumeration<String> headerNames = request.getHeaderNames();
 
         String username = null;
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
                 String name = headerNames.nextElement();
+                String val = request.getHeader(name);
+                LOGGER.info("Header: " + name + " value:" + val);
                 if (UserClient.USER_NAME_KEY.equals(name)) {
-                    username = httpRequest.getHeader(name);
+                    username = val;
+                    break;
                 }
-                LOGGER.info("Header: " + name + " value:" + httpRequest.getHeader(name));
             }
         }
 
@@ -54,11 +54,11 @@ public class AuthFilter implements Filter {
         }
 
         if (username == null) {
-            ((HttpServletResponse) res).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
         MDC.put(UserClient.USER_NAME_KEY, username);
         chain.doFilter(req, res);
-
     }
 
 }
