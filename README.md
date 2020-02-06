@@ -18,14 +18,16 @@ Please open the terminal and execute the command below. Make sure you have insta
 git clone https://github.com/singerdmx/BulletJournal.git
 cd BulletJournal
 chmod +x start.sh
-
 ```
 
-Next, you can look into the `docker-compose.yml` (with detailed config params)
-Then execute the command below, and SpringBoot + Postgres will start up. 
-Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the UI interface.
+Next, you can look into the `docker-compose.yml` for detailed config parameters. Then execute the command below to start the services.
+
 ```bash
 ./start.sh
 ```
+
+Open the browser and enter `http://localhost` to see the UI interface.
+Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the API documentation.
+
 
 
