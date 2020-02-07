@@ -2,6 +2,7 @@ package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -26,16 +27,22 @@ public class Project extends AuditModel {
     @Column
     private String owner;
 
+    @NotNull
+    @Column(updatable = false, nullable = false)
+    private Integer type;
+
     public Project() {
     }
 
     public Project(
             Long id,
             @NotBlank @Size(min = 1, max = 100) String name,
-            @NotBlank @Size(min = 2, max = 100) String owner) {
+            @NotBlank @Size(min = 2, max = 100) String owner,
+            @NotNull Integer type) {
         this.id = id;
         this.name = name;
         this.owner = owner;
+        this.type = type;
     }
 
     public Long getId() {
@@ -60,5 +67,13 @@ public class Project extends AuditModel {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }
