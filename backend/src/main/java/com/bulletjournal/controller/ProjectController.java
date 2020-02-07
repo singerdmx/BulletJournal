@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.repository.ProjectRepository;
 
 import org.slf4j.MDC;
@@ -33,18 +34,21 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return convert(projectRepository.save(convert(project.getName(), username)));
+        return convert(projectRepository.save(convert(project, username)));
     }
 
     private Project convert(com.bulletjournal.repository.models.Project project) {
-        return new Project(project.getId(), project.getName(), project.getOwner());
+        return new Project(project.getId(), project.getName(), project.getOwner(),
+                ProjectType.getType(project.getType()));
     }
 
-    private com.bulletjournal.repository.models.Project convert(String projectName, String owner) {
+    private com.bulletjournal.repository.models.Project convert(
+            CreateProjectParams createProjectParams, String owner) {
         com.bulletjournal.repository.models.Project project =
                 new com.bulletjournal.repository.models.Project();
         project.setOwner(owner);
-        project.setName(projectName);
+        project.setName(createProjectParams.getName());
+        project.setType(createProjectParams.getProjectType().getValue());
         return project;
     }
 }

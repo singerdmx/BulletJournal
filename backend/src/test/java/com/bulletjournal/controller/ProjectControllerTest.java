@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
+import com.bulletjournal.controller.models.ProjectType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +31,7 @@ public class ProjectControllerTest {
     @Test
     public void testCRUD() {
         String projectName = "P1";
-        CreateProjectParams project = new CreateProjectParams(projectName);
+        CreateProjectParams project = new CreateProjectParams(projectName, ProjectType.LEDGER);
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 "http://localhost:" + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
@@ -40,6 +41,7 @@ public class ProjectControllerTest {
         Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
         Assert.assertEquals(projectName, created.getName());
         Assert.assertEquals("BulletJournal", created.getOwner());
+        Assert.assertEquals(ProjectType.LEDGER, created.getProjectType());
     }
 }
 
