@@ -118,7 +118,7 @@
     "node-sass": "^4.10.0",
     "sass-loader": "^6.0.6",
     "svg-spritemap-webpack-plugin": "^1.2.0",
-    "webpack-dev-server": "^2.9.7"
+    "webpack-dev-server": "^3.1.11"
   },
   "scripts": {
     "start": "cross-env NODE_PATH=./src node scripts/start.js",
