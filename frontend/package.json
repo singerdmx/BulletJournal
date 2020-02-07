@@ -38,7 +38,7 @@
     "date-arithmetic": "^3.1.0",
     "date-fns": "^1.30.1",
     "dotenv": "^6.2.0",
-    "eslint": "4.4.1",
+    "eslint": "4.18.2",
     "eslint-config-react-app": "^2.0.0",
     "eslint-loader": "1.9.0",
     "eslint-plugin-flowtype": "2.35.0",
