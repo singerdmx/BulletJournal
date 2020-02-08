@@ -14,6 +14,7 @@ import javax.validation.constraints.Size;
  * {@link Note}: for ProjectType.NOTE
  * {@link Ledger}: for ProjectType.LEDGER
  */
+@MappedSuperclass
 public abstract class ProjectItemModel extends AuditModel {
 
     @NotBlank
@@ -24,6 +25,11 @@ public abstract class ProjectItemModel extends AuditModel {
     @Size(max = 100)
     @Column
     private String owner;
+
+    @NotBlank
+    @Size(min = 1, max = 100)
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
@@ -52,5 +58,13 @@ public abstract class ProjectItemModel extends AuditModel {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

@@ -2,6 +2,10 @@ package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
 
+/**
+ * This class is for ProjectType.LEDGER
+ * {@link ProjectItemModel#owner} is "who paid the bill"
+ */
 @Entity
 @Table(name = "ledgers")
 public class Ledger extends ProjectItemModel {

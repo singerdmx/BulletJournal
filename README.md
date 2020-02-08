@@ -2,7 +2,7 @@
 "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png"
  width="150px" height="150px"></a>
 
-<b>BulletJournal</b> is an open source platform for notebook keeping, task/project management and coordination with speciality in personal organization, scheduling, reminders, to-do lists, notes sharing and team project collaboration.
+<b>BulletJournal</b> is an open source platform for notebook keeping, ledger management, task/project management and coordination with speciality in personal organization, scheduling, reminders, to-do lists, notes sharing, multi-person ledger and team project collaboration.
 
 ## Installation
 - Docker

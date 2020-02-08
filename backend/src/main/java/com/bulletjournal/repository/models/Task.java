@@ -2,6 +2,10 @@ package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
 
+/**
+ * This class is for ProjectType.TODO
+ * {@link ProjectItemModel#owner} is "assigned to"
+ */
 @Entity
 @Table(name = "tasks")
 public class Task extends ProjectItemModel {
