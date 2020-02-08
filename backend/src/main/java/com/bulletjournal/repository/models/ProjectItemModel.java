@@ -14,6 +14,7 @@ import javax.validation.constraints.Size;
  * {@link Note}: for ProjectType.NOTE
  * {@link Ledger}: for ProjectType.LEDGER
  */
+@MappedSuperclass
 public abstract class ProjectItemModel extends AuditModel {
 
     @NotBlank
