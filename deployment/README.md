@@ -28,13 +28,14 @@ Run the following command to bring up all containers using online deployment con
 Go to `../discourse-auth-proxy` and run the following commands to build the image.
 For production deployment, please update `../discourse-auth-proxy/start.sh` and replace `sso-secret` with different value.
 Then use the new image for `auth-proxy` in `docker-compose.yml`.
-
 ```bash
 # docker build -t {dockerhub_name}/{image_name} .
 
 docker build -t xcode1024/auth-proxy .
 docker push xcode1024/auth-proxy
 ```
+
+Set environment variable `SSO_API_KEY` using [Discourse API Key](https://meta.discourse.org/t/user-api-keys-specification/48536) before running `start.sh`.
 
 ## Architecture
 

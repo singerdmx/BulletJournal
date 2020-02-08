@@ -47,9 +47,13 @@ public class UserClient {
 		String avatarTemplate = (String) userInfo.get("avatar_template");
 		String avatar = this.ssoEndPoint.resolve(avatarTemplate.replace(SIZE_HOLDER, AVATAR_SIZE)).toString();
 		String thumbnail = this.ssoEndPoint.resolve(avatarTemplate.replace(SIZE_HOLDER, THUMBNAIL_SIZE)).toString();
-		String timezone = this.authConfig.getDefaultUserTimezone();
+		String timezone = null;
 		if (this.ssoAPIParams != null) {
+			// If user never sets timezone in sso provider, it defaults to "America/Los_Angeles"
 			timezone = (String) ((LinkedHashMap) userInfo.get("user_option")).get("timezone");
+		}
+		if (timezone == null) {
+			timezone = this.authConfig.getDefaultUserTimezone();
 		}
 
 		String email = this.authConfig.getDefaultUserEmail();
