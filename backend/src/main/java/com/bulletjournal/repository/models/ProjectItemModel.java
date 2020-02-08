@@ -25,6 +25,11 @@ public abstract class ProjectItemModel extends AuditModel {
     @Column
     private String owner;
 
+    @NotBlank
+    @Size(min = 1, max = 100)
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -52,5 +57,13 @@ public abstract class ProjectItemModel extends AuditModel {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }
