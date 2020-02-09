@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
  * {@link Ledger}: for ProjectType.LEDGER
  */
 @MappedSuperclass
-public abstract class ProjectItemModel extends NamedModel {
+public abstract class ProjectItemModel extends OwnedModel {
 
     @NotBlank
     @Size(min = 1, max = 100)

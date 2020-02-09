@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @MappedSuperclass
-public abstract class NamedModel extends AuditModel {
+public abstract class OwnedModel extends AuditModel {
 
     @NotBlank
     @Size(min = 1, max = 100)

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"owner", "name"})
         })
-public class Project extends NamedModel {
+public class Project extends OwnedModel {
     @Id
     @GeneratedValue(generator = "project_generator")
     @SequenceGenerator(

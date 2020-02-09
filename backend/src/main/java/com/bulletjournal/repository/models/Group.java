@@ -8,7 +8,7 @@ import java.util.Set;
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"owner", "name"})
         })
-public class Group extends NamedModel {
+public class Group extends OwnedModel {
     @Id
     @GeneratedValue(generator = "group_generator")
     @SequenceGenerator(
