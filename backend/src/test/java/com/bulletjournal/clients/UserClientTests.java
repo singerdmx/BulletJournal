@@ -1,12 +1,17 @@
 package com.bulletjournal.clients;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.bulletjournal.config.AuthConfig;
-import com.bulletjournal.redis.UserRepository;
+import com.bulletjournal.redis.RedisUserRepository;
 import java.util.Optional;
+
+import com.bulletjournal.repository.UserDaoJpa;
 import org.junit.Assert;
 import org.junit.Test;
 import com.bulletjournal.config.SSOConfig;
 import com.bulletjournal.controller.models.User;
-import org.mockito.Mockito;
 
 /**
  * Tests {@link UserClient}
@@ -22,14 +27,15 @@ public class UserClientTests {
         String expectedUserTimeZone = "America/Los_Angeles";
         String expectedUserEmail = "todo1o24@outlook.com";
 
-        UserRepository redisUserRepository = Mockito.mock(UserRepository.class);
-        Mockito.when(redisUserRepository.findById(username)).thenReturn(Optional.empty());
+        RedisUserRepository redisUserRepository = mock(RedisUserRepository.class);
+        when(redisUserRepository.findById(username)).thenReturn(Optional.empty());
+        UserDaoJpa userDaoJpa = mock(UserDaoJpa.class);
 
         AuthConfig authConfig = new AuthConfig();
         authConfig.setDefaultUserTimezone(expectedUserTimeZone);
         authConfig.setDefaultUserEmail(expectedUserEmail);
         UserClient userClient = new UserClient(new SSOConfig(
-                "https://1o24bbs.com"), authConfig, redisUserRepository);
+                "https://1o24bbs.com"), authConfig, redisUserRepository, userDaoJpa);
 
         User user = userClient.getUser(username);
         Assert.assertEquals(username, user.getName());

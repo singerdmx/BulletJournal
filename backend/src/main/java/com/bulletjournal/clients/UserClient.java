@@ -4,9 +4,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import com.bulletjournal.config.AuthConfig;
-import com.bulletjournal.redis.UserRepository;
+import com.bulletjournal.exceptions.ResourceAlreadyExistException;
+import com.bulletjournal.redis.RedisUserRepository;
+import com.bulletjournal.repository.UserDaoJpa;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +24,7 @@ import com.bulletjournal.controller.models.User;
 
 @Component
 public class UserClient {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserClient.class);
     public static final String USER_NAME_KEY = "discourse-user-name";
     private static final String AVATAR_SIZE = "75";
     private static final String THUMBNAIL_SIZE = "37";
@@ -29,16 +34,19 @@ public class UserClient {
     private final URI ssoEndPoint;
     private final String ssoAPIKey;
     private final AuthConfig authConfig;
-    private final UserRepository redisUserRepository;
+    private final RedisUserRepository redisUserRepository;
+    private final  UserDaoJpa userDaoJpa;
 
     @Autowired
-    public UserClient(SSOConfig ssoConfig, AuthConfig authConfig, UserRepository redisUserRepository)
+    public UserClient(SSOConfig ssoConfig, AuthConfig authConfig,
+                      RedisUserRepository redisUserRepository, UserDaoJpa userDaoJpa)
             throws URISyntaxException {
         this.restClient = new RestTemplate();
         this.ssoEndPoint = new URI(ssoConfig.getEndpoint());
         this.ssoAPIKey = ssoConfig.getAPIKey();
         this.authConfig = authConfig;
         this.redisUserRepository = redisUserRepository;
+        this.userDaoJpa = userDaoJpa;
     }
 
     @SuppressWarnings("rawtypes")
@@ -49,6 +57,14 @@ public class UserClient {
             user = userOptional.get();
             return user;
         }
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                this.userDaoJpa.create(username);
+            } catch (ResourceAlreadyExistException ex) {
+                LOGGER.info("OK to ignore", ex);
+            }
+        });
         user = getUserByREST(username);
         redisUserRepository.save(user);
         return user;

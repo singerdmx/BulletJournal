@@ -29,7 +29,7 @@ public class ProjectControllerTest {
     int randomServerPort;
 
     @Test
-    public void testCRUD() {
+    public void testCRUD() throws Exception {
         String projectName = "P1";
         CreateProjectParams project = new CreateProjectParams(projectName, ProjectType.LEDGER);
         ResponseEntity<Project> response = this.restTemplate.exchange(

@@ -1,5 +1,8 @@
 package com.bulletjournal.repository.models;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -10,6 +13,7 @@ import javax.validation.constraints.NotNull;
                 @UniqueConstraint(columnNames = {"owner", "name"})
         })
 public class Project extends OwnedModel {
+
     @Id
     @GeneratedValue(generator = "project_generator")
     @SequenceGenerator(
@@ -21,6 +25,11 @@ public class Project extends OwnedModel {
     @NotNull
     @Column(updatable = false, nullable = false)
     private Integer type;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "group_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private Group group;
 
     public Long getId() {
         return id;
@@ -36,5 +45,16 @@ public class Project extends OwnedModel {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        if (!group.getProjects().contains(group)) {
+            this.group = group;
+            group.addProject(this);
+        }
     }
 }

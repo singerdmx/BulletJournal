@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.ProjectRepository;
 
 import org.slf4j.MDC;
@@ -23,6 +24,9 @@ public class ProjectController {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private ProjectDaoJpa projectDaoJpa;
+
     @GetMapping(PROJECTS_ROUTE)
     public List<Project> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -34,7 +38,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return convert(projectRepository.save(convert(project, username)));
+        return convert(projectDaoJpa.create(project, username));
     }
 
     private Project convert(com.bulletjournal.repository.models.Project project) {
@@ -42,13 +46,4 @@ public class ProjectController {
                 ProjectType.getType(project.getType()));
     }
 
-    private com.bulletjournal.repository.models.Project convert(
-            CreateProjectParams createProjectParams, String owner) {
-        com.bulletjournal.repository.models.Project project =
-                new com.bulletjournal.repository.models.Project();
-        project.setOwner(owner);
-        project.setName(createProjectParams.getName());
-        project.setType(createProjectParams.getProjectType().getValue());
-        return project;
-    }
 }
