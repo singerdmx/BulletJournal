@@ -47,7 +47,6 @@ public class UserClient {
         Optional<User> userOptional = redisUserRepository.findById(username);
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            user.setName(username);
             return user;
         }
         user = getUserByREST(username);
