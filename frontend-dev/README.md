@@ -4,7 +4,7 @@
 
 (1) Run `../start.sh` to bring up containers except frontend
 
-(2) Go to folder `../frontend` to the frontend application in the development mode
+(2) Go to folder `../frontend` to start the frontend application in the development mode
 ```bash
 cd ../frontend
 npm start
