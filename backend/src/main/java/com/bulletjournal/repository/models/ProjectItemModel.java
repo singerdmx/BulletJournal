@@ -28,7 +28,7 @@ public abstract class ProjectItemModel extends AuditModel {
 
     @NotBlank
     @Size(min = 1, max = 100)
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
