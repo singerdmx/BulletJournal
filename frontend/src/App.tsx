@@ -4,7 +4,7 @@ import './App.less';
 import createStore from './store';
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
-import UserInfo from './features/UserInfo';
+import UserInfo from './features/user-info/UserInfo';
 
 const store = createStore();
 

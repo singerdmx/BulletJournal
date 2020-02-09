@@ -1,4 +1,4 @@
-import { reducer as userReducer } from '../features/reducer';
+import { reducer as userReducer } from '../features/user-info/reducer';
 
 
 export default {

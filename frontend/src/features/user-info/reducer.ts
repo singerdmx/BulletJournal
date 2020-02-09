@@ -9,6 +9,11 @@ export type ApiErrorAction = {
     error: string;
 };
 
+export type UpdateUserInfo = {
+
+}
+
+
 let initialState = {  
     username: '',
     avatar: ''
@@ -24,9 +29,12 @@ const slice = createSlice({
             state.username = username;
             state.avatar = avatar;
         },
-        userApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) => state
+        userApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) => state,
+        UserInfoUpdate: (state, action: PayloadAction<UpdateUserInfo>)=>state
     },
 });
+
+export const updateUserInfo = () => actions.UserInfoUpdate({})
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;
