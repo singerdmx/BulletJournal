@@ -19,11 +19,11 @@ class App extends React.Component {
               defaultSelectedKeys={['main']}
               style={{height: '100%' }}
             >
-              <Menu.Item key="main">Today</Menu.Item>
-              <Menu.Item key="next">Next 7 days</Menu.Item>
-              <Menu.Item key="next">Projects</Menu.Item>
-              <Menu.Item key="next">Groups</Menu.Item>
-              <Menu.Item key="next">Labels</Menu.Item>
+              <Menu.Item key="today">Today</Menu.Item>
+              <Menu.Item key="next7days">Next 7 days</Menu.Item>
+              <Menu.Item key="projects">Projects</Menu.Item>
+              <Menu.Item key="groups">Groups</Menu.Item>
+              <Menu.Item key="labels">Labels</Menu.Item>
             </Menu>
           </Sider>
             <Layout>
