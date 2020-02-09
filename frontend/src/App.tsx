@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Input } from 'antd';
-import './App.css';
+import './App.less';
 import createStore from './store';
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
