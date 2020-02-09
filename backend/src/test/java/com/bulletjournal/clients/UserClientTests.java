@@ -22,15 +22,14 @@ public class UserClientTests {
         String expectedUserTimeZone = "America/Los_Angeles";
         String expectedUserEmail = "todo1o24@outlook.com";
 
-        User expectedUser = new User(username, expectedThumbnail, expectedAvatar, expectedUserTimeZone, expectedUserEmail);
         UserRepository redisUserRepository = Mockito.mock(UserRepository.class);
-        Mockito.when(redisUserRepository.findById("BulletJournal")).thenReturn(Optional.of(expectedUser));
-        Mockito.when(redisUserRepository.findById("BulletJournal")).thenReturn(Optional.of(expectedUser));
+        Mockito.when(redisUserRepository.findById(username)).thenReturn(Optional.empty());
 
         AuthConfig authConfig = new AuthConfig();
-        authConfig.setDefaultUserTimezone("America/Los_Angeles");
-        authConfig.setDefaultUserEmail("todo1o24@outlook.com");
-        UserClient userClient = new UserClient(new SSOConfig("https://1o24bbs.com"), authConfig, redisUserRepository);
+        authConfig.setDefaultUserTimezone(expectedUserTimeZone);
+        authConfig.setDefaultUserEmail(expectedUserEmail);
+        UserClient userClient = new UserClient(new SSOConfig(
+                "https://1o24bbs.com"), authConfig, redisUserRepository);
 
         User user = userClient.getUser(username);
         Assert.assertEquals(username, user.getName());
