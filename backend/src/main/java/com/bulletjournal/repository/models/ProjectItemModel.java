@@ -15,16 +15,7 @@ import javax.validation.constraints.Size;
  * {@link Ledger}: for ProjectType.LEDGER
  */
 @MappedSuperclass
-public abstract class ProjectItemModel extends AuditModel {
-
-    @NotBlank
-    @Size(min = 1, max = 100)
-    @Column
-    private String title;
-
-    @Size(max = 100)
-    @Column
-    private String owner;
+public abstract class ProjectItemModel extends NamedModel {
 
     @NotBlank
     @Size(min = 1, max = 100)
@@ -35,22 +26,6 @@ public abstract class ProjectItemModel extends AuditModel {
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
 
     public Project getProject() {
         return project;
