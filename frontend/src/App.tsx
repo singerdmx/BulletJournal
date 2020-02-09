@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu, Input } from 'antd';
+import { Layout, Menu, Input, Icon } from 'antd';
 import './App.less';
 import createStore from './store';
 import { Provider } from 'react-redux';
@@ -29,11 +29,11 @@ class App extends React.Component {
               defaultSelectedKeys={['today']}
               style={{height: '100%' }}
             >
-              <Menu.Item key="today">Today</Menu.Item>
-              <Menu.Item key="next7days">Next 7 days</Menu.Item>
-              <Menu.Item key="projects">Projects</Menu.Item>
-              <Menu.Item key="groups">Groups</Menu.Item>
-              <Menu.Item key="labels">Labels</Menu.Item>
+              <Menu.Item key="today"><Icon type="carry-out" />Today</Menu.Item>
+              <Menu.Item key="next7days"><Icon type="calendar" />Next 7 days</Menu.Item>
+              <Menu.Item key="projects"><Icon type="folder" />Projects</Menu.Item>
+              <Menu.Item key="groups"><Icon type="team" />Groups</Menu.Item>
+              <Menu.Item key="labels"><Icon type="flag" />Labels</Menu.Item>
             </Menu>
           </Sider>
             <Layout style={{marginLeft : '250px'}}>
