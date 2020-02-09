@@ -10,9 +10,14 @@
 
 /* ----------------------Header ---------------------- */
 .header {
+  position: fixed;
+  width: 90%;
   background: #fff;
+
   padding: 0 15px;
   height: 50px;
+  line-height: 50px;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -46,6 +51,8 @@
   height: 50px;
   line-height: 50px;
   padding-left: 10px;
+
+  border-bottom: 2px solid #fcd4e5;
 }
 
 .icon .icon-img {

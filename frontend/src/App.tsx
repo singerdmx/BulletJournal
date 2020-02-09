@@ -23,7 +23,7 @@ class App extends React.Component {
             </div>
             <Menu
               mode="inline"
-              defaultSelectedKeys={['main']}
+              defaultSelectedKeys={['today']}
               style={{height: '100%' }}
             >
               <Menu.Item key="today">Today</Menu.Item>
