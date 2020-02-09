@@ -1,1 +1,57 @@
 @import '~antd/dist/antd.css';
+
+.App {
+  height: 100vh;
+}
+
+.layout {
+  min-height: 100vh;
+}
+
+/* ----------------------Header ---------------------- */
+.header {
+  background: #fff;
+  padding: 0 15px;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-box {
+  width: 200px;
+}
+
+.search-box .ant-input {
+  background: #f0f0f0;
+  border-radius: 15px;
+  color: white;
+}
+
+.search-box .ant-input:hover {
+  outline: none;
+}
+
+.search-box .ant-input:focus {
+  outline-color: #fcd4e5;
+  background: white;
+}
+
+.header-icon {
+  width: 200px;
+}
+
+/* ----------------------Side----------------------  */
+.icon {
+  height: 50px;
+  line-height: 50px;
+  padding-left: 10px;
+}
+
+.icon .icon-img {
+  height: 40px;
+}
+/* ----------------------Body---------------------- */
+.content {
+  height: 100%;
+}
