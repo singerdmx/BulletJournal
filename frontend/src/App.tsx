@@ -27,7 +27,7 @@ class App extends React.Component {
             <Menu
               mode="inline"
               defaultSelectedKeys={['today']}
-              style={{height: '100%' }}
+              style={{height: '100%', fontWeight: 500 }}
             >
               <Menu.Item key="today"><Icon type="carry-out" />Today</Menu.Item>
               <Menu.Item key="next7days"><Icon type="calendar" />Next 7 days</Menu.Item>

@@ -19,7 +19,7 @@ const UserInfo = (props: UserProps) =>{
         style={{ display: 'flex', width: '100px', justifyContent: 'space-around', alignItems: 'center' }}
       >
         <div>{props.username || 'Log In'}</div>
-        <Avatar src={props.avatar}>{props.username || 'User'}</Avatar>
+        <Avatar src={props.avatar} style={{ cursor : 'pointer'}}>{props.username || 'User'}</Avatar>
       </div>)
 }
 
