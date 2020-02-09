@@ -6,18 +6,18 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @MappedSuperclass
-public abstract class OwnedModel extends NamedModel {
+public abstract class NamedModel extends AuditModel {
 
     @NotBlank
-    @Size(min = 2, max = 100)
+    @Size(min = 1, max = 100)
     @Column
-    private String owner;
+    private String name;
 
-    public String getOwner() {
-        return owner;
+    public String getName() {
+        return name;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setName(String name) {
+        this.name = name;
     }
 }

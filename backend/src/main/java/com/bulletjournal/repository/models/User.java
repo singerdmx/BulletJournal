@@ -4,8 +4,11 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
-public class User extends AuditModel {
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"name"})
+        })
+public class User extends NamedModel {
     @Id
     @GeneratedValue(generator = "user_generator")
     @SequenceGenerator(
