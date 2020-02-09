@@ -30,6 +30,12 @@ services:
       database:
         condition: service_healthy
 
+  cache:
+    image: redis
+    container_name: cache
+    ports:
+      - "6379:6379"
+
   database:
     image: postgres
     container_name: db
