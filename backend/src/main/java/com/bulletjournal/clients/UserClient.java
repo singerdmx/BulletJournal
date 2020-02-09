@@ -3,8 +3,10 @@ package com.bulletjournal.clients;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 import com.bulletjournal.config.AuthConfig;
+import com.bulletjournal.redis.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,19 +29,35 @@ public class UserClient {
     private final URI ssoEndPoint;
     private final String ssoAPIKey;
     private final AuthConfig authConfig;
+    private final UserRepository redisUserRepository;
 
     @Autowired
-    public UserClient(SSOConfig ssoConfig, AuthConfig authConfig) throws URISyntaxException {
+    public UserClient(SSOConfig ssoConfig, AuthConfig authConfig, UserRepository redisUserRepository)
+            throws URISyntaxException {
         this.restClient = new RestTemplate();
         this.ssoEndPoint = new URI(ssoConfig.getEndpoint());
         this.ssoAPIKey = ssoConfig.getAPIKey();
         this.authConfig = authConfig;
+        this.redisUserRepository = redisUserRepository;
     }
 
     @SuppressWarnings("rawtypes")
     public User getUser(String username) {
-        // TODO: get user info from redis
+        User user;
+        Optional<User> userOptional = redisUserRepository.findById(username);
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+            user.setName(username);
+            return user;
+        }
+        user = getUserByREST(username);
+        user.setName(null);
+        redisUserRepository.save(user);
+        user.setName(username);
+        return user;
+    }
 
+    private User getUserByREST(String username) {
         HttpEntity<LinkedHashMap> request = null;
         if (this.ssoAPIKey != null) {
             HttpHeaders headers = new HttpHeaders();

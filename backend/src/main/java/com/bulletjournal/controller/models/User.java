@@ -1,6 +1,14 @@
 package com.bulletjournal.controller.models;
 
-public class User {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
+
+@RedisHash("User")
+public class User implements Serializable {
+
+    @Id
     private String name;
     private String thumbnail;
     private String avatar;
@@ -57,4 +65,15 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", thumbnail='" + thumbnail + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", timezone='" + timezone + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
