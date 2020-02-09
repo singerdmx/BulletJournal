@@ -1,6 +1,8 @@
 package com.bulletjournal.filters;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
 import javax.servlet.Filter;
@@ -31,7 +33,8 @@ public class AuthFilter implements Filter {
 
     //this method will be called by container when we send any request
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -43,7 +46,7 @@ public class AuthFilter implements Filter {
                 String val = request.getHeader(name);
                 LOGGER.info("Header: " + name + " value:" + val);
                 if (UserClient.USER_NAME_KEY.equals(name)) {
-                    username = val;
+                    username = URLDecoder.decode(val, StandardCharsets.UTF_8.toString());
                     break;
                 }
             }
