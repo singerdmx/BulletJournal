@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.UpdateProjectParams;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.ProjectRepository;
 
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class ProjectController {
 
     protected static final String PROJECTS_ROUTE = "/api/projects";
+    protected static final String PROJECT_ROUTE = "/api/projects/{projectId}";
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -39,6 +42,12 @@ public class ProjectController {
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return convert(projectDaoJpa.create(project, username));
+    }
+
+    @PatchMapping(PROJECT_ROUTE)
+    public Project updateProject(@NotNull @PathVariable Long projectId,
+                                  @Valid @RequestBody UpdateProjectParams updateProjectParams) {
+        return convert(this.projectDaoJpa.partialUpdate(projectId, updateProjectParams));
     }
 
     private Project convert(com.bulletjournal.repository.models.Project project) {

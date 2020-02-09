@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Repository
 public class TaskDaoJpa {
 
@@ -21,13 +19,12 @@ public class TaskDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, String name, String createdBy) {
-        Optional<Project> project = this.projectRepository.findById(projectId);
-        if (!project.isPresent()) {
-            throw new ResourceNotFoundException("Project " + projectId + " not found");
-        }
+        Project project = this.projectRepository
+                .findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
         Task task = new Task();
-        task.setProject(project.get());
+        task.setProject(project);
         task.setOwner(owner);
         task.setName(name);
         task.setCreatedBy(createdBy);
