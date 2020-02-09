@@ -59,4 +59,8 @@ public class Group extends OwnedModel {
             project.setGroup(this);
         }
     }
+
+    public com.bulletjournal.controller.models.Group toPresentationModel() {
+        return new com.bulletjournal.controller.models.Group(this.getId(), this.getName(), this.getOwner());
+    }
 }

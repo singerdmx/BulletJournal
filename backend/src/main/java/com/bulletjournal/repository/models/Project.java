@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.ProjectType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -56,5 +57,11 @@ public class Project extends OwnedModel {
             this.group = group;
             group.addProject(this);
         }
+    }
+
+    public com.bulletjournal.controller.models.Project toPresentationModel() {
+        return new com.bulletjournal.controller.models.Project(
+                this.getId(), this.getName(), this.getOwner(),
+                ProjectType.getType(this.getType()), this.getGroup().toPresentationModel());
     }
 }
