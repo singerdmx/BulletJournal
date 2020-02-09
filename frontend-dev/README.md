@@ -6,7 +6,13 @@
 
 (2) Run `nginx -c <absolute path to this nginx.conf file>`.
 
-For example: `nginx -c /Users/xyao/ws/BulletJournal/frontend-dev/nginx.conf`.
+For example: 
+
+```bash
+nginx -c $PWD/nginx.conf
+# or just type out whole path
+nginx -c /Users/xyao/ws/BulletJournal/frontend-dev/nginx.conf
+```
 
 (3) Run `../start.sh` to bring up containers except frontend
 
