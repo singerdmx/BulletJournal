@@ -17,9 +17,12 @@ class App extends React.Component {
       <Provider store={store}>
       <div className="App">
         <Layout className="layout">
-          <Sider width={200} style={{ background: '#fff' }}>
-            <div className="icon">
+          <Sider width={249} className="sider">
+            <div className="sider-header">
               <img src="favicon466.ico" alt="Icon" className="icon-img" />
+              <div className="title">
+                <h2>Bullet Journal</h2>
+              </div>
             </div>
             <Menu
               mode="inline"
@@ -33,7 +36,7 @@ class App extends React.Component {
               <Menu.Item key="labels">Labels</Menu.Item>
             </Menu>
           </Sider>
-            <Layout>
+            <Layout style={{marginLeft : '250px'}}>
               <Header className="header">
                 <div className="search-box">
                   <Search />

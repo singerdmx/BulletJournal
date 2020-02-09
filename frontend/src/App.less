@@ -1,5 +1,5 @@
 @import '~antd/dist/antd.less';
-@primary-color : #fcd4e5;
+@primary-color : #f78cba;
 @link-color : #fcd4e5;
 
 .App {
@@ -12,8 +12,6 @@
 
 /* ----------------------Header ---------------------- */
 .header {
-  position: fixed;
-  width: 90%;
   background: #fff;
 
   padding: 0 15px;
@@ -49,15 +47,33 @@
 }
 
 /* ----------------------Side----------------------  */
-.icon {
-  height: 50px;
-  line-height: 50px;
-  padding-left: 10px;
-
-  border-bottom: 2px solid #fcd4e5;
+.sider {
+  height: 100vh;
+  background: #fff;
+  position: fixed;
+  box-shadow: 5px 0px 6px -6px rgb(104, 103, 103);
 }
 
-.icon .icon-img {
+.sider .sider-header {
+  height: 50px;
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.sider .sider-header .title {
+  height: 100%;
+  line-height: 55px;
+  margin-left: 1rem;
+}
+
+.sider .sider-header .title h2 {
+  font-family: 'Pacifico';
+  color: #f2448f;
+}
+
+.sider .sider-header .icon-img {
   height: 40px;
 }
 /* ----------------------Body---------------------- */
