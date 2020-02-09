@@ -51,9 +51,7 @@ public class UserClient {
             return user;
         }
         user = getUserByREST(username);
-        user.setName(null);
         redisUserRepository.save(user);
-        user.setName(username);
         return user;
     }
 
