@@ -1,11 +1,17 @@
 package com.bulletjournal.controller.models;
 
+import com.google.gson.annotations.Expose;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Project {
+    @Expose
     private Long id;
 
     @NotBlank
@@ -22,6 +28,10 @@ public class Project {
     @NotNull
     @Valid
     private Group group;
+
+    @Expose
+    @Valid
+    private List<Project> subProjects = new ArrayList<>();
 
     public Project() {
     }
@@ -72,5 +82,39 @@ public class Project {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public List<Project> getSubProjects() {
+        return subProjects;
+    }
+
+    public void addSubProject(Project subProject) {
+        this.subProjects.add(subProject);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Project project = (Project) o;
+        return Objects.equals(id, project.id) &&
+                Objects.equals(name, project.name) &&
+                Objects.equals(owner, project.owner) &&
+                projectType == project.projectType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, owner, projectType);
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", owner='" + owner + '\'' +
+                ", projectType=" + projectType +
+                '}';
     }
 }
