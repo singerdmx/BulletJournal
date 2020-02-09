@@ -4,6 +4,7 @@ import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateProjectParams;
+import com.bulletjournal.repository.models.Group;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +52,8 @@ public class ProjectControllerTest {
         Assert.assertEquals(projectName, created.getName());
         Assert.assertEquals(expectedOwner, created.getOwner());
         Assert.assertEquals(ProjectType.LEDGER, created.getProjectType());
+        Assert.assertEquals(Group.DEFAULT_NAME, created.getGroup().getName());
+        Assert.assertEquals(expectedOwner, created.getGroup().getOwner());
 
         String projectNewName = "P2";
         UpdateProjectParams updateProjectParams = new UpdateProjectParams();
@@ -66,6 +69,8 @@ public class ProjectControllerTest {
         Assert.assertEquals(projectNewName, updated.getName());
         Assert.assertEquals(expectedOwner, updated.getOwner());
         Assert.assertEquals(ProjectType.LEDGER, updated.getProjectType());
+        Assert.assertEquals(Group.DEFAULT_NAME, created.getGroup().getName());
+        Assert.assertEquals(expectedOwner, created.getGroup().getOwner());
     }
 }
 
