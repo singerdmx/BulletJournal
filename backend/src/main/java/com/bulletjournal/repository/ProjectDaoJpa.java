@@ -9,6 +9,7 @@ import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserProjects;
+import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
@@ -75,7 +75,7 @@ public class ProjectDaoJpa {
                     project.getOwner() + " while request is from " + requester);
         }
 
-        updateIfPresent(
+        DaoHelper.updateIfPresent(
                 updateProjectParams.hasName(), updateProjectParams.getName(), (value) -> project.setName(value));
 
         if (updateProjectParams.hasGroupId() &&
@@ -96,11 +96,5 @@ public class ProjectDaoJpa {
         userProjects.setProjects(ProjectRelationsProcessor.processProjectRelations(projects));
         userProjects.setName(user);
         this.userProjectsRepository.save(userProjects);
-    }
-
-    private <T> void updateIfPresent(Boolean isPresent, T value, Consumer<T> getter) {
-        if (isPresent) {
-            getter.accept(value);
-        }
     }
 }

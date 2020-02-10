@@ -1,11 +1,12 @@
 package com.bulletjournal.controller;
 
+import static org.junit.Assert.assertEquals;
+
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateProjectParams;
 import com.bulletjournal.repository.models.Group;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +31,7 @@ import java.util.List;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class ProjectControllerTest {
+    private static final String ROOT_URL = "http://localhost:";
     private TestRestTemplate restTemplate = new TestRestTemplate();
 
     @LocalServerPort
@@ -51,18 +53,18 @@ public class ProjectControllerTest {
         UpdateProjectParams updateProjectParams = new UpdateProjectParams();
         updateProjectParams.setName(projectNewName);
         ResponseEntity<Project> response = this.restTemplate.exchange(
-                "http://localhost:" + randomServerPort + ProjectController.PROJECT_ROUTE,
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateProjectParams),
                 Project.class,
                 p1.getId());
         p1 = response.getBody();
-        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertEquals(projectNewName, p1.getName());
-        Assert.assertEquals(expectedOwner, p1.getOwner());
-        Assert.assertEquals(ProjectType.LEDGER, p1.getProjectType());
-        Assert.assertEquals(Group.DEFAULT_NAME, p1.getGroup().getName());
-        Assert.assertEquals(expectedOwner, p1.getGroup().getOwner());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(projectNewName, p1.getName());
+        assertEquals(expectedOwner, p1.getOwner());
+        assertEquals(ProjectType.LEDGER, p1.getProjectType());
+        assertEquals(Group.DEFAULT_NAME, p1.getGroup().getName());
+        assertEquals(expectedOwner, p1.getGroup().getOwner());
 
         // create other projects
         Project p2 = createProject("P2", expectedOwner);
@@ -93,44 +95,44 @@ public class ProjectControllerTest {
         p5.addSubProject(p6);
         // Set user's project relations
         this.restTemplate.exchange(
-                "http://localhost:" + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.PUT,
                 new HttpEntity<>(projectRelations),
                 Void.class
         );
 
         ResponseEntity<Project[]> projectsResponse = this.restTemplate.exchange(
-                "http://localhost:" + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
                 null,
                 Project[].class);
         Project[] projects = projectsResponse.getBody();
-        Assert.assertEquals(2, projects.length);
-        Assert.assertEquals(p1, projects[0]);
-        Assert.assertEquals(p5, projects[1]);
-        Assert.assertEquals(2, projects[0].getSubProjects().size());
-        Assert.assertEquals(p2, projects[0].getSubProjects().get(0));
-        Assert.assertEquals(p4, projects[0].getSubProjects().get(1));
-        Assert.assertEquals(1, projects[1].getSubProjects().size());
-        Assert.assertEquals(p6, projects[1].getSubProjects().get(0));
-        Assert.assertEquals(1, projects[0].getSubProjects().get(0).getSubProjects().size());
-        Assert.assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
+        assertEquals(2, projects.length);
+        assertEquals(p1, projects[0]);
+        assertEquals(p5, projects[1]);
+        assertEquals(2, projects[0].getSubProjects().size());
+        assertEquals(p2, projects[0].getSubProjects().get(0));
+        assertEquals(p4, projects[0].getSubProjects().get(1));
+        assertEquals(1, projects[1].getSubProjects().size());
+        assertEquals(p6, projects[1].getSubProjects().get(0));
+        assertEquals(1, projects[0].getSubProjects().get(0).getSubProjects().size());
+        assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
     }
 
     private Project createProject(String projectName, String expectedOwner) {
         CreateProjectParams project = new CreateProjectParams(projectName, ProjectType.LEDGER);
         ResponseEntity<Project> response = this.restTemplate.exchange(
-                "http://localhost:" + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(project),
                 Project.class);
         Project created = response.getBody();
-        Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        Assert.assertEquals(projectName, created.getName());
-        Assert.assertEquals(expectedOwner, created.getOwner());
-        Assert.assertEquals(ProjectType.LEDGER, created.getProjectType());
-        Assert.assertEquals(Group.DEFAULT_NAME, created.getGroup().getName());
-        Assert.assertEquals(expectedOwner, created.getGroup().getOwner());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(projectName, created.getName());
+        assertEquals(expectedOwner, created.getOwner());
+        assertEquals(ProjectType.LEDGER, created.getProjectType());
+        assertEquals(Group.DEFAULT_NAME, created.getGroup().getName());
+        assertEquals(expectedOwner, created.getGroup().getOwner());
         return created;
     }
 }
