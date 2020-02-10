@@ -2,6 +2,7 @@ package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -19,12 +20,8 @@ public class User extends NamedModel {
     )
     private Long id;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_groups",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id"))
-    private Set<Group> groups = new HashSet<>();
+    @OneToMany(mappedBy = "user")
+    private Set<UserGroup> groups = new HashSet<>();
 
     @Column(length = 20)
     private String timezone;
@@ -40,13 +37,14 @@ public class User extends NamedModel {
         this.id = id;
     }
 
-    public Set<Group> getGroups() {
+    public Set<UserGroup> getGroups() {
         return groups;
     }
 
     public void addGroup(Group group) {
-        if (!this.groups.contains(group)) {
-            this.groups.add(group);
+        UserGroup userGroup = new UserGroup(this, group);
+        if (!this.groups.contains(userGroup)) {
+            this.groups.add(userGroup);
             group.addUser(this);
         }
     }
@@ -65,5 +63,18 @@ public class User extends NamedModel {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

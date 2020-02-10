@@ -1,10 +1,7 @@
 package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "groups",
@@ -24,8 +21,8 @@ public class Group extends OwnedModel {
     )
     private Long id;
 
-    @ManyToMany(mappedBy = "groups")
-    Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "group")
+    Set<UserGroup> users = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
     private List<Project> projects = new ArrayList<>();
@@ -38,14 +35,15 @@ public class Group extends OwnedModel {
         this.id = id;
     }
 
-    public Set<User> getUsers() {
+    public Set<UserGroup> getUsers() {
         return users;
     }
 
     public void addUser(User user) {
-        if (this.users.contains(user)) {
-            this.users.add(user);
-            user.getGroups().add(this);
+        UserGroup userGroup = new UserGroup(user, this);
+        if (!this.users.contains(userGroup)) {
+            this.users.add(userGroup);
+            user.addGroup(this);
         }
     }
 
@@ -62,5 +60,18 @@ public class Group extends OwnedModel {
 
     public com.bulletjournal.controller.models.Group toPresentationModel() {
         return new com.bulletjournal.controller.models.Group(this.getId(), this.getName(), this.getOwner());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return Objects.equals(id, group.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
