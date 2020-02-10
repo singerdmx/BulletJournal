@@ -10,8 +10,8 @@ public class UserProjects extends AuditModel {
     private String name;
 
     @Lob
-    @Column(columnDefinition="BLOB")
-    private byte[] projects;
+    @Column
+    private String projects;
 
     public String getName() {
         return name;
@@ -21,11 +21,11 @@ public class UserProjects extends AuditModel {
         this.name = name;
     }
 
-    public byte[] getProjects() {
+    public String getProjects() {
         return projects;
     }
 
-    public void setProjects(byte[] projects) {
+    public void setProjects(String projects) {
         this.projects = projects;
     }
 }
