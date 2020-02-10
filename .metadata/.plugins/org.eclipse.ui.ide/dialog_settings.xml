@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<list key="installedFeatures">
+		<item value="com.ianbrandt.tools.m2e.mdp.feature:0.0.4.201409291703"/>
+		<item value="org.eclipse.buildship:2.2.1.v20180125-1441"/>
+		<item value="org.eclipse.egit.gitflow.feature:5.1.0.201809111528-r"/>
+		<item value="org.eclipse.egit:5.1.0.201809111528-r"/>
+		<item value="org.eclipse.emf.common:2.15.0.v20180723-1316"/>
+		<item value="org.eclipse.emf.ecore:2.15.0.v20180722-1159"/>
+		<item value="org.eclipse.epp.mpc:1.7.2.v20180829-1931"/>
+		<item value="org.eclipse.help:2.2.300.v20180906-0745"/>
+		<item value="org.eclipse.jdt:3.15.0.v20180906-0745"/>
+		<item value="org.eclipse.jgit.lfs:5.1.0.201809111528-r"/>
+		<item value="org.eclipse.jgit:5.1.0.201809111528-r"/>
+		<item value="org.eclipse.m2e.feature:1.9.1.20180912-1601"/>
+		<item value="org.eclipse.m2e.logback.feature:1.9.1.20180912-1601"/>
+		<item value="org.eclipse.pde:3.13.200.v20180906-0745"/>
+		<item value="org.eclipse.platform:4.9.0.v20180906-1121"/>
+		<item value="org.eclipse.rcp:4.9.0.v20180906-1121"/>
+		<item value="org.eclipse.tm.terminal.control.feature:4.5.0.201809101428"/>
+		<item value="org.eclipse.tm.terminal.feature:4.5.0.201809101428"/>
+		<item value="org.eclipse.tm.terminal.view.feature:4.5.0.201809101428"/>
+		<item value="org.eclipse.userstorage:1.1.0.v20170526-1605"/>
+		<item value="org.eclipse.wst.jsdt.chromium.debug.feature:0.6.0.v201705091354"/>
+		<item value="org.eclipse.wst.jsdt.feature:2.1.1.v201804042202"/>
+		<item value="org.eclipse.wst.json_ui.feature:1.1.3.v201807251925"/>
+		<item value="org.eclipse.wst.web_ui.feature:3.11.0.v201808220605"/>
+		<item value="org.eclipse.wst.xml_ui.feature:3.11.0.v201807252207"/>
+		<item value="org.jboss.tools.m2e.wro4j.feature:1.1.0.201406251020"/>
+		<item value="org.jboss.tools.maven.apt.feature:1.5.0.201805160042"/>
+		<item value="org.sonatype.m2e.buildhelper.feature:0.15.0.201207090124"/>
+		<item value="org.sonatype.m2e.egit.feature:0.15.1.201806191431"/>
+		<item value="org.sonatype.m2e.mavenarchiver.feature:0.17.2.201606141937-signed-20160830073346"/>
+	</list>
+</section>

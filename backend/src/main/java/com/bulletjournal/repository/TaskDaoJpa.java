@@ -18,7 +18,7 @@ public class TaskDaoJpa {
     private ProjectRepository projectRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task create(Long projectId, String assignedTo, String name, String createdBy) {
+    public Task create(Long projectId, String assignedTo, String dueDate, String dueTime, String createdBy, String name) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -26,8 +26,20 @@ public class TaskDaoJpa {
         Task task = new Task();
         task.setProject(project);
         task.setAssignedTo(assignedTo);
-        task.setName(name);
+        task.setDueDate(dueDate);
+        task.setDueTime(dueTime);
         task.setCreatedBy(createdBy);
+        task.setName(name);
         return this.taskRepository.save(task);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Task update(Long taskId, String assignedTo, String dueDate, String dueTime, String createdBy, String name) {
+        Task task = this.taskRepository
+                .findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task " + projectId + " not found"));
+
+        return this.taskRepository.save(task);
+    }
+
 }
