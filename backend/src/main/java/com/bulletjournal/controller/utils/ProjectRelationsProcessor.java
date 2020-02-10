@@ -11,12 +11,15 @@ import java.util.Map;
 
 public class ProjectRelationsProcessor {
 
+    private static final String SUB_RPOJECTS_KEY = "subProjects";
+    private static final String SUB_RPOJECTS_KEY_REPLACEMENT = "s";
     private static final Gson GSON = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
 
     public static List<Project> processProjectRelations(
             Map<Long, com.bulletjournal.repository.models.Project> projectMap, String projectRelations) {
-        Project[] list = GSON.fromJson(projectRelations, Project[].class);
+        Project[] list = GSON.fromJson(
+                projectRelations.replace(SUB_RPOJECTS_KEY_REPLACEMENT, SUB_RPOJECTS_KEY), Project[].class);
         return merge(projectMap, Arrays.asList(list));
     }
 
@@ -36,6 +39,7 @@ public class ProjectRelationsProcessor {
 
     public static String processProjectRelations(List<Project> projects) {
         String jsonString = GSON.toJson(projects);
-        return jsonString;
+        // replace "subProjects" with "s" to save space
+        return jsonString.replace(SUB_RPOJECTS_KEY, SUB_RPOJECTS_KEY_REPLACEMENT);
     }
 }
