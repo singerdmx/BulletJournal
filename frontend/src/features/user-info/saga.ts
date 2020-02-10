@@ -11,7 +11,7 @@ function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
 function* userInfoUpdate(action: PayloadAction<UpdateUserInfo>){
     try {
         const data =  yield call(fetchUserInfo);
-        yield put(userActions.UserDataReceived({username: "fdfdf", avatar: "fdfdfd"}))
+        yield put(userActions.UserDataReceived({username: data.name, avatar: data.avatar}))
     } catch(error) {
         yield call(toast.error, `Error Received: ${error}`)
     }
