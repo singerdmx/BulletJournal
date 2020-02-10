@@ -45,14 +45,12 @@ public class ProjectControllerTest {
         String projectName = "P0";
         String expectedOwner = "BulletJournal";
         Project p1 = createProject(projectName, expectedOwner);
-        ResponseEntity<Project> response;
-        CreateProjectParams project;
 
         // update project name from "P0" to "P1"
         String projectNewName = "P1";
         UpdateProjectParams updateProjectParams = new UpdateProjectParams();
         updateProjectParams.setName(projectNewName);
-        response = this.restTemplate.exchange(
+        ResponseEntity<Project> response = this.restTemplate.exchange(
                 "http://localhost:" + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateProjectParams),
