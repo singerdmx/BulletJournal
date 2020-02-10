@@ -1,5 +1,8 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.authz.ContentType;
+import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.UpdateProjectParams;
 import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
@@ -38,6 +41,9 @@ public class ProjectDaoJpa {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
+    @Autowired
+    private AuthorizationService authorizationService;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Project> getProjects(String owner) {
         UserProjects userProjects = this.userProjectsRepository.findById(owner)
@@ -70,10 +76,8 @@ public class ProjectDaoJpa {
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
-        if (!Objects.equals(project.getOwner(), requester)) {
-            throw new UnAuthorizedException("Project " + projectId + " is owner by " +
-                    project.getOwner() + " while request is from " + requester);
-        }
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                project.getOwner(), requester, ContentType.PROJECT, Operation.UPDATE, projectId);
 
         DaoHelper.updateIfPresent(
                 updateProjectParams.hasName(), updateProjectParams.getName(), (value) -> project.setName(value));
