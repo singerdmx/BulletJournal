@@ -17,14 +17,20 @@ public class User extends NamedModel {
             name = "user_generator",
             sequenceName = "user_sequence"
     )
-    Long id;
+    private Long id;
 
     @ManyToMany
     @JoinTable(
             name = "user_groups",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id"))
-    Set<Group> groups = new HashSet<>();
+    private Set<Group> groups = new HashSet<>();
+
+    @Column(length = 20)
+    private String timezone;
+
+    @Column(length = 15)
+    private String currency;
 
     public Long getId() {
         return id;
@@ -43,5 +49,21 @@ public class User extends NamedModel {
             this.groups.add(group);
             group.addUser(this);
         }
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }

@@ -18,14 +18,14 @@ public class TaskDaoJpa {
     private ProjectRepository projectRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task create(Long projectId, String owner, String name, String createdBy) {
+    public Task create(Long projectId, String assignedTo, String name, String createdBy) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
         Task task = new Task();
         task.setProject(project);
-        task.setOwner(owner);
+        task.setAssignedTo(assignedTo);
         task.setName(name);
         task.setCreatedBy(createdBy);
         return this.taskRepository.save(task);

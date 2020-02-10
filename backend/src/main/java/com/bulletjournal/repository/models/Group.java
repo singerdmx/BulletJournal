@@ -45,7 +45,7 @@ public class Group extends OwnedModel {
     public void addUser(User user) {
         if (this.users.contains(user)) {
             this.users.add(user);
-            user.groups.add(this);
+            user.getGroups().add(this);
         }
     }
 

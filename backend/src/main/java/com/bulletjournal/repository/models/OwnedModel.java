@@ -10,7 +10,7 @@ public abstract class OwnedModel extends NamedModel {
 
     @NotBlank
     @Size(min = 2, max = 100)
-    @Column
+    @Column(length = 100)
     private String owner;
 
     public String getOwner() {

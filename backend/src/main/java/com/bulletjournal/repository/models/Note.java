@@ -4,7 +4,6 @@ import javax.persistence.*;
 
 /**
  * This class is for ProjectType.NOTE
- * {@link ProjectItemModel#owner} is null
  */
 @Entity
 @Table(name = "notes")

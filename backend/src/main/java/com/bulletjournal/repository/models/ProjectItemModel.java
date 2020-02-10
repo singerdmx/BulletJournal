@@ -15,11 +15,11 @@ import javax.validation.constraints.Size;
  * {@link Ledger}: for ProjectType.LEDGER
  */
 @MappedSuperclass
-public abstract class ProjectItemModel extends OwnedModel {
+public abstract class ProjectItemModel extends NamedModel {
 
     @NotBlank
     @Size(min = 1, max = 100)
-    @Column(name = "created_by", nullable = false, updatable = false)
+    @Column(name = "created_by", nullable = false, updatable = false, length = 100)
     private String createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
