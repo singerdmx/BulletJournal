@@ -1,12 +1,9 @@
 package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.Project;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +15,7 @@ public class ProjectRelationsProcessor {
             .excludeFieldsWithoutExposeAnnotation().create();
 
     public static List<Project> processProjectRelations(
-            Map<Long, com.bulletjournal.repository.models.Project> projectMap, byte[] projects) {
-        String projectRelations = new String(projects);
+            Map<Long, com.bulletjournal.repository.models.Project> projectMap, String projectRelations) {
         Project[] list = GSON.fromJson(projectRelations, Project[].class);
         return merge(projectMap, Arrays.asList(list));
     }
@@ -38,14 +34,8 @@ public class ProjectRelationsProcessor {
         return result;
     }
 
-    public static byte[] processProjectRelations(List<Project> projects) {
+    public static String processProjectRelations(List<Project> projects) {
         String jsonString = GSON.toJson(projects);
-        byte[] projectRelations;
-        try {
-            projectRelations = jsonString.getBytes(StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ex) {
-            throw new BadRequestException("Invalid projectRelations", ex);
-        }
-        return projectRelations;
+        return jsonString;
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,18 +46,6 @@ public class ProjectDaoJpa {
                 .stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
         return ProjectRelationsProcessor.processProjectRelations(
                 projects, userProjects.getProjects());
-    }
-
-    private List<Project> merge(Map<Long, Project> projects,
-                                List<com.bulletjournal.controller.models.Project> projectRelations) {
-        List<Project> result = new ArrayList<>();
-        for (com.bulletjournal.controller.models.Project p : projectRelations) {
-            result.add(projects.get(p.getId()));
-            for (com.bulletjournal.controller.models.Project subProject : p.getSubProjects()) {
-
-            }
-        }
-        return result;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
