@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.UserGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,6 +19,9 @@ public class UserDaoJpa {
 
     @Autowired
     private GroupRepository groupRepository;
+
+    @Autowired
+    private UserGroupRepository userGroupRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name) {
@@ -36,7 +40,7 @@ public class UserDaoJpa {
         group = this.groupRepository.save(group);
 
         user.addGroup(group);
-        this.groupRepository.save(group);
+        this.userGroupRepository.save(new UserGroup(user, group, true));
         return this.userRepository.save(user);
     }
 }

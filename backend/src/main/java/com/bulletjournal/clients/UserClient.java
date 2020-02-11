@@ -65,13 +65,11 @@ public class UserClient {
             return user;
         }
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                this.userDaoJpa.create(username);
-            } catch (ResourceAlreadyExistException ex) {
-                LOGGER.info(username + " already exists");
-            }
-        });
+        try {
+            this.userDaoJpa.create(username);
+        } catch (ResourceAlreadyExistException ex) {
+            LOGGER.info(username + " already exists");
+        }
         user = getUserByREST(username);
         redisUserRepository.save(user);
         return user;

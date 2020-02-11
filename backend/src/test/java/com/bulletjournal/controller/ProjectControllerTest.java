@@ -1,7 +1,10 @@
 package com.bulletjournal.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.repository.models.Group;
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +21,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Tests {@link ProjectController}
  */
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 @ActiveProfiles("test")
 public class ProjectControllerTest {
     private static final String ROOT_URL = "http://localhost:";
+    private final String expectedOwner = "BulletJournal";
     private TestRestTemplate restTemplate = new TestRestTemplate();
 
     @LocalServerPort
@@ -41,7 +43,6 @@ public class ProjectControllerTest {
     @Test
     public void testCRUD() throws Exception {
         String projectName = "P0";
-        String expectedOwner = "BulletJournal";
         createGroups(expectedOwner);
 
         Project p1 = createProject(projectName, expectedOwner);
@@ -61,7 +62,7 @@ public class ProjectControllerTest {
         assertEquals(projectNewName, p1.getName());
         assertEquals(expectedOwner, p1.getOwner());
         assertEquals(ProjectType.LEDGER, p1.getProjectType());
-        assertEquals(Group.DEFAULT_NAME, p1.getGroup().getName());
+        assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, p1.getGroup().getName());
         assertEquals(expectedOwner, p1.getGroup().getOwner());
 
         // create other projects
@@ -117,23 +118,38 @@ public class ProjectControllerTest {
         assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
     }
 
-    private List<Group> createGroups(String owner) {
-        Group g = createGroup(Group.DEFAULT_NAME, owner);
-        Group g1 = createGroup("G0", owner);
-        Group g2 = createGroup("G2", owner);
-        Group g3 = createGroup("G3", owner);
+    private List<Group> getGroups(List<Group> expected) {
         ResponseEntity<Group[]> groupsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
                 HttpMethod.GET,
                 null,
                 Group[].class);
         List<Group> groups = Arrays.asList(groupsResponse.getBody());
-        assertEquals(4, groups.size());
         Collections.sort(groups, Comparator.comparing(Group::getName));
-        assertEquals(g1, groups.get(1));
-        assertEquals(g2, groups.get(2));
-        assertEquals(g3, groups.get(3));
-        assertEquals(Group.DEFAULT_NAME, groups.get(0).getName());
+        if (expected != null) {
+            assertEquals(expected.size(), groups.size());
+            for (int i = 0; i < expected.size(); i++) {
+                assertEquals(expected.get(i), groups.get(i));
+                List<UserGroup> userGroups = groups.get(i).getUsers();
+                assertEquals(1, userGroups.size());
+                assertEquals(true, userGroups.get(0).isAccepted());
+                assertEquals(expectedOwner, userGroups.get(0).getName());
+                assertNotNull(userGroups.get(0).getThumbnail());
+                assertNotNull(userGroups.get(0).getAvatar());
+            }
+        }
+        return groups;
+    }
+
+    private List<Group> createGroups(String owner) {
+        List<Group> groups = getGroups(null);
+        assertEquals(1, groups.size());
+        Group g = groups.get(0);
+        Group g1 = createGroup("G0", owner);
+        Group g2 = createGroup("G2", owner);
+        Group g3 = createGroup("G3", owner);
+        getGroups(ImmutableList.of(g, g1, g2, g3));
+
         String groupNewName = "G1";
         UpdateGroupParams updateGroupParams = new UpdateGroupParams();
         updateGroupParams.setName(groupNewName);
@@ -157,13 +173,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g3.getId());
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-        groupsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-                HttpMethod.GET,
-                null,
-                Group[].class);
-        groups = Arrays.asList(groupsResponse.getBody());
-        assertEquals(3, groups.size());
+        getGroups(ImmutableList.of(g, g1, g2));
 
         // Delete Group "Default"
         deleteResponse = this.restTemplate.exchange(
@@ -173,15 +183,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
-        groupsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-                HttpMethod.GET,
-                null,
-                Group[].class);
-        groups = Arrays.asList(groupsResponse.getBody());
-        assertEquals(3, groups.size());
-
-        return groups;
+        return getGroups(ImmutableList.of(g, g1, g2));
     }
 
     private Group createGroup(String groupName, String expectedOwner) {
@@ -195,7 +197,6 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(groupName, created.getName());
         assertEquals(expectedOwner, created.getOwner());
-
 
         return created;
     }
@@ -212,7 +213,7 @@ public class ProjectControllerTest {
         assertEquals(projectName, created.getName());
         assertEquals(expectedOwner, created.getOwner());
         assertEquals(ProjectType.LEDGER, created.getProjectType());
-        assertEquals(Group.DEFAULT_NAME, created.getGroup().getName());
+        assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, created.getGroup().getName());
         assertEquals(expectedOwner, created.getGroup().getOwner());
         return created;
     }

@@ -1,9 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.CreateGroupParams;
-import com.bulletjournal.controller.models.Group;
-import com.bulletjournal.controller.models.UpdateGroupParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.repository.GroupDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class GroupController {
@@ -23,6 +22,9 @@ public class GroupController {
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
+
+    @Autowired
+    private UserClient userClient;
 
     @PostMapping(GROUPS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,7 +50,15 @@ public class GroupController {
     @GetMapping(GROUPS_ROUTE)
     public List<Group> getGroups() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.groupDaoJpa.getGroups(username);
+        List<Group> groups = this.groupDaoJpa.getGroups(username);
+        groups.stream().forEach(g -> {
+            List<UserGroup> users = g.getUsers().stream()
+                    .map(user -> {
+                        User u = this.userClient.getUser(user.getName());
+                        return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted());
+                    }).collect(Collectors.toList());
+            g.setUsers(users);
+        });
+        return groups;
     }
-
 }

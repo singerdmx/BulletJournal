@@ -17,7 +17,8 @@ public class Group extends OwnedModel {
     @GeneratedValue(generator = "group_generator")
     @SequenceGenerator(
             name = "group_generator",
-            sequenceName = "group_sequence"
+            sequenceName = "group_sequence",
+            initialValue = 100
     )
     private Long id;
 

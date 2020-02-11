@@ -27,8 +27,13 @@ public class UserGroup {
     }
 
     public UserGroup(User user, Group group) {
+        this(user, group, false);
+    }
+
+    public UserGroup(User user, Group group, boolean accepted) {
         this.user = user;
         this.group = group;
+        this.accepted = accepted;
         this.id = new UserGroupKey(user.getId(), group.getId());
     }
 

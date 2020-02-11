@@ -19,10 +19,12 @@ public class User implements Serializable {
     public User() {
     }
 
+    public User(String name) {
+        this(name, null, null);
+    }
+
     public User(String name, String thumbnail, String avatar) {
-        this.name = name;
-        this.thumbnail = thumbnail;
-        this.avatar = avatar;
+        this(null, name, thumbnail, avatar);
     }
 
     public User(Integer id, String name, String thumbnail, String avatar) {
