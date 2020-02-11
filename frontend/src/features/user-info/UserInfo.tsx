@@ -13,26 +13,29 @@ type UserProps = {
   updateUserInfo: () => void;
 };
 
-const UserInfo = (props: UserProps) => {
-  console.log(props);
-  return (
-    <div
-      onClick={() => props.updateUserInfo()}
-      style={{
-        display: 'flex',
-        width: '128px',
-        justifyContent: 'space-around',
-        alignItems: 'center'
-      }}
-    >
-      <div style={{ flexShrink: 2 }}>{props.username || 'Log In'}</div>
-      <Dropdown overlay={dropdown} trigger={['click']}>
-        <Avatar src={props.avatar} style={{ cursor: 'pointer', flexShrink: 1 }}>
-          {props.username || 'User'}
-        </Avatar>
-      </Dropdown>
-    </div>
-  );
+class UserInfo extends React.Component<UserProps> {
+  componentDidMount () {
+    this.props.updateUserInfo();
+  }
+  render() {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          width: '128px',
+          justifyContent: 'space-around',
+          alignItems: 'center'
+        }}
+      >
+        <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
+        <Dropdown overlay={dropdown} trigger={['click']}>
+          <Avatar src={this.props.avatar} style={{ cursor: 'pointer', flexShrink: 1 }}>
+            {this.props.username || 'User'}
+          </Avatar>
+        </Dropdown>
+      </div>
+    );
+  }
 };
 
 const mapStateToProps = (state: IState) => ({
