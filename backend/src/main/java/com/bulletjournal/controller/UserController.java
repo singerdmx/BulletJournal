@@ -21,6 +21,11 @@ public class UserController {
     @Autowired
     private SSOConfig ssoConfig;
 
+    @GetMapping("/api/users/{username}")
+    public User getUser(String username) {
+        return userClient.getUser(username);
+    }
+
     @GetMapping(MYSELF_ROUTE)
     public User getMyself() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
