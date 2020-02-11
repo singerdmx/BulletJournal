@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Icon, Layout } from 'antd';
-import { withRouter, RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps } from 'react-router';
+import * as logo from '../../assets/favicon466.ico';
 
 import './side.styles.less';
 
@@ -20,7 +21,7 @@ class SideLayout extends React.Component<PathComponentProps> {
     return (
       <Sider width={249} className="sider">
         <div className="sider-header">
-          <img src="favicon466.ico" alt="Icon" className="icon-img" />
+          <img src={logo} alt="Icon" className="icon-img" />
           <div className="title">
             <h2>Bullet Journal</h2>
           </div>
