@@ -1,11 +1,13 @@
 package com.bulletjournal.controller.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
 
 @RedisHash("User")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User implements Serializable {
 
     @Id
@@ -15,6 +17,12 @@ public class User implements Serializable {
     private String avatar;
 
     public User() {
+    }
+
+    public User(String name, String thumbnail, String avatar) {
+        this.name = name;
+        this.thumbnail = thumbnail;
+        this.avatar = avatar;
     }
 
     public User(Integer id, String name, String thumbnail, String avatar) {

@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.ContentType;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.UpdateGroupParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Group;
@@ -32,6 +33,9 @@ public class GroupDaoJpa {
 
     @Autowired
     private AuthorizationService authorizationService;
+
+    @Autowired
+    private UserClient userClient;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Group create(String name, String owner) {
@@ -79,11 +83,15 @@ public class GroupDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Group> getGroups(String owner) {
         User user = this.userRepository.findByName(owner).get(0);
-        return this.userGroupRepository.findByUser(user.getId())
+        return user.getGroups()
                 .stream()
                 .map(userGroup -> {
                     com.bulletjournal.controller.models.Group g = userGroup.getGroup().toPresentationModel();
                     g.setAccepted(userGroup.isAccepted());
+                    g.setUsers(userGroup.getGroup().getUsers()
+                            .stream()
+                            .map(u -> this.userClient.getUser(u.getUser().getName()))
+                            .collect(Collectors.toList()));
                     return g;
                 })
                 .collect(Collectors.toList());

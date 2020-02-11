@@ -69,7 +69,7 @@ public class UserClient {
             try {
                 this.userDaoJpa.create(username);
             } catch (ResourceAlreadyExistException ex) {
-                LOGGER.info("OK to ignore", ex);
+                LOGGER.info(username + " already exists");
             }
         });
         user = getUserByREST(username);

@@ -1,8 +1,12 @@
 package com.bulletjournal.controller.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Group {
     private Long id;
 
@@ -15,6 +19,8 @@ public class Group {
     private String owner;
 
     private boolean accepted;
+
+    private List<User> users;
 
     public Group() {
     }
@@ -65,5 +71,13 @@ public class Group {
 
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

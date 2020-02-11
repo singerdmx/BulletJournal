@@ -4,9 +4,6 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@NamedQuery(
-        name = "UserGroup.findByUser",
-        query = "SELECT u FROM UserGroup u WHERE LOWER(u.user) = LOWER(?1)")
 @Table(name = "user_groups",
         indexes = {@Index(name = "user_group_index", columnList = "user_id")})
 public class UserGroup {
