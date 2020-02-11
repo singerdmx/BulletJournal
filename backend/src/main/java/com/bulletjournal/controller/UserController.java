@@ -13,6 +13,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @RestController
 public class UserController {
     public static final String MYSELF_ROUTE = "/api/myself";
+    public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
 
     @Autowired
     private UserClient userClient;
@@ -26,7 +27,7 @@ public class UserController {
         return userClient.getUser(username);
     }
 
-    @PostMapping("/api/myself/logout")
+    @PostMapping(LOGOUT_MYSELF_ROUTE)
     public RedirectView logout() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.userClient.logout(username);
