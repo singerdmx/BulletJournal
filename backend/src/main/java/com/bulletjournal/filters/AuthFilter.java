@@ -44,7 +44,6 @@ public class AuthFilter implements Filter {
             while (headerNames.hasMoreElements()) {
                 String name = headerNames.nextElement();
                 String val = request.getHeader(name);
-                LOGGER.info("Header: " + name + " value:" + val);
                 if (UserClient.USER_NAME_KEY.equals(name)) {
                     username = URLDecoder.decode(val, StandardCharsets.UTF_8.toString());
                     break;
@@ -57,6 +56,7 @@ public class AuthFilter implements Filter {
         }
 
         if (username == null) {
+            LOGGER.error("not logged in");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
