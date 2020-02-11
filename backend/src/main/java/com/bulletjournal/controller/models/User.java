@@ -9,21 +9,27 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @Id
+    private Integer id;
     private String name;
     private String thumbnail;
     private String avatar;
-    private String timezone;
-    private String email;
 
     public User() {
     }
 
-    public User(String name, String thumbnail, String avatar, String timezone, String email) {
+    public User(Integer id, String name, String thumbnail, String avatar) {
+        this.id = id;
         this.name = name;
         this.thumbnail = thumbnail;
         this.avatar = avatar;
-        this.timezone = timezone;
-        this.email = email;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -50,30 +56,13 @@ public class User implements Serializable {
         this.avatar = avatar;
     }
 
-    public String getTimezone() {
-        return timezone;
-    }
-
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
-    }
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", avatar='" + avatar + '\'' +
-                ", timezone='" + timezone + '\'' +
-                ", email='" + email + '\'' +
                 '}';
     }
 }
