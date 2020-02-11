@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.ContentType;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.controller.models.AddUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Group;
@@ -25,17 +26,17 @@ public class GroupDaoJpa {
     private UserGroupRepository userGroupRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private GroupRepository groupRepository;
 
     @Autowired
-    private GroupRepository groupRepository;
+    private UserDaoJpa userDaoJpa;
 
     @Autowired
     private AuthorizationService authorizationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Group create(String name, String owner) {
-        User user = this.userRepository.findByName(owner).get(0);
+        User user = this.userDaoJpa.getByName(owner);
         Group group = new Group();
         group.setName(name);
         group.setOwner(owner);
@@ -78,7 +79,7 @@ public class GroupDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Group> getGroups(String owner) {
-        User user = this.userRepository.findByName(owner).get(0);
+        User user = this.userDaoJpa.getByName(owner);
         return user.getGroups()
                 .stream()
                 .map(userGroup -> {
@@ -92,5 +93,21 @@ public class GroupDaoJpa {
                     return g;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Group> addUserGroups(
+            String owner,
+            List<AddUserGroupParams> addUserGroupsParams) {
+        for (AddUserGroupParams addUserGroupParams : addUserGroupsParams) {
+            Long groupId = addUserGroupParams.getGroupId();
+            Group group = this.groupRepository.findById(groupId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
+            this.authorizationService.checkAuthorizedToOperateOnContent(
+                    group.getOwner(), owner, ContentType.GROUP, Operation.UPDATE, groupId);
+            User user = this.userDaoJpa.getByName(addUserGroupParams.getUsername());
+            this.userGroupRepository.save(new UserGroup(user, group, false));
+        }
+        return getGroups(owner);
     }
 }

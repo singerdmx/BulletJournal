@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.repository.GroupDaoJpa;
+import com.google.common.collect.ImmutableList;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,11 @@ public class GroupController {
     public List<Group> getGroups() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Group> groups = this.groupDaoJpa.getGroups(username);
+        addUserToGroup(groups);
+        return groups;
+    }
+
+    private void addUserToGroup(List<Group> groups) {
         groups.stream().forEach(g -> {
             List<UserGroup> users = g.getUsers().stream()
                     .map(user -> {
@@ -59,6 +65,21 @@ public class GroupController {
                     }).collect(Collectors.toList());
             g.setUsers(users);
         });
+    }
+
+    @PostMapping("/addUserGroups")
+    public List<Group> addUserGroups(AddUserGroupsParams addUserGroupsParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Group> groups = this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups());
+        addUserToGroup(groups);
+        return groups;
+    }
+
+    @PostMapping("/addUserGroup")
+    public List<Group> addUserGroups(AddUserGroupParams addUserGroupParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Group> groups = this.groupDaoJpa.addUserGroups(username, ImmutableList.of(addUserGroupParams));
+        addUserToGroup(groups);
         return groups;
     }
 }

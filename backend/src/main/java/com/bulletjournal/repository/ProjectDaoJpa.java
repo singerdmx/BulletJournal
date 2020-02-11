@@ -9,7 +9,6 @@ import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserProjects;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +31,7 @@ public class ProjectDaoJpa {
     private GroupRepository groupRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserProjectsRepository userProjectsRepository;
-
-    @Autowired
-    private UserDaoJpa userDaoJpa;
 
     @Autowired
     private AuthorizationService authorizationService;
@@ -55,11 +48,6 @@ public class ProjectDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project create(CreateProjectParams createProjectParams, String owner) {
-        List<User> userList = this.userRepository.findByName(owner);
-        if (userList.isEmpty()) {
-            this.userDaoJpa.create(owner);
-        }
-
         Project project = new Project();
         project.setOwner(owner);
         project.setName(createProjectParams.getName());

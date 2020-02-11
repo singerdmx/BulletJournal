@@ -1,6 +1,7 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
@@ -42,5 +43,19 @@ public class UserDaoJpa {
         user.addGroup(group);
         this.userGroupRepository.save(new UserGroup(user, group, true));
         return this.userRepository.save(user);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public User getByName(String name) {
+        List<User> userList = this.userRepository.findByName(name);
+        if (userList.isEmpty()) {
+            throw new ResourceNotFoundException("User " + name + " does not exist");
+        }
+
+        if (userList.size() > 1) {
+            throw new IllegalStateException("More than one user " + name + " exist");
+        }
+
+        return userList.get(0);
     }
 }
