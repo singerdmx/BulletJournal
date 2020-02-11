@@ -14,3 +14,5 @@ e.g.
 DOCKER_BUILDKIT=1 docker build -t mwangxx/bulletjournal-backend .
 docker push mwangxx/bulletjournal-backend:latest
 ```
+
+Note: bring up redis container in order for tests to pass.
