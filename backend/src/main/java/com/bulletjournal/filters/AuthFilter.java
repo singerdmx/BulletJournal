@@ -10,11 +10,13 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
+import com.bulletjournal.controller.UserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -44,7 +46,6 @@ public class AuthFilter implements Filter {
             while (headerNames.hasMoreElements()) {
                 String name = headerNames.nextElement();
                 String val = request.getHeader(name);
-                LOGGER.info("Header: " + name + " value:" + val);
                 if (UserClient.USER_NAME_KEY.equals(name)) {
                     username = URLDecoder.decode(val, StandardCharsets.UTF_8.toString());
                     break;
@@ -57,11 +58,20 @@ public class AuthFilter implements Filter {
         }
 
         if (username == null) {
+            LOGGER.error("not logged in");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
         MDC.put(UserClient.USER_NAME_KEY, username);
         chain.doFilter(req, res);
+
+        if (UserController.LOGOUT_MYSELF_ROUTE.equals(request.getRequestURI())) {
+            Cookie cookie = new Cookie("__discourse_proxy", null);
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
     }
 
 }
