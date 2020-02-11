@@ -1,4 +1,6 @@
-Make sure 8080 is available; then start backend
+## How to run Spring Boot App locally
+
+Make sure port 8080 is available and then start backend by running the following command:
 ```
 ./gradlew bootRun
 ```
