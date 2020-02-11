@@ -1,10 +1,7 @@
 import React from 'react';
-import { Layout } from 'antd';
-import { ToastContainer } from 'react-toastify';
-import SideLayout from './layouts/side/side.layout';
-import HeaderLayout from './layouts/header/header.layout';
-import ContentLayout from './layouts/content/content.layout';
-import FooterLayout from './layouts/footer/footer.layout';
+import {Switch, Route} from 'react-router-dom';
+import HomePage from './pages/home.pages';
+import SettingPage from './pages/settings.page';
 
 import './App.less';
 
@@ -12,15 +9,10 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <Layout className="layout">
-          <SideLayout />
-          <Layout style={{ marginLeft: '250px' }}>
-            <HeaderLayout />
-            <ContentLayout />
-            <ToastContainer />
-            <FooterLayout />
-          </Layout>
-        </Layout>
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+          <Route path="/settings" component={SettingPage}/>
+        </Switch>
       </div>
     );
   }
