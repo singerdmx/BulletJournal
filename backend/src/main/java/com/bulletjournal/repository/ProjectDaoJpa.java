@@ -7,7 +7,6 @@ import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.UpdateProjectParams;
 import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;

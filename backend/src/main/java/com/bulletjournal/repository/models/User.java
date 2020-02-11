@@ -20,7 +20,7 @@ public class User extends NamedModel {
     )
     private Long id;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
 
     @Column(length = 20)

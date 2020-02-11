@@ -14,15 +14,25 @@ public class Group {
     @Size(min = 1, max = 100)
     private String owner;
 
+    private boolean accepted;
+
     public Group() {
     }
 
     public Group(Long id,
                  @NotBlank @Size(min = 1, max = 100) String name,
                  @NotBlank @Size(min = 1, max = 100) String owner) {
+        this(id, name, owner, false);
+    }
+
+    public Group(Long id,
+                 @NotBlank @Size(min = 1, max = 100) String name,
+                 @NotBlank @Size(min = 1, max = 100) String owner,
+                 boolean accepted) {
         this.id = id;
         this.name = name;
         this.owner = owner;
+        this.accepted = accepted;
     }
 
     public Long getId() {
@@ -47,5 +57,13 @@ public class Group {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
     }
 }

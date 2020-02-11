@@ -3,7 +3,12 @@ package com.bulletjournal.repository.models;
 import javax.persistence.*;
 import java.util.Objects;
 
-@Entity(name = "user_groups")
+@Entity
+@NamedQuery(
+        name = "UserGroup.findByUser",
+        query = "SELECT u FROM UserGroup u WHERE LOWER(u.user) = LOWER(?1)")
+@Table(name = "user_groups",
+        indexes = {@Index(name = "user_group_index", columnList = "user_id")})
 public class UserGroup {
 
     @EmbeddedId
@@ -27,6 +32,7 @@ public class UserGroup {
     public UserGroup(User user, Group group) {
         this.user = user;
         this.group = group;
+        this.id = new UserGroupKey(user.getId(), group.getId());
     }
 
     public UserGroupKey getId() {

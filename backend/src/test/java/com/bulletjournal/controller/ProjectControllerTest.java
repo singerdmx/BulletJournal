@@ -1,11 +1,6 @@
 package com.bulletjournal.controller;
 
-import static org.junit.Assert.assertEquals;
-
-import com.bulletjournal.controller.models.CreateProjectParams;
-import com.bulletjournal.controller.models.Project;
-import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.UpdateProjectParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.repository.models.Group;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,8 +16,9 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests {@link ProjectController}
@@ -46,6 +42,8 @@ public class ProjectControllerTest {
     public void testCRUD() throws Exception {
         String projectName = "P0";
         String expectedOwner = "BulletJournal";
+        createGroups(expectedOwner);
+
         Project p1 = createProject(projectName, expectedOwner);
 
         // update project name from "P0" to "P1"
@@ -117,6 +115,89 @@ public class ProjectControllerTest {
         assertEquals(p6, projects[1].getSubProjects().get(0));
         assertEquals(1, projects[0].getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
+    }
+
+    private List<Group> createGroups(String owner) {
+        Group g = createGroup(Group.DEFAULT_NAME, owner);
+        Group g1 = createGroup("G0", owner);
+        Group g2 = createGroup("G2", owner);
+        Group g3 = createGroup("G3", owner);
+        ResponseEntity<Group[]> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Group[].class);
+        List<Group> groups = Arrays.asList(groupsResponse.getBody());
+        assertEquals(4, groups.size());
+        Collections.sort(groups, Comparator.comparing(Group::getName));
+        assertEquals(g1, groups.get(1));
+        assertEquals(g2, groups.get(2));
+        assertEquals(g3, groups.get(3));
+        assertEquals(Group.DEFAULT_NAME, groups.get(0).getName());
+        String groupNewName = "G1";
+        UpdateGroupParams updateGroupParams = new UpdateGroupParams();
+        updateGroupParams.setName(groupNewName);
+
+        // Update group name from "G0" to "G1"
+        ResponseEntity<Group> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUP_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateGroupParams),
+                Group.class,
+                g1.getId());
+        g1 = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(groupNewName, g1.getName());
+
+        // Delete Group "G3"
+        ResponseEntity<?> deleteResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUP_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Void.class,
+                g3.getId());
+        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
+        groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Group[].class);
+        groups = Arrays.asList(groupsResponse.getBody());
+        assertEquals(3, groups.size());
+
+        // Delete Group "Default"
+        deleteResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUP_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Void.class,
+                g.getId());
+        assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
+        groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Group[].class);
+        groups = Arrays.asList(groupsResponse.getBody());
+        assertEquals(3, groups.size());
+
+        return groups;
+    }
+
+    private Group createGroup(String groupName, String expectedOwner) {
+        CreateGroupParams group = new CreateGroupParams(groupName);
+        ResponseEntity<Group> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(group),
+                Group.class);
+        Group created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(groupName, created.getName());
+        assertEquals(expectedOwner, created.getOwner());
+
+
+        return created;
     }
 
     private Project createProject(String projectName, String expectedOwner) {

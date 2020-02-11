@@ -1,5 +1,5 @@
 package com.bulletjournal.authz;
 
 public enum ContentType {
-    PROJECT, TASK, NOTE, LEDGER;
+    PROJECT, TASK, NOTE, LEDGER, GROUP;
 }

@@ -21,10 +21,10 @@ public class Group extends OwnedModel {
     )
     private Long id;
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     Set<UserGroup> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Project> projects = new ArrayList<>();
 
     public Long getId() {
@@ -59,7 +59,8 @@ public class Group extends OwnedModel {
     }
 
     public com.bulletjournal.controller.models.Group toPresentationModel() {
-        return new com.bulletjournal.controller.models.Group(this.getId(), this.getName(), this.getOwner());
+        return new com.bulletjournal.controller.models.Group(
+                this.getId(), this.getName(), this.getOwner());
     }
 
     @Override
