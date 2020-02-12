@@ -20,6 +20,8 @@ public class GroupController {
 
     protected static final String GROUPS_ROUTE = "/api/groups";
     protected static final String GROUP_ROUTE = "/api/groups/{groupId}";
+    protected static final String ADD_USER_GROUPS_ROUTE = "/addUserGroups";
+    protected static final String ADD_USER_GROUP_ROUTE = "/addUserGroup";
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
@@ -52,34 +54,37 @@ public class GroupController {
     public List<Group> getGroups() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Group> groups = this.groupDaoJpa.getGroups(username);
-        addUserToGroup(groups);
-        return groups;
+        return addUserAvatarToGroups(groups);
     }
 
-    private void addUserToGroup(List<Group> groups) {
+    private List<Group> addUserAvatarToGroups(List<Group> groups) {
         groups.stream().forEach(g -> {
-            List<UserGroup> users = g.getUsers().stream()
-                    .map(user -> {
-                        User u = this.userClient.getUser(user.getName());
-                        return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted());
-                    }).collect(Collectors.toList());
-            g.setUsers(users);
+            addUserAvatarToGroup(g);
         });
-    }
-
-    @PostMapping("/addUserGroups")
-    public List<Group> addUserGroups(AddUserGroupsParams addUserGroupsParams) {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Group> groups = this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups());
-        addUserToGroup(groups);
         return groups;
     }
 
-    @PostMapping("/addUserGroup")
-    public List<Group> addUserGroups(AddUserGroupParams addUserGroupParams) {
+    private Group addUserAvatarToGroup(Group g) {
+        List<UserGroup> users = g.getUsers().stream()
+                .map(user -> {
+                    User u = this.userClient.getUser(user.getName());
+                    return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted());
+                }).collect(Collectors.toList());
+        g.setUsers(users);
+        return g;
+    }
+
+    @PostMapping(ADD_USER_GROUPS_ROUTE)
+    public List<Group> addUserGroups(@Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Group> groups = this.groupDaoJpa.addUserGroups(username, ImmutableList.of(addUserGroupParams));
-        addUserToGroup(groups);
-        return groups;
+        this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups());
+        return getGroups();
+    }
+
+    @PostMapping(ADD_USER_GROUP_ROUTE)
+    public Group addUserGroup(@Valid @RequestBody AddUserGroupParams addUserGroupParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.groupDaoJpa.addUserGroups(username, ImmutableList.of(addUserGroupParams));
+        return addUserAvatarToGroup(this.groupDaoJpa.getGroup(addUserGroupParams.getGroupId()).toVerbosePresentationModel());
     }
 }

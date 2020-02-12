@@ -96,7 +96,7 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Group> addUserGroups(
+    public void addUserGroups(
             String owner,
             List<AddUserGroupParams> addUserGroupsParams) {
         for (AddUserGroupParams addUserGroupParams : addUserGroupsParams) {
@@ -108,6 +108,11 @@ public class GroupDaoJpa {
             User user = this.userDaoJpa.getByName(addUserGroupParams.getUsername());
             this.userGroupRepository.save(new UserGroup(user, group, false));
         }
-        return getGroups(owner);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Group getGroup(Long id) {
+        return this.groupRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Group " + id + " not found"));
     }
 }

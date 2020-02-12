@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.RedisUserRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.bulletjournal.config.SSOConfig;
@@ -66,11 +68,17 @@ public class UserClient {
         }
 
         try {
+            user = getUserByREST(username);
+        } catch (HttpClientErrorException ex) {
+            throw new ResourceNotFoundException("Unable to find user " + username, ex);
+        }
+
+        try {
             this.userDaoJpa.create(username);
         } catch (ResourceAlreadyExistException ex) {
             LOGGER.info(username + " already exists");
         }
-        user = getUserByREST(username);
+
         redisUserRepository.save(user);
         return user;
     }

@@ -30,6 +30,20 @@ import java.util.*;
 public class ProjectControllerTest {
     private static final String ROOT_URL = "http://localhost:";
     private final String expectedOwner = "BulletJournal";
+    private final String[] sampleUsers = {
+            "Xavier",
+            "bbs1024",
+            "ccc",
+            "Thinker",
+            "Joker",
+            "mqm",
+            "hero",
+            "bean",
+            "xlf",
+            "999999",
+            "0518",
+            "Scarlet",
+            "lsx9981"};
     private TestRestTemplate restTemplate = new TestRestTemplate();
 
     @LocalServerPort
@@ -43,7 +57,15 @@ public class ProjectControllerTest {
     @Test
     public void testCRUD() throws Exception {
         String projectName = "P0";
-        createGroups(expectedOwner);
+        List<Group> groups = createGroups(expectedOwner);
+        Group group = groups.get(0);
+        int count = 1;
+        for (String username : Arrays.asList(sampleUsers).subList(0, 3)) {
+            group = addUserToGroup(group, username, ++count);
+        }
+
+        group = groups.get(1);
+        groups = addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
         Project p1 = createProject(projectName, expectedOwner);
 
@@ -184,6 +206,34 @@ public class ProjectControllerTest {
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
         return getGroups(ImmutableList.of(g, g1, g2));
+    }
+
+    private List<Group> addUsersToGroup(final Group group, List<String> usernames) {
+        AddUserGroupsParams addUserGroupsParams = new AddUserGroupsParams();
+        for (String username : usernames) {
+            addUserGroupsParams.getUserGroups().add(new AddUserGroupParams(group.getId(), username));
+        }
+        ResponseEntity<Group[]> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUPS_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(addUserGroupsParams),
+                Group[].class);
+        List<Group> groups = Arrays.asList(groupsResponse.getBody());
+        Group updated = groups.stream().filter(g -> group.getName().equals(g.getName())).findFirst().get();
+        assertEquals(usernames.size() + 1, updated.getUsers().size());
+        return groups;
+    }
+
+    private Group addUserToGroup(Group group, String username, int expectedSize) {
+        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
+        ResponseEntity<Group> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUP_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(addUserGroupParams),
+                Group.class);
+        Group updated = groupsResponse.getBody();
+        assertEquals(expectedSize, updated.getUsers().size());
+        return updated;
     }
 
     private Group createGroup(String groupName, String expectedOwner) {
