@@ -11,12 +11,16 @@ public class Notification {
     @NotNull
     private Long timestamp;
 
+    @NotBlank
+    private String targetUser;
+
     public Notification() {
     }
 
-    public Notification(@NotBlank String content, @NotNull Long timestamp) {
+    public Notification(@NotBlank String content, @NotNull Long timestamp, @NotBlank String targetUser) {
         this.content = content;
         this.timestamp = timestamp;
+        this.targetUser = targetUser;
     }
 
     public String getContent() {
@@ -33,5 +37,13 @@ public class Notification {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getTargetUser() {
+        return targetUser;
+    }
+
+    public void setTargetUser(String targetUser) {
+        this.targetUser = targetUser;
     }
 }
