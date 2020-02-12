@@ -7,18 +7,18 @@ import javax.persistence.*;
 public class UserProjects extends AuditModel {
 
     @Id
-    private String name;
+    private String owner;
 
     @Lob
     @Column
     private String projects;
 
-    public String getName() {
-        return name;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public String getProjects() {

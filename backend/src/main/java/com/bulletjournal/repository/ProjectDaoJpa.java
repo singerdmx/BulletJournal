@@ -85,7 +85,7 @@ public class ProjectDaoJpa {
     public void updateUserProjects(String user, List<com.bulletjournal.controller.models.Project> projects) {
         UserProjects userProjects = new UserProjects();
         userProjects.setProjects(ProjectRelationsProcessor.processProjectRelations(projects));
-        userProjects.setName(user);
+        userProjects.setOwner(user);
         this.userProjectsRepository.save(userProjects);
     }
 }
