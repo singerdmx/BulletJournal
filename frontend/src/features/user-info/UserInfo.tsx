@@ -5,8 +5,6 @@ import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component
 import { IState } from '../../store/index';
 import { updateUserInfo } from './reducer';
 
-const dropdown = <DropdownMenu />;
-
 type UserProps = {
   username: string;
   avatar: string;
@@ -18,6 +16,7 @@ class UserInfo extends React.Component<UserProps> {
     this.props.updateUserInfo();
   }
   render() {
+    const dropdown = <DropdownMenu />;
     return (
       <div
         style={{
