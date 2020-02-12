@@ -26,6 +26,11 @@ public class Notification extends AuditModel {
     @Column
     private String content;
 
+    @NotBlank
+    @Size(min = 2, max = 100)
+    @Column(length = 100)
+    private String targetUser;
+
     public Long getId() {
         return id;
     }
@@ -50,8 +55,16 @@ public class Notification extends AuditModel {
         this.content = content;
     }
 
+    public String getTargetUser() {
+        return targetUser;
+    }
+
+    public void setTargetUser(String targetUser) {
+        this.targetUser = targetUser;
+    }
+
     public com.bulletjournal.controller.models.Notification toPresentationModel() {
         return new com.bulletjournal.controller.models.Notification(
-                this.getContent(), this.getUpdatedAt().getTime());
+                this.getContent(), this.getUpdatedAt().getTime(), this.getTargetUser());
     }
 }
