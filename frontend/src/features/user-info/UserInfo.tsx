@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Avatar, Dropdown } from 'antd';
+import { Avatar, Dropdown, Icon } from 'antd';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import { IState } from '../../store/index';
 import { updateUserInfo } from './reducer';
@@ -21,14 +21,17 @@ class UserInfo extends React.Component<UserProps> {
       <div
         style={{
           display: 'flex',
-          width: '128px',
+          width: '200px',
           justifyContent: 'space-around',
-          alignItems: 'center'
+          alignItems: 'center',
+          fontSize: '20px',
+          color: 'white'
         }}
       >
         <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
+        <Icon type="bell" theme="filled" />
         <Dropdown overlay={dropdown} trigger={['click']}>
-          <Avatar src={this.props.avatar} style={{ cursor: 'pointer', flexShrink: 1 }}>
+          <Avatar src={this.props.avatar} style={{ cursor: 'pointer', flexShrink: 1 }} size={28}>
             {this.props.username || 'User'}
           </Avatar>
         </Dropdown>
