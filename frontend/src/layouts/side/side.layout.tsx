@@ -12,8 +12,7 @@ type PathComponentProps = RouteComponentProps;
 
 class SideLayout extends React.Component<PathComponentProps> {
   onClick = (menu:any) => {
-    const path = menu.keyPath.join("/");
-    console.log(path);
+    const path = menu.keyPath.reverse().join('/');
     this.props.history.push(`/${path}`);
   }
 
