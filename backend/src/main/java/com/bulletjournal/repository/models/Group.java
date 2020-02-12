@@ -1,10 +1,8 @@
 package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "groups",
@@ -20,14 +18,15 @@ public class Group extends OwnedModel {
     @GeneratedValue(generator = "group_generator")
     @SequenceGenerator(
             name = "group_generator",
-            sequenceName = "group_sequence"
+            sequenceName = "group_sequence",
+            initialValue = 100
     )
     private Long id;
 
-    @ManyToMany(mappedBy = "groups")
-    Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    Set<UserGroup> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Project> projects = new ArrayList<>();
 
     public Long getId() {
@@ -38,14 +37,15 @@ public class Group extends OwnedModel {
         this.id = id;
     }
 
-    public Set<User> getUsers() {
+    public Set<UserGroup> getUsers() {
         return users;
     }
 
     public void addUser(User user) {
-        if (this.users.contains(user)) {
-            this.users.add(user);
-            user.getGroups().add(this);
+        UserGroup userGroup = new UserGroup(user, this);
+        if (!this.users.contains(userGroup)) {
+            this.users.add(userGroup);
+            user.addGroup(this);
         }
     }
 
@@ -61,6 +61,30 @@ public class Group extends OwnedModel {
     }
 
     public com.bulletjournal.controller.models.Group toPresentationModel() {
-        return new com.bulletjournal.controller.models.Group(this.getId(), this.getName(), this.getOwner());
+        return new com.bulletjournal.controller.models.Group(
+                this.getId(), this.getName(), this.getOwner());
+    }
+
+    public com.bulletjournal.controller.models.Group toVerbosePresentationModel() {
+        com.bulletjournal.controller.models.Group group = new com.bulletjournal.controller.models.Group(
+                this.getId(), this.getName(), this.getOwner());
+        group.setUsers(this.getUsers()
+                .stream()
+                .map(ug -> new com.bulletjournal.controller.models.UserGroup(ug.getUser().getName(), ug.isAccepted()))
+                .collect(Collectors.toList()));
+        return group;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return Objects.equals(id, group.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
