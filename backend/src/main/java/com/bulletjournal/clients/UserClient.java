@@ -69,7 +69,6 @@ public class UserClient {
             user = userOptional.get();
             return user;
         }
-
         try {
             user = getUserByREST(username);
         } catch (HttpClientErrorException ex) {

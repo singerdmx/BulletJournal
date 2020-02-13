@@ -6,12 +6,12 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
 
-@RedisHash("User")
+@RedisHash(value = "User", timeToLive = 6)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User implements Serializable {
 
-    @Id
     private Integer id;
+    @Id
     private String name;
     private String thumbnail;
     private String avatar;
