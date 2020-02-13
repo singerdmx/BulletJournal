@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
+import com.bulletjournal.config.SSOConfig;
 import com.bulletjournal.controller.UserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,9 @@ public class AuthFilter implements Filter {
 
     @Autowired
     private AuthConfig authConfig;
+
+    @Autowired
+    private SSOConfig ssoConfig;
 
     //this method will be called by container when we send any request
     @Override
@@ -63,15 +67,15 @@ public class AuthFilter implements Filter {
             return;
         }
         MDC.put(UserClient.USER_NAME_KEY, username);
-        chain.doFilter(req, res);
-
         if (UserController.LOGOUT_MYSELF_ROUTE.equals(request.getRequestURI())) {
             Cookie cookie = new Cookie("__discourse_proxy", null);
             cookie.setPath("/");
             cookie.setHttpOnly(true);
             cookie.setMaxAge(0);
             response.addCookie(cookie);
+            response.addHeader("Location", this.ssoConfig.getEndpoint());
         }
+        chain.doFilter(req, res);
     }
 
 }

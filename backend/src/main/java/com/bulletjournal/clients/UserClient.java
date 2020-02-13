@@ -52,7 +52,8 @@ public class UserClient {
         }
         // build the request
         HttpEntity<?> request = buildHeaders();
-        String url = this.ssoEndPoint.resolve("/admin/users/" + username + "/log_out").toString();
+        User user = getUser(username);
+        String url = this.ssoEndPoint.resolve("/admin/users/" + user.getId() + "/log_out").toString();
         this.restClient
                 .exchange(url, HttpMethod.POST, request, Void.class);
     }
