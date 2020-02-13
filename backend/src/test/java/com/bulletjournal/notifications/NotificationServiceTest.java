@@ -16,6 +16,7 @@ public class NotificationServiceTest {
     public void testGetUser() {
         MockedNotificationDaoJpa mockedNotificationDaoJpa = new MockedNotificationDaoJpa();
         NotificationService notificationService = new NotificationService(mockedNotificationDaoJpa);
+        notificationService.postConstruct();
         String originator = "BulletJournal";
         String targetUser = "u1";
         for (int i = 0; i < 100; i++) {
@@ -33,5 +34,6 @@ public class NotificationServiceTest {
         } while (notifications.size() < 200);
 
         Assert.assertEquals(200, notifications.size());
+        notificationService.preDestroy();
     }
 }

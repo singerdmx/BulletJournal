@@ -16,19 +16,18 @@ public class Notification {
     @NotNull
     private Long timestamp;
 
-    @NotBlank
-    private String originator;
+    @NotNull
+    private User originator;
 
     public Notification() {
     }
 
     public Notification(@NotNull Long id, @NotBlank String title, @NotBlank String content,
-                        @NotNull Long timestamp, @NotBlank String originator) {
+                        @NotNull Long timestamp) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
-        this.originator = originator;
     }
 
     public Long getId() {
@@ -63,11 +62,11 @@ public class Notification {
         this.timestamp = timestamp;
     }
 
-    public String getOriginator() {
+    public User getOriginator() {
         return originator;
     }
 
-    public void setOriginator(String originator) {
+    public void setOriginator(User originator) {
         this.originator = originator;
     }
 }

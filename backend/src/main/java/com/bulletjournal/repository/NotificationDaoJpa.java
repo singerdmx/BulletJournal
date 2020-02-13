@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.repository.models.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,16 @@ public class NotificationDaoJpa {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Autowired
+    private UserClient userClient;
+
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
         List<Notification> notifications = this.notificationRepository.findByTargetUser(username);
-        return notifications.stream().map(Notification::toPresentationModel).collect(Collectors.toList());
+        return notifications.stream().map(n -> {
+            com.bulletjournal.controller.models.Notification notification = n.toPresentationModel();
+            notification.setOriginator(this.userClient.getUser(n.getOriginator()));
+            return notification;
+        }).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

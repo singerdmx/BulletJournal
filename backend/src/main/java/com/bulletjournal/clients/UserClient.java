@@ -58,6 +58,9 @@ public class UserClient {
                 .exchange(url, HttpMethod.POST, request, Void.class);
     }
 
+    /**
+     * DO NOT wrap this function inside @Transactional
+     */
     @SuppressWarnings("rawtypes")
     public User getUser(String username) {
         User user;

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,10 @@ public class NotificationService {
         this.notificationDaoJpa = notificationDaoJpa;
         this.executorService = Executors.newSingleThreadExecutor();
         this.eventQueue = new LinkedBlockingQueue<>();
+    }
+
+    @PostConstruct
+    public void postConstruct() {
         this.executorService.submit(() -> this.handleNotifications());
     }
 

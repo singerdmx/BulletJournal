@@ -81,3 +81,8 @@ VALUES (13, '2020-02-11 14:38:17.230000', '2020-02-11 14:38:17.230000', 'lsx9981
 INSERT INTO public.groups (id, created_at, updated_at, name, owner)
 VALUES (13, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'lsx9981');
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (13, 13, true);
+
+-- Join Group - Xavier invites BulletJournal to Join Group "Default" ID 1
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (1, 0, false);
+INSERT INTO public.notifications (id, created_at, updated_at, content, content_id, originator, target_user, title, type)
+VALUES (1, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', null, 1, 'Xavier', 'BulletJournal', 'Xavier invited you to join Group Default', 'JoinGroupEvent');
