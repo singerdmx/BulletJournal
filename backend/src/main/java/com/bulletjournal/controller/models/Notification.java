@@ -5,6 +5,9 @@ import javax.validation.constraints.NotNull;
 
 public class Notification {
 
+    @NotNull
+    private Long id;
+
     @NotBlank
     private String title;
 
@@ -14,17 +17,26 @@ public class Notification {
     private Long timestamp;
 
     @NotBlank
-    private String targetUser;
+    private String originator;
 
     public Notification() {
     }
 
-    public Notification(@NotBlank String title, @NotBlank String content,
-                        @NotNull Long timestamp, @NotBlank String targetUser) {
+    public Notification(@NotNull Long id, @NotBlank String title, @NotBlank String content,
+                        @NotNull Long timestamp, @NotBlank String originator) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
-        this.targetUser = targetUser;
+        this.originator = originator;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -51,11 +63,11 @@ public class Notification {
         this.timestamp = timestamp;
     }
 
-    public String getTargetUser() {
-        return targetUser;
+    public String getOriginator() {
+        return originator;
     }
 
-    public void setTargetUser(String targetUser) {
-        this.targetUser = targetUser;
+    public void setOriginator(String originator) {
+        this.originator = originator;
     }
 }

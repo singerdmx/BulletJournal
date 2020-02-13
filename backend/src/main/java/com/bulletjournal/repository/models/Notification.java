@@ -29,19 +29,31 @@ public class Notification extends AuditModel {
     @Column
     private String content;
 
+    @Column(name = "content_id")
+    private Long contentId;
+
     @NotBlank
     @Size(min = 2, max = 100)
     @Column(name = "target_user", length = 100)
     private String targetUser;
 
+    @NotBlank
+    @Size(min = 2, max = 15)
+    @Column(length = 15)
+    private String type;
+
     public Notification() {
     }
 
-    public Notification(String originator, String title, String content, String targetUser) {
+    public Notification(
+            String originator, String title, String content, String targetUser,
+            String type, Long contentId) {
         this.originator = originator;
         this.title = title;
         this.content = content;
         this.targetUser = targetUser;
+        this.type = type;
+        this.contentId = contentId;
     }
 
     public Long getId() {
@@ -84,8 +96,25 @@ public class Notification extends AuditModel {
         this.title = title;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Long getContentId() {
+        return contentId;
+    }
+
+    public void setContentId(Long contentId) {
+        this.contentId = contentId;
+    }
+
     public com.bulletjournal.controller.models.Notification toPresentationModel() {
         return new com.bulletjournal.controller.models.Notification(
-                this.getTitle(), this.getContent(), this.getUpdatedAt().getTime(), this.getTargetUser());
+                this.getId(), this.getTitle(), this.getContent(),
+                this.getUpdatedAt().getTime(), this.getOriginator());
     }
 }
