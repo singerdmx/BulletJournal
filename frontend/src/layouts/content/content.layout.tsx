@@ -1,6 +1,6 @@
 import React from 'react';
 import {Switch, Route} from 'react-router-dom';
-import HomePage from '../../pages/todo.pages';
+import HomePage from '../../pages/home.pages';
 import SettingPage from '../../pages/settings.page';
 import TodoPage from '../../pages/todo.pages';
 import { Layout } from 'antd';
