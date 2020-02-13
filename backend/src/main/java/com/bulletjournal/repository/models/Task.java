@@ -60,4 +60,13 @@ public class Task extends ProjectItemModel {
     public void setDueTime(String dueTime) {
         this.dueTime = dueTime;
     }
+
+    public com.bulletjournal.controller.models.Task toPresentationModel() {
+        return new com.bulletjournal.controller.models.Task(
+                this.getId(),
+                this.getAssignedTo(),
+                this.getDueDate(),
+                this.getDueTime(),
+                this.getName());
+    }
 }
