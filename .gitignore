@@ -1,3 +1,4 @@
+.metadata/*
 .vscode/*
 .idea/*
 **/.DS_Store
