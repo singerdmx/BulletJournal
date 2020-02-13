@@ -23,6 +23,7 @@ chmod +x start.sh
 Next, you can look into the `docker-compose.yml` for detailed config parameters. Then execute the command below to start the services.
 
 ```bash
+./buildImage.sh
 ./start.sh
 ```
 
