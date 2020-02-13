@@ -20,5 +20,13 @@
                 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
     .todo-header {
         border-bottom: 1px solid #e0e6ed;
+        display: flex;
+        justify-content: space-between;
+        .add-todo-button {
+            &:hover {
+                color: @primary-color;
+                cursor: pointer;
+            }
+        }
     }
 }
