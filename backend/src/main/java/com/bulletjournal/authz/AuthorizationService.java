@@ -1,5 +1,6 @@
 package com.bulletjournal.authz;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.models.Group;
 import org.springframework.stereotype.Component;

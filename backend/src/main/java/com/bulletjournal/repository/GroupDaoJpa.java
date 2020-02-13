@@ -1,11 +1,15 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
-import com.bulletjournal.authz.ContentType;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.AddUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.notifications.DeleteGroupEvent;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.JoinGroupEvent;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
@@ -15,7 +19,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -34,6 +40,9 @@ public class GroupDaoJpa {
     @Autowired
     private AuthorizationService authorizationService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Group create(String name, String owner) {
         User user = this.userDaoJpa.getByName(owner);
@@ -48,7 +57,7 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void delete(Long groupId, String requester) {
+    public void delete(final Long groupId, final String requester) {
 
         Group group = this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
@@ -56,10 +65,20 @@ public class GroupDaoJpa {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 group.getOwner(), requester, ContentType.GROUP, Operation.DELETE, groupId, group.getName());
 
+        List<Event> events = new ArrayList<>();
         for (UserGroup userGroup : group.getUsers()) {
             this.userGroupRepository.delete(userGroup);
+            events.add(new Event(
+                    userGroup.getUser().getName(), userGroup.getGroup().getId(), userGroup.getGroup().getName()));
         }
+
         this.groupRepository.delete(group);
+
+        this.notificationService.inform(
+                new DeleteGroupEvent(
+                        events.stream().filter(u -> !Objects.equals(u.getTargetUser(), requester))
+                                .collect(Collectors.toList()),
+                        requester));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -99,15 +118,21 @@ public class GroupDaoJpa {
     public void addUserGroups(
             String owner,
             List<AddUserGroupParams> addUserGroupsParams) {
+
+        List<Event> events = new ArrayList<>();
         for (AddUserGroupParams addUserGroupParams : addUserGroupsParams) {
             Long groupId = addUserGroupParams.getGroupId();
             Group group = this.groupRepository.findById(groupId)
                     .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
             this.authorizationService.checkAuthorizedToOperateOnContent(
                     group.getOwner(), owner, ContentType.GROUP, Operation.UPDATE, groupId);
-            User user = this.userDaoJpa.getByName(addUserGroupParams.getUsername());
+            String username = addUserGroupParams.getUsername();
+            User user = this.userDaoJpa.getByName(username);
+            events.add(new Event(username, groupId, group.getName()));
             this.userGroupRepository.save(new UserGroup(user, group, false));
         }
+
+        this.notificationService.inform(new JoinGroupEvent(events, owner));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

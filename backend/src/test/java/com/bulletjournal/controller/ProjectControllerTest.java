@@ -127,6 +127,7 @@ public class ProjectControllerTest {
                 HttpMethod.GET,
                 null,
                 Project[].class);
+        assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
         Project[] projects = projectsResponse.getBody();
         assertEquals(2, projects.length);
         assertEquals(p1, projects[0]);
@@ -138,6 +139,19 @@ public class ProjectControllerTest {
         assertEquals(p6, projects[1].getSubProjects().get(0));
         assertEquals(1, projects[0].getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
+
+        getNotifications();
+    }
+
+    private void getNotifications() {
+        ResponseEntity<Notification[]> notificationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Notification[].class);
+        assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
+        List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
+        assertEquals(20, notifications.size());
     }
 
     private List<Group> getGroups(List<Group> expected) {

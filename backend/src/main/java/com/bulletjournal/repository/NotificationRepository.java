@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface NotificationRepository extends JpaRepository<Notification, String> {
-    List<Notification> findByOwner(String owner);
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+    List<Notification> findByTargetUser(String targetUser);
 }

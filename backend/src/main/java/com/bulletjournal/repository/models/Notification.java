@@ -6,7 +6,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "notifications",
-        indexes = {@Index(name = "notification_time_index", columnList = "owner,updated_at")})
+        indexes = {@Index(name = "notification_time_index", columnList = "target_user,updated_at")})
 public class Notification extends AuditModel {
 
     @Id
@@ -20,16 +20,29 @@ public class Notification extends AuditModel {
     @NotBlank
     @Size(min = 2, max = 100)
     @Column(length = 100)
-    private String owner;
+    private String originator;
 
-    @Lob
+    @NotBlank
+    @Column
+    private String title;
+
     @Column
     private String content;
 
     @NotBlank
     @Size(min = 2, max = 100)
-    @Column(length = 100)
+    @Column(name = "target_user", length = 100)
     private String targetUser;
+
+    public Notification() {
+    }
+
+    public Notification(String originator, String title, String content, String targetUser) {
+        this.originator = originator;
+        this.title = title;
+        this.content = content;
+        this.targetUser = targetUser;
+    }
 
     public Long getId() {
         return id;
@@ -39,12 +52,12 @@ public class Notification extends AuditModel {
         this.id = id;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getOriginator() {
+        return originator;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setOriginator(String owner) {
+        this.originator = owner;
     }
 
     public String getContent() {
@@ -63,8 +76,16 @@ public class Notification extends AuditModel {
         this.targetUser = targetUser;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public com.bulletjournal.controller.models.Notification toPresentationModel() {
         return new com.bulletjournal.controller.models.Notification(
-                this.getContent(), this.getUpdatedAt().getTime(), this.getTargetUser());
+                this.getTitle(), this.getContent(), this.getUpdatedAt().getTime(), this.getTargetUser());
     }
 }

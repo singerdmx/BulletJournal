@@ -6,6 +6,8 @@ import javax.validation.constraints.NotNull;
 public class Notification {
 
     @NotBlank
+    private String title;
+
     private String content;
 
     @NotNull
@@ -17,10 +19,20 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(@NotBlank String content, @NotNull Long timestamp, @NotBlank String targetUser) {
+    public Notification(@NotBlank String title, @NotBlank String content,
+                        @NotNull Long timestamp, @NotBlank String targetUser) {
+        this.title = title;
         this.content = content;
         this.timestamp = timestamp;
         this.targetUser = targetUser;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContent() {
