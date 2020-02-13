@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-public class JoinGroupEvent extends Informed implements Actionable {
+public class JoinGroupEvent extends Informed {
 
     public JoinGroupEvent(Event event, String originator) {
         super(event, originator);
@@ -13,11 +13,6 @@ public class JoinGroupEvent extends Informed implements Actionable {
 
     public JoinGroupEvent(List<Event> events, String originator) {
         super(events, originator);
-    }
-
-    @Override
-    public List<Action> getActions() {
-        return ImmutableList.of(Action.ACCEPT, Action.DECLINE);
     }
 
     @Override
@@ -30,4 +25,8 @@ public class JoinGroupEvent extends Informed implements Actionable {
         return this.getOriginator() + " invited you to join Group " + event.getContentName();
     }
 
+    @Override
+    public List<Action> getEventActions(Event event) {
+        return ImmutableList.of(Action.ACCEPT, Action.DECLINE);
+    }
 }

@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class Notification {
 
@@ -18,6 +19,8 @@ public class Notification {
 
     @NotNull
     private User originator;
+
+    private List<String> actions;
 
     public Notification() {
     }
@@ -68,5 +71,13 @@ public class Notification {
 
     public void setOriginator(User originator) {
         this.originator = originator;
+    }
+
+    public List<String> getActions() {
+        return actions;
+    }
+
+    public void setActions(List<String> actions) {
+        this.actions = actions;
     }
 }

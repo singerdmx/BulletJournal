@@ -13,17 +13,18 @@ public class Notification extends AuditModel {
     @GeneratedValue(generator = "notification_generator")
     @SequenceGenerator(
             name = "notification_generator",
-            sequenceName = "notification_sequence"
+            sequenceName = "notification_sequence",
+            initialValue = 100
     )
     private Long id;
 
     @NotBlank
     @Size(min = 2, max = 100)
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
     private String originator;
 
     @NotBlank
-    @Column
+    @Column(nullable = false)
     private String title;
 
     @Column
@@ -34,13 +35,16 @@ public class Notification extends AuditModel {
 
     @NotBlank
     @Size(min = 2, max = 100)
-    @Column(name = "target_user", length = 100)
+    @Column(name = "target_user", length = 100, nullable = false)
     private String targetUser;
 
     @NotBlank
     @Size(min = 2, max = 15)
-    @Column(length = 15)
+    @Column(length = 15, nullable = false)
     private String type;
+
+    @Column
+    private String actions;
 
     public Notification() {
     }
@@ -110,6 +114,14 @@ public class Notification extends AuditModel {
 
     public void setContentId(Long contentId) {
         this.contentId = contentId;
+    }
+
+    public String getActions() {
+        return actions;
+    }
+
+    public void setActions(String actions) {
+        this.actions = actions;
     }
 
     public com.bulletjournal.controller.models.Notification toPresentationModel() {

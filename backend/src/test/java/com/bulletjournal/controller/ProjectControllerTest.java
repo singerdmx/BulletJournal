@@ -2,8 +2,10 @@ package com.bulletjournal.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.notifications.Action;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +66,7 @@ public class ProjectControllerTest {
             group = addUserToGroup(group, username, ++count);
         }
 
-        group = groups.get(1);
+        group = groups.get(2);
         groups = addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
         Project p1 = createProject(projectName, expectedOwner);
@@ -152,6 +154,12 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
         assertEquals(1, notifications.size());
+        Notification notification = notifications.get(0);
+        assertEquals("Xavier invited you to join Group Default", notification.getTitle());
+        assertNull(notification.getContent());
+        assertEquals("Xavier", notification.getOriginator().getName());
+        assertEquals(ImmutableList.of(Action.ACCEPT.getDescription(), Action.DECLINE.getDescription()),
+                notification.getActions());
     }
 
     private List<Group> getGroups(List<Group> expected) {
@@ -167,9 +175,10 @@ public class ProjectControllerTest {
             for (int i = 0; i < expected.size(); i++) {
                 assertEquals(expected.get(i), groups.get(i));
                 List<UserGroup> userGroups = groups.get(i).getUsers();
-                assertEquals(1, userGroups.size());
-                assertEquals(true, userGroups.get(0).isAccepted());
-                assertEquals(expectedOwner, userGroups.get(0).getName());
+                if (expectedOwner.equals(userGroups.get(0).getName())) {
+                    assertEquals(true, userGroups.get(0).isAccepted());
+                    assertEquals(1, userGroups.size());
+                }
                 assertNotNull(userGroups.get(0).getThumbnail());
                 assertNotNull(userGroups.get(0).getAvatar());
             }
@@ -179,12 +188,21 @@ public class ProjectControllerTest {
 
     private List<Group> createGroups(String owner) {
         List<Group> groups = getGroups(null);
-        assertEquals(1, groups.size());
+        assertEquals(2, groups.size());
         Group g = groups.get(0);
+        assertEquals(expectedOwner, g.getOwner());
+        assertEquals(1, g.getUsers().size());
+        Group invitedToJoin = groups.get(1);
+        assertEquals(2, invitedToJoin.getUsers().size());
+        assertEquals("Xavier", invitedToJoin.getOwner());
+        assertEquals("Xavier", invitedToJoin.getUsers().get(0).getName());
+        assertEquals(true, invitedToJoin.getUsers().get(0).isAccepted());
+        assertEquals(expectedOwner, invitedToJoin.getUsers().get(1).getName());
+        assertEquals(false, invitedToJoin.getUsers().get(1).isAccepted());
         Group g1 = createGroup("G0", owner);
         Group g2 = createGroup("G2", owner);
         Group g3 = createGroup("G3", owner);
-        getGroups(ImmutableList.of(g, g1, g2, g3));
+        getGroups(ImmutableList.of(g, invitedToJoin, g1, g2, g3));
 
         String groupNewName = "G1";
         UpdateGroupParams updateGroupParams = new UpdateGroupParams();
@@ -209,7 +227,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g3.getId());
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-        getGroups(ImmutableList.of(g, g1, g2));
+        getGroups(ImmutableList.of(g, invitedToJoin, g1, g2));
 
         // Delete Group "Default"
         deleteResponse = this.restTemplate.exchange(
@@ -219,7 +237,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
-        return getGroups(ImmutableList.of(g, g1, g2));
+        return getGroups(ImmutableList.of(g, invitedToJoin, g1, g2));
     }
 
     private List<Group> addUsersToGroup(final Group group, List<String> usernames) {

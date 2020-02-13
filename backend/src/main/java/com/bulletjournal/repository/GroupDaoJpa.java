@@ -102,12 +102,12 @@ public class GroupDaoJpa {
         return user.getGroups()
                 .stream()
                 .map(userGroup -> {
-                    com.bulletjournal.controller.models.Group g = userGroup.getGroup().toPresentationModel();
-                    g.setUsers(userGroup.getGroup().getUsers()
+                    Group group = userGroup.getGroup();
+                    com.bulletjournal.controller.models.Group g = group.toPresentationModel();
+                    g.setUsers(group.getUsers()
                             .stream()
-                            .map(u ->
-                                    new com.bulletjournal.controller.models.UserGroup(
-                                            u.getUser().getName(), userGroup.isAccepted()))
+                            .map(u -> new com.bulletjournal.controller.models.UserGroup(
+                                    u.getUser().getName(), u.isAccepted()))
                             .collect(Collectors.toList()));
                     return g;
                 })
