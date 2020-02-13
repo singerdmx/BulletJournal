@@ -4,7 +4,7 @@ Using `--typescript` to work with typescript.
 
 ## How to build and push image
 ```
-docker build -t mwangxx/bulletjournal-frontend 
+docker build -t mwangxx/bulletjournal-frontend .
 docker push mwangxx/bulletjournal-frontend:latest
 ```
 
