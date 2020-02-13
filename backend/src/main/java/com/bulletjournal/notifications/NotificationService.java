@@ -53,7 +53,7 @@ public class NotificationService {
     @PreDestroy
     public void preDestroy() {
         this.stop = true;
-        if(executorService != null){
+        if (executorService != null) {
             try {
                 // wait 5 seconds for closing all threads
                 executorService.awaitTermination(5, TimeUnit.SECONDS);
