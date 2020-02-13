@@ -151,7 +151,7 @@ public class ProjectControllerTest {
                 Notification[].class);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
-        assertEquals(20, notifications.size());
+        assertEquals(0, notifications.size());
     }
 
     private List<Group> getGroups(List<Group> expected) {
