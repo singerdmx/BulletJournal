@@ -17,6 +17,7 @@ Please open the terminal and execute the command below. Make sure you have insta
 ```bash
 git clone https://github.com/singerdmx/BulletJournal.git
 cd BulletJournal
+chmod +x buildImage.sh
 chmod +x start.sh
 ```
 
