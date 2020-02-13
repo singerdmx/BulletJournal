@@ -70,24 +70,7 @@ public class ProjectControllerTest {
         groups = addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
         Project p1 = createProject(projectName, expectedOwner);
-
-        // update project name from "P0" to "P1"
-        String projectNewName = "P1";
-        UpdateProjectParams updateProjectParams = new UpdateProjectParams();
-        updateProjectParams.setName(projectNewName);
-        ResponseEntity<Project> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
-                HttpMethod.PATCH,
-                new HttpEntity<>(updateProjectParams),
-                Project.class,
-                p1.getId());
-        p1 = response.getBody();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(projectNewName, p1.getName());
-        assertEquals(expectedOwner, p1.getOwner());
-        assertEquals(ProjectType.LEDGER, p1.getProjectType());
-        assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, p1.getGroup().getName());
-        assertEquals(expectedOwner, p1.getGroup().getOwner());
+        p1 = updateProject(p1);
 
         // create other projects
         Project p2 = createProject("P2", expectedOwner);
@@ -95,7 +78,12 @@ public class ProjectControllerTest {
         Project p4 = createProject("P4", expectedOwner);
         Project p5 = createProject("P5", expectedOwner);
         Project p6 = createProject("P6", expectedOwner);
+        updateProjectRelations(p1, p2, p3, p4, p5, p6);
 
+        getNotifications();
+    }
+
+    private void updateProjectRelations(Project p1, Project p2, Project p3, Project p4, Project p5, Project p6) {
         /**
          *  p1
          *   |
@@ -141,8 +129,27 @@ public class ProjectControllerTest {
         assertEquals(p6, projects[1].getSubProjects().get(0));
         assertEquals(1, projects[0].getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
+    }
 
-        getNotifications();
+    private Project updateProject(Project p1) {
+        // update project name from "P0" to "P1"
+        String projectNewName = "P1";
+        UpdateProjectParams updateProjectParams = new UpdateProjectParams();
+        updateProjectParams.setName(projectNewName);
+        ResponseEntity<Project> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateProjectParams),
+                Project.class,
+                p1.getId());
+        p1 = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(projectNewName, p1.getName());
+        assertEquals(expectedOwner, p1.getOwner());
+        assertEquals(ProjectType.LEDGER, p1.getProjectType());
+        assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, p1.getGroup().getName());
+        assertEquals(expectedOwner, p1.getGroup().getOwner());
+        return p1;
     }
 
     private void getNotifications() {
