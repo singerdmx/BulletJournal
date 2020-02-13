@@ -1,6 +1,7 @@
 import React from 'react';
+import TodoItem from '../components/todo-item/todo-item.component';
 import { RouteComponentProps } from 'react-router-dom';
-import { List } from 'antd';
+import { List, Icon } from 'antd';
 
 interface RouteParams {
   category: string;
@@ -12,13 +13,14 @@ const TodoPage = (props: RouteComponentProps<RouteParams>) => {
     <div className="todo">
       <div className="todo-header">
         <h2>{props.match.params.category.toUpperCase()} </h2>
-        <div className="todo-list">
-          <List
-            itemLayout="horizontal"
-            dataSource={fakeData}
-            renderItem={item => <List.Item>{item}</List.Item>}
-          />
-        </div>
+        <h2 className="add-todo-button"><Icon type="plus" />ADD</h2>
+      </div>
+      <div className="todo-list">
+        <List
+          itemLayout="horizontal"
+          dataSource={fakeData}
+          renderItem={item => <TodoItem title={item} />}
+        />
       </div>
     </div>
   );
