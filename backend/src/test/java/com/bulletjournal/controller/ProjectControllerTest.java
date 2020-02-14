@@ -131,30 +131,31 @@ public class ProjectControllerTest {
         projectRelations.add(p5);
         p5.addSubProject(p6);
         // Set user's project relations
-        this.restTemplate.exchange(
+        ResponseEntity<?> updateProjectRelationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.PUT,
                 new HttpEntity<>(projectRelations),
                 Void.class
         );
+        assertEquals(HttpStatus.OK, updateProjectRelationsResponse.getStatusCode());
 
-        ResponseEntity<Project[]> projectsResponse = this.restTemplate.exchange(
+        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
                 null,
-                Project[].class);
+                Projects.class);
         assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        Project[] projects = projectsResponse.getBody();
-        assertEquals(2, projects.length);
-        assertEquals(p1, projects[0]);
-        assertEquals(p5, projects[1]);
-        assertEquals(2, projects[0].getSubProjects().size());
-        assertEquals(p2, projects[0].getSubProjects().get(0));
-        assertEquals(p4, projects[0].getSubProjects().get(1));
-        assertEquals(1, projects[1].getSubProjects().size());
-        assertEquals(p6, projects[1].getSubProjects().get(0));
-        assertEquals(1, projects[0].getSubProjects().get(0).getSubProjects().size());
-        assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
+        List<Project> projects = projectsResponse.getBody().getOwned();
+        assertEquals(2, projects.size());
+        assertEquals(p1, projects.get(0));
+        assertEquals(p5, projects.get(1));
+        assertEquals(2, projects.get(0).getSubProjects().size());
+        assertEquals(p2, projects.get(0).getSubProjects().get(0));
+        assertEquals(p4, projects.get(0).getSubProjects().get(1));
+        assertEquals(1, projects.get(1).getSubProjects().size());
+        assertEquals(p6, projects.get(1).getSubProjects().get(0));
+        assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
+        assertEquals(p3, projects.get(0).getSubProjects().get(0).getSubProjects().get(0));
     }
 
     private Project updateProject(Project p1) {

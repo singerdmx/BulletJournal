@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Project;
+import com.bulletjournal.controller.models.Projects;
 import com.bulletjournal.controller.models.UpdateProjectParams;
 import com.bulletjournal.repository.ProjectDaoJpa;
 
@@ -26,7 +27,7 @@ public class ProjectController {
 
 
     @GetMapping(PROJECTS_ROUTE)
-    public List<Project> getProjects() {
+    public Projects getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.projectDaoJpa.getProjects(username);
     }
