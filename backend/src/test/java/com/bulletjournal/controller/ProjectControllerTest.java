@@ -2,6 +2,8 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.notifications.Action;
+import com.bulletjournal.notifications.JoinGroupEvent;
+import com.bulletjournal.notifications.JoinGroupResponseEvent;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,6 +105,7 @@ public class ProjectControllerTest {
                     Void.class,
                     notification.getId());
             assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(JoinGroupEvent.class.getSimpleName(), notification.getType());
         }
     }
 
@@ -191,10 +194,12 @@ public class ProjectControllerTest {
         assertEquals("Xavier", notification.getOriginator().getName());
         assertEquals(ImmutableList.of(Action.ACCEPT.getDescription(), Action.DECLINE.getDescription()),
                 notification.getActions());
+        assertEquals(JoinGroupEvent.class.getSimpleName(), notification.getType());
 
         for (int i = 1; i < 8; i++) {
             assertTrue(notifications.get(i).getTitle()
                     .endsWith("declined your invitation to join Group Default"));
+            assertEquals(JoinGroupResponseEvent.class.getSimpleName(), notifications.get(i).getType());
         }
     }
 

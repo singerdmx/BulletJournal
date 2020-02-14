@@ -22,15 +22,19 @@ public class Notification {
 
     private List<String> actions;
 
+    @NotBlank
+    private String type;
+
     public Notification() {
     }
 
     public Notification(@NotNull Long id, @NotBlank String title, @NotBlank String content,
-                        @NotNull Long timestamp) {
+                        @NotNull Long timestamp, @NotBlank String type) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
+        this.type = type;
     }
 
     public Long getId() {
@@ -79,5 +83,13 @@ public class Notification {
 
     public void setActions(List<String> actions) {
         this.actions = actions;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
