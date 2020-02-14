@@ -49,6 +49,7 @@ public class ProjectDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project create(CreateProjectParams createProjectParams, String owner) {
         Project project = new Project();
+        project.setDescription(createProjectParams.getDescription());
         project.setOwner(owner);
         project.setName(createProjectParams.getName());
         project.setType(createProjectParams.getProjectType().getValue());
@@ -68,6 +69,12 @@ public class ProjectDaoJpa {
 
         DaoHelper.updateIfPresent(
                 updateProjectParams.hasName(), updateProjectParams.getName(), (value) -> project.setName(value));
+
+        DaoHelper.updateIfPresent(
+                updateProjectParams.hasDescription(),
+                updateProjectParams.getDescription(),
+                (value) -> project.setDescription(value)
+        );
 
         if (updateProjectParams.hasGroupId() &&
                 !Objects.equals(updateProjectParams.getGroupId(), project.getGroup().getId())) {

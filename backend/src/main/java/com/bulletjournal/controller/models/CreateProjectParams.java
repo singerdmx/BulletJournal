@@ -13,14 +13,18 @@ public class CreateProjectParams {
     @NotNull
     private ProjectType projectType;
 
+    private String description;
+
     public CreateProjectParams() {
     }
 
     public CreateProjectParams(
             @NotBlank @Size(min = 1, max = 100) String name,
-            @NotNull ProjectType projectType) {
+            @NotNull ProjectType projectType,
+            String description) {
         this.name = name;
         this.projectType = projectType;
+        this.description = description;
     }
 
     public String getName() {
@@ -37,5 +41,13 @@ public class CreateProjectParams {
 
     public void setProjectType(ProjectType projectType) {
         this.projectType = projectType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

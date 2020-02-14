@@ -162,6 +162,7 @@ public class ProjectControllerTest {
         String projectNewName = "P1";
         UpdateProjectParams updateProjectParams = new UpdateProjectParams();
         updateProjectParams.setName(projectNewName);
+        updateProjectParams.setDescription("d2");
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,
@@ -175,6 +176,7 @@ public class ProjectControllerTest {
         assertEquals(ProjectType.LEDGER, p1.getProjectType());
         assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, p1.getGroup().getName());
         assertEquals(expectedOwner, p1.getGroup().getOwner());
+        assertEquals("d2", p1.getDescription());
         return p1;
     }
 
@@ -325,7 +327,7 @@ public class ProjectControllerTest {
     }
 
     private Project createProject(String projectName, String expectedOwner) {
-        CreateProjectParams project = new CreateProjectParams(projectName, ProjectType.LEDGER);
+        CreateProjectParams project = new CreateProjectParams(projectName, ProjectType.LEDGER, "d1");
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
@@ -338,6 +340,7 @@ public class ProjectControllerTest {
         assertEquals(ProjectType.LEDGER, created.getProjectType());
         assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, created.getGroup().getName());
         assertEquals(expectedOwner, created.getGroup().getOwner());
+        assertEquals("d1", created.getDescription());
         return created;
     }
 }

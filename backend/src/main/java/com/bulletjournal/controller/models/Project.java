@@ -29,6 +29,8 @@ public class Project {
     @Valid
     private Group group;
 
+    private String description;
+
     @Expose
     @Valid
     private List<Project> subProjects = new ArrayList<>();
@@ -36,12 +38,13 @@ public class Project {
     public Project() {
     }
 
-    public Project(Long id, String name, String owner, ProjectType projectType, Group group) {
+    public Project(Long id, String name, String owner, ProjectType projectType, Group group, String description) {
         this.id = id;
         this.name = name;
         this.owner = owner;
         this.projectType = projectType;
         this.group = group;
+        this.description = description;
     }
 
     public Long getId() {
@@ -90,6 +93,14 @@ public class Project {
 
     public void addSubProject(Project subProject) {
         this.subProjects.add(subProject);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

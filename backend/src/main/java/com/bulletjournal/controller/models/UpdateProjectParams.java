@@ -6,12 +6,15 @@ public class UpdateProjectParams {
 
     private Long groupId;
 
+    private String description;
+
     public UpdateProjectParams() {
     }
 
-    public UpdateProjectParams(String name, Long groupId) {
+    public UpdateProjectParams(String name, Long groupId, String description) {
         this.name = name;
         this.groupId = groupId;
+        this.description = description;
     }
 
     public String getName() {
@@ -36,5 +39,17 @@ public class UpdateProjectParams {
 
     public boolean hasGroupId() {
         return this.groupId != null;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean hasDescription() {
+        return this.description != null;
     }
 }

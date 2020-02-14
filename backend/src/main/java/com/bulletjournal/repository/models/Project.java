@@ -32,6 +32,9 @@ public class Project extends OwnedModel {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Group group;
 
+    @Column
+    private String description;
+
     public Long getId() {
         return id;
     }
@@ -59,9 +62,19 @@ public class Project extends OwnedModel {
         }
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public com.bulletjournal.controller.models.Project toPresentationModel() {
         return new com.bulletjournal.controller.models.Project(
                 this.getId(), this.getName(), this.getOwner(),
-                ProjectType.getType(this.getType()), this.getGroup().toPresentationModel());
+                ProjectType.getType(this.getType()),
+                this.getGroup().toPresentationModel(),
+                this.getDescription());
     }
 }
