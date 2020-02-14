@@ -40,7 +40,7 @@ public class NotificationService {
     }
 
     public void handleNotifications() {
-        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+//        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Informed> events = new ArrayList<>();
 
         while (!stop) {

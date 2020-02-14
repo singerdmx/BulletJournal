@@ -4,6 +4,13 @@ public class AnswerNotificationParams {
 
     private String action;
 
+    public AnswerNotificationParams() {
+    }
+
+    public AnswerNotificationParams(String action) {
+        this.action = action;
+    }
+
     public String getAction() {
         return action;
     }

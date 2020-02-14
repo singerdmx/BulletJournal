@@ -58,6 +58,7 @@ public class ProjectControllerTest {
 
     @Test
     public void testCRUD() throws Exception {
+        answerNotifications();
         String projectName = "P0";
         List<Group> groups = createGroups(expectedOwner);
         Group group = groups.get(0);
@@ -81,6 +82,30 @@ public class ProjectControllerTest {
         updateProjectRelations(p1, p2, p3, p4, p5, p6);
 
         getNotifications();
+    }
+
+    private void answerNotifications() {
+        ResponseEntity<Notification[]> notificationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Notification[].class);
+        assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
+        List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
+        assertEquals(8, notifications.size());
+        // reject invitations to join group
+        for (int i = 1; i < notifications.size(); i++) {
+            Notification notification = notifications.get(i);
+            AnswerNotificationParams answerNotificationParams =
+                    new AnswerNotificationParams(Action.DECLINE.getDescription());
+            ResponseEntity<?> response = this.restTemplate.exchange(
+                    ROOT_URL + randomServerPort + NotificationController.ANSWER_NOTIFICATION_ROUTE,
+                    HttpMethod.POST,
+                    new HttpEntity<>(answerNotificationParams),
+                    Void.class,
+                    notification.getId());
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+        }
     }
 
     private void updateProjectRelations(Project p1, Project p2, Project p3, Project p4, Project p5, Project p6) {
@@ -159,6 +184,7 @@ public class ProjectControllerTest {
                 null,
                 Notification[].class);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
+
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
         assertEquals(1, notifications.size());
         Notification notification = notifications.get(0);
