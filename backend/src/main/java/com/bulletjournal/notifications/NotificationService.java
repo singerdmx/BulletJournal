@@ -40,18 +40,26 @@ public class NotificationService {
     }
 
     public void handleNotifications() {
-//        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Informed> events = new ArrayList<>();
 
         while (!stop) {
             try {
                 // waiting until an element becomes available
                 events.add(this.eventQueue.take());
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("Error on taking from eventQueue", ex);
             }
-            this.eventQueue.drainTo(events);
-            this.notificationDaoJpa.create(events);
+            try {
+                this.eventQueue.drainTo(events);
+            } catch (Exception ex) {
+                LOGGER.error("Error on draining from eventQueue", ex);
+            }
+            try {
+                this.notificationDaoJpa.create(events);
+            } catch (Exception ex) {
+                LOGGER.error("Error on creating records in notificationDaoJpa", ex);
+            }
             events = new ArrayList<>();
         }
     }

@@ -1,5 +1,7 @@
 package com.bulletjournal.notifications;
 
+import com.bulletjournal.exceptions.BadRequestException;
+
 public enum Action {
 
     ACCEPT("Accept", "accepted"),
@@ -28,7 +30,7 @@ public enum Action {
             case "Decline":
                 return DECLINE;
             default:
-                throw new IllegalArgumentException();
+                throw new BadRequestException("Invalid Action for description: " + description);
         }
     }
 }

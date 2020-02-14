@@ -39,8 +39,8 @@ public class Notification extends AuditModel {
     private String targetUser;
 
     @NotBlank
-    @Size(min = 2, max = 15)
-    @Column(length = 15, nullable = false)
+    @Size(min = 2, max = 100)
+    @Column(length = 100, nullable = false)
     private String type;
 
     @Column

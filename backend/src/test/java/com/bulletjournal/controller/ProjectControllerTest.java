@@ -1,9 +1,5 @@
 package com.bulletjournal.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.notifications.Action;
 import com.google.common.collect.ImmutableList;
@@ -22,6 +18,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests {@link ProjectController}
@@ -186,13 +184,18 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
 
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
-        assertEquals(1, notifications.size());
+        assertEquals(8, notifications.size());
         Notification notification = notifications.get(0);
         assertEquals("Xavier invited you to join Group Default", notification.getTitle());
         assertNull(notification.getContent());
         assertEquals("Xavier", notification.getOriginator().getName());
         assertEquals(ImmutableList.of(Action.ACCEPT.getDescription(), Action.DECLINE.getDescription()),
                 notification.getActions());
+
+        for (int i = 1; i < 8; i++) {
+            assertTrue(notifications.get(i).getTitle()
+                    .endsWith("declined your invitation to join Group Default"));
+        }
     }
 
     private List<Group> getGroups(List<Group> expected) {
