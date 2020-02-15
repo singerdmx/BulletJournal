@@ -45,11 +45,14 @@ public class ProjectDaoJpa {
     public Projects getProjects(String owner) {
         Projects result = new Projects();
         Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
-        if (!userProjectsOptional.isPresent()) {
-            return new Projects();
+        UserProjects userProjects;
+        if (userProjectsOptional.isPresent()) {
+            userProjects = userProjectsOptional.get();
+        } else {
+            userProjects = new UserProjects(owner);
+            this.userProjectsRepository.save(userProjects);
         }
 
-        UserProjects userProjects = userProjectsOptional.get();
         result.setOwned(getOwnerProjects(userProjects, owner));
 
         // projects that are shared with owner
@@ -120,6 +123,9 @@ public class ProjectDaoJpa {
 
     private List<com.bulletjournal.controller.models.Project> getOwnerProjects(
             UserProjects userProjects, String owner) {
+        if (userProjects.getOwnedProjects() == null) {
+            return Collections.emptyList();
+        }
         Map<Long, Project> projects = this.projectRepository.findByOwner(owner)
                 .stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
         return ProjectRelationsProcessor.processProjectRelations(
