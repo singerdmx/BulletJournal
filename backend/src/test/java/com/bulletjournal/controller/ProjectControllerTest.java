@@ -68,7 +68,7 @@ public class ProjectControllerTest {
             group = addUserToGroup(group, username, ++count);
         }
 
-        group = groups.get(2);
+        group = groups.get(3);
         groups = addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
         Project p1 = createProject(projectName, expectedOwner);
@@ -152,6 +152,9 @@ public class ProjectControllerTest {
         assertEquals(p6, projects.get(1).getSubProjects().get(0));
         assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3, projects.get(0).getSubProjects().get(0).getSubProjects().get(0));
+
+        projects = projectsResponse.getBody().getShared();
+        assertEquals(0, projects.size());
     }
 
     private Project updateProject(Project p1) {
@@ -228,7 +231,7 @@ public class ProjectControllerTest {
 
     private List<Group> createGroups(String owner) {
         List<Group> groups = getGroups(null);
-        assertEquals(2, groups.size());
+        assertEquals(3, groups.size());
         Group g = groups.get(0);
         assertEquals(expectedOwner, g.getOwner());
         assertEquals(1, g.getUsers().size());
@@ -239,10 +242,17 @@ public class ProjectControllerTest {
         assertEquals(true, invitedToJoin.getUsers().get(0).isAccepted());
         assertEquals(expectedOwner, invitedToJoin.getUsers().get(1).getName());
         assertEquals(false, invitedToJoin.getUsers().get(1).isAccepted());
+        Group joinedGroup = groups.get(2);
+        assertEquals(2, joinedGroup.getUsers().size());
+        assertEquals("Scarlet", joinedGroup.getOwner());
+        assertEquals("Scarlet", joinedGroup.getUsers().get(0).getName());
+        assertEquals(true, joinedGroup.getUsers().get(0).isAccepted());
+        assertEquals(expectedOwner, joinedGroup.getUsers().get(1).getName());
+        assertEquals(true, joinedGroup.getUsers().get(1).isAccepted());
         Group g1 = createGroup("G0", owner);
         Group g2 = createGroup("G2", owner);
         Group g3 = createGroup("G3", owner);
-        getGroups(ImmutableList.of(g, invitedToJoin, g1, g2, g3));
+        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, g1, g2, g3));
 
         String groupNewName = "G1";
         UpdateGroupParams updateGroupParams = new UpdateGroupParams();
@@ -267,7 +277,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g3.getId());
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-        getGroups(ImmutableList.of(g, invitedToJoin, g1, g2));
+        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, g1, g2));
 
         // Delete Group "Default"
         deleteResponse = this.restTemplate.exchange(
@@ -277,7 +287,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
-        return getGroups(ImmutableList.of(g, invitedToJoin, g1, g2));
+        return getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, g1, g2));
     }
 
     private List<Group> addUsersToGroup(final Group group, List<String> usernames) {
