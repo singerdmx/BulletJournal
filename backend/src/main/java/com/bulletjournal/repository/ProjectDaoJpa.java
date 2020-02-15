@@ -6,6 +6,7 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.Projects;
 import com.bulletjournal.controller.models.UpdateProjectParams;
+import com.bulletjournal.controller.models.UpdateSharedProjectsOrderParams;
 import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.*;
@@ -42,9 +43,12 @@ public class ProjectDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Projects getProjects(String owner) {
         Projects result = new Projects();
-        UserProjects userProjects = this.userProjectsRepository.findById(owner)
-                .orElseThrow(() -> new ResourceNotFoundException("UserProjects " + owner + " not found"));
+        Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
+        if (!userProjectsOptional.isPresent()) {
+            return new Projects();
+        }
 
+        UserProjects userProjects = userProjectsOptional.get();
         result.setOwned(getOwnerProjects(userProjects, owner));
 
         // projects that are shared with owner
@@ -158,16 +162,28 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateUserProjects(String user, List<com.bulletjournal.controller.models.Project> projects) {
+    public void updateUserOwnedProjects(String user, List<com.bulletjournal.controller.models.Project> projects) {
         Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(user);
-        UserProjects userProjects = new UserProjects();
-        if (userProjectsOptional.isPresent()) {
-            userProjects = userProjectsOptional.get();
-        }
+        final UserProjects userProjects = userProjectsOptional.isPresent() ?
+                userProjectsOptional.get() : new UserProjects();
 
         userProjects.setOwnedProjects(ProjectRelationsProcessor.processProjectRelations(projects));
         userProjects.setOwner(user);
 
+        this.userProjectsRepository.save(userProjects);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void updateSharedProjectsOrder(
+            String owner, UpdateSharedProjectsOrderParams update) {
+        Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
+        final UserProjects userProjects = userProjectsOptional.isPresent() ?
+                userProjectsOptional.get() : new UserProjects();
+
+        DaoHelper.updateIfPresent(
+                update.hasProjectOwners(), update.getProjectOwners(),
+                (value) -> userProjects.setSharedProjects(GSON.toJson(value)));
+        userProjects.setOwner(owner);
         this.userProjectsRepository.save(userProjects);
     }
 }

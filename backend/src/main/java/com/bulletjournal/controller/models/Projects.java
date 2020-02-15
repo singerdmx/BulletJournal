@@ -1,12 +1,13 @@
 package com.bulletjournal.controller.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Projects {
 
-    List<Project> owned;
+    List<Project> owned = new ArrayList<>();
 
-    List<Project> shared;
+    List<Project> shared = new ArrayList<>();
 
     public List<Project> getOwned() {
         return owned;

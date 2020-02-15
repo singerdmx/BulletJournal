@@ -154,7 +154,16 @@ public class ProjectControllerTest {
         assertEquals(p3, projects.get(0).getSubProjects().get(0).getSubProjects().get(0));
 
         projects = projectsResponse.getBody().getShared();
-        assertEquals(0, projects.size());
+        assertEquals(2, projects.size());
+        assertEquals("P1", projects.get(0).getName());
+        assertEquals("P5", projects.get(1).getName());
+        assertEquals(2, projects.get(0).getSubProjects().size());
+        assertEquals("P2", projects.get(0).getSubProjects().get(0).getName());
+        assertEquals("P4", projects.get(0).getSubProjects().get(1).getName());
+        assertEquals(1, projects.get(1).getSubProjects().size());
+        assertEquals("P6", projects.get(1).getSubProjects().get(0).getName());
+        assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
+        assertEquals("P3", projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getName());
     }
 
     private Project updateProject(Project p1) {

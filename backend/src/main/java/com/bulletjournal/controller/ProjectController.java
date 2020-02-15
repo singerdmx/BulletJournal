@@ -1,10 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.CreateProjectParams;
-import com.bulletjournal.controller.models.Project;
-import com.bulletjournal.controller.models.Projects;
-import com.bulletjournal.controller.models.UpdateProjectParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.repository.ProjectDaoJpa;
 
 import org.slf4j.MDC;
@@ -21,10 +18,10 @@ public class ProjectController {
 
     protected static final String PROJECTS_ROUTE = "/api/projects";
     protected static final String PROJECT_ROUTE = "/api/projects/{projectId}";
+    protected static final String UPDATE_SHARED_PROJECTS_ORDER_ROUTE = "/api/updateSharedProjectsOrder";
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
-
 
     @GetMapping(PROJECTS_ROUTE)
     public Projects getProjects() {
@@ -46,9 +43,16 @@ public class ProjectController {
         return this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams).toPresentationModel();
     }
 
+    @PostMapping(UPDATE_SHARED_PROJECTS_ORDER_ROUTE)
+    public void updateSharedProjectsOrder(
+            @Valid @RequestBody UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.projectDaoJpa.updateSharedProjectsOrder(username, updateSharedProjectsOrderParams);
+    }
+
     @PutMapping(PROJECTS_ROUTE)
     public void updateProjectRelations(@Valid @RequestBody List<Project> projects) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.projectDaoJpa.updateUserProjects(username, projects);
+        this.projectDaoJpa.updateUserOwnedProjects(username, projects);
     }
 }
