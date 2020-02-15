@@ -37,7 +37,7 @@ public class ProjectsWithOwner {
 
     @Override
     public int hashCode() {
-        return Objects.hash(owner, Arrays.hashCode(projects.stream().toArray(Project[]::new)));
+        return owner.hashCode() + Arrays.hashCode(projects.stream().toArray(Project[]::new));
     }
 
     @Override
