@@ -11,7 +11,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,22 +34,22 @@ public class ProjectController {
         Projects projects = this.projectDaoJpa.getProjects(username);
 
         int requestHeaderETagSize = requestEntity.getHeaders().getIfNoneMatch().size();
-        String requestETag = requestHeaderETagSize > 0?
+        String requestETag = requestHeaderETagSize > 0 ?
                 requestEntity.getHeaders().getIfNoneMatch().get(requestHeaderETagSize - 1) : null;
-        String responseETag = null;
+        String responseETag;
 
         try {
             responseETag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                                                      EtagGenerator.HashType.TO_HASHCODE,
-                                                      projects.getOwned(),
-                                                      projects.getShared());
+                    EtagGenerator.HashType.TO_HASHCODE,
+                    projects.getOwned(),
+                    projects.getShared());
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setETag(responseETag);
-        if(requestETag != null && responseETag.equals(requestETag)) {
+        if (requestETag != null && responseETag.equals(requestETag)) {
             return new ResponseEntity<>(responseHeaders, HttpStatus.NOT_MODIFIED);
         }
 
@@ -66,7 +65,7 @@ public class ProjectController {
 
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
-                                  @Valid @RequestBody UpdateProjectParams updateProjectParams) {
+                                 @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams).toPresentationModel();
     }

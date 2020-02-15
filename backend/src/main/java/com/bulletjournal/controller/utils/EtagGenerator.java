@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * Etag Generator Class contains generate Etag
- *
+ * <p>
  * - To_Hash Code: Merge Hash Code of args into one String to hashing
  * - To_String: Concatenate String of args to one String for hashing
  */
@@ -25,31 +25,28 @@ public class EtagGenerator {
     }
 
     public static <T> String getHash(HashType hashType, T arg) {
-        if(hashType == HashType.TO_HASHCODE) {
+        if (hashType == HashType.TO_HASHCODE) {
             return String.valueOf(arg.hashCode());
-        }
-        else {
-            return (arg instanceof String)? (String)arg : arg.toString();
+        } else {
+            return (arg instanceof String) ? (String) arg : arg.toString();
         }
     }
 
     @SafeVarargs
     public static <T> void inputStreamBuilder(HashType hashType, StringBuilder inputBuilder, T... args) {
         // Add all input strings into one string
-        for(T arg : args) {
-            if(arg instanceof List<?>) {
-                List<?> list = (List<?>)arg;
+        for (T arg : args) {
+            if (arg instanceof List<?>) {
+                List<?> list = (List<?>) arg;
                 list.forEach(element -> {
                     inputBuilder.append(getHash(hashType, element));
                 });
-            }
-            else if(arg instanceof Set<?>) {
-                Set<?> set = (Set<?>)arg;
+            } else if (arg instanceof Set<?>) {
+                Set<?> set = (Set<?>) arg;
                 set.forEach(element -> {
                     inputBuilder.append(getHash(hashType, element));
                 });
-            }
-            else {
+            } else {
                 inputBuilder.append(getHash(hashType, arg));
             }
         }
@@ -66,11 +63,10 @@ public class EtagGenerator {
         InputStream inputStream = new ByteArrayInputStream(inputBuilder.toString().getBytes());
         outputBuilder.append("\"0");
 
-        if(HashAlgorithm.MD5 == hashAlg) {
+        if (HashAlgorithm.MD5 == hashAlg) {
             // MD5 Hash
             DigestUtils.appendMd5DigestAsHex(inputStream, outputBuilder);
-        }
-        else {
+        } else {
             // No Hash Function selected
             outputBuilder = inputBuilder;
         }

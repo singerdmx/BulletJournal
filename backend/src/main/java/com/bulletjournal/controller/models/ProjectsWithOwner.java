@@ -1,7 +1,6 @@
 package com.bulletjournal.controller.models;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,8 +35,17 @@ public class ProjectsWithOwner {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProjectsWithOwner that = (ProjectsWithOwner) o;
+        return Objects.equals(owner, that.owner) &&
+                Objects.equals(projects, that.projects);
+    }
+
+    @Override
     public int hashCode() {
-        return owner.hashCode() + Arrays.hashCode(projects.stream().toArray(Project[]::new));
+        return Objects.hash(owner, projects);
     }
 
     @Override
