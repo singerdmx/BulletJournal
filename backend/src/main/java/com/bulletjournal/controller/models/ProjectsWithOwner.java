@@ -1,7 +1,9 @@
 package com.bulletjournal.controller.models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ProjectsWithOwner {
 
@@ -31,5 +33,19 @@ public class ProjectsWithOwner {
 
     public void setProjects(List<Project> projects) {
         this.projects = projects;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(owner, Arrays.hashCode(projects.stream().toArray(Project[]::new)));
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProjectsWithOwner{");
+        projects.forEach(project -> builder.append(project.toString()));
+        builder.append("}");
+        return builder.toString();
     }
 }

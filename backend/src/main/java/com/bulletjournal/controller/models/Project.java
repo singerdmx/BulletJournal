@@ -133,7 +133,7 @@ public class Project {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, owner, projectType);
+        return Objects.hash(id, name, owner, projectType, description);
     }
 
     @Override

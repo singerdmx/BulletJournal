@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Etag Processor Class contains generate Etag
+ * Etag Generator Class contains generate Etag
  *
  * - To_Hash Code: Merge Hash Code of args into one String to hashing
  * - To_String: Concatenate String of args to one String for hashing
@@ -18,6 +18,10 @@ public class EtagGenerator {
 
     public enum HashType {
         TO_HASHCODE, TO_STRING
+    }
+
+    public enum HashAlgorithm {
+        MD5, ADLER32, SHA256
     }
 
     public static <T> String getHash(HashType hashType, T arg) {
@@ -29,10 +33,8 @@ public class EtagGenerator {
         }
     }
 
-    public static <T> String generateEtag(HashType hashType, T... args) throws IOException {
-        StringBuilder inputBuilder = new StringBuilder();
-        StringBuilder outputBuilder = new StringBuilder();
-
+    @SafeVarargs
+    public static <T> void inputStreamBuilder(HashType hashType, StringBuilder inputBuilder, T... args) {
         // Add all input strings into one string
         for(T arg : args) {
             if(arg instanceof List<?>) {
@@ -51,36 +53,29 @@ public class EtagGenerator {
                 inputBuilder.append(getHash(hashType, arg));
             }
         }
-
-        // Convert input string into Byte Array
-        InputStream inputStream = new ByteArrayInputStream(inputBuilder.toString().getBytes());
-        outputBuilder.append("\"0");
-
-        // MD5 Hash
-        DigestUtils.appendMd5DigestAsHex(inputStream, outputBuilder);
-        outputBuilder.append('"');
-
-        return outputBuilder.toString();
     }
-    /*
-    public static String generateEtagFromProjectList(List<Project> projectList) throws IOException {
+
+    @SafeVarargs
+    public static <T> String generateEtag(HashAlgorithm hashAlg, HashType hashType, T... args) throws IOException {
         StringBuilder inputBuilder = new StringBuilder();
         StringBuilder outputBuilder = new StringBuilder();
 
-        // Add all input strings into one string
-        for(Project project : projectList) {
-            inputBuilder.append(project.toString());
-        }
+        inputStreamBuilder(hashType, inputBuilder, args);
 
         // Convert input string into Byte Array
         InputStream inputStream = new ByteArrayInputStream(inputBuilder.toString().getBytes());
         outputBuilder.append("\"0");
 
-        // MD5 Hash
-        DigestUtils.appendMd5DigestAsHex(inputStream, outputBuilder);
-        outputBuilder.append('"');
+        if(HashAlgorithm.MD5 == hashAlg) {
+            // MD5 Hash
+            DigestUtils.appendMd5DigestAsHex(inputStream, outputBuilder);
+        }
+        else {
+            // No Hash Function selected
+            outputBuilder = inputBuilder;
+        }
 
+        outputBuilder.append('"');
         return outputBuilder.toString();
     }
-    */
 }
