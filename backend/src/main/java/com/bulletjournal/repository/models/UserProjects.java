@@ -9,9 +9,24 @@ public class UserProjects extends AuditModel {
     @Id
     private String owner;
 
-    @Lob
-    @Column
-    private String projects;
+    /**
+     * Store self-owned projects' hierarchy
+     */
+    @Column(length = 10485760)
+    private String ownedProjects;
+
+    /**
+     * Stores projects shared with me - order of project owners
+     */
+    @Column(length = 10485760)
+    private String sharedProjects;
+
+    public UserProjects() {
+    }
+
+    public UserProjects(String owner) {
+        this.owner = owner;
+    }
 
     public String getOwner() {
         return owner;
@@ -21,11 +36,19 @@ public class UserProjects extends AuditModel {
         this.owner = owner;
     }
 
-    public String getProjects() {
-        return projects;
+    public String getOwnedProjects() {
+        return ownedProjects;
     }
 
-    public void setProjects(String projects) {
-        this.projects = projects;
+    public void setOwnedProjects(String projects) {
+        this.ownedProjects = projects;
+    }
+
+    public String getSharedProjects() {
+        return sharedProjects;
+    }
+
+    public void setSharedProjects(String sharedProjects) {
+        this.sharedProjects = sharedProjects;
     }
 }

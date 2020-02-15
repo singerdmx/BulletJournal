@@ -19,7 +19,8 @@ public class Project extends OwnedModel {
     @GeneratedValue(generator = "project_generator")
     @SequenceGenerator(
             name = "project_generator",
-            sequenceName = "project_sequence"
+            sequenceName = "project_sequence",
+            initialValue = 100
     )
     private Long id;
 

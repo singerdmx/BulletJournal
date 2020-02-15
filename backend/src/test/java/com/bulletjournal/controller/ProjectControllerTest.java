@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.ProjectRelationsProcessorTest;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.JoinGroupEvent;
 import com.bulletjournal.notifications.JoinGroupResponseEvent;
@@ -67,7 +68,7 @@ public class ProjectControllerTest {
             group = addUserToGroup(group, username, ++count);
         }
 
-        group = groups.get(2);
+        group = groups.get(4);
         groups = addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
         Project p1 = createProject(projectName, expectedOwner);
@@ -123,38 +124,79 @@ public class ProjectControllerTest {
          *   |
          *    -- p6
          */
-        List<Project> projectRelations = new ArrayList<>();
-        projectRelations.add(p1);
-        p1.addSubProject(p2);
-        p1.addSubProject(p4);
-        p2.addSubProject(p3);
-        projectRelations.add(p5);
-        p5.addSubProject(p6);
+        List<Project> projectRelations = ProjectRelationsProcessorTest.createSampleProjectRelations(
+                p1, p2, p3, p4, p5, p6);
         // Set user's project relations
-        this.restTemplate.exchange(
+        ResponseEntity<?> updateProjectRelationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.PUT,
                 new HttpEntity<>(projectRelations),
                 Void.class
         );
+        assertEquals(HttpStatus.OK, updateProjectRelationsResponse.getStatusCode());
 
-        ResponseEntity<Project[]> projectsResponse = this.restTemplate.exchange(
+        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
                 null,
-                Project[].class);
+                Projects.class);
         assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        Project[] projects = projectsResponse.getBody();
-        assertEquals(2, projects.length);
-        assertEquals(p1, projects[0]);
-        assertEquals(p5, projects[1]);
-        assertEquals(2, projects[0].getSubProjects().size());
-        assertEquals(p2, projects[0].getSubProjects().get(0));
-        assertEquals(p4, projects[0].getSubProjects().get(1));
-        assertEquals(1, projects[1].getSubProjects().size());
-        assertEquals(p6, projects[1].getSubProjects().get(0));
-        assertEquals(1, projects[0].getSubProjects().get(0).getSubProjects().size());
-        assertEquals(p3, projects[0].getSubProjects().get(0).getSubProjects().get(0));
+        List<Project> projects = projectsResponse.getBody().getOwned();
+        assertEquals(2, projects.size());
+        assertEquals(p1, projects.get(0));
+        assertEquals(p5, projects.get(1));
+        assertEquals(2, projects.get(0).getSubProjects().size());
+        assertEquals(p2, projects.get(0).getSubProjects().get(0));
+        assertEquals(p4, projects.get(0).getSubProjects().get(1));
+        assertEquals(1, projects.get(1).getSubProjects().size());
+        assertEquals(p6, projects.get(1).getSubProjects().get(0));
+        assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
+        assertEquals(p3, projects.get(0).getSubProjects().get(0).getSubProjects().get(0));
+
+        List<ProjectsWithOwner> l = projectsResponse.getBody().getShared();
+        assertEquals(2, l.size());
+        projects = l.get(0).getProjects();
+        assertEquals("Scarlet", l.get(0).getOwner());
+        assertEquals(2, projects.size());
+        assertEquals("P1", projects.get(0).getName());
+        assertEquals("P5", projects.get(1).getName());
+        assertEquals(2, projects.get(0).getSubProjects().size());
+        assertEquals("P2", projects.get(0).getSubProjects().get(0).getName());
+        assertEquals("P4", projects.get(0).getSubProjects().get(1).getName());
+        assertEquals(1, projects.get(1).getSubProjects().size());
+        assertEquals("P6", projects.get(1).getSubProjects().get(0).getName());
+        assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
+        assertEquals("P3", projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getName());
+
+        projects = l.get(1).getProjects();
+        assertEquals("lsx9981", l.get(1).getOwner());
+        assertEquals(1, projects.size());
+        assertEquals("P1", projects.get(0).getName());
+
+        // change order of shared projects
+        UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams =
+                new UpdateSharedProjectsOrderParams(new String[]{"lsx9981", "Scarlet"});
+        ResponseEntity<?> updateSharedProjectsOrderResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.UPDATE_SHARED_PROJECTS_ORDER_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(updateSharedProjectsOrderParams),
+                Void.class);
+        assertEquals(HttpStatus.OK, updateSharedProjectsOrderResponse.getStatusCode());
+        projectsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
+        l = projectsResponse.getBody().getShared();
+        assertEquals(2, l.size());
+        projects = l.get(0).getProjects();
+        assertEquals("lsx9981", l.get(0).getOwner());
+        assertEquals(1, projects.size());
+
+        projects = l.get(1).getProjects();
+        assertEquals("Scarlet", l.get(1).getOwner());
+        assertEquals(2, projects.size());
     }
 
     private Project updateProject(Project p1) {
@@ -231,7 +273,7 @@ public class ProjectControllerTest {
 
     private List<Group> createGroups(String owner) {
         List<Group> groups = getGroups(null);
-        assertEquals(2, groups.size());
+        assertEquals(4, groups.size());
         Group g = groups.get(0);
         assertEquals(expectedOwner, g.getOwner());
         assertEquals(1, g.getUsers().size());
@@ -242,10 +284,18 @@ public class ProjectControllerTest {
         assertEquals(true, invitedToJoin.getUsers().get(0).isAccepted());
         assertEquals(expectedOwner, invitedToJoin.getUsers().get(1).getName());
         assertEquals(false, invitedToJoin.getUsers().get(1).isAccepted());
+        Group joinedGroup = groups.get(2);
+        assertEquals(2, joinedGroup.getUsers().size());
+        assertEquals("Scarlet", joinedGroup.getOwner());
+        assertEquals("Scarlet", joinedGroup.getUsers().get(0).getName());
+        assertEquals(true, joinedGroup.getUsers().get(0).isAccepted());
+        assertEquals(expectedOwner, joinedGroup.getUsers().get(1).getName());
+        assertEquals(true, joinedGroup.getUsers().get(1).isAccepted());
+        Group joinedGroup2 = groups.get(3);
         Group g1 = createGroup("G0", owner);
         Group g2 = createGroup("G2", owner);
         Group g3 = createGroup("G3", owner);
-        getGroups(ImmutableList.of(g, invitedToJoin, g1, g2, g3));
+        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2, g3));
 
         String groupNewName = "G1";
         UpdateGroupParams updateGroupParams = new UpdateGroupParams();
@@ -270,7 +320,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g3.getId());
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-        getGroups(ImmutableList.of(g, invitedToJoin, g1, g2));
+        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2));
 
         // Delete Group "Default"
         deleteResponse = this.restTemplate.exchange(
@@ -280,7 +330,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
-        return getGroups(ImmutableList.of(g, invitedToJoin, g1, g2));
+        return getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2));
     }
 
     private List<Group> addUsersToGroup(final Group group, List<String> usernames) {

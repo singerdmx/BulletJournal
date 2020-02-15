@@ -15,5 +15,7 @@ class NotificationList extends React.Component<NotificationsProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-    notifications: state
+    notifications: state.notice.notifications
 });
+
+export default connect(mapStateToProps, { updateNotifications })(NotificationList);
