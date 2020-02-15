@@ -25,8 +25,7 @@ const slice = createSlice({
       state.username = username;
       state.avatar = avatar;
     },
-    userApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
-      state,
+    userApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) => state,
     UserInfoUpdate: (state, action: PayloadAction<UpdateUserInfo>) => state
   }
 });

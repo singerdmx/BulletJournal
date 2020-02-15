@@ -4,8 +4,8 @@ import {
     actions as notificationsActions,
     ApiErrorAction, NotificationsAction
 } from './reducer';
-import {PayloadAction} from 'redux-starter-kit';
-import {fetchUserInfo} from '../../apis/userApis';
+import { PayloadAction } from 'redux-starter-kit';
+import { fetchUserInfo } from '../../apis/userApis';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
     yield call(toast.error, `Error Received: ${action.payload.error}`);

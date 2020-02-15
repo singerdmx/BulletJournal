@@ -27,21 +27,19 @@ export type NotificationsAction = {
     notifications: Notification[]
 }
 
+let initialState = {
+    notifications: [] as Notification[]
+}
+
 const slice = createSlice({
     name: "notifications",
-    initialState: [],
+    initialState,
     reducers: {
-        notificationsReceived: (
-            state: Notification[],
-            action: PayloadAction<NotificationsAction>
-        ) => {
-            const {notifications} = action.payload;
-            state = notifications;
+        notificationsReceived: ( state, action: PayloadAction<NotificationsAction>) => {
+            const { notifications } = action.payload;
+            state.notifications = notifications
         },
-        notificationApiErrorReceived: (
-            state,
-            action: PayloadAction<ApiErrorAction>
-        ) => state,
+        notificationApiErrorReceived: ( state, action: PayloadAction<ApiErrorAction> ) => state,
         notificationsUpdate: (state, action: PayloadAction<UpdateNotifications>) => state
     }
 });
