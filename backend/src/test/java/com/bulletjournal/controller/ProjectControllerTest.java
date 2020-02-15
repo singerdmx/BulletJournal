@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.ProjectRelationsProcessorTest;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.JoinGroupEvent;
 import com.bulletjournal.notifications.JoinGroupResponseEvent;
@@ -123,13 +124,8 @@ public class ProjectControllerTest {
          *   |
          *    -- p6
          */
-        List<Project> projectRelations = new ArrayList<>();
-        projectRelations.add(p1);
-        p1.addSubProject(p2);
-        p1.addSubProject(p4);
-        p2.addSubProject(p3);
-        projectRelations.add(p5);
-        p5.addSubProject(p6);
+        List<Project> projectRelations = ProjectRelationsProcessorTest.createSampleProjectRelations(
+                p1, p2, p3, p4, p5, p6);
         // Set user's project relations
         ResponseEntity<?> updateProjectRelationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,

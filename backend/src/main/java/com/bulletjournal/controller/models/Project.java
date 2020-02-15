@@ -38,6 +38,10 @@ public class Project {
     public Project() {
     }
 
+    public Project(Long id) {
+        this.id = id;
+    }
+
     public Project(Long id, String name, String owner, ProjectType projectType, Group group, String description) {
         this.id = id;
         this.name = name;
@@ -95,12 +99,25 @@ public class Project {
         this.subProjects.add(subProject);
     }
 
+    public void setSubProjects(List<Project> subProjects) {
+        this.subProjects = subProjects;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void clone(Project other) {
+        this.setGroup(other.getGroup());
+        this.setName(other.getName());
+        this.setId(other.getId());
+        this.setOwner(other.getOwner());
+        this.setProjectType(other.getProjectType());
+        this.setDescription(other.getDescription());
     }
 
     @Override
