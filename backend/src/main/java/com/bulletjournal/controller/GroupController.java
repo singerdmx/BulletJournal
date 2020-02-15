@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,10 +51,26 @@ public class GroupController {
     }
 
     @GetMapping(GROUPS_ROUTE)
-    public List<Group> getGroups() {
+    public List<GroupsWithOwner> getGroups() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Group> groups = this.groupDaoJpa.getGroups(username);
-        return addUserAvatarToGroups(groups);
+        groups = addUserAvatarToGroups(groups);
+        // owner name -> groups (order by owner)
+        Map<String, List<Group>> m = new TreeMap<>();
+        for (Group group : groups) {
+            m.computeIfAbsent(group.getOwner(), k -> new ArrayList<>()).add(group);
+        }
+        List<GroupsWithOwner> result = new ArrayList<>();
+        result.add(new GroupsWithOwner(username, m.get(username)));
+        for (Map.Entry<String, List<Group>> entry : m.entrySet()) {
+            if (Objects.equals(entry.getKey(), username)) {
+                continue;
+            }
+            List<Group> l = entry.getValue();
+            Collections.sort(l, Comparator.comparing(Group::getName));
+            result.add(new GroupsWithOwner(entry.getKey(), l));
+        }
+        return result;
     }
 
     private List<Group> addUserAvatarToGroups(List<Group> groups) {
@@ -75,7 +91,7 @@ public class GroupController {
     }
 
     @PostMapping(ADD_USER_GROUPS_ROUTE)
-    public List<Group> addUserGroups(@Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
+    public List<GroupsWithOwner> addUserGroups(@Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups());
         return getGroups();

@@ -61,15 +61,15 @@ public class ProjectControllerTest {
     public void testCRUD() throws Exception {
         answerNotifications();
         String projectName = "P0";
-        List<Group> groups = createGroups(expectedOwner);
-        Group group = groups.get(0);
+        List<GroupsWithOwner> groups = createGroups(expectedOwner);
+        Group group = groups.get(0).getGroups().get(0);
         int count = 1;
         for (String username : Arrays.asList(sampleUsers).subList(0, 3)) {
             group = addUserToGroup(group, username, ++count);
         }
 
-        group = groups.get(4);
-        groups = addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
+        group = groups.get(0).getGroups().get(2);
+        addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
         Project p1 = createProject(projectName, expectedOwner);
         p1 = updateProject(p1);
@@ -247,55 +247,51 @@ public class ProjectControllerTest {
         }
     }
 
-    private List<Group> getGroups(List<Group> expected) {
-        ResponseEntity<Group[]> groupsResponse = this.restTemplate.exchange(
+    private List<GroupsWithOwner> getGroups(List<GroupsWithOwner> expected) {
+        ResponseEntity<GroupsWithOwner[]> groupsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
                 HttpMethod.GET,
                 null,
-                Group[].class);
-        List<Group> groups = Arrays.asList(groupsResponse.getBody());
-        Collections.sort(groups, Comparator.comparing(Group::getName));
+                GroupsWithOwner[].class);
+        List<GroupsWithOwner> groupsBody = Arrays.asList(groupsResponse.getBody());
         if (expected != null) {
-            assertEquals(expected.size(), groups.size());
+            assertEquals(expected.size(), groupsBody.size());
             for (int i = 0; i < expected.size(); i++) {
-                assertEquals(expected.get(i), groups.get(i));
-                List<UserGroup> userGroups = groups.get(i).getUsers();
-                if (expectedOwner.equals(userGroups.get(0).getName())) {
-                    assertEquals(true, userGroups.get(0).isAccepted());
-                    assertEquals(1, userGroups.size());
-                }
-                assertNotNull(userGroups.get(0).getThumbnail());
-                assertNotNull(userGroups.get(0).getAvatar());
+                assertEquals(expected.get(i), groupsBody.get(i));
             }
         }
-        return groups;
+        return groupsBody;
     }
 
-    private List<Group> createGroups(String owner) {
-        List<Group> groups = getGroups(null);
+    private List<GroupsWithOwner> createGroups(String owner) {
+        List<GroupsWithOwner> groups = getGroups(null);
         assertEquals(4, groups.size());
-        Group g = groups.get(0);
+        Group g = groups.get(0).getGroups().get(0);
         assertEquals(expectedOwner, g.getOwner());
         assertEquals(1, g.getUsers().size());
-        Group invitedToJoin = groups.get(1);
+        Group invitedToJoin = groups.get(2).getGroups().get(0);
         assertEquals(2, invitedToJoin.getUsers().size());
         assertEquals("Xavier", invitedToJoin.getOwner());
         assertEquals("Xavier", invitedToJoin.getUsers().get(0).getName());
         assertEquals(true, invitedToJoin.getUsers().get(0).isAccepted());
         assertEquals(expectedOwner, invitedToJoin.getUsers().get(1).getName());
         assertEquals(false, invitedToJoin.getUsers().get(1).isAccepted());
-        Group joinedGroup = groups.get(2);
+        Group joinedGroup = groups.get(1).getGroups().get(0);
         assertEquals(2, joinedGroup.getUsers().size());
         assertEquals("Scarlet", joinedGroup.getOwner());
         assertEquals("Scarlet", joinedGroup.getUsers().get(0).getName());
         assertEquals(true, joinedGroup.getUsers().get(0).isAccepted());
         assertEquals(expectedOwner, joinedGroup.getUsers().get(1).getName());
         assertEquals(true, joinedGroup.getUsers().get(1).isAccepted());
-        Group joinedGroup2 = groups.get(3);
+        Group joinedGroup2 = groups.get(3).getGroups().get(0);
         Group g1 = createGroup("G0", owner);
         Group g2 = createGroup("G2", owner);
         Group g3 = createGroup("G3", owner);
-        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2, g3));
+        getGroups(ImmutableList.of(
+                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, g1, g2, g3)),
+                new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
+                new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
+                new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
 
         String groupNewName = "G1";
         UpdateGroupParams updateGroupParams = new UpdateGroupParams();
@@ -320,7 +316,11 @@ public class ProjectControllerTest {
                 Void.class,
                 g3.getId());
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2));
+        groups = getGroups(ImmutableList.of(
+                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, g1, g2)),
+                new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
+                new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
+                new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
 
         // Delete Group "Default"
         deleteResponse = this.restTemplate.exchange(
@@ -330,21 +330,28 @@ public class ProjectControllerTest {
                 Void.class,
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
-        return getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2));
+        groups = getGroups(ImmutableList.of(
+                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, g1, g2)),
+                new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
+                new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
+                new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
+        return groups;
     }
 
-    private List<Group> addUsersToGroup(final Group group, List<String> usernames) {
+    private List<GroupsWithOwner> addUsersToGroup(final Group group, List<String> usernames) {
         AddUserGroupsParams addUserGroupsParams = new AddUserGroupsParams();
         for (String username : usernames) {
             addUserGroupsParams.getUserGroups().add(new AddUserGroupParams(group.getId(), username));
         }
-        ResponseEntity<Group[]> groupsResponse = this.restTemplate.exchange(
+        ResponseEntity<GroupsWithOwner[]> groupsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUPS_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(addUserGroupsParams),
-                Group[].class);
-        List<Group> groups = Arrays.asList(groupsResponse.getBody());
-        Group updated = groups.stream().filter(g -> group.getName().equals(g.getName())).findFirst().get();
+                GroupsWithOwner[].class);
+        List<GroupsWithOwner> groups = Arrays.asList(groupsResponse.getBody());
+        Group updated = groups.stream().filter(g -> group.getOwner().equals(g.getOwner()))
+                .findFirst().get().getGroups()
+                .stream().filter(g -> group.getName().equals(g.getName())).findFirst().get();
         assertEquals(usernames.size() + 1, updated.getUsers().size());
         return groups;
     }
