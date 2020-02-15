@@ -68,7 +68,7 @@ public class ProjectControllerTest {
             group = addUserToGroup(group, username, ++count);
         }
 
-        group = groups.get(3);
+        group = groups.get(4);
         groups = addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
         Project p1 = createProject(projectName, expectedOwner);
@@ -153,7 +153,10 @@ public class ProjectControllerTest {
         assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3, projects.get(0).getSubProjects().get(0).getSubProjects().get(0));
 
-        projects = projectsResponse.getBody().getShared();
+        List<ProjectsWithOwner> l = projectsResponse.getBody().getShared();
+        assertEquals(2, l.size());
+        projects = l.get(0).getProjects();
+        assertEquals("Scarlet", l.get(0).getOwner());
         assertEquals(2, projects.size());
         assertEquals("P1", projects.get(0).getName());
         assertEquals("P5", projects.get(1).getName());
@@ -164,6 +167,36 @@ public class ProjectControllerTest {
         assertEquals("P6", projects.get(1).getSubProjects().get(0).getName());
         assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
         assertEquals("P3", projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getName());
+
+        projects = l.get(1).getProjects();
+        assertEquals("lsx9981", l.get(1).getOwner());
+        assertEquals(1, projects.size());
+        assertEquals("P1", projects.get(0).getName());
+
+        // change order of shared projects
+        UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams =
+                new UpdateSharedProjectsOrderParams(new String[]{"lsx9981", "Scarlet"});
+        ResponseEntity<?> updateSharedProjectsOrderResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.UPDATE_SHARED_PROJECTS_ORDER_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(updateSharedProjectsOrderParams),
+                Void.class);
+        assertEquals(HttpStatus.OK, updateSharedProjectsOrderResponse.getStatusCode());
+        projectsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
+        l = projectsResponse.getBody().getShared();
+        assertEquals(2, l.size());
+        projects = l.get(0).getProjects();
+        assertEquals("lsx9981", l.get(0).getOwner());
+        assertEquals(1, projects.size());
+
+        projects = l.get(1).getProjects();
+        assertEquals("Scarlet", l.get(1).getOwner());
+        assertEquals(2, projects.size());
     }
 
     private Project updateProject(Project p1) {
@@ -240,7 +273,7 @@ public class ProjectControllerTest {
 
     private List<Group> createGroups(String owner) {
         List<Group> groups = getGroups(null);
-        assertEquals(3, groups.size());
+        assertEquals(4, groups.size());
         Group g = groups.get(0);
         assertEquals(expectedOwner, g.getOwner());
         assertEquals(1, g.getUsers().size());
@@ -258,10 +291,11 @@ public class ProjectControllerTest {
         assertEquals(true, joinedGroup.getUsers().get(0).isAccepted());
         assertEquals(expectedOwner, joinedGroup.getUsers().get(1).getName());
         assertEquals(true, joinedGroup.getUsers().get(1).isAccepted());
+        Group joinedGroup2 = groups.get(3);
         Group g1 = createGroup("G0", owner);
         Group g2 = createGroup("G2", owner);
         Group g3 = createGroup("G3", owner);
-        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, g1, g2, g3));
+        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2, g3));
 
         String groupNewName = "G1";
         UpdateGroupParams updateGroupParams = new UpdateGroupParams();
@@ -286,7 +320,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g3.getId());
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, g1, g2));
+        getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2));
 
         // Delete Group "Default"
         deleteResponse = this.restTemplate.exchange(
@@ -296,7 +330,7 @@ public class ProjectControllerTest {
                 Void.class,
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
-        return getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, g1, g2));
+        return getGroups(ImmutableList.of(g, invitedToJoin, joinedGroup, joinedGroup2, g1, g2));
     }
 
     private List<Group> addUsersToGroup(final Group group, List<String> usernames) {

@@ -3,13 +3,14 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
-import com.bulletjournal.controller.models.CreateProjectParams;
-import com.bulletjournal.controller.models.Projects;
-import com.bulletjournal.controller.models.UpdateProjectParams;
-import com.bulletjournal.controller.models.UpdateSharedProjectsOrderParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.Group;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class ProjectDaoJpa {
         return result;
     }
 
-    private List<com.bulletjournal.controller.models.Project> getSharedProjects(
+    private List<ProjectsWithOwner> getSharedProjects(
             UserProjects userProjects, String owner) {
         User user = this.userDaoJpa.getByName(owner);
         // project owner -> project ids
@@ -84,31 +85,37 @@ public class ProjectDaoJpa {
         }
 
         List<String> newOwners = new ArrayList<>();
-        List<com.bulletjournal.controller.models.Project> result = new ArrayList<>();
+        List<ProjectsWithOwner> result = new ArrayList<>();
         for (String o : owners) {
             Set<Long> projectsByOwner = projectIds.remove(o);
-            result.addAll(getProjectsByOwner(newOwners, o, projectsByOwner));
+            addProjectsByOwner(newOwners, o, projectsByOwner, result);
         }
 
         for (Map.Entry<String, Set<Long>> entry : projectIds.entrySet()) {
-            result.addAll(getProjectsByOwner(newOwners, entry.getKey(), entry.getValue()));
+            addProjectsByOwner(newOwners, entry.getKey(), entry.getValue(), result);
         }
 
         return result;
     }
 
-    private List<com.bulletjournal.controller.models.Project> getProjectsByOwner(
-            List<String> newOwners, String o, Set<Long> projectsByOwner) {
+    private void addProjectsByOwner(
+            List<String> newOwners, String o, Set<Long> projectsByOwner, List<ProjectsWithOwner> result) {
         if (projectsByOwner == null) {
-            return Collections.emptyList();
+            return;
         }
 
         newOwners.add(o);
         List<Project> projects = this.projectRepository.findAllById(new ArrayList<>(projectsByOwner));
         String projectRelationsByOwner = this.userProjectsRepository.findById(o).get().getOwnedProjects();
-        return ProjectRelationsProcessor.processProjectRelations(
+        List<com.bulletjournal.controller.models.Project> l = ProjectRelationsProcessor.processProjectRelations(
                 projects.stream().collect(Collectors.toMap(Project::getId, p -> p)),
                 projectRelationsByOwner, projectsByOwner);
+
+        if (l.isEmpty()) {
+            return;
+        }
+
+        result.add(new ProjectsWithOwner(o, l));
     }
 
     private List<com.bulletjournal.controller.models.Project> getOwnerProjects(
