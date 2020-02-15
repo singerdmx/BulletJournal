@@ -12,16 +12,21 @@ public class UserProjects extends AuditModel {
     /**
      * Store self-owned projects' hierarchy
      */
-    @Lob
-    @Column
+    @Column(length = 10485760)
     private String ownedProjects;
 
     /**
      * Stores projects shared with me - order of project owners
      */
-    @Lob
-    @Column
+    @Column(length = 10485760)
     private String sharedProjects;
+
+    public UserProjects() {
+    }
+
+    public UserProjects(String owner) {
+        this.owner = owner;
+    }
 
     public String getOwner() {
         return owner;

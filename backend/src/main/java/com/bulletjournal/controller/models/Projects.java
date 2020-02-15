@@ -7,7 +7,7 @@ public class Projects {
 
     List<Project> owned = new ArrayList<>();
 
-    List<Project> shared = new ArrayList<>();
+    List<ProjectsWithOwner> shared;
 
     public List<Project> getOwned() {
         return owned;
@@ -17,11 +17,11 @@ public class Projects {
         this.owned = owned;
     }
 
-    public List<Project> getShared() {
+    public List<ProjectsWithOwner> getShared() {
         return shared;
     }
 
-    public void setShared(List<Project> shared) {
+    public void setShared(List<ProjectsWithOwner> shared) {
         this.shared = shared;
     }
 }

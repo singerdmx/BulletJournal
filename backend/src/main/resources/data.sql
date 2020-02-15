@@ -116,8 +116,10 @@ INSERT INTO public.notifications (id, created_at, updated_at, actions, content, 
 VALUES (7, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 8, 'bean', 'BulletJournal', 'bean invited you to join Group Default', 'JoinGroupEvent');
 
 -- Joined Scarlet's Default Group
-VALUES (12, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Scarlet');
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (12, 0, true);
+
+-- Joined lsx9981's Default Group
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (13, 0, true);
 
 -- Scarlet creates 6 projects
 INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
@@ -138,5 +140,12 @@ VALUES (5, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P5', 'Sc
 INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
 VALUES (6, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P6', 'Scarlet', null, 0, 12);
 
+-- lsx9981 creates 1 project
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (7, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P1', 'lsx9981', null, 0, 13);
+
 INSERT INTO public.user_projects (owner, created_at, updated_at, owned_projects, shared_projects)
-VALUES ('Scarlet', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '[{"id":1,"s":[{"id":2,"s":[{"id":3,"s":[]}]},{"id":4,"s":[]}]},{"id":5,"s":[{"id":6,"s":[]}]}]', null)
+VALUES ('Scarlet', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '[{"id":1,"s":[{"id":2,"s":[{"id":3,"s":[]}]},{"id":4,"s":[]}]},{"id":5,"s":[{"id":6,"s":[]}]}]', null);
+
+INSERT INTO public.user_projects (owner, created_at, updated_at, owned_projects, shared_projects)
+VALUES ('lsx9981', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '[{"id":7,"s":[]}]', null);
