@@ -1,11 +1,11 @@
 import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Group } from './reducer';
+import { GroupsWithOwner } from './reducer';
 import { updateGroups, createGroupByName } from './actions';
 
 type GroupsProps = {
-  groups: Group[];
+  groups: GroupsWithOwner[];
   updateGroups: () => void;
   createGroupByName: (name: string) => void;
 };

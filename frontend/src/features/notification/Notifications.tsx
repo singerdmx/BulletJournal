@@ -11,17 +11,26 @@ type NotificationsProps = {
 
 type titleProps = {
   title: String;
+  type: String;
 };
 
-const ListTitle = ({ title }: titleProps) => {
-  const titleList = title.split(' ');
-  const name = titleList[0];
-  const project = titleList[titleList.length - 1];
-  const rest = titleList.slice(1, titleList.length - 1).join(' ');
+const ListTitle = ({ title, type }: titleProps) => {
+  if (type === 'JoinGroupEvent') {
+    const titleList = title.split(' ');
+    const name = titleList[0];
+    const project = titleList[titleList.length - 1];
+    const rest = titleList.slice(1, titleList.length - 1).join(' ');
+    return (
+      <span>
+        <strong>{name}</strong> {rest} <strong>{project}</strong>
+      </span>
+    );
+  }
+
   return (
-    <span>
-      <strong>{name}</strong> {rest} <strong>{project}</strong>
-    </span>
+      <span>
+        title
+      </span>
   );
 };
 
@@ -39,7 +48,7 @@ class NotificationList extends React.Component<NotificationsProps> {
           <List.Item>
             <List.Item.Meta
               avatar={<Avatar src={item.originator.avatar} />}
-              title={<ListTitle title={item.title} />}
+              title={<ListTitle title={item.title} type={item.type}/>}
               description={item.content ? item.content : ''}
             />
           </List.Item>
