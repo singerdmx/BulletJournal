@@ -3,6 +3,7 @@ package com.bulletjournal.controller.models;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 public class Notification {
 
@@ -91,5 +92,24 @@ public class Notification {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Notification)) return false;
+        Notification that = (Notification) o;
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getTitle(), that.getTitle()) &&
+                Objects.equals(getContent(), that.getContent()) &&
+                Objects.equals(getTimestamp(), that.getTimestamp()) &&
+                Objects.equals(getOriginator(), that.getOriginator()) &&
+                Objects.equals(getActions(), that.getActions()) &&
+                Objects.equals(getType(), that.getType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getTitle(), getContent(), getTimestamp(), getOriginator(), getActions(), getType());
     }
 }
