@@ -2,7 +2,7 @@ import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateNotifications, Notification } from './reducer';
-import { List } from 'antd';
+import { List, Avatar } from 'antd';
 
 type NotificationsProps = {
   notifications: Notification[];
@@ -17,13 +17,14 @@ class NotificationList extends React.Component<NotificationsProps> {
   render() {
     return (
       <List
+        itemLayout="horizontal"
         dataSource={this.props.notifications}
         renderItem={item => (
           <List.Item>
             <List.Item.Meta
-              avatar={item.originator.avatar}
+              avatar={<Avatar src={item.originator.avatar} />}
               title={item.title}
-              description={item.content ? item.content : ''}
+              description={item.content ? item.content : 'A new notification'}
             />
           </List.Item>
         )}

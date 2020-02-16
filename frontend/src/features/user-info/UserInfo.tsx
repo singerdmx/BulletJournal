@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Avatar, Dropdown, Icon } from 'antd';
+import { Avatar, Dropdown, Icon, Popover } from 'antd';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import NotificationList from '../notification/Notifications';
 import { IState } from '../../store/index';
@@ -33,9 +33,9 @@ class UserInfo extends React.Component<UserProps> {
         }}
       >
       <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
-        <Dropdown overlay={notifications} trigger={['click']}>
+        <Popover content={notifications} trigger='click' placement="bottomRight">
           <Icon type="bell" theme="filled" />
-        </Dropdown>
+        </Popover>
         <Dropdown overlay={dropdown} trigger={['click']}>
           <Avatar
             src={this.props.avatar}
