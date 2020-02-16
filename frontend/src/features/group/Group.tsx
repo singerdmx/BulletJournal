@@ -12,6 +12,10 @@ class GroupList extends React.Component<GroupsProps> {
   componentDidMount() {
     this.props.updateGroups();
   }
+  render(){
+    console.log(this.props)
+    return (<div>group</div>)
+  }
 }
 
 const mapStateToProps = (state: IState) => ({

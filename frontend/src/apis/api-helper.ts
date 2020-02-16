@@ -1,10 +1,9 @@
-export function doFetch(endpoint: string, httpMethod: string) {
+export function doFetch(endpoint: string) {
   if (process.env.DEBUG_MODE === "DEBUG") {
     console.log(endpoint);
   }
   return fetch(endpoint, {
     headers: {},
-    method: httpMethod
   }).then(res => {
     if (!res.ok) {
       throw Error(res.statusText);
@@ -12,4 +11,20 @@ export function doFetch(endpoint: string, httpMethod: string) {
       return res;
     }
   });
+}
+
+export function doPost(endpoint: string) {
+    if (process.env.DEBUG_MODE === "DEBUG") {
+      console.log(endpoint);
+    }
+    return fetch(endpoint, {
+      headers: {},
+      method: 'POST'
+    }).then(res => {
+      if (!res.ok) {
+        throw Error(res.statusText);
+      } else {
+        return res;
+      }
+    });
 }

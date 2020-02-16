@@ -4,7 +4,7 @@ export type ApiErrorAction = {
   error: string;
 };
 
-export type UpdateGroups = Group[];
+export type UpdateGroups = {};
 
 export type User = {
   accepted: boolean;
@@ -43,7 +43,7 @@ const slice = createSlice({
   }
 });
 
-export const updateGroups = () => actions.groupsUpdate([]);
+export const updateGroups = () => actions.groupsUpdate({});
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;

@@ -1,7 +1,7 @@
-import { doFetch } from './api-helper';
+import { doFetch, doPost } from './api-helper';
 
 export const fetchUserInfo = () => {
-  return doFetch('/api/myself', 'GET')
+  return doFetch('/api/myself')
     .then(res => res.json())
     .catch(err => {
       throw Error(err);
@@ -9,5 +9,5 @@ export const fetchUserInfo = () => {
 };
 
 export const logoutUser = () => {
-  return doFetch('/api/myself/logout', 'POST');
+  return doPost('/api/myself/logout');
 };

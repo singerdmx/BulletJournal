@@ -15,7 +15,8 @@ function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
 function* groupsUpdate(action: PayloadAction<GroupsAction>) {
   try {
     const data = yield call(fetchGroups);
-    yield put(groupsActions.groupsReceived(data.groups));
+    // console.log(data)
+    yield put(groupsActions.groupsReceived({groups: data}));
   } catch (error) {
     yield call(message.error, `Error Received: ${error}`);
   }
