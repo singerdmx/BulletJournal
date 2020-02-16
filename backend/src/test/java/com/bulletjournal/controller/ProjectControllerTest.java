@@ -69,6 +69,11 @@ public class ProjectControllerTest {
             group = addUserToGroup(group, username, ++count);
         }
 
+        for (String username : Arrays.asList(sampleUsers).subList(0, 1)) {
+            removeUserFromGroup(group, username);
+        }
+        removeUsersFromGroup(group, Arrays.asList(sampleUsers).subList(1, 3));
+
         group = groups.get(0).getGroups().get(2);
         addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
 
@@ -462,6 +467,28 @@ public class ProjectControllerTest {
         Group updated = groupsResponse.getBody();
         assertEquals(expectedSize, updated.getUsers().size());
         return updated;
+    }
+
+    private void removeUsersFromGroup(final Group group, List<String> usernames) {
+        RemoveUserGroupsParams removeUserGroupsParams = new RemoveUserGroupsParams();
+        for (String username : usernames) {
+            removeUserGroupsParams.getUserGroups().add(new RemoveUserGroupParams(group.getId(), username));
+        }
+
+        this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.REMOVE_USER_GROUPS_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(removeUserGroupsParams),
+                Void.class);
+    }
+
+    private void removeUserFromGroup(Group group, String username) {
+        RemoveUserGroupParams removeUserGroupParams = new RemoveUserGroupParams(group.getId(), username);
+        this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.REMOVE_USER_GROUP_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(removeUserGroupParams),
+                Void.class);
     }
 
     private Group createGroup(String groupName, String expectedOwner) {

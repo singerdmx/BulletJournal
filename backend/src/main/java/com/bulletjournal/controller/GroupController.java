@@ -22,6 +22,8 @@ public class GroupController {
     protected static final String GROUP_ROUTE = "/api/groups/{groupId}";
     protected static final String ADD_USER_GROUPS_ROUTE = "/addUserGroups";
     protected static final String ADD_USER_GROUP_ROUTE = "/addUserGroup";
+    protected static final String REMOVE_USER_GROUP_ROUTE = "/removeUserGroup";
+    protected static final String REMOVE_USER_GROUPS_ROUTE = "/removeUserGroups";
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
@@ -102,5 +104,17 @@ public class GroupController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.groupDaoJpa.addUserGroups(username, ImmutableList.of(addUserGroupParams));
         return addUserAvatarToGroup(this.groupDaoJpa.getGroup(addUserGroupParams.getGroupId()).toVerbosePresentationModel());
+    }
+
+    @PostMapping(REMOVE_USER_GROUPS_ROUTE)
+    public void removeUserGroups(@Valid @RequestBody RemoveUserGroupsParams removeUserGroupsParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.groupDaoJpa.removeUserGroups(username, removeUserGroupsParams.getUserGroups());
+    }
+
+    @PostMapping(REMOVE_USER_GROUP_ROUTE)
+    public void removeUserGroup(@Valid @RequestBody RemoveUserGroupParams removeUserGroupParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.groupDaoJpa.removeUserGroups(username, ImmutableList.of(removeUserGroupParams));
     }
 }

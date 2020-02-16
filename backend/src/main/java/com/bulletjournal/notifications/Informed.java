@@ -38,7 +38,7 @@ public abstract class Informed {
                     Notification notification = new Notification(
                             this.getOriginator(),
                             this.getEventTitle(event),
-                            null,
+                            this.getEventContent(event),
                             event.getTargetUser(),
                             this.getEventType(),
                             event.getContentId());
