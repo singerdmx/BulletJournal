@@ -70,6 +70,15 @@ public class ProjectController {
         return this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams).toPresentationModel();
     }
 
+    /**
+     * Delete project deletes its child projects as well
+     */
+    @DeleteMapping(PROJECT_ROUTE)
+    public void deleteProject(@NotNull @PathVariable Long projectId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.projectDaoJpa.deleteProject(username, projectId);
+    }
+
     @PostMapping(UPDATE_SHARED_PROJECTS_ORDER_ROUTE)
     public void updateSharedProjectsOrder(
             @Valid @RequestBody UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams) {

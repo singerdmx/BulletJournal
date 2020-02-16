@@ -2,7 +2,9 @@ package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.repository.models.Group;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 import java.util.*;
@@ -40,6 +42,50 @@ public class ProjectRelationsProcessorTest {
         projectRelations.add(p5);
         p5.addSubProject(p6);
         return projectRelations;
+    }
+
+    /**
+     * Tests {@link ProjectRelationsProcessor#removeTargetProject(Project, Project, List)}
+     */
+    @Test
+    public void testRemoveTargetProject() {
+        List<Project> projects = new ArrayList<>();
+        for (long i = 1; i <= 6; i++) {
+            projects.add(createProject(i));
+        }
+        Project p1 = projects.get(0);
+        Project p2 = projects.get(1);
+        Project p3 = projects.get(2);
+        Project p4 = projects.get(3);
+        Project p5 = projects.get(4);
+        Project p6 = projects.get(5);
+        List<Project> projectHierarchy = createSampleProjectRelations(p1, p2, p3, p4, p5, p6);
+
+        /**
+         * After remove p2
+         *  p1
+         *   |
+         *    -- p4
+         *
+         *  p5
+         *   |
+         *    -- p6
+         */
+        List<Long> subProjects = ProjectRelationsProcessor.findSubProjects(p2);
+        Collections.sort(subProjects);
+        assertEquals(ImmutableList.of(2L, 3L), subProjects);
+
+        String projectRelations = ProjectRelationsProcessor.processProjectRelations(projectHierarchy);
+        Pair<Project, List<Project>> result = ProjectRelationsProcessor
+                .removeTargetProject(projectRelations, p2.getId());
+        projectHierarchy = result.getRight();
+        assertEquals(2, projectHierarchy.size());
+        assertEquals(1L, projectHierarchy.get(0).getId().longValue());
+        assertEquals(1, projectHierarchy.get(0).getSubProjects().size());
+        assertEquals(4L, projectHierarchy.get(0).getSubProjects().get(0).getId().longValue());
+        assertEquals(5L, projectHierarchy.get(1).getId().longValue());
+        assertEquals(1, projectHierarchy.get(1).getSubProjects().size());
+        assertEquals(6L, projectHierarchy.get(1).getSubProjects().get(0).getId().longValue());
     }
 
     /**

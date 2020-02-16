@@ -79,7 +79,38 @@ public class ProjectControllerTest {
         Project p6 = createProject("P6", expectedOwner);
         updateProjectRelations(p1, p2, p3, p4, p5, p6);
 
+        deleteProject(p1);
+
         getNotifications();
+    }
+
+    private void deleteProject(Project p) {
+        /**  After deletion
+         *
+         *  p5
+         *   |
+         *    -- p6
+         */
+
+        ResponseEntity<?> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Void.class,
+                p.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ResponseEntity<Projects> getResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        assertEquals(HttpStatus.OK, getResponse.getStatusCode());
+        List<Project> projects = getResponse.getBody().getOwned();
+        assertEquals(1, projects.size());
+        assertEquals("P5", projects.get(0).getName());
+        assertEquals(1, projects.get(0).getSubProjects().size());
+        assertEquals("P6", projects.get(0).getSubProjects().get(0).getName());
     }
 
     private void answerNotifications() {
