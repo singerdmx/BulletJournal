@@ -1,17 +1,15 @@
 import { takeEvery, call, all, put } from 'redux-saga/effects';
-import { toast } from 'react-toastify';
+import { message } from 'antd';
 import {
   actions as notificationsActions,
   NoticeApiErrorAction,
-  NotificationsAction,
-  Originator,
-  Notification
+  NotificationsAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchNotifications } from '../../apis/notificationApis';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
-  yield call(toast.error, `Error Received: ${action.payload.error}`);
+  yield call(message.error, `Error Received: ${action.payload.error}`);
 }
 
 function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
@@ -20,7 +18,7 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     // console.log(data)
     yield put(notificationsActions.notificationsReceived({ notifications: data}))
   } catch (error) {
-    yield call(toast.error, `Error Received: ${error}`);
+    yield call(message.error, `Error Received: ${error}`);
   }
 }
 

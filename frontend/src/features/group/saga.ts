@@ -1,5 +1,5 @@
 import { takeEvery, call, all, put } from 'redux-saga/effects';
-import { toast } from 'react-toastify';
+import { message } from 'antd';
 import {
   actions as groupsActions,
   ApiErrorAction,
@@ -9,7 +9,7 @@ import { PayloadAction } from 'redux-starter-kit';
 import { fetchGroups } from '../../apis/groupApis';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
-  yield call(toast.error, `Error Received: ${action.payload.error}`);
+  yield call(message.error, `Error Received: ${action.payload.error}`);
 }
 
 function* groupsUpdate(action: PayloadAction<GroupsAction>) {
@@ -17,7 +17,7 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
     const data = yield call(fetchGroups);
     yield put(groupsActions.groupsReceived(data.groups));
   } catch (error) {
-    yield call(toast.error, `Error Received: ${error}`);
+    yield call(message.error, `Error Received: ${error}`);
   }
 }
 
