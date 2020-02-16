@@ -1,17 +1,8 @@
 package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Projects {
-
-    @NotNull
-    private List<Project> owned = new ArrayList<>();
-
-    @NotNull
-    private List<ProjectsWithOwner> shared = new ArrayList<>();
+public class SystemUpdates {
 
     @NotBlank
     private String ownedProjectsEtag;
@@ -19,21 +10,13 @@ public class Projects {
     @NotBlank
     private String sharedProjectsEtag;
 
-    public List<Project> getOwned() {
-        return owned;
-    }
+    @NotBlank
+    private String groupsEtag;
 
-    public void setOwned(List<Project> owned) {
-        this.owned = owned;
-    }
+    @NotBlank
+    private String notificationsEtag;
 
-    public List<ProjectsWithOwner> getShared() {
-        return shared;
-    }
-
-    public void setShared(List<ProjectsWithOwner> shared) {
-        this.shared = shared;
-    }
+    // TODO: reminders
 
     public String getOwnedProjectsEtag() {
         return ownedProjectsEtag;
@@ -49,5 +32,21 @@ public class Projects {
 
     public void setSharedProjectsEtag(String sharedProjectsEtag) {
         this.sharedProjectsEtag = sharedProjectsEtag;
+    }
+
+    public String getGroupsEtag() {
+        return groupsEtag;
+    }
+
+    public void setGroupsEtag(String groupsEtag) {
+        this.groupsEtag = groupsEtag;
+    }
+
+    public String getNotificationsEtag() {
+        return notificationsEtag;
+    }
+
+    public void setNotificationsEtag(String notificationsEtag) {
+        this.notificationsEtag = notificationsEtag;
     }
 }
