@@ -16,23 +16,21 @@ class NotificationList extends React.Component<NotificationsProps> {
 
   render() {
     return (
-      <div className="list">
-        <List
-          dataSource={this.props.notifications}
-          renderItem={item => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={item.originator.avatar}
-                title={item.title}
-                description={item.content ? item.content : ''}
-              />
-            </List.Item>
-          )}
-        />
-      </div>
+      <List
+        dataSource={this.props.notifications}
+        renderItem={item => (
+          <List.Item>
+            <List.Item.Meta
+              avatar={item.originator.avatar}
+              title={item.title}
+              description={item.content ? item.content : ''}
+            />
+          </List.Item>
+        )}
+      />
     );
   }
-};
+}
 
 const mapStateToProps = (state: IState) => ({
   notifications: state.notice.notifications

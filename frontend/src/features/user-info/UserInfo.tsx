@@ -36,8 +36,6 @@ class UserInfo extends React.Component<UserProps> {
         <Dropdown overlay={notifications} trigger={['click']}>
           <Icon type="bell" theme="filled" />
         </Dropdown>
-        
-        <Icon type="bell" theme="filled" />
         <Dropdown overlay={dropdown} trigger={['click']}>
           <Avatar
             src={this.props.avatar}
