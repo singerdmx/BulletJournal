@@ -1,50 +1,52 @@
-import {createSlice, PayloadAction} from 'redux-starter-kit';
+import {createSlice, PayloadAction } from 'redux-starter-kit';
 
-export type ApiErrorAction = {
+export type NoticeApiErrorAction = {
     error: string;
 };
 
-export type UpdateNotifications = Notification[];
+export type UpdateNotifications = {
 
-export type Originator = {
-    id: number;
-    name: string;
-    thumbnail: string;
-    avatar: string;
+}
+
+export interface Originator{
+    id: number,
+    name: string,
+    thumbnail: string,
+    avatar: string
 };
 
-export type Notification = {
-    id: number;
-    title: string;
-    content: string;
-    timestamp: number;
-    originator: Originator;
-    actions: string[];
-    type: string;
+export interface Notification {
+    id: number,
+    title: string,
+    content: string,
+    timestamp: number,
+    originator: Originator,
+    actions: Array<string>,
+    type: string,
 };
 
 export type NotificationsAction = {
-    notifications: Notification[]
+    notifications: Array<Notification>
 }
 
 let initialState = {
-    notifications: [] as Notification[]
+    notifications: [] as Array<Notification>
 }
 
 const slice = createSlice({
-    name: "notifications",
+    name: 'notification',
     initialState,
     reducers: {
-        notificationsReceived: ( state, action: PayloadAction<NotificationsAction>) => {
+        notificationsReceived: ( state, action: PayloadAction<NotificationsAction> ) => {
             const { notifications } = action.payload;
             state.notifications = notifications
         },
-        notificationApiErrorReceived: ( state, action: PayloadAction<ApiErrorAction> ) => state,
-        notificationsUpdate: (state, action: PayloadAction<UpdateNotifications>) => state
+        noticeApiErrorReceived: ( state, action: PayloadAction<NoticeApiErrorAction> ) => state,
+        notificationsUpdate: (state, action: PayloadAction<UpdateNotifications> ) => state
     }
 });
 
-export const updateNotifications = () => actions.notificationsUpdate([]);
+export const updateNotifications = () => actions.notificationsUpdate({})
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;

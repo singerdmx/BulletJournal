@@ -5,7 +5,7 @@ export type UserInfoWithAvatar = {
   avatar: string;
 };
 
-export type ApiErrorAction = {
+export type UserApiErrorAction = {
   error: string;
 };
 
@@ -13,7 +13,7 @@ export type UpdateUserInfo = {};
 
 let initialState = {
   username: '',
-  avatar: ''
+  avatar: '',
 };
 
 const slice = createSlice({
@@ -25,7 +25,7 @@ const slice = createSlice({
       state.username = username;
       state.avatar = avatar;
     },
-    userApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) => state,
+    UserApiErrorReceived: (state, action: PayloadAction<UserApiErrorAction>) => state,
     UserInfoUpdate: (state, action: PayloadAction<UpdateUserInfo>) => state
   }
 });

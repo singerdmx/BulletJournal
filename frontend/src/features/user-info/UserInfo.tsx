@@ -16,6 +16,8 @@ class UserInfo extends React.Component<UserProps> {
     this.props.updateUserInfo();
   }
   render() {
+    // console.log(this.props)
+
     const dropdown = <DropdownMenu />;
     return (
       <div
@@ -28,7 +30,7 @@ class UserInfo extends React.Component<UserProps> {
           color: 'white'
         }}
       >
-        <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
+        <div onClick={()=>{this.props.updateUserInfo()}} style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
         <Icon type="bell" theme="filled" />
         <Dropdown overlay={dropdown} trigger={['click']}>
           <Avatar src={this.props.avatar} style={{ cursor: 'pointer', flexShrink: 1 }} size={28}>
