@@ -25,7 +25,7 @@ public class UserDaoJpa {
     private UserGroupRepository userGroupRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public User create(String name) {
+    public User create(String name, String timezone) {
         List<User> userList = this.userRepository.findByName(name);
         if (!userList.isEmpty()) {
             throw new ResourceAlreadyExistException("User " + name + " already exists");
@@ -33,6 +33,7 @@ public class UserDaoJpa {
 
         User user = new User();
         user.setName(name);
+        user.setTimezone(timezone);
         user = this.userRepository.save(user);
 
         Group group = new Group();

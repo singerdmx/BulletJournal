@@ -29,6 +29,7 @@ public class UserClient {
     private static final String AVATAR_SIZE = "75";
     private static final String THUMBNAIL_SIZE = "37";
     private static final String SIZE_HOLDER = "{size}";
+    private static final String DEFAULT_USER_TIME_ZONE = "America/Los_Angeles";
 
     private final RestTemplate restClient;
     private final URI ssoEndPoint;
@@ -69,14 +70,17 @@ public class UserClient {
             user = userOptional.get();
             return user;
         }
+
+        LinkedHashMap userInfo;
         try {
-            user = getUserByREST(username);
+            userInfo = getSSOUserInfo(username);
+            user = getUser(username, userInfo);
         } catch (HttpClientErrorException ex) {
             throw new ResourceNotFoundException("Unable to find user " + username, ex);
         }
 
         try {
-            this.userDaoJpa.create(username);
+            this.userDaoJpa.create(username, getUserTimeZone(userInfo));
         } catch (ResourceAlreadyExistException ex) {
             LOGGER.info(username + " already exists");
         }
@@ -85,18 +89,14 @@ public class UserClient {
         return user;
     }
 
-    public String getUserTimeZone(String username) {
+    private String getUserTimeZone(LinkedHashMap userInfo) {
         if (this.ssoAPIKey == null) {
-            throw new IllegalArgumentException("ssoAPIKey missing");
+            return DEFAULT_USER_TIME_ZONE;
         }
-
-        LinkedHashMap userInfo = getSSOUserInfo(username);
-        User user = getUser(username, userInfo);
-        redisUserRepository.save(user);
 
         String timezone = (String) ((LinkedHashMap) userInfo.get("user_option")).get("timezone");
         if (timezone == null) {
-            timezone = "America/Los_Angeles";
+            timezone = DEFAULT_USER_TIME_ZONE;
         }
 
         return timezone;
@@ -109,11 +109,6 @@ public class UserClient {
         String url = this.ssoEndPoint.resolve("/u/" + username + "/emails.json").toString();
         return (String) this.restClient
                 .exchange(url, HttpMethod.GET, buildHeaders(), LinkedHashMap.class).getBody().get("email");
-    }
-
-    private User getUserByREST(String username) {
-        LinkedHashMap userInfo = getSSOUserInfo(username);
-        return getUser(username, userInfo);
     }
 
     private User getUser(String username, LinkedHashMap userInfo) {
