@@ -39,7 +39,6 @@ class TodoPage extends React.Component<RouteProps, todoState> {
           <h2>{this.props.match.params.category.toUpperCase()} </h2>
           <h2 className="add-todo-button" onClick={this.showForm}>
             <Icon type="plus" />
-            ADD
           </h2>
         </div>
         <div className="todo-list">
