@@ -21,8 +21,13 @@ export type Group = {
   users: User[];
 };
 
-export type GroupsAction = {
+export type GroupsWithOwner = {
+  owner: string;
   groups: Group[];
+}
+
+export type GroupsAction = {
+  groups: GroupsWithOwner[];
 };
 
 export type GroupCreateAction = {
@@ -30,7 +35,7 @@ export type GroupCreateAction = {
 }
 
 let initialState = {
-  groups: [] as Group[]
+  groups: [] as GroupsWithOwner[]
 };
 
 const slice = createSlice({
