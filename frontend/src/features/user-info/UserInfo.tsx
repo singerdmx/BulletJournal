@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Avatar, Dropdown, Icon } from 'antd';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
+import NotificationList from '../notification/Notifications';
 import { IState } from '../../store/index';
 import { updateUserInfo } from './reducer';
 
@@ -12,11 +13,12 @@ type UserProps = {
 };
 
 class UserInfo extends React.Component<UserProps> {
-  componentDidMount () {
+  componentDidMount() {
     this.props.updateUserInfo();
   }
   render() {
     const dropdown = <DropdownMenu />;
+    const notifications = <NotificationList />
     return (
       <div
         style={{
@@ -28,17 +30,24 @@ class UserInfo extends React.Component<UserProps> {
           color: 'white'
         }}
       >
-        <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
-        <Icon type="bell" theme="filled" />
+      <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
+        <Dropdown overlay={notifications} trigger={['click']}>
+          <Icon type="bell" theme="filled" />
+        </Dropdown>
+
         <Dropdown overlay={dropdown} trigger={['click']}>
-          <Avatar src={this.props.avatar} style={{ cursor: 'pointer', flexShrink: 1 }} size={28}>
+          <Avatar
+            src={this.props.avatar}
+            style={{ cursor: 'pointer', flexShrink: 1 }}
+            size={28}
+          >
             {this.props.username || 'User'}
           </Avatar>
         </Dropdown>
       </div>
     );
   }
-};
+}
 
 const mapStateToProps = (state: IState) => ({
   username: state.user.username,
