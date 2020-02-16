@@ -22,7 +22,7 @@ class UserInfo extends React.Component<UserProps> {
     // console.log(this.props)
 
     const dropdown = <DropdownMenu />;
-    const notifications = <NotificationList />
+    const notifications = <NotificationList />;
     return (
       <div
         style={{
@@ -34,8 +34,14 @@ class UserInfo extends React.Component<UserProps> {
           color: 'white'
         }}
       >
-      <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
-        <Popover content={notifications} trigger='click' placement="bottomRight" overlayClassName="notifications">
+        <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
+        <Popover
+          content={notifications}
+          title="Notifications"
+          trigger="click"
+          placement="bottomRight"
+          overlayClassName="notifications"
+        >
           <Icon type="bell" theme="filled" />
         </Popover>
         <Dropdown overlay={dropdown} trigger={['click']}>

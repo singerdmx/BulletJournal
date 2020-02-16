@@ -9,6 +9,22 @@ type NotificationsProps = {
   updateNotifications: () => void;
 };
 
+type titleProps = {
+  title: String;
+};
+
+const ListTitle = ({ title }: titleProps) => {
+  const titleList = title.split(' ');
+  const name = titleList[0];
+  const project = titleList[titleList.length - 1];
+  const rest = titleList.slice(1, titleList.length - 1).join(' ');
+  return (
+    <span>
+      <strong>{name}</strong> {rest} <strong>{project}</strong>
+    </span>
+  );
+};
+
 class NotificationList extends React.Component<NotificationsProps> {
   componentDidMount() {
     this.props.updateNotifications();
@@ -23,8 +39,8 @@ class NotificationList extends React.Component<NotificationsProps> {
           <List.Item>
             <List.Item.Meta
               avatar={<Avatar src={item.originator.avatar} />}
-              title={item.title}
-              description={item.content ? item.content : 'A new notification'}
+              title={<ListTitle title={item.title} />}
+              description={item.content ? item.content : ''}
             />
           </List.Item>
         )}
