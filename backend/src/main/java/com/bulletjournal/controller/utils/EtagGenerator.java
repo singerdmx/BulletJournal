@@ -53,7 +53,7 @@ public class EtagGenerator {
     }
 
     @SafeVarargs
-    public static <T> String generateEtag(HashAlgorithm hashAlg, HashType hashType, T... args) throws IOException {
+    public static <T> String generateEtag(HashAlgorithm hashAlg, HashType hashType, T... args) {
         StringBuilder inputBuilder = new StringBuilder();
         StringBuilder outputBuilder = new StringBuilder();
 
@@ -65,7 +65,11 @@ public class EtagGenerator {
 
         if (HashAlgorithm.MD5 == hashAlg) {
             // MD5 Hash
-            DigestUtils.appendMd5DigestAsHex(inputStream, outputBuilder);
+            try {
+                DigestUtils.appendMd5DigestAsHex(inputStream, outputBuilder);
+            } catch (IOException ex) {
+                throw new IllegalStateException(ex);
+            }
         } else {
             // No Hash Function selected
             outputBuilder = inputBuilder;

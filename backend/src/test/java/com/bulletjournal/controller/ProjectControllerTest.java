@@ -12,12 +12,16 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -161,6 +165,15 @@ public class ProjectControllerTest {
     }
 
     private void updateProjectRelations(Project p1, Project p2, Project p3, Project p4, Project p5, Project p6) {
+        ResponseEntity<Projects> getProjectsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        validateProjectResponseEtagMatch(getProjectsResponse.getBody());
+        String ownedProjectsEtag = getProjectsResponse.getBody().getOwnedProjectsEtag();
+        String sharedProjectsEtag = getProjectsResponse.getBody().getSharedProjectsEtag();
+
         /**
          *  p1
          *   |
@@ -248,73 +261,33 @@ public class ProjectControllerTest {
         assertEquals("Scarlet", l.get(1).getOwner());
         assertEquals(2, projects.size());
 
-        testProjectsEtag(projectsResponse.getHeaders().getETag(), p1);
+
+        validateProjectResponseEtagNotMatch(ownedProjectsEtag, sharedProjectsEtag);
     }
 
-    private void testProjectsEtag(String eTagFromFirstResponse, Project p1) {
-        validateProjectResponseEtagMatch(eTagFromFirstResponse);
-
-        String eTagFromSecondResponse = getEtagAfterUpdateProject(p1);
-        validateProjectResponseEtagNotMatch(eTagFromFirstResponse);
-        validateProjectResponseEtagMatch(eTagFromSecondResponse);
-    }
-
-    private String getEtagAfterUpdateProject(Project p) {
-        // update project name to "P11"
-        UpdateProjectParams updateProjectParams = new UpdateProjectParams();
-        updateProjectParams.setName("P11");
-        updateProjectParams.setDescription("ddddd");
-        ResponseEntity<Project> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
-                HttpMethod.PATCH,
-                new HttpEntity<>(updateProjectParams),
-                Project.class,
-                p.getId());
-        p = response.getBody();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("P11", p.getName());
-        assertEquals(expectedOwner, p.getOwner());
-        assertEquals(ProjectType.LEDGER, p.getProjectType());
-        assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, p.getGroup().getName());
-        assertEquals(expectedOwner, p.getGroup().getOwner());
-
+    private void validateProjectResponseEtagMatch(Projects p) {
+        String ownedProjectsEtag = p.getOwnedProjectsEtag();
+        String sharedProjectsEtag = p.getSharedProjectsEtag();
         ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
                 null,
                 Projects.class);
-        return projectsResponse.getHeaders().getETag();
-    }
 
-    private void validateProjectResponseEtagMatch(String matchETag) {
-        HttpHeaders eTagRequestHeader = new HttpHeaders();
-        eTagRequestHeader.setIfNoneMatch(matchETag);
-        HttpEntity eTagRequestEntity = new HttpEntity(eTagRequestHeader);
-
-        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.GET,
-                eTagRequestEntity,
-                Projects.class);
-
-        assertEquals(HttpStatus.NOT_MODIFIED, projectsResponse.getStatusCode());
-        assertNull(projectsResponse.getBody());
-    }
-
-    private void validateProjectResponseEtagNotMatch(String notMatchEtag) {
-        HttpHeaders eTagRequestHeader = new HttpHeaders();
-        eTagRequestHeader.setIfNoneMatch(notMatchEtag);
-        HttpEntity eTagRequestEntity = new HttpEntity(eTagRequestHeader);
-
-        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.GET,
-                eTagRequestEntity,
-                Projects.class);
-
-        assertNotEquals(HttpStatus.NOT_MODIFIED, projectsResponse.getStatusCode());
         assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        assertNotNull(projectsResponse.getBody());
+        assertEquals(ownedProjectsEtag, projectsResponse.getBody().getOwnedProjectsEtag());
+        assertEquals(sharedProjectsEtag, projectsResponse.getBody().getSharedProjectsEtag());
+    }
+
+    private void validateProjectResponseEtagNotMatch(String ownedProjectsEtag, String sharedProjectsEtag) {
+        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
+        assertNotEquals(ownedProjectsEtag, projectsResponse.getBody().getOwnedProjectsEtag());
+        assertNotEquals(sharedProjectsEtag, projectsResponse.getBody().getSharedProjectsEtag());
     }
 
     private Project updateProject(Project p1) {
