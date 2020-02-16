@@ -32,7 +32,7 @@ class NotificationList extends React.Component<NotificationsProps> {
       </div>
     );
   }
-}
+};
 
 const mapStateToProps = (state: IState) => ({
   notifications: state.notice.notifications

@@ -13,12 +13,8 @@ public class CreateTaskParams {
     @NotNull
     private Long projectId;
 
-    @NotBlank
-    @Size(min = 10, max = 10)
     private String dueDate; // "yyyy-MM-dd"
 
-    @NotBlank
-    @Size(min = 5, max = 5)
     private String dueTime; // "HH-mm"
 
     public CreateTaskParams() {
@@ -26,8 +22,8 @@ public class CreateTaskParams {
 
     public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
                             @NotNull Long projectId,
-                            @NotBlank @Size(min = 10, max = 10) String dueDate,
-                            @NotBlank @Size(min = 5, max = 5) String dueTime) {
+                            String dueDate,
+                            String dueTime) {
         this.name = name;
         this.projectId = projectId;
         this.dueDate = dueDate;

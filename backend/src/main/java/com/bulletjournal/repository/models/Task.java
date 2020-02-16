@@ -1,5 +1,8 @@
 package com.bulletjournal.repository.models;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -8,7 +11,11 @@ import javax.validation.constraints.Size;
  * This class is for ProjectType.TODO
  */
 @Entity
-@Table(name = "tasks")
+@Table(name = "tasks",
+        indexes = {@Index(name = "task_project_id_index", columnList = "project_id")},
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"project_id", "name"})
+        })
 public class Task extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "task_generator")
@@ -28,6 +35,14 @@ public class Task extends ProjectItemModel {
 
     @Column(name = "due_time", length = 10)
     private String dueTime; // "HH-mm"
+
+    @Column(name = "timezone")
+    private String timezone;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "project_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Project project;
 
     public Long getId() {
         return id;
@@ -61,12 +76,22 @@ public class Task extends ProjectItemModel {
         this.dueTime = dueTime;
     }
 
+    public String getTimezone() { return timezone; }
+
+    public void setTimezone(String timezone) { this.timezone = timezone; }
+
+    public Project getProject() { return project; }
+
+    public void setProject(Project project) { this.project = project; }
+
     public com.bulletjournal.controller.models.Task toPresentationModel() {
         return new com.bulletjournal.controller.models.Task(
                 this.getId(),
                 this.getAssignedTo(),
                 this.getDueDate(),
                 this.getDueTime(),
-                this.getName());
+                this.getTimezone(),
+                this.getName(),
+                this.getProject());
     }
 }

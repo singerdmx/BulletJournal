@@ -1,6 +1,6 @@
 package com.bulletjournal.controller.models;
 
-import com.google.gson.annotations.Expose;
+import com.bulletjournal.repository.models.Project;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -8,7 +8,6 @@ import javax.validation.constraints.Size;
 import java.util.Objects;
 
 public class Task {
-    @Expose
     private Long id;
 
     @NotBlank
@@ -23,8 +22,14 @@ public class Task {
     @Size(min = 5, max = 5)
     private String dueTime;
 
+    @NotBlank
+    private String timezone;
+
     @NotNull
     private String name;
+
+    @NotNull
+    private Long projectId;
 
     public Task() {
     }
@@ -33,12 +38,16 @@ public class Task {
                 @NotBlank @Size(min = 1, max = 100) String assignedTo,
                 @NotBlank @Size(min = 10, max = 10) String dueDate,
                 @NotBlank @Size(min = 5, max = 5) String dueTime,
-                @NotNull String name) {
+                @NotBlank String timezone,
+                @NotNull String name,
+                @NotNull Project project) {
         this.id = id;
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
+        this.timezone = timezone;
         this.name = name;
+        this.projectId = project.getId();
     }
 
     public Long getId() {
@@ -73,12 +82,28 @@ public class Task {
         this.dueTime = dueTime;
     }
 
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId() {
+        this.projectId = projectId;
     }
 
     @Override
@@ -90,11 +115,13 @@ public class Task {
                 Objects.equals(assignedTo, task.assignedTo) &&
                 Objects.equals(dueDate, task.dueDate) &&
                 Objects.equals(dueTime, task.dueTime) &&
-                Objects.equals(name, task.name);
+                Objects.equals(timezone, task.timezone) &&
+                Objects.equals(name, task.name) &&
+                Objects.equals(projectId, task.projectId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, assignedTo, dueDate, dueTime, name);
+        return Objects.hash(id, assignedTo, dueDate, dueTime, timezone, name, projectId);
     }
 }

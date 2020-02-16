@@ -13,6 +13,7 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -199,4 +200,32 @@ public class ProjectDaoJpa {
         userProjects.setOwner(owner);
         this.userProjectsRepository.save(userProjects);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteProject(String owner, Long projectId) {
+        Project project = this.projectRepository
+                .findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                project.getOwner(), owner, ContentType.PROJECT, Operation.DELETE, projectId);
+
+        UserProjects userProjects = this.userProjectsRepository.findById(owner)
+                .orElseThrow(() -> new ResourceNotFoundException("UserProjects by " + owner + " not found"));
+
+        Pair<com.bulletjournal.controller.models.Project, List<com.bulletjournal.controller.models.Project>> result =
+                ProjectRelationsProcessor.removeTargetProject(userProjects.getOwnedProjects(), projectId);
+        List<com.bulletjournal.controller.models.Project> projectHierarchy = result.getRight();
+        com.bulletjournal.controller.models.Project target = result.getLeft();
+
+        // delete project and its subProjects
+        List<Project> targetProjects = this.projectRepository
+                .findAllById(ProjectRelationsProcessor.findSubProjects(target));
+        this.projectRepository.deleteAll(targetProjects);
+
+        // Update project relations
+        userProjects.setOwnedProjects(ProjectRelationsProcessor.processProjectRelations(projectHierarchy));
+        this.userProjectsRepository.save(userProjects);
+    }
+
 }
