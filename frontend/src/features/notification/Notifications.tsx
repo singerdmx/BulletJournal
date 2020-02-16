@@ -2,8 +2,8 @@ import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateNotifications, Notification } from './reducer';
-import { List, Avatar, Radio } from 'antd';
-import * as moment from 'moment';
+import { List, Avatar, Radio, Badge } from 'antd';
+import moment from 'moment';
 
 import './notification.styles.less';
 
@@ -13,9 +13,9 @@ type NotificationsProps = {
 };
 
 type titleProps = {
-  title: String;
-  type: String;
-  time: Number;
+  title: string;
+  type: string;
+  time: number;
 };
 
 const ListTitle = ({ title, type, time }: titleProps) => {
@@ -39,6 +39,21 @@ const ListTitle = ({ title, type, time }: titleProps) => {
   );
 };
 
+type titleAvatarProps = {
+  source: string,
+  type: string
+}
+
+const TitleAvatar = ({source, type}: titleAvatarProps) => {
+  return (
+    <div className="avatar-title">
+      <Badge status={type === 'JoinGroupEvent'? 'processing' : 'success'} dot>
+        <Avatar src={source} />
+      </Badge>
+    </div>
+  )
+}
+
 class NotificationList extends React.Component<NotificationsProps> {
   componentDidMount() {
     this.props.updateNotifications();
@@ -52,7 +67,7 @@ class NotificationList extends React.Component<NotificationsProps> {
         renderItem={item => (
           <List.Item extra={<Radio></Radio>}>
             <List.Item.Meta
-              avatar={<Avatar src={item.originator.avatar} />}
+              avatar={<TitleAvatar source={item.originator.avatar} type={item.type} />}
               title={
                 <ListTitle
                   title={item.title}
