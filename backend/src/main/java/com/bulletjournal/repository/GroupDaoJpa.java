@@ -4,7 +4,9 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.AddUserGroupParams;
+import com.bulletjournal.controller.models.RemoveUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.DeleteGroupEvent;
 import com.bulletjournal.notifications.Event;
@@ -13,6 +15,7 @@ import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.repository.models.UserGroupKey;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -139,5 +142,31 @@ public class GroupDaoJpa {
     public Group getGroup(Long id) {
         return this.groupRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + id + " not found"));
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void removeUserGroups(
+            String owner,
+            List<RemoveUserGroupParams> removeUserGroupsParams) {
+
+        for (RemoveUserGroupParams removeUserGroupParams: removeUserGroupsParams) {
+            String username = removeUserGroupParams.getUsername();
+            if (Objects.equals(username, owner)) {
+                throw new BadRequestException("can not remove owner");
+            }
+
+            Long groupId = removeUserGroupParams.getGroupId();
+            Group group = this.groupRepository.findById(groupId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
+            this.authorizationService.checkAuthorizedToOperateOnContent(
+                    group.getOwner(), owner, ContentType.GROUP, Operation.UPDATE, groupId);
+
+            User user = this.userDaoJpa.getByName(username);
+            UserGroupKey userGroupKey = new UserGroupKey(user.getId(), group.getId());
+            UserGroup userGroup = this.userGroupRepository.findById(userGroupKey)
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("UserGroupKey not found"));
+            this.userGroupRepository.delete(userGroup);
+        }
     }
 }
