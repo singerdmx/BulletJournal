@@ -81,7 +81,29 @@ public class ProjectControllerTest {
 
         deleteProject(p1);
 
+        createTasks(p5);
         getNotifications();
+    }
+
+    private void createTasks(Project project) {
+        Task t1 = createTask(project, "t1");
+        Task t2 = createTask(project, "t2");
+        Task t3 = createTask(project, "t3");
+    }
+
+    private Task createTask(Project project, String taskName) {
+        CreateTaskParams task = new CreateTaskParams(taskName, project.getId(), null, null);
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(task),
+                Task.class,
+                project.getId());
+        Task created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(taskName, created.getName());
+        assertEquals(project.getId(), created.getProjectId());
+        return created;
     }
 
     private void deleteProject(Project p) {

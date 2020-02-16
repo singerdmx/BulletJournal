@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class TaskController {
@@ -22,11 +24,11 @@ public class TaskController {
     @Autowired
     private TaskDaoJpa taskDaoJpa;
 
-    /*
     @GetMapping(TASKS_ROUTE)
     public List<Task> getTasks(@NotNull @PathVariable Long projectId) {
+        return this.taskDaoJpa.getTasks(projectId)
+                .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
-     */
 
     @PostMapping(TASKS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)

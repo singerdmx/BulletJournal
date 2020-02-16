@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public class TaskDaoJpa {
 
@@ -19,6 +21,14 @@ public class TaskDaoJpa {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getTasks(Long projectId) {
+        Project project = this.projectRepository
+                .findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        return this.taskRepository.findTaskByProject(project);
+    }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
