@@ -170,9 +170,11 @@ public class ProjectControllerTest {
                 HttpMethod.GET,
                 null,
                 Projects.class);
-        validateProjectResponseEtagMatch(getProjectsResponse.getBody());
-        String ownedProjectsEtag = getProjectsResponse.getBody().getOwnedProjectsEtag();
-        String sharedProjectsEtag = getProjectsResponse.getBody().getSharedProjectsEtag();
+        String[] eTags = getProjectsResponse.getHeaders().getETag().split("|");
+        assertEquals(2, eTags.length);
+        String ownedProjectsEtag = eTags[0];
+        String sharedProjectsEtag = eTags[1];
+        validateProjectResponseEtagMatch(ownedProjectsEtag, sharedProjectsEtag);
 
         /**
          *  p1
@@ -265,9 +267,7 @@ public class ProjectControllerTest {
         validateProjectResponseEtagNotMatch(ownedProjectsEtag, sharedProjectsEtag);
     }
 
-    private void validateProjectResponseEtagMatch(Projects p) {
-        String ownedProjectsEtag = p.getOwnedProjectsEtag();
-        String sharedProjectsEtag = p.getSharedProjectsEtag();
+    private void validateProjectResponseEtagMatch(String ownedProjectsEtag, String sharedProjectsEtag) {
         ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
@@ -275,8 +275,11 @@ public class ProjectControllerTest {
                 Projects.class);
 
         assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        assertEquals(ownedProjectsEtag, projectsResponse.getBody().getOwnedProjectsEtag());
-        assertEquals(sharedProjectsEtag, projectsResponse.getBody().getSharedProjectsEtag());
+
+        String[] eTags = projectsResponse.getHeaders().getETag().split("|");
+        assertEquals(2, eTags.length);
+        assertEquals(ownedProjectsEtag, eTags[0]);
+        assertEquals(sharedProjectsEtag, eTags[1]);
     }
 
     private void validateProjectResponseEtagNotMatch(String ownedProjectsEtag, String sharedProjectsEtag) {
@@ -286,8 +289,10 @@ public class ProjectControllerTest {
                 null,
                 Projects.class);
         assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        assertNotEquals(ownedProjectsEtag, projectsResponse.getBody().getOwnedProjectsEtag());
-        assertNotEquals(sharedProjectsEtag, projectsResponse.getBody().getSharedProjectsEtag());
+        String[] eTags = projectsResponse.getHeaders().getETag().split("|");
+        assertEquals(2, eTags.length);
+        assertNotEquals(ownedProjectsEtag, eTags[0]);
+        assertNotEquals(sharedProjectsEtag, eTags[1]);
     }
 
     private Project updateProject(Project p1) {

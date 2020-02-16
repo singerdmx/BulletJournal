@@ -13,12 +13,6 @@ public class Projects {
     @NotNull
     private List<ProjectsWithOwner> shared = new ArrayList<>();
 
-    @NotBlank
-    private String ownedProjectsEtag;
-
-    @NotBlank
-    private String sharedProjectsEtag;
-
     public List<Project> getOwned() {
         return owned;
     }
@@ -33,21 +27,5 @@ public class Projects {
 
     public void setShared(List<ProjectsWithOwner> shared) {
         this.shared = shared;
-    }
-
-    public String getOwnedProjectsEtag() {
-        return ownedProjectsEtag;
-    }
-
-    public void setOwnedProjectsEtag(String ownedProjectsEtag) {
-        this.ownedProjectsEtag = ownedProjectsEtag;
-    }
-
-    public String getSharedProjectsEtag() {
-        return sharedProjectsEtag;
-    }
-
-    public void setSharedProjectsEtag(String sharedProjectsEtag) {
-        this.sharedProjectsEtag = sharedProjectsEtag;
     }
 }

@@ -6,7 +6,9 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,7 +26,7 @@ public class ProjectController {
     private ProjectDaoJpa projectDaoJpa;
 
     @GetMapping(PROJECTS_ROUTE)
-    public Projects getProjects() {
+    public ResponseEntity<Projects> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Projects projects = this.projectDaoJpa.getProjects(username);
 
@@ -36,10 +38,10 @@ public class ProjectController {
                 EtagGenerator.HashType.TO_HASHCODE,
                 projects.getShared());
 
-        projects.setOwnedProjectsEtag(ownedProjectsEtag);
-        projects.setSharedProjectsEtag(sharedProjectsEtag);
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setETag(ownedProjectsEtag + "|" + sharedProjectsEtag);
 
-        return projects;
+        return ResponseEntity.ok().headers(responseHeader).body(projects);
     }
 
     @PostMapping(PROJECTS_ROUTE)
