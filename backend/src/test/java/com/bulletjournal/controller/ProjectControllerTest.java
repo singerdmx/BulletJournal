@@ -170,7 +170,7 @@ public class ProjectControllerTest {
                 HttpMethod.GET,
                 null,
                 Projects.class);
-        String[] eTags = getProjectsResponse.getHeaders().getETag().split("|");
+        String[] eTags = getProjectsResponse.getHeaders().getETag().split("\\|");
         assertEquals(2, eTags.length);
         String ownedProjectsEtag = eTags[0];
         String sharedProjectsEtag = eTags[1];
@@ -276,7 +276,7 @@ public class ProjectControllerTest {
 
         assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
 
-        String[] eTags = projectsResponse.getHeaders().getETag().split("|");
+        String[] eTags = projectsResponse.getHeaders().getETag().split("\\|");
         assertEquals(2, eTags.length);
         assertEquals(ownedProjectsEtag, eTags[0]);
         assertEquals(sharedProjectsEtag, eTags[1]);
@@ -289,7 +289,7 @@ public class ProjectControllerTest {
                 null,
                 Projects.class);
         assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        String[] eTags = projectsResponse.getHeaders().getETag().split("|");
+        String[] eTags = projectsResponse.getHeaders().getETag().split("\\|");
         assertEquals(2, eTags.length);
         assertNotEquals(ownedProjectsEtag, eTags[0]);
         assertNotEquals(sharedProjectsEtag, eTags[1]);
