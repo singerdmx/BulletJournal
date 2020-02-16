@@ -6,6 +6,8 @@ import NotificationList from '../notification/Notifications';
 import { IState } from '../../store/index';
 import { updateUserInfo } from './reducer';
 
+import './user-info.styles.less';
+
 type UserProps = {
   username: string;
   avatar: string;
@@ -33,7 +35,7 @@ class UserInfo extends React.Component<UserProps> {
         }}
       >
       <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
-        <Popover content={notifications} trigger='click' placement="bottomRight">
+        <Popover content={notifications} trigger='click' placement="bottomRight" overlayClassName="notifications">
           <Icon type="bell" theme="filled" />
         </Popover>
         <Dropdown overlay={dropdown} trigger={['click']}>
