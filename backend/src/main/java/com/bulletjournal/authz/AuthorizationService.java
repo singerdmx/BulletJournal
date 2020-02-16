@@ -45,6 +45,7 @@ public class AuthorizationService {
     private void checkAuthorizedToOperateOnProject(
             String owner, String requester, Operation operation, Long contentId) {
         switch (operation) {
+            case DELETE:
             case UPDATE:
                 if (!Objects.equals(owner, requester)) {
                     throw new UnAuthorizedException("Project " + contentId + " is owner by " +
