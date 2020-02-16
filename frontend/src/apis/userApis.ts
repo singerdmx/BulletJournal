@@ -9,5 +9,6 @@ export const fetchUserInfo = () => {
 };
 
 export const logoutUser = () => {
-  return doPost('/api/myself/logout');
+  const postBody = JSON.stringify({})
+  return doPost('/api/myself/logout', postBody)
 };

@@ -13,13 +13,14 @@ export function doFetch(endpoint: string) {
   });
 }
 
-export function doPost(endpoint: string) {
+export function doPost(endpoint: string, body: string) {
     if (process.env.DEBUG_MODE === "DEBUG") {
       console.log(endpoint);
     }
     return fetch(endpoint, {
-      headers: {},
-      method: 'POST'
+      headers: { 'Content-Type': 'application/json'},
+      method: 'POST', 
+      body: body
     }).then(res => {
       if (!res.ok) {
         throw Error(res.statusText);

@@ -34,7 +34,7 @@ let initialState = {
 }
 
 const slice = createSlice({
-    name: 'notification',
+    name: 'notice',
     initialState,
     reducers: {
         notificationsReceived: ( state, action: PayloadAction<NotificationsAction> ) => {

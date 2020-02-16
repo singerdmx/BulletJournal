@@ -9,7 +9,7 @@ import { PayloadAction } from 'redux-starter-kit';
 import { fetchNotifications } from '../../apis/notificationApis';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
-  yield call(message.error, `Error Received: ${action.payload.error}`);
+  yield call(message.error, `Notice Error Received: ${action.payload.error}`);
 }
 
 function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
@@ -18,11 +18,11 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     // console.log(data)
     yield put(notificationsActions.notificationsReceived({ notifications: data}))
   } catch (error) {
-    yield call(message.error, `Error Received: ${error}`);
+    yield call(message.error, `Notice Error Received: ${error}`);
   }
 }
 
-export default function* userSagas() {
+export default function* noticeSagas() {
   yield all([
     yield takeEvery(
       notificationsActions.noticeApiErrorReceived.type,

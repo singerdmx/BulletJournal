@@ -1,11 +1,13 @@
 import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { updateGroups, Group } from './reducer';
+import { Group } from './reducer';
+import { updateGroups, createGroupByName } from './actions';
 
 type GroupsProps = {
   groups: Group[];
   updateGroups: () => void;
+  createGroupByName: (name: string) => void;
 };
 
 class GroupList extends React.Component<GroupsProps> {
@@ -13,8 +15,7 @@ class GroupList extends React.Component<GroupsProps> {
     this.props.updateGroups();
   }
   render(){
-    console.log(this.props)
-    return (<div>group</div>)
+    return (<div onClick ={()=> this.props.createGroupByName('TestPEnggfdfdds')}>group</div>)
   }
 }
 
@@ -22,4 +23,4 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups
 });
 
-export default connect(mapStateToProps, { updateGroups })(GroupList);
+export default connect(mapStateToProps, { updateGroups, createGroupByName })(GroupList);
