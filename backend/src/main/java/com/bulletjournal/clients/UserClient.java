@@ -85,6 +85,23 @@ public class UserClient {
         return user;
     }
 
+    public String getUserTimeZone(String username) {
+        if (this.ssoAPIKey == null) {
+            throw new IllegalArgumentException("ssoAPIKey missing");
+        }
+
+        LinkedHashMap userInfo = getSSOUserInfo(username);
+        User user = getUser(username, userInfo);
+        redisUserRepository.save(user);
+
+        String timezone = (String) ((LinkedHashMap) userInfo.get("user_option")).get("timezone");
+        if (timezone == null) {
+            timezone = "America/Los_Angeles";
+        }
+
+        return timezone;
+    }
+
     public String getUserEmail(String username) {
         if (this.ssoAPIKey == null) {
             throw new IllegalArgumentException("ssoAPIKey missing");
@@ -95,9 +112,11 @@ public class UserClient {
     }
 
     private User getUserByREST(String username) {
-        String url = this.ssoEndPoint.resolve("/u/" + username + ".json").toString();
-        LinkedHashMap userInfo = (LinkedHashMap) this.restClient
-                .exchange(url, HttpMethod.GET, null, LinkedHashMap.class).getBody().get("user");
+        LinkedHashMap userInfo = getSSOUserInfo(username);
+        return getUser(username, userInfo);
+    }
+
+    private User getUser(String username, LinkedHashMap userInfo) {
         Integer id = (Integer) userInfo.get("id");
         String avatarTemplate = (String) userInfo.get("avatar_template");
         String avatar = this.ssoEndPoint.resolve(avatarTemplate.replace(SIZE_HOLDER, AVATAR_SIZE)).toString();
@@ -105,7 +124,16 @@ public class UserClient {
         return new User(id, username, thumbnail, avatar);
     }
 
+    private LinkedHashMap getSSOUserInfo(String username) {
+        String url = this.ssoEndPoint.resolve("/u/" + username + ".json").toString();
+        return (LinkedHashMap) this.restClient
+                .exchange(url, HttpMethod.GET, buildHeaders(), LinkedHashMap.class).getBody().get("user");
+    }
+
     private HttpEntity<LinkedHashMap> buildHeaders() {
+        if (this.ssoAPIKey == null) {
+            return null;
+        }
         HttpEntity<LinkedHashMap> request;
         HttpHeaders headers = new HttpHeaders();
         headers.add("Api-Username", "system");
