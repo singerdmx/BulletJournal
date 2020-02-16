@@ -47,7 +47,7 @@ type titleAvatarProps = {
 const TitleAvatar = ({source, type}: titleAvatarProps) => {
   return (
     <div className="avatar-title">
-      <Badge status={type === 'JoinGroupEvent'? 'processing' : 'success'} dot>
+      <Badge status={type ==="JoinGroupEvent" ? "success" : "processing"} dot>
         <Avatar src={source} />
       </Badge>
     </div>
