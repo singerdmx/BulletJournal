@@ -4,6 +4,7 @@ services:
     image: mwangxx/auth-proxy:latest
     container_name: auth-proxy
     ports:
+      - "80:80"
       - "443:443"
     depends_on:
       - frontend

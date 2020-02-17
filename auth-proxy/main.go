@@ -74,8 +74,18 @@ func main() {
 		TLSNextProto:   make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
 	}
 
-	log.Fatal(server.ListenAndServeTLS("/bin/localhost.cert",
-		"/bin/localhost.key"))
+	go func() {
+		log.Fatal(server.ListenAndServeTLS("/bin/localhost.cert",
+			"/bin/localhost.key"))
+	}()
+
+	httpSrv := http.Server{
+		Addr: ":80",
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+		}),
+	}
+	log.Println(httpSrv.ListenAndServe())
 }
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
