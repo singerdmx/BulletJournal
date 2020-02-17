@@ -8,8 +8,15 @@ const handleLogout = () => {
   });
 };
 
-const DropdownMenu = () => (
+type menuProps = {
+  username : string
+}
+
+const DropdownMenu = ({username} : menuProps) => (
   <Menu>
+    <Menu.Item>
+      {username}
+    </Menu.Item>
     <Menu.Item>
       <Icon type="setting" />
       Settings

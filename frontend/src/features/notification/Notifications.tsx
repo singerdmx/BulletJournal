@@ -2,7 +2,7 @@ import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateNotifications, Notification } from './reducer';
-import { List, Avatar, Radio, Badge } from 'antd';
+import { List, Avatar, Radio, Badge, Popover, Icon } from 'antd';
 import moment from 'moment';
 
 import './notification.styles.less';
@@ -40,46 +40,71 @@ const ListTitle = ({ title, type, time }: titleProps) => {
 };
 
 type titleAvatarProps = {
-  source: string,
-  type: string
-}
+  source: string;
+  type: string;
+};
 
-const TitleAvatar = ({source, type}: titleAvatarProps) => {
+const TitleAvatar = ({ source, type }: titleAvatarProps) => {
   return (
     <div className="avatar-title">
-      <Badge status={type ==="JoinGroupEvent" ? "success" : "processing"} dot>
+      <Badge status={type === 'JoinGroupEvent' ? 'success' : 'processing'} dot>
         <Avatar src={source} />
       </Badge>
     </div>
-  )
-}
+  );
+};
 
-class NotificationList extends React.Component<NotificationsProps> {
+const NotificationList = ({ notifications }: NotificationsProps) => {
+  return notifications.length > 0 ? (
+    <List
+    itemLayout="horizontal"
+    dataSource={notifications}
+    renderItem={item => (
+      <List.Item extra={<Radio></Radio>}>
+        <List.Item.Meta
+          avatar={
+            <TitleAvatar source={item.originator.avatar} type={item.type} />
+          }
+          title={
+            <ListTitle
+              title={item.title}
+              type={item.type}
+              time={item.timestamp}
+            />
+          }
+          description={item.content ? item.content : ''}
+        />
+      </List.Item>
+    )}
+  />
+  ) : (
+    <div className="no-data">
+      No Notifications
+    </div>
+  )
+};
+
+class Notifications extends React.Component<NotificationsProps> {
   componentDidMount() {
     this.props.updateNotifications();
   }
 
   render() {
     return (
-      <List
-        itemLayout="horizontal"
-        dataSource={this.props.notifications}
-        renderItem={item => (
-          <List.Item extra={<Radio></Radio>}>
-            <List.Item.Meta
-              avatar={<TitleAvatar source={item.originator.avatar} type={item.type} />}
-              title={
-                <ListTitle
-                  title={item.title}
-                  type={item.type}
-                  time={item.timestamp}
-                />
-              }
-              description={item.content ? item.content : ''}
-            />
-          </List.Item>
-        )}
-      />
+      <div className="notifications">
+        <Badge dot={this.props.notifications.length > 0}>
+        <Popover
+          content={<NotificationList {...this.props} />}
+          title="Notifications"
+          trigger="click"
+          arrowPointAtCenter
+          placement="bottomRight"
+          overlayClassName="notifications-list"
+        >
+          <Icon type="bell" theme="filled" />
+        </Popover>
+      </Badge>
+      </div>
     );
   }
 }
@@ -88,6 +113,4 @@ const mapStateToProps = (state: IState) => ({
   notifications: state.notice.notifications
 });
 
-export default connect(mapStateToProps, { updateNotifications })(
-  NotificationList
-);
+export default connect(mapStateToProps, { updateNotifications })(Notifications);

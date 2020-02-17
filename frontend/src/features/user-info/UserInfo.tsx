@@ -1,12 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Avatar, Dropdown, Icon, Popover } from 'antd';
+import { Avatar, Icon, Popover } from 'antd';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
-import NotificationList from '../notification/Notifications';
+import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
 import { updateUserInfo } from './reducer';
-
-import './user-info.styles.less';
 
 type UserProps = {
   username: string;
@@ -19,32 +17,24 @@ class UserInfo extends React.Component<UserProps> {
     this.props.updateUserInfo();
   }
   render() {
-    // console.log(this.props)
-
-    const dropdown = <DropdownMenu />;
-    const notifications = <NotificationList />;
     return (
       <div
         style={{
           display: 'flex',
-          width: '200px',
+          width: '100px',
           justifyContent: 'space-around',
           alignItems: 'center',
           fontSize: '20px',
           color: 'white'
         }}
       >
-        <div style={{ flexShrink: 2 }}>{this.props.username || 'Log In'}</div>
+        <Icon type="plus" />
+        <Notifications />
         <Popover
-          content={notifications}
-          title="Notifications"
+          content={<DropdownMenu username={this.props.username} />}
           trigger="click"
           placement="bottomRight"
-          overlayClassName="notifications"
         >
-          <Icon type="bell" theme="filled" />
-        </Popover>
-        <Dropdown overlay={dropdown} trigger={['click']}>
           <Avatar
             src={this.props.avatar}
             style={{ cursor: 'pointer', flexShrink: 1 }}
@@ -52,7 +42,7 @@ class UserInfo extends React.Component<UserProps> {
           >
             {this.props.username || 'User'}
           </Avatar>
-        </Dropdown>
+        </Popover>
       </div>
     );
   }
