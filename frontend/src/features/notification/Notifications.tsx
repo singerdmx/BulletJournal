@@ -54,13 +54,28 @@ const TitleAvatar = ({ source, type }: titleAvatarProps) => {
   );
 };
 
+type actionsProps = {
+    actions: string[];
+}
+
+const Actions = ({actions}: actionsProps) => {
+    return actions.length > 0 ? (
+            <Radio.Group options={actions}></Radio.Group>
+        ):
+        (
+            <Radio>Mark as Read</Radio>
+        );
+};
+
 const NotificationList = ({ notifications }: NotificationsProps) => {
   return notifications.length > 0 ? (
     <List
     itemLayout="horizontal"
     dataSource={notifications}
     renderItem={item => (
-      <List.Item extra={<Radio></Radio>}>
+      <List.Item extra={
+          <Actions actions={item.actions}></Actions>
+      }>
         <List.Item.Meta
           avatar={
             <TitleAvatar source={item.originator.avatar} type={item.type} />

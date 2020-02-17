@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,7 +22,7 @@ public class Notification {
     @NotNull
     private User originator;
 
-    private List<String> actions;
+    private List<String> actions = new ArrayList<>();
 
     @NotBlank
     private String type;
