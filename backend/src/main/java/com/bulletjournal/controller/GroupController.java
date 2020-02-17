@@ -69,7 +69,23 @@ public class GroupController {
                 continue;
             }
             List<Group> l = entry.getValue();
+            // sort by group name
             Collections.sort(l, Comparator.comparing(Group::getName));
+            for (Group group : l) {
+                // sort by username
+                Collections.sort(group.getUsers(), (a, b) -> {
+                    if (Objects.equals(a.isAccepted(), b.isAccepted())) {
+                        return a.getName().compareTo(b.getName());
+                    }
+
+                    return a.isAccepted() ? 1 : -1;
+                });
+                // move owner to the first
+                UserGroup ownerUserGroup = group.getUsers().stream()
+                        .filter(u -> Objects.equals(group.getOwner(), u.getName())).findFirst().get();
+                group.getUsers().remove(ownerUserGroup);
+                group.getUsers().add(0, ownerUserGroup);
+            }
             result.add(new GroupsWithOwner(entry.getKey(), l));
         }
         return result;
