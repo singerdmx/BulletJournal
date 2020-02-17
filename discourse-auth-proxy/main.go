@@ -4,12 +4,12 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -52,31 +52,30 @@ func main() {
 		handler = logHandler(handler)
 	}
 
-	var listener net.Listener
-	var err error
-
-	if strings.Index(config.ListenAddr, "unix:") == 0 {
-		file := strings.Replace(config.ListenAddr, "unix:", "", 1)
-		if _, err = os.Stat(file); err == nil {
-			os.Remove(file)
-		}
-		listener, err = net.Listen("unix", strings.Replace(config.ListenAddr, "unix:", "", 1))
-	} else {
-		listener, err = net.Listen("tcp", config.ListenAddr)
-	}
-
-	if err != nil {
-		log.Fatal(err)
+	cfg := &tls.Config{
+		MinVersion:               tls.VersionTLS12,
+		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		PreferServerCipherSuites: true,
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+		},
 	}
 
 	server := &http.Server{
+		Addr:           ":443",
 		Handler:        handler,
 		ReadTimeout:    config.Timeout,
 		WriteTimeout:   config.Timeout,
+		TLSConfig:      cfg,
 		MaxHeaderBytes: 1 << 20,
+		TLSNextProto:   make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
 	}
 
-	log.Fatal(server.Serve(listener))
+	log.Fatal(server.ListenAndServeTLS("/bin/bulletjournal.us.cert",
+		"/bin/bulletjournal.us.key"))
 }
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {

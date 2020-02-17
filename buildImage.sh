@@ -1,4 +1,4 @@
-cd ./discourse-auth-proxy
+cd ./auth-proxy
 docker build -t mwangxx/auth-proxy .
 cd ..
 
