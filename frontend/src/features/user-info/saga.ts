@@ -5,7 +5,7 @@ import { PayloadAction } from 'redux-starter-kit';
 import { fetchUserInfo } from '../../apis/userApis'
 
 function* userApiErrorAction(action: PayloadAction<UserApiErrorAction>) {
-    yield call(message.error, `Notice Error Received: ${action.payload.error}`);
+    yield call(message.error, `User Error Received: ${action.payload.error}`);
 }
 
 function* userInfoUpdate(action: PayloadAction<UpdateUserInfo>){

@@ -59,8 +59,13 @@ public class GroupController {
         groups = addUserAvatarToGroups(groups);
         // owner name -> groups (order by owner)
         Map<String, List<Group>> m = new TreeMap<>();
+        // group -> self accepted or not
+        Map<Group, Boolean> accepts = new HashMap<>();
         for (Group group : groups) {
             m.computeIfAbsent(group.getOwner(), k -> new ArrayList<>()).add(group);
+            UserGroup self = group.getUsers().stream()
+                    .filter(u -> Objects.equals(username, u.getName())).findFirst().get();
+            accepts.put(group, self.isAccepted());
         }
         List<GroupsWithOwner> result = new ArrayList<>();
         result.add(new GroupsWithOwner(username, m.get(username)));
@@ -69,7 +74,29 @@ public class GroupController {
                 continue;
             }
             List<Group> l = entry.getValue();
-            Collections.sort(l, Comparator.comparing(Group::getName));
+            // sort by group name, but accepted group first
+            Collections.sort(l, (a, b) -> {
+                if (Objects.equals(accepts.get(a), accepts.get(b))) {
+                    return a.getName().compareTo(b.getName());
+                }
+
+                return accepts.get(a) ? 1 : -1;
+            });
+            for (Group group : l) {
+                // sort by username
+                Collections.sort(group.getUsers(), (a, b) -> {
+                    if (Objects.equals(a.isAccepted(), b.isAccepted())) {
+                        return a.getName().compareTo(b.getName());
+                    }
+
+                    return a.isAccepted() ? 1 : -1;
+                });
+                // move owner to the first
+                UserGroup ownerUserGroup = group.getUsers().stream()
+                        .filter(u -> Objects.equals(group.getOwner(), u.getName())).findFirst().get();
+                group.getUsers().remove(ownerUserGroup);
+                group.getUsers().add(0, ownerUserGroup);
+            }
             result.add(new GroupsWithOwner(entry.getKey(), l));
         }
         return result;
