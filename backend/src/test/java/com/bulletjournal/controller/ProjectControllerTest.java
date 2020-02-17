@@ -69,13 +69,13 @@ public class ProjectControllerTest {
             group = addUserToGroup(group, username, ++count);
         }
 
-        for (String username : Arrays.asList(sampleUsers).subList(0, 1)) {
-            removeUserFromGroup(group, username);
+        for (String username : Arrays.asList(sampleUsers).subList(0, 2)) {
+            removeUserFromGroup(group, username,  --count);
         }
-        removeUsersFromGroup(group, Arrays.asList(sampleUsers).subList(1, 3));
 
         group = groups.get(0).getGroups().get(2);
         addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
+        removeUsersFromGroup(group, Arrays.asList(sampleUsers).subList(0, 5), 1);
 
         Project p1 = createProject(projectName, expectedOwner);
         p1 = updateProject(p1);
@@ -469,7 +469,7 @@ public class ProjectControllerTest {
         return updated;
     }
 
-    private void removeUsersFromGroup(final Group group, List<String> usernames) {
+    private void removeUsersFromGroup(final Group group, List<String> usernames, int count) {
         RemoveUserGroupsParams removeUserGroupsParams = new RemoveUserGroupsParams();
         for (String username : usernames) {
             removeUserGroupsParams.getUserGroups().add(new RemoveUserGroupParams(group.getId(), username));
@@ -480,15 +480,38 @@ public class ProjectControllerTest {
                 HttpMethod.POST,
                 new HttpEntity<>(removeUserGroupsParams),
                 Void.class);
+
+        ResponseEntity<GroupsWithOwner[]> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.GET,
+                null,
+                GroupsWithOwner[].class);
+        List<GroupsWithOwner> groupsWithOwners = Arrays.asList(groupsResponse.getBody());
+        Group resultGroup = groupsWithOwners.stream().filter(g -> group.getOwner().equals(g.getOwner()))
+                .findFirst().get().getGroups()
+                .stream().filter(g -> group.getId().equals(g.getId())).findFirst().get();
+        assertEquals(count, resultGroup.getUsers().size());
     }
 
-    private void removeUserFromGroup(Group group, String username) {
+    private void removeUserFromGroup(Group group, String username, int count) {
         RemoveUserGroupParams removeUserGroupParams = new RemoveUserGroupParams(group.getId(), username);
         this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.REMOVE_USER_GROUP_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(removeUserGroupParams),
                 Void.class);
+
+        ResponseEntity<GroupsWithOwner[]> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.GET,
+                null,
+                GroupsWithOwner[].class);
+
+        List<GroupsWithOwner> groupsWithOwners = Arrays.asList(groupsResponse.getBody());
+        Group resultGroup = groupsWithOwners.stream().filter(g -> group.getOwner().equals(g.getOwner()))
+                .findFirst().get().getGroups()
+                .stream().filter(g -> group.getId().equals(g.getId())).findFirst().get();
+        assertEquals(count, resultGroup.getUsers().size());
     }
 
     private Group createGroup(String groupName, String expectedOwner) {
