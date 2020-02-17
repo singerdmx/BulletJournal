@@ -31,7 +31,7 @@ class SideLayout extends React.Component<PathComponentProps> {
           style={{ height: '100%', fontWeight: 500 }}
           onClick={this.onClick}
         >
-          <SubMenu key="todo" title="Todos">
+          <SubMenu key="todo" title="TODO">
             <Menu.Item key="today">
               <Icon type="carry-out" />
               Today
@@ -46,7 +46,7 @@ class SideLayout extends React.Component<PathComponentProps> {
             title={
               <span>
                 <Icon type="folder" />
-                <span>Projects</span>
+                <span>Bullet Journal</span>
               </span>
             }
           ></SubMenu>
