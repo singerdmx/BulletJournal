@@ -1,6 +1,6 @@
 import { doFetch, doPost } from './api-helper';
 
-export const fetchUserInfo = () => {
+export const fetchMyself = () => {
   return doFetch('/api/myself')
     .then(res => res.json())
     .catch(err => {
@@ -9,6 +9,6 @@ export const fetchUserInfo = () => {
 };
 
 export const logoutUser = () => {
-  const postBody = JSON.stringify({})
-  return doPost('/api/myself/logout', postBody)
+  const postBody = JSON.stringify({});
+  return doPost('/api/myself/logout', postBody);
 };
