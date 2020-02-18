@@ -22,6 +22,8 @@ const ListTitle = ({ title, type, time }: titleProps) => {
   const titleList = title.split(' ');
   switch (type) {
     case 'JoinGroupEvent':
+    case 'RemoveUserFromGroupEvent':
+    case 'JoinGroupResponseEvent':
       return (
           <div className="notification-title">
             <span>
@@ -57,11 +59,17 @@ type titleAvatarProps = {
 const TitleAvatar = ({ source, type }: titleAvatarProps) => {
   let icon = null;
   switch (type){
-    case "JoinGroupEvent":
+    case 'JoinGroupEvent':
       icon =  <Icon type="usergroup-add" />;
       break;
-    case "DeleteGroupEvent":
+    case 'RemoveUserFromGroupEvent':
+      icon =  <Icon type="usergroup-delete" />;
+      break;
+    case 'DeleteGroupEvent':
       icon = <Icon type="delete" />;
+      break;
+    case 'JoinGroupResponseEvent':
+      icon = <Icon type="info-circle" />;
       break;
     default:
       icon = <Icon type="eye" />;
