@@ -11,7 +11,6 @@ import { IState } from '../../store';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
-const { Text } = Typography;
 
 type GroupProps = {
   groups: GroupsWithOwner[];

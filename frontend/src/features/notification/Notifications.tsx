@@ -55,48 +55,48 @@ const TitleAvatar = ({ source, type }: titleAvatarProps) => {
 };
 
 type actionsProps = {
-    actions: string[];
-}
+  actions: string[];
+};
 
-const Actions = ({actions}: actionsProps) => {
-    return actions.length > 0 ? (
-            <Radio.Group options={actions}></Radio.Group>
-        ):
-        (
-            <Radio>Mark as Read</Radio>
-        );
+const Actions = ({ actions }: actionsProps) => {
+  return actions.length > 0 ? (
+    <div className="notification-operation">
+      <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> 
+      <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96"/>
+    </div>
+  ) : (
+    <div className="notification-operation">
+      <Radio>mark as read</Radio>
+    </div>
+  );
 };
 
 const NotificationList = ({ notifications }: NotificationsProps) => {
   return notifications.length > 0 ? (
     <List
-    itemLayout="horizontal"
-    dataSource={notifications}
-    renderItem={item => (
-      <List.Item extra={
-          <Actions actions={item.actions}></Actions>
-      }>
-        <List.Item.Meta
-          avatar={
-            <TitleAvatar source={item.originator.avatar} type={item.type} />
-          }
-          title={
-            <ListTitle
-              title={item.title}
-              type={item.type}
-              time={item.timestamp}
-            />
-          }
-          description={item.content ? item.content : ''}
-        />
-      </List.Item>
-    )}
-  />
+      itemLayout="horizontal"
+      dataSource={notifications}
+      renderItem={item => (
+        <List.Item extra={<Actions actions={item.actions}></Actions>}>
+          <List.Item.Meta
+            avatar={
+              <TitleAvatar source={item.originator.avatar} type={item.type} />
+            }
+            title={
+              <ListTitle
+                title={item.title}
+                type={item.type}
+                time={item.timestamp}
+              />
+            }
+            description={item.content ? item.content : ''}
+          />
+        </List.Item>
+      )}
+    />
   ) : (
-    <div className="no-data">
-      No Notifications
-    </div>
-  )
+    <div className="no-data">No Notifications</div>
+  );
 };
 
 class Notifications extends React.Component<NotificationsProps> {
@@ -108,17 +108,17 @@ class Notifications extends React.Component<NotificationsProps> {
     return (
       <div className="notifications">
         <Badge dot={this.props.notifications.length > 0}>
-        <Popover
-          content={<NotificationList {...this.props} />}
-          title="Notifications"
-          trigger="click"
-          arrowPointAtCenter
-          placement="bottomRight"
-          overlayClassName="notifications-list"
-        >
-          <Icon type="bell" theme="filled" />
-        </Popover>
-      </Badge>
+          <Popover
+            content={<NotificationList {...this.props} />}
+            title="Notifications"
+            trigger="click"
+            arrowPointAtCenter
+            placement="bottomRight"
+            overlayClassName="notifications-list"
+          >
+            <Icon type="bell" theme="filled" />
+          </Popover>
+        </Badge>
       </div>
     );
   }
