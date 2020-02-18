@@ -1,12 +1,12 @@
 import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { UpdateNotifications, Notification } from './reducer';
+import { Notification } from './reducer';
 import { List, Badge, Popover, Icon } from 'antd';
 import TitleAvatar from '../../components/notification/avatar.compoennt';
 import Actions from '../../components/notification/action.component';
 import ListTitle from '../../components/notification/list-title.component';
-import { updateNotifications, answerNotice } from './actions';
+import { updateNotifications } from './actions';
 
 import './notification.styles.less';
 
@@ -23,7 +23,7 @@ const NotificationList = ({ notifications }: NotificationsProps) => {
       dataSource={notifications}
       renderItem={item => (
         <List.Item
-          extra={<Actions actions={item.actions}></Actions>}
+          extra={item.actions && <Actions actions={item.actions} notificationId={item.id}></Actions>}
           key={item.id}
         >
           <List.Item.Meta

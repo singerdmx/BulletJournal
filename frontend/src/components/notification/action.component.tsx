@@ -1,43 +1,37 @@
 import React from 'react';
 import { Icon } from 'antd';
-import {
-  answerNotice,
-  updateNotifications
-} from '../../features/notification/actions';
+import { answerNotice } from '../../features/notification/actions';
 import { connect } from 'react-redux';
 
 type actionsProps = {
   actions: string[];
-  action: string;
+  notificationId: number;
   answerNotice: (action: string, notificationId: number) => void;
-  updateNotifications: () => void;
 };
 
 class Actions extends React.Component<actionsProps> {
   handleClick(action: string, id: number) {
-    const answer = {
-      action: action,
-      notificationId: id
-    };
+    this.props.answerNotice(action, id);
   }
 
   render() {
-    const { actions } = this.props;
+    const { actions, notificationId } = this.props;
     if (actions.length === 0) {
       return (
-        <div className='notification-operation'>
+        <div className="notification-operation">
           <Icon
-            type='delete'
-            theme='twoTone'
-            twoToneColor='#ff0000'
-            title='Remove'
+            type="delete"
+            theme="twoTone"
+            twoToneColor="#ff0000"
+            title="Remove"
             style={{ cursor: 'pointer' }}
+            onClick={() => this.handleClick('delete', notificationId)}
           />
         </div>
       );
     }
     return (
-      <div className='notification-operation'>
+      <div className="notification-operation">
         {actions.map(action => {
           let iconType = 'delete';
           let iconColor = '#ff0000';
@@ -57,10 +51,11 @@ class Actions extends React.Component<actionsProps> {
           return (
             <Icon
               type={iconType}
-              theme='twoTone'
+              theme="twoTone"
               twoToneColor={iconColor}
               title={action}
               style={{ cursor: 'pointer' }}
+              onClick={() => this.handleClick(action, notificationId)}
             />
           );
         })}
@@ -69,4 +64,4 @@ class Actions extends React.Component<actionsProps> {
   }
 }
 
-export default Actions;
+export default connect(null, {answerNotice})(Actions);
