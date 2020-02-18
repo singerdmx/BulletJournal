@@ -4,7 +4,6 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectRelationsProcessorTest;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.JoinGroupEvent;
-import com.bulletjournal.notifications.JoinGroupResponseEvent;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;

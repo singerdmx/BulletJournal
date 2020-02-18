@@ -80,13 +80,20 @@ const Actions = ({ actions }: actionsProps) => {
   return actions.length > 0 ? (
     <div className="notification-operation">
       {actions.map(action => {
-        return action === "Accept" ? <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> :
-        <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96" />
+        switch (action) {
+          case 'Accept':
+            return <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" title={action}/>;
+          case 'Decline':
+            return <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96" title={action}/>;
+          default:
+            console.error("Invalid action " + action);
+            return <Icon type="delete" theme="twoTone" twoToneColor="#ff0000" title="Remove"/>;
+        }
       })}
     </div>
   ) : (
     <div className="notification-operation">
-      <Icon type="delete" theme="twoTone" twoToneColor="#ff0000" />
+      <Icon type="delete" theme="twoTone" twoToneColor="#ff0000" title="Remove"/>
     </div>
   );
 };
