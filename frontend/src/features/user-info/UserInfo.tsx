@@ -4,17 +4,17 @@ import { Avatar, Icon, Popover } from 'antd';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
-import { updateUserInfo } from './reducer';
+import { updateMyself } from './reducer';
 
-type UserProps = {
+type MyselfProps = {
   username: string;
   avatar: string;
-  updateUserInfo: () => void;
+  updateMyself: () => void;
 };
 
-class UserInfo extends React.Component<UserProps> {
+class Myself extends React.Component<MyselfProps> {
   componentDidMount() {
-    this.props.updateUserInfo();
+    this.props.updateMyself();
   }
   render() {
     return (
@@ -28,12 +28,12 @@ class UserInfo extends React.Component<UserProps> {
           color: 'white'
         }}
       >
-        <Icon type="plus" />
-        <Notifications />
+        <Icon type='plus' />
+
         <Popover
           content={<DropdownMenu username={this.props.username} />}
-          trigger="click"
-          placement="bottomRight"
+          trigger='click'
+          placement='bottomRight'
         >
           <Avatar
             src={this.props.avatar}
@@ -49,8 +49,8 @@ class UserInfo extends React.Component<UserProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  username: state.user.username,
-  avatar: state.user.avatar
+  username: state.myself.username,
+  avatar: state.myself.avatar
 });
 
-export default connect(mapStateToProps, { updateUserInfo })(UserInfo);
+export default connect(mapStateToProps, { updateMyself })(Myself);

@@ -1,36 +1,39 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 
-export type UserInfoWithAvatar = {
+export type MyselfWithAvatar = {
   username: string;
   avatar: string;
 };
 
-export type UserApiErrorAction = {
+export type MyselfApiErrorAction = {
   error: string;
 };
 
-export type UpdateUserInfo = {};
+export type UpdateMyself = {};
 
 let initialState = {
   username: '',
-  avatar: '',
+  avatar: ''
 };
 
 const slice = createSlice({
-  name: 'user',
+  name: 'myself',
   initialState,
   reducers: {
-    UserDataReceived: (state, action: PayloadAction<UserInfoWithAvatar>) => {
+    myselfDataReceived: (state, action: PayloadAction<MyselfWithAvatar>) => {
       const { username, avatar } = action.payload;
       state.username = username;
       state.avatar = avatar;
     },
-    UserApiErrorReceived: (state, action: PayloadAction<UserApiErrorAction>) => state,
-    UserInfoUpdate: (state, action: PayloadAction<UpdateUserInfo>) => state
+    myselfApiErrorReceived: (
+      state,
+      action: PayloadAction<MyselfApiErrorAction>
+    ) => state,
+    myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state
   }
 });
 
-export const updateUserInfo = () => actions.UserInfoUpdate({});
+export const updateMyself = () => actions.myselfUpdate({});
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;

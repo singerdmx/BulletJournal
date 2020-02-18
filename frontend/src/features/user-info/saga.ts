@@ -1,32 +1,38 @@
 import { takeEvery, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
-  actions as userActions,
-  UserApiErrorAction,
-  UpdateUserInfo
+  actions as myselfActions,
+  MyselfApiErrorAction,
+  UpdateMyself
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself } from '../../apis/userApis';
 
-function* userApiErrorAction(action: PayloadAction<UserApiErrorAction>) {
-  yield call(message.error, `User Error Received: ${action.payload.error}`);
+function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
+  yield call(message.error, `Myself Error Received: ${action.payload.error}`);
 }
 
-function* userInfoUpdate(action: PayloadAction<UpdateUserInfo>) {
+function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
   try {
     const data = yield call(fetchMyself);
     // console.log(data);
     yield put(
-      userActions.UserDataReceived({ username: data.name, avatar: data.avatar })
+      myselfActions.myselfDataReceived({
+        username: data.name,
+        avatar: data.avatar
+      })
     );
   } catch (error) {
-    yield call(message.error, `User Error Received: ${error}`);
+    yield call(message.error, `Myself Error Received: ${error}`);
   }
 }
 
-export default function* userSagas() {
+export default function* myselfSagas() {
   yield all([
-    yield takeEvery(userActions.UserApiErrorReceived.type, userApiErrorAction),
-    yield takeEvery(userActions.UserInfoUpdate.type, userInfoUpdate)
+    yield takeEvery(
+      myselfActions.myselfApiErrorReceived.type,
+      myselfApiErrorAction
+    ),
+    yield takeEvery(myselfActions.myselfUpdate.type, myselfUpdate)
   ]);
 }
