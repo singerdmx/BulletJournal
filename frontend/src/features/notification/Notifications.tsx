@@ -47,7 +47,15 @@ type titleAvatarProps = {
 const TitleAvatar = ({ source, type }: titleAvatarProps) => {
   return (
     <div className="avatar-title">
-      <Badge status={type === 'JoinGroupEvent' ? 'success' : 'processing'} dot>
+      <Badge
+        count={
+          type === 'JoinGroupEvent' ? (
+            <Icon type="usergroup-add" />
+          ) : (
+            <Icon type="eye" />
+          )
+        }
+      >
         <Avatar src={source} />
       </Badge>
     </div>
@@ -61,8 +69,8 @@ type actionsProps = {
 const Actions = ({ actions }: actionsProps) => {
   return actions.length > 0 ? (
     <div className="notification-operation">
-      <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> 
-      <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96"/>
+      <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" />
+      <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96" />
     </div>
   ) : (
     <div className="notification-operation">
