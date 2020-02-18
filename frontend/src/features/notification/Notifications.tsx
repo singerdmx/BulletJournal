@@ -2,7 +2,7 @@ import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateNotifications, Notification } from './reducer';
-import { List, Avatar, Radio, Badge, Popover, Icon } from 'antd';
+import { List, Avatar, Badge, Popover, Icon } from 'antd';
 import moment from 'moment';
 
 import './notification.styles.less';
@@ -20,23 +20,33 @@ type titleProps = {
 
 const ListTitle = ({ title, type, time }: titleProps) => {
   const titleList = title.split(' ');
-  const name = titleList[0];
-  const project = titleList[titleList.length - 1];
-  const rest = titleList.slice(1, titleList.length - 1).join(' ');
-
-  return type === 'JoinGroupEvent' ? (
-    <div className="notification-title">
-      <span>
-        <strong>{name}</strong> {rest} <strong>{project}</strong>
-      </span>
-      <span>{moment(time).fromNow()}</span>
-    </div>
-  ) : (
-    <div className="notification-title">
-      <span>{title}</span>
-      <span>{moment(time).fromNow()}</span>
-    </div>
-  );
+  switch (type) {
+    case 'JoinGroupEvent':
+      return (
+          <div className="notification-title">
+            <span>
+              <strong>{titleList[0]}</strong> {titleList.slice(1, titleList.length - 1).join(' ')} <strong>{titleList[titleList.length - 1]}</strong>
+            </span>
+            <span>{moment(time).fromNow()}</span>
+          </div>
+        );
+    case 'DeleteGroupEvent':
+      return (
+        <div className="notification-title">
+            <span>
+              {titleList[0]} <strong>{titleList[1]}</strong> {titleList.slice(2, titleList.length).join(' ')}
+            </span>
+            <span>{moment(time).fromNow()}</span>
+        </div>
+      );
+    default:
+        return (
+            <div className="notification-title">
+                <span>{title}</span>
+                <span>{moment(time).fromNow()}</span>
+            </div>
+        );
+  }
 };
 
 type titleAvatarProps = {
