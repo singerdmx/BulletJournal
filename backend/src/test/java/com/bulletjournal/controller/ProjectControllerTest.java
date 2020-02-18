@@ -152,9 +152,9 @@ public class ProjectControllerTest {
                 Notification[].class);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
-        assertEquals(8, notifications.size());
+        assertEquals(9, notifications.size());
         // reject invitations to join group
-        for (int i = 1; i < notifications.size(); i++) {
+        for (int i = 1; i < notifications.size() - 1; i++) {
             Notification notification = notifications.get(i);
             AnswerNotificationParams answerNotificationParams =
                     new AnswerNotificationParams(Action.DECLINE.getDescription());
@@ -332,7 +332,7 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
 
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
-        assertEquals(8, notifications.size());
+        assertEquals(9, notifications.size());
         Notification notification = notifications.get(0);
         assertEquals("Xavier invited you to join Group Default", notification.getTitle());
         assertNull(notification.getContent());
@@ -340,12 +340,6 @@ public class ProjectControllerTest {
         assertEquals(ImmutableList.of(Action.ACCEPT.getDescription(), Action.DECLINE.getDescription()),
                 notification.getActions());
         assertEquals(JoinGroupEvent.class.getSimpleName(), notification.getType());
-
-        for (int i = 1; i < 8; i++) {
-            assertTrue(notifications.get(i).getTitle()
-                    .endsWith("declined your invitation to join Group Default"));
-            assertEquals(JoinGroupResponseEvent.class.getSimpleName(), notifications.get(i).getType());
-        }
     }
 
     private List<GroupsWithOwner> getGroups(List<GroupsWithOwner> expected) {
