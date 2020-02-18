@@ -82,27 +82,41 @@ class SideLayout extends React.Component<GroupProps & PathProps> {
                   title={
                     <span className="group-title">
                       <Avatar
-                        size="small"
-                        style={
-                          index === 0
-                            ? {
-                                backgroundColor: '#f56a00'
-                              }
-                            : {
-                                backgroundColor: '#fde3cf'
-                              }
-                        }
+                          size="small"
+                          style={
+                            index === 0
+                                ? {
+                                  backgroundColor: '#f56a00'
+                                }
+                                : {
+                                  backgroundColor: '#fde3cf'
+                                }
+                          }
                       >
                         {group.owner[0]}
                       </Avatar>
-                      <span className="group-name">{group.name}</span>
+                      <span className="group-name" title={"Group \"" + group.name + "\" owned by \"" + group.owner + "\""}>
+                        {group.name}
+                      </span>
                     </span>
                   }
                 >
-                  {group.users.map(user => (
-                    <Menu.Item key={user.id}>
-                      <Avatar size="small" src={user.avatar} /> {user.name}
-                    </Menu.Item>
+                  {group.users.map((user, index) => (
+                      <Menu.Item key={user.id}>
+                        <Avatar size="small" src={user.avatar} /> <span title={
+                        index == 0 ? "Owner" : user.accepted ? "Joined" : "Not Joined"
+                      } style={
+                        index === 0
+                            ? {
+                              color: '#f56a00'
+                            }
+                            : user.accepted ? {
+                              color: '#fab785'
+                            } : {
+                              color: '#d9d9d9'
+                            }
+                      }>{user.name}</span>
+                      </Menu.Item>
                   ))}
                 </SubMenu>
               ));
