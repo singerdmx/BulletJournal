@@ -90,23 +90,34 @@ type actionsProps = {
 };
 
 const Actions = ({ actions }: actionsProps) => {
-  return actions.length > 0 ? (
+  if (actions.length == 0) {
+    return (
+      <div className="notification-operation">
+        <Icon type="delete" theme="twoTone" twoToneColor="#ff0000" title="Remove" style={{cursor:'pointer'}}/>
+      </div>
+    );
+  }
+
+  return (
     <div className="notification-operation">
       {actions.map(action => {
+        let iconType = 'delete';
+        let iconColor = '#ff0000';
         switch (action) {
           case 'Accept':
-            return <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" title={action}/>;
+            iconType = 'check-circle';
+            iconColor = '#52c41a';
+            break;
           case 'Decline':
-            return <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96" title={action}/>;
+            iconType = 'close-circle';
+            iconColor = '#eb2f96';
+            break;
           default:
             console.error("Invalid action " + action);
-            return <Icon type="delete" theme="twoTone" twoToneColor="#ff0000" title="Remove"/>;
         }
+
+        return <Icon type={iconType} theme='twoTone' twoToneColor={iconColor} title={action} style={{cursor:'pointer'}}/>;
       })}
-    </div>
-  ) : (
-    <div className="notification-operation">
-      <Icon type="delete" theme="twoTone" twoToneColor="#ff0000" title="Remove"/>
     </div>
   );
 };
