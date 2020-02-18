@@ -115,6 +115,10 @@ INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (8, 0, false
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (7, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 8, 'bean', 'BulletJournal', 'bean invited you to join Group Default', 'JoinGroupEvent');
 
+-- DeleteGroupEvent
+INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
+VALUES (8, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', null, null, 99, 'ShrimpChips', 'BulletJournal', 'Group Avenger is deleted', 'DeleteGroupEvent');
+
 -- Joined Scarlet's Default Group
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (12, 0, true);
 
