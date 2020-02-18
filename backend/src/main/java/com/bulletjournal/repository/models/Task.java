@@ -12,10 +12,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "tasks",
-        indexes = {@Index(name = "task_project_id_index", columnList = "project_id")},
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"project_id", "name"})
-        })
+        indexes = {@Index(name = "task_project_id_index", columnList = "project_id")})
 public class Task extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "task_generator")
