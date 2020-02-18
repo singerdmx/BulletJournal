@@ -1,8 +1,5 @@
 package com.bulletjournal.repository.models;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -35,11 +32,6 @@ public class Task extends ProjectItemModel {
 
     @Column(name = "timezone")
     private String timezone;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Project project;
 
     public Long getId() {
         return id;
@@ -76,10 +68,6 @@ public class Task extends ProjectItemModel {
     public String getTimezone() { return timezone; }
 
     public void setTimezone(String timezone) { this.timezone = timezone; }
-
-    public Project getProject() { return project; }
-
-    public void setProject(Project project) { this.project = project; }
 
     public com.bulletjournal.controller.models.Task toPresentationModel() {
         return new com.bulletjournal.controller.models.Task(
