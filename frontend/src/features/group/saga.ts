@@ -5,10 +5,16 @@ import {
   ApiErrorAction,
   GroupsAction,
   GroupCreateAction,
-  AddUserGroupAction
+  AddUserGroupAction,
+  RemoveUserGroupAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
-import { fetchGroups, createGroups, addUserGroup } from '../../apis/groupApis';
+import {
+  fetchGroups,
+  createGroups,
+  addUserGroup,
+  removeUserGroup
+} from '../../apis/groupApis';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -17,16 +23,16 @@ function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
 function* groupsUpdate(action: PayloadAction<GroupsAction>) {
   try {
     const data = yield call(fetchGroups);
-    console.log(data)
-    yield put(groupsActions.groupsReceived({groups: data}));
+    console.log(data);
+    yield put(groupsActions.groupsReceived({ groups: data }));
   } catch (error) {
     yield call(message.error, `Group Error Received: ${error}`);
   }
 }
 
-function* createGroup(action: PayloadAction<GroupCreateAction>){
+function* createGroup(action: PayloadAction<GroupCreateAction>) {
   try {
-    const name = action.payload.name
+    const name = action.payload.name;
     yield call(createGroups, name);
     yield call(message.success, `${name} Group Created`);
   } catch (error) {
@@ -34,7 +40,7 @@ function* createGroup(action: PayloadAction<GroupCreateAction>){
   }
 }
 
-function* addUserToGroup(action: PayloadAction<AddUserGroupAction>){
+function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
   try {
     const { groupId, username } = action.payload;
     yield call(addUserGroup, groupId, username);
@@ -44,11 +50,28 @@ function* addUserToGroup(action: PayloadAction<AddUserGroupAction>){
   }
 }
 
+function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
+  try {
+    const { groupId, username } = action.payload;
+    yield call(removeUserGroup, groupId, username);
+    yield call(
+      message.success,
+      `User ${username} removed from Group ${groupId}`
+    );
+  } catch (error) {
+    yield call(message.error, `Remove user group fail: ${error}`);
+  }
+}
+
 export default function* groupSagas() {
   yield all([
-    yield takeEvery(groupsActions.groupsApiErrorReceived.type, apiErrorReceived),
+    yield takeEvery(
+      groupsActions.groupsApiErrorReceived.type,
+      apiErrorReceived
+    ),
     yield takeEvery(groupsActions.groupsUpdate.type, groupsUpdate),
     yield takeEvery(groupsActions.createGroup.type, createGroup),
     yield takeLatest(groupsActions.addUserGroup.type, addUserToGroup),
+    yield takeLatest(groupsActions.removeUserGroup.type, removeUserFromGroup)
   ]);
 }

@@ -24,20 +24,25 @@ export type Group = {
 export type GroupsWithOwner = {
   owner: string;
   groups: Group[];
-}
+};
 
 export type GroupsAction = {
   groups: GroupsWithOwner[];
 };
 
 export type GroupCreateAction = {
-  name: string
-}
+  name: string;
+};
 
 export type AddUserGroupAction = {
-  groupId: number,
-  username: string
-}
+  groupId: number;
+  username: string;
+};
+
+export type RemoveUserGroupAction = {
+  groupId: number;
+  username: string;
+};
 
 let initialState = {
   groups: [] as GroupsWithOwner[]
@@ -51,10 +56,13 @@ const slice = createSlice({
       const { groups } = action.payload;
       state.groups = groups;
     },
-    groupsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>state,
+    groupsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
+      state,
     groupsUpdate: (state, action: PayloadAction<UpdateGroups>) => state,
     createGroup: (state, action: PayloadAction<GroupCreateAction>) => state,
-    addUserGroup: (state, action: PayloadAction<AddUserGroupAction>) => state
+    addUserGroup: (state, action: PayloadAction<AddUserGroupAction>) => state,
+    removeUserGroup: (state, action: PayloadAction<RemoveUserGroupAction>) =>
+      state
   }
 });
 
