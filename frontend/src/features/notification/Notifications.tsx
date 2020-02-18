@@ -66,7 +66,7 @@ const Actions = ({ actions }: actionsProps) => {
     </div>
   ) : (
     <div className="notification-operation">
-      <Radio>mark as read</Radio>
+      <Icon type="delete" theme="twoTone" twoToneColor="#ff0000" />
     </div>
   );
 };
