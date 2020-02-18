@@ -18,3 +18,15 @@ export const createGroups = (name: string) => {
       throw Error(err);
     });
 };
+
+export const addUserGroup = (groupId: number, username : string) =>{
+  const postBody = JSON.stringify({
+    groupId: groupId,
+    username: username
+  }) 
+  return doPost('/addUserGroup', postBody)
+    .then(res=>res.json())
+    .catch(err => {
+      throw Error(err);
+    });
+}
