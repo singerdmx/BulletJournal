@@ -69,8 +69,10 @@ type actionsProps = {
 const Actions = ({ actions }: actionsProps) => {
   return actions.length > 0 ? (
     <div className="notification-operation">
-      <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" />
-      <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96" />
+      {actions.map(action => {
+        return action === "Accept" ? <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> :
+        <Icon type="close-circle" theme="twoTone" twoToneColor="#eb2f96" />
+      })}
     </div>
   ) : (
     <div className="notification-operation">
