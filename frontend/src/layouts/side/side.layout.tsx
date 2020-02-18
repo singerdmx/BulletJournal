@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Icon, Layout, Avatar, Typography } from 'antd';
+import { Menu, Icon, Layout, Avatar, Badge } from 'antd';
 import { GroupsWithOwner } from '../../features/group/reducer';
 import { updateGroups, createGroupByName } from '../../features/group/actions';
 import { withRouter, RouteComponentProps } from 'react-router';
@@ -75,47 +75,70 @@ class SideLayout extends React.Component<GroupProps & PathProps> {
             }
           >
             {groupsByOwner.map((groupsOwner, index) => {
-              return groupsOwner.groups.map((group) => (
+              return groupsOwner.groups.map(group => (
                 <SubMenu
                   key={group.id}
                   title={
                     <span className="group-title">
                       <Avatar
-                          size="small"
-                          style={
-                            index === 0
-                                ? {
-                                  backgroundColor: '#f56a00'
-                                }
-                                : {
-                                  backgroundColor: '#fde3cf'
-                                }
-                          }
+                        size="small"
+                        style={
+                          index === 0
+                            ? {
+                                backgroundColor: '#f56a00'
+                              }
+                            : {
+                                backgroundColor: '#fde3cf'
+                              }
+                        }
                       >
                         {group.owner[0]}
                       </Avatar>
-                      <span className="group-name" title={"Group \"" + group.name + "\" owned by \"" + group.owner + "\""}>
+                      <span
+                        className="group-name"
+                        title={
+                          'Group "' +
+                          group.name +
+                          '" owned by "' +
+                          group.owner +
+                          '"'
+                        }
+                      >
                         {group.name}
                       </span>
                     </span>
                   }
                 >
                   {group.users.map((user, index) => (
-                      <Menu.Item key={user.id}>
-                        <Avatar size="small" src={user.avatar} /> <span title={
-                        index == 0 ? "Owner" : user.accepted ? "Joined" : "Not Joined"
-                      } style={
-                        index === 0
+                    <Menu.Item key={user.id}>
+                      <Badge dot={!user.accepted && index !== 0} >
+                        <Avatar src={user.avatar} size="small"/>
+                      </Badge>{' '}
+                      <span
+                        title={
+                          index === 0
+                            ? 'Owner'
+                            : user.accepted
+                            ? 'Joined'
+                            : 'Not Joined'
+                        }
+                        style={
+                          index === 0
                             ? {
-                              color: '#f56a00'
-                            }
-                            : user.accepted ? {
-                              color: '#fab785'
-                            } : {
-                              color: '#d9d9d9'
-                            }
-                      }>{user.name}</span>
-                      </Menu.Item>
+                                color: '#f56a00'
+                              }
+                            : user.accepted
+                            ? {
+                                color: '#fab785'
+                              }
+                            : {
+                                color: '#d9d9d9'
+                              }
+                        }
+                      >
+                        {user.name}
+                      </span>
+                    </Menu.Item>
                   ))}
                 </SubMenu>
               ));
