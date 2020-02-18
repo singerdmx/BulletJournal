@@ -45,6 +45,7 @@ public class AuthFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         Enumeration<String> headerNames = request.getHeaderNames();
 
+        LOGGER.info(request.getRequestURI());
         String username = null;
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
@@ -52,6 +53,7 @@ public class AuthFilter implements Filter {
                 String val = request.getHeader(name);
                 if (UserClient.USER_NAME_KEY.equals(name)) {
                     username = URLDecoder.decode(val, StandardCharsets.UTF_8.toString());
+                    LOGGER.info("User " + username + " logged in");
                     break;
                 }
             }
