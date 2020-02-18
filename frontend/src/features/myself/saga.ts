@@ -6,7 +6,7 @@ import {
   UpdateMyself
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
-import { fetchMyself } from '../../apis/userApis';
+import { fetchMyself } from '../../apis/myselfApis';
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
