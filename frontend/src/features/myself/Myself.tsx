@@ -29,7 +29,7 @@ class Myself extends React.Component<MyselfProps> {
         }}
       >
         <Icon type='plus' />
-
+        <Notifications />
         <Popover
           content={<DropdownMenu username={this.props.username} />}
           trigger='click'

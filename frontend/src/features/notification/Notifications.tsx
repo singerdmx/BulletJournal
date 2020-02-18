@@ -13,7 +13,6 @@ import './notification.styles.less';
 type NotificationsProps = {
   notifications: Notification[];
   updateNotifications: () => void;
-  answerNotice: (action: string, notificationId: number) => void;
 };
 
 const NotificationList = ({ notifications }: NotificationsProps) => {
