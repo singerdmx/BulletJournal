@@ -33,6 +33,7 @@ public class NotificationService {
     }
 
     public void inform(Informed informed) {
+        LOGGER.info("Received informed: " + informed);
         if (informed.getEvents().isEmpty()) {
             return;
         }

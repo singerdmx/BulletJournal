@@ -37,4 +37,13 @@ public class Event {
     public void setContentName(String contentName) {
         this.contentName = contentName;
     }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "targetUser='" + targetUser + '\'' +
+                ", contentId=" + contentId +
+                ", contentName='" + contentName + '\'' +
+                '}';
+    }
 }
