@@ -55,16 +55,21 @@ type titleAvatarProps = {
 };
 
 const TitleAvatar = ({ source, type }: titleAvatarProps) => {
+  let icon = null;
+  switch (type){
+    case "JoinGroupEvent":
+      icon =  <Icon type="usergroup-add" />;
+      break;
+    case "DeleteGroupEvent":
+      icon = <Icon type="delete" />;
+      break;
+    default:
+      icon = <Icon type="eye" />;
+  }
   return (
     <div className="avatar-title">
       <Badge
-        count={
-          type === 'JoinGroupEvent' ? (
-            <Icon type="usergroup-add" />
-          ) : (
-            <Icon type="eye" />
-          )
-        }
+        count={icon}
       >
         <Avatar src={source} />
       </Badge>
@@ -97,7 +102,7 @@ const NotificationList = ({ notifications }: NotificationsProps) => {
       itemLayout="horizontal"
       dataSource={notifications}
       renderItem={item => (
-        <List.Item extra={<Actions actions={item.actions}></Actions>}>
+        <List.Item extra={<Actions actions={item.actions}></Actions>} key={item.id}>
           <List.Item.Meta
             avatar={
               <TitleAvatar source={item.originator.avatar} type={item.type} />
