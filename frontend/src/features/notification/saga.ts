@@ -34,7 +34,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     yield call(answerNotification, notificationId, action);
     yield call(message.success, 'User answers notification successful');
   } catch (error) {
-    yield call(message.error, 'User answers notification faild');
+    yield call(message.error, `User answers notification failed: ${error}`);
   }
 }
 
