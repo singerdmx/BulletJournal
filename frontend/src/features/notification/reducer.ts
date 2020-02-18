@@ -1,53 +1,64 @@
-import {createSlice, PayloadAction } from 'redux-starter-kit';
+import { createSlice, PayloadAction } from 'redux-starter-kit';
 
 export type NoticeApiErrorAction = {
-    error: string;
+  error: string;
 };
 
-export type UpdateNotifications = {
+export type UpdateNotifications = {};
 
+export type AnswerNotificationAction = {
+  action: string;
+  notificationId: number;
+};
+
+export interface Originator {
+  id: number;
+  name: string;
+  thumbnail: string;
+  avatar: string;
 }
-
-export interface Originator{
-    id: number,
-    name: string,
-    thumbnail: string,
-    avatar: string
-};
 
 export interface Notification {
-    id: number,
-    title: string,
-    content: string,
-    timestamp: number,
-    originator: Originator,
-    actions: Array<string>,
-    type: string,
-};
+  id: number;
+  title: string;
+  content: string;
+  timestamp: number;
+  originator: Originator;
+  actions: Array<string>;
+  type: string;
+}
 
 export type NotificationsAction = {
-    notifications: Array<Notification>
-}
+  notifications: Array<Notification>;
+};
 
 let initialState = {
-    notifications: [] as Array<Notification>
-}
+  notifications: [] as Array<Notification>
+};
 
 const slice = createSlice({
-    name: 'notice',
-    initialState,
-    reducers: {
-        notificationsReceived: ( state, action: PayloadAction<NotificationsAction> ) => {
-            const { notifications } = action.payload;
-            state.notifications = notifications
-        },
-        noticeApiErrorReceived: ( state, action: PayloadAction<NoticeApiErrorAction> ) => state,
-        notificationsUpdate: (state, action: PayloadAction<UpdateNotifications> ) => state
-    }
+  name: 'notice',
+  initialState,
+  reducers: {
+    notificationsReceived: (
+      state,
+      action: PayloadAction<NotificationsAction>
+    ) => {
+      const { notifications } = action.payload;
+      state.notifications = notifications;
+    },
+    noticeApiErrorReceived: (
+      state,
+      action: PayloadAction<NoticeApiErrorAction>
+    ) => state,
+    notificationsUpdate: (state, action: PayloadAction<UpdateNotifications>) =>
+      state,
+    answerNotice: (state, action: PayloadAction<AnswerNotificationAction>) =>
+      state
+  }
 });
 
-export const updateNotifications = () => actions.notificationsUpdate({})
+export const updateNotifications = () => actions.notificationsUpdate({});
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;
-
