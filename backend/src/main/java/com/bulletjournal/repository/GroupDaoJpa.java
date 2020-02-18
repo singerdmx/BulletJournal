@@ -8,10 +8,7 @@ import com.bulletjournal.controller.models.RemoveUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.notifications.DeleteGroupEvent;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.JoinGroupEvent;
-import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
@@ -149,6 +146,7 @@ public class GroupDaoJpa {
             String owner,
             List<RemoveUserGroupParams> removeUserGroupsParams) {
 
+        List<Event> events = new ArrayList<>();
         for (RemoveUserGroupParams removeUserGroupParams: removeUserGroupsParams) {
             String username = removeUserGroupParams.getUsername();
             if (Objects.equals(username, owner)) {
@@ -167,6 +165,8 @@ public class GroupDaoJpa {
                     .orElseThrow(() ->
                             new ResourceNotFoundException("UserGroupKey not found"));
             this.userGroupRepository.delete(userGroup);
+            events.add(new Event(username, groupId, group.getName()));
         }
+        this.notificationService.inform(new RemoveUserFromGroupEvent(events, owner));
     }
 }

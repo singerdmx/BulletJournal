@@ -97,8 +97,6 @@ public class NotificationController {
                 this.notificationService.inform(
                         new JoinGroupResponseEvent(event, notification.getOriginator(), action));
                 break;
-            default:
-                throw new ResourceNotFoundException("Notification Type " + notification.getType() + " not found");
         }
         this.notificationRepository.delete(notification);
     }
