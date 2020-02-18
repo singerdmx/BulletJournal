@@ -59,6 +59,11 @@ const slice = createSlice({
 });
 
 export const updateNotifications = () => actions.notificationsUpdate({});
+export const answerNotice = ({
+  action,
+  notificationId
+}: AnswerNotificationAction) =>
+  actions.answerNotice({ action: action, notificationId: notificationId });
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;
