@@ -14,6 +14,8 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.UserGroupKey;
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ import java.util.List;
 
 @RestController
 public class NotificationController {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationController.class);
     protected static final String NOTIFICATIONS_ROUTE = "/api/notifications";
     protected static final String ANSWER_NOTIFICATION_ROUTE = "/api/notifications/{notificationId}/answer";
 
@@ -59,13 +61,15 @@ public class NotificationController {
     public ResponseEntity<?> answerNotification(
             @NotNull @PathVariable Long notificationId,
             @Valid @RequestBody AnswerNotificationParams answerNotificationParams) {
-        processNotification(notificationId, answerNotificationParams);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        processNotification(notificationId, answerNotificationParams, username);
         return ResponseEntity.ok().build();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void processNotification(@PathVariable @NotNull Long notificationId,
-                                    AnswerNotificationParams answerNotificationParams) {
+                                    AnswerNotificationParams answerNotificationParams,
+                                    String owner) {
         com.bulletjournal.repository.models.Notification notification =
                 this.notificationRepository.findById(notificationId)
                         .orElseThrow(() ->
@@ -91,11 +95,11 @@ public class NotificationController {
                 Group group = this.groupRepository.findById(notification.getContentId()).orElseThrow(() ->
                         new ResourceNotFoundException("Group " + notification.getContentId() + " not found"));
                 Event event = new Event(
-                        notification.getTargetUser(),
+                        notification.getOriginator(),
                         notification.getContentId(),
                         group.getName());
                 this.notificationService.inform(
-                        new JoinGroupResponseEvent(event, notification.getOriginator(), action));
+                        new JoinGroupResponseEvent(event, owner, action));
                 break;
         }
         this.notificationRepository.delete(notification);

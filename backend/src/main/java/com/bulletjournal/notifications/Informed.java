@@ -4,12 +4,14 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Notification;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class Informed {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(Informed.class);
     private List<Event> events;
     private String originator;
     private static final Gson GSON = new Gson();
@@ -70,5 +72,13 @@ public abstract class Informed {
 
     public String getOriginator() {
         return this.originator;
+    }
+
+    @Override
+    public String toString() {
+        return this.getEventType() + "{" +
+                "events=" + events +
+                ", originator='" + originator + '\'' +
+                '}';
     }
 }
