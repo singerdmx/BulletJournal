@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Menu, Icon, Avatar, Badge } from 'antd';
+import { Menu, Icon, Avatar } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/reducer';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
@@ -16,10 +16,24 @@ type GroupProps = {
 
 type PathProps = RouteComponentProps;
 
-class SideMenu extends React.Component<GroupProps & PathProps> {
+type MenuState = {
+  showModal: boolean;
+};
+
+class SideMenu extends React.Component<GroupProps & PathProps, MenuState> {
+  state = {
+    showModal: false
+  };
+
   onClick = (menu: any) => {
-    const path = menu.keyPath.reverse().join('/');
-    this.props.history.push(`/${path}`);
+    if (menu.key === 'addGroup') {
+      console.log(menu);
+    } else if (menu.keyPath[menu.keyPath.length - 1] === 'groups') {
+      console.log(menu);
+    } else {
+      const path = menu.keyPath.reverse().join('/');
+      this.props.history.push(`/${path}`);
+    }
   };
 
   componentDidMount() {
@@ -62,76 +76,43 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
             </span>
           }
         >
+          <Menu.Item key="addGroup">
+            <Icon type="usergroup-add" style={{ fontSize: 20 }} />
+          </Menu.Item>
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
-              <SubMenu
-                key={group.id}
-                title={
-                  <span className="group-title">
-                    <span>
-                      <Avatar
-                        size="small"
-                        style={
-                          index === 0
-                            ? {
-                                backgroundColor: '#f56a00'
-                              }
-                            : {
-                                backgroundColor: '#fde3cf'
-                              }
-                        }
-                      >
-                        {group.owner.slice(1, 3)}
-                      </Avatar>
-                      <span
-                        className="group-name"
-                        title={
-                          'Group "' +
-                          group.name +
-                          '" owned by "' +
-                          group.owner +
-                          '"'
-                        }
-                      >
-                        {group.name}
-                      </span>
-                    </span>
-                    <Icon type="user-add" style={{ float: 'right' }} />
-                  </span>
-                }
-              >
-                {group.users.map((user, index) => (
-                  <Menu.Item key={user.name}>
-                    <Badge dot={!user.accepted && index !== 0}>
-                      <Avatar src={user.avatar} size="small" />
-                    </Badge>{' '}
-                    <span
-                      title={
-                        index === 0
-                          ? 'Owner'
-                          : user.accepted
-                          ? 'Joined'
-                          : 'Not Joined'
-                      }
+              <Menu.Item key={group.id}>
+                <span className="group-title">
+                  <span>
+                    <Avatar
+                      size="small"
                       style={
                         index === 0
                           ? {
-                              color: '#f56a00'
-                            }
-                          : user.accepted
-                          ? {
-                              color: '#fab785'
+                              backgroundColor: '#f56a00'
                             }
                           : {
-                              color: '#d9d9d9'
+                              backgroundColor: '#fde3cf'
                             }
                       }
                     >
-                      {user.name}
+                      {group.owner.slice(1, 3)}
+                    </Avatar>
+                    <span
+                      className="group-name"
+                      title={
+                        'Group "' +
+                        group.name +
+                        '" owned by "' +
+                        group.owner +
+                        '"'
+                      }
+                    >
+                      {group.name}
                     </span>
-                  </Menu.Item>
-                ))}
-              </SubMenu>
+                  </span>
+                </span>
+              </Menu.Item>
             ));
           })}
         </SubMenu>
