@@ -1,10 +1,12 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -58,5 +60,13 @@ public class UserDaoJpa {
         }
 
         return userList.get(0);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public User updateMyself(String user, UpdateMyselfParams updateMyselfParams) {
+        User self = getByName(user);
+        DaoHelper.updateIfPresent(updateMyselfParams.hasTimezone(), updateMyselfParams.getTimezone(),
+                (value) -> self.setTimezone(value));
+        return self;
     }
 }

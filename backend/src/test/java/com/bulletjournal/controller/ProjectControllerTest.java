@@ -59,7 +59,7 @@ public class ProjectControllerTest {
 
     @Test
     public void testCRUD() throws Exception {
-        answerNotifications();
+        String notificationsEtag = answerNotifications();
         String projectName = "P0";
         List<GroupsWithOwner> groups = createGroups(expectedOwner);
         Group group = groups.get(0).getGroups().get(0);
@@ -90,7 +90,7 @@ public class ProjectControllerTest {
         deleteProject(p1);
 
         createTasks(p5);
-        getNotifications();
+        getNotifications(notificationsEtag);
     }
 
     private void createTasks(Project project) {
@@ -143,12 +143,14 @@ public class ProjectControllerTest {
         assertEquals("P6", projects.get(0).getSubProjects().get(0).getName());
     }
 
-    private void answerNotifications() {
+    private String answerNotifications() {
         ResponseEntity<Notification[]> notificationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
                 HttpMethod.GET,
                 null,
                 Notification[].class);
+        String etag = notificationsResponse.getHeaders().getETag();
+        validateNotificationResponseEtagMatch(etag);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
         assertEquals(9, notifications.size());
@@ -166,6 +168,20 @@ public class ProjectControllerTest {
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(JoinGroupEvent.class.getSimpleName(), notification.getType());
         }
+        return etag;
+    }
+
+    private void validateNotificationResponseEtagMatch(String expectedEtag) {
+        ResponseEntity<Notification[]> notificationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Notification[].class);
+
+        assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
+
+        String etag = notificationsResponse.getHeaders().getETag();
+        assertEquals(expectedEtag, etag);
     }
 
     private void updateProjectRelations(Project p1, Project p2, Project p3, Project p4, Project p5, Project p6) {
@@ -322,13 +338,14 @@ public class ProjectControllerTest {
         return p1;
     }
 
-    private void getNotifications() {
+    private void getNotifications(String notificationsEtag) {
         ResponseEntity<Notification[]> notificationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
                 HttpMethod.GET,
                 null,
                 Notification[].class);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
+        assertNotEquals(notificationsEtag, notificationsResponse.getHeaders().getETag());
 
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
         assertEquals(2, notifications.size());
@@ -347,6 +364,7 @@ public class ProjectControllerTest {
                 HttpMethod.GET,
                 null,
                 GroupsWithOwner[].class);
+        String etag = groupsResponse.getHeaders().getETag();
         List<GroupsWithOwner> groupsBody = Arrays.asList(groupsResponse.getBody());
         if (expected != null) {
             assertEquals(expected.size(), groupsBody.size());
@@ -354,7 +372,19 @@ public class ProjectControllerTest {
                 assertEquals(expected.get(i), groupsBody.get(i));
             }
         }
+
+        validateGroupsResponseEtagMatch(etag);
         return groupsBody;
+    }
+
+    private void validateGroupsResponseEtagMatch(String etag) {
+        ResponseEntity<GroupsWithOwner[]> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.GET,
+                null,
+                GroupsWithOwner[].class);
+        assertEquals(HttpStatus.OK, groupsResponse.getStatusCode());
+        assertEquals(etag, groupsResponse.getHeaders().getETag());
     }
 
     private List<GroupsWithOwner> createGroups(String owner) {
