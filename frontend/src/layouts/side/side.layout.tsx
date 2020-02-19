@@ -110,7 +110,7 @@ class SideLayout extends React.Component<GroupProps & PathProps> {
                   }
                 >
                   {group.users.map((user, index) => (
-                    <Menu.Item key={user.id}>
+                    <Menu.Item key={user.name}>
                       <Badge dot={!user.accepted && index !== 0} >
                         <Avatar src={user.avatar} size="small"/>
                       </Badge>{' '}
