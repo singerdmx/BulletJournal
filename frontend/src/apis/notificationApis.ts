@@ -2,7 +2,7 @@ import { doFetch, doPost } from './api-helper';
 
 export const fetchNotifications = () => {
   return doFetch('/api/notifications')
-    .then(res => res.json())
+    .then(res => res)
     .catch(err => {
       throw Error(err);
     });

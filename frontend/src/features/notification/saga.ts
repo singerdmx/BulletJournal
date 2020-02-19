@@ -23,9 +23,11 @@ function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
 function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
   try {
     const data = yield call(fetchNotifications);
-    // console.log(data)
+    const etag = data.headers.get("Etag")!;
+    const notifications = yield data.json();
+
     yield put(
-      notificationsActions.notificationsReceived({ notifications: data })
+      notificationsActions.notificationsReceived({ notifications: notifications, etag: etag })
     );
   } catch (error) {
     yield call(message.error, `Notice Error Received: ${error}`);
@@ -40,7 +42,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     const notifications = state.notice.notifications.filter( (notice: Notification) =>notice.id!==notificationId);
     console.log(notifications)
     yield put(
-      notificationsActions.notificationsReceived({ notifications: notifications })
+      notificationsActions.notificationsReceived({ notifications: notifications, etag: '' })
     );
     yield call(message.success, 'User answers notification successful');
   } catch (error) {
