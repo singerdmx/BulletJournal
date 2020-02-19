@@ -331,7 +331,7 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
 
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
-        assertEquals(9, notifications.size());
+        assertEquals(2, notifications.size());
         Notification notification = notifications.get(0);
         assertEquals("Xavier invited you to join Group Default", notification.getTitle());
         assertNull(notification.getContent());

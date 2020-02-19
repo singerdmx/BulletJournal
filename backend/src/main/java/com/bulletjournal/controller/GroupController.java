@@ -2,10 +2,12 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,9 +55,12 @@ public class GroupController {
     }
 
     @GetMapping(GROUPS_ROUTE)
-    public List<GroupsWithOwner> getGroups() {
+    public ResponseEntity<List<GroupsWithOwner>> getGroups() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Group> groups = this.groupDaoJpa.getGroups(username);
+        String groupsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE,
+                groups);
         groups = addUserAvatarToGroups(groups);
         // owner name -> groups (order by owner)
         Map<String, List<Group>> m = new TreeMap<>();
@@ -99,7 +104,11 @@ public class GroupController {
             }
             result.add(new GroupsWithOwner(entry.getKey(), l));
         }
-        return result;
+
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setETag(groupsEtag);
+
+        return ResponseEntity.ok().headers(responseHeader).body(result);
     }
 
     private List<Group> addUserAvatarToGroups(List<Group> groups) {
@@ -120,7 +129,8 @@ public class GroupController {
     }
 
     @PostMapping(ADD_USER_GROUPS_ROUTE)
-    public List<GroupsWithOwner> addUserGroups(@Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
+    public ResponseEntity<List<GroupsWithOwner>> addUserGroups(
+            @Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups());
         return getGroups();

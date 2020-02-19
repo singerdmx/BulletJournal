@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -111,6 +112,7 @@ public class GroupDaoJpa {
                             .collect(Collectors.toList()));
                     return g;
                 })
+                .sorted(Comparator.comparingLong(com.bulletjournal.controller.models.Group::getId))
                 .collect(Collectors.toList());
     }
 
