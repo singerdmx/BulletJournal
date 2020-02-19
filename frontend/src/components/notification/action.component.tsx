@@ -32,7 +32,7 @@ class Actions extends React.Component<actionsProps> {
     }
     return (
       <div className="notification-operation">
-        {actions.map(action => {
+        {actions.map((action, index) => {
           let iconType = 'delete';
           let iconColor = '#ff0000';
           switch (action) {
@@ -50,6 +50,7 @@ class Actions extends React.Component<actionsProps> {
 
           return (
             <Icon
+              key={index}
               type={iconType}
               theme="twoTone"
               twoToneColor={iconColor}
@@ -64,4 +65,4 @@ class Actions extends React.Component<actionsProps> {
   }
 }
 
-export default connect(null, {answerNotice})(Actions);
+export default connect(null, { answerNotice })(Actions);
