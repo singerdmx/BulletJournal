@@ -6,3 +6,5 @@ export const addUserGroupByUsername = (groupId: number, username: string) =>
   actions.addUserGroup({ groupId: groupId, username: username });
 export const removeUserGroupByUsername = (groupId: number, username: string) =>
   actions.removeUserGroup({ groupId: groupId, username: username });
+export const deleteGroup = (groupId: number) =>
+  actions.deleteGroup({groupId: groupId});

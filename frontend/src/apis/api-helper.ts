@@ -19,7 +19,7 @@ export function doPost(endpoint: string, body: string) {
     }
     return fetch(endpoint, {
       headers: { 'Content-Type': 'application/json'},
-      method: 'POST', 
+      method: 'POST',
       body: body
     }).then(res => {
       if (!res.ok) {
@@ -28,4 +28,18 @@ export function doPost(endpoint: string, body: string) {
         return res;
       }
     });
+}
+
+export function doDelete(endpoint: string) {
+  if (process.env.DEBUG_MODE === "DEBUG") {
+    console.log(endpoint);
+  }
+  return fetch(endpoint, {
+    method: 'DELETE'
+  }).then(res => {
+    if (!res.ok) {
+      throw Error(res.statusText);
+    }
+    return res;
+  });
 }

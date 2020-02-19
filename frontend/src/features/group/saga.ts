@@ -6,14 +6,16 @@ import {
   GroupsAction,
   GroupCreateAction,
   AddUserGroupAction,
-  RemoveUserGroupAction
+  RemoveUserGroupAction,
+  DeleteGroupAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchGroups,
   createGroups,
   addUserGroup,
-  removeUserGroup
+  removeUserGroup,
+  deleteGroup
 } from '../../apis/groupApis';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
@@ -67,6 +69,19 @@ function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
   }
 }
 
+function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
+  try {
+    const { groupId } = action.payload;
+    yield call(deleteGroup, groupId);
+    yield call(
+      message.success,
+      `Group ${groupId} deleted`
+    );
+  } catch (error) {
+    yield call(message.error, `Delete group fail: ${error}`);
+  }
+}
+
 export default function* groupSagas() {
   yield all([
     yield takeEvery(
@@ -76,6 +91,7 @@ export default function* groupSagas() {
     yield takeEvery(groupsActions.groupsUpdate.type, groupsUpdate),
     yield takeEvery(groupsActions.createGroup.type, createGroup),
     yield takeLatest(groupsActions.addUserGroup.type, addUserToGroup),
-    yield takeLatest(groupsActions.removeUserGroup.type, removeUserFromGroup)
+    yield takeLatest(groupsActions.removeUserGroup.type, removeUserFromGroup),
+    yield takeLatest(groupsActions.deleteGroup.type, deleteUserGroup)
   ]);
 }
