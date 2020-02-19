@@ -22,9 +22,13 @@ function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
 
 function* groupsUpdate(action: PayloadAction<GroupsAction>) {
   try {
+    //get etag from header
     const data = yield call(fetchGroups);
-    console.log(data);
-    yield put(groupsActions.groupsReceived({ groups: data }));
+    const etag = data.headers.get("Etag")!;
+    const groups = yield data.json();
+    console.log(groups);
+
+    yield put(groupsActions.groupsReceived({ groups: groups, etag: etag }));
   } catch (error) {
     yield call(message.error, `Group Error Received: ${error}`);
   }

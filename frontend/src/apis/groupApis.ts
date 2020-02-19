@@ -1,8 +1,8 @@
-import { doFetch, doPost } from './api-helper';
+import { doFetch, doPost } from "./api-helper";
 
 export const fetchGroups = () => {
-  return doFetch('/api/groups')
-    .then(res => res.json())
+  return doFetch("/api/groups")
+    .then(res => res)
     .catch(err => {
       throw Error(err);
     });
