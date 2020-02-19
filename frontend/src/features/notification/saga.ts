@@ -1,16 +1,20 @@
-import { takeEvery, call, all, put } from 'redux-saga/effects';
+import { takeEvery, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as notificationsActions,
   NoticeApiErrorAction,
   NotificationsAction,
-  AnswerNotificationAction
+  AnswerNotificationAction,
+  Notification
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchNotifications,
   answerNotification
 } from '../../apis/notificationApis';
+
+import { IState } from '../../store';
+
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -32,6 +36,12 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   try {
     const { action, notificationId } = act.payload;
     yield call(answerNotification, notificationId, action);
+    const state: IState = yield select();
+    const notifications = state.notice.notifications.filter( (notice: Notification) =>notice.id!==notificationId);
+    console.log(notifications)
+    yield put(
+      notificationsActions.notificationsReceived({ notifications: notifications })
+    );
     yield call(message.success, 'User answers notification successful');
   } catch (error) {
     yield call(message.error, `User answers notification failed: ${error}`);
