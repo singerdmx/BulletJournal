@@ -1,5 +1,6 @@
 cd ../discourse-auth-proxy
 docker build -t xcode1024/auth-proxy .
+cd ..
 
 cd ./frontend
 docker build -t xcode1024/bulletjournal-frontend .
