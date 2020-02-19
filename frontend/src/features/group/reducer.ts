@@ -60,7 +60,7 @@ export type GetGroupAction = {
 let initialState = {
   groups: [] as GroupsWithOwner[],
   etag: '',
-  group: {}
+  group: {} as Group
 };
 
 const slice = createSlice({
