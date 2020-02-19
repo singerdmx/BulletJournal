@@ -8,3 +8,5 @@ export const removeUserGroupByUsername = (groupId: number, username: string) =>
   actions.removeUserGroup({ groupId: groupId, username: username });
 export const deleteGroup = (groupId: number) =>
   actions.deleteGroup({groupId: groupId});
+export const getGroup = (groupId: number) =>
+  actions.getGroup({groupId: groupId});

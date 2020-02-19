@@ -31,6 +31,10 @@ export type GroupsAction = {
   etag: string;
 };
 
+export type GroupAction = {
+  group: Group;
+};
+
 export type GroupCreateAction = {
   name: string;
 };
@@ -49,9 +53,14 @@ export type DeleteGroupAction = {
   groupId: number;
 };
 
+export type GetGroupAction = {
+  groupId: number;
+};
+
 let initialState = {
   groups: [] as GroupsWithOwner[],
-  etag: ""
+  etag: '',
+  group: {}
 };
 
 const slice = createSlice({
@@ -70,7 +79,12 @@ const slice = createSlice({
     addUserGroup: (state, action: PayloadAction<AddUserGroupAction>) => state,
     removeUserGroup: (state, action: PayloadAction<RemoveUserGroupAction>) =>
       state,
-    deleteGroup: (state, action: PayloadAction<DeleteGroupAction>) => state
+    deleteGroup: (state, action: PayloadAction<DeleteGroupAction>) => state,
+    getGroup: (state, action: PayloadAction<GetGroupAction>) => state,
+    groupReceived: (state, action: PayloadAction<GroupAction>) => {
+      const { group } = action.payload;
+      state.group = group;
+    },
   }
 });
 

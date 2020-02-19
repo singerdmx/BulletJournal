@@ -8,6 +8,14 @@ export const fetchGroups = () => {
     });
 };
 
+export const getGroup = (groupId: number) => {
+  return doFetch(`/api/groups/${groupId}`)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err);
+    });
+};
+
 export const createGroups = (name: string) => {
   const postBody = JSON.stringify({
     name: name
