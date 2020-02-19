@@ -3,6 +3,8 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.notifications.Informed;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.MDC;
@@ -33,6 +35,9 @@ public class GroupController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @PostMapping(GROUPS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Group createGroup(@Valid @RequestBody CreateGroupParams group) {
@@ -52,6 +57,11 @@ public class GroupController {
                              @Valid @RequestBody UpdateGroupParams updateGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.groupDaoJpa.partialUpdate(username, groupId, updateGroupParams).toPresentationModel();
+    }
+
+    @GetMapping(GROUP_ROUTE)
+    public Group getGroup(@NotNull @PathVariable Long groupId) {
+        return addUserAvatarToGroup(this.groupDaoJpa.getGroup(groupId).toVerbosePresentationModel());
     }
 
     @GetMapping(GROUPS_ROUTE)
@@ -139,8 +149,11 @@ public class GroupController {
     @PostMapping(ADD_USER_GROUP_ROUTE)
     public Group addUserGroup(@Valid @RequestBody AddUserGroupParams addUserGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.addUserGroups(username, ImmutableList.of(addUserGroupParams));
-        return addUserAvatarToGroup(this.groupDaoJpa.getGroup(addUserGroupParams.getGroupId()).toVerbosePresentationModel());
+        Informed informed = this.groupDaoJpa.addUserGroup(username, addUserGroupParams);
+        if (informed != null) {
+            this.notificationService.inform(informed);
+        }
+        return getGroup(addUserGroupParams.getGroupId());
     }
 
     @PostMapping(REMOVE_USER_GROUPS_ROUTE)

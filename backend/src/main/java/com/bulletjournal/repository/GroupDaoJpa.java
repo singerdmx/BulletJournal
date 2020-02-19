@@ -14,15 +14,13 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.UserGroupKey;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -135,6 +133,28 @@ public class GroupDaoJpa {
         }
 
         this.notificationService.inform(new JoinGroupEvent(events, owner));
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public JoinGroupEvent addUserGroup(
+            String owner,
+            AddUserGroupParams addUserGroupParams) {
+
+        Long groupId = addUserGroupParams.getGroupId();
+        Group group = this.groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                group.getOwner(), owner, ContentType.GROUP, Operation.UPDATE, groupId);
+        String username = addUserGroupParams.getUsername();
+        User user = this.userDaoJpa.getByName(username);
+        UserGroupKey key = new UserGroupKey(user.getId(), groupId);
+        Optional<UserGroup> userGroup = this.userGroupRepository.findById(key);
+        if (userGroup.isPresent()) {
+            return null;
+        }
+        this.userGroupRepository.save(new UserGroup(user, group, false));
+
+        return new JoinGroupEvent(ImmutableList.of(new Event(username, groupId, group.getName())), owner);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

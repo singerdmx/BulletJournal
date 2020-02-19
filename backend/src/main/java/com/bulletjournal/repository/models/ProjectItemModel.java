@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
  * Its child classes are as follows:
  * {@link Task}: for ProjectType.TODO
  * {@link Note}: for ProjectType.NOTE
- * {@link Ledger}: for ProjectType.LEDGER
+ * {@link Transaction}: for ProjectType.LEDGER
  */
 @MappedSuperclass
 public abstract class ProjectItemModel extends NamedModel {

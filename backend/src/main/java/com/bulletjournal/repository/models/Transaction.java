@@ -8,8 +8,8 @@ import javax.validation.constraints.Size;
  * This class is for ProjectType.LEDGER
  */
 @Entity
-@Table(name = "ledgers")
-public class Ledger extends ProjectItemModel {
+@Table(name = "transactions")
+public class Transaction extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "ledger_generator")
     @SequenceGenerator(
