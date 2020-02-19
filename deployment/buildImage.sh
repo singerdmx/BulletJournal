@@ -1,5 +1,5 @@
-cd ../discourse-auth-proxy
-docker build -t xcode1024/auth-proxy .
+# cd ../discourse-auth-proxy
+# docker build -t xcode1024/auth-proxy .
 cd ..
 
 cd ./frontend
