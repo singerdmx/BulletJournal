@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from 'redux-starter-kit';
+import { createSlice, PayloadAction } from "redux-starter-kit";
 
 export type ApiErrorAction = {
   error: string;
@@ -28,6 +28,7 @@ export type GroupsWithOwner = {
 
 export type GroupsAction = {
   groups: GroupsWithOwner[];
+  etag: string;
 };
 
 export type GroupCreateAction = {
@@ -45,16 +46,18 @@ export type RemoveUserGroupAction = {
 };
 
 let initialState = {
-  groups: [] as GroupsWithOwner[]
+  groups: [] as GroupsWithOwner[],
+  etag: ""
 };
 
 const slice = createSlice({
-  name: 'groups',
+  name: "groups",
   initialState,
   reducers: {
     groupsReceived: (state, action: PayloadAction<GroupsAction>) => {
-      const { groups } = action.payload;
+      const { groups, etag } = action.payload;
       state.groups = groups;
+      state.etag = etag;
     },
     groupsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
       state,
