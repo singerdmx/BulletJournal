@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.AnswerNotificationParams;
 import com.bulletjournal.controller.models.Notification;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Event;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,9 +54,18 @@ public class NotificationController {
     private GroupRepository groupRepository;
 
     @GetMapping(NOTIFICATIONS_ROUTE)
-    public List<Notification> getNotification() {
+    public ResponseEntity<List<Notification>> getNotification() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.notificationDaoJpa.getNotifications(username);
+        List<Notification> notificationList = this.notificationDaoJpa.getNotifications(username);
+
+        String notificationsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE,
+                notificationList);
+
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setETag(notificationsEtag);
+
+        return ResponseEntity.ok().headers(responseHeader).body(notificationList);
     }
 
     @PostMapping(ANSWER_NOTIFICATION_ROUTE)
