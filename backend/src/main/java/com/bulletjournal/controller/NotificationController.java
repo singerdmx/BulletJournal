@@ -61,13 +61,15 @@ public class NotificationController {
     public ResponseEntity<?> answerNotification(
             @NotNull @PathVariable Long notificationId,
             @Valid @RequestBody AnswerNotificationParams answerNotificationParams) {
-        processNotification(notificationId, answerNotificationParams);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        processNotification(notificationId, answerNotificationParams, username);
         return ResponseEntity.ok().build();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void processNotification(@PathVariable @NotNull Long notificationId,
-                                    AnswerNotificationParams answerNotificationParams) {
+                                    AnswerNotificationParams answerNotificationParams,
+                                    String owner) {
         com.bulletjournal.repository.models.Notification notification =
                 this.notificationRepository.findById(notificationId)
                         .orElseThrow(() ->
@@ -97,7 +99,7 @@ public class NotificationController {
                         notification.getContentId(),
                         group.getName());
                 this.notificationService.inform(
-                        new JoinGroupResponseEvent(event, notification.getTargetUser(), action));
+                        new JoinGroupResponseEvent(event, owner, action));
                 break;
         }
         this.notificationRepository.delete(notification);
