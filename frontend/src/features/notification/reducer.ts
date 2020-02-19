@@ -54,7 +54,9 @@ const slice = createSlice({
     notificationsUpdate: (state, action: PayloadAction<UpdateNotifications>) =>
       state,
     answerNotice: (state, action: PayloadAction<AnswerNotificationAction>) =>
-      state
+      {
+        state.notifications = state.notifications.filter(item => item.id !== action.payload.notificationId)
+      }
   }
 });
 
