@@ -90,7 +90,7 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
                             }
                       }
                     >
-                      {group.owner.slice(1, 3)}
+                      {group.owner.charAt(0)}
                     </Avatar>
                     <span
                       className="group-name"
