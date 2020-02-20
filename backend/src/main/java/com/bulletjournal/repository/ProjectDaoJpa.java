@@ -62,6 +62,13 @@ public class ProjectDaoJpa {
         return result;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Project getProject(Long projectId) {
+        Project project = this.projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group " + projectId + " not found"));
+        return project;
+    }
+
     private List<ProjectsWithOwner> getSharedProjects(
             UserProjects userProjects, String owner) {
         User user = this.userDaoJpa.getByName(owner);

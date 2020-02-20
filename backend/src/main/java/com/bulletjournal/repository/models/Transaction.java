@@ -11,10 +11,10 @@ import javax.validation.constraints.Size;
 @Table(name = "transactions")
 public class Transaction extends ProjectItemModel {
     @Id
-    @GeneratedValue(generator = "ledger_generator")
+    @GeneratedValue(generator = "transaction_generator")
     @SequenceGenerator(
-            name = "ledger_generator",
-            sequenceName = "ledger_sequence"
+            name = "transaction_generator",
+            sequenceName = "transaction_sequence"
     )
     private Long id;
 

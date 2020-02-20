@@ -44,6 +44,11 @@ public class ProjectController {
         return ResponseEntity.ok().headers(responseHeader).body(projects);
     }
 
+    @GetMapping(PROJECT_ROUTE)
+    public Project getProject(@NotNull @PathVariable Long projectId) {
+        return this.projectDaoJpa.getProject(projectId).toPresentationModel();
+    }
+
     @PostMapping(PROJECTS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
