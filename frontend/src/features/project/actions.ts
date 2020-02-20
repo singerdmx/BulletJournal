@@ -16,3 +16,14 @@ export const updateSharedProjectsOrder = (projectOwners: string[]) =>
   actions.updateSharedProjectsOrder({ projectOwners: projectOwners });
 export const deleteProject = (projectId: number) =>
   actions.deleteProject({ projectId: projectId});
+export const updateProject = (
+    projectId: number,
+    description: string,
+    groupId: number,
+    name: string
+) =>
+  actions.patchProject({
+      projectId: projectId,
+      description: description,
+      groupId: groupId,
+      name: name});

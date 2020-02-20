@@ -7,7 +7,7 @@ import {
   ProjectCreateAction,
   GetProjectAction,
   UpdateSharedProjectsOrderAction,
-  DeleteProjectAction
+  DeleteProjectAction, PatchProjectAction,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -15,7 +15,8 @@ import {
   createProject,
   getProject,
   updateSharedProjectsOrder,
-  deleteProject
+  deleteProject,
+  updateProject
 } from '../../apis/projectApis';
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
@@ -82,6 +83,21 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
   }
 }
 
+function* patchProject(action: PayloadAction<PatchProjectAction>) {
+  try {
+    const { projectId, description, groupId, name} = action.payload;
+    yield call(updateProject, projectId, description, groupId, name);
+    yield put(projectActions.projectsUpdate);
+    yield call(
+        message.success,
+        'Successfully updated project'
+    );
+  } catch (error) {
+    yield call(message.error, `update Project Fail: ${error}`);
+  }
+}
+
+
 export default function* projectSagas() {
   yield all([
     yield takeLatest(
@@ -93,5 +109,6 @@ export default function* projectSagas() {
     yield takeLatest(projectActions.deleteProject.type, deleteUserProject),
     yield takeLatest(projectActions.getProject.type, getUserProject),
     yield takeLatest(projectActions.updateSharedProjectsOrder.type, updateSharedProjectOwnersOrder),
+    yield takeLatest(projectActions.patchProject.type, patchProject),
   ]);
 }

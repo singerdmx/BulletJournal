@@ -53,3 +53,21 @@ export const deleteProject = (projectId: number) => {
     throw Error(err);
   });
 };
+
+export const updateProject = (
+    projectId: number,
+    description: string,
+    groupId: number,
+    name: string
+) => {
+  const postBody = JSON.stringify({
+    description: description,
+    groupId: groupId,
+    name: name
+  });
+  return doPost(`/api/projects/${projectId}`, postBody)
+      .then(res => res.json())
+      .catch(err => {
+        throw Error(err);
+      });
+};
