@@ -9,6 +9,7 @@ export type UpdateNotifications = {};
 export type AnswerNotificationAction = {
   action: string;
   notificationId: number;
+  type: string;
 };
 
 export interface Originator {

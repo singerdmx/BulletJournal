@@ -5,17 +5,18 @@ import { connect } from 'react-redux';
 
 type actionsProps = {
   actions: string[];
+  type: string;
   notificationId: number;
-  answerNotice: (action: string, notificationId: number) => void;
+  answerNotice: (action: string, notificationId: number, type: string) => void;
 };
 
 class Actions extends React.Component<actionsProps> {
-  handleClick(action: string, id: number) {
-    this.props.answerNotice(action, id);
+  handleClick(action: string, id: number, type: string) {
+    this.props.answerNotice(action, id, type);
   }
 
   render() {
-    const { actions, notificationId } = this.props;
+    const { actions, notificationId, type } = this.props;
     if (actions.length === 0) {
       return (
         <div className="notification-operation">
@@ -25,7 +26,7 @@ class Actions extends React.Component<actionsProps> {
             twoToneColor="#ff0000"
             title="Remove"
             style={{ cursor: 'pointer' }}
-            onClick={() => this.handleClick('delete', notificationId)}
+            onClick={() => this.handleClick('delete', notificationId, type)}
           />
         </div>
       );
@@ -56,7 +57,7 @@ class Actions extends React.Component<actionsProps> {
               twoToneColor={iconColor}
               title={action}
               style={{ cursor: 'pointer' }}
-              onClick={() => this.handleClick(action, notificationId)}
+              onClick={() => this.handleClick(action, notificationId, type)}
             />
           );
         })}

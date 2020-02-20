@@ -22,7 +22,7 @@ const NotificationList = ({ notifications }: NotificationsProps) => {
       dataSource={notifications}
       renderItem={item => (
         <List.Item
-          extra={item.actions && <Actions actions={item.actions} notificationId={item.id}></Actions>}
+          extra={item.actions && <Actions type={item.type} actions={item.actions} notificationId={item.id}></Actions>}
           key={item.id}
         >
           <List.Item.Meta

@@ -37,16 +37,15 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
 
 function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   try {
-    const { action, notificationId } = act.payload;
-    console.log(act)
+    const { action, notificationId, type } = act.payload;
     yield call(answerNotification, notificationId, action);
     const state: IState = yield select();
-    const notifications = state.notice.notifications.filter( (notice: Notification) =>notice.id!==notificationId);
+    const notifications = state.notice.notifications.filter((notice: Notification) => notice.id !== notificationId);
     console.log(notifications)
     yield put(
       notificationsActions.notificationsReceived({ notifications: notifications, etag: '' })
     );
-    if(action==='Decline' || action==='Accept'){
+    if (type === 'JoinGroupEvent' && action === 'Deline') {
       yield put(updateGroups());
     }
     yield call(message.success, 'User answers notification successful');
