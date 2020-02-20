@@ -1,22 +1,35 @@
 import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Projects } from './reducer';
+import { Projects, ProjectType } from './reducer';
 import { updateProjects, createProjectByName } from './actions';
 
 type ProjectsProps = {
   projects: Projects;
   updateProjects: () => void;
-  createProjectByName: (name: string) => void;
+  createProjectByName: (
+    description: string,
+    name: string,
+    projectType: ProjectType
+  ) => void;
 };
 
 class ProjectList extends React.Component<ProjectsProps> {
   componentDidMount() {
     this.props.updateProjects();
   }
+
   render() {
     return (
-      <div onClick={() => this.props.createProjectByName('aaaaaaabbbbbbbb')}>
+      <div
+        onClick={() =>
+          this.props.createProjectByName(
+            'aaaaaaabbbbbbbb',
+            'aaaaas',
+            ProjectType.LEDGER
+          )
+        }
+      >
         project
       </div>
     );

@@ -1,4 +1,14 @@
-import { actions } from './reducer';
+import { actions, ProjectType } from './reducer';
 export const updateProjects = () => actions.projectsUpdate({});
-export const createProjectByName = (name: string) =>
-  actions.createProject({ name: name });
+export const createProjectByName = (
+  description: string,
+  name: string,
+  projectType: ProjectType
+) =>
+  actions.createProject({
+    description: description,
+    name: name,
+    projectType: projectType
+  });
+export const getProject = (projectId: number) =>
+  actions.getProject({ projectId: projectId });

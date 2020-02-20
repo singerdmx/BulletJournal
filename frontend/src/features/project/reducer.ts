@@ -4,10 +4,20 @@ export type ProjectApiErrorAction = {
   error: string;
 };
 
+export type ProjectAction = {
+  project: Project;
+};
+
+export type GetProjectAction = {
+  projectId: number;
+};
+
 export type UpdateProjects = {};
 
 export type ProjectCreateAction = {
+  description: string;
   name: string;
+  projectType: ProjectType;
 };
 
 export type Group = {
@@ -21,13 +31,19 @@ export type Projects = {
   shared: ProjectsWithOwner[];
 };
 
+export enum ProjectType {
+  TODO = 'TODO',
+  NOTE = 'NOTE',
+  LEDGER = 'LEDGER'
+}
+
 export type Project = {
   description: string;
   group: Group;
   id: number;
   name: string;
   owner: string;
-  projectType: string;
+  projectType: ProjectType;
   subProjects: Project[];
 };
 
@@ -38,7 +54,8 @@ export type ProjectsWithOwner = {
 
 let initialState = {
   owned: [] as Project[],
-  shared: [] as ProjectsWithOwner[]
+  shared: [] as ProjectsWithOwner[],
+  project: {} as Project
 };
 
 const slice = createSlice({
@@ -50,12 +67,18 @@ const slice = createSlice({
       state.owned = owned;
       state.shared = shared;
     },
+
     projectsApiErrorReceived: (
       state,
       action: PayloadAction<ProjectApiErrorAction>
     ) => state,
     projectsUpdate: (state, action: PayloadAction<UpdateProjects>) => state,
-    createProject: (state, action: PayloadAction<ProjectCreateAction>) => state
+    createProject: (state, action: PayloadAction<ProjectCreateAction>) => state,
+    getProject: (state, action: PayloadAction<GetProjectAction>) => state,
+    projectReceived: (state, action: PayloadAction<ProjectAction>) => {
+      const { project } = action.payload;
+      state.project = project;
+    }
   }
 });
 

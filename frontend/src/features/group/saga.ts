@@ -28,7 +28,7 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
   try {
     //get etag from header
     const data = yield call(fetchGroups);
-    const etag = data.headers.get("Etag")!;
+    const etag = data.headers.get('Etag')!;
     const groups = yield data.json();
     console.log(groups);
 
@@ -41,8 +41,8 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
 function* createGroup(action: PayloadAction<GroupCreateAction>) {
   try {
     const name = action.payload.name;
-    yield call(createGroups, name);
-    yield call(message.success, `${name} Group Created`);
+    const data = yield call(createGroups, name);
+    yield put(groupsActions.groupReceived({ group: data }));
   } catch (error) {
     yield call(message.error, `Group Create Fail: ${error}`);
   }
@@ -75,10 +75,7 @@ function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
   try {
     const { groupId } = action.payload;
     yield call(deleteGroup, groupId);
-    yield call(
-      message.success,
-      `Group ${groupId} deleted`
-    );
+    yield call(message.success, `Group ${groupId} deleted`);
   } catch (error) {
     yield call(message.error, `Delete group fail: ${error}`);
   }
