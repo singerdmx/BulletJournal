@@ -2,9 +2,9 @@ import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
 import { getGroup } from '../features/group/actions';
-import { Group } from '../features/group/reducer';
+import { Group, User } from '../features/group/reducer';
 import { IState } from '../store';
-import { Icon, Avatar, Button, List } from 'antd';
+import { Icon, Avatar, Button, List, Badge } from 'antd';
 
 type GroupPathParams = {
   groupId: string;
@@ -19,6 +19,24 @@ type GroupProps = {
   getGroup: (groupId: number) => void;
 };
 
+function getGroupUserTitle(item: User, group: Group): string {
+  if (item.name === group.owner) {
+    return 'Owner';
+  }
+  return item.accepted ? 'Joined' : 'Not Joined';
+}
+
+function getGroupUserSpan(item: User, group: Group): JSX.Element {
+  if (item.name === group.owner) {
+    return (<span style={{fontSize:'larges'}}>&nbsp;&nbsp;<strong>{item.name}</strong></span>);
+  }
+  if (item.accepted) {
+    return (<span>&nbsp;&nbsp;{item.name}</span>);
+  }
+
+  return (<span style={{color:'grey'}}>&nbsp;&nbsp;{item.name}</span>);
+}
+
 class GroupPage extends React.Component<GroupProps & GroupPathProps> {
   componentDidMount() {
     const groupId = this.props.match.params.groupId;
@@ -32,13 +50,14 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
       this.props.getGroup(parseInt(groupId));
     }
   }
+
   render() {
     const { group } = this.props;
     return (
       <div className="group-page">
         <div className="group-title">
-          <h2>{`Group "${group.name}"`}</h2>
-          <Icon type="dash" />
+          <h3>{`Group "${group.name}"`}</h3>
+          <Icon type="dash" title="Edit Group" style={{cursor: 'pointer'}}/>
         </div>
         <div className="group-users">
           <List
@@ -46,12 +65,14 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
             renderItem={item => {
               return (
                 <List.Item key={item.id}>
-                  <div className="group-user">
-                    <Avatar src={item.avatar} />
-                    <span>{item.name}</span>
+                  <div className="group-user" title={getGroupUserTitle(item, group)}>
+                    <Badge dot={!item.accepted}>
+                      <Avatar src={item.avatar} />
+                    </Badge>
+                    {getGroupUserSpan(item, group)}
                   </div>
                   {item.name !== group.owner && (
-                    <Button type="danger" icon="close" ghost size="small" />
+                    <Button type="danger" icon="close" ghost size="small" title={item.accepted ? "Remove" : "Cancel Invitation"}/>
                   )}
                 </List.Item>
               );

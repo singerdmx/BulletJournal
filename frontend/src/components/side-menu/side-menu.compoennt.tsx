@@ -70,8 +70,8 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
             </span>
           }
         >
-          <Menu.Item key="addGroup">
-            <Icon type="usergroup-add" style={{ fontSize: 20 }} />
+          <Menu.Item key="addGroup" title='Create New Group'>
+            <Icon type="usergroup-add" style={{ fontSize: 20 }}/>
           </Menu.Item>
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
