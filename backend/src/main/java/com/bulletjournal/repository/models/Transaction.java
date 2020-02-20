@@ -1,7 +1,10 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.ledger.TransactionType;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -23,6 +26,12 @@ public class Transaction extends ProjectItemModel {
     @Column(length = 100)
     private String payer;
 
+    @NotNull
+    private Integer amount;
+
+    @NotNull
+    private TransactionType transactionType;
+
     public Long getId() {
         return id;
     }
@@ -37,5 +46,21 @@ public class Transaction extends ProjectItemModel {
 
     public void setPayer(String payer) {
         this.payer = payer;
+    }
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
     }
 }
