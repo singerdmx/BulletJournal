@@ -1,4 +1,4 @@
-import { doFetch, doPost } from './api-helper';
+import { doFetch, doPost, doDelete } from './api-helper';
 
 export const fetchProjects = () => {
   return doFetch('/api/projects')
@@ -45,4 +45,11 @@ export const updateSharedProjectsOrder = (
     .catch(err => {
       throw Error(err);
     });
+};
+
+export const deleteProject = (projectId: number) => {
+  return doDelete(`/api/projects/${projectId}`)
+  .catch(err => {
+    throw Error(err);
+  });
 };

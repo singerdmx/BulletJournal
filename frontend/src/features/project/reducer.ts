@@ -24,6 +24,10 @@ export type UpdateSharedProjectsOrderAction = {
   projectOwners: string[];
 };
 
+export type DeleteProjectAction = {
+  projectId: number;
+};
+
 export type Group = {
   id: number;
   name: string;
@@ -83,7 +87,8 @@ const slice = createSlice({
       const { project } = action.payload;
       state.project = project;
     },
-    updateSharedProjectsOrder: (state, action: PayloadAction<UpdateSharedProjectsOrderAction>) => state
+    updateSharedProjectsOrder: (state, action: PayloadAction<UpdateSharedProjectsOrderAction>) => state,
+    deleteProject: (state, action: PayloadAction<DeleteProjectAction>) => state
   }
 });
 
