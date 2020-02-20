@@ -28,7 +28,7 @@ function getGroupUserTitle(item: User, group: Group): string {
 
 function getGroupUserSpan(item: User, group: Group): JSX.Element {
   if (item.name === group.owner) {
-    return (<span style={{fontSize:'larges'}}>&nbsp;&nbsp;<strong>{item.name}</strong></span>);
+    return (<span>&nbsp;&nbsp;<strong>{item.name}</strong></span>);
   }
   if (item.accepted) {
     return (<span>&nbsp;&nbsp;{item.name}</span>);
