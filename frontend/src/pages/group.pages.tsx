@@ -52,7 +52,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                     <Avatar src={item.avatar} />
                     {item.name}
                   </div>
-                  <Button type="danger" icon="close" ghost size="small" />
+                  {item.name !== group.owner && <Button type="danger" icon="close" ghost size="small" />}
                 </List.Item>
               );
             }}
