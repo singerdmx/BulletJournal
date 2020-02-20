@@ -45,7 +45,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     yield put(
       notificationsActions.notificationsReceived({ notifications: notifications, etag: '' })
     );
-    if (type === 'JoinGroupEvent' && action === 'Deline') {
+    if (type === 'JoinGroupEvent') {
       yield put(updateGroups());
     }
     yield call(message.success, 'User answers notification successful');
