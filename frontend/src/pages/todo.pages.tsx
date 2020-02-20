@@ -3,10 +3,10 @@ import TodoItem from '../components/todo-item/todo-item.component';
 import { List, Icon, Modal, Form, Input } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 
-type RouteParams = {
+type TdoRouteParams = {
   category: string;
 };
-interface RouteProps extends RouteComponentProps<RouteParams> {
+interface TodoRouteProps extends RouteComponentProps<TdoRouteParams> {
   category: string;
 }
 
@@ -15,7 +15,7 @@ type todoState = {
 };
 
 const fakeData = ['Frontend', 'Bakcend', 'UI designer'];
-class TodoPage extends React.Component<RouteProps, todoState> {
+class TodoPage extends React.Component<TodoRouteProps, todoState> {
   state: todoState = {
     showForm: false
   };

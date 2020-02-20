@@ -1,14 +1,71 @@
 import React from 'react';
+import { RouteComponentProps } from 'react-router';
+import { connect } from 'react-redux';
+import { getGroup } from '../features/group/actions';
+import { Group } from '../features/group/reducer';
+import { IState } from '../store';
+import { Icon, Avatar, Button, List } from 'antd';
 
-
-class GroupPage extends React.Component {
-    render () {
-        return (
-            <div className="groups-page" >
-                
-            </div>
-        )
-    }
+type GroupPathParams = {
+  groupId: string;
 }
 
-export default GroupPage;
+interface GroupPathProps extends RouteComponentProps<GroupPathParams> {
+    groupId: string
+}
+
+type GroupProps = {
+  group: Group;
+  getGroup: (groupId: number) => void;
+};
+
+class GroupPage extends React.Component<
+  GroupProps & GroupPathProps
+> {
+  componentDidMount() {
+    const groupId = this.props.match.params.groupId;
+    console.log(groupId);
+    this.props.getGroup(parseInt(groupId));
+  }
+
+  componentDidUpdate(prevProps : GroupPathProps): void {
+    const groupId = this.props.match.params.groupId;
+    if (prevProps.groupId !== groupId) {
+        this.props.getGroup(parseInt(groupId));
+    }
+  }
+  render() {
+    const { group } = this.props;
+    return (
+      <div className="group-page">
+        <div className="group-title">
+          <h3>
+            {group.name} Group of {group.owner}
+          </h3>
+          <Icon type="dash" />
+        </div>
+        <div className="group-users">
+          <List
+            dataSource={group.users}
+            renderItem={item => {
+              return (
+                <List.Item key={item.id}>
+                  <Avatar src={item.avatar} />
+                </List.Item>
+              );
+            }}
+          />
+        </div>
+        <div className="group-footer">
+          <Button type="primary" icon="plus" />
+        </div>
+      </div>
+    );
+  }
+}
+
+const mapStateToProps = (state: IState) => ({
+  group: state.group.group
+});
+
+export default connect(mapStateToProps, { getGroup })(GroupPage);

@@ -16,19 +16,13 @@ type GroupProps = {
 
 type PathProps = RouteComponentProps;
 
-type MenuState = {
-  showModal: boolean;
-};
-
-class SideMenu extends React.Component<GroupProps & PathProps, MenuState> {
+class SideMenu extends React.Component<GroupProps & PathProps> {
   state = {
     showModal: false
   };
 
   onClick = (menu: any) => {
     if (menu.key === 'addGroup') {
-      console.log(menu);
-    } else if (menu.keyPath[menu.keyPath.length - 1] === 'groups') {
       console.log(menu);
     } else {
       const path = menu.keyPath.reverse().join('/');
@@ -110,6 +104,9 @@ class SideMenu extends React.Component<GroupProps & PathProps, MenuState> {
                     >
                       {group.name}
                     </span>
+                  </span>
+                  <span>
+                    <Icon type="user" />{group.users.length}
                   </span>
                 </span>
               </Menu.Item>
