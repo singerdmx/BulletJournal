@@ -27,9 +27,11 @@ public class Transaction extends ProjectItemModel {
     private String payer;
 
     @NotNull
+    @Column
     private Integer amount;
 
     @NotNull
+    @Column
     private TransactionType transactionType;
 
     public Long getId() {
