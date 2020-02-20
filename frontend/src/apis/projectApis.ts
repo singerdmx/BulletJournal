@@ -32,3 +32,17 @@ export const createProject = (
       throw Error(err);
     });
 };
+
+export const updateSharedProjectsOrder = (
+  projectOwners: string[]
+) => {
+  const postBody = JSON.stringify({
+    projectOwners: projectOwners
+  });
+
+  return doPost('/api/updateSharedProjectsOrder', postBody)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err);
+    });
+};

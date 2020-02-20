@@ -5,13 +5,15 @@ import {
   ProjectApiErrorAction,
   UpdateProjects,
   ProjectCreateAction,
-  GetProjectAction
+  GetProjectAction,
+  UpdateSharedProjectsOrderAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchProjects,
   createProject,
-  getProject
+  getProject,
+  updateSharedProjectsOrder
 } from '../../apis/projectApis';
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
@@ -40,6 +42,19 @@ function* addProject(action: PayloadAction<ProjectCreateAction>) {
     yield put(projectActions.projectReceived({ project: data }));
   } catch (error) {
     yield call(message.error, `Project Create Fail: ${error}`);
+  }
+}
+
+function* updateSharedProjectOwnersOrder(action: PayloadAction<UpdateSharedProjectsOrderAction>) {
+  try {
+    const { projectOwners } = action.payload;
+    yield call(updateSharedProjectsOrder, projectOwners);
+    yield call(
+      message.success,
+      'Successfully updated SharedProjectOwnersOrder'
+    );
+  } catch (error) {
+    yield call(message.error, `updateSharedProjectsOrder Fail: ${error}`);
   }
 }
 
