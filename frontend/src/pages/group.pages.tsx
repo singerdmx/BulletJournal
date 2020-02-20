@@ -28,13 +28,17 @@ function getGroupUserTitle(item: User, group: Group): string {
 
 function getGroupUserSpan(item: User, group: Group): JSX.Element {
   if (item.name === group.owner) {
-    return (<span>&nbsp;&nbsp;<strong>{item.name}</strong></span>);
+    return (
+      <span>
+        &nbsp;&nbsp;<strong>{item.name}</strong>
+      </span>
+    );
   }
   if (item.accepted) {
-    return (<span>&nbsp;&nbsp;{item.name}</span>);
+    return <span>&nbsp;&nbsp;{item.name}</span>;
   }
 
-  return (<span style={{color:'grey'}}>&nbsp;&nbsp;{item.name}</span>);
+  return <span style={{ color: 'grey' }}>&nbsp;&nbsp;{item.name}</span>;
 }
 
 class GroupPage extends React.Component<GroupProps & GroupPathProps> {
@@ -57,7 +61,15 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
       <div className="group-page">
         <div className="group-title">
           <h3>{`Group "${group.name}"`}</h3>
-          <Icon type="dash" title="Edit Group" style={{cursor: 'pointer'}}/>
+          <div className="group-operation">
+            <Icon type="user" />
+            {group.users && group.users.length}
+            <Icon
+              type="dash"
+              title="Edit Group"
+              style={{ cursor: 'pointer' }}
+            />
+          </div>
         </div>
         <div className="group-users">
           <List
@@ -65,14 +77,23 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
             renderItem={item => {
               return (
                 <List.Item key={item.id}>
-                  <div className="group-user" title={getGroupUserTitle(item, group)}>
+                  <div
+                    className="group-user"
+                    title={getGroupUserTitle(item, group)}
+                  >
                     <Badge dot={!item.accepted}>
                       <Avatar src={item.avatar} />
                     </Badge>
                     {getGroupUserSpan(item, group)}
                   </div>
                   {item.name !== group.owner && (
-                    <Button type="danger" icon="close" ghost size="small" title={item.accepted ? "Remove" : "Cancel Invitation"}/>
+                    <Button
+                      type="danger"
+                      icon="close"
+                      ghost
+                      size="small"
+                      title={item.accepted ? 'Remove' : 'Cancel Invitation'}
+                    />
                   )}
                 </List.Item>
               );
@@ -80,7 +101,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
           />
         </div>
         <div className="group-footer">
-          <Button type="primary" icon="plus" shape="round" title="Add User"/>
+          <Button type="primary" icon="plus" shape="round" title="Add User" />
         </div>
       </div>
     );
