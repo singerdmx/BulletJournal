@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.Myself;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.controller.models.User;
@@ -37,13 +38,15 @@ public class UserController {
     public Myself getMyself(@RequestParam(name = "expand", defaultValue = "false") String expand) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String timezone = null;
+        Before before = null;
         if (Objects.equals(expand, "true")) {
             com.bulletjournal.repository.models.User user =
                     this.userDaoJpa.getByName(username);
             timezone = user.getTimezone();
+            before = user.getReminderBeforeTask();
         }
         User self = userClient.getUser(username);
-        return new Myself(self, timezone);
+        return new Myself(self, timezone, before);
     }
 
     @PatchMapping(MYSELF_ROUTE)
@@ -52,7 +55,7 @@ public class UserController {
         com.bulletjournal.repository.models.User user =
                 this.userDaoJpa.updateMyself(username, updateMyselfParams);
         User self = userClient.getUser(username);
-        return new Myself(self, user.getTimezone());
+        return new Myself(self, user.getTimezone(), user.getReminderBeforeTask());
     }
 
     @PostMapping(LOGOUT_MYSELF_ROUTE)

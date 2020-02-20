@@ -67,6 +67,9 @@ public class UserDaoJpa {
         User self = getByName(user);
         DaoHelper.updateIfPresent(updateMyselfParams.hasTimezone(), updateMyselfParams.getTimezone(),
                 (value) -> self.setTimezone(value));
+        DaoHelper.updateIfPresent(updateMyselfParams.hasReminderBeforeTask(),
+                updateMyselfParams.getReminderBeforeTask(),
+                (value) -> self.setReminderBeforeTask(value));
         return self;
     }
 }

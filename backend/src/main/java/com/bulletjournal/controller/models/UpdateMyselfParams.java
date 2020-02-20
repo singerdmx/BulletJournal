@@ -4,6 +4,8 @@ public class UpdateMyselfParams {
 
     private String timezone;
 
+    private Before reminderBeforeTask;
+
     public String getTimezone() {
         return timezone;
     }
@@ -14,5 +16,17 @@ public class UpdateMyselfParams {
 
     public boolean hasTimezone() {
         return this.timezone != null;
+    }
+
+    public Before getReminderBeforeTask() {
+        return reminderBeforeTask;
+    }
+
+    public void setReminderBeforeTask(Before reminderBeforeTask) {
+        this.reminderBeforeTask = reminderBeforeTask;
+    }
+
+    public boolean hasReminderBeforeTask() {
+        return this.reminderBeforeTask != null;
     }
 }

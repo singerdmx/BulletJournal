@@ -31,6 +31,8 @@ public class Task {
     @NotNull
     private Long projectId;
 
+    private ReminderSetting reminderSetting;
+
     public Task() {
     }
 
@@ -102,8 +104,16 @@ public class Task {
         return projectId;
     }
 
-    public void setProjectId() {
+    public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public ReminderSetting getReminderSetting() {
+        return reminderSetting;
+    }
+
+    public void setReminderSetting(ReminderSetting reminderSetting) {
+        this.reminderSetting = reminderSetting;
     }
 
     @Override

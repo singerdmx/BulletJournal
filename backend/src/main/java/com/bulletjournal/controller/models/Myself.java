@@ -7,12 +7,15 @@ public class Myself extends User {
 
     private String timezone;
 
+    private Before reminderBeforeTask;
+
     public Myself() {
     }
 
-    public Myself(User user, String timezone) {
+    public Myself(User user, String timezone, Before reminderBeforeTask) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
+        this.reminderBeforeTask = reminderBeforeTask;
     }
 
     public String getTimezone() {
@@ -25,5 +28,17 @@ public class Myself extends User {
 
     public boolean hasTimezone() {
         return this.timezone != null;
+    }
+
+    public Before getBefore() {
+        return reminderBeforeTask;
+    }
+
+    public void setBefore(Before before) {
+        this.reminderBeforeTask = before;
+    }
+
+    public boolean hasBefore() {
+        return this.reminderBeforeTask != null;
     }
 }

@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.Before;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
@@ -29,6 +31,13 @@ public class User extends NamedModel {
 
     @Column(length = 15)
     private String currency;
+
+    @Column(length = 25)
+    private String language;
+
+    // reminder before task
+    @Column(name = "reminder_before_task")
+    private Before reminderBeforeTask = Before.FIVE_MIN_BEFORE;
 
     public Long getId() {
         return id;
@@ -64,6 +73,22 @@ public class User extends NamedModel {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public Before getReminderBeforeTask() {
+        return reminderBeforeTask;
+    }
+
+    public void setReminderBeforeTask(Before reminderBeforeTask) {
+        this.reminderBeforeTask = reminderBeforeTask;
     }
 
     @Override
