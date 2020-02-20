@@ -30,7 +30,7 @@ class GroupPage extends React.Component<
 
   componentDidUpdate(prevProps : GroupPathProps): void {
     const groupId = this.props.match.params.groupId;
-    if (prevProps.groupId !== groupId) {
+    if (groupId !== prevProps.match.params.groupId) {
         this.props.getGroup(parseInt(groupId));
     }
   }
@@ -57,7 +57,7 @@ class GroupPage extends React.Component<
           />
         </div>
         <div className="group-footer">
-          <Button type="primary" icon="plus" />
+          <Button type="default" icon="plus" shape="circle" />
         </div>
       </div>
     );
