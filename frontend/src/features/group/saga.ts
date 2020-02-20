@@ -1,4 +1,4 @@
-import { takeEvery, takeLatest, call, all, put, select } from 'redux-saga/effects';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as groupsActions,
@@ -76,6 +76,7 @@ function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
   try {
     const { groupId } = action.payload;
     yield call(deleteGroup, groupId);
+    yield put(groupsActions.groupsUpdate({}));
     yield call(message.success, `Group ${groupId} deleted`);
   } catch (error) {
     yield call(message.error, `Delete group fail: ${error}`);
@@ -95,12 +96,12 @@ function* getUserGroup(action: PayloadAction<GetGroupAction>) {
 
 export default function* groupSagas() {
   yield all([
-    yield takeEvery(
+    yield takeLatest(
       groupsActions.groupsApiErrorReceived.type,
       apiErrorReceived
     ),
-    yield takeEvery(groupsActions.groupsUpdate.type, groupsUpdate),
-    yield takeEvery(groupsActions.createGroup.type, createGroup),
+    yield takeLatest(groupsActions.groupsUpdate.type, groupsUpdate),
+    yield takeLatest(groupsActions.createGroup.type, createGroup),
     yield takeLatest(groupsActions.addUserGroup.type, addUserToGroup),
     yield takeLatest(groupsActions.removeUserGroup.type, removeUserFromGroup),
     yield takeLatest(groupsActions.deleteGroup.type, deleteUserGroup),

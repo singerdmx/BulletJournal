@@ -1,4 +1,4 @@
-import { takeEvery, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as systemActions,
@@ -31,10 +31,10 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
 
 export default function* userSagas() {
   yield all([
-    yield takeEvery(
+    yield takeLatest(
       systemActions.systemApiErrorReceived.type,
       systemApiErrorAction
     ),
-    yield takeEvery(systemActions.systemUpdate.type, SystemUpdate)
+    yield takeLatest(systemActions.systemUpdate.type, SystemUpdate)
   ]);
 }

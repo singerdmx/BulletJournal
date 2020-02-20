@@ -1,4 +1,4 @@
-import { takeEvery, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as projectActions,
@@ -75,6 +75,7 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
   try {
     const { projectId } = action.payload;
     yield call(deleteProject, projectId);
+    yield put(projectActions.projectsUpdate);
     yield call(message.success, `Project ${projectId} deleted`);
   } catch (error) {
     yield call(message.error, `Delete project fail: ${error}`);
@@ -83,14 +84,14 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
 
 export default function* projectSagas() {
   yield all([
-    yield takeEvery(
+    yield takeLatest(
       projectActions.projectsApiErrorReceived.type,
       projectApiErrorAction
     ),
-    yield takeEvery(projectActions.projectsUpdate.type, projectsUpdate),
-    yield takeEvery(projectActions.createProject.type, addProject),
-    yield takeEvery(projectActions.deleteProject.type, deleteUserProject),
-    yield takeEvery(projectActions.getProject.type, getUserProject),
-    yield takeEvery(projectActions.updateSharedProjectsOrder.type, updateSharedProjectOwnersOrder),
+    yield takeLatest(projectActions.projectsUpdate.type, projectsUpdate),
+    yield takeLatest(projectActions.createProject.type, addProject),
+    yield takeLatest(projectActions.deleteProject.type, deleteUserProject),
+    yield takeLatest(projectActions.getProject.type, getUserProject),
+    yield takeLatest(projectActions.updateSharedProjectsOrder.type, updateSharedProjectOwnersOrder),
   ]);
 }

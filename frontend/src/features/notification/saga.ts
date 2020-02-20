@@ -1,4 +1,4 @@
-import { takeEvery, call, all, put, select } from 'redux-saga/effects';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as notificationsActions,
@@ -56,14 +56,14 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
 
 export default function* noticeSagas() {
   yield all([
-    yield takeEvery(
+    yield takeLatest(
       notificationsActions.noticeApiErrorReceived.type,
       noticeApiErrorReceived
     ),
-    yield takeEvery(
+    yield takeLatest(
       notificationsActions.notificationsUpdate.type,
       notificationsUpdate
     ),
-    yield takeEvery(notificationsActions.answerNotice.type, answerNotice)
+    yield takeLatest(notificationsActions.answerNotice.type, answerNotice)
   ]);
 }
