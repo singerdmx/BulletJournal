@@ -38,6 +38,7 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
 function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   try {
     const { action, notificationId } = act.payload;
+    console.log(act)
     yield call(answerNotification, notificationId, action);
     const state: IState = yield select();
     const notifications = state.notice.notifications.filter( (notice: Notification) =>notice.id!==notificationId);
@@ -45,7 +46,9 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     yield put(
       notificationsActions.notificationsReceived({ notifications: notifications, etag: '' })
     );
-    yield put(updateGroups());
+    if(action==='Decline' || action==='Accept'){
+      yield put(updateGroups());
+    }
     yield call(message.success, 'User answers notification successful');
   } catch (error) {
     yield call(message.error, `User answers notification failed: ${error}`);
