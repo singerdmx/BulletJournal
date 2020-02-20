@@ -1,4 +1,4 @@
-import { doFetch, doPost, doDelete } from "./api-helper";
+import { doFetch, doPost, doDelete, doPatch } from "./api-helper";
 
 export const fetchGroups = () => {
   return doFetch("/api/groups")
@@ -51,6 +51,18 @@ export const removeUserGroup = (groupId: number, username: string) => {
 
 export const deleteGroup = (groupId: number) => {
   return doDelete(`/api/groups/${groupId}`).catch(err => {
+    throw Error(err);
+  });
+}
+
+export const updateGroup = (groupId: number, name: string) => {
+  const postBody = JSON.stringify({
+    name: name
+  });
+
+  return doPatch(`/api/groups/${groupId}`, postBody)
+  .then(res => res.json())
+  .catch(err => {
     throw Error(err);
   });
 }

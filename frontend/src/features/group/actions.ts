@@ -10,3 +10,5 @@ export const deleteGroup = (groupId: number) =>
   actions.deleteGroup({groupId: groupId});
 export const getGroup = (groupId: number) =>
   actions.getGroup({groupId: groupId});
+export const patchGroup = (groupId: number, name: string) =>
+  actions.patchGroup({groupId: groupId, name: name});

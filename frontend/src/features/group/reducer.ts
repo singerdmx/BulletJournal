@@ -57,6 +57,11 @@ export type GetGroupAction = {
   groupId: number;
 };
 
+export type PatchGroupAction = {
+  groupId: number;
+  name: string;
+};
+
 let initialState = {
   groups: [] as GroupsWithOwner[],
   etag: '',
@@ -85,6 +90,7 @@ const slice = createSlice({
       const { group } = action.payload;
       state.group = group;
     },
+    patchGroup: (state, action: PayloadAction<PatchGroupAction>) => state,
   }
 });
 

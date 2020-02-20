@@ -8,7 +8,8 @@ import {
   AddUserGroupAction,
   RemoveUserGroupAction,
   DeleteGroupAction,
-  GetGroupAction
+  GetGroupAction,
+  PatchGroupAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -17,7 +18,8 @@ import {
   addUserGroup,
   removeUserGroup,
   deleteGroup,
-  getGroup
+  getGroup,
+  updateGroup,
 } from '../../apis/groupApis'; 
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
@@ -94,6 +96,20 @@ function* getUserGroup(action: PayloadAction<GetGroupAction>) {
   }
 }
 
+function* patchGroup(action: PayloadAction<PatchGroupAction>) {
+  try {
+    const { groupId, name} = action.payload;
+    const group = yield call(updateGroup, groupId, name);
+    yield put(groupsActions.groupReceived({ group: group }));
+    yield call(
+        message.success,
+        'Successfully updated group'
+    );
+  } catch (error) {
+    yield call(message.error, `Patch group Fail: ${error}`);
+  }
+}
+
 export default function* groupSagas() {
   yield all([
     yield takeLatest(
@@ -105,6 +121,7 @@ export default function* groupSagas() {
     yield takeLatest(groupsActions.addUserGroup.type, addUserToGroup),
     yield takeLatest(groupsActions.removeUserGroup.type, removeUserFromGroup),
     yield takeLatest(groupsActions.deleteGroup.type, deleteUserGroup),
-    yield takeLatest(groupsActions.getGroup.type, getUserGroup)
+    yield takeLatest(groupsActions.getGroup.type, getUserGroup),
+    yield takeLatest(groupsActions.patchGroup.type, patchGroup)
   ]);
 }
