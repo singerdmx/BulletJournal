@@ -64,11 +64,9 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
           <div className="group-operation">
             <Icon type="user" />
             {group.users && group.users.length}
-            <Icon
-              type="dash"
-              title="Edit Group"
-              style={{ cursor: 'pointer' }}
-            />
+            <Button type="link">
+              <Icon type="setting" title="Edit Group" />
+            </Button>
           </div>
         </div>
         <div className="group-users">
