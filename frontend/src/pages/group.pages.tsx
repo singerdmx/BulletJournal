@@ -37,7 +37,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
     return (
       <div className="group-page">
         <div className="group-title">
-          <h3>{`Group '${group.name}' of ${group.owner}`}</h3>
+          <h2>{`Group "${group.name}"`}</h2>
           <Icon type="dash" />
         </div>
         <div className="group-users">
@@ -48,7 +48,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                 <List.Item key={item.id}>
                   <div className="group-user">
                     <Avatar src={item.avatar} />
-                    {item.name}
+                    <span>{item.name}</span>
                   </div>
                   {item.name !== group.owner && (
                     <Button type="danger" icon="close" ghost size="small" />
@@ -59,7 +59,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
           />
         </div>
         <div className="group-footer">
-          <Button type="primary" icon="plus" shape="round" />
+          <Button type="primary" icon="plus" shape="round" title="Add User"/>
         </div>
       </div>
     );
