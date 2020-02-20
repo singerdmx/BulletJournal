@@ -51,13 +51,14 @@ class GroupPage extends React.Component<
               return (
                 <List.Item key={item.id}>
                   <Avatar src={item.avatar} />
+                  <Button type="danger" icon="close" ghost size="small" />
                 </List.Item>
               );
             }}
           />
         </div>
         <div className="group-footer">
-          <Button type="default" icon="plus" shape="circle" />
+          <Button type="primary" icon="plus" shape="round" />
         </div>
       </div>
     );
