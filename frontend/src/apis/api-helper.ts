@@ -1,9 +1,9 @@
 export function doFetch(endpoint: string) {
-  if (process.env.DEBUG_MODE === "DEBUG") {
+  if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }
   return fetch(endpoint, {
-    headers: {},
+    headers: {}
   }).then(res => {
     if (!res.ok) {
       throw Error(res.statusText);
@@ -13,23 +13,23 @@ export function doFetch(endpoint: string) {
 }
 
 export function doPost(endpoint: string, body: string) {
-    if (process.env.DEBUG_MODE === "DEBUG") {
-      console.log(endpoint);
+  if (process.env.DEBUG_MODE === 'DEBUG') {
+    console.log(endpoint);
+  }
+  return fetch(endpoint, {
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+    body: body
+  }).then(res => {
+    if (!res.ok) {
+      throw Error(res.statusText);
     }
-    return fetch(endpoint, {
-      headers: { 'Content-Type': 'application/json'},
-      method: 'POST',
-      body: body
-    }).then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
-      }
-      return res;
-    });
+    return res;
+  });
 }
 
 export function doDelete(endpoint: string) {
-  if (process.env.DEBUG_MODE === "DEBUG") {
+  if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }
   return fetch(endpoint, {
@@ -43,12 +43,12 @@ export function doDelete(endpoint: string) {
 }
 
 export function doPut(endpoint: string, body: string) {
-  if (process.env.DEBUG_MODE === "DEBUG") {
+  if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }
   return fetch(endpoint, {
-    headers: { 'Content-Type': 'application/json'},
-    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    method: 'PUT',
     body: body
   }).then(res => {
     if (!res.ok) {
@@ -59,12 +59,12 @@ export function doPut(endpoint: string, body: string) {
 }
 
 export function doPatch(endpoint: string, body: string) {
-  if (process.env.DEBUG_MODE === "DEBUG") {
+  if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }
   return fetch(endpoint, {
-    headers: { 'Content-Type': 'application/json'},
-    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    method: 'PATCH',
     body: body
   }).then(res => {
     if (!res.ok) {

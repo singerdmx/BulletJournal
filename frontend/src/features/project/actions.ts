@@ -1,4 +1,4 @@
-import { actions, ProjectType } from './reducer';
+import { actions, ProjectType, Project } from './reducer';
 export const updateProjects = () => actions.projectsUpdate({});
 export const createProjectByName = (
   description: string,
@@ -15,15 +15,19 @@ export const getProject = (projectId: number) =>
 export const updateSharedProjectsOrder = (projectOwners: string[]) =>
   actions.updateSharedProjectsOrder({ projectOwners: projectOwners });
 export const deleteProject = (projectId: number) =>
-  actions.deleteProject({ projectId: projectId});
+  actions.deleteProject({ projectId: projectId });
 export const updateProject = (
-    projectId: number,
-    description: string,
-    groupId: number,
-    name: string
+  projectId: number,
+  description: string,
+  groupId: number,
+  name: string
 ) =>
   actions.patchProject({
-      projectId: projectId,
-      description: description,
-      groupId: groupId,
-      name: name});
+    projectId: projectId,
+    description: description,
+    groupId: groupId,
+    name: name
+  });
+export const updateProjectRelations = (projects: Project[]) => {
+  actions.updateProjectRelations({ projects: projects });
+};
