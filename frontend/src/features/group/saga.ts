@@ -1,4 +1,4 @@
-import { takeEvery, takeLatest, call, all, put } from 'redux-saga/effects';
+import { takeEvery, takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as groupsActions,
@@ -18,7 +18,7 @@ import {
   removeUserGroup,
   deleteGroup,
   getGroup
-} from '../../apis/groupApis';
+} from '../../apis/groupApis'; 
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -43,6 +43,7 @@ function* createGroup(action: PayloadAction<GroupCreateAction>) {
     const name = action.payload.name;
     const data = yield call(createGroups, name);
     yield put(groupsActions.groupReceived({ group: data }));
+    yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
     yield call(message.error, `Group Create Fail: ${error}`);
   }

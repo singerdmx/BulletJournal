@@ -12,6 +12,7 @@ import {
   fetchNotifications,
   answerNotification
 } from '../../apis/notificationApis';
+import { updateGroups } from '../group/actions';
 
 import { IState } from '../../store';
 
@@ -44,6 +45,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     yield put(
       notificationsActions.notificationsReceived({ notifications: notifications, etag: '' })
     );
+    yield put(updateGroups());
     yield call(message.success, 'User answers notification successful');
   } catch (error) {
     yield call(message.error, `User answers notification failed: ${error}`);
