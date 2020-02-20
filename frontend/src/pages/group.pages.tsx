@@ -64,7 +64,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
           <div className="group-operation">
             <Icon type="user" />
             {group.users && group.users.length}
-            <Button type="link">
+            <Button type="link" className="group-setting">
               <Icon type="setting" title="Edit Group" />
             </Button>
           </div>
@@ -86,12 +86,12 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                   </div>
                   {item.name !== group.owner && (
                     <Button
-                      type="danger"
-                      icon="close"
-                      ghost
+                      type="link"
                       size="small"
                       title={item.accepted ? 'Remove' : 'Cancel Invitation'}
-                    />
+                    >
+                        <Icon type="close" />
+                    </Button>
                   )}
                 </List.Item>
               );
