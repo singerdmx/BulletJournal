@@ -8,10 +8,10 @@ import { Icon, Avatar, Button, List } from 'antd';
 
 type GroupPathParams = {
   groupId: string;
-}
+};
 
 interface GroupPathProps extends RouteComponentProps<GroupPathParams> {
-    groupId: string
+  groupId: string;
 }
 
 type GroupProps = {
@@ -19,19 +19,17 @@ type GroupProps = {
   getGroup: (groupId: number) => void;
 };
 
-class GroupPage extends React.Component<
-  GroupProps & GroupPathProps
-> {
+class GroupPage extends React.Component<GroupProps & GroupPathProps> {
   componentDidMount() {
     const groupId = this.props.match.params.groupId;
     console.log(groupId);
     this.props.getGroup(parseInt(groupId));
   }
 
-  componentDidUpdate(prevProps : GroupPathProps): void {
+  componentDidUpdate(prevProps: GroupPathProps): void {
     const groupId = this.props.match.params.groupId;
     if (groupId !== prevProps.match.params.groupId) {
-        this.props.getGroup(parseInt(groupId));
+      this.props.getGroup(parseInt(groupId));
     }
   }
   render() {
@@ -50,7 +48,10 @@ class GroupPage extends React.Component<
             renderItem={item => {
               return (
                 <List.Item key={item.id}>
-                  <Avatar src={item.avatar} />
+                  <div className="group-user">
+                    <Avatar src={item.avatar} />
+                    {item.name}
+                  </div>
                   <Button type="danger" icon="close" ghost size="small" />
                 </List.Item>
               );
