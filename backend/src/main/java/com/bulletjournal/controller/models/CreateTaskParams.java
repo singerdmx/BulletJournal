@@ -17,6 +17,8 @@ public class CreateTaskParams {
 
     private String dueTime; // "HH-mm"
 
+    private ReminderSetting reminderSetting;
+
     public CreateTaskParams() {
     }
 
@@ -60,5 +62,17 @@ public class CreateTaskParams {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ReminderSetting getReminderSetting() {
+        return reminderSetting;
+    }
+
+    public void setReminderSetting(ReminderSetting reminderSetting) {
+        this.reminderSetting = reminderSetting;
+    }
+
+    public boolean hasReminderSetting() {
+        return this.reminderSetting != null;
     }
 }

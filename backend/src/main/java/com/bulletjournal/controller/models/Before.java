@@ -1,5 +1,8 @@
 package com.bulletjournal.controller.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Before {
 
     ZERO_MIN_BEFORE(0, "0 minute before"),

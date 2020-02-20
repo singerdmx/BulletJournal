@@ -10,14 +10,18 @@ public class UpdateTaskParams {
 
     private String name;
 
+    private ReminderSetting reminderSetting;
+
     public UpdateTaskParams() {
     }
 
-    public UpdateTaskParams(String assignedTo, String dueDate, String dueTime, String name) {
+    public UpdateTaskParams(
+            String assignedTo, String dueDate, String dueTime, String name, ReminderSetting reminderSetting) {
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;
+        this.reminderSetting = reminderSetting;
     }
 
     public String getAssignedTo() {
@@ -66,5 +70,17 @@ public class UpdateTaskParams {
 
     public boolean hasName() {
         return this.name != null;
+    }
+
+    public ReminderSetting getReminderSetting() {
+        return reminderSetting;
+    }
+
+    public void setReminderSetting(ReminderSetting reminderSetting) {
+        this.reminderSetting = reminderSetting;
+    }
+
+    public boolean hasReminderSetting() {
+        return reminderSetting != null;
     }
 }

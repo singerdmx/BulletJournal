@@ -42,7 +42,8 @@ public class Task {
                 @NotBlank @Size(min = 5, max = 5) String dueTime,
                 @NotBlank String timezone,
                 @NotNull String name,
-                @NotNull Project project) {
+                @NotNull Project project,
+                ReminderSetting reminderSetting) {
         this.id = id;
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
@@ -50,6 +51,9 @@ public class Task {
         this.timezone = timezone;
         this.name = name;
         this.projectId = project.getId();
+        if (reminderSetting.hasBefore() || reminderSetting.hasDate()) {
+            this.reminderSetting = reminderSetting;
+        }
     }
 
     public Long getId() {

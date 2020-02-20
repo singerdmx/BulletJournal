@@ -43,6 +43,7 @@ public class TaskDaoJpa {
         task.setDueTime(createTaskParams.getDueTime());
         task.setCreatedBy(owner);
         task.setName(createTaskParams.getName());
+        task.setReminderSetting(createTaskParams.getReminderSetting());
         return this.taskRepository.save(task);
     }
 
@@ -65,6 +66,8 @@ public class TaskDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasDueTime(), updateTaskParams.getDueTime(), (value) -> task.setDueTime(value));
 
+        DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
+                (value) -> task.setReminderSetting(value));
         return this.taskRepository.save(task);
     }
 

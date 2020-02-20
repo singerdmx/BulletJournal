@@ -35,6 +35,10 @@ public class ReminderSetting {
         this.date = date;
     }
 
+    public boolean hasDate() {
+        return this.date != null;
+    }
+
     public String getTime() {
         return time;
     }
@@ -43,11 +47,19 @@ public class ReminderSetting {
         this.time = time;
     }
 
+    public boolean hasTime() {
+        return this.time != null;
+    }
+
     public Before getBefore() {
         return before;
     }
 
     public void setBefore(Before before) {
         this.before = before;
+    }
+
+    public boolean hasBefore() {
+        return this.before != null;
     }
 }
