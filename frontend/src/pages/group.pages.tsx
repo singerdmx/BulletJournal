@@ -83,7 +83,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                   <Menu onClick={menu => this.handleMenuClick(menu, group.id)}>
                     <Menu.Item key="edit"><Icon type="edit" /> Edit</Menu.Item>
                     <Menu.Divider />
-                    <Menu.Item key="delete"><Icon type="delete" /> Delete</Menu.Item>
+                    <Menu.Item key="delete" disabled={group.name === 'Default'}><Icon type="delete" /> Delete</Menu.Item>
                   </Menu>
                 }
                 trigger={['click']}
