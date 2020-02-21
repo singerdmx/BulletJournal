@@ -2,6 +2,7 @@ package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.hierarchy.HierarchyItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.tuple.Pair;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RelationsProcessor {
+public class ProjectRelationsProcessor {
 
     private static final String SUB_PROJECTS_KEY = "subProjects";
     private static final String SUB_PROJECTS_KEY_REPLACEMENT = "s";
@@ -125,6 +126,6 @@ public class RelationsProcessor {
     public static String processRelations(List<Project> projects) {
         String jsonString = GSON.toJson(projects);
         // replace "subProjects" with "s" to save space
-        return jsonString.replace(SUB_PROJECTS_KEY, SUB_PROJECTS_KEY_REPLACEMENT);
+        return jsonString.replace(SUB_PROJECTS_KEY, HierarchyItem.SUB_ITEMS_KEY_REPLACEMENT);
     }
 }

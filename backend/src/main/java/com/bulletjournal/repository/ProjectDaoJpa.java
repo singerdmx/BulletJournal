@@ -4,7 +4,7 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.utils.RelationsProcessor;
+import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
@@ -122,7 +122,7 @@ public class ProjectDaoJpa {
         newOwners.add(o);
         List<Project> projects = this.projectRepository.findAllById(new ArrayList<>(projectsByOwner));
         String projectRelationsByOwner = this.userProjectsRepository.findById(o).get().getOwnedProjects();
-        List<com.bulletjournal.controller.models.Project> l = RelationsProcessor.processRelations(
+        List<com.bulletjournal.controller.models.Project> l = ProjectRelationsProcessor.processRelations(
                 projects.stream().collect(Collectors.toMap(Project::getId, p -> p)),
                 projectRelationsByOwner, projectsByOwner);
 
@@ -140,7 +140,7 @@ public class ProjectDaoJpa {
         }
         Map<Long, Project> projects = this.projectRepository.findByOwner(owner)
                 .stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
-        return RelationsProcessor.processRelations(
+        return ProjectRelationsProcessor.processRelations(
                 projects, userProjects.getOwnedProjects(), null);
     }
 
@@ -194,7 +194,7 @@ public class ProjectDaoJpa {
         final UserProjects userProjects = userProjectsOptional.isPresent() ?
                 userProjectsOptional.get() : new UserProjects();
 
-        userProjects.setOwnedProjects(RelationsProcessor.processRelations(projects));
+        userProjects.setOwnedProjects(ProjectRelationsProcessor.processRelations(projects));
         userProjects.setOwner(user);
 
         this.userProjectsRepository.save(userProjects);
@@ -227,17 +227,17 @@ public class ProjectDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("UserProjects by " + owner + " not found"));
 
         Pair<com.bulletjournal.controller.models.Project, List<com.bulletjournal.controller.models.Project>> result =
-                RelationsProcessor.removeTargetProject(userProjects.getOwnedProjects(), projectId);
+                ProjectRelationsProcessor.removeTargetProject(userProjects.getOwnedProjects(), projectId);
         List<com.bulletjournal.controller.models.Project> projectHierarchy = result.getRight();
         com.bulletjournal.controller.models.Project target = result.getLeft();
 
         // delete project and its subProjects
         List<Project> targetProjects = this.projectRepository
-                .findAllById(RelationsProcessor.findSubProjects(target));
+                .findAllById(ProjectRelationsProcessor.findSubProjects(target));
         this.projectRepository.deleteAll(targetProjects);
 
         // Update project relations
-        userProjects.setOwnedProjects(RelationsProcessor.processRelations(projectHierarchy));
+        userProjects.setOwnedProjects(ProjectRelationsProcessor.processRelations(projectHierarchy));
         this.userProjectsRepository.save(userProjects);
 
         // return generated events
