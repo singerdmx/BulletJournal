@@ -2,7 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.utils.ProjectRelationsProcessorTest;
+import com.bulletjournal.controller.utils.RelationsProcessorTest;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.JoinGroupEvent;
 import com.google.common.collect.ImmutableList;
@@ -214,7 +214,7 @@ public class ProjectControllerTest {
          *   |
          *    -- p6
          */
-        List<Project> projectRelations = ProjectRelationsProcessorTest.createSampleProjectRelations(
+        List<Project> projectRelations = RelationsProcessorTest.createSampleProjectRelations(
                 p1, p2, p3, p4, p5, p6);
         // Set user's project relations
         ResponseEntity<?> updateProjectRelationsResponse = this.restTemplate.exchange(

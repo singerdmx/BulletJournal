@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProjectRelationsProcessor {
+public class RelationsProcessor {
 
     private static final String SUB_PROJECTS_KEY = "subProjects";
     private static final String SUB_PROJECTS_KEY_REPLACEMENT = "s";
