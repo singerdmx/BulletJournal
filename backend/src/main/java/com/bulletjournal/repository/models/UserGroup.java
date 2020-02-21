@@ -5,7 +5,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "user_groups",
-        indexes = {@Index(name = "user_group_index", columnList = "user_id")})
+        indexes = {@Index(name = "user_group_user_index", columnList = "user_id"),
+                   @Index(name = "user_group_group_accept_index", columnList = "group_id, accepted")})
 public class UserGroup {
 
     @EmbeddedId

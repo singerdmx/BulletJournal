@@ -167,7 +167,7 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void removeUserGroups(
+    public List<Event> removeUserGroups(
             String owner,
             List<RemoveUserGroupParams> removeUserGroupsParams) {
 
@@ -192,6 +192,6 @@ public class GroupDaoJpa {
             this.userGroupRepository.delete(userGroup);
             events.add(new Event(username, groupId, group.getName()));
         }
-        this.notificationService.inform(new RemoveUserFromGroupEvent(events, owner));
+        return events;
     }
 }

@@ -6,6 +6,7 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
@@ -39,6 +40,9 @@ public class ProjectDaoJpa {
 
     @Autowired
     private AuthorizationService authorizationService;
+
+    @Autowired
+    private UserGroupRepository userGroupRepository;
 
     private static final Gson GSON = new Gson();
 
@@ -209,7 +213,7 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void deleteProject(String owner, Long projectId) {
+    public List<Event> deleteProject(String owner, Long projectId) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -233,6 +237,23 @@ public class ProjectDaoJpa {
         // Update project relations
         userProjects.setOwnedProjects(ProjectRelationsProcessor.processProjectRelations(projectHierarchy));
         this.userProjectsRepository.save(userProjects);
+
+        // return generated events
+        return generateEvents(owner, targetProjects);
+    }
+
+    private List<Event> generateEvents(String owner, List<Project> targetProjects) {
+        List<Event> events = new ArrayList<>();
+        for (Project p : targetProjects) {
+            Long groupId = p.getGroup().getId();
+            List<UserGroup> userGroups = this.userGroupRepository.findAllByGroupIdAndAccepted(groupId, true);
+            for (UserGroup userGroup : userGroups) {
+                // skip send event to self
+                if (userGroup.getUser().getName().equals(owner)) continue;
+                events.add(new Event(String.valueOf(userGroup.getUser().getName()), p.getId(), p.getName()));
+            }
+        }
+        return events;
     }
 
 }

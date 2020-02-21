@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Menu, Icon, Avatar } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
-import { GroupsWithOwner } from '../../features/group/reducer';
+import { GroupsWithOwner } from '../../features/group/interfaces';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
 

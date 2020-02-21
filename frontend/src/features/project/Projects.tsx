@@ -1,8 +1,9 @@
 import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Projects, ProjectType } from './reducer';
+import { Projects } from './reducer';
 import { updateProjects, createProjectByName } from './actions';
+import { ProjectType } from './constants';
 
 type ProjectsProps = {
   projects: Projects;

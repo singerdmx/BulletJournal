@@ -5,7 +5,6 @@ import {
   NoticeApiErrorAction,
   NotificationsAction,
   AnswerNotificationAction,
-  Notification
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -13,6 +12,8 @@ import {
   answerNotification
 } from '../../apis/notificationApis';
 import { updateGroups } from '../group/actions';
+
+import { Notification } from './interface';
 
 import { IState } from '../../store';
 

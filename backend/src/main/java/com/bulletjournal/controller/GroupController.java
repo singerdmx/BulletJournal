@@ -3,8 +3,10 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveUserFromGroupEvent;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.MDC;
@@ -167,12 +169,18 @@ public class GroupController {
     @PostMapping(REMOVE_USER_GROUPS_ROUTE)
     public void removeUserGroups(@Valid @RequestBody RemoveUserGroupsParams removeUserGroupsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.removeUserGroups(username, removeUserGroupsParams.getUserGroups());
+        List<Event> events = this.groupDaoJpa.removeUserGroups(username, removeUserGroupsParams.getUserGroups());
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new RemoveUserFromGroupEvent(events, username));
+        }
     }
 
     @PostMapping(REMOVE_USER_GROUP_ROUTE)
     public void removeUserGroup(@Valid @RequestBody RemoveUserGroupParams removeUserGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.removeUserGroups(username, ImmutableList.of(removeUserGroupParams));
+        List<Event> events = this.groupDaoJpa.removeUserGroups(username, ImmutableList.of(removeUserGroupParams));
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new RemoveUserFromGroupEvent(events, username));
+        }
     }
 }
