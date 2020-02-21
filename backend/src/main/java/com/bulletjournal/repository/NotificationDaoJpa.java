@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,5 +45,10 @@ public class NotificationDaoJpa {
         events.forEach(event -> {
             event.toNotifications().forEach(n -> this.notificationRepository.save(n));
         });
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteAllExpiredNotifications(Timestamp expirationTime) {
+        this.notificationRepository.deleteByUpdatedAtBefore(expirationTime);
     }
 }
