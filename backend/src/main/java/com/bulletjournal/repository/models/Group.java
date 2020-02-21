@@ -22,7 +22,7 @@ public class Group extends OwnedModel {
     )
     private Long id;
 
-    @Column(name = "default", nullable = false, updatable = false)
+    @Column(name = "default_group", nullable = false, updatable = false)
     private boolean defaultGroup = false;
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
