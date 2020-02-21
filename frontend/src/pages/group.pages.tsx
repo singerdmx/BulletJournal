@@ -81,9 +81,9 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
               <Dropdown
                 overlay={
                   <Menu onClick={menu => this.handleMenuClick(menu, group.id)}>
-                    <Menu.Item key="edit">Edit</Menu.Item>
+                    <Menu.Item key="edit"><Icon type="edit" /> Edit</Menu.Item>
                     <Menu.Divider />
-                    <Menu.Item key="delete">Delete</Menu.Item>
+                    <Menu.Item key="delete"><Icon type="delete" /> Delete</Menu.Item>
                   </Menu>
                 }
                 trigger={['click']}
