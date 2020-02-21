@@ -75,7 +75,7 @@ public class RelationsProcessorTest {
         Collections.sort(subProjects);
         assertEquals(ImmutableList.of(2L, 3L), subProjects);
 
-        String projectRelations = RelationsProcessor.processProjectRelations(projectHierarchy);
+        String projectRelations = RelationsProcessor.processRelations(projectHierarchy);
         Pair<Project, List<Project>> result = RelationsProcessor
                 .removeTargetProject(projectRelations, p2.getId());
         projectHierarchy = result.getRight();
@@ -89,7 +89,7 @@ public class RelationsProcessorTest {
     }
 
     /**
-     * Tests {@link RelationsProcessor#processProjectRelations(Map, String, Set)}
+     * Tests {@link RelationsProcessor#processRelations(Map, String, Set)}
      */
     @Test
     public void testProjectRelationsProcessor() {
@@ -104,7 +104,7 @@ public class RelationsProcessorTest {
         Project p5 = projects.get(4);
         Project p6 = projects.get(5);
 
-        String projectRelations = RelationsProcessor.processProjectRelations(
+        String projectRelations = RelationsProcessor.processRelations(
                 createSampleProjectRelations(p1, p2, p3, p4, p5, p6));
         Map<Long, com.bulletjournal.repository.models.Project> projectMap = new HashMap<>();
         for (int i = 1; i <= 6; i++) {
@@ -117,7 +117,7 @@ public class RelationsProcessorTest {
             p.setName("P" + i);
             projectMap.put(id, p);
         }
-        projects = RelationsProcessor.processProjectRelations(projectMap, projectRelations, null);
+        projects = RelationsProcessor.processRelations(projectMap, projectRelations, null);
         assertEquals(2, projects.size());
         assertEquals(p1.getId(), projects.get(0).getId());
         assertEquals(p5.getId(), projects.get(1).getId());
@@ -129,7 +129,7 @@ public class RelationsProcessorTest {
         assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3.getId(), projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getId());
 
-        projects = RelationsProcessor.processProjectRelations(projectMap, projectRelations,
+        projects = RelationsProcessor.processRelations(projectMap, projectRelations,
                 ImmutableSet.of(1L, 2L, 3L, 4L));
         assertEquals(1, projects.size());
         assertEquals(p1.getId(), projects.get(0).getId());
@@ -139,14 +139,14 @@ public class RelationsProcessorTest {
         assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3.getId(), projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getId());
 
-        projects = RelationsProcessor.processProjectRelations(projectMap, projectRelations,
+        projects = RelationsProcessor.processRelations(projectMap, projectRelations,
                 ImmutableSet.of(5L, 6L));
         assertEquals(1, projects.size());
         assertEquals(p5.getId(), projects.get(0).getId());
         assertEquals(1, projects.get(0).getSubProjects().size());
         assertEquals(p6.getId(), projects.get(0).getSubProjects().get(0).getId());
 
-        projects = RelationsProcessor.processProjectRelations(projectMap, projectRelations,
+        projects = RelationsProcessor.processRelations(projectMap, projectRelations,
                 ImmutableSet.of(3L, 4L, 6L));
         assertEquals(2, projects.size());
         assertEquals(p1.getId(), projects.get(0).getId());
@@ -165,7 +165,7 @@ public class RelationsProcessorTest {
         assertEquals(p3.getId(), projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getId());
         assertNotNull(projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getName());
 
-        projects = RelationsProcessor.processProjectRelations(projectMap, projectRelations,
+        projects = RelationsProcessor.processRelations(projectMap, projectRelations,
                 ImmutableSet.of(1L, 5L));
         assertEquals(2, projects.size());
         assertEquals(p1.getId(), projects.get(0).getId());
@@ -175,7 +175,7 @@ public class RelationsProcessorTest {
         assertTrue(projects.get(0).getSubProjects().isEmpty());
         assertTrue(projects.get(1).getSubProjects().isEmpty());
 
-        projects = RelationsProcessor.processProjectRelations(projectMap, projectRelations,
+        projects = RelationsProcessor.processRelations(projectMap, projectRelations,
                 ImmutableSet.of(1L, 2L));
         assertEquals(1, projects.size());
         assertEquals(p1.getId(), projects.get(0).getId());
