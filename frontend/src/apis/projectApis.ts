@@ -1,5 +1,5 @@
 import { doFetch, doPost, doDelete, doPatch, doPut } from "./api-helper";
-import { Project } from "../features/project/reducer";
+import { Project } from "../features/project/interfaces";
 
 export const fetchProjects = () => {
   return doFetch("/api/projects")
