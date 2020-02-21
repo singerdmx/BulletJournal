@@ -4,6 +4,7 @@ export type MyselfWithAvatar = {
   username: string;
   avatar: string;
   timezone: string;
+  before: Before;
 };
 
 export type MyselfApiErrorAction = {
@@ -12,10 +13,16 @@ export type MyselfApiErrorAction = {
 
 export type UpdateMyself = {};
 
+export type Before = {
+  text: string;
+  value: number;
+};
+
 let initialState = {
   username: '',
   avatar: '',
-  timezone: ''
+  timezone: '',
+  before: {} as Before
 };
 
 const slice = createSlice({
@@ -23,10 +30,11 @@ const slice = createSlice({
   initialState,
   reducers: {
     myselfDataReceived: (state, action: PayloadAction<MyselfWithAvatar>) => {
-      const { username, avatar, timezone } = action.payload;
+      const { username, avatar, timezone, before } = action.payload;
       state.username = username;
       state.avatar = avatar;
       if (timezone && timezone.length > 0) state.timezone = timezone;
+      if (before) state.before = before;
     },
     myselfApiErrorReceived: (
       state,

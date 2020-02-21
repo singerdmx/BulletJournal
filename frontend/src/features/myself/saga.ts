@@ -19,7 +19,8 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
       myselfActions.myselfDataReceived({
         username: data.name,
         avatar: data.avatar,
-        timezone: data.timezone
+        timezone: data.timezone,
+        before: data.before
       })
     );
   } catch (error) {
