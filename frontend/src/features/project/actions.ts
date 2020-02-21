@@ -1,4 +1,6 @@
-import { actions, ProjectType, Project } from './reducer';
+import { actions } from './reducer';
+import { Project } from './interfaces';
+import { ProjectType } from './constants';
 export const updateProjects = () => actions.projectsUpdate({});
 export const createProjectByName = (
   description: string,

@@ -1,4 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
+import { ProjectType } from './constants';
+import { Project } from './interfaces';
 
 export type ProjectApiErrorAction = {
   error: string;
@@ -39,12 +41,6 @@ export type DeleteProjectAction = {
   projectId: number;
 };
 
-export type Group = {
-  id: number;
-  name: string;
-  owner: string;
-};
-
 export type Projects = {
   owned: Project[];
   shared: ProjectsWithOwner[];
@@ -52,21 +48,6 @@ export type Projects = {
   ownedProjectsEtag: string;
 };
 
-export enum ProjectType {
-  TODO = "TODO",
-  NOTE = "NOTE",
-  LEDGER = "LEDGER"
-}
-
-export type Project = {
-  description: string;
-  group: Group;
-  id: number;
-  name: string;
-  owner: string;
-  projectType: ProjectType;
-  subProjects: Project[];
-};
 
 export type ProjectsWithOwner = {
   owner: string;

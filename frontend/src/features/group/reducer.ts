@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "redux-starter-kit";
+import { Group, GroupsWithOwner } from './interfaces';
 
 export type ApiErrorAction = {
   error: string;
@@ -6,25 +7,7 @@ export type ApiErrorAction = {
 
 export type UpdateGroups = {};
 
-export type User = {
-  accepted: boolean;
-  avatar: string;
-  id: number;
-  name: string;
-  thumbnail: string;
-};
 
-export type Group = {
-  id: number;
-  name: string;
-  owner: string;
-  users: User[];
-};
-
-export type GroupsWithOwner = {
-  owner: string;
-  groups: Group[];
-};
 
 export type GroupsAction = {
   groups: GroupsWithOwner[];

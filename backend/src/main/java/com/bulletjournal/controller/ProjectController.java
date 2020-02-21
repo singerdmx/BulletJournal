@@ -49,19 +49,16 @@ public class ProjectController {
 
         return ResponseEntity.ok().headers(responseHeader).body(projects);
     }
-
     @GetMapping(PROJECT_ROUTE)
     public Project getProject(@NotNull @PathVariable Long projectId) {
         return this.projectDaoJpa.getProject(projectId).toPresentationModel();
     }
-
     @PostMapping(PROJECTS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return projectDaoJpa.create(project, username).toPresentationModel();
     }
-
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
                                  @Valid @RequestBody UpdateProjectParams updateProjectParams) {
@@ -80,14 +77,12 @@ public class ProjectController {
             this.notificationService.inform(new RemoveProjectEvent(events, username));
         }
     }
-
     @PostMapping(UPDATE_SHARED_PROJECTS_ORDER_ROUTE)
     public void updateSharedProjectsOrder(
             @Valid @RequestBody UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.projectDaoJpa.updateSharedProjectsOrder(username, updateSharedProjectsOrderParams);
     }
-
     @PutMapping(PROJECTS_ROUTE)
     public void updateProjectRelations(@Valid @RequestBody List<Project> projects) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

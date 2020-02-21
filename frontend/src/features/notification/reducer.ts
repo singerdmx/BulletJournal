@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
+import { Notification } from './interface';
 
 export type NoticeApiErrorAction = {
   error: string;
@@ -11,23 +12,6 @@ export type AnswerNotificationAction = {
   notificationId: number;
   type: string;
 };
-
-export interface Originator {
-  id: number;
-  name: string;
-  thumbnail: string;
-  avatar: string;
-}
-
-export interface Notification {
-  id: number;
-  title: string;
-  content: string;
-  timestamp: number;
-  originator: Originator;
-  actions: Array<string>;
-  type: string;
-}
 
 export type NotificationsAction = {
   notifications: Array<Notification>;

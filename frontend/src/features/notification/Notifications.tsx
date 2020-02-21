@@ -1,7 +1,7 @@
 import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Notification } from './reducer';
+import { Notification } from './interface';
 import { List, Badge, Popover, Icon } from 'antd';
 import TitleAvatar from '../../components/notification/avatar.compoennt';
 import Actions from '../../components/notification/action.component';
