@@ -48,12 +48,14 @@ export type Group = {
 export type Projects = {
   owned: Project[];
   shared: ProjectsWithOwner[];
+  sharedProjectsEtag: string;
+  ownedProjectsEtag: string;
 };
 
 export enum ProjectType {
-  TODO = 'TODO',
-  NOTE = 'NOTE',
-  LEDGER = 'LEDGER'
+  TODO = "TODO",
+  NOTE = "NOTE",
+  LEDGER = "LEDGER"
 }
 
 export type Project = {
@@ -74,17 +76,31 @@ export type ProjectsWithOwner = {
 let initialState = {
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
-  project: {} as Project
+  project: {} as Project,
+  ownedProjectsEtag: "",
+  sharedProjectsEtag: ""
 };
 
 const slice = createSlice({
-  name: 'projects',
+  name: "projects",
   initialState,
   reducers: {
     projectsReceived: (state, action: PayloadAction<Projects>) => {
-      const { owned, shared } = action.payload;
+      const {
+        owned,
+        shared,
+        ownedProjectsEtag,
+        sharedProjectsEtag
+      } = action.payload;
       state.owned = owned;
       state.shared = shared;
+
+      if (ownedProjectsEtag && ownedProjectsEtag.length > 0) {
+        state.ownedProjectsEtag = ownedProjectsEtag;
+      }
+      if (sharedProjectsEtag && sharedProjectsEtag.length > 0) {
+        state.sharedProjectsEtag = sharedProjectsEtag;
+      }
     },
 
     projectsApiErrorReceived: (

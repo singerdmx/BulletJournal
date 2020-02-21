@@ -29,11 +29,18 @@ function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
 function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
   try {
     const data = yield call(fetchProjects);
+    const projects = yield data.json();
+    //get etag and split into 2 parts
+    const etags = data.headers.get("Etag")!.split("|");
+    console.log(etags);
+
     // console.log(data);
     yield put(
       projectActions.projectsReceived({
-        owned: data.owned,
-        shared: data.shared
+        owned: projects.owned,
+        shared: projects.shared,
+        ownedProjectsEtag: etags[0],
+        sharedProjectsEtag: etags[1]
       })
     );
   } catch (error) {
