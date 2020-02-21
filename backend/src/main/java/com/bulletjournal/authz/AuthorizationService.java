@@ -2,7 +2,6 @@ package com.bulletjournal.authz;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.repository.models.Group;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -29,9 +28,6 @@ public class AuthorizationService {
             String owner, String requester, Operation operation, Long contentId, Object... other) {
         switch (operation) {
             case DELETE:
-                if (Group.DEFAULT_NAME.equals(other[0])) {
-                    throw new UnAuthorizedException("Default Group cannot be deleted");
-                }
             case UPDATE:
                 if (!Objects.equals(owner, requester)) {
                     throw new UnAuthorizedException("Group " + contentId + " is owner by " +

@@ -8,6 +8,7 @@ import com.bulletjournal.controller.models.RemoveUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
@@ -60,6 +61,10 @@ public class GroupDaoJpa {
 
         Group group = this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
+
+        if (group.isDefaultGroup()) {
+            throw new UnAuthorizedException("Default Group cannot be deleted");
+        }
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 group.getOwner(), requester, ContentType.GROUP, Operation.DELETE, groupId, group.getName());
@@ -187,6 +192,7 @@ public class GroupDaoJpa {
             Long groupId = removeUserGroupParams.getGroupId();
             Group group = this.groupRepository.findById(groupId)
                     .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
+
             this.authorizationService.checkAuthorizedToOperateOnContent(
                     group.getOwner(), owner, ContentType.GROUP, Operation.UPDATE, groupId);
 
