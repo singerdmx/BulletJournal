@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from 'redux-starter-kit';
 export type MyselfWithAvatar = {
   username: string;
   avatar: string;
+  timezone: string;
 };
 
 export type MyselfApiErrorAction = {
@@ -13,7 +14,8 @@ export type UpdateMyself = {};
 
 let initialState = {
   username: '',
-  avatar: ''
+  avatar: '',
+  timezone: ''
 };
 
 const slice = createSlice({
@@ -21,9 +23,10 @@ const slice = createSlice({
   initialState,
   reducers: {
     myselfDataReceived: (state, action: PayloadAction<MyselfWithAvatar>) => {
-      const { username, avatar } = action.payload;
+      const { username, avatar, timezone } = action.payload;
       state.username = username;
       state.avatar = avatar;
+      if (timezone && timezone.length > 0) state.timezone = timezone;
     },
     myselfApiErrorReceived: (
       state,

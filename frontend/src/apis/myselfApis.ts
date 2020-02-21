@@ -1,7 +1,10 @@
 import { doFetch, doPost } from './api-helper';
 
-export const fetchMyself = () => {
-  return doFetch('/api/myself')
+export const fetchMyself = (expand = false) => {
+  let endpoint = '/api/myself';
+  if (expand) endpoint += '?expand=true';
+
+  return doFetch(endpoint)
     .then(res => res.json())
     .catch(err => {
       throw Error(err);

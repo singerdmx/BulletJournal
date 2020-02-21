@@ -15,11 +15,11 @@ function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
 function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
   try {
     const data = yield call(fetchMyself);
-    // console.log(data);
     yield put(
       myselfActions.myselfDataReceived({
         username: data.name,
-        avatar: data.avatar
+        avatar: data.avatar,
+        timezone: data.timezone
       })
     );
   } catch (error) {
