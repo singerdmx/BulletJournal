@@ -7,7 +7,9 @@ import {
   ProjectCreateAction,
   GetProjectAction,
   UpdateSharedProjectsOrderAction,
-  DeleteProjectAction, PatchProjectAction,
+  DeleteProjectAction,
+  PatchProjectAction,
+  UpdateProjectRelationsAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -16,7 +18,8 @@ import {
   getProject,
   updateSharedProjectsOrder,
   deleteProject,
-  updateProject
+  updateProject,
+  updateProjectRelations
 } from '../../apis/projectApis';
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
@@ -26,11 +29,18 @@ function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
 function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
   try {
     const data = yield call(fetchProjects);
+    const projects = yield data.json();
+    //get etag and split into 2 parts
+    const etags = data.headers.get("Etag")!.split("|");
+    console.log(etags);
+
     // console.log(data);
     yield put(
       projectActions.projectsReceived({
-        owned: data.owned,
-        shared: data.shared
+        owned: projects.owned,
+        shared: projects.shared,
+        ownedProjectsEtag: etags[0],
+        sharedProjectsEtag: etags[1]
       })
     );
   } catch (error) {
@@ -48,7 +58,9 @@ function* addProject(action: PayloadAction<ProjectCreateAction>) {
   }
 }
 
-function* updateSharedProjectOwnersOrder(action: PayloadAction<UpdateSharedProjectsOrderAction>) {
+function* updateSharedProjectOwnersOrder(
+  action: PayloadAction<UpdateSharedProjectsOrderAction>
+) {
   try {
     const { projectOwners } = action.payload;
     yield call(updateSharedProjectsOrder, projectOwners);
@@ -85,18 +97,26 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
 
 function* patchProject(action: PayloadAction<PatchProjectAction>) {
   try {
-    const { projectId, description, groupId, name} = action.payload;
+    const { projectId, description, groupId, name } = action.payload;
     yield call(updateProject, projectId, description, groupId, name);
     yield put(projectActions.projectsUpdate);
-    yield call(
-        message.success,
-        'Successfully updated project'
-    );
+    yield call(message.success, 'Successfully updated project');
   } catch (error) {
     yield call(message.error, `update Project Fail: ${error}`);
   }
 }
 
+function* putProjectRelations(
+  action: PayloadAction<UpdateProjectRelationsAction>
+) {
+  try {
+    const { projects } = action.payload;
+    yield call(updateProjectRelations, projects);
+    yield call(message.success, 'Successfully updated project relations');
+  } catch (error) {
+    yield call(message.error, `update Project relations Fail: ${error}`);
+  }
+}
 
 export default function* projectSagas() {
   yield all([
@@ -108,7 +128,14 @@ export default function* projectSagas() {
     yield takeLatest(projectActions.createProject.type, addProject),
     yield takeLatest(projectActions.deleteProject.type, deleteUserProject),
     yield takeLatest(projectActions.getProject.type, getUserProject),
-    yield takeLatest(projectActions.updateSharedProjectsOrder.type, updateSharedProjectOwnersOrder),
+    yield takeLatest(
+      projectActions.updateSharedProjectsOrder.type,
+      updateSharedProjectOwnersOrder
+    ),
     yield takeLatest(projectActions.patchProject.type, patchProject),
+    yield takeLatest(
+      projectActions.updateProjectRelations.type,
+      putProjectRelations
+    )
   ]);
 }
