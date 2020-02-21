@@ -1,8 +1,7 @@
-package com.bulletjournal.controller.utils;
+package com.bulletjournal.hierarchy;
 
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.exceptions.BadRequestException;
-import com.bulletjournal.hierarchy.HierarchyItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.tuple.Pair;

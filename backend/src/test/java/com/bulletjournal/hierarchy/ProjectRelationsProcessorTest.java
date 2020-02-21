@@ -1,4 +1,4 @@
-package com.bulletjournal.controller.utils;
+package com.bulletjournal.hierarchy;
 
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.repository.models.Group;

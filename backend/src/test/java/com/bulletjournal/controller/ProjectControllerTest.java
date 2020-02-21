@@ -2,7 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.utils.ProjectRelationsProcessorTest;
+import com.bulletjournal.hierarchy.ProjectRelationsProcessorTest;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.JoinGroupEvent;
 import com.google.common.collect.ImmutableList;

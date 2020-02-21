@@ -4,7 +4,7 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.utils.ProjectRelationsProcessor;
+import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
