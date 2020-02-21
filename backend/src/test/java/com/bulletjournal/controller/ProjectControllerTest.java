@@ -61,7 +61,7 @@ public class ProjectControllerTest {
         String projectName = "P0";
         List<GroupsWithOwner> groups = createGroups(expectedOwner);
         Group group = groups.get(0).getGroups().get(0);
-        int count = 1;
+        int count = 6;
         for (String username : Arrays.asList(sampleUsers).subList(0, 3)) {
             group = addUserToGroup(group, username, ++count);
         }
@@ -406,7 +406,7 @@ public class ProjectControllerTest {
         assertEquals(4, groups.size());
         Group g = groups.get(0).getGroups().get(0);
         assertEquals(expectedOwner, g.getOwner());
-        assertEquals(1, g.getUsers().size());
+        assertEquals(6, g.getUsers().size());
         Group invitedToJoin = groups.get(2).getGroups().get(0);
         assertEquals(2, invitedToJoin.getUsers().size());
         assertEquals("Xavier", invitedToJoin.getOwner());
