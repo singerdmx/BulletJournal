@@ -44,12 +44,16 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
       >
         <SubMenu key="todo" title="TODO">
           <Menu.Item key="today">
-            <Icon type="carry-out" />
+            <Icon type="bell" />
             Today
           </Menu.Item>
           <Menu.Item key="next7days">
-            <Icon type="calendar" />
+            <Icon type="carry-out" />
             Next 7 days
+          </Menu.Item>
+          <Menu.Item key="calendarView">
+            <Icon type="calendar" />
+            Calendar View
           </Menu.Item>
         </SubMenu>
         <SubMenu
