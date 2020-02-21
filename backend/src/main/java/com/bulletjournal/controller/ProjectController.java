@@ -3,6 +3,9 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveProjectEvent;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,9 @@ public class ProjectController {
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> getProjects() {
@@ -69,7 +75,10 @@ public class ProjectController {
     @DeleteMapping(PROJECT_ROUTE)
     public void deleteProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.projectDaoJpa.deleteProject(username, projectId);
+        List<Event> events = this.projectDaoJpa.deleteProject(username, projectId);
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new RemoveProjectEvent(events, username));
+        }
     }
 
     @PostMapping(UPDATE_SHARED_PROJECTS_ORDER_ROUTE)

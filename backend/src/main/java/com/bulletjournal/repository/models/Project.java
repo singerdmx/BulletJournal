@@ -28,7 +28,7 @@ public class Project extends OwnedModel {
     @Column(updatable = false, nullable = false)
     private Integer type;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "group_id", nullable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Group group;
