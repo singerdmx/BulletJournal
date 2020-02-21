@@ -23,4 +23,12 @@ public class Note extends ProjectItemModel {
     public void setId(Long id) {
         this.id = id;
     }
+
+public com.bulletjournal.controller.models.Note toPresentationModel() {
+
+    return new com.bulletjournal.controller.models.Note(
+            this.getId(),
+            this.getName(),
+            this.getProject());
+}
 }
