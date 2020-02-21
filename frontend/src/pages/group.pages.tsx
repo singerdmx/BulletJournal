@@ -1,10 +1,11 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
-import { getGroup } from '../features/group/actions';
+import { getGroup, deleteGroup } from '../features/group/actions';
 import { Group, User } from '../features/group/reducer';
+import { MyselfWithAvatar } from '../features/myself/reducer';
 import { IState } from '../store';
-import { Icon, Avatar, Button, List, Badge } from 'antd';
+import { Icon, Avatar, Button, List, Badge, Menu, Dropdown } from 'antd';
 
 type GroupPathParams = {
   groupId: string;
@@ -16,7 +17,9 @@ interface GroupPathProps extends RouteComponentProps<GroupPathParams> {
 
 type GroupProps = {
   group: Group;
+  myself: MyselfWithAvatar;
   getGroup: (groupId: number) => void;
+  deleteGroup: (groupId: number) => void;
 };
 
 function getGroupUserTitle(item: User, group: Group): string {
@@ -55,19 +58,43 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
     }
   }
 
+  handleDelete = (groupId: number) => {
+    this.props.deleteGroup(groupId);
+  };
+
+  handleMenuClick = (menu: any, groupId: number) => {
+    if (menu.key === 'delete') {
+      this.handleDelete(groupId);
+    }
+  };
+
   render() {
     const { group } = this.props;
     return (
       <div className="group-page">
         <div className="group-title">
           <h3>{`Group "${group.name}"`}</h3>
-          <div className="group-operation">
+          <h3 className="group-operation">
             <Icon type="user" />
             {group.users && group.users.length}
-            <Button type="link" className="group-setting">
-              <Icon type="setting" title="Edit Group" />
-            </Button>
-          </div>
+            {group.owner === this.props.myself.username && (
+              <Dropdown
+                overlay={
+                  <Menu onClick={menu => this.handleMenuClick(menu, group.id)}>
+                    <Menu.Item key="edit">Edit</Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item key="delete">Delete</Menu.Item>
+                  </Menu>
+                }
+                trigger={['click']}
+                placement="bottomLeft"
+              >
+                <Button type="link" className="group-setting">
+                  <Icon type="setting" title="Edit Group" />
+                </Button>
+              </Dropdown>
+            )}
+          </h3>
         </div>
         <div className="group-users">
           <List
@@ -90,7 +117,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                       size="small"
                       title={item.accepted ? 'Remove' : 'Cancel Invitation'}
                     >
-                        <Icon type="close" />
+                      <Icon type="close" />
                     </Button>
                   )}
                 </List.Item>
@@ -107,7 +134,8 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  group: state.group.group
+  group: state.group.group,
+  myself: state.myself
 });
 
-export default connect(mapStateToProps, { getGroup })(GroupPage);
+export default connect(mapStateToProps, { getGroup, deleteGroup })(GroupPage);
