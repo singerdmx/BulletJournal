@@ -28,7 +28,7 @@ public class Transaction extends ProjectItemModel {
 
     @NotNull
     @Column
-    private Integer amount;
+    private Double amount;
 
     @NotNull
     @Column
@@ -50,11 +50,11 @@ public class Transaction extends ProjectItemModel {
         this.payer = payer;
     }
 
-    public Integer getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
