@@ -74,15 +74,15 @@ public class ProjectControllerTest {
         addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
         removeUsersFromGroup(group, Arrays.asList(sampleUsers).subList(0, 5), 1);
 
-        Project p1 = createProject(projectName, expectedOwner);
+        Project p1 = createProject(projectName, expectedOwner, group);
         p1 = updateProject(p1);
 
         // create other projects
-        Project p2 = createProject("P2", expectedOwner);
-        Project p3 = createProject("P3", expectedOwner);
-        Project p4 = createProject("P4", expectedOwner);
-        Project p5 = createProject("P5", expectedOwner);
-        Project p6 = createProject("P6", expectedOwner);
+        Project p2 = createProject("P2", expectedOwner, group);
+        Project p3 = createProject("P3", expectedOwner, group);
+        Project p4 = createProject("P4", expectedOwner, group);
+        Project p5 = createProject("P5", expectedOwner, group);
+        Project p6 = createProject("P6", expectedOwner, group);
         updateProjectRelations(p1, p2, p3, p4, p5, p6);
 
         deleteProject(p1);
@@ -337,7 +337,7 @@ public class ProjectControllerTest {
         assertEquals(projectNewName, p1.getName());
         assertEquals(expectedOwner, p1.getOwner());
         assertEquals(ProjectType.LEDGER, p1.getProjectType());
-        assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, p1.getGroup().getName());
+        assertEquals("G1", p1.getGroup().getName());
         assertEquals(expectedOwner, p1.getGroup().getOwner());
         assertEquals("d2", p1.getDescription());
         return p1;
@@ -569,8 +569,9 @@ public class ProjectControllerTest {
         return created;
     }
 
-    private Project createProject(String projectName, String expectedOwner) {
-        CreateProjectParams project = new CreateProjectParams(projectName, ProjectType.LEDGER, "d1");
+    private Project createProject(String projectName, String expectedOwner, Group g) {
+        CreateProjectParams project = new CreateProjectParams(
+                projectName, ProjectType.LEDGER, "d1", g.getId());
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
@@ -581,7 +582,7 @@ public class ProjectControllerTest {
         assertEquals(projectName, created.getName());
         assertEquals(expectedOwner, created.getOwner());
         assertEquals(ProjectType.LEDGER, created.getProjectType());
-        assertEquals(com.bulletjournal.repository.models.Group.DEFAULT_NAME, created.getGroup().getName());
+        assertEquals("G1", created.getGroup().getName());
         assertEquals(expectedOwner, created.getGroup().getOwner());
         assertEquals("d1", created.getDescription());
         return created;

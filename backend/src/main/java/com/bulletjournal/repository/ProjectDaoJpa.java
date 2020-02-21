@@ -146,12 +146,14 @@ public class ProjectDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project create(CreateProjectParams createProjectParams, String owner) {
+        Long groupId = createProjectParams.getGroupId();
         Project project = new Project();
         project.setDescription(createProjectParams.getDescription());
         project.setOwner(owner);
         project.setName(createProjectParams.getName());
         project.setType(createProjectParams.getProjectType().getValue());
-        project.setGroup(this.groupRepository.findByNameAndOwner(Group.DEFAULT_NAME, owner).get(0));
+        project.setGroup(this.groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " cannot be found")));
         this.projectRepository.save(project);
         return project;
     }

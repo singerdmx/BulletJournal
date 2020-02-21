@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "groups",
-        indexes = {@Index(name = "group_name_owner_index", columnList = "name,owner")},
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"owner", "name"})
         })

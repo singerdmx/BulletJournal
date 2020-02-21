@@ -15,16 +15,21 @@ public class CreateProjectParams {
 
     private String description;
 
+    @NotNull
+    private Long groupId;
+
     public CreateProjectParams() {
     }
 
     public CreateProjectParams(
             @NotBlank @Size(min = 1, max = 100) String name,
             @NotNull ProjectType projectType,
-            String description) {
+            String description,
+            Long groupId) {
         this.name = name;
         this.projectType = projectType;
         this.description = description;
+        this.groupId = groupId;
     }
 
     public String getName() {
@@ -49,5 +54,13 @@ public class CreateProjectParams {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 }
