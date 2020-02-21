@@ -89,6 +89,9 @@ public class GroupDaoJpa {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 group.getOwner(), requester, ContentType.GROUP, Operation.UPDATE, groupId);
 
+        if (Group.DEFAULT_NAME.equals(group.getName()) && updateGroupParams.hasName()) {
+            throw new BadRequestException("Default Group cannot be renamed");
+        }
         DaoHelper.updateIfPresent(
                 updateGroupParams.hasName(), updateGroupParams.getName(), (value) -> group.setName(value));
 

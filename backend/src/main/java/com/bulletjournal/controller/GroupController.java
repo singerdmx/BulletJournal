@@ -61,7 +61,7 @@ public class GroupController {
 
     @GetMapping(GROUP_ROUTE)
     public Group getGroup(@NotNull @PathVariable Long groupId) {
-        return addUserAvatarToGroup(this.groupDaoJpa.getGroup(groupId).toVerbosePresentationModel());
+        return sortGroup(addUserAvatarToGroup(this.groupDaoJpa.getGroup(groupId).toVerbosePresentationModel()));
     }
 
     @GetMapping(GROUPS_ROUTE)
@@ -83,42 +83,50 @@ public class GroupController {
             accepts.put(group, self.isAccepted());
         }
         List<GroupsWithOwner> result = new ArrayList<>();
-        result.add(new GroupsWithOwner(username, m.get(username)));
+        result.add(new GroupsWithOwner(username, sortGroups(accepts, m.get(username))));
         for (Map.Entry<String, List<Group>> entry : m.entrySet()) {
             if (Objects.equals(entry.getKey(), username)) {
                 continue;
             }
-            List<Group> l = entry.getValue();
-            // sort by group name, but accepted group first
-            Collections.sort(l, (a, b) -> {
-                if (Objects.equals(accepts.get(a), accepts.get(b))) {
-                    return a.getName().compareTo(b.getName());
-                }
-
-                return accepts.get(a) ? 1 : -1;
-            });
-            for (Group group : l) {
-                // sort by username
-                Collections.sort(group.getUsers(), (a, b) -> {
-                    if (Objects.equals(a.isAccepted(), b.isAccepted())) {
-                        return a.getName().compareTo(b.getName());
-                    }
-
-                    return a.isAccepted() ? 1 : -1;
-                });
-                // move owner to the first
-                UserGroup ownerUserGroup = group.getUsers().stream()
-                        .filter(u -> Objects.equals(group.getOwner(), u.getName())).findFirst().get();
-                group.getUsers().remove(ownerUserGroup);
-                group.getUsers().add(0, ownerUserGroup);
-            }
-            result.add(new GroupsWithOwner(entry.getKey(), l));
+            result.add(new GroupsWithOwner(entry.getKey(), sortGroups(accepts, entry.getValue())));
         }
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(groupsEtag);
 
         return ResponseEntity.ok().headers(responseHeader).body(result);
+    }
+
+    private List<Group> sortGroups(Map<Group, Boolean> accepts, List<Group> l) {
+        // sort by group name, but accepted group first
+        Collections.sort(l, (a, b) -> {
+            if (!Objects.equals(accepts.get(a), accepts.get(b))) {
+                return accepts.get(a) ? -1 : 1;
+            }
+
+            return a.getName().compareTo(b.getName());
+        });
+        for (Group group : l) {
+            sortGroup(group);
+        }
+        return l;
+    }
+
+    private Group sortGroup(Group group) {
+        // sort by username
+        Collections.sort(group.getUsers(), (a, b) -> {
+            if (!Objects.equals(a.isAccepted(), b.isAccepted())) {
+                return a.isAccepted() ? -1 : 1;
+            }
+
+            return a.getName().compareTo(b.getName());
+        });
+        // move owner to the first
+        UserGroup ownerUserGroup = group.getUsers().stream()
+                .filter(u -> Objects.equals(group.getOwner(), u.getName())).findFirst().get();
+        group.getUsers().remove(ownerUserGroup);
+        group.getUsers().add(0, ownerUserGroup);
+        return group;
     }
 
     private List<Group> addUserAvatarToGroups(List<Group> groups) {
