@@ -19,6 +19,7 @@ export const getProject = (projectId: number) => {
 
 export const createProject = (
   description: string,
+  groupId: number,
   name: string,
   projectType: string
 ) => {

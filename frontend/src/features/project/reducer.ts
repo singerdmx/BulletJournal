@@ -18,6 +18,7 @@ export type UpdateProjects = {};
 
 export type ProjectCreateAction = {
   description: string;
+  groupId: number,
   name: string;
   projectType: ProjectType;
 };

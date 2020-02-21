@@ -10,6 +10,7 @@ type ProjectsProps = {
   updateProjects: () => void;
   createProjectByName: (
     description: string,
+    groupId: number,
     name: string,
     projectType: ProjectType
   ) => void;
@@ -26,6 +27,7 @@ class ProjectList extends React.Component<ProjectsProps> {
         onClick={() =>
           this.props.createProjectByName(
             'aaaaaaabbbbbbbb',
+            0,
             'aaaaas',
             ProjectType.LEDGER
           )

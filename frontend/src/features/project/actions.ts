@@ -4,11 +4,13 @@ import { ProjectType } from './constants';
 export const updateProjects = () => actions.projectsUpdate({});
 export const createProjectByName = (
   description: string,
+  groupId: number,
   name: string,
   projectType: ProjectType
 ) =>
   actions.createProject({
     description: description,
+    groupId: groupId,
     name: name,
     projectType: projectType
   });

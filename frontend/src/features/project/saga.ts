@@ -50,8 +50,8 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
 
 function* addProject(action: PayloadAction<ProjectCreateAction>) {
   try {
-    const { description, name, projectType } = action.payload;
-    const data = yield call(createProject, description, name, projectType);
+    const { description, groupId, name, projectType } = action.payload;
+    const data = yield call(createProject, description, groupId, name, projectType);
     yield put(projectActions.projectReceived({ project: data }));
   } catch (error) {
     yield call(message.error, `Project Create Fail: ${error}`);
