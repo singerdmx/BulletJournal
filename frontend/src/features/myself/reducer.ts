@@ -13,6 +13,11 @@ export type MyselfApiErrorAction = {
 
 export type UpdateMyself = {};
 
+export type PatchMyself = {
+  timezone: string;
+  before: Before;
+};
+
 export type Before = {
   text: string;
   value: number;
@@ -40,7 +45,8 @@ const slice = createSlice({
       state,
       action: PayloadAction<MyselfApiErrorAction>
     ) => state,
-    myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state
+    myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state,
+    patchMyself: (state, action: PayloadAction<PatchMyself>) => state
   }
 });
 
