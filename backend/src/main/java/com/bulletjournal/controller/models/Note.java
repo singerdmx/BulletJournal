@@ -2,28 +2,11 @@ package com.bulletjournal.controller.models;
 
 import com.bulletjournal.repository.models.Project;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.Objects;
 
 public class Note {
     private Long id;
-
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String assignedTo;
-
-    @NotBlank
-    @Size(min = 10, max = 10)
-    private String dueDate;
-
-    @NotBlank
-    @Size(min = 5, max = 5)
-    private String dueTime;
-
-    @NotBlank
-    private String timezone;
 
     @NotNull
     private String name;
@@ -72,13 +55,12 @@ public class Note {
         if (o == null || getClass() != o.getClass()) return false;
         Note note = (Note) o;
         return Objects.equals(id, note.id) &&
-                Objects.equals(timezone, note.timezone) &&
                 Objects.equals(name, note.name) &&
                 Objects.equals(projectId, note.projectId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, timezone, name, projectId);
+        return Objects.hash(id, name, projectId);
     }
 }
