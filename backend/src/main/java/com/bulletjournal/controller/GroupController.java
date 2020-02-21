@@ -70,6 +70,7 @@ public class GroupController {
     public ResponseEntity<List<GroupsWithOwner>> getGroups() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Group> groups = this.groupDaoJpa.getGroups(username);
+        Long defaultGroupId = groups.get(0).getId();
         String groupsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE,
                 groups);
@@ -85,7 +86,12 @@ public class GroupController {
             accepts.put(group, self.isAccepted());
         }
         List<GroupsWithOwner> result = new ArrayList<>();
-        result.add(new GroupsWithOwner(username, sortGroups(accepts, m.get(username))));
+        List<Group> l = sortGroups(accepts, m.get(username));
+        // move defaultGroup to first
+        Group defaultGroup = l.stream().filter(g -> defaultGroupId.equals(g.getId())).findFirst().get();
+        l.remove(defaultGroup);
+        l.add(0, defaultGroup);
+        result.add(new GroupsWithOwner(username, l));
         for (Map.Entry<String, List<Group>> entry : m.entrySet()) {
             if (Objects.equals(entry.getKey(), username)) {
                 continue;

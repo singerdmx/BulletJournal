@@ -23,6 +23,9 @@ public class Group extends OwnedModel {
     )
     private Long id;
 
+    @Column(name = "default", nullable = false, updatable = false)
+    private boolean defaultGroup = false;
+
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     Set<UserGroup> users = new HashSet<>();
 
@@ -58,6 +61,15 @@ public class Group extends OwnedModel {
             this.projects.add(project);
             project.setGroup(this);
         }
+    }
+
+
+    public boolean isDefaultGroup() {
+        return defaultGroup;
+    }
+
+    public void setDefaultGroup(boolean defaultGroup) {
+        this.defaultGroup = defaultGroup;
     }
 
     public com.bulletjournal.controller.models.Group toPresentationModel() {

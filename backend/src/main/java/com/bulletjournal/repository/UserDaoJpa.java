@@ -41,6 +41,7 @@ public class UserDaoJpa {
         Group group = new Group();
         group.setName(Group.DEFAULT_NAME);
         group.setOwner(name);
+        group.setDefaultGroup(true);
         group = this.groupRepository.save(group);
 
         user.addGroup(group);

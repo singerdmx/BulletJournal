@@ -1,126 +1,129 @@
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (0, '2020-02-11 05:01:54.960000', '2020-02-11 05:01:54.960000', 'BulletJournal', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (0, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Default', 'BulletJournal');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (0, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Default', 'BulletJournal', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 0, true);
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (99, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Bullet', 'BulletJournal', false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (99, 0, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (1, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Xavier', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (1, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Xavier');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (1, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Xavier', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (1, 1, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (2, '2020-02-11 14:34:49.363000', '2020-02-11 14:34:49.363000', 'bbs1024', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (2, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'bbs1024');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (2, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'bbs1024', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (2, 2, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (3, '2020-02-11 14:35:16.334000', '2020-02-11 14:35:16.334000', 'ccc', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (3, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'ccc');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (3, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'ccc', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (3, 3, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (4, '2020-02-11 14:35:44.218000', '2020-02-11 14:35:44.218000', 'Thinker', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (4, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Thinker');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (4, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Thinker', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (4, 4, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (5, '2020-02-11 14:35:50.358000', '2020-02-11 14:35:50.358000', 'Joker', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (5, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Joker');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (5, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Joker', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (5, 5, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (6, '2020-02-11 14:36:40.548000', '2020-02-11 14:36:40.548000', 'mqm', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (6, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'mqm');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (6, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'mqm', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (6, 6, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (7, '2020-02-11 14:36:52.566000', '2020-02-11 14:36:52.566000', 'hero', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (7, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'hero');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (7, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'hero', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (7, 7, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (8, '2020-02-11 14:37:14.582000', '2020-02-11 14:37:14.582000', 'bean', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (8, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'bean');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (8, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'bean', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (8, 8, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (9, '2020-02-11 14:37:21.339000', '2020-02-11 14:37:21.339000', 'xlf', null, 'America/Los_Angeles', 1);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (9, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'xlf');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (9, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'xlf', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (9, 9, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (10, '2020-02-11 14:37:30.421000', '2020-02-11 14:37:30.421000', '999999', null, 'America/Los_Angeles', 2);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (10, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', '999999');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (10, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', '999999', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (10, 10, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (11, '2020-02-11 14:37:41.698000', '2020-02-11 14:37:41.698000', '0518', null, 'America/Los_Angeles', 3);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (11, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', '0518');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (11, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', '0518', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (11, 11, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (12, '2020-02-11 14:37:52.109000', '2020-02-11 14:37:52.109000', 'Scarlet', null, 'America/Los_Angeles', 0);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (12, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Scarlet');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (12, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Scarlet', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (12, 12, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task)
 VALUES (13, '2020-02-11 14:38:17.230000', '2020-02-11 14:38:17.230000', 'lsx9981', null, 'America/Los_Angeles', 4);
-INSERT INTO public.groups (id, created_at, updated_at, name, owner)
-VALUES (13, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'lsx9981');
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default)
+VALUES (13, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'lsx9981', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (13, 13, true);
 
 -- Join Group - Xavier invites BulletJournal to Join Group "Default" ID 1
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (1, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (1, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (0, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 1, 'Xavier', 'BulletJournal', 'Xavier invited you to join Group Default', 'JoinGroupEvent');
 
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (2, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (2, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (1, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 2, 'bbs1024', 'BulletJournal', 'bbs1024 invited you to join Group Default', 'JoinGroupEvent');
 
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (3, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (3, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (2, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 3, 'ccc', 'BulletJournal', 'ccc invited you to join Group Default', 'JoinGroupEvent');
 
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (4, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (4, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (3, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 4, 'Thinker', 'BulletJournal', 'Thinker invited you to join Group Default', 'JoinGroupEvent');
 
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (5, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (5, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (4, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 5, 'Joker', 'BulletJournal', 'Joker invited you to join Group Default', 'JoinGroupEvent');
 
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (6, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (6, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (5, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 6, 'mqm', 'BulletJournal', 'mqm invited you to join Group Default', 'JoinGroupEvent');
 
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (7, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (7, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (6, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 7, 'hero', 'BulletJournal', 'hero invited you to join Group Default', 'JoinGroupEvent');
 
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (8, 0, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (8, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
 VALUES (7, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 8, 'bean', 'BulletJournal', 'bean invited you to join Group Default', 'JoinGroupEvent');
 
 -- My default group
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 4, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 4, true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 5, true);
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 6, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 6, true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 7, true);
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 8, false);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 8, true);
 
 -- DeleteGroupEvent
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)

@@ -34,8 +34,9 @@ public class NotificationCleaner {
     @PostConstruct
     public void postConstruct() {
         int intervalInSeconds = notificationConfig.getCleaner().getIntervalInSeconds();
-        if(intervalInSeconds <= 0)
-            throw new IllegalArgumentException();
+        if (intervalInSeconds <= 0) {
+            throw new IllegalArgumentException("Invalid intervalInSeconds: " + intervalInSeconds);
+        }
 
         this.executorService.scheduleAtFixedRate(this::cleanNotification, 0, intervalInSeconds, TimeUnit.SECONDS);
     }

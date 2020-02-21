@@ -89,9 +89,6 @@ public class GroupDaoJpa {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 group.getOwner(), requester, ContentType.GROUP, Operation.UPDATE, groupId);
 
-        if (Group.DEFAULT_NAME.equals(group.getName()) && updateGroupParams.hasName()) {
-            throw new BadRequestException("Default Group cannot be renamed");
-        }
         DaoHelper.updateIfPresent(
                 updateGroupParams.hasName(), updateGroupParams.getName(), (value) -> group.setName(value));
 
@@ -103,8 +100,17 @@ public class GroupDaoJpa {
         User user = this.userDaoJpa.getByName(owner);
         return user.getGroups()
                 .stream()
-                .map(userGroup -> {
-                    Group group = userGroup.getGroup();
+                .map(userGroup -> userGroup.getGroup())
+                .sorted((a, b) -> {
+                    if (a.isDefaultGroup() && a.getOwner().equals(owner)) {
+                        return -1;
+                    }
+                    if (b.isDefaultGroup() && b.getOwner().equals(owner)) {
+                        return 1;
+                    }
+                    return Long.compare(a.getId(), b.getId());
+                })
+                .map(group -> {
                     com.bulletjournal.controller.models.Group g = group.toPresentationModel();
                     g.setUsers(group.getUsers()
                             .stream()
@@ -113,7 +119,7 @@ public class GroupDaoJpa {
                             .collect(Collectors.toList()));
                     return g;
                 })
-                .sorted(Comparator.comparingLong(com.bulletjournal.controller.models.Group::getId))
+
                 .collect(Collectors.toList());
     }
 

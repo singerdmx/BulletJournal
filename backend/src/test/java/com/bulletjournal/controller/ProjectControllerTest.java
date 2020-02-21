@@ -407,13 +407,16 @@ public class ProjectControllerTest {
         Group g = groups.get(0).getGroups().get(0);
         assertEquals(expectedOwner, g.getOwner());
         assertEquals(6, g.getUsers().size());
+        Group secondOwnedGroup = groups.get(0).getGroups().get(1);
+        assertEquals(expectedOwner, secondOwnedGroup.getOwner());
+        assertEquals(1, secondOwnedGroup.getUsers().size());
         Group invitedToJoin = groups.get(2).getGroups().get(0);
         assertEquals(2, invitedToJoin.getUsers().size());
         assertEquals("Xavier", invitedToJoin.getOwner());
         assertEquals("Xavier", invitedToJoin.getUsers().get(0).getName());
         assertEquals(true, invitedToJoin.getUsers().get(0).isAccepted());
         assertEquals(expectedOwner, invitedToJoin.getUsers().get(1).getName());
-        assertEquals(false, invitedToJoin.getUsers().get(1).isAccepted());
+        assertEquals(true, invitedToJoin.getUsers().get(1).isAccepted());
         Group joinedGroup = groups.get(1).getGroups().get(0);
         assertEquals(2, joinedGroup.getUsers().size());
         assertEquals("Scarlet", joinedGroup.getOwner());
@@ -426,7 +429,7 @@ public class ProjectControllerTest {
         Group g2 = createGroup("G2", owner);
         Group g3 = createGroup("G3", owner);
         getGroups(ImmutableList.of(
-                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, g1, g2, g3)),
+                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, secondOwnedGroup, g1, g2, g3)),
                 new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
                 new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
                 new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
@@ -455,7 +458,7 @@ public class ProjectControllerTest {
                 g3.getId());
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
         groups = getGroups(ImmutableList.of(
-                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, g1, g2)),
+                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, secondOwnedGroup, g1, g2)),
                 new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
                 new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
                 new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
@@ -469,7 +472,7 @@ public class ProjectControllerTest {
                 g.getId());
         assertEquals(HttpStatus.UNAUTHORIZED, deleteResponse.getStatusCode());
         groups = getGroups(ImmutableList.of(
-                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, g1, g2)),
+                new GroupsWithOwner(expectedOwner, ImmutableList.of(g, secondOwnedGroup, g1, g2)),
                 new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
                 new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
                 new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
