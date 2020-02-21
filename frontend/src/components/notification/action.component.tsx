@@ -2,6 +2,7 @@ import React from 'react';
 import { Icon } from 'antd';
 import { answerNotice } from '../../features/notification/actions';
 import { connect } from 'react-redux';
+import { ActionType } from '../../features/notification/constants';
 
 type actionsProps = {
   actions: string[];
@@ -37,11 +38,11 @@ class Actions extends React.Component<actionsProps> {
           let iconType = 'delete';
           let iconColor = '#ff0000';
           switch (action) {
-            case 'Accept':
+            case ActionType.Accept:
               iconType = 'check-circle';
               iconColor = '#52c41a';
               break;
-            case 'Decline':
+            case ActionType.Decline:
               iconType = 'close-circle';
               iconColor = '#eb2f96';
               break;

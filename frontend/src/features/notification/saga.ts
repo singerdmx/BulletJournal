@@ -16,6 +16,7 @@ import { updateGroups } from '../group/actions';
 import { Notification } from './interface';
 
 import { IState } from '../../store';
+import { EventType, ActionType } from './constants';
 
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
@@ -46,7 +47,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     yield put(
       notificationsActions.notificationsReceived({ notifications: notifications, etag: '' })
     );
-    if (type === 'JoinGroupEvent') {
+    if (type === EventType.JoinGroupEvent && action === ActionType.Decline) {
       yield put(updateGroups());
     }
     yield call(message.success, 'User answers notification successful');
