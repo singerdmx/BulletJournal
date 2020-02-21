@@ -111,23 +111,26 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                     </Badge>
                     {getGroupUserSpan(item, group)}
                   </div>
-                  {item.name !== group.owner && (
-                    <Button
-                      type="link"
-                      size="small"
-                      title={item.accepted ? 'Remove' : 'Cancel Invitation'}
-                    >
-                      <Icon type="close" />
-                    </Button>
-                  )}
+                  {item.name !== group.owner &&
+                    group.owner === this.props.myself.username && (
+                      <Button
+                        type="link"
+                        size="small"
+                        title={item.accepted ? 'Remove' : 'Cancel Invitation'}
+                      >
+                        <Icon type="close" />
+                      </Button>
+                    )}
                 </List.Item>
               );
             }}
           />
         </div>
-        <div className="group-footer">
-          <Button type="primary" icon="plus" shape="round" title="Add User" />
-        </div>
+        {group.owner === this.props.myself.username && (
+          <div className="group-footer">
+            <Button type="primary" icon="plus" shape="round" title="Add User" />
+          </div>
+        )}
       </div>
     );
   }
