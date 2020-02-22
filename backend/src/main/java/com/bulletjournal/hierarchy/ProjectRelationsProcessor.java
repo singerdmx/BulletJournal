@@ -9,7 +9,6 @@ import java.util.*;
 public class ProjectRelationsProcessor {
 
     private static final String SUB_PROJECTS_KEY = "subProjects";
-    private static final String SUB_PROJECTS_KEY_REPLACEMENT = "s";
     private static final Gson GSON = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
 
@@ -17,7 +16,7 @@ public class ProjectRelationsProcessor {
             Map<Long, com.bulletjournal.repository.models.Project> projectMap, String projectRelations,
             Set<Long> selectedProjects) {
         Project[] list = GSON.fromJson(
-                projectRelations.replace(SUB_PROJECTS_KEY_REPLACEMENT, SUB_PROJECTS_KEY), Project[].class);
+                projectRelations.replace(HierarchyItem.SUB_ITEMS_KEY_REPLACEMENT, SUB_PROJECTS_KEY), Project[].class);
         List<Project> projects = new ArrayList<>();
         for (Project project : list) {
             if (merge(projectMap, project, selectedProjects) > 0) {
