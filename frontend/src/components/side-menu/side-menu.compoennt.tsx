@@ -30,6 +30,10 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
     }
   };
 
+  onGroupsClick = (menu: any) => {
+    this.props.history.push(`/${menu.key}`);
+  }
+
   componentDidMount() {
     this.props.updateGroups();
   }
@@ -67,6 +71,7 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
         ></SubMenu>
         <SubMenu
           key="groups"
+          onTitleClick={this.onGroupsClick}
           title={
             <span>
               <Icon type="team" />
