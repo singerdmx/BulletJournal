@@ -55,4 +55,10 @@ public class NoteDaoJpa {
         return this.noteRepository.save(note);
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Note getNote(Long id) {
+        return this.noteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Note " + id + " not found"));
+    }
+
 }
