@@ -4,7 +4,6 @@ import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.repository.models.Group;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 import java.util.*;
@@ -15,9 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests {@link ProjectRelationsProcessor}
+ * Tests {@link HierarchyProcessor}
  */
-public class ProjectRelationsProcessorTest {
+public class HierarchyProcessorProcessorTest {
 
     public static List<Project> createSampleProjectRelations(
             Project p1, Project p2, Project p3, Project p4, Project p5, Project p6) {
@@ -45,7 +44,7 @@ public class ProjectRelationsProcessorTest {
     }
 
     /**
-     * Tests {@link ProjectRelationsProcessor#removeTargetProject(Project, Project, List)}
+     * Tests {@link HierarchyProcessor#removeTargetItem(String, Long)}
      */
     @Test
     public void testRemoveTargetProject() {
@@ -71,21 +70,20 @@ public class ProjectRelationsProcessorTest {
          *   |
          *    -- p6
          */
-        List<Long> subProjects = ProjectRelationsProcessor.findSubProjects(p2);
+        String relations = ProjectRelationsProcessor.processRelations(projectHierarchy);
+        List<Long> subProjects = HierarchyProcessor.getSubItems(relations, p2.getId());
         Collections.sort(subProjects);
         assertEquals(ImmutableList.of(2L, 3L), subProjects);
 
         String projectRelations = ProjectRelationsProcessor.processRelations(projectHierarchy);
-        Pair<Project, List<Project>> result = ProjectRelationsProcessor
-                .removeTargetProject(projectRelations, p2.getId());
-        projectHierarchy = result.getRight();
-        assertEquals(2, projectHierarchy.size());
-        assertEquals(1L, projectHierarchy.get(0).getId().longValue());
-        assertEquals(1, projectHierarchy.get(0).getSubProjects().size());
-        assertEquals(4L, projectHierarchy.get(0).getSubProjects().get(0).getId().longValue());
-        assertEquals(5L, projectHierarchy.get(1).getId().longValue());
-        assertEquals(1, projectHierarchy.get(1).getSubProjects().size());
-        assertEquals(6L, projectHierarchy.get(1).getSubProjects().get(0).getId().longValue());
+        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(projectRelations, p2.getId());
+        assertEquals(2, hierarchy.size());
+        assertEquals(1L, hierarchy.get(0).getId().longValue());
+        assertEquals(1, hierarchy.get(0).getS().size());
+        assertEquals(4L, hierarchy.get(0).getS().get(0).getId().longValue());
+        assertEquals(5L, hierarchy.get(1).getId().longValue());
+        assertEquals(1, hierarchy.get(1).getS().size());
+        assertEquals(6L, hierarchy.get(1).getS().get(0).getId().longValue());
     }
 
     /**

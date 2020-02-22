@@ -59,7 +59,7 @@ public class HierarchyProcessor {
         }
 
         for (HierarchyItem item : cur.getS()) {
-            parent[0] = item;
+            parent[0] = cur;
             HierarchyItem found = findItem(item, targetId, parent);
             if (found != null) {
                 return found;

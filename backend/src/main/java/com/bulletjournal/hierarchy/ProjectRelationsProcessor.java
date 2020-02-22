@@ -1,14 +1,10 @@
 package com.bulletjournal.hierarchy;
 
 import com.bulletjournal.controller.models.Project;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ProjectRelationsProcessor {
 
@@ -16,72 +12,6 @@ public class ProjectRelationsProcessor {
     private static final String SUB_PROJECTS_KEY_REPLACEMENT = "s";
     private static final Gson GSON = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
-
-    public static Pair<Project, List<Project>> removeTargetProject(String projectRelations, Long projectId) {
-        Triple<Project, Project, List<Project>> found = findProject(projectRelations, projectId);
-        Project target = found.getLeft();
-        Project targetParent = found.getMiddle();
-        List<Project> projectHierarchy = found.getRight();
-
-        if (targetParent == null) {
-            // target is at root level
-            projectHierarchy = projectHierarchy.stream()
-                    .filter(p -> !target.getId().equals(p.getId())).collect(Collectors.toList());
-        } else {
-            targetParent.setSubProjects(
-                    targetParent.getSubProjects().stream()
-                            .filter(p -> !target.getId().equals(p.getId())).collect(Collectors.toList()));
-        }
-        return Pair.of(target, projectHierarchy);
-    }
-
-    public static List<Long> findSubProjects(Project parent) {
-        List<Long> result = new ArrayList<>();
-        findSubProjects(parent, result);
-        return result;
-    }
-
-    private static void findSubProjects(Project cur, List<Long> result) {
-        result.add(cur.getId());
-
-        for (Project subProject : cur.getSubProjects()) {
-            findSubProjects(subProject, result);
-        }
-    }
-
-    /**
-     * @return <foundProject, its parent project, whole project hierarchy>
-     */
-    private static Triple<Project, Project, List<Project>> findProject(String projectRelations, Long projectId) {
-        Project[] parent = new Project[1];
-        List<Project> list = Arrays.asList(GSON.fromJson(
-                projectRelations.replace(SUB_PROJECTS_KEY_REPLACEMENT, SUB_PROJECTS_KEY), Project[].class));
-
-        for (Project project : list) {
-            Project found = findProject(project, projectId, parent);
-            if (found != null) {
-                return Triple.of(found, parent[0], list);
-            }
-        }
-
-        throw new BadRequestException("Project " + projectId + " not found in " + projectRelations);
-    }
-
-    private static Project findProject(Project project, Long projectId, Project[] parent) {
-        if (Objects.equals(projectId, project.getId())) {
-            return project;
-        }
-
-        for (Project subProject : project.getSubProjects()) {
-            parent[0] = project;
-            Project found = findProject(subProject, projectId, parent);
-            if (found != null) {
-                return found;
-            }
-        }
-
-        return null;
-    }
 
     public static List<Project> processRelations(
             Map<Long, com.bulletjournal.repository.models.Project> projectMap, String projectRelations,
