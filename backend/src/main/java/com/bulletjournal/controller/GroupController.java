@@ -63,7 +63,12 @@ public class GroupController {
 
     @GetMapping(GROUP_ROUTE)
     public Group getGroup(@NotNull @PathVariable Long groupId) {
-        return sortGroup(addUserAvatarToGroup(this.groupDaoJpa.getGroup(groupId).toVerbosePresentationModel()));
+        com.bulletjournal.repository.models.Group g = this.groupDaoJpa.getGroup(groupId);
+        Group group = sortGroup(addUserAvatarToGroup(g.toVerbosePresentationModel()));
+        if (g.isDefaultGroup()) {
+            group.setDefault(true);
+        }
+        return group;
     }
 
     @GetMapping(GROUPS_ROUTE)

@@ -173,8 +173,9 @@ public class GroupDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Group getGroup(Long id) {
-        return this.groupRepository.findById(id)
+        Group group = this.groupRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + id + " not found"));
+        return group;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
