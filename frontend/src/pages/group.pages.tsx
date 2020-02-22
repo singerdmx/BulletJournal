@@ -74,7 +74,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
       <div className='group-page'>
         <div className='group-page-card'>
           <div className='group-title'>
-            <h3>{`Group "${group.name}"`}</h3>
+            <h3>{group.name}</h3>
             <h3 className='group-operation'>
               <Icon type='user' />
               {group.users && group.users.length}

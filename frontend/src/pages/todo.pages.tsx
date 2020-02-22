@@ -1,7 +1,8 @@
 import React from 'react';
 import TodoItem from '../components/todo-item/todo-item.component';
-import { List, Icon, Modal, Form, Input } from 'antd';
+import { List, Icon, Modal, Form, Input, Checkbox, DatePicker } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
+import moment from 'moment';
 
 type TdoRouteParams = {
   category: string;
@@ -14,7 +15,12 @@ type todoState = {
   showForm: boolean;
 };
 
+const { MonthPicker, RangePicker } = DatePicker;
 const fakeData = ['Frontend', 'Bakcend', 'UI designer'];
+const dateFormat = 'YYYY/MM/DD';
+const monthFormat = 'YYYY/MM';
+const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY'];
+
 class TodoPage extends React.Component<TodoRouteProps, todoState> {
   state: todoState = {
     showForm: false
@@ -37,9 +43,17 @@ class TodoPage extends React.Component<TodoRouteProps, todoState> {
       <div className="todo">
         <div className="todo-header">
           <h2>{this.props.match.params.category.toUpperCase()} </h2>
+          <Checkbox><Icon type="carry-out" title="TODO"/></Checkbox>
+          <Checkbox><Icon type="account-book" title="Ledger"/></Checkbox>
           <h2 className="add-todo-button" onClick={this.showForm}>
             <Icon type="plus" />
           </h2>
+        </div>
+        <div>
+          <RangePicker
+            defaultValue={[moment('2015/01/01', dateFormat), moment('2015/01/01', dateFormat)]}
+            format={dateFormat}
+          />
         </div>
         <div className="todo-list">
           <List
