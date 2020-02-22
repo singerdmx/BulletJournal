@@ -4,6 +4,8 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.hierarchy.HierarchyItem;
+import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
@@ -14,7 +16,6 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -226,18 +227,16 @@ public class ProjectDaoJpa {
         UserProjects userProjects = this.userProjectsRepository.findById(owner)
                 .orElseThrow(() -> new ResourceNotFoundException("UserProjects by " + owner + " not found"));
 
-        Pair<com.bulletjournal.controller.models.Project, List<com.bulletjournal.controller.models.Project>> result =
-                ProjectRelationsProcessor.removeTargetProject(userProjects.getOwnedProjects(), projectId);
-        List<com.bulletjournal.controller.models.Project> projectHierarchy = result.getRight();
-        com.bulletjournal.controller.models.Project target = result.getLeft();
+        String relations = userProjects.getOwnedProjects();
 
         // delete project and its subProjects
         List<Project> targetProjects = this.projectRepository
-                .findAllById(ProjectRelationsProcessor.findSubProjects(target));
+                .findAllById(HierarchyProcessor.getSubItems(relations, projectId));
         this.projectRepository.deleteAll(targetProjects);
 
         // Update project relations
-        userProjects.setOwnedProjects(ProjectRelationsProcessor.processRelations(projectHierarchy));
+        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, projectId);
+        userProjects.setOwnedProjects(GSON.toJson(hierarchy));
         this.userProjectsRepository.save(userProjects);
 
         // return generated events
