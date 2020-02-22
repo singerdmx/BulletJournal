@@ -56,10 +56,6 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
             <Icon type="bell" />
             Today
           </Menu.Item>
-          <Menu.Item key="next7days">
-            <Icon type="carry-out" />
-            Next 7 days
-          </Menu.Item>
           <Menu.Item key="calendarView">
             <Icon type="calendar" />
             Calendar View
