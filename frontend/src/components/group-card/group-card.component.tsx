@@ -51,7 +51,7 @@ class GroupCard extends React.Component<GroupProps> {
     return (
       <div className='group-card'>
         <div className='group-title'>
-          <h3>{`Group "${group.name}"`}</h3>
+          <h3>{group.name}</h3>
           <h3 className='group-operation'>
             <Icon type='user' />
             {group.users && group.users.length}
