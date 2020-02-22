@@ -91,6 +91,7 @@ public class GroupController {
         Group defaultGroup = l.stream().filter(g -> defaultGroupId.equals(g.getId())).findFirst().get();
         l.remove(defaultGroup);
         l.add(0, defaultGroup);
+        defaultGroup.setDefault(true);
         result.add(new GroupsWithOwner(username, l));
         for (Map.Entry<String, List<Group>> entry : m.entrySet()) {
             if (Objects.equals(entry.getKey(), username)) {

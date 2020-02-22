@@ -21,6 +21,8 @@ public class Group {
 
     private List<UserGroup> users;
 
+    private Boolean isDefault;
+
     public Group() {
     }
 
@@ -62,6 +64,14 @@ public class Group {
 
     public void setUsers(List<UserGroup> users) {
         this.users = users;
+    }
+
+    public Boolean getDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
     }
 
     @Override
