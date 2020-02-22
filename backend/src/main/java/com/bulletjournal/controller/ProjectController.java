@@ -51,7 +51,7 @@ public class ProjectController {
     }
     @GetMapping(PROJECT_ROUTE)
     public Project getProject(@NotNull @PathVariable Long projectId) {
-        return this.projectDaoJpa.getProject(projectId).toPresentationModel();
+        return this.projectDaoJpa.getProject(projectId).toVerbosePresentationModel();
     }
     @PostMapping(PROJECTS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)

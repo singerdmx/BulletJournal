@@ -78,4 +78,12 @@ public class Project extends OwnedModel {
                 this.getGroup().toPresentationModel(),
                 this.getDescription());
     }
+
+    public com.bulletjournal.controller.models.Project toVerbosePresentationModel() {
+        return new com.bulletjournal.controller.models.Project(
+                this.getId(), this.getName(), this.getOwner(),
+                ProjectType.getType(this.getType()),
+                this.getGroup().toVerbosePresentationModel(),
+                this.getDescription());
+    }
 }
