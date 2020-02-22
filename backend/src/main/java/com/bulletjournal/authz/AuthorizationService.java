@@ -20,7 +20,21 @@ public class AuthorizationService {
             case GROUP:
                 checkAuthorizedToOperateOnGroup(owner, requester, operation, contentId, other);
                 break;
+            case TASK:
+                checkAuthorizedToOperateOnTask(owner, requester, operation, contentId);
+                break;
             default:
+        }
+    }
+
+    private void checkAuthorizedToOperateOnTask(String owner, String requester, Operation operation, Long contentId) {
+        switch (operation) {
+            case UPDATE:
+                if (!Objects.equals(owner, requester)) {
+                    throw new UnAuthorizedException("Task " + contentId + " is owner by " +
+                            owner + " while request is from " + requester);
+                }
+                break;
         }
     }
 

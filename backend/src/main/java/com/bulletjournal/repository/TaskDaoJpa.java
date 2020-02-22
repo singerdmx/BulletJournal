@@ -1,5 +1,8 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.authz.Operation;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.UpdateTaskParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -21,6 +24,9 @@ public class TaskDaoJpa {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private AuthorizationService authorizationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasks(Long projectId) {
@@ -48,10 +54,13 @@ public class TaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task partialUpdate(String owner, Long taskId, UpdateTaskParams updateTaskParams) {
+    public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
         Task task = this.taskRepository
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                task.getCreatedBy(), requester, ContentType.TASK, Operation.UPDATE, taskId);
 
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasName(), updateTaskParams.getName(), (value) -> task.setName(value));
