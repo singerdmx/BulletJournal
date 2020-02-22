@@ -19,7 +19,7 @@ type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
   getGroup: (groupId: number) => void;
-  deleteGroup: (groupId: number) => void;
+  deleteGroup: (groupId: number, groupName: string) => void;
 };
 
 function getGroupUserTitle(item: User, group: Group): string {
@@ -58,62 +58,64 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
     }
   }
 
-  handleDelete = (groupId: number) => {
-    this.props.deleteGroup(groupId);
+  handleDelete = (groupId: number, groupName: string) => {
+    this.props.deleteGroup(groupId, groupName);
   };
 
-  handleMenuClick = (menu: any, groupId: number) => {
+  handleMenuClick = (menu: any, groupId: number, groupName: string) => {
     if (menu.key === 'delete') {
-      this.handleDelete(groupId);
+      this.handleDelete(groupId, groupName);
     }
   };
 
   render() {
     const { group } = this.props;
     return (
-      <div className="group-page">
-        <div className="group-page-card">
-          <div className="group-title">
+      <div className='group-page'>
+        <div className='group-page-card'>
+          <div className='group-title'>
             <h3>{`Group "${group.name}"`}</h3>
-            <h3 className="group-operation">
-              <Icon type="user" />
+            <h3 className='group-operation'>
+              <Icon type='user' />
               {group.users && group.users.length}
               {group.owner === this.props.myself.username && (
                 <Dropdown
                   overlay={
                     <Menu
-                      onClick={menu => this.handleMenuClick(menu, group.id)}
+                      onClick={menu =>
+                        this.handleMenuClick(menu, group.id, group.name)
+                      }
                     >
-                      <Menu.Item key="edit">
-                        <Icon type="edit" /> Edit
+                      <Menu.Item key='edit'>
+                        <Icon type='edit' /> Edit
                       </Menu.Item>
                       <Menu.Divider />
                       <Menu.Item
-                        key="delete"
-                        disabled={this.props.group.owner === ''}
+                        key='delete'
+                        disabled={this.props.group.default}
                       >
-                        <Icon type="delete" /> Delete
+                        <Icon type='delete' /> Delete
                       </Menu.Item>
                     </Menu>
                   }
                   trigger={['click']}
-                  placement="bottomLeft"
+                  placement='bottomLeft'
                 >
-                  <Button type="link" className="group-setting">
-                    <Icon type="setting" title="Edit Group" />
+                  <Button type='link' className='group-setting'>
+                    <Icon type='setting' title='Edit Group' />
                   </Button>
                 </Dropdown>
               )}
             </h3>
           </div>
-          <div className="group-users">
+          <div className='group-users'>
             <List
               dataSource={group.users}
               renderItem={item => {
                 return (
                   <List.Item key={item.id}>
                     <div
-                      className="group-user"
+                      className='group-user'
                       title={getGroupUserTitle(item, group)}
                     >
                       <Badge dot={!item.accepted}>
@@ -124,11 +126,11 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                     {item.name !== group.owner &&
                       group.owner === this.props.myself.username && (
                         <Button
-                          type="link"
-                          size="small"
+                          type='link'
+                          size='small'
                           title={item.accepted ? 'Remove' : 'Cancel Invitation'}
                         >
-                          <Icon type="close" />
+                          <Icon type='close' />
                         </Button>
                       )}
                   </List.Item>
@@ -137,12 +139,12 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
             />
           </div>
           {group.owner === this.props.myself.username && (
-            <div className="group-footer">
+            <div className='group-footer'>
               <Button
-                type="primary"
-                icon="plus"
-                shape="round"
-                title="Add User"
+                type='primary'
+                icon='plus'
+                shape='round'
+                title='Add User'
               />
             </div>
           )}

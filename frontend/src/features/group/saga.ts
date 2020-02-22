@@ -19,8 +19,8 @@ import {
   removeUserGroup,
   deleteGroup,
   getGroup,
-  updateGroup,
-} from '../../apis/groupApis'; 
+  updateGroup
+} from '../../apis/groupApis';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -76,10 +76,10 @@ function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
 
 function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
   try {
-    const { groupId } = action.payload;
+    const { groupId, groupName } = action.payload;
     yield call(deleteGroup, groupId);
     yield put(groupsActions.groupsUpdate({}));
-    yield call(message.success, `Group ${groupId} deleted`);
+    yield call(message.success, `Group "${groupName}" deleted`);
   } catch (error) {
     yield call(message.error, `Delete group fail: ${error}`);
   }
@@ -98,13 +98,10 @@ function* getUserGroup(action: PayloadAction<GetGroupAction>) {
 
 function* patchGroup(action: PayloadAction<PatchGroupAction>) {
   try {
-    const { groupId, name} = action.payload;
+    const { groupId, name } = action.payload;
     const group = yield call(updateGroup, groupId, name);
     yield put(groupsActions.groupReceived({ group: group }));
-    yield call(
-        message.success,
-        'Successfully updated group'
-    );
+    yield call(message.success, 'Successfully updated group');
   } catch (error) {
     yield call(message.error, `Patch group Fail: ${error}`);
   }
