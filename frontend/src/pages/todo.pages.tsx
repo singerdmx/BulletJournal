@@ -44,7 +44,7 @@ class TodoPage extends React.Component<TodoRouteProps, todoState> {
         <div className="todo-header">
           <h2>{this.props.match.params.category.toUpperCase()} </h2>
           <Checkbox><Icon type="carry-out" title="TODO"/></Checkbox>
-          <Checkbox><Icon type="account-book" title="Ledger"/></Checkbox>
+          <Checkbox><Icon type="account-book" title="LEDGER"/></Checkbox>
           <h2 className="add-todo-button" onClick={this.showForm}>
             <Icon type="plus" />
           </h2>

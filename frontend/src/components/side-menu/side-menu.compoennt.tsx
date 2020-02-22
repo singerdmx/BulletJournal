@@ -46,7 +46,12 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
         style={{ height: '100%', fontWeight: 500 }}
         onClick={this.onClick}
       >
-        <SubMenu key="todo" title="TODO">
+        <SubMenu key="todo" title={
+          <span>
+            <Icon type="sketch" />
+            <span>My BUJOs</span>
+          </span>
+        }>
           <Menu.Item key="today">
             <Icon type="bell" />
             Today
