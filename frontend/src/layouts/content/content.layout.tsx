@@ -4,6 +4,7 @@ import HomePage from '../../pages/home.pages';
 import SettingPage from '../../pages/settings.page';
 import TodoPage from '../../pages/todo.pages';
 import GroupPage from '../../pages/group.pages';
+import GroupsPage from '../../pages/groups.pages';
 import { Layout } from 'antd';
 
 const { Content } = Layout;
@@ -15,6 +16,7 @@ class ContentLayout extends React.Component {
           <Route exact path="/" component={HomePage} />
           <Route exact path="/todo/:category" component={TodoPage} />
           <Route path="/settings" component={SettingPage} />
+          <Route exact path="/groups" component={GroupsPage} />
           <Route exact path="/groups/:groupId" component={GroupPage} />
         </Switch>
       </Content>

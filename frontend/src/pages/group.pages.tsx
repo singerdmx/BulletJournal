@@ -72,65 +72,81 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
     const { group } = this.props;
     return (
       <div className="group-page">
-        <div className="group-title">
-          <h3>{`Group "${group.name}"`}</h3>
-          <h3 className="group-operation">
-            <Icon type="user" />
-            {group.users && group.users.length}
-            {group.owner === this.props.myself.username && (
-              <Dropdown
-                overlay={
-                  <Menu onClick={menu => this.handleMenuClick(menu, group.id)}>
-                    <Menu.Item key="edit"><Icon type="edit" /> Edit</Menu.Item>
-                    <Menu.Divider />
-                    <Menu.Item key="delete" disabled={group.name === 'Default'}><Icon type="delete" /> Delete</Menu.Item>
-                  </Menu>
-                }
-                trigger={['click']}
-                placement="bottomLeft"
-              >
-                <Button type="link" className="group-setting">
-                  <Icon type="setting" title="Edit Group" />
-                </Button>
-              </Dropdown>
-            )}
-          </h3>
-        </div>
-        <div className="group-users">
-          <List
-            dataSource={group.users}
-            renderItem={item => {
-              return (
-                <List.Item key={item.id}>
-                  <div
-                    className="group-user"
-                    title={getGroupUserTitle(item, group)}
-                  >
-                    <Badge dot={!item.accepted}>
-                      <Avatar src={item.avatar} />
-                    </Badge>
-                    {getGroupUserSpan(item, group)}
-                  </div>
-                  {item.name !== group.owner &&
-                    group.owner === this.props.myself.username && (
-                      <Button
-                        type="link"
-                        size="small"
-                        title={item.accepted ? 'Remove' : 'Cancel Invitation'}
+        <div className="group-page-card">
+          <div className="group-title">
+            <h3>{`Group "${group.name}"`}</h3>
+            <h3 className="group-operation">
+              <Icon type="user" />
+              {group.users && group.users.length}
+              {group.owner === this.props.myself.username && (
+                <Dropdown
+                  overlay={
+                    <Menu
+                      onClick={menu => this.handleMenuClick(menu, group.id)}
+                    >
+                      <Menu.Item key="edit">
+                        <Icon type="edit" /> Edit
+                      </Menu.Item>
+                      <Menu.Divider />
+                      <Menu.Item
+                        key="delete"
+                        disabled={this.props.group.owner === ''}
                       >
-                        <Icon type="close" />
-                      </Button>
-                    )}
-                </List.Item>
-              );
-            }}
-          />
-        </div>
-        {group.owner === this.props.myself.username && (
-          <div className="group-footer">
-            <Button type="primary" icon="plus" shape="round" title="Add User" />
+                        <Icon type="delete" /> Delete
+                      </Menu.Item>
+                    </Menu>
+                  }
+                  trigger={['click']}
+                  placement="bottomLeft"
+                >
+                  <Button type="link" className="group-setting">
+                    <Icon type="setting" title="Edit Group" />
+                  </Button>
+                </Dropdown>
+              )}
+            </h3>
           </div>
-        )}
+          <div className="group-users">
+            <List
+              dataSource={group.users}
+              renderItem={item => {
+                return (
+                  <List.Item key={item.id}>
+                    <div
+                      className="group-user"
+                      title={getGroupUserTitle(item, group)}
+                    >
+                      <Badge dot={!item.accepted}>
+                        <Avatar src={item.avatar} />
+                      </Badge>
+                      {getGroupUserSpan(item, group)}
+                    </div>
+                    {item.name !== group.owner &&
+                      group.owner === this.props.myself.username && (
+                        <Button
+                          type="link"
+                          size="small"
+                          title={item.accepted ? 'Remove' : 'Cancel Invitation'}
+                        >
+                          <Icon type="close" />
+                        </Button>
+                      )}
+                  </List.Item>
+                );
+              }}
+            />
+          </div>
+          {group.owner === this.props.myself.username && (
+            <div className="group-footer">
+              <Button
+                type="primary"
+                icon="plus"
+                shape="round"
+                title="Add User"
+              />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -138,6 +154,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
 
 const mapStateToProps = (state: IState) => ({
   group: state.group.group,
+
   myself: state.myself
 });
 
