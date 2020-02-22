@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.AddUserGroupParams;
 import com.bulletjournal.controller.models.RemoveUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
@@ -51,6 +52,9 @@ public class GroupDaoJpa {
         group.setOwner(owner);
         group.addUser(user);
 
+        if (!this.groupRepository.findByNameAndOwner(name, owner).isEmpty()) {
+            throw new ResourceAlreadyExistException("Group with name " + name + " already exists");
+        }
         group = this.groupRepository.save(group);
         this.userGroupRepository.save(new UserGroup(user, group, true));
         return group;
@@ -93,6 +97,15 @@ public class GroupDaoJpa {
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 group.getOwner(), requester, ContentType.GROUP, Operation.UPDATE, groupId);
+
+        if (Objects.equals(group.getName(), updateGroupParams.getName())) {
+            return group;
+        }
+
+        if (!this.groupRepository.findByNameAndOwner(updateGroupParams.getName(), requester).isEmpty()) {
+            throw new ResourceAlreadyExistException("Group with name " + updateGroupParams.getName()
+                    + " already exists");
+        }
 
         DaoHelper.updateIfPresent(
                 updateGroupParams.hasName(), updateGroupParams.getName(), (value) -> group.setName(value));

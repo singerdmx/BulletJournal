@@ -10,7 +10,7 @@ public abstract class NamedModel extends AuditModel {
 
     @NotBlank
     @Size(min = 1, max = 100)
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
     private String name;
 
     public String getName() {
