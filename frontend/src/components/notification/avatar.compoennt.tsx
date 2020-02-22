@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar, Badge, Icon} from 'antd';
+import { EventType } from '../../features/notification/constants'
 
 type titleAvatarProps = {
     source: string;
@@ -9,16 +10,16 @@ type titleAvatarProps = {
   const TitleAvatar = ({ source, type }: titleAvatarProps) => {
     let icon = null;
     switch (type){
-      case 'JoinGroupEvent':
+      case EventType.JoinGroupEvent:
         icon =  <Icon type="usergroup-add" />;
         break;
-      case 'RemoveUserFromGroupEvent':
+      case EventType.RemoveUserFromGroupEvent:
         icon =  <Icon type="usergroup-delete" />;
         break;
-      case 'DeleteGroupEvent':
+      case EventType.DeleteGroupEvent:
         icon = <Icon type="delete" />;
         break;
-      case 'JoinGroupResponseEvent':
+      case EventType.JoinGroupResponseEvent:
         icon = <Icon type="info-circle" />;
         break;
       default:

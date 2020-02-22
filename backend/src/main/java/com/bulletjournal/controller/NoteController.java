@@ -28,6 +28,7 @@ public class NoteController {
     public List<Note> getNotes(@NotNull @PathVariable Long projectId) {
         return this.noteDaoJpa.getNotes(projectId).stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
+
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(NOTES_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,6 +37,12 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return noteDaoJpa.create(projectId, username, note).toPresentationModel();
     }
+
+    @GetMapping(NOTE_ROUTE)
+    public Note getNote(@NotNull @PathVariable Long noteId) {
+        return this.noteDaoJpa.getNote(noteId).toPresentationModel();
+    }
+
     @CrossOrigin(origins = "http://localhost:3000")
     @PatchMapping(NOTE_ROUTE)
     public Note updateNote(@NotNull @PathVariable Long noteId,

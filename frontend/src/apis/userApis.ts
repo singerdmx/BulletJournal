@@ -1,4 +1,4 @@
-import { doFetch, doPost } from './api-helper';
+import { doFetch } from './api-helper';
 
 export const fetchUser = (username: string) => {
   return doFetch(`/api/users/${username}`)

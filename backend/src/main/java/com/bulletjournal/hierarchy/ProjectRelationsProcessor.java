@@ -1,4 +1,4 @@
-package com.bulletjournal.controller.utils;
+package com.bulletjournal.hierarchy;
 
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.exceptions.BadRequestException;
@@ -83,7 +83,7 @@ public class ProjectRelationsProcessor {
         return null;
     }
 
-    public static List<Project> processProjectRelations(
+    public static List<Project> processRelations(
             Map<Long, com.bulletjournal.repository.models.Project> projectMap, String projectRelations,
             Set<Long> selectedProjects) {
         Project[] list = GSON.fromJson(
@@ -122,9 +122,9 @@ public class ProjectRelationsProcessor {
         return count;
     }
 
-    public static String processProjectRelations(List<Project> projects) {
+    public static String processRelations(List<Project> projects) {
         String jsonString = GSON.toJson(projects);
         // replace "subProjects" with "s" to save space
-        return jsonString.replace(SUB_PROJECTS_KEY, SUB_PROJECTS_KEY_REPLACEMENT);
+        return jsonString.replace(SUB_PROJECTS_KEY, HierarchyItem.SUB_ITEMS_KEY_REPLACEMENT);
     }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { EventType } from '../../features/notification/constants'
 
 type titleProps = {
   title: string;
@@ -11,7 +12,7 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
   let titleText = (<span>{title}</span>);
   let beg = 0;
   switch (type) {
-    case 'JoinGroupEvent':
+    case EventType.JoinGroupEvent:
       beg = title.indexOf(' invited you to join Group ');
       titleText = (
         <span>
@@ -19,7 +20,7 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
         </span>
       );
       break;
-    case 'RemoveUserFromGroupEvent':
+    case EventType.RemoveUserFromGroupEvent:
       beg = title.indexOf(' removed you from Group ');
       titleText = (
         <span>
@@ -27,7 +28,7 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
         </span>
       );
       break;
-    case 'JoinGroupResponseEvent':
+    case EventType.JoinGroupResponseEvent:
       beg = title.indexOf(' declined your invitation to join Group ');
       titleText = (
         <span>
@@ -43,7 +44,7 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
         );
       }
       break;
-    case 'DeleteGroupEvent':
+    case EventType.DeleteGroupEvent:
       beg = title.indexOf(' is deleted');
       titleText = (
         <span>

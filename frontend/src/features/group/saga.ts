@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put, select } from 'redux-saga/effects';
+import { takeLatest, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as groupsActions,

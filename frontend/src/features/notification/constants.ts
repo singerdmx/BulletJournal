@@ -1,7 +1,11 @@
-export enum ActionTypes {
-    JoinGroupEvent = 'JoinGroupEvent',
+export enum ActionType {
     Accept = 'Accept',
     Decline = 'Decline',
-    Reject = 'Reject',
-    Delete = 'Delete'
+}
+
+export enum EventType {
+    JoinGroupEvent = 'JoinGroupEvent',
+    RemoveUserFromGroupEvent = 'RemoveUserFromGroupEvent',
+    DeleteGroupEvent = 'DeleteGroupEvent',
+    JoinGroupResponseEvent = 'JoinGroupResponseEvent'
 }
