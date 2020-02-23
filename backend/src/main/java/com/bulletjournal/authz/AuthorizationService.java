@@ -21,10 +21,10 @@ public class AuthorizationService {
                 checkAuthorizedToOperateOnGroup(owner, requester, operation, contentId);
                 break;
             case TASK:
+            case NOTE:
+            case TRANSACTION:
                 checkAuthorizedToOperateOnProjectItem(owner, requester, operation, contentId, other);
                 break;
-            case NOTE:
-                checkAuthorizedToOperateOnProjectItem(owner, requester, operation, contentId, other);
             default:
         }
     }
