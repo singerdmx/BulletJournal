@@ -1,4 +1,6 @@
 import React from 'react';
+import { Select } from 'antd';
+const { Option } = Select;
 
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -391,16 +393,15 @@ const zones = [
   return 0;
 });
 
-const TimezonePicker = ({ ...props }) => {
+const TimezonePicker = () => {
   return (
-    <select {...props}>
-      {<option key='unset'>{'unselect'}</option>}
-      {zones.map(timezone => (
-        <option key={timezone} value={timezone}>
-          {timezone}
-        </option>
+    <Select style={{ width: 200 }} placeholder='Select a timezone'>
+      {zones.map((zone: string, index: number) => (
+        <Option key={zone} value={zone}>
+          {zone}
+        </Option>
       ))}
-    </select>
+    </Select>
   );
 };
 
