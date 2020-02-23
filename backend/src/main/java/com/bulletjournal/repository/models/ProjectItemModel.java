@@ -4,8 +4,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Parent class for items under a project.
@@ -15,12 +13,7 @@ import javax.validation.constraints.Size;
  * {@link Transaction}: for ProjectType.LEDGER
  */
 @MappedSuperclass
-public abstract class ProjectItemModel extends NamedModel {
-
-    @NotBlank
-    @Size(min = 1, max = 100)
-    @Column(name = "created_by", nullable = false, updatable = false, length = 100)
-    private String createdBy;
+public abstract class ProjectItemModel extends OwnedModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
@@ -35,11 +28,4 @@ public abstract class ProjectItemModel extends NamedModel {
         this.project = project;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
 }

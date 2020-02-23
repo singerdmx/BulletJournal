@@ -57,7 +57,7 @@ public class NoteDaoJpa {
 
         Note note = new Note();
         note.setProject(project);
-        note.setCreatedBy(owner);
+        note.setOwner(owner);
         note.setName(createNoteParams.getName());
         return this.noteRepository.save(note);
     }
@@ -68,7 +68,7 @@ public class NoteDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                note.getCreatedBy(), requester, ContentType.NOTE, Operation.UPDATE, noteId,
+                note.getOwner(), requester, ContentType.NOTE, Operation.UPDATE, noteId,
                 note.getProject().getOwner());
 
         DaoHelper.updateIfPresent(updateNoteParams.hasName(), updateNoteParams.getName(),
@@ -102,7 +102,7 @@ public class NoteDaoJpa {
 
         Project project = note.getProject();
         Long projectId = project.getId();
-        this.authorizationService.checkAuthorizedToOperateOnContent(note.getCreatedBy(), requester, ContentType.PROJECT,
+        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.PROJECT,
                 Operation.DELETE, projectId, project.getOwner());
 
         ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId)

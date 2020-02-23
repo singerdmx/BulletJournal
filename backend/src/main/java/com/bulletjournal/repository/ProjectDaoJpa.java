@@ -4,6 +4,7 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
@@ -147,11 +148,15 @@ public class ProjectDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project create(CreateProjectParams createProjectParams, String owner) {
+        String name = createProjectParams.getName();
+        if (!this.projectRepository.findByNameAndOwner(name, owner).isEmpty()) {
+            throw new ResourceAlreadyExistException("Project with name " + name + " already exists");
+        }
         Long groupId = createProjectParams.getGroupId();
         Project project = new Project();
         project.setDescription(createProjectParams.getDescription());
         project.setOwner(owner);
-        project.setName(createProjectParams.getName());
+        project.setName(name);
         project.setType(createProjectParams.getProjectType().getValue());
         project.setGroup(this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " cannot be found")));

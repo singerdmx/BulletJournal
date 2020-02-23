@@ -51,7 +51,7 @@ public class TaskDaoJpa {
         task.setAssignedTo(owner);
         task.setDueDate(createTaskParams.getDueDate());
         task.setDueTime(createTaskParams.getDueTime());
-        task.setCreatedBy(owner);
+        task.setOwner(owner);
         task.setName(createTaskParams.getName());
         task.setReminderSetting(createTaskParams.getReminderSetting());
         return this.taskRepository.save(task);
@@ -64,7 +64,7 @@ public class TaskDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                task.getCreatedBy(), requester, ContentType.TASK, Operation.UPDATE,
+                task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
                 taskId, task.getProject().getOwner());
 
         DaoHelper.updateIfPresent(
@@ -92,7 +92,7 @@ public class TaskDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                task.getCreatedBy(), requester, ContentType.TASK, Operation.UPDATE, taskId);
+                task.getOwner(), requester, ContentType.TASK, Operation.UPDATE, taskId);
 
         CompletedTask completedTask = new CompletedTask(task);
         this.completedTaskRepository.save(completedTask);
