@@ -26,7 +26,7 @@ public class User extends NamedModel {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String timezone;
 
     @Column(length = 15)
@@ -34,6 +34,12 @@ public class User extends NamedModel {
 
     @Column(length = 25)
     private String language;
+
+    @Column(name = "date_format", length = 10, nullable = false)
+    private Integer dateFormat; // 0: "DD-MM-YYYY", 1: "MM-DD-YYYY"
+
+    @Column(name = "time_format", length = 10, nullable = false)
+    private Integer timeFormat; // 0: "1:00pm", 1: "13:00"
 
     // reminder before task
     @Column(name = "reminder_before_task")
@@ -89,6 +95,22 @@ public class User extends NamedModel {
 
     public void setReminderBeforeTask(Before reminderBeforeTask) {
         this.reminderBeforeTask = reminderBeforeTask;
+    }
+
+    public Integer getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(Integer dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public Integer getTimeFormat() {
+        return timeFormat;
+    }
+
+    public void setTimeFormat(Integer timeFormat) {
+        this.timeFormat = timeFormat;
     }
 
     @Override

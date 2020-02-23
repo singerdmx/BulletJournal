@@ -36,6 +36,8 @@ public class UserDaoJpa {
         User user = new User();
         user.setName(name);
         user.setTimezone(timezone);
+        user.setDateFormat(0);
+        user.setTimeFormat(0);
         user = this.userRepository.save(user);
 
         Group group = new Group();
