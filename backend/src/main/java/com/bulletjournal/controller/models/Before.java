@@ -10,7 +10,8 @@ public enum Before {
     TEN_MIN_BEFORE(2, "10 minutes before"),
     THIRTY_MIN_BEFORE(3, "30 minutes before"),
     ONE_HR_BEFORE(4, "1 hour before"),
-    TWO_HR_BEFORE(5, "2 hours before");
+    TWO_HR_BEFORE(5, "2 hours before"),
+    NONE(6, "No reminder");
 
     private final int value;
 
@@ -43,6 +44,8 @@ public enum Before {
                 return ONE_HR_BEFORE;
             case 5:
                 return TWO_HR_BEFORE;
+            case 6:
+                return NONE;
             default:
                 throw new IllegalArgumentException();
         }
