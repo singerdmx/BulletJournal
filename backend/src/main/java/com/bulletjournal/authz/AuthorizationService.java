@@ -18,10 +18,10 @@ public class AuthorizationService {
                 checkAuthorizedToOperateOnProject(owner, requester, operation, contentId);
                 break;
             case GROUP:
-                checkAuthorizedToOperateOnGroup(owner, requester, operation, contentId, other);
+                checkAuthorizedToOperateOnGroup(owner, requester, operation, contentId);
                 break;
             case TASK:
-                checkAuthorizedToOperateOnTask(owner, requester, operation, contentId);
+                checkAuthorizedToOperateOnTask(owner, requester, operation, contentId, other);
                 break;
             case NOTE:
                 checkAuthorizedToOperateOnNote(owner, requester, operation, contentId, other);
@@ -29,19 +29,22 @@ public class AuthorizationService {
         }
     }
 
-    private void checkAuthorizedToOperateOnTask(String owner, String requester, Operation operation, Long contentId) {
+    private void checkAuthorizedToOperateOnTask(
+            String owner, String requester, Operation operation, Long contentId, Object... other) {
+        String projectOwner = (String) other[0];
         switch (operation) {
+            case DELETE:
             case UPDATE:
-                if (!Objects.equals(owner, requester)) {
-                    throw new UnAuthorizedException("Task " + contentId + " is owner by " +
-                            owner + " while request is from " + requester);
+                if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
+                    throw new UnAuthorizedException("Project Note " + contentId + " is owner by " +
+                            owner + "and Project is owned by " + projectOwner  + " while request is from " + requester);
                 }
                 break;
         }
     }
 
     private void checkAuthorizedToOperateOnGroup(
-            String owner, String requester, Operation operation, Long contentId, Object... other) {
+            String owner, String requester, Operation operation, Long contentId) {
         switch (operation) {
             case DELETE:
             case UPDATE:
@@ -70,7 +73,7 @@ public class AuthorizationService {
 
     private void checkAuthorizedToOperateOnNote(
             String owner, String requester, Operation operation, Long contentId, Object... other) {
-         String projectOwner = (String) other[0];
+        String projectOwner = (String) other[0];
         switch (operation) {
             case DELETE:
             case UPDATE:
@@ -79,7 +82,6 @@ public class AuthorizationService {
                     owner + "and Project is owned by " + projectOwner  + " while request is from " + requester);
                 }
                 break;
-            default:
         }
     }
 }

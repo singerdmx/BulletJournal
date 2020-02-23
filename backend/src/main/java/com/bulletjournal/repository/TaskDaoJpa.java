@@ -64,7 +64,8 @@ public class TaskDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                task.getCreatedBy(), requester, ContentType.TASK, Operation.UPDATE, taskId);
+                task.getCreatedBy(), requester, ContentType.TASK, Operation.UPDATE,
+                taskId, task.getProject().getOwner());
 
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasName(), updateTaskParams.getName(), (value) -> task.setName(value));
