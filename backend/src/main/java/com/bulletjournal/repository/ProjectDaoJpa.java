@@ -216,16 +216,16 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> deleteProject(String owner, Long projectId) {
+    public List<Event> deleteProject(String requester, Long projectId) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                project.getOwner(), owner, ContentType.PROJECT, Operation.DELETE, projectId);
+                project.getOwner(), requester, ContentType.PROJECT, Operation.DELETE, projectId);
 
-        UserProjects userProjects = this.userProjectsRepository.findById(owner)
-                .orElseThrow(() -> new ResourceNotFoundException("UserProjects by " + owner + " not found"));
+        UserProjects userProjects = this.userProjectsRepository.findById(requester)
+                .orElseThrow(() -> new ResourceNotFoundException("UserProjects by " + requester + " not found"));
 
         String relations = userProjects.getOwnedProjects();
 
@@ -240,7 +240,7 @@ public class ProjectDaoJpa {
         this.userProjectsRepository.save(userProjects);
 
         // return generated events
-        return generateEvents(owner, targetProjects);
+        return generateEvents(requester, targetProjects);
     }
 
     private List<Event> generateEvents(String owner, List<Project> targetProjects) {
