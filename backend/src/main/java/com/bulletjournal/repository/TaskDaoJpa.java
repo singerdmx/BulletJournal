@@ -80,4 +80,13 @@ public class TaskDaoJpa {
         return this.taskRepository.save(task);
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void complete(String requester, Long taskId) {
+        Task task = this.taskRepository
+                .findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                task.getCreatedBy(), requester, ContentType.TASK, Operation.UPDATE, taskId);
+    }
 }

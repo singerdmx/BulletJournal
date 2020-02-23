@@ -9,11 +9,8 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.NoteRelationsProcessor;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.ProjectNotes;
-import com.bulletjournal.repository.models.Note;
+import com.bulletjournal.repository.models.*;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
 
@@ -66,9 +63,12 @@ public class NoteDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Note partialUpdate(String owner, Long noteId, UpdateNoteParams updateNoteParams) {
+    public Note partialUpdate(String requester, Long noteId, UpdateNoteParams updateNoteParams) {
         Note note = this.noteRepository.findById(noteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                note.getCreatedBy(), requester, ContentType.NOTE, Operation.UPDATE, noteId);
 
         DaoHelper.updateIfPresent(updateNoteParams.hasName(), updateNoteParams.getName(),
                 (value) -> note.setName(value));

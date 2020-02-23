@@ -20,6 +20,7 @@ public class TaskController {
 
     protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
+    protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -50,4 +51,10 @@ public class TaskController {
     public void updateProjectRelations(@Valid @RequestBody List<Project> projects) {
     }
      */
+
+    @PostMapping(COMPLETE_TASK_ROUTE)
+    public void completeTask(@NotNull @PathVariable Long taskId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.complete(username, taskId);
+    }
 }
