@@ -3,6 +3,7 @@ import { Select, Icon } from 'antd';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { updateTimezone } from '../../features/myself/actions';
+import { updateTimezoneSaveButtonVisiblility } from './actions';
 
 const { Option } = Select;
 
@@ -399,12 +400,15 @@ const zones = [
 
 type TimezoneProps = {
   timezone: string;
+  timezoneSaveButtonVisible: boolean;
   updateTimezone: (timezone: string) => void;
+  updateTimezoneSaveButtonVisiblility: (timezoneSaveButtonVisible: boolean) => void;
 };
 
 class TimezonePicker extends React.Component<TimezoneProps> {
-  handleOnchange = (value: string) => {
+  handleOnChange = (value: string) => {
     this.props.updateTimezone(value);
+    this.props.updateTimezoneSaveButtonVisiblility(true);
   };
 
   render() {
@@ -414,7 +418,7 @@ class TimezonePicker extends React.Component<TimezoneProps> {
           showSearch={true}
           style={{ width: 250 }}
           placeholder='Select a timezone'
-          onChange={this.handleOnchange}
+          onChange={this.handleOnChange}
           value={this.props.timezone}
         >
           {zones.map((zone: string, index: number) => (
@@ -429,7 +433,8 @@ class TimezonePicker extends React.Component<TimezoneProps> {
             marginLeft: '20px',
             cursor: 'pointer',
             color: '#00e600',
-            fontSize: 20
+            fontSize: 20,
+            visibility: this.props.timezoneSaveButtonVisible? 'visible' : 'hidden'
           }}
           title='Save'
         />
@@ -439,7 +444,8 @@ class TimezonePicker extends React.Component<TimezoneProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  timezone: state.myself.timezone
+  timezone: state.myself.timezone,
+  timezoneSaveButtonVisible: state.settings.timezoneSaveButtonVisible
 });
 
-export default connect(mapStateToProps, { updateTimezone })(TimezonePicker);
+export default connect(mapStateToProps, { updateTimezone, updateTimezoneSaveButtonVisiblility })(TimezonePicker);

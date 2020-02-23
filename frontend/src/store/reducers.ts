@@ -4,8 +4,10 @@ import { reducer as groupReducer } from '../features/group/reducer';
 import { reducer as projectReducer } from '../features/project/reducer';
 import { reducer as systemReducer } from '../features/system/reducer';
 import { reducer as userReducer } from '../features/user/reducer';
+import { reducer as settingsReducer } from '../components/settings/reducer';
 
 export default {
+  settings: settingsReducer,
   myself: myselfReducer,
   notice: notificationReducer,
   group: groupReducer,
