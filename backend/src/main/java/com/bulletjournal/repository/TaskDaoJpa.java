@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.UpdateTaskParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.utils.DaoHelper;
@@ -27,6 +28,9 @@ public class TaskDaoJpa {
 
     @Autowired
     private AuthorizationService authorizationService;
+
+    @Autowired
+    private CompletedTaskRepository completedTaskRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasks(Long projectId) {
@@ -88,5 +92,9 @@ public class TaskDaoJpa {
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 task.getCreatedBy(), requester, ContentType.TASK, Operation.UPDATE, taskId);
+
+        CompletedTask completedTask = new CompletedTask(task);
+        this.completedTaskRepository.save(completedTask);
+        this.taskRepository.delete(task);
     }
 }

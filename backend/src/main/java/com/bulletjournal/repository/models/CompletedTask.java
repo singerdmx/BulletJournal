@@ -16,6 +16,19 @@ public class CompletedTask extends TaskModel {
     )
     private Long id;
 
+    public CompletedTask() {
+    }
+
+    public CompletedTask(Task task) {
+        this.setAssignedTo(task.getAssignedTo());
+        this.setDueDate(task.getDueDate());
+        this.setDueTime(task.getDueTime());
+        this.setName(task.getName());
+        this.setReminderBeforeTask(task.getReminderBeforeTask());
+        this.setReminderDate(task.getReminderDate());
+        this.setReminderTime(task.getReminderTime());
+    }
+
     @Override
     public Long getId() {
         return id;
