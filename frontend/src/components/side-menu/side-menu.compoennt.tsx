@@ -5,7 +5,6 @@ import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
-import { updateExpandedMyself } from '../../features/myself/actions';
 const { SubMenu } = Menu;
 
 type GroupProps = {
@@ -16,7 +15,6 @@ type GroupProps = {
 
 type MyselfProps = {
   timezone: string;
-  updateExpandedMyself: () => void;
 };
 
 type PathProps = RouteComponentProps;
@@ -24,10 +22,6 @@ type PathProps = RouteComponentProps;
 class SideMenu extends React.Component<GroupProps & PathProps & MyselfProps> {
   state = {
     showModal: false
-  };
-
-  handleFetchExpandedMyself = () => {
-    this.props.updateExpandedMyself();
   };
 
   onClick = (menu: any) => {
@@ -142,7 +136,6 @@ class SideMenu extends React.Component<GroupProps & PathProps & MyselfProps> {
         </Menu.Item>
         <Menu.Item
           key='settings'
-          onClick={() => this.handleFetchExpandedMyself()}
         >
           <Icon type='setting' />
           Settings
@@ -159,6 +152,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   updateGroups,
-  createGroupByName,
-  updateExpandedMyself
+  createGroupByName
 })(withRouter(SideMenu));
