@@ -15,11 +15,9 @@ type todoState = {
   showForm: boolean;
 };
 
-const { MonthPicker, RangePicker } = DatePicker;
+const { RangePicker } = DatePicker;
 const fakeData = ['Frontend', 'Bakcend', 'UI designer'];
-const dateFormat = 'YYYY/MM/DD';
-const monthFormat = 'YYYY/MM';
-const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY'];
+const dateFormat = 'YYYY-MM-DD';
 
 class TodoPage extends React.Component<TodoRouteProps, todoState> {
   state: todoState = {
@@ -51,7 +49,7 @@ class TodoPage extends React.Component<TodoRouteProps, todoState> {
         </div>
         <div>
           <RangePicker
-            defaultValue={[moment('2015/01/01', dateFormat), moment('2015/01/01', dateFormat)]}
+            defaultValue={[moment('2015-01-01', dateFormat), moment('2015-01-01', dateFormat)]}
             format={dateFormat}
           />
         </div>
