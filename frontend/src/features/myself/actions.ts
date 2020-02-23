@@ -8,3 +8,4 @@ export const updateTimezone = (timezone: string) =>
     username: '',
     avatar: ''
   });
+export const patchMyself = () => actions.patchMyself({});

@@ -1,4 +1,4 @@
-import { takeEvery, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as myselfActions,
@@ -9,6 +9,7 @@ import {
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself } from '../../apis/myselfApis';
+import { IState } from '../../store';
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -48,8 +49,9 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
 
 function* myselfPatch(action: PayloadAction<PatchMyself>) {
   try {
-    const { timezone, before } = action.payload;
-    yield call(patchMyself, timezone, before);
+    const state: IState = yield select();
+    yield call(patchMyself, state.myself.timezone, state.myself.before);
+    yield call(message.success, 'User Settings updated successfully');
   } catch (error) {
     yield call(message.error, `Myself Patch Error Received: ${error}`);
   }
@@ -57,12 +59,12 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
 
 export default function* myselfSagas() {
   yield all([
-    yield takeEvery(
+    yield takeLatest(
       myselfActions.myselfApiErrorReceived.type,
       myselfApiErrorAction
     ),
-    yield takeEvery(myselfActions.myselfUpdate.type, myselfUpdate),
-    yield takeEvery(myselfActions.patchMyself.type, myselfPatch),
-    yield takeEvery(myselfActions.expandedMyselfUpdate.type, getExpandedMyself)
+    yield takeLatest(myselfActions.myselfUpdate.type, myselfUpdate),
+    yield takeLatest(myselfActions.patchMyself.type, myselfPatch),
+    yield takeLatest(myselfActions.expandedMyselfUpdate.type, getExpandedMyself)
   ]);
 }

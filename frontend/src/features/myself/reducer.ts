@@ -15,10 +15,7 @@ export type UpdateMyself = {};
 
 export type UpdateExpandedMyself = {};
 
-export type PatchMyself = {
-  timezone: string;
-  before: Before;
-};
+export type PatchMyself = {};
 
 export type Before = {
   text: string;
@@ -37,7 +34,6 @@ const slice = createSlice({
   initialState,
   reducers: {
     myselfDataReceived: (state, action: PayloadAction<MyselfWithAvatar>) => {
-      console.log('inside reducer 40');
       const { username, avatar, timezone, before } = action.payload;
       if (username && username.length > 0) state.username = username;
       if (avatar && avatar.length > 0) state.avatar = avatar;

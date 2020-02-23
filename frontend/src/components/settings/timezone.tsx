@@ -2,7 +2,7 @@ import React from 'react';
 import { Select, Icon } from 'antd';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
-import { updateTimezone } from '../../features/myself/actions';
+import { updateTimezone, updateExpandedMyself, patchMyself } from '../../features/myself/actions';
 import { updateTimezoneSaveButtonVisiblility } from './actions';
 
 const { Option } = Select;
@@ -401,7 +401,9 @@ const zones = [
 type TimezoneProps = {
   timezone: string;
   timezoneSaveButtonVisible: boolean;
+  updateExpandedMyself: () => void;
   updateTimezone: (timezone: string) => void;
+  patchMyself: () => void;
   updateTimezoneSaveButtonVisiblility: (timezoneSaveButtonVisible: boolean) => void;
 };
 
@@ -409,6 +411,15 @@ class TimezonePicker extends React.Component<TimezoneProps> {
   handleOnChange = (value: string) => {
     this.props.updateTimezone(value);
     this.props.updateTimezoneSaveButtonVisiblility(true);
+  };
+
+  handleOnClick = (save: boolean) => {
+    this.props.updateTimezoneSaveButtonVisiblility(false);
+    if (save) {
+      this.props.patchMyself();
+    } else {
+      this.props.updateExpandedMyself();
+    }
   };
 
   render() {
@@ -429,6 +440,7 @@ class TimezonePicker extends React.Component<TimezoneProps> {
         </Select>
         <Icon
           type='check-circle'
+          onClick={() => this.handleOnClick(true)}
           style={{
             marginLeft: '20px',
             cursor: 'pointer',
@@ -437,6 +449,18 @@ class TimezonePicker extends React.Component<TimezoneProps> {
             visibility: this.props.timezoneSaveButtonVisible? 'visible' : 'hidden'
           }}
           title='Save'
+        />
+        <Icon
+          type='close-circle'
+          onClick={() => this.handleOnClick(false)}
+          style={{
+            marginLeft: '20px',
+            cursor: 'pointer',
+            color: '#ff0000',
+            fontSize: 20,
+            visibility: this.props.timezoneSaveButtonVisible? 'visible' : 'hidden'
+          }}
+          title='Cancel'
         />
       </span>
     );
@@ -448,4 +472,4 @@ const mapStateToProps = (state: IState) => ({
   timezoneSaveButtonVisible: state.settings.timezoneSaveButtonVisible
 });
 
-export default connect(mapStateToProps, { updateTimezone, updateTimezoneSaveButtonVisiblility })(TimezonePicker);
+export default connect(mapStateToProps, { updateTimezone, patchMyself, updateTimezoneSaveButtonVisiblility, updateExpandedMyself })(TimezonePicker);

@@ -26,7 +26,7 @@ public class User extends NamedModel {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
 
-    @Column(length = 20)
+    @Column(length = 50)
     private String timezone;
 
     @Column(length = 15)
