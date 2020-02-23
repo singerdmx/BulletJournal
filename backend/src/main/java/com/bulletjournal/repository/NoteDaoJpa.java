@@ -89,6 +89,7 @@ public class NoteDaoJpa {
         projectNotesOptional.get() : new ProjectNotes();
 
         projectNotes.setNotes(NoteRelationsProcessor.processRelations(notes));
+        projectNotes.setProjectId(projectId);
 
         this.projectNotesRepository.save(projectNotes);
     }
