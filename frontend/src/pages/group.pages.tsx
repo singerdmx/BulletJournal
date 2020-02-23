@@ -6,6 +6,7 @@ import { Group, User } from '../features/group/interfaces';
 import { MyselfWithAvatar } from '../features/myself/reducer';
 import { IState } from '../store';
 import { Icon, Avatar, Button, List, Badge, Menu, Dropdown } from 'antd';
+import AddUser from '../components/modals/add-user.component';
 
 type GroupPathParams = {
   groupId: string;
@@ -20,6 +21,10 @@ type GroupProps = {
   myself: MyselfWithAvatar;
   getGroup: (groupId: number) => void;
   deleteGroup: (groupId: number, groupName: string) => void;
+};
+
+type GroupState = {
+  showModal: boolean;
 };
 
 function getGroupUserTitle(item: User, group: Group): string {
@@ -44,7 +49,17 @@ function getGroupUserSpan(item: User, group: Group): JSX.Element {
   return <span style={{ color: 'grey' }}>&nbsp;&nbsp;{item.name}</span>;
 }
 
-class GroupPage extends React.Component<GroupProps & GroupPathProps> {
+class GroupPage extends React.Component<GroupProps & GroupPathProps, GroupState> {
+  state: GroupState = {
+    showModal: false
+  };
+
+  private modalElement: React.RefObject<AddUser>
+  constructor (props: GroupProps & GroupPathProps) {
+    super(props);
+    this.modalElement = React.createRef();
+  }
+
   componentDidMount() {
     const groupId = this.props.match.params.groupId;
     console.log(groupId);
@@ -67,6 +82,10 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
       this.handleDelete(groupId, groupName);
     }
   };
+
+  addUser = () => {
+    this.modalElement.current?.showModal();
+  }
 
   render() {
     const { group } = this.props;
@@ -145,9 +164,11 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps> {
                 icon='plus'
                 shape='round'
                 title='Add User'
+                onClick={this.addUser}
               />
             </div>
           )}
+          <AddUser ref={this.modalElement} groupId={group.id}/>
         </div>
       </div>
     );

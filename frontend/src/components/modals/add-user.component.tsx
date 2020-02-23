@@ -20,7 +20,7 @@ class AddUser extends React.Component<ModalProps ,ModalState> {
 
   render() {
     return <Modal
-    title="Create User"
+    title="Add User"
     visible={this.state.isShow}
     onCancel={() => this.setState({ isShow: false })}
     onOk={() => this.setState({ isShow: false })}
