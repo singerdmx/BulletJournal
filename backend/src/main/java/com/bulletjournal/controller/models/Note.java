@@ -1,11 +1,15 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.repository.models.Project;
+import com.google.gson.annotations.Expose;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.*;
 
 public class Note {
+    @Expose
     private Long id;
 
     @NotNull
@@ -13,6 +17,10 @@ public class Note {
 
     @NotNull
     private Long projectId;
+
+    @Expose
+    @Valid
+    private List<Note> subNotes = new ArrayList<>();
 
     public Note() {
     }
@@ -47,6 +55,14 @@ public class Note {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public List<Note> getSubNotes() {
+        return subNotes;
+    }
+
+    public void setSubNotes(List<Note> subNotes) {
+        this.subNotes = subNotes;
     }
 
     @Override

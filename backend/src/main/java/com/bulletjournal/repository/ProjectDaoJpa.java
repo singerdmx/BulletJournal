@@ -250,8 +250,11 @@ public class ProjectDaoJpa {
             List<UserGroup> userGroups = this.userGroupRepository.findAllByGroupIdAndAccepted(groupId, true);
             for (UserGroup userGroup : userGroups) {
                 // skip send event to self
-                if (userGroup.getUser().getName().equals(owner)) continue;
-                events.add(new Event(String.valueOf(userGroup.getUser().getName()), p.getId(), p.getName()));
+                String username = userGroup.getUser().getName();
+                if (username.equals(owner)) {
+                    continue;
+                }
+                events.add(new Event(username, p.getId(), p.getName()));
             }
         }
         return events;

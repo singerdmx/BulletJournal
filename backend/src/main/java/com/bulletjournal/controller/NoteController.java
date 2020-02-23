@@ -4,6 +4,9 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateNoteParams;
 import com.bulletjournal.controller.models.Note;
 import com.bulletjournal.controller.models.UpdateNoteParams;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,10 @@ public class NoteController {
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
+
+    @Autowired
+    private NotificationService notificationService;
+
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(NOTES_ROUTE)
     public List<Note> getNotes(@NotNull @PathVariable Long projectId) {
@@ -38,6 +45,7 @@ public class NoteController {
         return noteDaoJpa.create(projectId, username, note).toPresentationModel();
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(NOTE_ROUTE)
     public Note getNote(@NotNull @PathVariable Long noteId) {
         return this.noteDaoJpa.getNote(noteId).toPresentationModel();
@@ -50,4 +58,21 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
     }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @DeleteMapping(NOTE_ROUTE)
+    public void deleteNote(@NotNull @PathVariable Long noteId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Event> events = this.noteDaoJpa.deleteNote(username, noteId);
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new RemoveNoteEvent(events, username));
+        }
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PutMapping(NOTES_ROUTE)
+    public void updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
+        this.noteDaoJpa.updateUserNotes(projectId, notes);
+    }
+
 }

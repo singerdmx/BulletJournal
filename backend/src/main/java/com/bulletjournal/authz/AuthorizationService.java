@@ -23,6 +23,8 @@ public class AuthorizationService {
             case TASK:
                 checkAuthorizedToOperateOnTask(owner, requester, operation, contentId);
                 break;
+            case NOTE:
+                checkAuthorizedToOperateOnNote(owner, requester, operation, contentId, other);
             default:
         }
     }
@@ -60,6 +62,26 @@ public class AuthorizationService {
                 if (!Objects.equals(owner, requester)) {
                     throw new UnAuthorizedException("Project " + contentId + " is owner by " +
                             owner + " while request is from " + requester);
+                }
+                break;
+            default:
+        }
+    }
+
+    private void checkAuthorizedToOperateOnNote(
+            String owner, String requester, Operation operation, Long contentId, Object... other) {
+         String projectOwner = (String) other[0];
+        switch (operation) {
+            case DELETE:
+                if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
+                    throw new UnAuthorizedException("Project Note " + contentId + " is owner by " +
+                        owner + "and Project is owned by " + projectOwner  + " while request is from " + requester);
+                }
+                break;
+            case UPDATE:
+                if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
+                    throw new UnAuthorizedException("Project Note " + contentId + " is owner by " +
+                    owner + "and Project is owned by " + projectOwner  + " while request is from " + requester);
                 }
                 break;
             default:
