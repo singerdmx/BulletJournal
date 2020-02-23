@@ -1,5 +1,13 @@
 import React from 'react';
-import { Menu, Icon, Button, List, Dropdown, Badge, Avatar } from 'antd';
+import {
+  Menu,
+  Icon,
+  Button,
+  List,
+  Dropdown,
+  Badge,
+  Avatar
+} from 'antd';
 import { connect } from 'react-redux';
 import { deleteGroup } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interfaces';
@@ -7,11 +15,16 @@ import { MyselfWithAvatar } from '../../features/myself/reducer';
 import { IState } from '../../store';
 
 import './group-card.styles.less';
+import AddUser from '../modals/add-user.component';
 
 type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
   deleteGroup: (groupId: number, groupName: string) => void;
+};
+
+type GroupState = {
+  showModal: boolean;
 };
 
 function getGroupUserTitle(item: User, group: Group): string {
@@ -36,7 +49,17 @@ function getGroupUserSpan(item: User, group: Group): JSX.Element {
   return <span style={{ color: 'grey' }}>&nbsp;&nbsp;{item.name}</span>;
 }
 
-class GroupCard extends React.Component<GroupProps> {
+class GroupCard extends React.Component<GroupProps, GroupState> {
+  state: GroupState = {
+    showModal: false
+  };
+
+  private modalElement: React.RefObject<AddUser>
+  constructor (props: GroupProps) {
+    super(props);
+    this.modalElement = React.createRef();
+  }
+
   handleDelete = (groupId: number, groupName: string) => {
     this.props.deleteGroup(groupId, groupName);
   };
@@ -46,14 +69,19 @@ class GroupCard extends React.Component<GroupProps> {
       this.handleDelete(groupId, groupName);
     }
   };
+
+  addUser = () => {
+    this.modalElement.current?.showModal();
+  }
+
   render() {
     const { group } = this.props;
     return (
-      <div className='group-card'>
-        <div className='group-title'>
+      <div className="group-card">
+        <div className="group-title">
           <h3>{group.name}</h3>
-          <h3 className='group-operation'>
-            <Icon type='user' />
+          <h3 className="group-operation">
+            <Icon type="user" />
             {group.users && group.users.length}
             {group.owner === this.props.myself.username && (
               <Dropdown
@@ -63,33 +91,33 @@ class GroupCard extends React.Component<GroupProps> {
                       this.handleMenuClick(menu, group.id, group.name)
                     }
                   >
-                    <Menu.Item key='edit'>
-                      <Icon type='edit' /> Edit
+                    <Menu.Item key="edit">
+                      <Icon type="edit" /> Edit
                     </Menu.Item>
                     <Menu.Divider />
-                    <Menu.Item key='delete' disabled={this.props.group.default}>
-                      <Icon type='delete' /> Delete
+                    <Menu.Item key="delete" disabled={this.props.group.default}>
+                      <Icon type="delete" /> Delete
                     </Menu.Item>
                   </Menu>
                 }
                 trigger={['click']}
-                placement='bottomLeft'
+                placement="bottomLeft"
               >
-                <Button type='link' className='group-setting'>
-                  <Icon type='setting' title='Edit Group' />
+                <Button type="link" className="group-setting">
+                  <Icon type="setting" title="Edit Group" />
                 </Button>
               </Dropdown>
             )}
           </h3>
         </div>
-        <div className='group-users'>
+        <div className="group-users">
           <List
             dataSource={group.users}
             renderItem={item => {
               return (
                 <List.Item key={item.id}>
                   <div
-                    className='group-user'
+                    className="group-user"
                     title={getGroupUserTitle(item, group)}
                   >
                     <Badge dot={!item.accepted}>
@@ -100,11 +128,11 @@ class GroupCard extends React.Component<GroupProps> {
                   {item.name !== group.owner &&
                     group.owner === this.props.myself.username && (
                       <Button
-                        type='link'
-                        size='small'
+                        type="link"
+                        size="small"
                         title={item.accepted ? 'Remove' : 'Cancel Invitation'}
                       >
-                        <Icon type='close' />
+                        <Icon type="close" />
                       </Button>
                     )}
                 </List.Item>
@@ -113,10 +141,17 @@ class GroupCard extends React.Component<GroupProps> {
           />
         </div>
         {group.owner === this.props.myself.username && (
-          <div className='group-footer'>
-            <Button type='primary' icon='plus' shape='round' title='Add User' />
+          <div className="group-footer">
+            <Button
+              type="primary"
+              icon="plus"
+              shape="round"
+              title="Add User"
+              onClick={this.addUser}
+            />
           </div>
         )}
+        <AddUser ref={this.modalElement} groupId={group.id}/>
       </div>
     );
   }

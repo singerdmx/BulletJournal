@@ -1,15 +1,32 @@
 import React from 'react';
 import { Modal, Input } from 'antd';
 
-type ModalProps = {
+type ModalState = {
   isShow: boolean;
 };
 
-class AddUser extends React.Component<ModalProps> {
+type ModalProps = {
+  groupId : number 
+}
+
+class AddUser extends React.Component<ModalProps ,ModalState> {
+  state : ModalState ={
+    isShow : false
+  }
+
+  showModal = () => {
+    this.setState({isShow: true})
+  }
+
   render() {
-    return <Modal title="Create New Group" visible={this.props.isShow}>
-        <Input.Search allowClear/>
-    </Modal>;
+    return <Modal
+    title="Create User"
+    visible={this.state.isShow}
+    onCancel={() => this.setState({ isShow: false })}
+    onOk={() => this.setState({ isShow: false })}
+  >
+    <Input.Search allowClear />
+  </Modal>
   }
 }
 
