@@ -5,6 +5,7 @@ import { reducer as projectReducer } from '../features/project/reducer';
 import { reducer as systemReducer } from '../features/system/reducer';
 import { reducer as userReducer } from '../features/user/reducer';
 import { reducer as settingsReducer } from '../components/settings/reducer';
+import { reducer as noteReducer } from '../features/notes/reducer';
 
 export default {
   settings: settingsReducer,
@@ -13,5 +14,6 @@ export default {
   group: groupReducer,
   project: projectReducer,
   system: systemReducer,
-  user: userReducer
+  user: userReducer,
+  note: noteReducer
 };

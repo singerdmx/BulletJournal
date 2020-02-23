@@ -5,6 +5,7 @@ import groupSaga from '../features/group/saga';
 import projectSaga from '../features/project/saga';
 import systemSaga from '../features/system/saga';
 import userSaga from '../features/user/saga';
+import noteSaga from '../features/notes/saga';
 
 export default function* root() {
   yield spawn(myselfSaga);
@@ -13,4 +14,5 @@ export default function* root() {
   yield spawn(projectSaga);
   yield spawn(systemSaga);
   yield spawn(userSaga);
+  yield spawn(noteSaga);
 }
