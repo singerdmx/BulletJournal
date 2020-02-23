@@ -38,7 +38,7 @@ public class NotificationCleaner {
             throw new IllegalArgumentException("Invalid intervalInSeconds: " + intervalInSeconds);
         }
 
-        this.executorService.scheduleAtFixedRate(this::cleanNotification, 0, intervalInSeconds, TimeUnit.SECONDS);
+        this.executorService.scheduleWithFixedDelay(this::cleanNotification, 0, intervalInSeconds, TimeUnit.SECONDS);
     }
 
     public void cleanNotification() {
