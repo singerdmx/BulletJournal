@@ -395,7 +395,7 @@ const zones = [
 
 const TimezonePicker = () => {
   return (
-    <Select style={{ width: 200 }} placeholder='Select a timezone'>
+    <Select style={{ width: 250 }} placeholder='Select a timezone'>
       {zones.map((zone: string, index: number) => (
         <Option key={zone} value={zone}>
           {zone}
