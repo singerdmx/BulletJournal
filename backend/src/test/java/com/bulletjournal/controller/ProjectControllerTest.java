@@ -105,7 +105,7 @@ public class ProjectControllerTest {
     }
 
     private Task createTask(Project project, String taskName) {
-        CreateTaskParams task = new CreateTaskParams(taskName, project.getId(), null, null);
+        CreateTaskParams task = new CreateTaskParams(taskName, null, null);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,

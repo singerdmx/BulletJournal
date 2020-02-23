@@ -1,7 +1,6 @@
 package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class CreateTaskParams {
@@ -9,9 +8,6 @@ public class CreateTaskParams {
     @NotBlank
     @Size(min = 1, max = 100)
     private String name;
-
-    @NotNull
-    private Long projectId;
 
     private String dueDate; // "yyyy-MM-dd"
 
@@ -23,21 +19,11 @@ public class CreateTaskParams {
     }
 
     public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
-                            @NotNull Long projectId,
                             String dueDate,
                             String dueTime) {
         this.name = name;
-        this.projectId = projectId;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
     }
 
     public String getDueDate() {
