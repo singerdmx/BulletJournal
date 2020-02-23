@@ -68,7 +68,8 @@ public class NoteDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                note.getCreatedBy(), requester, ContentType.NOTE, Operation.UPDATE, noteId);
+                note.getCreatedBy(), requester, ContentType.NOTE, Operation.UPDATE, noteId,
+                note.getProject().getOwner());
 
         DaoHelper.updateIfPresent(updateNoteParams.hasName(), updateNoteParams.getName(),
                 (value) -> note.setName(value));
