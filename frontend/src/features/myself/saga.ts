@@ -4,13 +4,30 @@ import {
   actions as myselfActions,
   MyselfApiErrorAction,
   UpdateMyself,
-  PatchMyself
+  PatchMyself,
+  UpdateExpandedMyself
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself } from '../../apis/myselfApis';
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
+}
+
+function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
+  try {
+    const data = yield call(fetchMyself, true);
+    yield put(
+      myselfActions.myselfDataReceived({
+        username: data.name,
+        avatar: data.avatar,
+        timezone: data.timezone,
+        before: data.before
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Myself (Expand) Error Received: ${error}`);
+  }
 }
 
 function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
@@ -45,6 +62,7 @@ export default function* myselfSagas() {
       myselfApiErrorAction
     ),
     yield takeEvery(myselfActions.myselfUpdate.type, myselfUpdate),
-    yield takeEvery(myselfActions.patchMyself.type, myselfPatch)
+    yield takeEvery(myselfActions.patchMyself.type, myselfPatch),
+    yield takeEvery(myselfActions.expandedMyselfUpdate.type, getExpandedMyself)
   ]);
 }

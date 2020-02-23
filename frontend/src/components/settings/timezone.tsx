@@ -1,5 +1,9 @@
 import React from 'react';
-import { Select } from 'antd';
+import { Select, Icon } from 'antd';
+import { connect } from 'react-redux';
+import { IState } from '../../store';
+import { updateTimezone } from '../../features/myself/actions';
+
 const { Option } = Select;
 
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -393,16 +397,49 @@ const zones = [
   return 0;
 });
 
-const TimezonePicker = () => {
-  return (
-    <Select style={{ width: 250 }} placeholder='Select a timezone'>
-      {zones.map((zone: string, index: number) => (
-        <Option key={zone} value={zone}>
-          {zone}
-        </Option>
-      ))}
-    </Select>
-  );
+type TimezoneProps = {
+  timezone: string;
+  updateTimezone: (timezone: string) => void;
 };
 
-export default TimezonePicker;
+class TimezonePicker extends React.Component<TimezoneProps> {
+  handleOnchange = (value: string) => {
+    this.props.updateTimezone(value);
+  };
+
+  render() {
+    return (
+      <span>
+        <Select
+          showSearch={true}
+          style={{ width: 250 }}
+          placeholder='Select a timezone'
+          onChange={this.handleOnchange}
+          value={this.props.timezone}
+        >
+          {zones.map((zone: string, index: number) => (
+            <Option key={zone} value={zone}>
+              {zone}
+            </Option>
+          ))}
+        </Select>
+        <Icon
+          type='check-circle'
+          style={{
+            marginLeft: '20px',
+            cursor: 'pointer',
+            color: '#00e600',
+            fontSize: 20
+          }}
+          title='Save'
+        />
+      </span>
+    );
+  }
+}
+
+const mapStateToProps = (state: IState) => ({
+  timezone: state.myself.timezone
+});
+
+export default connect(mapStateToProps, { updateTimezone })(TimezonePicker);

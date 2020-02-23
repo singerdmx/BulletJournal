@@ -1,15 +1,6 @@
 import React from 'react';
 import TodoItem from '../components/todo-item/todo-item.component';
-import {
-  List,
-  Icon,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  Radio,
-  Checkbox
-} from 'antd';
+import { List, Icon, Modal, Form, Input, DatePicker, Checkbox } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import moment from 'moment';
 
@@ -47,23 +38,23 @@ class TodoPage extends React.Component<TodoRouteProps, todoState> {
 
   render() {
     return (
-      <div className="todo">
-        <div className="todo-header">
+      <div className='todo'>
+        <div className='todo-header'>
           <h2>{this.props.match.params.category.toUpperCase()} </h2>
-          <Checkbox.Group defaultValue={['todo']} className="header-check">
-            <Checkbox value="todo">
-              <Icon type="carry-out" title="TODO" />
+          <Checkbox.Group defaultValue={['todo']} className='header-check'>
+            <Checkbox value='todo'>
+              <Icon type='carry-out' title='TODO' />
             </Checkbox>
-            <Checkbox value="ledger">
-              <Icon type="account-book" title="LEDGER" />
+            <Checkbox value='ledger'>
+              <Icon type='account-book' title='LEDGER' />
             </Checkbox>
           </Checkbox.Group>
 
-          <h2 className="add-todo-button" onClick={this.showForm}>
-            <Icon type="plus" />
+          <h2 className='add-todo-button' onClick={this.showForm}>
+            <Icon type='plus' />
           </h2>
         </div>
-        <div className="todo-panel">
+        <div className='todo-panel'>
           <RangePicker
             defaultValue={[
               moment('2015-01-01', dateFormat),
@@ -72,24 +63,24 @@ class TodoPage extends React.Component<TodoRouteProps, todoState> {
             format={dateFormat}
           />
         </div>
-        <div className="todo-list">
+        <div className='todo-list'>
           <List
-            itemLayout="horizontal"
+            itemLayout='horizontal'
             dataSource={fakeData}
             renderItem={item => <TodoItem title={item} />}
           />
         </div>
         <Modal
-          title="Create Task"
+          title='Create Task'
           visible={this.state.showForm}
           onOk={this.handleCreate}
           onCancel={this.handleCancel}
           centered={true}
-          okText="Create"
+          okText='Create'
         >
           <Form>
             <Form.Item>
-              <Input placeholder="titie" />
+              <Input placeholder='titie' />
             </Form.Item>
             <Form.Item>
               <Input.TextArea allowClear={true} />

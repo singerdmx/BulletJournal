@@ -4,7 +4,7 @@ import { Avatar, Icon, Popover } from 'antd';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
-import { updateMyself } from './reducer';
+import { updateMyself } from './actions';
 
 type MyselfProps = {
   username: string;

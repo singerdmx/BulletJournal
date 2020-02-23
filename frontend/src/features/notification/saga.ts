@@ -4,7 +4,7 @@ import {
   actions as notificationsActions,
   NoticeApiErrorAction,
   NotificationsAction,
-  AnswerNotificationAction,
+  AnswerNotificationAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -16,8 +16,6 @@ import { updateGroups } from '../group/actions';
 import { Notification } from './interface';
 
 import { IState } from '../../store';
-import { EventType, ActionType } from './constants';
-
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -26,11 +24,14 @@ function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
 function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
   try {
     const data = yield call(fetchNotifications);
-    const etag = data.headers.get("Etag")!;
+    const etag = data.headers.get('Etag')!;
     const notifications = yield data.json();
 
     yield put(
-      notificationsActions.notificationsReceived({ notifications: notifications, etag: etag })
+      notificationsActions.notificationsReceived({
+        notifications: notifications,
+        etag: etag
+      })
     );
   } catch (error) {
     yield call(message.error, `Notice Error Received: ${error}`);
@@ -42,10 +43,15 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     const { action, notificationId, type } = act.payload;
     yield call(answerNotification, notificationId, action);
     const state: IState = yield select();
-    const notifications = state.notice.notifications.filter((notice: Notification) => notice.id !== notificationId);
-    console.log(notifications)
+    const notifications = state.notice.notifications.filter(
+      (notice: Notification) => notice.id !== notificationId
+    );
+    console.log(notifications);
     yield put(
-      notificationsActions.notificationsReceived({ notifications: notifications, etag: '' })
+      notificationsActions.notificationsReceived({
+        notifications: notifications,
+        etag: ''
+      })
     );
     if (type.toLowerCase().includes('group')) {
       yield put(updateGroups());

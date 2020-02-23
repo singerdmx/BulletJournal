@@ -4,7 +4,7 @@ export type MyselfWithAvatar = {
   username: string;
   avatar: string;
   timezone: string;
-  before: Before;
+  before?: Before;
 };
 
 export type MyselfApiErrorAction = {
@@ -12,6 +12,8 @@ export type MyselfApiErrorAction = {
 };
 
 export type UpdateMyself = {};
+
+export type UpdateExpandedMyself = {};
 
 export type PatchMyself = {
   timezone: string;
@@ -35,9 +37,10 @@ const slice = createSlice({
   initialState,
   reducers: {
     myselfDataReceived: (state, action: PayloadAction<MyselfWithAvatar>) => {
+      console.log('inside reducer 40');
       const { username, avatar, timezone, before } = action.payload;
-      state.username = username;
-      state.avatar = avatar;
+      if (username && username.length > 0) state.username = username;
+      if (avatar && avatar.length > 0) state.avatar = avatar;
       if (timezone && timezone.length > 0) state.timezone = timezone;
       if (before) state.before = before;
     },
@@ -46,11 +49,13 @@ const slice = createSlice({
       action: PayloadAction<MyselfApiErrorAction>
     ) => state,
     myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state,
-    patchMyself: (state, action: PayloadAction<PatchMyself>) => state
+    patchMyself: (state, action: PayloadAction<PatchMyself>) => state,
+    expandedMyselfUpdate: (
+      state,
+      action: PayloadAction<UpdateExpandedMyself>
+    ) => state
   }
 });
-
-export const updateMyself = () => actions.myselfUpdate({});
 
 export const reducer = slice.reducer;
 export const actions = slice.actions;

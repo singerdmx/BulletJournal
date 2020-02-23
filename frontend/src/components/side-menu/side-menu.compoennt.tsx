@@ -5,7 +5,7 @@ import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
-
+import { updateExpandedMyself } from '../../features/myself/actions';
 const { SubMenu } = Menu;
 
 type GroupProps = {
@@ -14,11 +14,20 @@ type GroupProps = {
   createGroupByName: (name: string) => void;
 };
 
+type MyselfProps = {
+  timezone: string;
+  updateExpandedMyself: () => void;
+};
+
 type PathProps = RouteComponentProps;
 
-class SideMenu extends React.Component<GroupProps & PathProps> {
+class SideMenu extends React.Component<GroupProps & PathProps & MyselfProps> {
   state = {
     showModal: false
+  };
+
+  handleFetchExpandedMyself = () => {
+    this.props.updateExpandedMyself();
   };
 
   onClick = (menu: any) => {
@@ -32,7 +41,7 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
 
   onGroupsClick = (menu: any) => {
     this.props.history.push(`/${menu.key}`);
-  }
+  };
 
   componentDidMount() {
     this.props.updateGroups();
@@ -41,55 +50,58 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
     const groupsByOwner = this.props.groups;
     return (
       <Menu
-        mode="inline"
+        mode='inline'
         defaultOpenKeys={['todo']}
         style={{ height: '100%', fontWeight: 500 }}
         onClick={this.onClick}
       >
-        <SubMenu key="todo" title={
-          <span>
-            <Icon type="sketch" />
-            <span>My BUJOs</span>
-          </span>
-        }>
-          <Menu.Item key="today">
-            <Icon type="bell" />
+        <SubMenu
+          key='todo'
+          title={
+            <span>
+              <Icon type='sketch' />
+              <span>My BUJOs</span>
+            </span>
+          }
+        >
+          <Menu.Item key='today'>
+            <Icon type='bell' />
             Today
           </Menu.Item>
-          <Menu.Item key="calendarView">
-            <Icon type="calendar" />
+          <Menu.Item key='calendarView'>
+            <Icon type='calendar' />
             Calendar View
           </Menu.Item>
         </SubMenu>
         <SubMenu
-          key="projects"
+          key='projects'
           title={
             <span>
-              <Icon type="folder" />
+              <Icon type='folder' />
               <span>Bullet Journal</span>
             </span>
           }
         ></SubMenu>
         <SubMenu
-          key="groups"
+          key='groups'
           onTitleClick={this.onGroupsClick}
           title={
             <span>
-              <Icon type="team" />
+              <Icon type='team' />
               <span>Groups</span>
             </span>
           }
         >
-          <Menu.Item key="addGroup" title='Create New Group'>
-            <Icon type="usergroup-add" style={{ fontSize: 20 }}/>
+          <Menu.Item key='addGroup' title='Create New Group'>
+            <Icon type='usergroup-add' style={{ fontSize: 20 }} />
           </Menu.Item>
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
               <Menu.Item key={group.id}>
-                <span className="group-title">
+                <span className='group-title'>
                   <span>
                     <Avatar
-                      size="small"
+                      size='small'
                       style={
                         index === 0
                           ? {
@@ -103,7 +115,7 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
                       {group.owner.charAt(0)}
                     </Avatar>
                     <span
-                      className="group-name"
+                      className='group-name'
                       title={
                         'Group "' +
                         group.name +
@@ -116,19 +128,23 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
                     </span>
                   </span>
                   <span>
-                    <Icon type="user" />{group.users.length}
+                    <Icon type='user' />
+                    {group.users.length}
                   </span>
                 </span>
               </Menu.Item>
             ));
           })}
         </SubMenu>
-        <Menu.Item key="labels">
-          <Icon type="flag" />
+        <Menu.Item key='labels'>
+          <Icon type='flag' />
           Labels
         </Menu.Item>
-        <Menu.Item key="settings">
-          <Icon type="setting" />
+        <Menu.Item
+          key='settings'
+          onClick={() => this.handleFetchExpandedMyself()}
+        >
+          <Icon type='setting' />
           Settings
         </Menu.Item>
       </Menu>
@@ -137,9 +153,12 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  groups: state.group.groups
+  groups: state.group.groups,
+  timezone: state.myself.timezone
 });
 
-export default connect(mapStateToProps, { updateGroups, createGroupByName })(
-  withRouter(SideMenu)
-);
+export default connect(mapStateToProps, {
+  updateGroups,
+  createGroupByName,
+  updateExpandedMyself
+})(withRouter(SideMenu));
