@@ -4,9 +4,11 @@ import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.ReminderSetting;
 
 import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+@MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
 
     @NotBlank
