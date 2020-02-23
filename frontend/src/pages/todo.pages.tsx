@@ -1,6 +1,15 @@
 import React from 'react';
 import TodoItem from '../components/todo-item/todo-item.component';
-import { List, Icon, Modal, Form, Input, Checkbox, DatePicker } from 'antd';
+import {
+  List,
+  Icon,
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  Radio,
+  Checkbox
+} from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import moment from 'moment';
 
@@ -41,15 +50,25 @@ class TodoPage extends React.Component<TodoRouteProps, todoState> {
       <div className="todo">
         <div className="todo-header">
           <h2>{this.props.match.params.category.toUpperCase()} </h2>
-          <Checkbox><Icon type="carry-out" title="TODO"/></Checkbox>
-          <Checkbox><Icon type="account-book" title="LEDGER"/></Checkbox>
+          <Checkbox.Group defaultValue={['todo']} className="header-check">
+            <Checkbox value="todo">
+              <Icon type="carry-out" title="TODO" />
+            </Checkbox>
+            <Checkbox value="ledger">
+              <Icon type="account-book" title="LEDGER" />
+            </Checkbox>
+          </Checkbox.Group>
+
           <h2 className="add-todo-button" onClick={this.showForm}>
             <Icon type="plus" />
           </h2>
         </div>
-        <div>
+        <div className="todo-panel">
           <RangePicker
-            defaultValue={[moment('2015-01-01', dateFormat), moment('2015-01-01', dateFormat)]}
+            defaultValue={[
+              moment('2015-01-01', dateFormat),
+              moment('2015-01-01', dateFormat)
+            ]}
             format={dateFormat}
           />
         </div>
