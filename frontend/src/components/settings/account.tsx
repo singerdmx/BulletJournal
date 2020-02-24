@@ -21,7 +21,7 @@ class Account extends React.Component<AccountProps> {
           <span>Time Zone &nbsp;&nbsp;&nbsp;</span> <TimezonePicker />
         </div>
         <div className='option-container'>
-          <span>Default Reminder Before Task&nbsp;&nbsp;&nbsp;</span>{' '}
+          <span>Default Reminder Before Task&nbsp;&nbsp;&nbsp;</span>
           <ReminderBeforeTaskPicker />
         </div>
       </div>
@@ -30,7 +30,8 @@ class Account extends React.Component<AccountProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  timezone: state.myself.timezone
+  timezone: state.myself.timezone,
+  before: state.myself.before
 });
 
 export default connect(mapStateToProps, { updateExpandedMyself })(Account);
