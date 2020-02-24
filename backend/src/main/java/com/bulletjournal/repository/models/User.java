@@ -93,8 +93,8 @@ public class User extends NamedModel {
         return reminderBeforeTask;
     }
 
-    public void setReminderBeforeTask(Before reminderBeforeTask) {
-        this.reminderBeforeTask = reminderBeforeTask;
+    public void setReminderBeforeTask(Integer reminderBeforeTask) {
+        this.reminderBeforeTask = Before.getType(reminderBeforeTask);
     }
 
     public Integer getDateFormat() {

@@ -33,9 +33,6 @@ public class NoteDaoJpa {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private UserGroupRepository userGroupRepository;
-
-    @Autowired
     private AuthorizationService authorizationService;
 
     @Autowired
