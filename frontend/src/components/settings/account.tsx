@@ -4,6 +4,7 @@ import ReminderBeforeTaskPicker from './reminder-before-task';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { updateExpandedMyself } from '../../features/myself/actions';
+import './account.styles.less';
 
 type AccountProps = {
   updateExpandedMyself: () => void;
@@ -16,11 +17,12 @@ class Account extends React.Component<AccountProps> {
   render() {
     return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div className='option-container'>
           <span>Time Zone &nbsp;&nbsp;&nbsp;</span> <TimezonePicker />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span>Default Reminder Before Task&nbsp;&nbsp;&nbsp;</span> <ReminderBeforeTaskPicker />
+        <div className='option-container'>
+          <span>Default Reminder Before Task&nbsp;&nbsp;&nbsp;</span>{' '}
+          <ReminderBeforeTaskPicker />
         </div>
       </div>
     );
