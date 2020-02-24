@@ -30,7 +30,7 @@ public class UserController {
     private UserDaoJpa userDaoJpa;
 
     @GetMapping("/api/users/{username}")
-    public User getUser(String username) {
+    public User getUser(@NotNull @PathVariable String username) {
         return userClient.getUser(username);
     }
 
