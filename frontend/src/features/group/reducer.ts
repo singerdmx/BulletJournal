@@ -23,11 +23,13 @@ export type GroupCreateAction = {
 export type AddUserGroupAction = {
   groupId: number;
   username: string;
+  groupName: string;
 };
 
 export type RemoveUserGroupAction = {
   groupId: number;
   username: string;
+  groupName: string;
 };
 
 export type DeleteGroupAction = {

@@ -2,10 +2,26 @@ import { actions } from './reducer';
 export const updateGroups = () => actions.groupsUpdate({});
 export const createGroupByName = (name: string) =>
   actions.createGroup({ name: name });
-export const addUserGroupByUsername = (groupId: number, username: string) =>
-  actions.addUserGroup({ groupId: groupId, username: username });
-export const removeUserGroupByUsername = (groupId: number, username: string) =>
-  actions.removeUserGroup({ groupId: groupId, username: username });
+export const addUserGroupByUsername = (
+  groupId: number,
+  username: string,
+  groupName: string
+) =>
+  actions.addUserGroup({
+    groupId: groupId,
+    username: username,
+    groupName: groupName
+  });
+export const removeUserGroupByUsername = (
+  groupId: number,
+  username: string,
+  groupName: string
+) =>
+  actions.removeUserGroup({
+    groupId: groupId,
+    username: username,
+    groupName: groupName
+  });
 export const deleteGroup = (groupId: number, groupName: string) =>
   actions.deleteGroup({ groupId: groupId, groupName: groupName });
 export const getGroup = (groupId: number) =>

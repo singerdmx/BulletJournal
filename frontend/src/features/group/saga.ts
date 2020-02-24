@@ -53,9 +53,12 @@ function* createGroup(action: PayloadAction<GroupCreateAction>) {
 
 function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
   try {
-    const { groupId, username } = action.payload;
+    const { groupId, username, groupName } = action.payload;
     yield call(addUserGroup, groupId, username);
-    yield call(message.success, `User ${username} added into Group ${groupId}`);
+    yield call(
+      message.success,
+      `User ${username} added into Group ${groupName}`
+    );
   } catch (error) {
     yield call(message.error, `Add user group fail: ${error}`);
   }
@@ -63,11 +66,11 @@ function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
 
 function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
   try {
-    const { groupId, username } = action.payload;
+    const { groupId, username, groupName } = action.payload;
     yield call(removeUserGroup, groupId, username);
     yield call(
       message.success,
-      `User ${username} removed from Group ${groupId}`
+      `User ${username} removed from Group ${groupName}`
     );
   } catch (error) {
     yield call(message.error, `Remove user group fail: ${error}`);
