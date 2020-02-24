@@ -65,6 +65,10 @@ public class Note {
         this.subNotes = subNotes;
     }
 
+    public void addSubNote(Note note) {
+        this.subNotes.add(note);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

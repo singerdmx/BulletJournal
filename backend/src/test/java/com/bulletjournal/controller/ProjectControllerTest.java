@@ -92,8 +92,7 @@ public class ProjectControllerTest {
         Note note1 = createNotes(p5, "test111");
         Note note2 = createNotes(p5, "test2");
         Note note3 = createNotes(p5, "test3");
-        updateNoteRelations(p5, note1);
-        updateNoteRelations(p5, note2);
+        updateNoteRelations(p5, note1, note2, note3);
         updateNote(note1);
 //        deleteNote(note2);
         getNotifications(notificationsEtag);
@@ -144,19 +143,30 @@ public class ProjectControllerTest {
         return n1;
     }
 
-    private void updateNoteRelations(Project p1, Note note1) {
-        List<Note> notes = new ArrayList<>();
-        List<Note> subNotes = new ArrayList<>();
-        note1.setSubNotes(subNotes);
-        notes.add(note1);
+    private void updateNoteRelations(Project project, Note note1, Note note2, Note note3) {
+//        note1
+//          |
+//           --note2
+//               |
+//                --- note3
+        note1.addSubNote(note2);
+        note2.addSubNote(note3);
         ResponseEntity<?> updateNoteRelationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
                 HttpMethod.PUT,
-                new HttpEntity<>(notes),
+                new HttpEntity<>(ImmutableList.of(note1)),
                 Project.class,
-                note1.getId()
+                project.getId()
         );
         assertEquals(HttpStatus.OK, updateNoteRelationsResponse.getStatusCode());
+
+        ResponseEntity<Note[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
+                HttpMethod.GET,
+                null,
+                Note[].class,
+                project.getId());
+        Note[] notes = response.getBody();
     }
 
     private void deleteNote(Note note1) {
