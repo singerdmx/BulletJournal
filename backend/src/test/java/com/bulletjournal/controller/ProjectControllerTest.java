@@ -102,6 +102,7 @@ public class ProjectControllerTest {
         Task t1 = createTask(project, "t1");
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
+        updateTask(t1, null, "2020-02-28", null, null, null);
     }
 
     private Task createTask(Project project, String taskName) {
@@ -117,6 +118,26 @@ public class ProjectControllerTest {
         assertEquals(taskName, created.getName());
         assertEquals(project.getId(), created.getProjectId());
         return created;
+    }
+
+
+    private Task updateTask(Task task, String assignedTo, String dueDate,
+                            String dueTime, String name, ReminderSetting reminderSetting) {
+        //update task parameter
+        UpdateTaskParams updateTaskParams = new UpdateTaskParams(assignedTo, dueDate, dueTime, name, reminderSetting);
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateTaskParams),
+                Task.class,
+                task.getId());
+        Task updated = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updated.getAssignedTo(), assignedTo);
+        assertEquals(updated.getDueDate(), dueDate);
+        assertEquals(updated.getDueTime(), dueTime);
+        assertEquals(updated.getName(), name);
+        return updated;
     }
 
     private void deleteProject(Project p) {
