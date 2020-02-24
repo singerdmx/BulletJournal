@@ -20,8 +20,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Repository
 public class NoteDaoJpa {
@@ -41,10 +43,14 @@ public class NoteDaoJpa {
     private static final Gson GSON = new Gson();
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Note> getNotes(Long projectId) {
+    public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId) {
+        ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId).orElseThrow(
+                () -> new ResourceNotFoundException("ProjectNotes of project " + projectId + " not found"));
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
-        return this.noteRepository.findNoteByProject(project);
+        Map<Long, Note> notes = this.noteRepository.findNoteByProject(project)
+                .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
+        return NoteRelationsProcessor.processRelations(notes, projectNotes.getNotes());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

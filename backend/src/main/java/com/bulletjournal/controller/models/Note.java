@@ -83,4 +83,10 @@ public class Note {
     public int hashCode() {
         return Objects.hash(id, name, projectId);
     }
+
+    public void clone(Note note) {
+        this.setId(note.getId());
+        this.setName(note.getName());
+        this.setProjectId(note.getProjectId());
+    }
 }

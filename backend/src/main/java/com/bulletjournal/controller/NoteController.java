@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class NoteController {
@@ -33,7 +32,7 @@ public class NoteController {
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(NOTES_ROUTE)
     public List<Note> getNotes(@NotNull @PathVariable Long projectId) {
-        return this.noteDaoJpa.getNotes(projectId).stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+        return this.noteDaoJpa.getNotes(projectId);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")

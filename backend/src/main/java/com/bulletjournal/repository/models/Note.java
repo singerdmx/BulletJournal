@@ -24,11 +24,11 @@ public class Note extends ProjectItemModel {
         this.id = id;
     }
 
-public com.bulletjournal.controller.models.Note toPresentationModel() {
+    public com.bulletjournal.controller.models.Note toPresentationModel() {
 
-    return new com.bulletjournal.controller.models.Note(
-            this.getId(),
-            this.getName(),
-            this.getProject());
-}
+        return new com.bulletjournal.controller.models.Note(
+                this.getId(),
+                this.getName(),
+                this.getProject());
+    }
 }

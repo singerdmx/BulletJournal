@@ -167,6 +167,12 @@ public class ProjectControllerTest {
                 Note[].class,
                 project.getId());
         Note[] notes = response.getBody();
+        assertEquals(1, notes.length);
+        assertEquals(note1, notes[0]);
+        assertEquals(1, notes[0].getSubNotes().size());
+        assertEquals(note2, notes[0].getSubNotes().get(0));
+        assertEquals(1, notes[0].getSubNotes().get(0).getSubNotes().size());
+        assertEquals(note3, notes[0].getSubNotes().get(0).getSubNotes().get(0));
     }
 
     private void deleteNote(Note note1) {
