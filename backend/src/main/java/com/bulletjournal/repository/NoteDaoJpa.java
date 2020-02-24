@@ -91,7 +91,6 @@ public class NoteDaoJpa {
 
         projectNotes.setNotes(NoteRelationsProcessor.processRelations(notes));
         projectNotes.setProjectId(projectId);
-
         this.projectNotesRepository.save(projectNotes);
     }
 
@@ -102,12 +101,11 @@ public class NoteDaoJpa {
 
         Project project = note.getProject();
         Long projectId = project.getId();
-        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.PROJECT,
+        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.TRANSACTION,
                 Operation.DELETE, projectId, project.getOwner());
 
         ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("ProjectNotes by " + projectId + " not found"));
-
         String relations = projectNotes.getNotes();
 
         // delete notes and its subNotes

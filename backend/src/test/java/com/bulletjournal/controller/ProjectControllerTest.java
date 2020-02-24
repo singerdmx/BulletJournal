@@ -17,6 +17,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,7 +89,85 @@ public class ProjectControllerTest {
         deleteProject(p1);
 
         createTasks(p5);
-        getNotifications(notificationsEtag);
+        Note note1 = createNotes(p5, "test111");
+        Note note2 = createNotes(p5, "test2");
+        Note note3 = createNotes(p5, "test3");
+        updateNoteRelations(p5, note1);
+        updateNoteRelations(p5, note2);
+        updateNote(note1);
+//        deleteNote(note2);
+    }
+
+    private Note createNotes(Project p5, String noteName) {
+            CreateNoteParams note = new CreateNoteParams(noteName);
+            ResponseEntity<Note> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(note),
+                Note.class,
+                p5.getId());
+        Note created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(noteName, created.getName());
+        assertEquals(p5.getId(), created.getProjectId());
+        return created;
+    }
+
+    private Note getNote(Note note1) {
+           ResponseEntity<Note> response = this.restTemplate.exchange(
+                   ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
+                   HttpMethod.GET,
+                   null,
+                   Note.class,
+                   note1.getId());
+           Note outputNote = response.getBody();
+           assertEquals(HttpStatus.OK, response.getStatusCode());
+           assertEquals(note1.getName(), outputNote.getName());
+           return outputNote;
+    }
+
+    private Note updateNote(Note n1) {
+        // update project name from "P0" to "P1"
+        String noteName = "test111";
+        UpdateNoteParams updateNoteParams = new UpdateNoteParams();
+        updateNoteParams.setName(noteName);
+        ResponseEntity<Note> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateNoteParams),
+                Note.class,
+                n1.getId());
+        n1 = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(noteName, n1.getName());
+        return n1;
+    }
+
+    private void updateNoteRelations(Project p1, Note note1) {
+        List<Note> notes = new ArrayList<>();
+        List<Note> subNotes = new ArrayList<>();
+        note1.setSubNotes(subNotes);
+        notes.add(note1);
+        ResponseEntity<?> updateNoteRelationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(notes),
+                Project.class,
+                note1.getId()
+        );
+        assertEquals(HttpStatus.OK, updateNoteRelationsResponse.getStatusCode());
+    }
+
+    private void deleteNote(Note note1) {
+
+        ResponseEntity<Note> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Note.class,
+                note1.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     private HttpEntity actAsOtherUser(String username) {
