@@ -93,7 +93,7 @@ public class ProjectControllerTest {
         Note note3 = createNotes(p5, "test3");
         updateNoteRelations(p5, note1, note2, note3);
         updateNote(note1);
-//        deleteNote(note2);
+        deleteNote(note1);
         getNotifications(notificationsEtag);
     }
 
@@ -174,16 +174,24 @@ public class ProjectControllerTest {
         assertEquals(note3, notes[0].getSubNotes().get(0).getSubNotes().get(0));
     }
 
-    private void deleteNote(Note note1) {
+    private void deleteNote(Note note) {
 
         ResponseEntity<Note> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
                 HttpMethod.DELETE,
                 null,
                 Note.class,
-                note1.getId());
+                note.getId());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        ResponseEntity<Note[]> getResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
+                HttpMethod.GET,
+                null,
+                Note[].class,
+                note.getProjectId());
+        Note[] notes = getResponse.getBody();
+        assertEquals(0, notes.length);
     }
 
     private HttpEntity actAsOtherUser(String username) {
