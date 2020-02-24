@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 
 export type MyselfWithAvatar = {
-  username: string;
-  avatar: string;
-  timezone: string;
-  before?: Before;
+  username?: string;
+  avatar?: string;
+  timezone?: string;
+  before?: number;
 };
 
 export type MyselfApiErrorAction = {
@@ -17,16 +17,11 @@ export type UpdateExpandedMyself = {};
 
 export type PatchMyself = {};
 
-export type Before = {
-  text: string;
-  value: number;
-};
-
 let initialState = {
   username: '',
   avatar: '',
   timezone: '',
-  before: {} as Before
+  before: 0
 };
 
 const slice = createSlice({
@@ -38,7 +33,7 @@ const slice = createSlice({
       if (username && username.length > 0) state.username = username;
       if (avatar && avatar.length > 0) state.avatar = avatar;
       if (timezone && timezone.length > 0) state.timezone = timezone;
-      if (before) state.before = before;
+      if (before || before === 0) state.before = before!;
     },
     myselfApiErrorReceived: (
       state,

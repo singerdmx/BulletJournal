@@ -18,12 +18,13 @@ function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
 function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
   try {
     const data = yield call(fetchMyself, true);
+    console.log(data);
     yield put(
       myselfActions.myselfDataReceived({
         username: data.name,
         avatar: data.avatar,
         timezone: data.timezone,
-        before: data.before
+        before: data.reminderBeforeTask
       })
     );
   } catch (error) {
@@ -34,6 +35,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
 function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
   try {
     const data = yield call(fetchMyself);
+
     yield put(
       myselfActions.myselfDataReceived({
         username: data.name,

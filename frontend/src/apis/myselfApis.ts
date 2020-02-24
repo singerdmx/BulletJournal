@@ -1,5 +1,4 @@
 import { doFetch, doPost, doPatch } from './api-helper';
-import { Before } from '../features/myself/reducer';
 
 export const fetchMyself = (expand = false) => {
   let endpoint = '/api/myself';
@@ -17,10 +16,10 @@ export const logoutUser = () => {
   return doPost('/api/myself/logout', postBody);
 };
 
-export const patchMyself = (timezone: string, before: Before) => {
+export const patchMyself = (timezone: string, before: number) => {
   const patchBody = JSON.stringify({
     timezone: timezone,
-    before: before
+    reminderBeforeTask: before
   });
 
   return doPatch('/api/myself', patchBody)

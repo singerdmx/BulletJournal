@@ -3,7 +3,6 @@ import { Select, Icon } from 'antd';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { ReminderBeforeTaskText } from './reducer';
-import { Before } from '../../features/myself/reducer';
 import {
   updateBefore,
   updateExpandedMyself,
@@ -13,21 +12,18 @@ import { updateBeforeSaveButtonVisiblility } from './actions';
 const { Option } = Select;
 
 type ReminderBeforeProps = {
-  before: Before;
+  before: number;
   beforeSaveButtonVisible: boolean;
   updateExpandedMyself: () => void;
-  updateBefore: (before: Before) => void;
+  updateBefore: (before: number) => void;
   patchMyself: () => void;
   updateBeforeSaveButtonVisiblility: (beforeSaveButtonVisible: boolean) => void;
 };
 
 class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
   handleOnChange = (value: string) => {
-    const index = ReminderBeforeTaskText.indexOf(value);
-    const before: Before = {
-      text: value,
-      value: index
-    };
+    const before = ReminderBeforeTaskText.indexOf(value);
+
     this.props.updateBefore(before);
     this.props.updateBeforeSaveButtonVisiblility(true);
   };
@@ -49,7 +45,7 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
           style={{ width: 250 }}
           placeholder='Select a before'
           onChange={this.handleOnChange}
-          value={this.props.before.text}
+          value={ReminderBeforeTaskText[this.props.before]}
         >
           {ReminderBeforeTaskText.map((before: string, index: number) => (
             <Option key={index} value={before}>
