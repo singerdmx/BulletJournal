@@ -19,10 +19,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -44,8 +41,11 @@ public class NoteDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId) {
-        ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId).orElseThrow(
-                () -> new ResourceNotFoundException("ProjectNotes of project " + projectId + " not found"));
+        Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
+        if (!projectNotesOptional.isPresent()) {
+            return Collections.emptyList();
+        }
+        ProjectNotes projectNotes = projectNotesOptional.get();
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         Map<Long, Note> notes = this.noteRepository.findNoteByProject(project)
