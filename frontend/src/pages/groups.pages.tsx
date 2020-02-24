@@ -4,6 +4,7 @@ import { updateGroups } from '../features/group/actions';
 import { IState } from '../store';
 import { GroupsWithOwner } from '../features/group/interfaces';
 import GroupCard from '../components/group-card/group-card.component';
+import { BackTop } from 'antd';
 
 type GroupsProps = {
   groups: GroupsWithOwner[];
@@ -19,6 +20,7 @@ class GroupsPage extends React.Component<GroupsProps> {
     const groupsByOwner = this.props.groups;
     return (
       <div className="groups-page">
+        <BackTop />
         {groupsByOwner && groupsByOwner.map(groupOwner => {
             return groupOwner.groups.map(group => (
                 <GroupCard group={group} />
