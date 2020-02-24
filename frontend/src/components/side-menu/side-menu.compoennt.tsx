@@ -50,7 +50,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & MyselfProps> {
         onClick={this.onClick}
       >
         <SubMenu
-          key='todo'
+          key='bujo'
           title={
             <span>
               <Icon type='sketch' />
@@ -62,7 +62,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & MyselfProps> {
             <Icon type='bell' />
             Today
           </Menu.Item>
-          <Menu.Item key='calendarView'>
+          <Menu.Item key='calender'>
             <Icon type='calendar' />
             Calendar View
           </Menu.Item>
