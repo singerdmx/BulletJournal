@@ -1,13 +1,18 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.repository.models.Project;
+import com.google.gson.annotations.Expose;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Task {
+    @Expose
     private Long id;
 
     @NotBlank
@@ -32,6 +37,10 @@ public class Task {
     private Long projectId;
 
     private ReminderSetting reminderSetting;
+
+    @Expose
+    @Valid
+    private List<Task> subTasks = new ArrayList<>();
 
     public Task() {
     }
@@ -118,6 +127,14 @@ public class Task {
 
     public void setReminderSetting(ReminderSetting reminderSetting) {
         this.reminderSetting = reminderSetting;
+    }
+
+    public List<Task> getSubTasks() {
+        return subTasks;
+    }
+
+    public void setSubTasks(List<Task> subTasks) {
+        this.subTasks = subTasks;
     }
 
     @Override

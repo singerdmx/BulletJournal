@@ -4,6 +4,9 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveTaskEvent;
 import com.bulletjournal.repository.TaskDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +28,19 @@ public class TaskController {
     @Autowired
     private TaskDaoJpa taskDaoJpa;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @GetMapping(TASKS_ROUTE)
     public List<Task> getTasks(@NotNull @PathVariable Long projectId) {
         return this.taskDaoJpa.getTasks(projectId)
                 .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 
+    @GetMapping(TASK_ROUTE)
+    public Task getTask(@NotNull @PathVariable Long taskId) {
+        return this.taskDaoJpa.getTask(taskId).toPresentationModel();
+    }
 
     @PostMapping(TASKS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -47,15 +57,24 @@ public class TaskController {
         return this.taskDaoJpa.partialUpdate(username, taskId, updateTaskParams).toPresentationModel();
     }
 
-    /*
+
     @PutMapping(TASKS_ROUTE)
-    public void updateProjectRelations(@Valid @RequestBody List<Project> projects) {
+    public void updateTaskRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Task> tasks) {
+        this.taskDaoJpa.updateUserTasks(projectId, tasks);
     }
-     */
 
     @PostMapping(COMPLETE_TASK_ROUTE)
     public void completeTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.taskDaoJpa.complete(username, taskId);
+    }
+
+    @DeleteMapping(TASK_ROUTE)
+    public void deleteTask(@NotNull @PathVariable Long taskId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Event> events = this.taskDaoJpa.deleteTask(username, taskId);
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new RemoveTaskEvent(events, username));
+        }
     }
 }
