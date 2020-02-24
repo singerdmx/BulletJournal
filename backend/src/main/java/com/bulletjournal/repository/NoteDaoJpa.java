@@ -101,7 +101,7 @@ public class NoteDaoJpa {
 
         Project project = note.getProject();
         Long projectId = project.getId();
-        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.TRANSACTION,
+        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.DELETE, projectId, project.getOwner());
 
         ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId)
