@@ -46,7 +46,7 @@ public class UserController {
             before = user.getReminderBeforeTask();
         }
         User self = userClient.getUser(username);
-        return new Myself(self, timezone, before.getValue());
+        return new Myself(self, timezone, before);
     }
 
     @PatchMapping(MYSELF_ROUTE)
@@ -55,7 +55,7 @@ public class UserController {
         com.bulletjournal.repository.models.User user =
                 this.userDaoJpa.updateMyself(username, updateMyselfParams);
         User self = userClient.getUser(username);
-        return new Myself(self, user.getTimezone(), user.getReminderBeforeTask().getValue());
+        return new Myself(self, user.getTimezone(), user.getReminderBeforeTask());
     }
 
     @PostMapping(LOGOUT_MYSELF_ROUTE)

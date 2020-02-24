@@ -12,10 +12,12 @@ public class Myself extends User {
     public Myself() {
     }
 
-    public Myself(User user, String timezone, Integer reminderBeforeTask) {
+    public Myself(User user, String timezone, Before reminderBeforeTask) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
-        this.reminderBeforeTask = reminderBeforeTask;
+        if (reminderBeforeTask != null) {
+            this.reminderBeforeTask = reminderBeforeTask.getValue();
+        }
     }
 
     public String getTimezone() {
