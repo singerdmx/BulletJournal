@@ -96,6 +96,7 @@ public class ProjectControllerTest {
         updateNoteRelations(p5, note2);
         updateNote(note1);
 //        deleteNote(note2);
+        getNotifications(notificationsEtag);
     }
 
     private Note createNotes(Project p5, String noteName) {
