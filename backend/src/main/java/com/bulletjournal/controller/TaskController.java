@@ -31,6 +31,7 @@ public class TaskController {
                 .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 
+
     @PostMapping(TASKS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Task createTask(@NotNull @PathVariable Long projectId,

@@ -102,7 +102,7 @@ public class ProjectControllerTest {
         Task t1 = createTask(project, "t1");
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
-        updateTask(t1, null, "2020-02-28", null, null, null);
+        updateTask(t1, null, "2020-02-28", null, null, null, t1.getName());
     }
 
     private Task createTask(Project project, String taskName) {
@@ -122,7 +122,7 @@ public class ProjectControllerTest {
 
 
     private Task updateTask(Task task, String assignedTo, String dueDate,
-                            String dueTime, String name, ReminderSetting reminderSetting) {
+                            String dueTime, String name, ReminderSetting reminderSetting, String expectedName) {
         //update task parameter
         UpdateTaskParams updateTaskParams = new UpdateTaskParams(assignedTo, dueDate, dueTime, name, reminderSetting);
         ResponseEntity<Task> response = this.restTemplate.exchange(
@@ -133,10 +133,10 @@ public class ProjectControllerTest {
                 task.getId());
         Task updated = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(updated.getAssignedTo(), assignedTo);
-        assertEquals(updated.getDueDate(), dueDate);
-        assertEquals(updated.getDueTime(), dueTime);
-        assertEquals(updated.getName(), name);
+        assertEquals(expectedOwner, updated.getAssignedTo());
+        assertEquals(dueDate, updated.getDueDate());
+        assertEquals(dueTime, updated.getDueTime());
+        assertEquals(expectedName, updated.getName());
         return updated;
     }
 
