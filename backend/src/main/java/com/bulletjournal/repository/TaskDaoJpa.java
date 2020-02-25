@@ -101,7 +101,7 @@ public class TaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void complete(String requester, Long taskId) {
+    public CompletedTask complete(String requester, Long taskId) {
         Task task = this.taskRepository
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
@@ -112,6 +112,7 @@ public class TaskDaoJpa {
         CompletedTask completedTask = new CompletedTask(task);
         this.completedTaskRepository.save(completedTask);
         this.taskRepository.delete(task);
+        return completedTask;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
