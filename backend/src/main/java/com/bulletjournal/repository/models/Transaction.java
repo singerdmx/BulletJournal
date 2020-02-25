@@ -34,6 +34,10 @@ public class Transaction extends ProjectItemModel {
     @Column
     private TransactionType transactionType;
 
+    @NotNull
+    @Column
+    private String date;
+
     public Long getId() {
         return id;
     }
@@ -64,5 +68,24 @@ public class Transaction extends ProjectItemModel {
 
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public com.bulletjournal.controller.models.Transaction toPresentationModel() {
+        return new com.bulletjournal.controller.models.Transaction(
+                this.getId(),
+                this.getName(),
+                this.getProject(),
+                this.getPayer(),
+                this.getAmount(),
+                this.getDate(),
+                this.getTransactionType().getValue());
     }
 }

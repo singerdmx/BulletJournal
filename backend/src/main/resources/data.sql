@@ -163,3 +163,16 @@ VALUES ('Scarlet', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '
 
 INSERT INTO public.user_projects (owner, created_at, updated_at, owned_projects, shared_projects)
 VALUES ('lsx9981', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '[{"id":7,"s":[]}]', null);
+
+-- Michael_Zhou creates 1 project
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (8, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P1', 'Michael_Zhou', null, 2, 12);
+
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, payer, transaction_type, project_id)
+VALUES (1, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'T1', 'Michael_Zhou', 10.0, '2020-02-18', 'Michael_Zhou', 0, 8);
+
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, payer, transaction_type, project_id)
+VALUES (2, '2020-02-15 07:11:23.535000', '2020-02-15 07:11:23.535000', 'T2', 'Michael_Zhou', 20.0, '2020-02-18', 'Michael_Zhou', 0, 8);
+
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, payer, transaction_type, project_id)
+VALUES (3, '2020-02-15 07:11:23.535000', '2020-02-15 07:11:23.535000', 'T3', 'Michael_Zhou', 200000.0, '2020-02-18', 'Michael_Zhou', 1, 8);

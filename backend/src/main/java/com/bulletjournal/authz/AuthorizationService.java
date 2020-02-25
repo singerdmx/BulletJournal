@@ -65,7 +65,7 @@ public class AuthorizationService {
             case UPDATE:
                 if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
                     throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
-                    owner + "and Project is owned by " + projectOwner  + " while request is from " + requester);
+                    owner + " and Project is owned by " + projectOwner  + " while request is from " + requester);
                 }
                 break;
         }
