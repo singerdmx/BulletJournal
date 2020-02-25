@@ -17,7 +17,6 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
   const { name } = action.payload;
   try {
     const data = yield call(fetchUser, name);
-    // console.log(data);
     yield put(
       userActions.userDataReceived({
         name: data.name,
@@ -28,7 +27,7 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
     );
   } catch (error) {
     if (error.status === 404) {
-      yield call(message.error, `User Not Found`);
+      yield call(message.error, `User ${name} Not Found`);
     } else {
       yield call(message.error, `User Error Received: ${error}`);
     }

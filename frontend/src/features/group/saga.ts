@@ -55,6 +55,10 @@ function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
   try {
     const { groupId, username, groupName } = action.payload;
     yield call(addUserGroup, groupId, username);
+    yield all ([
+      yield put(groupsActions.groupsUpdate({})),
+      yield put(groupsActions.getGroup({groupId: groupId}))
+    ]);
     yield call(
       message.success,
       `User ${username} added into Group ${groupName}`
