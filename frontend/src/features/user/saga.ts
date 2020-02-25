@@ -27,7 +27,11 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `User Error Received: ${error}`);
+    if (error.status === 404) {
+      yield call(message.error, `User Not Found`);
+    } else {
+      yield call(message.error, `User Error Received: ${error}`);
+    }
   }
 }
 

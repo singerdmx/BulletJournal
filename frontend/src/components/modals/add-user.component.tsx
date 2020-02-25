@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Input, Button, Avatar, Empty } from 'antd';
 import { connect } from 'react-redux';
 import { addUserGroupByUsername } from '../../features/group/actions';
-import { updateUser } from '../../features/user/actions';
+import { updateUser, clearUser } from '../../features/user/actions';
 import { UserWithAvatar } from '../../features/user/reducer';
 import { IState } from '../../store';
 
@@ -14,6 +14,7 @@ type ModalState = {
 
 type ModalProps = {
   groupId: number;
+  groupName : string;
   user: UserWithAvatar;
   addUserGroupByUsername: (
     groupId: number,
@@ -21,6 +22,7 @@ type ModalProps = {
     groupName: string
   ) => void;
   updateUser: (username: string) => void;
+  clearUser : () => void;
 };
 
 class AddUser extends React.Component<ModalProps, ModalState> {
@@ -36,7 +38,18 @@ class AddUser extends React.Component<ModalProps, ModalState> {
     this.props.updateUser(value);
   };
 
+  addUser = (groupId: number, username : string, groupName: string) => {
+    this.props.addUserGroupByUsername(groupId, username, groupName);
+    this.setState({isShow : false});
+  }
+
+  onCancel = () => {
+    this.props.clearUser();
+    this.setState({isShow: false});
+  }
+
   render() {
+    const {groupId, user, groupName} = this.props;
     return (
       <div className="group-footer">
         <Button
@@ -49,15 +62,17 @@ class AddUser extends React.Component<ModalProps, ModalState> {
         <Modal
           title="Add User"
           visible={this.state.isShow}
-          onCancel={() => this.setState({ isShow: false })}
-          onOk={() => this.setState({ isShow: false })}
+          onCancel={this.onCancel}
+          onOk={() => this.addUser(groupId, user.name, groupName)}
+          okText="Add User"
           centered={true}
-          okButtonProps={{disabled : !this.props.user.name}}
+          width={300}
+          okButtonProps={{disabled : !user.name}}
         >
           <Input.Search allowClear onSearch={value => this.searchUser(value)} />
           <div className="search-result">
-            {this.props.user.name ? (
-              <Avatar src={this.props.user.avatar} />
+            {user.name ? (
+              <Avatar size="large" src={user.avatar}/>
             ) : (
               <Empty
                 description="No result found"
@@ -77,7 +92,7 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(
   mapStateToProps,
-  { addUserGroupByUsername, updateUser },
+  { addUserGroupByUsername, updateUser, clearUser },
   null,
   { forwardRef: true }
 )(AddUser);

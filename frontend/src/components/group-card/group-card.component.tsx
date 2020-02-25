@@ -131,7 +131,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
           />
         </div>
         {group.owner === this.props.myself.username && (
-          <AddUser groupId={group.id}/>
+          <AddUser groupId={group.id} groupName={group.name}/>
         )}
       </div>
     );

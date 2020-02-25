@@ -148,7 +148,7 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps, GroupState>
             />
           </div>
           {group.owner === this.props.myself.username && (
-            <AddUser groupId={group.id} />
+            <AddUser groupId={group.id} groupName={group.name}/>
           )}
         </div>
       </div>
