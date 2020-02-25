@@ -64,7 +64,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & MyselfProps> {
           </Menu.Item>
           <Menu.Item key='calender'>
             <Icon type='calendar' />
-            Calendar View
+            Calendar
           </Menu.Item>
         </SubMenu>
         <SubMenu
