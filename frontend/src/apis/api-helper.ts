@@ -6,7 +6,7 @@ export function doFetch(endpoint: string) {
     headers: {}
   }).then(res => {
     if (!res.ok) {
-      throw Error(res.statusText);
+      throw Error(res.status.toString());
     }
     return res;
   });
@@ -22,7 +22,7 @@ export function doPost(endpoint: string, body: string) {
     body: body
   }).then(res => {
     if (!res.ok) {
-      throw Error(res.statusText);
+      throw Error(res.status.toString());
     }
     return res;
   });
@@ -36,7 +36,7 @@ export function doDelete(endpoint: string) {
     method: 'DELETE'
   }).then(res => {
     if (!res.ok) {
-      throw Error(res.statusText);
+      throw Error(res.status.toString());
     }
     return res;
   });
@@ -52,7 +52,7 @@ export function doPut(endpoint: string, body: string) {
     body: body
   }).then(res => {
     if (!res.ok) {
-      throw Error(res.statusText);
+      throw Error(res.status.toString());
     }
     return res;
   });
@@ -68,7 +68,7 @@ export function doPatch(endpoint: string, body: string) {
     body: body
   }).then(res => {
     if (!res.ok) {
-      throw Error(res.statusText);
+      throw Error(res.status.toString());
     }
     return res;
   });

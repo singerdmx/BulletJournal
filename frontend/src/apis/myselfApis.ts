@@ -7,7 +7,7 @@ export const fetchMyself = (expand = false) => {
   return doFetch(endpoint)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -25,6 +25,6 @@ export const patchMyself = (timezone?: string, before?: number) => {
   return doPatch('/api/myself', patchBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };

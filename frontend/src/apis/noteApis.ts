@@ -5,7 +5,7 @@ export const fetchNotes = (projectId: number) => {
   return doFetch(`http://localhost:8081/api/projects/${projectId}/notes`)
     .then(res => res)
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -13,7 +13,7 @@ export const getNoteById = (noteId: number) => {
   return doFetch(`http://localhost:8081/api/notes/${noteId}`)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -21,7 +21,7 @@ export const deleteNoteById = (noteId: number) => {
   return doFetch(`http://localhost:8081/api/notes/${noteId}`)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -33,7 +33,7 @@ export const createNotes = (projectId: number, name: string) => {
   return doPost(`http://localhost:8081/api/projects/${projectId}/notes`, postBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -44,6 +44,6 @@ export const putNotes = (projectId: number, notes: Note[]) => {
   return doPost(`http://localhost:8081/api/projects/${projectId}/notes`, postBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 }
