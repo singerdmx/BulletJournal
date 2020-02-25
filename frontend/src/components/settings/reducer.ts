@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 
-type TimezoneSaveButtonAction = {
-  timezoneSaveButtonVisible: boolean;
+type GetTimezoneAction = {};
+
+type TimezoneAction = {
+  timezone: string;
 };
 
-type BeforeSaveButtonAction = {
-  beforeSaveButtonVisible: boolean;
+type BeforeAction = {
+  before: number;
 };
 
 export enum ReminderBeforeTask {
@@ -29,27 +31,21 @@ export const ReminderBeforeTaskText = [
 ];
 
 let initialState = {
-  timezoneSaveButtonVisible: false,
-  beforeSaveButtonVisible: false
+  timezone: '',
+  before: 0
 };
 
 const slice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    updateTimezoneSaveButtonVisiblility: (
-      state,
-      action: PayloadAction<TimezoneSaveButtonAction>
-    ) => {
-      const { timezoneSaveButtonVisible } = action.payload;
-      state.timezoneSaveButtonVisible = timezoneSaveButtonVisible;
+    updateTimezone: (state, action: PayloadAction<TimezoneAction>) => {
+      const { timezone } = action.payload;
+      state.timezone = timezone;
     },
-    updateBeforeSaveButtonVisiblility: (
-      state,
-      action: PayloadAction<BeforeSaveButtonAction>
-    ) => {
-      const { beforeSaveButtonVisible } = action.payload;
-      state.beforeSaveButtonVisible = beforeSaveButtonVisible;
+    updateBefore: (state, action: PayloadAction<BeforeAction>) => {
+      const { before } = action.payload;
+      state.before = before;
     }
   }
 });

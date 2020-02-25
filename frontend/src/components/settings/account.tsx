@@ -7,12 +7,12 @@ import { updateExpandedMyself } from '../../features/myself/actions';
 import './account.styles.less';
 
 type AccountProps = {
-  updateExpandedMyself: () => void;
+  updateExpandedMyself: (updateSettings: boolean) => void;
 };
 
 class Account extends React.Component<AccountProps> {
-  componentDidMount() {
-    this.props.updateExpandedMyself();
+  async componentDidMount() {
+    this.props.updateExpandedMyself(true);
   }
   render() {
     return (
@@ -29,9 +29,8 @@ class Account extends React.Component<AccountProps> {
   }
 }
 
-const mapStateToProps = (state: IState) => ({
-  timezone: state.myself.timezone,
-  before: state.myself.before
-});
+const mapStateToProps = (state: IState) => ({});
 
-export default connect(mapStateToProps, { updateExpandedMyself })(Account);
+export default connect(mapStateToProps, {
+  updateExpandedMyself
+})(Account);

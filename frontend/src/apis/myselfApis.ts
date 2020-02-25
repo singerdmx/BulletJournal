@@ -16,7 +16,7 @@ export const logoutUser = () => {
   return doPost('/api/myself/logout', postBody);
 };
 
-export const patchMyself = (timezone: string, before: number) => {
+export const patchMyself = (timezone?: string, before?: number) => {
   const patchBody = JSON.stringify({
     timezone: timezone,
     reminderBeforeTask: before

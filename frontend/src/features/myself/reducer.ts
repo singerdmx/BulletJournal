@@ -13,9 +13,14 @@ export type MyselfApiErrorAction = {
 
 export type UpdateMyself = {};
 
-export type UpdateExpandedMyself = {};
+export type UpdateExpandedMyself = {
+  updateSettings: boolean;
+};
 
-export type PatchMyself = {};
+export type PatchMyself = {
+  timezone?: string;
+  before?: number;
+};
 
 let initialState = {
   username: '',

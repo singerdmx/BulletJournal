@@ -1,15 +1,11 @@
 import { actions } from './reducer';
 
-export const updateTimezoneSaveButtonVisiblility = (
-  timezoneSaveButtonVisible: boolean
-) =>
-  actions.updateTimezoneSaveButtonVisiblility({
-    timezoneSaveButtonVisible: timezoneSaveButtonVisible
+export const updateTimezone = (timezone: string) =>
+  actions.updateTimezone({
+    timezone: timezone
   });
 
-export const updateBeforeSaveButtonVisiblility = (
-  beforeSaveButtonVisible: boolean
-) =>
-  actions.updateBeforeSaveButtonVisiblility({
-    beforeSaveButtonVisible: beforeSaveButtonVisible
+export const updateBefore = (before: number) =>
+  actions.updateBefore({
+    before: before
   });

@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put, select } from 'redux-saga/effects';
+import { takeLatest, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as myselfActions,
@@ -7,9 +7,9 @@ import {
   PatchMyself,
   UpdateExpandedMyself
 } from './reducer';
+import { actions as settingsActions } from '../../components/settings/reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself } from '../../apis/myselfApis';
-import { IState } from '../../store';
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -17,8 +17,9 @@ function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
 
 function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
   try {
+    const { updateSettings } = action.payload;
+
     const data = yield call(fetchMyself, true);
-    console.log(data);
     yield put(
       myselfActions.myselfDataReceived({
         username: data.name,
@@ -27,6 +28,12 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
         before: data.reminderBeforeTask
       })
     );
+    if (updateSettings) {
+      yield put(settingsActions.updateTimezone({ timezone: data.timezone }));
+      yield put(
+        settingsActions.updateBefore({ before: data.reminderBeforeTask })
+      );
+    }
   } catch (error) {
     yield call(message.error, `Myself (Expand) Error Received: ${error}`);
   }
@@ -39,9 +46,7 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
     yield put(
       myselfActions.myselfDataReceived({
         username: data.name,
-        avatar: data.avatar,
-        timezone: data.timezone,
-        before: data.before
+        avatar: data.avatar
       })
     );
   } catch (error) {
@@ -51,8 +56,14 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
 
 function* myselfPatch(action: PayloadAction<PatchMyself>) {
   try {
-    const state: IState = yield select();
-    yield call(patchMyself, state.myself.timezone, state.myself.before);
+    const { timezone, before } = action.payload;
+    yield call(patchMyself, timezone, before);
+    yield put(
+      myselfActions.myselfDataReceived({
+        timezone: timezone,
+        before: before
+      })
+    );
     yield call(message.success, 'User Settings updated successfully');
   } catch (error) {
     yield call(message.error, `Myself Patch Error Received: ${error}`);

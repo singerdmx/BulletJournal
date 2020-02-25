@@ -4,36 +4,31 @@ import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { ReminderBeforeTaskText } from './reducer';
 import {
-  updateBefore,
   updateExpandedMyself,
   patchMyself
 } from '../../features/myself/actions';
-import { updateBeforeSaveButtonVisiblility } from './actions';
+import { updateBefore } from './actions';
 const { Option } = Select;
 
 type ReminderBeforeProps = {
-  before: number;
-  beforeSaveButtonVisible: boolean;
-  updateExpandedMyself: () => void;
+  originalBefore: number;
+  currentBefore: number;
+  updateExpandedMyself: (updateSettings: boolean) => void;
   updateBefore: (before: number) => void;
-  patchMyself: () => void;
-  updateBeforeSaveButtonVisiblility: (beforeSaveButtonVisible: boolean) => void;
+  patchMyself: (timezone?: string, before?: number) => void;
 };
 
 class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
   handleOnChange = (value: string) => {
     const before = ReminderBeforeTaskText.indexOf(value);
-
     this.props.updateBefore(before);
-    this.props.updateBeforeSaveButtonVisiblility(true);
   };
 
   handleOnClick = (save: boolean) => {
-    this.props.updateBeforeSaveButtonVisiblility(false);
     if (save) {
-      this.props.patchMyself();
+      this.props.patchMyself(undefined, this.props.currentBefore);
     } else {
-      this.props.updateExpandedMyself();
+      this.props.updateBefore(this.props.originalBefore);
     }
   };
 
@@ -45,7 +40,7 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
           style={{ width: 250 }}
           placeholder='Select a before'
           onChange={this.handleOnChange}
-          value={ReminderBeforeTaskText[this.props.before]}
+          value={ReminderBeforeTaskText[this.props.currentBefore]}
         >
           {ReminderBeforeTaskText.map((before: string, index: number) => (
             <Option key={index} value={before}>
@@ -61,9 +56,10 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
             cursor: 'pointer',
             color: '#00e600',
             fontSize: 20,
-            visibility: this.props.beforeSaveButtonVisible
-              ? 'visible'
-              : 'hidden'
+            visibility:
+              this.props.currentBefore !== this.props.originalBefore
+                ? 'visible'
+                : 'hidden'
           }}
           title='Save'
         />
@@ -75,9 +71,10 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
             cursor: 'pointer',
             color: '#ff0000',
             fontSize: 20,
-            visibility: this.props.beforeSaveButtonVisible
-              ? 'visible'
-              : 'hidden'
+            visibility:
+              this.props.currentBefore !== this.props.originalBefore
+                ? 'visible'
+                : 'hidden'
           }}
           title='Cancel'
         />
@@ -87,13 +84,12 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  before: state.myself.before,
-  beforeSaveButtonVisible: state.settings.beforeSaveButtonVisible
+  originalBefore: state.myself.before,
+  currentBefore: state.settings.before
 });
 
 export default connect(mapStateToProps, {
   updateBefore,
   patchMyself,
-  updateBeforeSaveButtonVisiblility,
   updateExpandedMyself
 })(ReminderBeforeTaskPicker);
