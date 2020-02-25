@@ -26,10 +26,10 @@ public class GroupController {
 
     protected static final String GROUPS_ROUTE = "/api/groups";
     protected static final String GROUP_ROUTE = "/api/groups/{groupId}";
-    protected static final String ADD_USER_GROUPS_ROUTE = "/addUserGroups";
-    protected static final String ADD_USER_GROUP_ROUTE = "/addUserGroup";
-    protected static final String REMOVE_USER_GROUP_ROUTE = "/removeUserGroup";
-    protected static final String REMOVE_USER_GROUPS_ROUTE = "/removeUserGroups";
+    protected static final String ADD_USER_GROUPS_ROUTE = "/api/addUserGroups";
+    protected static final String ADD_USER_GROUP_ROUTE = "/api/addUserGroup";
+    protected static final String REMOVE_USER_GROUP_ROUTE = "/api/removeUserGroup";
+    protected static final String REMOVE_USER_GROUPS_ROUTE = "/api/removeUserGroups";
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;

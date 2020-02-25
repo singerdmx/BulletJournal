@@ -32,7 +32,7 @@ export const addUserGroup = (groupId: number, username: string) => {
     groupId: groupId,
     username: username
   });
-  return doPost('/addUserGroup', postBody)
+  return doPost('/api/addUserGroup', postBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err);
@@ -44,7 +44,7 @@ export const removeUserGroup = (groupId: number, username: string) => {
     groupId: groupId,
     username: username
   });
-  return doPost('/removeUserGroup', postBody).catch(err => {
+  return doPost('/api/removeUserGroup', postBody).catch(err => {
     throw Error(err);
   });
 };
