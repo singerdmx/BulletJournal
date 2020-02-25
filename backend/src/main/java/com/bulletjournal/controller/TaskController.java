@@ -66,7 +66,7 @@ public class TaskController {
     @PostMapping(COMPLETE_TASK_ROUTE)
     public Task completeTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.complete(username, taskId).toPresentationModel();
+        return this.taskDaoJpa.complete(username, taskId).toPresentationModel();
     }
 
     @DeleteMapping(TASK_ROUTE)
