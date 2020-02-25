@@ -17,6 +17,10 @@ type titleAvatarProps = {
         icon =  <Icon type="usergroup-delete" />;
         break;
       case EventType.DeleteGroupEvent:
+      case EventType.RemoveNoteEvent:
+      case EventType.RemoveProjectEvent:
+      case EventType.RemoveTaskEvent:
+      case EventType.RemoveTransactionEvent:
         icon = <Icon type="delete" />;
         break;
       case EventType.JoinGroupResponseEvent:

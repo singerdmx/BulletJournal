@@ -28,6 +28,38 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
         </span>
       );
       break;
+    case EventType.RemoveNoteEvent:
+      beg = title.indexOf(' removed Note ');
+      titleText = (
+        <span>
+          <strong>{title.slice(0, beg)}</strong> removed Note <strong>{title.slice(beg + 14)}</strong>
+        </span>
+      );
+      break;
+    case EventType.RemoveProjectEvent:
+      beg = title.indexOf(' removed Project ');
+      titleText = (
+        <span>
+          <strong>{title.slice(0, beg)}</strong> removed Project <strong>{title.slice(beg + 17)}</strong>
+        </span>
+      );
+      break;
+    case EventType.RemoveTaskEvent:
+      beg = title.indexOf(' removed Task ');
+      titleText = (
+        <span>
+          <strong>{title.slice(0, beg)}</strong> removed Task <strong>{title.slice(beg + 14)}</strong>
+        </span>
+      );
+      break;
+    case EventType.RemoveTransactionEvent:
+      beg = title.indexOf(' removed Transaction ');
+      titleText = (
+        <span>
+          <strong>{title.slice(0, beg)}</strong> removed Transaction <strong>{title.slice(beg + 21)}</strong>
+        </span>
+      );
+      break;
     case EventType.JoinGroupResponseEvent:
       beg = title.indexOf(' declined your invitation to join Group ');
       titleText = (

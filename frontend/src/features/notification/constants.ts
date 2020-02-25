@@ -7,5 +7,9 @@ export enum EventType {
     JoinGroupEvent = 'JoinGroupEvent',
     RemoveUserFromGroupEvent = 'RemoveUserFromGroupEvent',
     DeleteGroupEvent = 'DeleteGroupEvent',
-    JoinGroupResponseEvent = 'JoinGroupResponseEvent'
+    JoinGroupResponseEvent = 'JoinGroupResponseEvent',
+    RemoveNoteEvent = 'RemoveNoteEvent',
+    RemoveProjectEvent = 'RemoveProjectEvent',
+    RemoveTaskEvent = 'RemoveTaskEvent',
+    RemoveTransactionEvent = 'RemoveTransactionEvent'
 }
