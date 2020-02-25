@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 
-type GetTimezoneAction = {};
-
 type TimezoneAction = {
   timezone: string;
 };

@@ -11,7 +11,7 @@ type AccountProps = {
 };
 
 class Account extends React.Component<AccountProps> {
-  async componentDidMount() {
+  componentDidMount() {
     this.props.updateExpandedMyself(true);
   }
   render() {
