@@ -24,6 +24,7 @@ public class TaskController {
     protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
     protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
+    protected static final String COMPLETED_TASKS_ROUTE = "/api/projects/{projectId}/completedTasks";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -76,5 +77,10 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
+    }
+
+    @GetMapping(COMPLETED_TASKS_ROUTE)
+    public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId) {
+        return null;
     }
 }
