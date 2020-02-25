@@ -12,7 +12,6 @@ import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,15 +23,12 @@ import java.util.List;
 @Repository
 public class TransactionDaoJpa {
 
-    private static final Gson GSON = new Gson();
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
     private AuthorizationService authorizationService;
-    @Autowired
-    private ProjectLedgersRepository projectLedgersRepository;
 
     /**
      * Get transactions list from project
