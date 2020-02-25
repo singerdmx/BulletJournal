@@ -15,6 +15,8 @@ export type UpdateUser = {
   name: string;
 };
 
+export type ClearUser = {};
+
 let initialState = {
   name: '',
   avatar: '',
@@ -35,7 +37,13 @@ const slice = createSlice({
     },
     userApiErrorReceived: (state, action: PayloadAction<UserApiErrorAction>) =>
       state,
-    userUpdate: (state, action: PayloadAction<UpdateUser>) => state
+    userUpdate: (state, action: PayloadAction<UpdateUser>) => state,
+    userClear: (state, action: PayloadAction<ClearUser>) => {
+      state.name = '';
+      state.avatar = '';
+      state.thumbnail = '';
+      state.id = 0;
+    }
   }
 });
 

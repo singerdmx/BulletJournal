@@ -1,9 +1,10 @@
-import { takeEvery, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as userActions,
   UserApiErrorAction,
-  UpdateUser
+  UpdateUser,
+  ClearUser
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchUser } from '../../apis/userApis';
@@ -32,7 +33,7 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
 
 export default function* userSagas() {
   yield all([
-    yield takeEvery(userActions.userApiErrorReceived.type, userApiErrorAction),
-    yield takeEvery(userActions.userUpdate.type, userUpdate)
+    yield takeLatest(userActions.userApiErrorReceived.type, userApiErrorAction),
+    yield takeLatest(userActions.userUpdate.type, userUpdate)
   ]);
 }
