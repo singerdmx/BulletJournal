@@ -21,6 +21,7 @@ import {
   getGroup,
   updateGroup
 } from '../../apis/groupApis';
+import { clearUser } from '../user/actions'
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -57,7 +58,8 @@ function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
     yield call(addUserGroup, groupId, username);
     yield all ([
       yield put(groupsActions.groupsUpdate({})),
-      yield put(groupsActions.getGroup({groupId: groupId}))
+      yield put(groupsActions.getGroup({groupId: groupId})),
+      yield put(clearUser()),
     ]);
     yield call(
       message.success,
