@@ -23,7 +23,7 @@ class GroupsPage extends React.Component<GroupsProps> {
         <BackTop />
         {groupsByOwner && groupsByOwner.map(groupOwner => {
             return groupOwner.groups.map(group => (
-                <GroupCard group={group} />
+                <GroupCard key={group.id} group={group} />
             ))
         })}
       </div>

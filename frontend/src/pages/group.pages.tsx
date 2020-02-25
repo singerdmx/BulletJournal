@@ -54,12 +54,6 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps, GroupState>
     showModal: false
   };
 
-  private modalElement: React.RefObject<AddUser>
-  constructor (props: GroupProps & GroupPathProps) {
-    super(props);
-    this.modalElement = React.createRef();
-  }
-
   componentDidMount() {
     const groupId = this.props.match.params.groupId;
     console.log(groupId);
@@ -82,10 +76,6 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps, GroupState>
       this.handleDelete(groupId, groupName);
     }
   };
-
-  addUser = () => {
-    this.modalElement.current?.showModal();
-  }
 
   render() {
     const { group } = this.props;
@@ -158,17 +148,8 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps, GroupState>
             />
           </div>
           {group.owner === this.props.myself.username && (
-            <div className='group-footer'>
-              <Button
-                type='primary'
-                icon='plus'
-                shape='round'
-                title='Add User'
-                onClick={this.addUser}
-              />
-            </div>
+            <AddUser groupId={group.id} />
           )}
-          <AddUser ref={this.modalElement} groupId={group.id}/>
         </div>
       </div>
     );

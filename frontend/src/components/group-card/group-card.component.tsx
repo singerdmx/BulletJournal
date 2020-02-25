@@ -54,12 +54,6 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
     showModal: false
   };
 
-  private modalElement: React.RefObject<AddUser>
-  constructor (props: GroupProps) {
-    super(props);
-    this.modalElement = React.createRef();
-  }
-
   handleDelete = (groupId: number, groupName: string) => {
     this.props.deleteGroup(groupId, groupName);
   };
@@ -69,10 +63,6 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
       this.handleDelete(groupId, groupName);
     }
   };
-
-  addUser = () => {
-    this.modalElement.current?.showModal();
-  }
 
   render() {
     const { group } = this.props;
@@ -141,17 +131,8 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
           />
         </div>
         {group.owner === this.props.myself.username && (
-          <div className="group-footer">
-            <Button
-              type="primary"
-              icon="plus"
-              shape="round"
-              title="Add User"
-              onClick={this.addUser}
-            />
-          </div>
+          <AddUser groupId={group.id}/>
         )}
-        <AddUser ref={this.modalElement} groupId={group.id}/>
       </div>
     );
   }
