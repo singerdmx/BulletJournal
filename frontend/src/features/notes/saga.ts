@@ -4,11 +4,13 @@ import {
   actions as notesActions,
   NoteApiErrorAction,
   UpdateNotes,
-  CreateNote
+  CreateNote,
+  PutNote,
+  GetNote
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchNotes, createNotes
+  fetchNotes, createNotes, putNotes, getNoteById
 } from '../../apis/noteApis';
 import { updateNotes } from './actions';
 import { Note } from './interface';
@@ -43,6 +45,23 @@ function* noteCreate(action: PayloadAction<CreateNote>) {
     }
   }
 
+function* notePut(action: PayloadAction<PutNote>) {
+    try{
+      const data = yield call(putNotes, action.payload.projectId, action.payload.notes)
+      yield put(updateNotes(action.payload.projectId));
+    } catch (error) {
+      yield call(message.error, `Put Note Error Received: ${error}`);
+    }
+}
+
+function* getNote(action: PayloadAction<GetNote>) {
+  try{
+    const data = yield call(getNoteById, action.payload.noteId, )
+  }catch (error) {
+    yield call(message.error, `Get Note Error Received: ${error}`);
+  }
+}
+
 export default function* noticeSagas() {
   yield all([
     yield takeLatest(
@@ -56,6 +75,14 @@ export default function* noticeSagas() {
     yield takeLatest(
         notesActions.NotesCreate.type,
         noteCreate
-    )
+    ),
+    yield takeLatest(
+          notesActions.NotePut.type,
+          notePut
+    ),
+    yield takeLatest(
+          notesActions.NoteGet.type,
+          getNote
+      )
   ]);
 }
