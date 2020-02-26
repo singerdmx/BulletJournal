@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Avatar, Icon, Popover } from 'antd';
+import { withRouter, RouteComponentProps } from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
@@ -12,7 +13,9 @@ type MyselfProps = {
   updateMyself: () => void;
 };
 
-class Myself extends React.Component<MyselfProps> {
+type PathProps = RouteComponentProps;
+
+class Myself extends React.Component<MyselfProps & PathProps> {
   componentDidMount() {
     this.props.updateMyself();
   }
@@ -31,7 +34,7 @@ class Myself extends React.Component<MyselfProps> {
         <Icon type='plus' />
         <Notifications />
         <Popover
-          content={<DropdownMenu username={this.props.username} />}
+          content={<DropdownMenu username={this.props.username} history={this.props.history}/>}
           trigger='click'
           placement='bottomRight'
         >
@@ -53,4 +56,4 @@ const mapStateToProps = (state: IState) => ({
   avatar: state.myself.avatar
 });
 
-export default connect(mapStateToProps, { updateMyself })(Myself);
+export default connect(mapStateToProps, { updateMyself })(withRouter(Myself));

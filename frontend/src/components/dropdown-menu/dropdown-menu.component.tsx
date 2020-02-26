@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Icon } from 'antd';
 import { logoutUser } from '../../apis/myselfApis';
+import { History } from 'history';
 
 const handleLogout = () => {
   logoutUser().then(res => {
@@ -10,13 +11,14 @@ const handleLogout = () => {
 
 type menuProps = {
   username: string;
+  history: History<History.PoorMansUnknown>;
 };
 
-const DropdownMenu = ({ username }: menuProps) => (
+const DropdownMenu = ({ username, history }: menuProps) => (
   <Menu>
     <Menu.Item style={{cursor: 'default'}}>{username}</Menu.Item>
     <Menu.Item>
-      <Icon type='setting' />
+      <Icon type='setting' onClick={() => history.push('/settings')}/>
       Settings
     </Menu.Item>
     <Menu.Item onClick={() => handleLogout()}>
