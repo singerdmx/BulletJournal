@@ -13,13 +13,9 @@ type GroupProps = {
   createGroupByName: (name: string) => void;
 };
 
-type MyselfProps = {
-  timezone: string;
-};
-
 type PathProps = RouteComponentProps;
 
-class SideMenu extends React.Component<GroupProps & PathProps & MyselfProps> {
+class SideMenu extends React.Component<GroupProps & PathProps> {
   state = {
     showModal: false
   };
