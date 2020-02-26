@@ -59,7 +59,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           title={
             <span>
               <Icon type='sketch' />
-              <span>My BUJOs</span>
+              <span>My BuJo</span>
             </span>
           }
         >
@@ -85,30 +85,27 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             key='own-Projects'
             title={
               <span>
-                <Icon type='project' />
-                <span>ownProjects</span>
+                <Icon type='profile' />
+                <span>Owned BuJo</span>
               </span>
             }
           >
-            <Menu.Item key='ownProjects' title='ownProjects'>
-              <Icon type='project' style={{ fontSize: 20 }} />
+            <Menu.Item key='addProjects' title='Add New BuJo'>
+              <Icon type='folder-add' />
             </Menu.Item>
           </SubMenu>
           <SubMenu
             key='share-Projects'
             title={
               <span>
-                <Icon type='share-alt' />
-                <span>shareProjects</span>
+                <Icon type='team' />
+                <span>Shared BuJo</span>
               </span>
             }
           >
-            <Menu.Item key='shareProjects' title='shareProjects'>
-            <Icon type='share-alt' style={{ fontSize: 20 }} />
-          </Menu.Item>
           {sharedProjects.map(((item, index)=>{
             return (
-                <Menu.Item key={index} title={item.owner}>
+                <Menu.Item key={'project' + index} title={item.owner}>
                 <div>{item.owner}</div>
                 <Icon type='usergroup-add' style={{ fontSize: 20 }} />
                 </Menu.Item>)
