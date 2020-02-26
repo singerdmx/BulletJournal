@@ -69,7 +69,6 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
 
   deleteUser = (groupId: number, username: string, groupName: string) => {
     this.props.removeUserGroupByUsername(groupId, username, groupName);
-    this.props.getGroup(groupId);
   };
 
   render() {

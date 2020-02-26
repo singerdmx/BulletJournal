@@ -12,6 +12,8 @@ export type GroupsAction = {
   etag: string;
 };
 
+export type GroupUpdateAction = {};
+
 export type GroupAction = {
   group: Group;
 };
@@ -74,7 +76,8 @@ const slice = createSlice({
       const { group } = action.payload;
       state.group = group;
     },
-    patchGroup: (state, action: PayloadAction<PatchGroupAction>) => state
+    patchGroup: (state, action: PayloadAction<PatchGroupAction>) => state,
+    groupUpdate: (state, action: PayloadAction<GroupUpdateAction>) => state
   }
 });
 

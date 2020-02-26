@@ -11,7 +11,7 @@ import {
   fetchNotifications,
   answerNotification
 } from '../../apis/notificationApis';
-import { updateGroups } from '../group/actions';
+import { updateGroups, groupUpdate } from '../group/actions';
 
 import { Notification } from './interface';
 
@@ -54,7 +54,10 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
       })
     );
     if (type.toLowerCase().includes('group')) {
-      yield put(updateGroups());
+      yield all([
+        put(updateGroups()),
+        put(groupUpdate()),
+      ]);
     }
     yield call(message.success, 'User answers notification successful');
   } catch (error) {

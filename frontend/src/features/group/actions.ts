@@ -28,3 +28,4 @@ export const getGroup = (groupId: number) =>
   actions.getGroup({ groupId: groupId });
 export const patchGroup = (groupId: number, name: string) =>
   actions.patchGroup({ groupId: groupId, name: name });
+export const groupUpdate = () => actions.groupUpdate({});
