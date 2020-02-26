@@ -82,7 +82,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           }
         >
           <SubMenu
-            key='own-Projects'
+            key='ownedProjects'
             title={
               <span>
                 <Icon type='profile' />
@@ -90,12 +90,12 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               </span>
             }
           >
-            <Menu.Item key='addProjects' title='Add New BuJo'>
+            <Menu.Item key='addProject' title='Add New BuJo'>
               <Icon type='folder-add' />
             </Menu.Item>
           </SubMenu>
           <SubMenu
-            key='share-Projects'
+            key='sharedProjects'
             title={
               <span>
                 <Icon type='team' />
