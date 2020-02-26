@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { ProjectType } from './constants';
-import { Project } from './interfaces';
+import { Project, ProjectsWithOwner } from './interfaces';
 
 export type ProjectApiErrorAction = {
   error: string;
@@ -49,11 +49,6 @@ export type Projects = {
   ownedProjectsEtag: string;
 };
 
-
-export type ProjectsWithOwner = {
-  owner: string;
-  projects: Project[];
-};
 
 let initialState = {
   owned: [] as Project[],

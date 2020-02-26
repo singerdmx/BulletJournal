@@ -3,13 +3,18 @@ import { connect } from 'react-redux';
 import { Menu, Icon, Avatar } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
+import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
+import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
 const { SubMenu } = Menu;
 
 type GroupProps = {
   groups: GroupsWithOwner[];
+  ownProjects: Project[]
+  sharedProjects: ProjectsWithOwner[]
   updateGroups: () => void;
+  updateProjects: () => void;
   createGroupByName: (name: string) => void;
 };
 
@@ -35,9 +40,10 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
 
   componentDidMount() {
     this.props.updateGroups();
+    this.props.updateProjects();
   }
   render() {
-    const groupsByOwner = this.props.groups;
+    const { groups: groupsByOwner, ownProjects, sharedProjects}  = this.props;
     return (
       <Menu
         mode='inline'
@@ -71,7 +77,41 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
               <span>Bullet Journal</span>
             </span>
           }
-        ></SubMenu>
+        >
+          <SubMenu
+            key='own-Projects'
+            title={
+              <span>
+                <Icon type='project' />
+                <span>ownProjects</span>
+              </span>
+            }
+          >
+            <Menu.Item key='ownProjects' title='ownProjects'>
+              <Icon type='project' style={{ fontSize: 20 }} />
+            </Menu.Item>
+          </SubMenu>
+          <SubMenu
+            key='share-Projects'
+            title={
+              <span>
+                <Icon type='share-alt' />
+                <span>shareProjects</span>
+              </span>
+            }
+          >
+            <Menu.Item key='shareProjects' title='shareProjects'>
+            <Icon type='share-alt' style={{ fontSize: 20 }} />
+          </Menu.Item>
+          {sharedProjects.map(((item, index)=>{
+            return (
+                <Menu.Item key={index} title={item.owner}>
+                <div>{item.owner}</div>
+                <Icon type='usergroup-add' style={{ fontSize: 20 }} />
+                </Menu.Item>)
+              }))}
+          </SubMenu>
+        </SubMenu>
         <SubMenu
           key='groups'
           onTitleClick={this.onGroupsClick}
@@ -143,10 +183,13 @@ class SideMenu extends React.Component<GroupProps & PathProps> {
 
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
-  timezone: state.myself.timezone
+  timezone: state.myself.timezone,
+  ownProjects: state.project.owned,
+  sharedProjects: state.project.shared
 });
 
 export default connect(mapStateToProps, {
   updateGroups,
-  createGroupByName
+  createGroupByName,
+  updateProjects
 })(withRouter(SideMenu));

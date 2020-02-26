@@ -9,3 +9,8 @@ export interface Project {
   projectType: ProjectType;
   subProjects: Project[];
 };
+
+export interface ProjectsWithOwner {
+  owner: string;
+  projects: Project[];
+};

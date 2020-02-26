@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as projectActions,
@@ -30,19 +30,23 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
   try {
     const data = yield call(fetchProjects);
     const projects = yield data.json();
-    //get etag and split into 2 parts
-    const etags = data.headers.get("Etag")!.split("|");
-    console.log(etags);
-
-    // console.log(data);
+    const state = yield select();
+    var ownEtag = state.project.ownedProjectsEtag;
+    var shared = state.project.sharedProjectsEtag;
+    if(data.headers.get("Etag")){
+      const etags = data.headers.get("Etag").split("|");
+      ownEtag = etags[0];
+      shared = etags[1];
+    }
     yield put(
       projectActions.projectsReceived({
         owned: projects.owned,
         shared: projects.shared,
-        ownedProjectsEtag: etags[0],
-        sharedProjectsEtag: etags[1]
+        ownedProjectsEtag: ownEtag,
+        sharedProjectsEtag: shared
       })
     );
+    
   } catch (error) {
     yield call(message.error, `Project Error Received: ${error}`);
   }
