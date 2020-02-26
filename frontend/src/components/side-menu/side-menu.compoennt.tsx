@@ -11,16 +11,19 @@ const { SubMenu } = Menu;
 
 type GroupProps = {
   groups: GroupsWithOwner[];
-  ownProjects: Project[]
-  sharedProjects: ProjectsWithOwner[]
   updateGroups: () => void;
-  updateProjects: () => void;
   createGroupByName: (name: string) => void;
 };
 
+type ProjectProps = {
+  ownProjects: Project[];
+  sharedProjects: ProjectsWithOwner[];
+  updateProjects: () => void;
+}
+
 type PathProps = RouteComponentProps;
 
-class SideMenu extends React.Component<GroupProps & PathProps> {
+class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   state = {
     showModal: false
   };
