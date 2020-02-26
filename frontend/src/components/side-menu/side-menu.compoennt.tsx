@@ -127,7 +127,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           </Menu.Item>
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
-              <Menu.Item key={group.id}>
+              <Menu.Item key={`${group.name}-${group.id}`}>
                 <span className='group-title'>
                   <span>
                     <Avatar

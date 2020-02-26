@@ -55,14 +55,14 @@ class GroupPage extends React.Component<GroupProps & GroupPathProps, GroupState>
   };
 
   componentDidMount() {
-    const groupId = this.props.match.params.groupId;
+    const groupId = this.props.match.params.groupId.split('-')[1];
     console.log(groupId);
     this.props.getGroup(parseInt(groupId));
   }
 
   componentDidUpdate(prevProps: GroupPathProps): void {
-    const groupId = this.props.match.params.groupId;
-    if (groupId !== prevProps.match.params.groupId) {
+    const groupId = this.props.match.params.groupId.split('-')[1];
+    if (groupId !== prevProps.match.params.groupId.split('-')[1]) {
       this.props.getGroup(parseInt(groupId));
     }
   }
