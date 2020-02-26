@@ -4,7 +4,7 @@ export const fetchNotifications = () => {
   return doFetch('/api/notifications')
     .then(res => res)
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -15,7 +15,8 @@ export const answerNotification = (notificationId: number, action: string) => {
 
   return doPost(`/api/notifications/${notificationId}/answer`, postBody).catch(
     err => {
-      throw Error(err);
+      console.log(err);
+      throw Error(err.message);
     }
   );
 };

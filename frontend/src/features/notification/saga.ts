@@ -16,6 +16,7 @@ import { updateGroups, groupUpdate } from '../group/actions';
 import { Notification } from './interface';
 
 import { IState } from '../../store';
+import { EventType } from './constants';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -39,31 +40,35 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
 }
 
 function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
+  const { action, notificationId, type } = act.payload;
+  console.log(type);
+
   try {
-    const { action, notificationId, type } = act.payload;
     yield call(answerNotification, notificationId, action);
-    const state: IState = yield select();
-    const notifications = state.notice.notifications.filter(
-      (notice: Notification) => notice.id !== notificationId
-    );
-    console.log(notifications);
-    yield put(
-      notificationsActions.notificationsReceived({
-        notifications: notifications,
-        etag: ''
-      })
-    );
-    console.log(type);
     if (type.toLowerCase().includes('group')) {
-      yield all([
-        put(updateGroups()),
-        put(groupUpdate()),
-      ]);
+      yield put(updateGroups());
+      if (type !== EventType.DeleteGroupEvent && type !== EventType.RemoveUserFromGroupEvent) {
+        yield put(groupUpdate());
+      }
     }
-    yield call(message.success, 'User answers notification successful');
   } catch (error) {
-    yield call(message.error, `User answers notification failed: ${error}`);
+    console.log(error);
+    if (error.message === '404') {
+      yield call(message.error, 'The notification is no longer valid');
+    } else {
+      yield call(message.error, `User answers notification failed: ${error}`);
+    }
   }
+  const state: IState = yield select();
+  const notifications = state.notice.notifications.filter(
+    (notice: Notification) => notice.id !== notificationId
+  );
+  yield put(
+    notificationsActions.notificationsReceived({
+      notifications: notifications,
+      etag: ''
+    })
+  );
 }
 
 export default function* noticeSagas() {

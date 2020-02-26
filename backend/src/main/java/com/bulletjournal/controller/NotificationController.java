@@ -5,10 +5,7 @@ import com.bulletjournal.controller.models.AnswerNotificationParams;
 import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.notifications.Action;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.JoinGroupResponseEvent;
-import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
@@ -73,18 +70,28 @@ public class NotificationController {
             @NotNull @PathVariable Long notificationId,
             @Valid @RequestBody AnswerNotificationParams answerNotificationParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        processNotification(notificationId, answerNotificationParams, username);
-        return ResponseEntity.ok().build();
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void processNotification(@PathVariable @NotNull Long notificationId,
-                                    AnswerNotificationParams answerNotificationParams,
-                                    String owner) {
         com.bulletjournal.repository.models.Notification notification =
                 this.notificationRepository.findById(notificationId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Notification " + notificationId + " not found"));
+        deleteNotification(notification);
+        Informed informed = processNotification(notification, answerNotificationParams, username);
+        if (informed != null) {
+            this.notificationService.inform(informed);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    void deleteNotification(com.bulletjournal.repository.models.Notification notification) {
+        this.notificationRepository.delete(notification);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Informed processNotification(
+            com.bulletjournal.repository.models.Notification notification,
+            AnswerNotificationParams answerNotificationParams,
+            String owner) {
         switch (notification.getType()) {
             case "JoinGroupEvent":
                 String answerAction = answerNotificationParams.getAction();
@@ -109,10 +116,9 @@ public class NotificationController {
                         notification.getOriginator(),
                         notification.getContentId(),
                         group.getName());
-                this.notificationService.inform(
-                        new JoinGroupResponseEvent(event, owner, action));
-                break;
+                return new JoinGroupResponseEvent(event, owner, action);
         }
-        this.notificationRepository.delete(notification);
+
+        return null;
     }
 }
