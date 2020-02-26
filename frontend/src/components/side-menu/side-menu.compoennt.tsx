@@ -105,7 +105,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           >
           {sharedProjects.map(((item, index)=>{
             return (
-                <Menu.Item key={'project' + index} title={item.owner}>
+                <Menu.Item key={`project${index}`} title={item.owner}>
                 <div>{item.owner}</div>
                 <Icon type='usergroup-add' style={{ fontSize: 20 }} />
                 </Menu.Item>)
@@ -127,7 +127,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           </Menu.Item>
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
-              <Menu.Item key={`${group.name}-${group.id}`}>
+              <Menu.Item key={`group${group.id}`}>
                 <span className='group-title'>
                   <span>
                     <Avatar
