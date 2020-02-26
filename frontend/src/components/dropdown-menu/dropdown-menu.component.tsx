@@ -14,7 +14,7 @@ type menuProps = {
 
 const DropdownMenu = ({ username }: menuProps) => (
   <Menu>
-    <Menu.Item>{username}</Menu.Item>
+    <Menu.Item style={{cursor: 'default'}}>{username}</Menu.Item>
     <Menu.Item>
       <Icon type='setting' />
       Settings
