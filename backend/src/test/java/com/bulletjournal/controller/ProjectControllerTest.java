@@ -479,9 +479,9 @@ public class ProjectControllerTest {
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
         assertEquals(2, notifications.size());
         Notification notification = notifications.get(0);
-        assertEquals("Xavier invited you to join Group Default", notification.getTitle());
+        assertEquals("bean invited you to join Group Default", notification.getTitle());
         assertNull(notification.getContent());
-        assertEquals("Xavier", notification.getOriginator().getName());
+        assertEquals("bean", notification.getOriginator().getName());
         assertEquals(ImmutableList.of(Action.ACCEPT.getDescription(), Action.DECLINE.getDescription()),
                 notification.getActions());
         assertEquals(JoinGroupEvent.class.getSimpleName(), notification.getType());
@@ -493,7 +493,7 @@ public class ProjectControllerTest {
                 Notification[].class);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
         notifications = Arrays.asList(notificationsResponse.getBody());
-        assertEquals(4, notifications.size());
+        assertEquals(5, notifications.size());
     }
 
     private List<GroupsWithOwner> getGroups(List<GroupsWithOwner> expected) {
@@ -536,8 +536,8 @@ public class ProjectControllerTest {
         assertEquals(1, secondOwnedGroup.getUsers().size());
         Group invitedToJoin = groups.get(2).getGroups().get(0);
         assertEquals(2, invitedToJoin.getUsers().size());
-        assertEquals("Xavier", invitedToJoin.getOwner());
-        assertEquals("Xavier", invitedToJoin.getUsers().get(0).getName());
+        assertEquals("bean", invitedToJoin.getOwner());
+        assertEquals("bean", invitedToJoin.getUsers().get(0).getName());
         assertEquals(true, invitedToJoin.getUsers().get(0).isAccepted());
         assertEquals(expectedOwner, invitedToJoin.getUsers().get(1).getName());
         assertEquals(true, invitedToJoin.getUsers().get(1).isAccepted());
@@ -555,7 +555,7 @@ public class ProjectControllerTest {
         getGroups(ImmutableList.of(
                 new GroupsWithOwner(expectedOwner, ImmutableList.of(g, secondOwnedGroup, g1, g2, g3)),
                 new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
-                new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
+                new GroupsWithOwner("bean", ImmutableList.of(invitedToJoin)),
                 new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
 
         String groupNewName = "G1";
@@ -584,7 +584,7 @@ public class ProjectControllerTest {
         groups = getGroups(ImmutableList.of(
                 new GroupsWithOwner(expectedOwner, ImmutableList.of(g, secondOwnedGroup, g1, g2)),
                 new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
-                new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
+                new GroupsWithOwner("bean", ImmutableList.of(invitedToJoin)),
                 new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
 
         // Delete Group "Default"
@@ -598,7 +598,7 @@ public class ProjectControllerTest {
         groups = getGroups(ImmutableList.of(
                 new GroupsWithOwner(expectedOwner, ImmutableList.of(g, secondOwnedGroup, g1, g2)),
                 new GroupsWithOwner("Scarlet", ImmutableList.of(joinedGroup)),
-                new GroupsWithOwner("Xavier", ImmutableList.of(invitedToJoin)),
+                new GroupsWithOwner("bean", ImmutableList.of(invitedToJoin)),
                 new GroupsWithOwner("lsx9981", ImmutableList.of(joinedGroup2))));
         return groups;
     }

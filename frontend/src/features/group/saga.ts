@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as groupsActions,
@@ -9,7 +9,8 @@ import {
   RemoveUserGroupAction,
   DeleteGroupAction,
   GetGroupAction,
-  PatchGroupAction
+  PatchGroupAction,
+  GroupUpdateAction
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -21,6 +22,7 @@ import {
   getGroup,
   updateGroup
 } from '../../apis/groupApis';
+import { IState } from '../../store';
 import { clearUser } from '../user/actions'
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
@@ -39,6 +41,11 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
   } catch (error) {
     yield call(message.error, `Group Error Received: ${error}`);
   }
+}
+
+function* groupUpdate(action: PayloadAction<GroupUpdateAction>) {
+  const state: IState = yield select();
+  yield put(groupsActions.getGroup({groupId: state.group.group.id}));
 }
 
 function* createGroup(action: PayloadAction<GroupCreateAction>) {
@@ -74,6 +81,10 @@ function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
   try {
     const { groupId, username, groupName } = action.payload;
     yield call(removeUserGroup, groupId, username);
+    yield all ([
+      yield put(groupsActions.groupsUpdate({})),
+      yield put(groupsActions.getGroup({groupId: groupId})),
+    ])
     yield call(
       message.success,
       `User ${username} removed from Group ${groupName}`
@@ -128,6 +139,7 @@ export default function* groupSagas() {
     yield takeLatest(groupsActions.removeUserGroup.type, removeUserFromGroup),
     yield takeLatest(groupsActions.deleteGroup.type, deleteUserGroup),
     yield takeLatest(groupsActions.getGroup.type, getUserGroup),
-    yield takeLatest(groupsActions.patchGroup.type, patchGroup)
+    yield takeLatest(groupsActions.patchGroup.type, patchGroup),
+    yield takeLatest(groupsActions.groupUpdate.type, groupUpdate),
   ]);
 }

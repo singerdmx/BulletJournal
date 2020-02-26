@@ -28,7 +28,7 @@ public class NotificationDaoJpa {
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
         List<Notification> notifications = this.notificationRepository.findByTargetUser(username);
-        return notifications.stream().map(n -> {
+        List<com.bulletjournal.controller.models.Notification> returnNotifications = notifications.stream().map(n -> {
             com.bulletjournal.controller.models.Notification notification = n.toPresentationModel();
             notification.setOriginator(this.userClient.getUser(n.getOriginator()));
             if (n.getActions() != null) {
@@ -37,7 +37,19 @@ public class NotificationDaoJpa {
                         .stream().map(a -> a.getDescription()).collect(Collectors.toList()));
             }
             return notification;
+        }).sorted((a, b) -> {
+            if (a.getActions().isEmpty() && !b.getActions().isEmpty()) {
+                return 1;
+            }
+            if (!a.getActions().isEmpty() && b.getActions().isEmpty()) {
+                return -1;
+            }
+            if (a.getTimestamp().compareTo(b.getTimestamp()) == 0) {
+                return b.getId().compareTo(a.getId());
+            }
+            return b.getTimestamp().compareTo(a.getTimestamp());
         }).collect(Collectors.toList());
+        return returnNotifications;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
