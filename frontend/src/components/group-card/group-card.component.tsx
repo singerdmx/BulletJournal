@@ -1,15 +1,11 @@
 import React from 'react';
-import {
-  Menu,
-  Icon,
-  Button,
-  List,
-  Dropdown,
-  Badge,
-  Avatar
-} from 'antd';
+import { Menu, Icon, Button, List, Dropdown, Badge, Avatar } from 'antd';
 import { connect } from 'react-redux';
-import { deleteGroup } from '../../features/group/actions';
+import {
+  deleteGroup,
+  removeUserGroupByUsername,
+  getGroup
+} from '../../features/group/actions';
 import { Group, User } from '../../features/group/interfaces';
 import { MyselfWithAvatar } from '../../features/myself/reducer';
 import { IState } from '../../store';
@@ -21,6 +17,12 @@ type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
   deleteGroup: (groupId: number, groupName: string) => void;
+  removeUserGroupByUsername: (
+    groupId: number,
+    username: string,
+    groupName: string
+  ) => void;
+  getGroup: (groupdId: number ) => void;
 };
 
 type GroupState = {
@@ -53,6 +55,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
   state: GroupState = {
     showModal: false
   };
+  
 
   handleDelete = (groupId: number, groupName: string) => {
     this.props.deleteGroup(groupId, groupName);
@@ -62,6 +65,11 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
     if (menu.key === 'delete') {
       this.handleDelete(groupId, groupName);
     }
+  };
+
+  deleteUser = (groupId: number, username: string, groupName: string) => {
+    this.props.removeUserGroupByUsername(groupId, username, groupName);
+    this.props.getGroup(groupId);
   };
 
   render() {
@@ -121,6 +129,9 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
                         type="link"
                         size="small"
                         title={item.accepted ? 'Remove' : 'Cancel Invitation'}
+                        onClick={() =>
+                          this.deleteUser(group.id, item.name, group.name)
+                        }
                       >
                         <Icon type="close" />
                       </Button>
@@ -131,7 +142,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
           />
         </div>
         {group.owner === this.props.myself.username && (
-          <AddUser groupId={group.id} groupName={group.name}/>
+          <AddUser groupId={group.id} groupName={group.name} />
         )}
       </div>
     );
@@ -142,4 +153,8 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself
 });
 
-export default connect(mapStateToProps, { deleteGroup })(GroupCard);
+export default connect(mapStateToProps, {
+  deleteGroup,
+  removeUserGroupByUsername,
+  getGroup
+})(GroupCard);
