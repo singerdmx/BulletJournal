@@ -14,11 +14,15 @@ type menuProps = {
   history: History<History.PoorMansUnknown>;
 };
 
+const onClickSetting = (history: History<History.PoorMansUnknown>) => {
+  history.push('/settings');
+};
+
 const DropdownMenu = ({ username, history }: menuProps) => (
   <Menu>
     <Menu.Item style={{cursor: 'default'}}>{username}</Menu.Item>
-    <Menu.Item>
-      <Icon type='setting' onClick={() => history.push('/settings')}/>
+    <Menu.Item onClick={() => onClickSetting(history)}>
+      <Icon type='setting'/>
       Settings
     </Menu.Item>
     <Menu.Item onClick={() => handleLogout()}>
