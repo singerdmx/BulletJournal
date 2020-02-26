@@ -139,6 +139,7 @@ export default function* groupSagas() {
     yield takeLatest(groupsActions.removeUserGroup.type, removeUserFromGroup),
     yield takeLatest(groupsActions.deleteGroup.type, deleteUserGroup),
     yield takeLatest(groupsActions.getGroup.type, getUserGroup),
-    yield takeLatest(groupsActions.patchGroup.type, patchGroup)
+    yield takeLatest(groupsActions.patchGroup.type, patchGroup),
+    yield takeLatest(groupsActions.groupUpdate.type, groupUpdate),
   ]);
 }

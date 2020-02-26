@@ -53,6 +53,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
         etag: ''
       })
     );
+    console.log(type);
     if (type.toLowerCase().includes('group')) {
       yield all([
         put(updateGroups()),
