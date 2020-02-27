@@ -1,5 +1,14 @@
 import React from 'react';
-import { Menu, Icon, Button, List, Dropdown, Badge, Avatar } from 'antd';
+import {
+  Icon,
+  Button,
+  List,
+  Badge,
+  Avatar,
+  Typography,
+  Popconfirm,
+  Popover
+} from 'antd';
 import { connect } from 'react-redux';
 import {
   deleteGroup,
@@ -22,7 +31,7 @@ type GroupProps = {
     username: string,
     groupName: string
   ) => void;
-  getGroup: (groupdId: number ) => void;
+  getGroup: (groupdId: number) => void;
 };
 
 type GroupState = {
@@ -55,7 +64,6 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
   state: GroupState = {
     showModal: false
   };
-  
 
   handleDelete = (groupId: number, groupName: string) => {
     this.props.deleteGroup(groupId, groupName);
@@ -76,34 +84,19 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
     return (
       <div className="group-card">
         <div className="group-title">
-          <h3>{group.name}</h3>
+          <Typography.Title
+            level={4}
+            editable={group.owner === this.props.myself.username}
+          >
+            {group.name}
+          </Typography.Title>
           <h3 className="group-operation">
             <Icon type="user" />
             {group.users && group.users.length}
             {group.owner === this.props.myself.username && (
-              <Dropdown
-                overlay={
-                  <Menu
-                    onClick={menu =>
-                      this.handleMenuClick(menu, group.id, group.name)
-                    }
-                  >
-                    <Menu.Item key="edit">
-                      <Icon type="edit" /> Edit
-                    </Menu.Item>
-                    <Menu.Divider />
-                    <Menu.Item key="delete" disabled={this.props.group.default}>
-                      <Icon type="delete" /> Delete
-                    </Menu.Item>
-                  </Menu>
-                }
-                trigger={['click']}
-                placement="bottomLeft"
-              >
-                <Button type="link" className="group-setting">
-                  <Icon type="setting" title="Edit Group" />
-                </Button>
-              </Dropdown>
+              <Popconfirm title="Are you sure" okText="Yes" cancelText="No" className="group-setting">
+                <Icon type="delete" title="Delte Group" />
+              </Popconfirm>
             )}
           </h3>
         </div>
