@@ -53,7 +53,7 @@ class Notifications extends React.Component<NotificationsProps> {
 
   render() {
     return (
-      <div className='notifications'>
+      <div className='notifications' title='Notifications'>
         <Badge dot={this.props.notifications.length > 0}>
           <Popover
             content={<NotificationList {...this.props} />}
