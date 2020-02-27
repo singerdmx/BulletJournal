@@ -1,6 +1,5 @@
 package com.bulletjournal.repository.models;
 
-import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.ReminderSetting;
 
 import javax.persistence.Column;
@@ -33,7 +32,7 @@ public abstract class TaskModel extends ProjectItemModel {
 
     // reminder before task
     @Column(name = "reminder_before_task")
-    private Before reminderBeforeTask;
+    private Integer reminderBeforeTask;
 
     public String getAssignedTo() {
         return assignedTo;
@@ -87,11 +86,11 @@ public abstract class TaskModel extends ProjectItemModel {
         this.reminderTime = reminderTime;
     }
 
-    public Before getReminderBeforeTask() {
+    public Integer getReminderBeforeTask() {
         return reminderBeforeTask;
     }
 
-    public void setReminderBeforeTask(Before reminderBeforeTask) {
+    public void setReminderBeforeTask(Integer reminderBeforeTask) {
         this.reminderBeforeTask = reminderBeforeTask;
     }
 
