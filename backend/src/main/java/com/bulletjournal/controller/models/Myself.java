@@ -9,15 +9,18 @@ public class Myself extends User {
 
     private Integer reminderBeforeTask;
 
+    private String currency;
+
     public Myself() {
     }
 
-    public Myself(User user, String timezone, Before reminderBeforeTask) {
+    public Myself(User user, String timezone, Before reminderBeforeTask, String currency) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
         if (reminderBeforeTask != null) {
             this.reminderBeforeTask = reminderBeforeTask.getValue();
         }
+        this.currency = currency;
     }
 
     public String getTimezone() {
@@ -42,5 +45,13 @@ public class Myself extends User {
 
     public boolean hasBefore() {
         return this.reminderBeforeTask != null;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }

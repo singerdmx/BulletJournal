@@ -6,6 +6,8 @@ public class UpdateMyselfParams {
 
     private Integer reminderBeforeTask;
 
+    private String currency;
+
     public String getTimezone() {
         return timezone;
     }
@@ -28,5 +30,13 @@ public class UpdateMyselfParams {
 
     public boolean hasReminderBeforeTask() {
         return this.reminderBeforeTask != null;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }

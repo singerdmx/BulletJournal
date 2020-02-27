@@ -39,14 +39,16 @@ public class UserController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String timezone = null;
         Before before = null;
+        String currency = null;
         if (Objects.equals(expand, "true")) {
             com.bulletjournal.repository.models.User user =
                     this.userDaoJpa.getByName(username);
             timezone = user.getTimezone();
             before = user.getReminderBeforeTask();
+            currency = user.getCurrency();
         }
         User self = userClient.getUser(username);
-        return new Myself(self, timezone, before);
+        return new Myself(self, timezone, before, currency);
     }
 
     @PatchMapping(MYSELF_ROUTE)
@@ -55,7 +57,7 @@ public class UserController {
         com.bulletjournal.repository.models.User user =
                 this.userDaoJpa.updateMyself(username, updateMyselfParams);
         User self = userClient.getUser(username);
-        return new Myself(self, user.getTimezone(), user.getReminderBeforeTask());
+        return new Myself(self, user.getTimezone(), user.getReminderBeforeTask(), user.getCurrency());
     }
 
     @PostMapping(LOGOUT_MYSELF_ROUTE)
