@@ -101,7 +101,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
             {group.users && group.users.length}
             {group.owner === this.props.myself.username && !group.default && (
               <Popconfirm title="Are you sure?" okText="Yes" cancelText="No" className="group-setting">
-                <Icon type="delete" title="Delte Group" />
+                <Icon type="delete" title="Delete Group" />
               </Popconfirm>
             )}
           </h3>
