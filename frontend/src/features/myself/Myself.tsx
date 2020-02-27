@@ -24,14 +24,15 @@ class Myself extends React.Component<MyselfProps & PathProps> {
       <div
         style={{
           display: 'flex',
-          width: '100px',
+          width: '125px',
           justifyContent: 'space-around',
           alignItems: 'center',
           fontSize: '20px',
           color: 'white'
         }}
       >
-        <Icon type='plus' />
+        <Icon type='plus' title='Create a new BuJo'/>
+        <Icon type='sync' title='Refresh'/>
         <Notifications />
         <Popover
           content={<DropdownMenu username={this.props.username} history={this.props.history}/>}
