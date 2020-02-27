@@ -3,7 +3,7 @@ package com.bulletjournal.controller.models;
 import com.bulletjournal.repository.models.Project;
 
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
+import java.sql.Timestamp;
 
 public class Transaction {
     private Long id;
@@ -26,6 +26,17 @@ public class Transaction {
     @NotNull
     private Integer transactionType;
 
+    private String time;
+
+    @NotNull
+    private String timezone;
+
+    @NotNull
+    private Timestamp startTime;
+
+    @NotNull
+    private Timestamp endTime;
+
     public Transaction() {
     }
 
@@ -35,6 +46,10 @@ public class Transaction {
                        @NotNull String payer,
                        @NotNull Double amount,
                        @NotNull String date,
+                       String time,
+                       @NotNull String timezone,
+                       @NotNull Timestamp startTime,
+                       @NotNull Timestamp endTime,
                        @NotNull Integer transactionType) {
         this.id = id;
         this.name = name;
@@ -42,6 +57,10 @@ public class Transaction {
         this.payer = payer;
         this.amount = amount;
         this.date = date;
+        this.time = time;
+        this.timezone = timezone;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.transactionType = transactionType;
     }
 
@@ -85,14 +104,6 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public Integer getTransactionType() {
-        return transactionType;
-    }
-
-    public void setTransactionType(Integer transactionType) {
-        this.transactionType = transactionType;
-    }
-
     public String getDate() {
         return date;
     }
@@ -101,22 +112,44 @@ public class Transaction {
         this.date = date;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Transaction)) return false;
-        Transaction that = (Transaction) o;
-        return Objects.equals(getId(), that.getId()) &&
-                Objects.equals(getName(), that.getName()) &&
-                Objects.equals(getProjectId(), that.getProjectId()) &&
-                Objects.equals(getPayer(), that.getPayer()) &&
-                Objects.equals(getAmount(), that.getAmount()) &&
-                getTransactionType() == that.getTransactionType() &&
-                Objects.equals(getDate(), that.getDate());
+    public String getTime() {
+        return time;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getProjectId(), getPayer(), getAmount(), getTransactionType(), getDate());
+    public void setTime(String time) {
+        this.time = time;
     }
+
+    public String getTimezone() {
+        return this.timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
+    public Timestamp getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
+    }
+
+    public Timestamp getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
+
+    public Integer getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(Integer transactionType) {
+        this.transactionType = transactionType;
+    }
+
 }

@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 
 /**
  * This class is for ProjectType.LEDGER
@@ -38,6 +39,21 @@ public class Transaction extends ProjectItemModel {
     @Column
     private String date;
 
+    @Column
+    private String time;
+
+    @NotBlank
+    @Column(length = 50, nullable = false)
+    private String timezone;
+
+    @NotNull
+    @Column
+    private Timestamp startTime;
+
+    @NotNull
+    @Column
+    private Timestamp endTime;
+
     public Long getId() {
         return id;
     }
@@ -58,25 +74,31 @@ public class Transaction extends ProjectItemModel {
         return amount;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
+    public void setAmount(Double amount) { this.amount = amount; }
 
-    public TransactionType getTransactionType() {
-        return transactionType;
-    }
+    public TransactionType getTransactionType() { return transactionType; }
 
-    public void setTransactionType(TransactionType transactionType) {
-        this.transactionType = transactionType;
-    }
+    public void setTransactionType(TransactionType transactionType) { this.transactionType = transactionType; }
 
-    public String getDate() {
-        return date;
-    }
+    public String getDate() { return date; }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+    public void setDate(String date) { this.date = date; }
+
+    public String getTime() { return time; }
+
+    public void setTime(String time) { this.time = time; }
+
+    public String getTimezone() { return timezone; }
+
+    public void setTimezone(String timezone) { this.timezone = timezone; }
+
+    public Timestamp getStartTime() { return startTime; }
+
+    public void setStartTime(Timestamp startTime) { this.startTime = startTime; }
+
+    public Timestamp getEndTime() { return endTime; }
+
+    public void setEndTime(Timestamp endTime) { this.endTime = endTime; }
 
     public com.bulletjournal.controller.models.Transaction toPresentationModel() {
         return new com.bulletjournal.controller.models.Transaction(
@@ -86,6 +108,10 @@ public class Transaction extends ProjectItemModel {
                 this.getPayer(),
                 this.getAmount(),
                 this.getDate(),
+                this.getTime(),
+                this.getTimezone(),
+                this.getStartTime(),
+                this.getEndTime(),
                 this.getTransactionType().getValue());
     }
 }

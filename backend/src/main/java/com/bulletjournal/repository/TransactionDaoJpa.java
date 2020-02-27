@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,23 @@ public class TransactionDaoJpa {
     public Transaction getTransaction(Long id) {
         return this.transactionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction " + id + " not found"));
+    }
+
+    /**
+     * Get transactions based on interval from Ledger Repository
+     * <p>
+     * Parameter:
+     *
+     * @projectId Long - Transaction identifier to retrieve transaction from ledger repository
+     * @startTime Long - Start Time to retrieve transaction from ledger repository
+     * @endTime Long - End Time to retrieve transaction from ledger repository
+     * @retVal Transaction - Transaction object
+     */
+    public List<Transaction> findTransactionsByProjectInterval(Long projectId, Long startTime, Long endTime) {
+        Project project = this.projectRepository
+                .findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        return this.transactionRepository.findTransactionsByProjectInterval(project, new Timestamp(startTime), new Timestamp(endTime));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -132,4 +150,6 @@ public class TransactionDaoJpa {
         }
         return events;
     }
+
+
 }
