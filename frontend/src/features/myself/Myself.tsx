@@ -31,8 +31,8 @@ class Myself extends React.Component<MyselfProps & PathProps> {
           color: 'white'
         }}
       >
-        <Icon type='plus' title='Create a new BuJo'/>
-        <Icon type='sync' title='Refresh'/>
+        <Icon type='plus' title='Create New BuJo' style={{cursor: 'pointer'}}/>
+        <Icon type='sync' title='Refresh' style={{cursor: 'pointer'}}/>
         <Notifications />
         <Popover
           content={<DropdownMenu username={this.props.username} history={this.props.history}/>}
