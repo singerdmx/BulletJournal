@@ -40,9 +40,8 @@ class AddUser extends React.Component<ModalProps, ModalState> {
     }
   };
 
-  addUser = (groupId: number, username : string, groupName: string) => {
+  addUser =  (groupId: number, username : string, groupName: string) => {
     this.props.addUserGroupByUsername(groupId, username, groupName);
-    this.props.clearUser();
     this.setState({isShow : false});
   }
 
