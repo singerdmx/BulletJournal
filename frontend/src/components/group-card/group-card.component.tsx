@@ -6,8 +6,7 @@ import {
   Badge,
   Avatar,
   Typography,
-  Popconfirm,
-  Popover
+  Popconfirm
 } from 'antd';
 import { connect } from 'react-redux';
 import {
@@ -60,6 +59,8 @@ function getGroupUserSpan(item: User, group: Group): JSX.Element {
   return <span style={{ color: 'grey' }}>&nbsp;&nbsp;{item.name}</span>;
 }
 
+const {Title} = Typography;
+
 class GroupCard extends React.Component<GroupProps, GroupState> {
   state: GroupState = {
     showModal: false
@@ -79,22 +80,27 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
     this.props.removeUserGroupByUsername(groupId, username, groupName);
   };
 
+  titleChange = (content : string) => {
+    console.log(content)
+  }
+
   render() {
     const { group } = this.props;
     return (
       <div className="group-card">
         <div className="group-title">
-          <Typography.Title
+          <Title
             level={4}
             editable={group.owner === this.props.myself.username}
+            
           >
             {group.name}
-          </Typography.Title>
+          </Title>
           <h3 className="group-operation">
             <Icon type="user" />
             {group.users && group.users.length}
-            {group.owner === this.props.myself.username && (
-              <Popconfirm title="Are you sure" okText="Yes" cancelText="No" className="group-setting">
+            {group.owner === this.props.myself.username && !group.default && (
+              <Popconfirm title="Are you sure?" okText="Yes" cancelText="No" className="group-setting">
                 <Icon type="delete" title="Delte Group" />
               </Popconfirm>
             )}
