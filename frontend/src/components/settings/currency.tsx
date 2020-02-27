@@ -34,7 +34,8 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
         >
           {_.map(cc.countries, country => (
             <Option
-              title={country.name}
+              title={country.name + ' (' +
+                LocaleCurrency.getCurrency(country.alpha2.toLowerCase()) + ')'}
               key={country.name}
               value={
                 country.name +
