@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class TaskDaoJpa {
@@ -40,11 +41,17 @@ public class TaskDaoJpa {
     private CompletedTaskRepository completedTaskRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getTasks(Long projectId) {
-        Project project = this.projectRepository
-                .findById(projectId)
+    public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId) {
+        Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
+        if (!projectTasksOptional.isPresent()) {
+            return Collections.emptyList();
+        }
+        ProjectTasks projectTasks = projectTasksOptional.get();
+        Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
-        return this.taskRepository.findTaskByProject(project);
+        Map<Long, Task> tasks = this.taskRepository.findTaskByProject(project)
+                .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
+        return TaskRelationsProcessor.processRelations(tasks, projectTasks.getTasks());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
