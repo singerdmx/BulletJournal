@@ -10,7 +10,7 @@ import {
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchNotes, createNotes, putNotes, getNoteById
+  fetchNotes, createNote, putNotes, getNoteById
 } from '../../apis/noteApis';
 import { updateNotes } from './actions';
 import { Note } from './interface';
@@ -37,8 +37,8 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
 
 function* noteCreate(action: PayloadAction<CreateNote>) {
     try {
-      const data = yield call(createNotes, action.payload.projectId, action.payload.name);
-      const notes = yield data.json();
+      const data = yield call(createNote, action.payload.projectId, action.payload.name);
+      const note = yield data.json();
       yield put(updateNotes(action.payload.projectId));
     } catch (error) {
       yield call(message.error, `Note Error Received: ${error}`);

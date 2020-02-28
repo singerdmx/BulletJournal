@@ -1,6 +1,5 @@
 package com.bulletjournal.hierarchy;
 
-import com.bulletjournal.controller.models.Note;
 import com.bulletjournal.controller.models.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

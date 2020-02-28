@@ -36,7 +36,7 @@ let initialState = {
 };
 
 const slice = createSlice({
-  name: 'notice',
+  name: 'note',
   initialState,
   reducers: {
     notesReceived: (

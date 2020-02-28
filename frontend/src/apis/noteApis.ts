@@ -24,7 +24,7 @@ export const deleteNoteById = (noteId: number) => {
     });
 };
 
-export const createNotes = (projectId: number, name: string) => {
+export const createNote = (projectId: number, name: string) => {
   const postBody = JSON.stringify({
     name: name,
   });
