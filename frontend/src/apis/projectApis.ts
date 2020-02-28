@@ -5,7 +5,7 @@ export const fetchProjects = () => {
   return doFetch("/api/projects")
     .then(res => res)
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -13,7 +13,7 @@ export const getProject = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}`)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -26,12 +26,13 @@ export const createProject = (
   const postBody = JSON.stringify({
     description: description,
     name: name,
-    projectType: projectType
+    projectType: projectType,
+    groupId: groupId
   });
   return doPost('/api/projects', postBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -43,7 +44,7 @@ export const updateSharedProjectsOrder = (projectOwners: string[]) => {
   return doPost('/api/updateSharedProjectsOrder', postBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -67,13 +68,13 @@ export const updateProject = (
   return doPatch(`/api/projects/${projectId}`, patchBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
 export const updateProjectRelations = (projects: Project[]) => {
   const putBody = JSON.stringify(projects);
   return doPut('/api/projects', putBody).catch(err => {
-    throw Error(err);
+    throw Error(err.message);
   });
 };
