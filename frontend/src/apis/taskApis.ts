@@ -1,6 +1,5 @@
-import { doFetch, doPost, doDelete, doPut } from './api-helper';
-import { Task } from '../features/tasks/interface';
-import TaskList from '../components/task-list/task-list.component';
+import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
+import { Task, ReminderSetting } from '../features/tasks/interface';
 
 export const fetchTasks = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/tasks`)
@@ -25,10 +24,13 @@ export const deleteTaskById = (taskId: number) => {
     });
 };
 
-export const createTask = (projectId: number, name: string) => {
+export const createTask = (projectId: number, name: string,
+  dueDate?: string, dueTime?: string, reminderSetting?: ReminderSetting) => {
   const postBody = JSON.stringify({
     name: name,
-    projectId: projectId
+    dueDate: dueDate,
+    dueTime: dueTime,
+    reminderSetting: reminderSetting
   });
   return doPost(`/api/projects/${projectId}/tasks`, postBody)
     .then(res => res.json())
@@ -39,10 +41,30 @@ export const createTask = (projectId: number, name: string) => {
 
 export const putTasks = (projectId: number, tasks: Task[]) => {
   const putBody = JSON.stringify({
-    tasks: TaskList,
+    tasks: tasks,
   });
   return doPut(`/api/projects/${projectId}/tasks`, putBody)
     .catch(err => {
       throw Error(err.message);
     });
 }
+
+export const updateTask = (
+  taskId: number,
+  name?: string,
+  dueDate?: string,
+  dueTime?: string,
+  reminderSetting?: ReminderSetting
+) => {
+  const patchBody = JSON.stringify({
+    name: name,
+    dueDate: dueDate,
+    dueTime: dueTime,
+    reminderSetting: reminderSetting
+  });
+  return doPatch(`/api/tasks/${taskId}`, patchBody)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err);
+    });
+};
