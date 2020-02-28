@@ -1,6 +1,7 @@
 import React from 'react';
 import TimezonePicker from './timezone';
 import ReminderBeforeTaskPicker from './reminder-before-task';
+import CurrencyPicker from './currency';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { updateExpandedMyself } from '../../features/myself/actions';
@@ -23,6 +24,10 @@ class Account extends React.Component<AccountProps> {
         <div className='option-container'>
           <span>Default Reminder Before Task&nbsp;&nbsp;&nbsp;</span>
           <ReminderBeforeTaskPicker />
+        </div>
+        <div className='option-container'>
+          <span>Currency&nbsp;&nbsp;&nbsp;</span>
+          <CurrencyPicker />
         </div>
       </div>
     );

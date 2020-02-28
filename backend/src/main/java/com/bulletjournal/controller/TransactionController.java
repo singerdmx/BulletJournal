@@ -29,11 +29,21 @@ public class TransactionController {
     @Autowired
     private NotificationService notificationService;
 
+//    @GetMapping(TRANSACTIONS_ROUTE)
+//    public List<Transaction> getTransactions(@NotNull @PathVariable Long projectId) {
+//        return this.transactionDaoJpa.getTransactions(projectId)
+//                .stream()
+//                .map(com.bulletjournal.repository.models.Transaction::toPresentationModel)
+//                .collect(Collectors.toList());
+//    }
+
     @GetMapping(TRANSACTIONS_ROUTE)
-    public List<Transaction> getTransactions(@NotNull @PathVariable Long projectId) {
-        return this.transactionDaoJpa.getTransactions(projectId)
+    public List<Transaction> getTransactionsByInterval(@NotNull @PathVariable Long projectId,
+                                                       @NotNull @RequestParam Long startTime,
+                                                       @NotNull @RequestParam Long endTime) {
+        return this.transactionDaoJpa.findTransactionsByProjectInterval(projectId, startTime, endTime)
                 .stream()
-                .map(x -> x.toPresentationModel())
+                .map(com.bulletjournal.repository.models.Transaction::toPresentationModel)
                 .collect(Collectors.toList());
     }
 

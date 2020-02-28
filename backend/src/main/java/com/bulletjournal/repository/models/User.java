@@ -29,7 +29,7 @@ public class User extends NamedModel {
     @Column(length = 50, nullable = false)
     private String timezone;
 
-    @Column(length = 15)
+    @Column(length = 50)
     private String currency;
 
     @Column(length = 25)
