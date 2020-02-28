@@ -58,7 +58,11 @@ function* addProject(action: PayloadAction<ProjectCreateAction>) {
     const data = yield call(createProject, description, groupId, name, projectType);
     yield put(projectActions.projectReceived({ project: data }));
   } catch (error) {
-    yield call(message.error, `Project Create Fail: ${error}`);
+    if (error.message === '400') {
+      yield call(message.error, `Project with ${name} already exists`);
+    } else {
+      yield call(message.error, `Project Create Fail: ${error}`);
+    }
   }
 }
 

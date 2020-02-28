@@ -4,7 +4,7 @@ export const fetchGroups = () => {
   return doFetch('/api/groups')
     .then(res => res)
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -12,7 +12,7 @@ export const getGroup = (groupId: number) => {
   return doFetch(`/api/groups/${groupId}`)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -23,7 +23,7 @@ export const createGroups = (name: string) => {
   return doPost('/api/groups', postBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -35,7 +35,7 @@ export const addUserGroup = (groupId: number, username: string) => {
   return doPost('/api/addUserGroup', postBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };
 
@@ -45,13 +45,13 @@ export const removeUserGroup = (groupId: number, username: string) => {
     username: username
   });
   return doPost('/api/removeUserGroup', postBody).catch(err => {
-    throw Error(err);
+    throw Error(err.message);
   });
 };
 
 export const deleteGroup = (groupId: number) => {
   return doDelete(`/api/groups/${groupId}`).catch(err => {
-    throw Error(err);
+    throw Error(err.message);
   });
 };
 
@@ -63,6 +63,6 @@ export const updateGroup = (groupId: number, name: string) => {
   return doPatch(`/api/groups/${groupId}`, patchBody)
     .then(res => res.json())
     .catch(err => {
-      throw Error(err);
+      throw Error(err.message);
     });
 };

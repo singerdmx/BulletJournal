@@ -55,7 +55,11 @@ function* createGroup(action: PayloadAction<GroupCreateAction>) {
     yield put(groupsActions.groupReceived({ group: data }));
     yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
-    yield call(message.error, `Group Create Fail: ${error}`);
+    if (error.message === '400') {
+      yield call(message.error, `Group with ${name} already exists`);
+    } else {
+      yield call(message.error, `Group Create Fail: ${error}`);
+    }
   }
 }
 
