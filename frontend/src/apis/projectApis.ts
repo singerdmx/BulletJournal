@@ -1,8 +1,8 @@
-import { doFetch, doPost, doDelete, doPatch, doPut } from "./api-helper";
-import { Project } from "../features/project/interfaces";
+import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
+import { Project } from '../features/project/interfaces';
 
 export const fetchProjects = () => {
-  return doFetch("/api/projects")
+  return doFetch('/api/projects')
     .then(res => res)
     .catch(err => {
       throw Error(err.message);

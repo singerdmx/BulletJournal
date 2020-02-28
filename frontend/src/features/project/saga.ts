@@ -33,8 +33,8 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
     const state = yield select();
     var ownEtag = state.project.ownedProjectsEtag;
     var shared = state.project.sharedProjectsEtag;
-    if(data.headers.get("Etag")){
-      const etags = data.headers.get("Etag").split("|");
+    if (data.headers.get('Etag')) {
+      const etags = data.headers.get('Etag').split('|');
       ownEtag = etags[0];
       shared = etags[1];
     }
@@ -46,7 +46,6 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
         sharedProjectsEtag: shared
       })
     );
-    
   } catch (error) {
     yield call(message.error, `Project Error Received: ${error}`);
   }
@@ -56,7 +55,13 @@ function* addProject(action: PayloadAction<ProjectCreateAction>) {
   const { description, groupId, name, projectType } = action.payload;
 
   try {
-    const data = yield call(createProject, description, groupId, name, projectType);
+    const data = yield call(
+      createProject,
+      description,
+      groupId,
+      name,
+      projectType
+    );
     yield put(projectActions.projectReceived({ project: data }));
   } catch (error) {
     if (error.message === '400') {
@@ -95,10 +100,10 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
 
 function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
   try {
-    const { projectId } = action.payload;
+    const { projectId, name } = action.payload;
     yield call(deleteProject, projectId);
     yield put(projectActions.projectsUpdate);
-    yield call(message.success, `Project ${projectId} deleted`);
+    yield call(message.success, `Project ${name} deleted`);
   } catch (error) {
     yield call(message.error, `Delete project fail: ${error}`);
   }

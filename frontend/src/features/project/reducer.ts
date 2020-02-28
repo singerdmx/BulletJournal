@@ -18,7 +18,7 @@ export type UpdateProjects = {};
 
 export type ProjectCreateAction = {
   description: string;
-  groupId: number,
+  groupId: number;
   name: string;
   projectType: ProjectType;
 };
@@ -40,6 +40,7 @@ export type UpdateProjectRelationsAction = {
 
 export type DeleteProjectAction = {
   projectId: number;
+  name: string;
 };
 
 export type Projects = {
@@ -49,17 +50,16 @@ export type Projects = {
   ownedProjectsEtag: string;
 };
 
-
 let initialState = {
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
   project: {} as Project,
-  ownedProjectsEtag: "",
-  sharedProjectsEtag: ""
+  ownedProjectsEtag: '',
+  sharedProjectsEtag: ''
 };
 
 const slice = createSlice({
-  name: "projects",
+  name: 'projects',
   initialState,
   reducers: {
     projectsReceived: (state, action: PayloadAction<Projects>) => {
