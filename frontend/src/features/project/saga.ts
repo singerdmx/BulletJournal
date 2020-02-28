@@ -53,8 +53,9 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
 }
 
 function* addProject(action: PayloadAction<ProjectCreateAction>) {
+  const { description, groupId, name, projectType } = action.payload;
+
   try {
-    const { description, groupId, name, projectType } = action.payload;
     const data = yield call(createProject, description, groupId, name, projectType);
     yield put(projectActions.projectReceived({ project: data }));
   } catch (error) {
@@ -88,7 +89,7 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
     console.log(data);
     yield put(projectActions.projectReceived({ project: data }));
   } catch (error) {
-    yield call(message.error, `Get Group Error Received: ${error}`);
+    yield call(message.error, `Get Project Error Received: ${error}`);
   }
 }
 
