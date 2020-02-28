@@ -71,7 +71,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   );
 }
 
-export default function* noticeSagas() {
+export default function* notificationSagas() {
   yield all([
     yield takeLatest(
       notificationsActions.noticeApiErrorReceived.type,

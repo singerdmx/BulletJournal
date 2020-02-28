@@ -60,7 +60,7 @@ const slice = createSlice({
     NotePut: (state, action: PayloadAction<PutNote>) => state,
     NoteGet: (state, action: PayloadAction<GetNote>) => state,
     NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
-    PatchNote: (state, action: PayloadAction<PatchNote>) => state,
+    NotePatch: (state, action: PayloadAction<PatchNote>) => state,
     }
 });
 

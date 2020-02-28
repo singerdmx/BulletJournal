@@ -29,7 +29,7 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
   }
 }
 
-export default function* userSagas() {
+export default function* systemSagas() {
   yield all([
     yield takeLatest(
       systemActions.systemApiErrorReceived.type,

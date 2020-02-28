@@ -12,9 +12,9 @@ export type UpdateTasks = {
 export type CreateTask = {
     projectId: number;
     name: string;
-    dueDate: string;
-    dueTime: string;
-    reminderSetting: ReminderSetting;
+    dueDate?: string;
+    dueTime?: string;
+    reminderSetting?: ReminderSetting;
 }
 
 export type GetTask = {
@@ -32,6 +32,14 @@ export type PutTask = {
 
 export type DeleteTask = {
   taskId: number
+}
+
+export type PatchTask = {
+  taskId: number,
+  name?: string;
+  dueDate?: string;
+  dueTime?: string;
+  reminderSetting?: ReminderSetting;
 }
 
 let initialState = {
@@ -57,7 +65,8 @@ const slice = createSlice({
     TasksCreate: (state, action: PayloadAction<CreateTask>) => state,
     TaskPut: (state, action: PayloadAction<PutTask>) => state,
     TaskGet: (state, action: PayloadAction<GetTask>) => state,
-    TaskDelete: (state, action: PayloadAction<DeleteTask>) => state
+    TaskDelete: (state, action: PayloadAction<DeleteTask>) => state,
+    TaskPatch: (state, action: PayloadAction<PatchTask>) => state,
     }
 });
 

@@ -69,7 +69,7 @@ function* patchNote(action: PayloadAction<PatchNote>) {
   }
 }
 
-export default function* noticeSagas() {
+export default function* noteSagas() {
   yield all([
     yield takeLatest(
       notesActions.noteApiErrorReceived.type,
@@ -92,7 +92,7 @@ export default function* noticeSagas() {
           getNote
     ),
     yield takeLatest(
-      notesActions.PatchNote.type,
+      notesActions.NotePatch.type,
       patchNote
     )
   ]);

@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put, select } from 'redux-saga/effects';
+import { takeLatest, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as tasksActions,
@@ -6,15 +6,14 @@ import {
   UpdateTasks,
   CreateTask,
   PutTask,
-  GetTask
+  GetTask,
+  PatchTask
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchTasks, createTask, putTasks, getTaskById
+  fetchTasks, createTask, putTasks, getTaskById, updateTask
 } from '../../apis/taskApis';
 import { updateTasks } from './actions';
-import { Task } from './interface';
-import { IState } from '../../store';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -47,7 +46,7 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
 
 function* taskPut(action: PayloadAction<PutTask>) {
     try{
-      const data = yield call(putTasks, action.payload.projectId, action.payload.tasks)
+      const data = yield call(putTasks, action.payload.projectId, action.payload.tasks);
       yield put(updateTasks(action.payload.projectId));
     } catch (error) {
       yield call(message.error, `Put Task Error Received: ${error}`);
@@ -55,14 +54,23 @@ function* taskPut(action: PayloadAction<PutTask>) {
 }
 
 function* getTask(action: PayloadAction<GetTask>) {
-  try{
-    const data = yield call(getTaskById, action.payload.taskId, )
-  }catch (error) {
+  try {
+    const data = yield call(getTaskById, action.payload.taskId);
+  } catch (error) {
     yield call(message.error, `Get Task Error Received: ${error}`);
   }
 }
 
-export default function* noticeSagas() {
+function* patchTask(action: PayloadAction<PatchTask>) {
+  try {
+    yield call(updateTask, action.payload.taskId, action.payload.name, action.payload.dueDate,
+      action.payload.dueTime, action.payload.reminderSetting);
+  } catch (error) {
+    yield call(message.error, `Patch Task Error Received: ${error}`);
+  }
+}
+
+export default function* taskSagas() {
   yield all([
     yield takeLatest(
       tasksActions.taskApiErrorReceived.type,
@@ -83,6 +91,10 @@ export default function* noticeSagas() {
     yield takeLatest(
           tasksActions.TaskGet.type,
           getTask
-      )
+    ),
+    yield takeLatest(
+      tasksActions.TaskPatch.type,
+      patchTask
+    ),
   ]);
 }
