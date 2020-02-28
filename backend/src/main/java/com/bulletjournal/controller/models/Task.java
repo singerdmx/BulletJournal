@@ -155,4 +155,18 @@ public class Task {
     public int hashCode() {
         return Objects.hash(id, assignedTo, dueDate, dueTime, timezone, name, projectId);
     }
+
+    public void clone(Task task) {
+        this.setId(task.getId());
+        this.setAssignedTo(task.getAssignedTo());
+        this.setDueDate(task.getDueDate());
+        this.setDueTime(task.getDueTime());
+        this.setTimezone(task.getTimezone());
+        this.setName(task.getName());
+        this.setProjectId(task.getProjectId());
+        this.setProjectId(task.getProjectId());
+        if (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate()) {
+            this.setReminderSetting(task.getReminderSetting());
+        }
+    }
 }
