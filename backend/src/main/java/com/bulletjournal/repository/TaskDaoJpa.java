@@ -117,6 +117,8 @@ public class TaskDaoJpa {
         CompletedTask completedTask = new CompletedTask(task);
         this.completedTaskRepository.save(completedTask);
         this.taskRepository.delete(task);
+
+        // TODO: remove task in relations
         return completedTask;
     }
 
@@ -173,5 +175,14 @@ public class TaskDaoJpa {
             events.add(new Event(username, task.getId(), task.getName()));
         }
         return events;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<CompletedTask> getCompletedTasks(Long projectId) {
+        // TODO: sort by last_updated
+        Project project = this.projectRepository
+                .findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        return this.completedTaskRepository.findCompletedTaskByProject(project);
     }
 }

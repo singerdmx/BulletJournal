@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class TaskController {
@@ -68,6 +69,12 @@ public class TaskController {
         return this.taskDaoJpa.complete(username, taskId).toPresentationModel();
     }
 
+    @GetMapping(COMPLETED_TASKS_ROUTE)
+    public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId) {
+        return this.taskDaoJpa.getCompletedTasks(projectId)
+                .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+    }
+
     @DeleteMapping(TASK_ROUTE)
     public void deleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -77,8 +84,4 @@ public class TaskController {
         }
     }
 
-    @GetMapping(COMPLETED_TASKS_ROUTE)
-    public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId) {
-        return null;
-    }
 }
