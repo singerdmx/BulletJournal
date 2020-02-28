@@ -1,5 +1,5 @@
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (0, '2020-02-11 05:01:54.960000', '2020-02-11 05:01:54.960000', 'BulletJournal', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (0, '2020-02-11 05:01:54.960000', '2020-02-11 05:01:54.960000', 'BulletJournal', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (0, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Default', 'BulletJournal', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 0, true);
@@ -8,79 +8,79 @@ VALUES (99, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Bullet'
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (99, 0, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (1, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Xavier', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (1, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Xavier', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (1, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Xavier', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (1, 1, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (2, '2020-02-11 14:34:49.363000', '2020-02-11 14:34:49.363000', 'bbs1024', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (2, '2020-02-11 14:34:49.363000', '2020-02-11 14:34:49.363000', 'bbs1024', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (2, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'bbs1024', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (2, 2, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (3, '2020-02-11 14:35:16.334000', '2020-02-11 14:35:16.334000', 'ccc', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (3, '2020-02-11 14:35:16.334000', '2020-02-11 14:35:16.334000', 'ccc', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (3, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'ccc', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (3, 3, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (4, '2020-02-11 14:35:44.218000', '2020-02-11 14:35:44.218000', 'Thinker', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (4, '2020-02-11 14:35:44.218000', '2020-02-11 14:35:44.218000', 'Thinker', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (4, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Thinker', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (4, 4, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (5, '2020-02-11 14:35:50.358000', '2020-02-11 14:35:50.358000', 'Joker', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (5, '2020-02-11 14:35:50.358000', '2020-02-11 14:35:50.358000', 'Joker', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (5, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Joker', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (5, 5, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (6, '2020-02-11 14:36:40.548000', '2020-02-11 14:36:40.548000', 'mqm', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (6, '2020-02-11 14:36:40.548000', '2020-02-11 14:36:40.548000', 'mqm', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (6, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'mqm', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (6, 6, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (7, '2020-02-11 14:36:52.566000', '2020-02-11 14:36:52.566000', 'hero', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (7, '2020-02-11 14:36:52.566000', '2020-02-11 14:36:52.566000', 'hero', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (7, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'hero', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (7, 7, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (8, '2020-02-11 14:37:14.582000', '2020-02-11 14:37:14.582000', 'bean', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (8, '2020-02-11 14:37:14.582000', '2020-02-11 14:37:14.582000', 'bean', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (8, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'bean', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (8, 8, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (9, '2020-02-11 14:37:21.339000', '2020-02-11 14:37:21.339000', 'xlf', null, 'America/Los_Angeles', 1, 0, 0);
+VALUES (9, '2020-02-11 14:37:21.339000', '2020-02-11 14:37:21.339000', 'xlf', 'United States of America-US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (9, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'xlf', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (9, 9, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (10, '2020-02-11 14:37:30.421000', '2020-02-11 14:37:30.421000', '999999', null, 'America/Los_Angeles', 2, 1, 1);
+VALUES (10, '2020-02-11 14:37:30.421000', '2020-02-11 14:37:30.421000', '999999', 'United States of America-US', 'America/Los_Angeles', 2, 1, 1);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (10, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', '999999', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (10, 10, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (11, '2020-02-11 14:37:41.698000', '2020-02-11 14:37:41.698000', '0518', null, 'America/Los_Angeles', 3, 1, 0);
+VALUES (11, '2020-02-11 14:37:41.698000', '2020-02-11 14:37:41.698000', '0518', 'United States of America-US', 'America/Los_Angeles', 3, 1, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (11, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', '0518', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (11, 11, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (12, '2020-02-11 14:37:52.109000', '2020-02-11 14:37:52.109000', 'Scarlet', null, 'America/Los_Angeles', 0, 0, 1);
+VALUES (12, '2020-02-11 14:37:52.109000', '2020-02-11 14:37:52.109000', 'Scarlet', 'United States of America-US', 'America/Los_Angeles', 0, 0, 1);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (12, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'Scarlet', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (12, 12, true);
 
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
-VALUES (13, '2020-02-11 14:38:17.230000', '2020-02-11 14:38:17.230000', 'lsx9981', null, 'America/Los_Angeles', 4, 1, 1);
+VALUES (13, '2020-02-11 14:38:17.230000', '2020-02-11 14:38:17.230000', 'lsx9981', 'United States of America-US', 'America/Los_Angeles', 4, 1, 1);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (13, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'lsx9981', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (13, 13, true);

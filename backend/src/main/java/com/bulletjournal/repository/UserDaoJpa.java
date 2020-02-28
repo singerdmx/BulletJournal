@@ -38,6 +38,7 @@ public class UserDaoJpa {
         user.setTimezone(timezone);
         user.setDateFormat(0);
         user.setTimeFormat(0);
+        user.setCurrency("United States of America-US");
         user = this.userRepository.save(user);
 
         Group group = new Group();

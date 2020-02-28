@@ -3,8 +3,7 @@ import { message } from 'antd';
 import {
   actions as userActions,
   UserApiErrorAction,
-  UpdateUser,
-  ClearUser
+  UpdateUser
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchUser } from '../../apis/userApis';
