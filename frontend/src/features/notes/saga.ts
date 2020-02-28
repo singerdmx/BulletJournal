@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put, select } from 'redux-saga/effects';
+import { takeLatest, call, all, put } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as notesActions,
@@ -6,15 +6,14 @@ import {
   UpdateNotes,
   CreateNote,
   PutNote,
-  GetNote
+  GetNote,
+  PatchNote
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchNotes, createNote, putNotes, getNoteById
+  fetchNotes, createNote, putNotes, getNoteById, updateNote
 } from '../../apis/noteApis';
 import { updateNotes } from './actions';
-import { Note } from './interface';
-import { IState } from '../../store';
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -47,7 +46,7 @@ function* noteCreate(action: PayloadAction<CreateNote>) {
 
 function* notePut(action: PayloadAction<PutNote>) {
     try{
-      const data = yield call(putNotes, action.payload.projectId, action.payload.notes)
+      const data = yield call(putNotes, action.payload.projectId, action.payload.notes);
       yield put(updateNotes(action.payload.projectId));
     } catch (error) {
       yield call(message.error, `Put Note Error Received: ${error}`);
@@ -55,10 +54,18 @@ function* notePut(action: PayloadAction<PutNote>) {
 }
 
 function* getNote(action: PayloadAction<GetNote>) {
-  try{
-    const data = yield call(getNoteById, action.payload.noteId, )
-  }catch (error) {
+  try {
+    const data = yield call(getNoteById, action.payload.noteId);
+  } catch (error) {
     yield call(message.error, `Get Note Error Received: ${error}`);
+  }
+}
+
+function* patchNote(action: PayloadAction<PatchNote>) {
+  try {
+    yield call(updateNote, action.payload.noteId, action.payload.name);
+  } catch (error) {
+    yield call(message.error, `Patch Note Error Received: ${error}`);
   }
 }
 
@@ -83,6 +90,10 @@ export default function* noticeSagas() {
     yield takeLatest(
           notesActions.NoteGet.type,
           getNote
-      )
+    ),
+    yield takeLatest(
+      notesActions.PatchNote.type,
+      patchNote
+    )
   ]);
 }

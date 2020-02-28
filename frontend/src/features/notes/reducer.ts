@@ -31,6 +31,11 @@ export type DeleteNote = {
   noteId: number
 }
 
+export type PatchNote = {
+  noteId: number,
+  name: string
+}
+
 let initialState = {
   notes: [] as Array<Note>
 };
@@ -54,7 +59,8 @@ const slice = createSlice({
     NotesCreate: (state, action: PayloadAction<CreateNote>) => state,
     NotePut: (state, action: PayloadAction<PutNote>) => state,
     NoteGet: (state, action: PayloadAction<GetNote>) => state,
-    NoteDelete: (state, action: PayloadAction<DeleteNote>) => state
+    NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
+    PatchNote: (state, action: PayloadAction<PatchNote>) => state,
     }
 });
 
