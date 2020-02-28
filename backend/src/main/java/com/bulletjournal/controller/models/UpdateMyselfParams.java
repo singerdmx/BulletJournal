@@ -39,4 +39,8 @@ public class UpdateMyselfParams {
     public void setCurrency(String currency) {
         this.currency = currency;
     }
+
+    public boolean hasCurrency() {
+        return this.currency != null;
+    }
 }

@@ -74,6 +74,9 @@ public class UserDaoJpa {
         DaoHelper.updateIfPresent(updateMyselfParams.hasReminderBeforeTask(),
                 updateMyselfParams.getReminderBeforeTask(),
                 (value) -> self.setReminderBeforeTask(value));
+        DaoHelper.updateIfPresent(updateMyselfParams.hasCurrency(),
+                updateMyselfParams.getCurrency(),
+                (value) -> self.setCurrency(value));
         return self;
     }
 }
