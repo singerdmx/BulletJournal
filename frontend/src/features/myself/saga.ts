@@ -20,12 +20,14 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
     const { updateSettings } = action.payload;
 
     const data = yield call(fetchMyself, true);
+
     yield put(
       myselfActions.myselfDataReceived({
         username: data.name,
         avatar: data.avatar,
         timezone: data.timezone,
-        before: data.reminderBeforeTask
+        before: data.reminderBeforeTask,
+        currency: data.currency
       })
     );
     if (updateSettings) {
@@ -33,6 +35,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
       yield put(
         settingsActions.updateBefore({ before: data.reminderBeforeTask })
       );
+      yield put(settingsActions.updateCurrency({ currency: data.currency }));
     }
   } catch (error) {
     yield call(message.error, `Myself (Expand) Error Received: ${error}`);
@@ -56,12 +59,13 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
 
 function* myselfPatch(action: PayloadAction<PatchMyself>) {
   try {
-    const { timezone, before } = action.payload;
-    yield call(patchMyself, timezone, before);
+    const { timezone, before, currency } = action.payload;
+    yield call(patchMyself, timezone, before, currency);
     yield put(
       myselfActions.myselfDataReceived({
         timezone: timezone,
-        before: before
+        before: before,
+        currency: currency
       })
     );
     yield call(message.success, 'User Settings updated successfully');

@@ -11,5 +11,8 @@ export const updateBefore = (before: number) =>
   actions.myselfDataReceived({
     before: before
   });
-export const patchMyself = (timezone?: string, before?: number) =>
-  actions.patchMyself({ timezone, before });
+export const patchMyself = (
+  timezone?: string,
+  before?: number,
+  currency?: string
+) => actions.patchMyself({ timezone, before, currency });

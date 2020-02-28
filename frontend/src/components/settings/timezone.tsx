@@ -406,7 +406,7 @@ type TimezoneProps = {
   currentTimezone: string;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTimezone: (timezone: string) => void;
-  patchMyself: (timezone?: string, before?: number) => void;
+  patchMyself: (timezone?: string, before?: number, currency?: string) => void;
 };
 
 class TimezonePicker extends React.Component<TimezoneProps> {

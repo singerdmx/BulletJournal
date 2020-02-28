@@ -9,3 +9,8 @@ export const updateBefore = (before: number) =>
   actions.updateBefore({
     before: before
   });
+
+export const updateCurrency = (currency: string) =>
+  actions.updateCurrency({
+    currency: currency
+  });

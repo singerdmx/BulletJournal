@@ -16,10 +16,15 @@ export const logoutUser = () => {
   return doPost('/api/myself/logout', postBody);
 };
 
-export const patchMyself = (timezone?: string, before?: number) => {
+export const patchMyself = (
+  timezone?: string,
+  before?: number,
+  currency?: string
+) => {
   const patchBody = JSON.stringify({
     timezone: timezone,
-    reminderBeforeTask: before
+    reminderBeforeTask: before,
+    currency: currency
   });
 
   return doPatch('/api/myself', patchBody)

@@ -8,6 +8,10 @@ type BeforeAction = {
   before: number;
 };
 
+type CurrencyAction = {
+  currency: string;
+};
+
 export enum ReminderBeforeTask {
   ZERO_MIN_BEFORE = 0,
   FIVE_MIN_BEFORE = 1,
@@ -30,7 +34,8 @@ export const ReminderBeforeTaskText = [
 
 let initialState = {
   timezone: '',
-  before: 0
+  before: 0,
+  currency: ''
 };
 
 const slice = createSlice({
@@ -44,6 +49,10 @@ const slice = createSlice({
     updateBefore: (state, action: PayloadAction<BeforeAction>) => {
       const { before } = action.payload;
       state.before = before;
+    },
+    updateCurrency: (state, action: PayloadAction<CurrencyAction>) => {
+      const { currency } = action.payload;
+      state.currency = currency;
     }
   }
 });
