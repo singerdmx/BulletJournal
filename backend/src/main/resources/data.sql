@@ -85,6 +85,12 @@ INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_grou
 VALUES (13, '2020-02-11 14:34:09.535000', '2020-02-11 14:34:09.535000', 'Default', 'lsx9981', true);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (13, 13, true);
 
+INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
+VALUES (14, '2020-02-11 14:40:17.230000', '2020-02-11 14:40:17.240000', 'Michael_Zhou', 'US', 'America/Los_Angeles', 1, 1, 1);
+INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
+VALUES (14, '2020-02-11 14:45:09.535000', '2020-02-11 14:45:09.536000', 'Default', 'Michael_Zhou', true);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (14, 14, true);
+
 -- Join Group - Xavier invites BulletJournal to Join Group "Default" ID 1
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (1, 0, true);
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)
@@ -163,3 +169,18 @@ VALUES ('Scarlet', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '
 
 INSERT INTO public.user_projects (owner, created_at, updated_at, owned_projects, shared_projects)
 VALUES ('lsx9981', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '[{"id":7,"s":[]}]', null);
+
+-- Michael_Zhou Joined lsx9981 group
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (13, 14, true);
+
+-- Michael_Zhou created 1 project in lsx9981 group
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (8, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P2', 'Michael_Zhou', null, 0, 13);
+
+-- Michael_Zhou created 1 project in default group
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (9, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P1', 'Michael_Zhou', null, 2, 14);
+
+-- Michael_Zhou created 1 transaction in the project of default group
+INSERT INTO public.transactions(id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
+VALUES  (0, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment1', 'Michael_Zhou', 1000, '2020-02-20', '2020-02-20 00:00:00.000000', 'Michael_Zhou', '2020-02-20 00:00:00.000000', null, 'America/Los_Angeles', 0, 8)
