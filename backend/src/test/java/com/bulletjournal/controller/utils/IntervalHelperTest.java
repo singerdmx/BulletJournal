@@ -51,7 +51,7 @@ public class IntervalHelperTest {
         assertEquals(11, zonedStartDateTime.getHour());
         assertEquals(5, zonedStartDateTime.getMinute());
 
-        ZoneId chinaZoneID= ZoneId.of("Asia/Shanghai");
+        ZoneId chinaZoneID = ZoneId.of("Asia/Shanghai");
         ZonedDateTime zonedStartDateTimeInChina = zonedStartDateTime.withZoneSameInstant(chinaZoneID);
         assertNotNull(zonedStartDateTime);
         assertEquals(2020, zonedStartDateTimeInChina.getYear());
