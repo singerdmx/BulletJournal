@@ -41,6 +41,7 @@ export type DeleteGroupAction = {
 
 export type GetGroupAction = {
   groupId: number;
+  hideError?: boolean;
 };
 
 export type PatchGroupAction = {

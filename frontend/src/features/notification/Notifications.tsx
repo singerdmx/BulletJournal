@@ -22,7 +22,15 @@ const NotificationList = ({ notifications }: NotificationsProps) => {
       dataSource={notifications}
       renderItem={item => (
         <List.Item
-          extra={item.actions && <Actions type={item.type} actions={item.actions} notificationId={item.id}></Actions>}
+          extra={
+            item.actions && (
+              <Actions
+                type={item.type}
+                actions={item.actions}
+                notificationId={item.id}
+              ></Actions>
+            )
+          }
           key={item.id}
         >
           <List.Item.Meta
@@ -63,7 +71,7 @@ class Notifications extends React.Component<NotificationsProps> {
             placement='bottomRight'
             overlayClassName='notifications-list'
           >
-            <Icon type='bell' theme='filled' />
+            <Icon type='bell' theme='filled' style={{ fontSize: '20px' }} />
           </Popover>
         </Badge>
       </div>

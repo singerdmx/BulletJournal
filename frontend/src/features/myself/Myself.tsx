@@ -5,12 +5,20 @@ import { withRouter, RouteComponentProps } from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
-import { updateMyself } from './actions';
+import { updateMyself, updateExpandedMyself } from './actions';
+import { updateGroups, groupUpdate } from '../group/actions';
+import { updateNotifications } from '../notification/actions';
+
+import './myself.styles.less';
 
 type MyselfProps = {
   username: string;
   avatar: string;
   updateMyself: () => void;
+  updateExpandedMyself: (updateSettings: boolean) => void;
+  updateGroups: () => void;
+  updateNotifications: () => void;
+  groupUpdate: () => void;
 };
 
 type PathProps = RouteComponentProps;
@@ -19,23 +27,32 @@ class Myself extends React.Component<MyselfProps & PathProps> {
   componentDidMount() {
     this.props.updateMyself();
   }
+
+  handleRefreshOnClick = () => {
+    this.props.updateExpandedMyself(true);
+    this.props.updateGroups();
+    this.props.updateNotifications();
+    this.props.groupUpdate();
+  };
+
   render() {
     return (
-      <div
-        style={{
-          display: 'flex',
-          width: '125px',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          fontSize: '20px',
-          color: 'white'
-        }}
-      >
-        <Icon type='plus' title='Create New BuJo' style={{cursor: 'pointer'}}/>
-        <Icon type='sync' title='Refresh' style={{cursor: 'pointer'}}/>
+      <div className='myselfContainer'>
+        <Icon type='plus' title='Create New BuJo' className='rotateIcon' />
+        <Icon
+          type='sync'
+          title='Refresh'
+          className='rotateIcon'
+          onClick={this.handleRefreshOnClick}
+        />
         <Notifications />
         <Popover
-          content={<DropdownMenu username={this.props.username} history={this.props.history}/>}
+          content={
+            <DropdownMenu
+              username={this.props.username}
+              history={this.props.history}
+            />
+          }
           trigger='click'
           placement='bottomRight'
         >
@@ -57,4 +74,10 @@ const mapStateToProps = (state: IState) => ({
   avatar: state.myself.avatar
 });
 
-export default connect(mapStateToProps, { updateMyself })(withRouter(Myself));
+export default connect(mapStateToProps, {
+  updateMyself,
+  updateExpandedMyself,
+  updateGroups,
+  updateNotifications,
+  groupUpdate
+})(withRouter(Myself));

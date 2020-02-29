@@ -23,7 +23,7 @@ import {
   updateGroup
 } from '../../apis/groupApis';
 import { IState } from '../../store';
-import { clearUser } from '../user/actions'
+import { clearUser } from '../user/actions';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -45,7 +45,9 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
 
 function* groupUpdate(action: PayloadAction<GroupUpdateAction>) {
   const state: IState = yield select();
-  yield put(groupsActions.getGroup({groupId: state.group.group.id}));
+  yield put(
+    groupsActions.getGroup({ groupId: state.group.group.id, hideError: true })
+  );
 }
 
 function* createGroup(action: PayloadAction<GroupCreateAction>) {
@@ -67,10 +69,10 @@ function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
   try {
     const { groupId, username, groupName } = action.payload;
     yield call(addUserGroup, groupId, username);
-    yield all ([
+    yield all([
       yield put(groupsActions.groupsUpdate({})),
-      yield put(groupsActions.getGroup({groupId: groupId})),
-      yield put(clearUser()),
+      yield put(groupsActions.getGroup({ groupId: groupId })),
+      yield put(clearUser())
     ]);
     yield call(
       message.success,
@@ -85,10 +87,10 @@ function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
   try {
     const { groupId, username, groupName } = action.payload;
     yield call(removeUserGroup, groupId, username);
-    yield all ([
+    yield all([
       yield put(groupsActions.groupsUpdate({})),
-      yield put(groupsActions.getGroup({groupId: groupId})),
-    ])
+      yield put(groupsActions.getGroup({ groupId: groupId }))
+    ]);
     yield call(
       message.success,
       `User ${username} removed from Group ${groupName}`
@@ -110,12 +112,16 @@ function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
 }
 
 function* getUserGroup(action: PayloadAction<GetGroupAction>) {
+  const { groupId, hideError } = action.payload;
+
   try {
-    const { groupId } = action.payload;
     const data = yield call(getGroup, groupId);
     console.log(data);
     yield put(groupsActions.groupReceived({ group: data }));
   } catch (error) {
+    if (hideError) {
+      return;
+    }
     yield call(message.error, `Get Group Error Received: ${error}`);
   }
 }
@@ -144,6 +150,6 @@ export default function* groupSagas() {
     yield takeLatest(groupsActions.deleteGroup.type, deleteUserGroup),
     yield takeLatest(groupsActions.getGroup.type, getUserGroup),
     yield takeLatest(groupsActions.patchGroup.type, patchGroup),
-    yield takeLatest(groupsActions.groupUpdate.type, groupUpdate),
+    yield takeLatest(groupsActions.groupUpdate.type, groupUpdate)
   ]);
 }

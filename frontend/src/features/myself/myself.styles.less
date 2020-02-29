@@ -1,0 +1,23 @@
+.myselfContainer {
+  display: flex;
+  width: 150px;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 22px;
+  color: white;
+}
+
+.rotateIcon {
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover {
+    transform: rotate(180deg);
+    transition-duration: 1s;
+  }
+
+  &:active {
+    color: pink;
+    transition-duration: 0s;
+  }
+}
