@@ -1,6 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Menu, Icon, Avatar } from 'antd';
+
+import {
+  BellOutlined,
+  CalendarOutlined,
+  FlagOutlined,
+  FolderAddOutlined,
+  FolderOutlined,
+  ProfileOutlined,
+  SettingOutlined,
+  SketchOutlined,
+  TeamOutlined,
+  UsergroupAddOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+
+import { Menu, Avatar } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
@@ -58,17 +73,17 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           key='bujo'
           title={
             <span>
-              <Icon type='sketch' />
+              <SketchOutlined />
               <span>My BuJo</span>
             </span>
           }
         >
           <Menu.Item key='today'>
-            <Icon type='bell' />
+            <BellOutlined />
             Today
           </Menu.Item>
           <Menu.Item key='calender'>
-            <Icon type='calendar' />
+            <CalendarOutlined />
             Calendar
           </Menu.Item>
         </SubMenu>
@@ -76,7 +91,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           key='projects'
           title={
             <span>
-              <Icon type='folder' />
+              <FolderOutlined />
               <span>Bullet Journal</span>
             </span>
           }
@@ -85,30 +100,31 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             key='ownedProjects'
             title={
               <span>
-                <Icon type='profile' />
+                <ProfileOutlined />
                 <span>Owned BuJo</span>
               </span>
             }
           >
             <Menu.Item key='addProject' title='Add New BuJo'>
-              <Icon type='folder-add' />
+              <FolderAddOutlined />
             </Menu.Item>
           </SubMenu>
           <SubMenu
             key='sharedProjects'
             title={
               <span>
-                <Icon type='team' />
+                <TeamOutlined />
                 <span>Shared BuJo</span>
               </span>
             }
           >
           {sharedProjects.map(((item, index)=>{
             return (
-                <Menu.Item key={`project${index}`} title={item.owner}>
-                <div>{item.owner}</div>
-                <Icon type='usergroup-add' style={{ fontSize: 20 }} />
-                </Menu.Item>)
+              <Menu.Item key={`project${index}`} title={item.owner}>
+              <div>{item.owner}</div>
+              <UsergroupAddOutlined style={{ fontSize: 20 }} />
+              </Menu.Item>
+            );
               }))}
           </SubMenu>
         </SubMenu>
@@ -117,13 +133,13 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           onTitleClick={this.onGroupsClick}
           title={
             <span>
-              <Icon type='team' />
+              <TeamOutlined />
               <span>Groups</span>
             </span>
           }
         >
           <Menu.Item key='addGroup' title='Create New Group'>
-            <Icon type='usergroup-add' style={{ fontSize: 20 }} />
+            <UsergroupAddOutlined style={{ fontSize: 20 }} />
           </Menu.Item>
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
@@ -158,7 +174,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                     </span>
                   </span>
                   <span>
-                    <Icon type='user' />
+                    <UserOutlined />
                     {group.users.length}
                   </span>
                 </span>
@@ -167,13 +183,13 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           })}
         </SubMenu>
         <Menu.Item key='labels'>
-          <Icon type='flag' />
+          <FlagOutlined />
           Labels
         </Menu.Item>
         <Menu.Item
           key='settings'
         >
-          <Icon type='setting' />
+          <SettingOutlined />
           Settings
         </Menu.Item>
       </Menu>

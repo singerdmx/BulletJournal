@@ -1,5 +1,6 @@
 import React from 'react';
-import { Select, Icon } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Select } from 'antd';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
@@ -9,8 +10,10 @@ import {
 } from '../../features/myself/actions';
 import { updateCurrency } from './actions';
 import 'flag-icon-css/css/flag-icon.css'; //flag icon
+
 var LocaleCurrency = require('locale-currency'); //currency code
 var cc = require('country-code'); //contry alpha2 code
+
 const { Option } = Select;
 
 const alpha2ToName = new Map();
@@ -60,7 +63,7 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
         <Select
           showSearch={true}
           style={{ width: 300 }}
-          placeholder='Select a currency'
+          placeholder="Select a currency"
           onChange={this.handleOnChange}
           value={
             <span>
@@ -107,8 +110,7 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
             </Option>
           ))}
         </Select>
-        <Icon
-          type='check-circle'
+        <CheckCircleOutlined
           onClick={() => this.handleOnClick(true)}
           style={{
             marginLeft: '20px',
@@ -120,10 +122,9 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
                 ? 'visible'
                 : 'hidden'
           }}
-          title='Save'
+          title="Save"
         />
-        <Icon
-          type='close-circle'
+        <CloseCircleOutlined
           onClick={() => this.handleOnClick(false)}
           style={{
             marginLeft: '20px',
@@ -135,7 +136,7 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
                 ? 'visible'
                 : 'hidden'
           }}
-          title='Cancel'
+          title="Cancel"
         />
       </span>
     );

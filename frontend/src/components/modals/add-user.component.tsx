@@ -1,4 +1,5 @@
 import React from 'react';
+import { PlusOutlined } from '@ant-design/icons';
 import { Modal, Input, Button, Avatar, Empty } from 'antd';
 import { connect } from 'react-redux';
 import { addUserGroupByUsername } from '../../features/group/actions';
@@ -56,7 +57,7 @@ class AddUser extends React.Component<ModalProps, ModalState> {
       <div className="group-footer">
         <Button
           type="primary"
-          icon="plus"
+          icon={<PlusOutlined />}
           shape="round"
           title="Add User"
           onClick={this.showModal}

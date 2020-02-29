@@ -1,5 +1,6 @@
 import React from 'react';
-import { Select, Icon } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { ReminderBeforeTaskText } from './reducer';
@@ -48,8 +49,7 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
             </Option>
           ))}
         </Select>
-        <Icon
-          type='check-circle'
+        <CheckCircleOutlined
           onClick={() => this.handleOnClick(true)}
           style={{
             marginLeft: '20px',
@@ -61,10 +61,8 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
                 ? 'visible'
                 : 'hidden'
           }}
-          title='Save'
-        />
-        <Icon
-          type='close-circle'
+          title='Save' />
+        <CloseCircleOutlined
           onClick={() => this.handleOnClick(false)}
           style={{
             marginLeft: '20px',
@@ -76,8 +74,7 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
                 ? 'visible'
                 : 'hidden'
           }}
-          title='Cancel'
-        />
+          title='Cancel' />
       </span>
     );
   }

@@ -1,7 +1,10 @@
 import React from 'react';
 import TaskList from '../components/task-list/task-list.component';
 import BujoCalender from '../components/bujo-calender/bujo-calender.component';
-import { Icon, Modal, Form, Input, Checkbox } from 'antd';
+import { AccountBookOutlined, CarryOutOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Modal, Input, Checkbox } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 
 type BujoRouteParams = {
@@ -42,15 +45,15 @@ class BujoPage extends React.Component<BujoRouteProps, todoState> {
           <h2>{category.toUpperCase()} </h2>
           <Checkbox.Group defaultValue={['todo']} className="header-check">
             <Checkbox value="todo">
-              <Icon type="carry-out" title="TODO" />
+              <CarryOutOutlined title="TODO" />
             </Checkbox>
             <Checkbox value="ledger">
-              <Icon type="account-book" title="LEDGER" />
+              <AccountBookOutlined title="LEDGER" />
             </Checkbox>
           </Checkbox.Group>
 
           <h2 className="add-todo-button" onClick={this.showForm}>
-            <Icon type="plus" />
+            <PlusOutlined />
           </h2>
         </div>
         

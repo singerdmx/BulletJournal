@@ -2,7 +2,8 @@ import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { Notification } from './interface';
-import { List, Badge, Popover, Icon } from 'antd';
+import { BellFilled } from '@ant-design/icons';
+import { List, Badge, Popover } from 'antd';
 import TitleAvatar from '../../components/notification/avatar.compoennt';
 import Actions from '../../components/notification/action.component';
 import ListTitle from '../../components/notification/list-title.component';
@@ -71,7 +72,7 @@ class Notifications extends React.Component<NotificationsProps> {
             placement='bottomRight'
             overlayClassName='notifications-list'
           >
-            <Icon type='bell' theme='filled' style={{ fontSize: '20px' }} />
+            <BellFilled style={{ fontSize: '20px' }} />
           </Popover>
         </Badge>
       </div>

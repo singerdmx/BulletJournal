@@ -1,5 +1,6 @@
 import React from 'react';
-import { Icon } from 'antd';
+import { DeleteTwoTone } from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { answerNotice } from '../../features/notification/actions';
 import { connect } from 'react-redux';
 import { ActionType } from '../../features/notification/constants';
@@ -21,14 +22,11 @@ class Actions extends React.Component<actionsProps> {
     if (actions.length === 0) {
       return (
         <div className="notification-operation">
-          <Icon
-            type="delete"
-            theme="twoTone"
+          <DeleteTwoTone
             twoToneColor="#ff0000"
             title="Remove"
             style={{ cursor: 'pointer' }}
-            onClick={() => this.handleClick('delete', notificationId, type)}
-          />
+            onClick={() => this.handleClick('delete', notificationId, type)} />
         </div>
       );
     }
@@ -51,7 +49,7 @@ class Actions extends React.Component<actionsProps> {
           }
 
           return (
-            <Icon
+            <LegacyIcon
               key={index}
               type={iconType}
               theme="twoTone"

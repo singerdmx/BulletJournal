@@ -1,5 +1,6 @@
 import React from 'react';
-import { List, Checkbox, Icon, Menu, Dropdown } from 'antd';
+import { DashOutlined } from '@ant-design/icons';
+import { List, Checkbox, Menu, Dropdown } from 'antd';
 
 import './todo-item.styles.less';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
@@ -30,7 +31,7 @@ const TodoItem = (props: ItemProps) => {
       </div>
       <div className="selector">
         <Dropdown overlay={todoMenu} trigger={['click']}>
-          <Icon type="dash" />
+          <DashOutlined />
         </Dropdown>
       </div>
     </List.Item>

@@ -1,13 +1,6 @@
 import React from 'react';
-import {
-  Icon,
-  Button,
-  List,
-  Badge,
-  Avatar,
-  Typography,
-  Popconfirm
-} from 'antd';
+import { CloseOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, List, Badge, Avatar, Typography, Popconfirm } from 'antd';
 import { connect } from 'react-redux';
 import {
   deleteGroup,
@@ -97,11 +90,11 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
             {group.name}
           </Title>
           <h3 className="group-operation">
-            <Icon type="user" />
+            <UserOutlined />
             {group.users && group.users.length}
             {group.owner === this.props.myself.username && !group.default && (
               <Popconfirm title="Are you sure?" okText="Yes" cancelText="No" className="group-setting">
-                <Icon type="delete" title="Delete Group" />
+                <DeleteOutlined title="Delete Group" />
               </Popconfirm>
             )}
           </h3>
@@ -131,7 +124,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
                           this.deleteUser(group.id, item.name, group.name)
                         }
                       >
-                        <Icon type="close" />
+                        <CloseOutlined />
                       </Button>
                     )}
                 </List.Item>

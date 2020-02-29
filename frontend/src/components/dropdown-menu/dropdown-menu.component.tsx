@@ -1,5 +1,6 @@
 import React from 'react';
-import { Menu, Icon } from 'antd';
+import { ExportOutlined, SettingOutlined } from '@ant-design/icons';
+import { Menu } from 'antd';
 import { logoutUser } from '../../apis/myselfApis';
 import { History } from 'history';
 
@@ -24,11 +25,11 @@ const DropdownMenu = ({ username, history }: menuProps) => (
   <Menu selectable={false}>
     <Menu.Item className='modified-item' style={{cursor: 'default'}}>{username}</Menu.Item>
     <Menu.Item className='modified-item' onClick={() => onClickSetting(history)}>
-      <Icon type='setting'/>
+      <SettingOutlined />
       Settings
     </Menu.Item>
     <Menu.Item className='modified-item' onClick={() => handleLogout()}>
-      <Icon type='export' />
+      <ExportOutlined />
       Log Out
     </Menu.Item>
   </Menu>
