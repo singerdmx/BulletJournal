@@ -13,6 +13,8 @@ public class ProjectItems {
 
     private List<Transaction> transactions = new ArrayList<>();
 
+    private List<Note> notes = new ArrayList<>();
+
     @NotBlank
     @Size(min = 10, max = 10)
     private String date; // "yyyy-MM-dd"
@@ -39,5 +41,13 @@ public class ProjectItems {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public List<Note> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<Note> notes) {
+        this.notes = notes;
     }
 }

@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "transactions",
-        indexes = {@Index(name = "payer_interval_index", columnList = "payer, startTime, endTime")})
+        indexes = {@Index(name = "payer_interval_index", columnList = "payer, start_time, end_time")})
 public class Transaction extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "transaction_generator")
@@ -49,11 +49,11 @@ public class Transaction extends ProjectItemModel {
     private String timezone;
 
     @NotNull
-    @Column
+    @Column(name = "start_time")
     private Timestamp startTime;
 
     @NotNull
-    @Column
+    @Column(name = "end_time")
     private Timestamp endTime;
 
     public Long getId() {
