@@ -18,7 +18,8 @@ public class Transaction extends ProjectItemModel {
     @GeneratedValue(generator = "transaction_generator")
     @SequenceGenerator(
             name = "transaction_generator",
-            sequenceName = "transaction_sequence"
+            sequenceName = "transaction_sequence",
+            initialValue = 100
     )
     private Long id;
 

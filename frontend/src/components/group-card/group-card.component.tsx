@@ -86,13 +86,13 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
 
   render() {
     const { group } = this.props;
+    const isEditable = group.owner === this.props.myself.username;
     return (
       <div className="group-card">
         <div className="group-title">
           <Title
             level={4}
-            editable={group.owner === this.props.myself.username}
-            
+            editable={isEditable ? {onChange : this.titleChange} : false}
           >
             {group.name}
           </Title>
