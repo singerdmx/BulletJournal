@@ -58,7 +58,8 @@ public class GroupController {
     public Group updateGroup(@NotNull @PathVariable Long groupId,
                              @Valid @RequestBody UpdateGroupParams updateGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.groupDaoJpa.partialUpdate(username, groupId, updateGroupParams).toPresentationModel();
+        this.groupDaoJpa.partialUpdate(username, groupId, updateGroupParams);
+        return getGroup(groupId);
     }
 
     @GetMapping(GROUP_ROUTE)
