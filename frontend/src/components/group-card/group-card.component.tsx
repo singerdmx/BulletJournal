@@ -5,7 +5,8 @@ import { connect } from 'react-redux';
 import {
   deleteGroup,
   removeUserGroupByUsername,
-  getGroup
+  getGroup,
+  patchGroup,
 } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interfaces';
 import { MyselfWithAvatar } from '../../features/myself/reducer';
@@ -24,6 +25,7 @@ type GroupProps = {
     groupName: string
   ) => void;
   getGroup: (groupdId: number) => void;
+  patchGroup : (groupdId: number, groupName: string) => void;
 };
 
 type GroupState = {
@@ -73,9 +75,13 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
     this.props.removeUserGroupByUsername(groupId, username, groupName);
   };
 
-  titleChange = (content : string) => {
-    console.log(content)
+  deleteGroup = () => {
+    this.props.deleteGroup(this.props.group.id, this.props.group.name);
   }
+
+  titleChange = (content : string) => {
+    this.props.patchGroup(this.props.group.id, content);
+  };
 
   render() {
     const { group } = this.props;
@@ -93,7 +99,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
             <UserOutlined />
             {group.users && group.users.length}
             {group.owner === this.props.myself.username && !group.default && (
-              <Popconfirm title="Are you sure?" okText="Yes" cancelText="No" className="group-setting">
+              <Popconfirm title="Are you sure?" okText="Yes" cancelText="No" onConfirm={this.deleteGroup} className="group-setting">
                 <DeleteOutlined title="Delete Group" />
               </Popconfirm>
             )}
@@ -147,5 +153,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   deleteGroup,
   removeUserGroupByUsername,
-  getGroup
+  getGroup,
+  patchGroup
 })(GroupCard);
