@@ -3,6 +3,7 @@ package com.bulletjournal.controller.models;
 import com.bulletjournal.repository.models.Transaction;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,18 @@ public class ProjectItems {
 
     private List<Note> notes = new ArrayList<>();
 
+    /**
+     * "yyyy-MM-dd"
+     */
     @NotBlank
     @Size(min = 10, max = 10)
-    private String date; // "yyyy-MM-dd"
+    private String date;
+
+    /**
+     * Corresponding to date
+     */
+    @NotNull
+    private DayOfWeek dayOfWeek;
 
     public List<Task> getTasks() {
         return tasks;
@@ -49,5 +59,13 @@ public class ProjectItems {
 
     public void setNotes(List<Note> notes) {
         this.notes = notes;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(DayOfWeek dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
     }
 }
