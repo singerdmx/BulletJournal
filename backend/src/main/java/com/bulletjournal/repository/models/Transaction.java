@@ -74,31 +74,57 @@ public class Transaction extends ProjectItemModel {
         return amount;
     }
 
-    public void setAmount(Double amount) { this.amount = amount; }
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
 
-    public TransactionType getTransactionType() { return transactionType; }
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
 
-    public void setTransactionType(TransactionType transactionType) { this.transactionType = transactionType; }
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
 
-    public String getDate() { return date; }
+    public String getDate() {
+        return date;
+    }
 
-    public void setDate(String date) { this.date = date; }
+    public void setDate(String date) {
+        this.date = date;
+    }
 
-    public String getTime() { return time; }
+    public String getTime() {
+        return time;
+    }
 
-    public void setTime(String time) { this.time = time; }
+    public void setTime(String time) {
+        this.time = time;
+    }
 
-    public String getTimezone() { return timezone; }
+    public String getTimezone() {
+        return timezone;
+    }
 
-    public void setTimezone(String timezone) { this.timezone = timezone; }
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
 
-    public Timestamp getStartTime() { return startTime; }
+    public Timestamp getStartTime() {
+        return startTime;
+    }
 
-    public void setStartTime(Timestamp startTime) { this.startTime = startTime; }
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
+    }
 
-    public Timestamp getEndTime() { return endTime; }
+    public Timestamp getEndTime() {
+        return endTime;
+    }
 
-    public void setEndTime(Timestamp endTime) { this.endTime = endTime; }
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
 
     public com.bulletjournal.controller.models.Transaction toPresentationModel() {
         return new com.bulletjournal.controller.models.Transaction(
@@ -110,8 +136,6 @@ public class Transaction extends ProjectItemModel {
                 this.getDate(),
                 this.getTime(),
                 this.getTimezone(),
-                this.getStartTime(),
-                this.getEndTime(),
                 this.getTransactionType().getValue());
     }
 }

@@ -3,7 +3,6 @@ package com.bulletjournal.controller.models;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.sql.Timestamp;
 
 public class CreateTransactionParams {
 
@@ -20,16 +19,10 @@ public class CreateTransactionParams {
     @NotNull
     private String date; // "yyyy-MM-dd"
 
-    private String time;
+    private String time; // "[h]h:[m]m:[s]s"
 
     @NotNull
     private String timezone;
-
-    @NotNull
-    private Timestamp startTime;
-
-    @NotNull
-    private Timestamp endTime;
 
     @NotNull
     private Integer transactionType;
@@ -43,8 +36,6 @@ public class CreateTransactionParams {
                                    @NotNull String date,
                                    String time,
                                    @NotNull String timezone,
-                                   @NotNull Timestamp startTime,
-                                   @NotNull Timestamp endTime,
                                    @NotNull Integer transactionType) {
         this.name = name;
         this.payer = payer;
@@ -52,8 +43,6 @@ public class CreateTransactionParams {
         this.date = date;
         this.time = time;
         this.timezone = timezone;
-        this.startTime = startTime;
-        this.endTime = endTime;
         this.transactionType = transactionType;
     }
 
@@ -89,23 +78,21 @@ public class CreateTransactionParams {
         this.date = date;
     }
 
-    public String getTime() { return time; }
+    public String getTime() {
+        return time;
+    }
 
-    public void setTime(String time) { this.time = time; }
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public String getTimezone() {
         return this.timezone;
     }
 
-    public void setTimezone(String timezone) { this.timezone = timezone; }
-
-    public Timestamp getStartTime() { return startTime; }
-
-    public void setStartTime(Timestamp startTime) { this.startTime = startTime; }
-
-    public Timestamp getEndTime() { return endTime; }
-
-    public void setEndTime(Timestamp endTime) { this.endTime = endTime; }
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
 
     public Integer getTransactionType() {
         return transactionType;

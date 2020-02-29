@@ -3,7 +3,6 @@ package com.bulletjournal.controller.models;
 import com.bulletjournal.repository.models.Project;
 
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
 public class Transaction {
     private Long id;
@@ -31,12 +30,6 @@ public class Transaction {
     @NotNull
     private String timezone;
 
-    @NotNull
-    private Timestamp startTime;
-
-    @NotNull
-    private Timestamp endTime;
-
     public Transaction() {
     }
 
@@ -48,8 +41,6 @@ public class Transaction {
                        @NotNull String date,
                        String time,
                        @NotNull String timezone,
-                       @NotNull Timestamp startTime,
-                       @NotNull Timestamp endTime,
                        @NotNull Integer transactionType) {
         this.id = id;
         this.name = name;
@@ -59,8 +50,6 @@ public class Transaction {
         this.date = date;
         this.time = time;
         this.timezone = timezone;
-        this.startTime = startTime;
-        this.endTime = endTime;
         this.transactionType = transactionType;
     }
 
@@ -126,22 +115,6 @@ public class Transaction {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
-    }
-
-    public Timestamp getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Timestamp startTime) {
-        this.startTime = startTime;
-    }
-
-    public Timestamp getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Timestamp endTime) {
-        this.endTime = endTime;
     }
 
     public Integer getTransactionType() {

@@ -5,6 +5,7 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTransactionParams;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
+import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,15 +72,36 @@ public class TransactionDaoJpa {
      * @endTime Long - End Time to retrieve transaction from ledger repository
      * @retVal Transaction - Transaction object
      */
-    public List<Transaction> findTransactionsByProjectInterval(Long projectId, Long startTime, Long endTime) {
+    public List<Transaction> findTransactionsByProjectInterval(Long projectId, Timestamp startTime, Timestamp endTime) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
-        return this.transactionRepository.findTransactionsByProjectInterval(project, new Timestamp(startTime), new Timestamp(endTime));
+        return this.transactionRepository.findTransactionsByProjectInterval(project, startTime, endTime);
+    }
+
+    /**
+     * Get transactions based on owner and interval from Ledger Repository
+     * <p>
+     * Parameter:
+     *
+     * @projectId Long - Transaction identifier to retrieve transaction from ledger repository
+     * @startTime ZoneDateTime - Start Time to retrieve transaction from ledger repository
+     * @endTime ZoneDateTime - End Time to retrieve transaction from ledger repository
+     * @retVal Transaction - Transaction object
+     */
+    public List<Transaction> findTransactionsByInterval(String owner, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Project> projects = this.projectRepository.findByOwner(owner);
+        List<Transaction> transactions = new ArrayList<>();
+        for (Project project : projects) {
+            transactions.addAll(this.transactionRepository.findTransactionsByProjectInterval(project,
+                    Timestamp.from(startTime.toInstant()),
+                    Timestamp.from(endTime.toInstant())));
+        }
+        return transactions;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Transaction create(Long projectId, String owner, CreateTransactionParams createTransactionParams) {
+    public Transaction create(Long projectId, String owner, CreateTransactionParams createTransaction) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -86,11 +109,19 @@ public class TransactionDaoJpa {
         Transaction transaction = new Transaction();
         transaction.setProject(project);
         transaction.setOwner(owner);
-        transaction.setName(createTransactionParams.getName());
-        transaction.setPayer(createTransactionParams.getPayer());
-        transaction.setAmount(createTransactionParams.getAmount());
-        transaction.setDate(createTransactionParams.getDate());
-        transaction.setTransactionType(TransactionType.getType(createTransactionParams.getTransactionType()));
+        transaction.setName(createTransaction.getName());
+        transaction.setPayer(createTransaction.getPayer());
+        transaction.setAmount(createTransaction.getAmount());
+        transaction.setDate(createTransaction.getDate());
+        transaction.setTransactionType(TransactionType.getType(createTransaction.getTransactionType()));
+        transaction.setStartTime(Timestamp.from(IntervalHelper.getStartTime(createTransaction.getDate(),
+                createTransaction.getTime(),
+                createTransaction.getTimezone())
+                .toInstant()));
+        transaction.setStartTime(Timestamp.from(IntervalHelper.getEndTime(createTransaction.getDate(),
+                createTransaction.getTime(),
+                createTransaction.getTimezone())
+                .toInstant()));
         return this.transactionRepository.save(transaction);
     }
 
@@ -118,6 +149,17 @@ public class TransactionDaoJpa {
 
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasDate(), updateTransactionParams.getDate(), transaction::setDate);
+
+        DaoHelper.updateIfPresent(
+                updateTransactionParams.hasTime(), updateTransactionParams.getTime(), transaction::setTime);
+
+        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime(),
+                Timestamp.from(IntervalHelper.getStartTime(transaction.getDate(), transaction.getTime(),
+                        transaction.getTimezone()).toInstant()), transaction::setStartTime);
+
+        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime(),
+                Timestamp.from(IntervalHelper.getEndTime(transaction.getDate(), transaction.getTime(),
+                        transaction.getTimezone()).toInstant()), transaction::setStartTime);
 
         return this.transactionRepository.save(transaction);
     }
