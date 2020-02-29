@@ -32,7 +32,14 @@ public class ZonedDateTimeHelper {
      */
     public static String getDateFromZoneDateTime(ZonedDateTime zonedDateTime) {
         return zonedDateTime.getYear() + DATE_DELIMITER +
-                zonedDateTime.getMonthValue() + DATE_DELIMITER +
-                zonedDateTime.getDayOfMonth();
+                convertSingleDigitToTwoDigits(zonedDateTime.getMonthValue()) + DATE_DELIMITER +
+                convertSingleDigitToTwoDigits(zonedDateTime.getDayOfMonth());
+    }
+
+    public static String convertSingleDigitToTwoDigits(int val) {
+        if(val < 10 && val >= 0) {
+            return "0" + val;
+        }
+        return String.valueOf(val);
     }
 }
