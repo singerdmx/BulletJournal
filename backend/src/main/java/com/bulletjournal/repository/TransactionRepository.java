@@ -17,8 +17,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT transaction FROM Transaction transaction where " +
             "(transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR " +
             "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime) AND " +
-            "transaction.project = :project")
-    List<Transaction> findTransactionsByProjectInterval(@Param("project") Project project,
+            "transaction.payer = :payer")
+    List<Transaction> findTransactionsByPayerInterval(@Param("payer") String payer,
                                                         @Param("startTime") Timestamp startTime,
                                                         @Param("endTime") Timestamp endTime);
 }

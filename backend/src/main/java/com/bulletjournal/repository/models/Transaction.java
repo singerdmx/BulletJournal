@@ -12,7 +12,8 @@ import java.sql.Timestamp;
  * This class is for ProjectType.LEDGER
  */
 @Entity
-@Table(name = "transactions")
+@Table(name = "transactions",
+        indexes = {@Index(name = "payer_interval_index", columnList = "payer, startTime, endTime")})
 public class Transaction extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "transaction_generator")

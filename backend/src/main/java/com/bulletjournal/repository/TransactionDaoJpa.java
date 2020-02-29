@@ -63,23 +63,6 @@ public class TransactionDaoJpa {
     }
 
     /**
-     * Get transactions based on interval from Ledger Repository
-     * <p>
-     * Parameter:
-     *
-     * @projectId Long - Transaction identifier to retrieve transaction from ledger repository
-     * @startTime Long - Start Time to retrieve transaction from ledger repository
-     * @endTime Long - End Time to retrieve transaction from ledger repository
-     * @retVal Transaction - Transaction object
-     */
-    public List<Transaction> findTransactionsByProjectInterval(Long projectId, Timestamp startTime, Timestamp endTime) {
-        Project project = this.projectRepository
-                .findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
-        return this.transactionRepository.findTransactionsByProjectInterval(project, startTime, endTime);
-    }
-
-    /**
      * Get transactions based on owner and interval from Ledger Repository
      * <p>
      * Parameter:
@@ -89,14 +72,11 @@ public class TransactionDaoJpa {
      * @endTime ZoneDateTime - End Time to retrieve transaction from ledger repository
      * @retVal Transaction - Transaction object
      */
-    public List<Transaction> findTransactionsByInterval(String owner, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<Project> projects = this.projectRepository.findByOwner(owner);
-        List<Transaction> transactions = new ArrayList<>();
-        for (Project project : projects) {
-            transactions.addAll(this.transactionRepository.findTransactionsByProjectInterval(project,
-                    Timestamp.from(startTime.toInstant()),
-                    Timestamp.from(endTime.toInstant())));
-        }
+    public List<Transaction> findTransactionsByInterval(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Transaction> transactions = this.transactionRepository.findTransactionsByPayerInterval(
+                                                                    payer,
+                                                                    Timestamp.from(startTime.toInstant()),
+                                                                    Timestamp.from(endTime.toInstant()));
         return transactions;
     }
 
