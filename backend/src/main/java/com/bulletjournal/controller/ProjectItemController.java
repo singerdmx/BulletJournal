@@ -33,13 +33,6 @@ public class ProjectItemController {
     @GetMapping(PROJECT_ITEMS_ROUTE)
     public List<ProjectItems> getProjectItems(
             @Valid @RequestParam List<ProjectType> types,
-            @NotBlank @RequestParam String timezone) {
-        return null;
-    }
-
-    @GetMapping(PROJECT_ITEMS_ROUTE)
-    public List<ProjectItems> getProjectItemsByInterval(
-            @Valid @RequestParam List<ProjectType> types,
             @NotBlank @RequestParam String date,
             @RequestParam Optional<String> time,
             @NotBlank @RequestParam String timezone) {

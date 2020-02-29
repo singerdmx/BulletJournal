@@ -19,7 +19,7 @@ public class CreateTransactionParams {
     @NotNull
     private String date; // "yyyy-MM-dd"
 
-    private String time; // "[h]h:[m]m:[s]s"
+    private String time; // "hh:mm"
 
     @NotNull
     private String timezone;
