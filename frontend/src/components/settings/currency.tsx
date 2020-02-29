@@ -35,7 +35,9 @@ type CurrencyProps = {
 
 class CurrencyPicker extends React.Component<CurrencyProps> {
   handleOnChange = (value: any) => {
-    const alpha2 = nameToAlpha2.get(value);
+    const str = value as string;
+    const name = str.substring(0, str.length - 3);
+    const alpha2 = nameToAlpha2.get(name);
     this.props.updateCurrency(alpha2);
   };
 
@@ -60,26 +62,11 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
       <span>
         <Select
           showSearch={true}
-          style={{ width: 300 }}
-          placeholder="Select a currency"
+          style={{ width: 260 }}
+          placeholder='Select a currency'
           onChange={this.handleOnChange}
           value={
-              {
-                key: alpha2,
-                value: name,
-                label: (
-                  <span>
-                    <span
-                      style={{ width: '20px' }}
-                      className={`flag-icon flag-icon-${alpha2.toLowerCase()}`} />
-                    <span>
-                      &nbsp;&nbsp;{name}
-                    </span>
-                    <span>
-                      &nbsp; ({LocaleCurrency.getCurrency(alpha2.toLowerCase())})
-                    </span>
-                  </span>
-            )}
+            name + ' (' + LocaleCurrency.getCurrency(alpha2.toLowerCase()) + ')'
           }
         >
           {_.map(optionCountries, country => (
@@ -122,7 +109,7 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
                 ? 'visible'
                 : 'hidden'
           }}
-          title="Save"
+          title='Save'
         />
         <CloseCircleOutlined
           onClick={() => this.handleOnClick(false)}
@@ -136,7 +123,7 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
                 ? 'visible'
                 : 'hidden'
           }}
-          title="Cancel"
+          title='Cancel'
         />
       </span>
     );
