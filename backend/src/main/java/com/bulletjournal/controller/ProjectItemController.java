@@ -36,15 +36,14 @@ public class ProjectItemController {
             @Valid @RequestParam List<ProjectType> types,
             @NotBlank @RequestParam String startDate,
             @NotBlank @RequestParam String endDate,
-            @RequestParam String time,
             @NotBlank @RequestParam String timezone) {
 
         List<ProjectItems> projectItems = new ArrayList<>();
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // Set start time and end time
-        ZonedDateTime startTime = IntervalHelper.getStartTime(startDate, time, timezone);
-        ZonedDateTime endTime = IntervalHelper.getEndTime(endDate, time, timezone);
+        ZonedDateTime startTime = IntervalHelper.getStartTime(startDate, null, timezone);
+        ZonedDateTime endTime = IntervalHelper.getEndTime(endDate, null, timezone);
 
         // Get dates between start time and end time
         List<ZonedDateTime> intervalDates = IntervalHelper.getIntervalDateList(startTime, endTime);
