@@ -4,44 +4,42 @@ import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.repository.models.Transaction;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class ProjectItemsGrouper {
 
-    private static final String DATE_DELIMITER = "-";
-
     /*
-     * Group transactions by date and add to project item. If no transaction happened on the date,
-     * the date will be skipped.
+     * Convert list of transactions to a Map and convert map into List of Project Items
      *
-     * @projectItems List<ProjectItems> - Project item List will get result
-     * @transactions List<Transaction> - Transaction list
-     * @dates List<ZoneDateTime> - List of dates
+     * @transactions List<Transaction> - List of Transactions
      */
-    public static void groupTransactionsByDate(
-            List<ProjectItems> projectItems, List<Transaction> transactions, List<ZonedDateTime> dates) {
-        for (ZonedDateTime date : dates) {
+    public static List<ProjectItems> groupTransactionsByDate(List<Transaction> transactions) {
+        Map<ZonedDateTime, List<Transaction>> map = getCandidateDates(transactions);
+        List<ProjectItems> projectItems = new ArrayList<>();
+        map.keySet().forEach(dateTime -> {
             ProjectItems projectItem = new ProjectItems();
-            projectItem.setDate(getDateFromZoneDateTime(date));
-            List<Transaction> transactionOnDate = getTransactionOn(transactions, projectItem.getDate());
-            if (!transactionOnDate.isEmpty()) {
-                projectItem.setTransactions(transactionOnDate);
-                projectItems.add(projectItem);
-            }
-        }
-    }
-
-    private static List<Transaction> getTransactionOn(List<Transaction> transactions, String date) {
-        return transactions.stream().filter(t -> t.getDate().equals(date)).collect(Collectors.toList());
+            projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(dateTime));
+            projectItem.setTransactions(map.get(dateTime));
+        });
+        return projectItems;
     }
 
     /*
-     * Convert ZoneDateTime to Date String
+     * Convert list of transactions to a Map with Key as ZonedDateTime
+     *
+     * @transactions List<Transaction> - List of Transactions
+     * @retVal Map<ZonedDateTime, List<Transaction>>
      */
-    private static String getDateFromZoneDateTime(ZonedDateTime zonedDateTime) {
-        return zonedDateTime.getYear() + DATE_DELIMITER +
-                zonedDateTime.getMonthValue() + DATE_DELIMITER +
-                zonedDateTime.getDayOfMonth();
+    public static Map<ZonedDateTime, List<Transaction>> getCandidateDates(List<Transaction> transactions) {
+        Map<ZonedDateTime, List<Transaction>> map = new HashMap<>();
+        for (Transaction transaction : transactions) {
+            ZonedDateTime zonedDateTime =
+                    ZonedDateTimeHelper.convertDateOnly(transaction.getDate(), transaction.getTimezone());
+            map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(transaction);
+        }
+        return map;
     }
 }
