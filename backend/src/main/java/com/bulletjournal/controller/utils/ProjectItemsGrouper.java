@@ -22,6 +22,7 @@ public class ProjectItemsGrouper {
         map.keySet().forEach(dateTime -> {
             ProjectItems projectItem = new ProjectItems();
             projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(dateTime));
+            projectItem.setDayOfWeek(dateTime.getDayOfWeek());
             projectItem.setTransactions(map.get(dateTime));
         });
         return projectItems;
