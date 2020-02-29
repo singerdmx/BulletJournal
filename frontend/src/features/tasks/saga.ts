@@ -36,7 +36,8 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
 
 function* taskCreate(action: PayloadAction<CreateTask>) {
     try {
-      const data = yield call(createTask, action.payload.projectId, action.payload.name);
+      const data = yield call(createTask, action.payload.projectId, action.payload.name,
+      action.payload.dueDate, action.payload.dueTime, action.payload.reminderSetting);
       const task = yield data.json();
       yield put(updateTasks(action.payload.projectId));
     } catch (error) {
