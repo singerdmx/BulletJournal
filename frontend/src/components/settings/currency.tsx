@@ -35,9 +35,7 @@ type CurrencyProps = {
 
 class CurrencyPicker extends React.Component<CurrencyProps> {
   handleOnChange = (value: any) => {
-    const str = value as string;
-    const name = str.substring(0, str.length - 3);
-    const alpha2 = nameToAlpha2.get(name);
+    const alpha2 = nameToAlpha2.get(value);
     this.props.updateCurrency(alpha2);
   };
 
@@ -66,20 +64,22 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
           placeholder="Select a currency"
           onChange={this.handleOnChange}
           value={
-            <span>
-              <span
-                style={{ width: '20px' }}
-                className={`flag-icon flag-icon-${alpha2.toLowerCase()}`}
-              ></span>
-              <span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {name}
-              </span>
-              <span>
-                &nbsp;&nbsp; ({LocaleCurrency.getCurrency(alpha2.toLowerCase())}
-                )
-              </span>
-            </span>
+              {
+                key: alpha2,
+                value: name,
+                label: (
+                  <span>
+                    <span
+                      style={{ width: '20px' }}
+                      className={`flag-icon flag-icon-${alpha2.toLowerCase()}`} />
+                    <span>
+                      &nbsp;&nbsp;{name}
+                    </span>
+                    <span>
+                      &nbsp; ({LocaleCurrency.getCurrency(alpha2.toLowerCase())})
+                    </span>
+                  </span>
+            )}
           }
         >
           {_.map(optionCountries, country => (
