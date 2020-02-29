@@ -6,7 +6,7 @@ import {
   deleteGroup,
   removeUserGroupByUsername,
   getGroup,
-  patchGroup,
+  patchGroup
 } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interfaces';
 import { MyselfWithAvatar } from '../../features/myself/reducer';
@@ -25,7 +25,7 @@ type GroupProps = {
     groupName: string
   ) => void;
   getGroup: (groupdId: number) => void;
-  patchGroup : (groupdId: number, groupName: string) => void;
+  patchGroup: (groupdId: number, groupName: string) => void;
 };
 
 type GroupState = {
@@ -54,21 +54,11 @@ function getGroupUserSpan(item: User, group: Group): JSX.Element {
   return <span style={{ color: 'grey' }}>&nbsp;&nbsp;{item.name}</span>;
 }
 
-const {Title} = Typography;
+const { Title } = Typography;
 
 class GroupCard extends React.Component<GroupProps, GroupState> {
   state: GroupState = {
     showModal: false
-  };
-
-  handleDelete = (groupId: number, groupName: string) => {
-    this.props.deleteGroup(groupId, groupName);
-  };
-
-  handleMenuClick = (menu: any, groupId: number, groupName: string) => {
-    if (menu.key === 'delete') {
-      this.handleDelete(groupId, groupName);
-    }
   };
 
   deleteUser = (groupId: number, username: string, groupName: string) => {
@@ -77,9 +67,9 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
 
   deleteGroup = () => {
     this.props.deleteGroup(this.props.group.id, this.props.group.name);
-  }
+  };
 
-  titleChange = (content : string) => {
+  titleChange = (content: string) => {
     this.props.patchGroup(this.props.group.id, content);
   };
 
@@ -91,7 +81,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
         <div className="group-title">
           <Title
             level={4}
-            editable={isEditable ? {onChange : this.titleChange} : false}
+            editable={isEditable ? { onChange: this.titleChange } : false}
           >
             {group.name}
           </Title>
@@ -99,7 +89,13 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
             <UserOutlined />
             {group.users && group.users.length}
             {group.owner === this.props.myself.username && !group.default && (
-              <Popconfirm title="Are you sure?" okText="Yes" cancelText="No" onConfirm={this.deleteGroup} className="group-setting">
+              <Popconfirm
+                title="Are you sure?"
+                okText="Yes"
+                cancelText="No"
+                onConfirm={this.deleteGroup}
+                className="group-setting"
+              >
                 <DeleteOutlined title="Delete Group" />
               </Popconfirm>
             )}
