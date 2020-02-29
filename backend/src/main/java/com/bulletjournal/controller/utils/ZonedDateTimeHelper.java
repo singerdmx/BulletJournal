@@ -37,7 +37,7 @@ public class ZonedDateTimeHelper {
     }
 
     public static String convertSingleDigitToTwoDigits(int val) {
-        if(val < 10 && val >= 0) {
+        if (val < 10 && val >= 0) {
             return "0" + val;
         }
         return String.valueOf(val);
