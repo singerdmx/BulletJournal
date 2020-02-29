@@ -15,7 +15,7 @@ import {
   UserOutlined
 } from '@ant-design/icons';
 
-import { Menu, Avatar } from 'antd';
+import { Menu, Avatar, Tree } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
@@ -23,6 +23,7 @@ import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
 const { SubMenu } = Menu;
+const { TreeNode } = Tree;
 
 type GroupProps = {
   groups: GroupsWithOwner[];
@@ -34,6 +35,19 @@ type ProjectProps = {
   sharedProjects: ProjectsWithOwner[];
   updateProjects: () => void;
 };
+
+const loop = (data: Project[]) =>
+      data.map((item:Project)  => {
+        console.log(item)
+        if (item.subProjects && item.subProjects.length) {
+          return (
+            <TreeNode active={true} key={item.id.toString()} title={item.name}>
+              {loop(item.subProjects)}
+            </TreeNode>
+          );
+        }
+        return <TreeNode active={true} key={item.id.toString()} title={item.owner} />;
+      });
 
 type PathProps = RouteComponentProps;
 
@@ -109,14 +123,26 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               </span>
             }
           >
-            {sharedProjects.map((item, index) => {
-              return (
-                <Menu.Item key={`project${index}`} title={item.owner}>
-                  <div>{item.owner}</div>
-                  <UsergroupAddOutlined style={{ fontSize: 20 }} />
-                </Menu.Item>
-              );
-            })}
+          {sharedProjects.map(((item, index)=>{
+            return (
+              <div style={{ marginLeft: '20%'}}>
+              <div style={{display: 'flex', alignItems: 'center'}}>
+                <UsergroupAddOutlined style={{ fontSize: 20 }} />
+                <div style={{padding: '1px 1px 1px 4px'}}>{item.owner}</div>
+              </div>
+                <Tree
+                    className="draggable-tree"
+                    defaultExpandedKeys={['1', '2', '4', '5']}
+                    draggable
+                    blockNode
+                    // onDragEnter={this.onDragEnter}
+                    // onDrop={this.onDrop}
+                  >
+                    {loop(item.projects)}
+                  </Tree>
+                  </div>              
+            );
+              }))}
           </SubMenu>
         </SubMenu>
         <SubMenu
