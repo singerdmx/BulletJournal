@@ -66,7 +66,7 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
           placeholder='Select a currency'
           onChange={this.handleOnChange}
           value={
-            name + ' (' + LocaleCurrency.getCurrency(alpha2.toLowerCase()) + ')'
+            '(' + LocaleCurrency.getCurrency(alpha2.toLowerCase()) + ') ' + name
           }
         >
           {_.map(optionCountries, country => (

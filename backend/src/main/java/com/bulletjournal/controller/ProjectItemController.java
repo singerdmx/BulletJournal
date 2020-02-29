@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -39,7 +40,7 @@ public class ProjectItemController {
             @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
 
-        List<ProjectItems> projectItems = null;
+        List<ProjectItems> projectItems = new ArrayList<>();
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // Set start time and end time
@@ -56,7 +57,7 @@ public class ProjectItemController {
                             transactionDaoJpa.findTransactionsByInterval(username, startTime, endTime);
 
                     // Group transactions by date
-                    projectItems = ProjectItemsGrouper.groupTransactionsByDate(transactions);
+                    projectItems.addAll(ProjectItemsGrouper.groupTransactionsByDate(transactions));
                     break;
                 default:
             }
