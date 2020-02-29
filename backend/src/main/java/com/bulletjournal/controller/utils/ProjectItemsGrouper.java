@@ -19,16 +19,18 @@ public class ProjectItemsGrouper {
      * @transactions List<Transaction> - Transaction list
      * @dates List<ZoneDateTime> - List of dates
      */
-    public static void groupTransactionsByDate(List<ProjectItems> projectItems, List<Transaction> transactions, List<ZonedDateTime> dates) {
+    public static void groupTransactionsByDate(
+            List<ProjectItems> projectItems, List<Transaction> transactions, List<ZonedDateTime> dates) {
         for (ZonedDateTime date : dates) {
             ProjectItems projectItem = new ProjectItems();
             projectItem.setDate(getDateFromZoneDateTime(date));
-            List<Transaction> transactionOnDate = (getTransactionOn(transactions, projectItem.getDate()));
-            if (transactionOnDate.size() != 0)
+            List<Transaction> transactionOnDate = getTransactionOn(transactions, projectItem.getDate());
+            if (!transactionOnDate.isEmpty()) {
+                projectItem.setTransactions(transactionOnDate);
                 projectItems.add(projectItem);
+            }
         }
     }
-
 
     private static List<Transaction> getTransactionOn(List<Transaction> transactions, String date) {
         return transactions.stream().filter(t -> t.getDate().equals(date)).collect(Collectors.toList());
