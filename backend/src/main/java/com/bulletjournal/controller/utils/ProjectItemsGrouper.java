@@ -24,6 +24,7 @@ public class ProjectItemsGrouper {
             projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(dateTime));
             projectItem.setDayOfWeek(dateTime.getDayOfWeek());
             projectItem.setTransactions(map.get(dateTime));
+            projectItems.add(projectItem);
         });
         return projectItems;
     }
