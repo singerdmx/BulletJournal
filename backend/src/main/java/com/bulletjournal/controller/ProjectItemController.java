@@ -32,7 +32,7 @@ public class ProjectItemController {
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
     public List<ProjectItems> getProjectItems(
-            @Valid @RequestBody List<ProjectType> types,
+            @Valid @RequestParam List<ProjectType> types,
             @NotBlank @RequestParam String startDate,
             @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
