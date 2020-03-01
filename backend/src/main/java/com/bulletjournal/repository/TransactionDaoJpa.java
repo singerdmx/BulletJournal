@@ -74,9 +74,9 @@ public class TransactionDaoJpa {
      */
     public List<Transaction> findTransactionsByInterval(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Transaction> transactions = this.transactionRepository.findTransactionsByPayerInterval(
-                                                                    payer,
-                                                                    Timestamp.from(startTime.toInstant()),
-                                                                    Timestamp.from(endTime.toInstant()));
+                payer,
+                Timestamp.from(startTime.toInstant()),
+                Timestamp.from(endTime.toInstant()));
         return transactions;
     }
 

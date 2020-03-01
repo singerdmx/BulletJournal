@@ -10,10 +10,7 @@ import com.bulletjournal.repository.TransactionDaoJpa;
 import com.bulletjournal.repository.models.Transaction;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -35,7 +32,7 @@ public class ProjectItemController {
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
     public List<ProjectItems> getProjectItems(
-            @Valid @RequestParam List<ProjectType> types,
+            @Valid @RequestBody List<ProjectType> types,
             @NotBlank @RequestParam String startDate,
             @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
