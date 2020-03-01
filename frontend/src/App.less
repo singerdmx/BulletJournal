@@ -1,6 +1,6 @@
 @import '~antd/dist/antd.less';
-@primary-color : #f78cba;
-@link-color : #f78cba;
+@primary-color: #f78cba;
+@link-color: #f78cba;
 
 .App {
   height: 100vh;
@@ -26,6 +26,14 @@
 
 .search-box {
   width: 300px;
+
+  input {
+    border-radius: 0 !important;
+  }
+}
+
+.ant-input-affix-wrapper-focused {
+  width: 800px;
 }
 
 .search-box .ant-input {
