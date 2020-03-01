@@ -93,12 +93,14 @@ public class TransactionDaoJpa {
         transaction.setPayer(createTransaction.getPayer());
         transaction.setAmount(createTransaction.getAmount());
         transaction.setDate(createTransaction.getDate());
+        transaction.setTime(createTransaction.getTime());
+        transaction.setTimezone(createTransaction.getTimezone());
         transaction.setTransactionType(TransactionType.getType(createTransaction.getTransactionType()));
         transaction.setStartTime(Timestamp.from(IntervalHelper.getStartTime(createTransaction.getDate(),
                 createTransaction.getTime(),
                 createTransaction.getTimezone())
                 .toInstant()));
-        transaction.setStartTime(Timestamp.from(IntervalHelper.getEndTime(createTransaction.getDate(),
+        transaction.setEndTime(Timestamp.from(IntervalHelper.getEndTime(createTransaction.getDate(),
                 createTransaction.getTime(),
                 createTransaction.getTimezone())
                 .toInstant()));
@@ -122,7 +124,8 @@ public class TransactionDaoJpa {
                 updateTransactionParams.hasPayer(), updateTransactionParams.getPayer(), transaction::setPayer);
 
         DaoHelper.updateIfPresent(
-                updateTransactionParams.hasTransactionType(), TransactionType.getType(updateTransactionParams.getTransactionType()), transaction::setTransactionType);
+                updateTransactionParams.hasTransactionType(), TransactionType.getType(
+                        updateTransactionParams.getTransactionType()), transaction::setTransactionType);
 
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasAmount(), updateTransactionParams.getAmount(), transaction::setAmount);
@@ -139,7 +142,7 @@ public class TransactionDaoJpa {
 
         DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime(),
                 Timestamp.from(IntervalHelper.getEndTime(transaction.getDate(), transaction.getTime(),
-                        transaction.getTimezone()).toInstant()), transaction::setStartTime);
+                        transaction.getTimezone()).toInstant()), transaction::setEndTime);
 
         return this.transactionRepository.save(transaction);
     }

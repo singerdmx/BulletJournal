@@ -3,6 +3,7 @@ package com.bulletjournal.controller.models;
 import com.bulletjournal.repository.models.Project;
 
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 public class Transaction {
     private Long id;
@@ -125,4 +126,24 @@ public class Transaction {
         this.transactionType = transactionType;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(projectId, that.projectId) &&
+                Objects.equals(payer, that.payer) &&
+                Objects.equals(amount, that.amount) &&
+                Objects.equals(date, that.date) &&
+                Objects.equals(transactionType, that.transactionType) &&
+                Objects.equals(time, that.time) &&
+                Objects.equals(timezone, that.timezone);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, projectId, payer, amount, date, transactionType, time, timezone);
+    }
 }
