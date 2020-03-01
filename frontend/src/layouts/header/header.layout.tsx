@@ -9,7 +9,7 @@ class HeaderLayout extends React.Component {
     return (
       <Header className='header'>
         <div className='search-box'>
-          <Search placeholder='Search' />
+          <Search placeholder='Search' style={{ width: '300px' }} />
         </div>
         <Myself />
       </Header>
