@@ -1,7 +1,11 @@
 import React from 'react';
 import TaskList from '../components/task-list/task-list.component';
-import BujoCalender from '../components/bujo-calender/bujo-calender.component';
-import { AccountBookOutlined, CarryOutOutlined, PlusOutlined } from '@ant-design/icons';
+import BujoCalendar from '../components/bujo-calendar/bujo-calendar.component';
+import {
+  AccountBookOutlined,
+  CarryOutOutlined,
+  PlusOutlined
+} from '@ant-design/icons';
 import { Form } from '@ant-design/compatible';
 import '@ant-design/compatible/assets/index.css';
 import { Modal, Input, Checkbox } from 'antd';
@@ -18,7 +22,6 @@ type todoState = {
   showForm: boolean;
 };
 const fakeData = ['Frontend', 'Bakcend', 'UI designer'];
-
 
 class BujoPage extends React.Component<BujoRouteProps, todoState> {
   state: todoState = {
@@ -40,35 +43,35 @@ class BujoPage extends React.Component<BujoRouteProps, todoState> {
   render() {
     const { category } = this.props.match.params;
     return (
-      <div className="todo">
-        <div className="todo-header">
+      <div className='todo'>
+        <div className='todo-header'>
           <h2>{category.toUpperCase()} </h2>
-          <Checkbox.Group defaultValue={['todo']} className="header-check">
-            <Checkbox value="todo">
-              <CarryOutOutlined title="TODO" />
+          <Checkbox.Group defaultValue={['todo']} className='header-check'>
+            <Checkbox value='todo'>
+              <CarryOutOutlined title='TODO' />
             </Checkbox>
-            <Checkbox value="ledger">
-              <AccountBookOutlined title="LEDGER" />
+            <Checkbox value='ledger'>
+              <AccountBookOutlined title='LEDGER' />
             </Checkbox>
           </Checkbox.Group>
 
-          <h2 className="add-todo-button" onClick={this.showForm}>
+          <h2 className='add-todo-button' onClick={this.showForm}>
             <PlusOutlined />
           </h2>
         </div>
-        
-        {category === 'today' ? <TaskList data={fakeData} /> : <BujoCalender />}
+
+        {category === 'today' ? <TaskList data={fakeData} /> : <BujoCalendar />}
         <Modal
-          title="Create Task"
+          title='Create Task'
           visible={this.state.showForm}
           onOk={this.handleCreate}
           onCancel={this.handleCancel}
           centered={true}
-          okText="Create"
+          okText='Create'
         >
           <Form>
             <Form.Item>
-              <Input placeholder="titie" />
+              <Input placeholder='titie' />
             </Form.Item>
             <Form.Item>
               <Input.TextArea allowClear={true} />
