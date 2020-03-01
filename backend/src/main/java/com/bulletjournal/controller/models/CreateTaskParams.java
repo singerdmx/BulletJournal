@@ -13,6 +13,9 @@ public class CreateTaskParams {
 
     private String dueTime; // "HH-mm"
 
+    // In minutes
+    private Integer duration;
+
     private ReminderSetting reminderSetting;
 
     public CreateTaskParams() {
@@ -20,10 +23,14 @@ public class CreateTaskParams {
 
     public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
                             String dueDate,
-                            String dueTime) {
+                            String dueTime,
+                            Integer duration,
+                            ReminderSetting reminderSetting) {
         this.name = name;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
+        this.duration = duration;
+        this.reminderSetting = reminderSetting;
     }
 
     public String getDueDate() {
@@ -60,5 +67,13 @@ public class CreateTaskParams {
 
     public boolean hasReminderSetting() {
         return this.reminderSetting != null;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }

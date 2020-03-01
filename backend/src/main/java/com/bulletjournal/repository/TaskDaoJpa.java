@@ -87,6 +87,9 @@ public class TaskDaoJpa {
                 task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
                 taskId, task.getProject().getOwner());
 
+        DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(),
+                (value) -> task.setDuration(value));
+
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasName(), updateTaskParams.getName(), (value) -> task.setName(value));
 
