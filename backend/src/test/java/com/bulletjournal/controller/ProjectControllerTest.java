@@ -205,7 +205,7 @@ public class ProjectControllerTest {
         Task t1 = createTask(project, "t1");
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
-        updateTask(t1, null, "2020-02-28", null, null, null, t1.getName());
+        updateTask(t1, expectedOwner, "2020-02-28", null, null, null, t1.getName());
     }
 
     private Task createTask(Project project, String taskName) {

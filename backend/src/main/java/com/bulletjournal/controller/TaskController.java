@@ -4,9 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.UpdateTaskParams;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.RemoveTaskEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +52,11 @@ public class TaskController {
     public Task updateTask(@NotNull @PathVariable Long taskId,
                            @Valid @RequestBody UpdateTaskParams updateTaskParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.partialUpdate(username, taskId, updateTaskParams).toPresentationModel();
+        List<Event> events = this.taskDaoJpa.partialUpdate(username, taskId, updateTaskParams);
+        if (!events.isEmpty()) {
+            notificationService.inform(new UpdateTaskAssigneeEvent(events, username, updateTaskParams.getAssignedTo()));
+        }
+        return getTask(taskId);
     }
 
 

@@ -78,7 +78,7 @@ public class TaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
+    public List<Event> partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
         Task task = this.taskRepository
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
@@ -93,9 +93,7 @@ public class TaskDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasName(), updateTaskParams.getName(), (value) -> task.setName(value));
 
-        DaoHelper.updateIfPresent(
-                updateTaskParams.hasAssignedTo(), updateTaskParams.getAssignedTo(),
-                (value) -> task.setAssignedTo(value));
+        List<Event> events = updateAssignee(requester, taskId, updateTaskParams, task);
 
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasDueDate(), updateTaskParams.getDueDate(), (value) -> task.setDueDate(value));
@@ -105,7 +103,24 @@ public class TaskDaoJpa {
 
         DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
                 (value) -> task.setReminderSetting(value));
-        return this.taskRepository.save(task);
+        this.taskRepository.save(task);
+        return events;
+    }
+
+    private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams, Task task) {
+        List<Event> events = new ArrayList<>();
+        String newAssignee = updateTaskParams.getAssignedTo();
+        String oldAssignee = task.getAssignedTo();
+        if (!Objects.equals(newAssignee, oldAssignee)) {
+            task.setAssignedTo(newAssignee);
+            if (!Objects.equals(newAssignee, requester)) {
+                events.add(new Event(newAssignee, taskId, task.getName()));
+            }
+            if (!Objects.equals(oldAssignee, requester)) {
+                events.add(new Event(oldAssignee, taskId, task.getName()));
+            }
+        }
+        return events;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

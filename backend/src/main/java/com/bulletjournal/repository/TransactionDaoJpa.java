@@ -8,10 +8,7 @@ import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
-import com.bulletjournal.notifications.AddPayerTransactionEvent;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.Informed;
-import com.bulletjournal.notifications.RemovePayerTransactionEvent;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.UserGroup;
@@ -114,7 +111,7 @@ public class TransactionDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Informed> partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
+    public List<Event> partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.transactionRepository
                 .findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction " + transactionId + " not found"));
@@ -126,7 +123,7 @@ public class TransactionDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasName(), updateTransactionParams.getName(), transaction::setName);
 
-        List<Informed> informs = this.updatePayer(requester, transactionId, updateTransactionParams, transaction);
+        List<Event> events = this.updatePayer(requester, transactionId, updateTransactionParams, transaction);
 
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasTransactionType(), TransactionType.getType(
@@ -151,24 +148,24 @@ public class TransactionDaoJpa {
 
         this.transactionRepository.save(transaction);
 
-        return informs;
+        return events;
     }
 
-    private List<Informed> updatePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+    private List<Event> updatePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
         String oldPayer = transaction.getPayer();
         String newPayer = updateTransactionParams.getPayer();
-        List<Informed> informeds  = new ArrayList<>();
+        List<Event> events  = new ArrayList<>();
+
         if (!Objects.equals(oldPayer, newPayer)) {
             transaction.setPayer(newPayer);
             if (!Objects.equals(requester, newPayer)) {
-                informeds.add(new AddPayerTransactionEvent(new Event(newPayer, transactionId, transaction.getName()), requester));
+                events.add(new Event(newPayer, transactionId, transaction.getName()));
             }
-
             if (!Objects.equals(requester, oldPayer)) {
-                informeds.add(new RemovePayerTransactionEvent(new Event(oldPayer, transactionId, transaction.getName()), requester));
+                events.add(new Event(oldPayer, transactionId, transaction.getName()));
             }
         }
-        return informeds;
+        return events;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
