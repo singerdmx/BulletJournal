@@ -126,9 +126,7 @@ public class TransactionDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasName(), updateTransactionParams.getName(), transaction::setName);
 
-//        DaoHelper.updateIfPresent(
-//                updateTransactionParams.hasPayer(), updateTransactionParams.getPayer(), transaction::setPayer);
-        List<Informed> informs = changePayer(requester, transactionId, updateTransactionParams, transaction);
+        List<Informed> informs = this.updatePayer(requester, transactionId, updateTransactionParams, transaction);
 
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasTransactionType(), TransactionType.getType(
@@ -156,7 +154,7 @@ public class TransactionDaoJpa {
         return informs;
     }
 
-    private List<Informed> changePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+    private List<Informed> updatePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
         String oldPayer = transaction.getPayer();
         String newPayer = updateTransactionParams.getPayer();
         List<Informed> informeds  = new ArrayList<>();
