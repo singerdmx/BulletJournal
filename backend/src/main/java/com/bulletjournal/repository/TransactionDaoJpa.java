@@ -8,7 +8,10 @@ import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
+import com.bulletjournal.notifications.AddPayerTransactionEvent;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.Informed;
+import com.bulletjournal.notifications.RemovePayerTransactionEvent;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.UserGroup;
@@ -22,6 +25,7 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Repository
@@ -110,7 +114,7 @@ public class TransactionDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Transaction partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
+    public List<Informed> partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.transactionRepository
                 .findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction " + transactionId + " not found"));
@@ -122,8 +126,9 @@ public class TransactionDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasName(), updateTransactionParams.getName(), transaction::setName);
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasPayer(), updateTransactionParams.getPayer(), transaction::setPayer);
+//        DaoHelper.updateIfPresent(
+//                updateTransactionParams.hasPayer(), updateTransactionParams.getPayer(), transaction::setPayer);
+        List<Informed> informs = changePayer(requester, transactionId, updateTransactionParams, transaction);
 
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasTransactionType(), TransactionType.getType(
@@ -146,7 +151,26 @@ public class TransactionDaoJpa {
                 Timestamp.from(IntervalHelper.getEndTime(transaction.getDate(), transaction.getTime(),
                         transaction.getTimezone()).toInstant()), transaction::setEndTime);
 
-        return this.transactionRepository.save(transaction);
+        this.transactionRepository.save(transaction);
+
+        return informs;
+    }
+
+    private List<Informed> changePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+        String oldPayer = transaction.getPayer();
+        String newPayer = updateTransactionParams.getPayer();
+        List<Informed> informeds  = new ArrayList<>();
+        if (!Objects.equals(oldPayer, newPayer)) {
+            transaction.setPayer(newPayer);
+            if (!Objects.equals(requester, newPayer)) {
+                informeds.add(new AddPayerTransactionEvent(new Event(newPayer, transactionId, transaction.getName()), requester));
+            }
+
+            if (!Objects.equals(requester, oldPayer)) {
+                informeds.add(new RemovePayerTransactionEvent(new Event(oldPayer, transactionId, transaction.getName()), requester));
+            }
+        }
+        return informeds;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
