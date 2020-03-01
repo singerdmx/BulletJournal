@@ -9,7 +9,7 @@ public class Label {
     private Long id;
 
     @NotBlank
-    private String value;
+    private String name;
 
     public Long getId() {
         return id;
@@ -19,11 +19,11 @@ public class Label {
         this.id = id;
     }
 
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setName(String name) {
+        this.name = name;
     }
 }
