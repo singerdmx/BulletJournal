@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class TransactionController {
@@ -31,10 +30,7 @@ public class TransactionController {
 
     @GetMapping(TRANSACTIONS_ROUTE)
     public List<Transaction> getTransactions(@NotNull @PathVariable Long projectId) {
-        return this.transactionDaoJpa.getTransactions(projectId)
-                .stream()
-                .map(com.bulletjournal.repository.models.Transaction::toPresentationModel)
-                .collect(Collectors.toList());
+        return this.transactionDaoJpa.getTransactions(projectId);
     }
 
     @PostMapping(TRANSACTIONS_ROUTE)

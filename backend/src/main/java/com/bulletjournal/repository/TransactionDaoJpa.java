@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class TransactionDaoJpa {
@@ -41,12 +42,15 @@ public class TransactionDaoJpa {
      * @projectId Long - Project identifier to retrieve project from project repository
      * @retVal List<Transaction> - List of transaction
      */
-    public List<Transaction> getTransactions(Long projectId) {
+    public List<com.bulletjournal.controller.models.Transaction> getTransactions(Long projectId) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
-        return this.transactionRepository.findTransactionsByProject(project);
+        return this.transactionRepository.findAllByProject(project)
+                .stream()
+                .map(Transaction::toPresentationModel)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -72,12 +76,10 @@ public class TransactionDaoJpa {
      * @endTime ZoneDateTime - End Time to retrieve transaction from ledger repository
      * @retVal Transaction - Transaction object
      */
-    public List<Transaction> findTransactionsByInterval(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<Transaction> transactions = this.transactionRepository.findTransactionsByPayerInterval(
-                payer,
-                Timestamp.from(startTime.toInstant()),
-                Timestamp.from(endTime.toInstant()));
-        return transactions;
+    public List<com.bulletjournal.controller.models.Transaction> findTransactionsByInterval(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+        return this.transactionRepository.findTransactionsByPayerInterval(payer,
+                Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
+                .stream().map(Transaction::toPresentationModel).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    List<Transaction> findTransactionsByProject(Project project);
+    List<Transaction> findAllByProject(Project project);
 
     @Query("SELECT transaction FROM Transaction transaction where " +
             "(transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR " +

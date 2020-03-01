@@ -1,7 +1,7 @@
 package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.controller.models.Transaction;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;

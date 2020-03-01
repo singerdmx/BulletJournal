@@ -7,7 +7,7 @@ import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
-import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.controller.models.Transaction;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
