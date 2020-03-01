@@ -1,7 +1,6 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.ledger.TransactionType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
