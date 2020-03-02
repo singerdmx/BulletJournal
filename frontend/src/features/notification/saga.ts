@@ -31,6 +31,7 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     const state: IState = yield select();
 
     if (etag && state.notice.etag && state.notice.etag != etag) {
+      yield call(message.info, "You've got new notifications");
       displayNotification("You've got new notifications");
     }
     yield put(
