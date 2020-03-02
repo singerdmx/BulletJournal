@@ -6,6 +6,7 @@ import {
   InfoCircleOutlined,
   UsergroupAddOutlined,
   UsergroupDeleteOutlined,
+  SolutionOutlined,
 } from '@ant-design/icons';
 
 import { Avatar, Badge } from 'antd';
@@ -34,6 +35,10 @@ const TitleAvatar = ({ source, type }: titleAvatarProps) => {
       break;
     case EventType.JoinGroupResponseEvent:
       icon = <InfoCircleOutlined />;
+      break;
+    case EventType.UpdateTaskAssigneeEvent:
+    case EventType.UpdateTransactionPayerEvent:
+      icon = <SolutionOutlined />
       break;
     default:
       icon = <EyeOutlined />;
