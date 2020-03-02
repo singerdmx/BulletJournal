@@ -1,6 +1,5 @@
 package com.bulletjournal.controller.utils;
 
-import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.Transaction;

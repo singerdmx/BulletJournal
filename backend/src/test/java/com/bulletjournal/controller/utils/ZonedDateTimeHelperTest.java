@@ -5,7 +5,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.ZonedDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests {@link ZonedDateTimeHelper}
@@ -59,7 +60,7 @@ public class ZonedDateTimeHelperTest {
         String time = "11:05";
         String timezone = "America/Los_Angeles";
 
-        ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateAndTime(date, time,timezone);
+        ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateAndTime(date, time, timezone);
         assertNotNull(zonedDateTime);
         assertEquals(2020, zonedDateTime.getYear());
         assertEquals(2, zonedDateTime.getMonthValue());
