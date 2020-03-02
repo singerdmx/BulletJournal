@@ -1,6 +1,6 @@
 @import '~antd/dist/antd.less';
-@primary-color : #f78cba;
-@link-color : #f78cba;
+@primary-color: #f78cba;
+@link-color: #f78cba;
 
 .App {
   height: 100vh;
@@ -24,8 +24,23 @@
   font-size: 16px;
 }
 
+/* ----------------------search bar---------------------- */
 .search-box {
-  width: 300px;
+  width: 100%;
+
+  input {
+    border-radius: 0 !important;
+  }
+}
+
+//search bar default width
+.ant-input-search {
+  width: 40%;
+}
+
+//used for extend search bar when focused
+.ant-input-affix-wrapper-focused {
+  width: 100% !important;
 }
 
 .search-box .ant-input {

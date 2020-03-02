@@ -131,7 +131,7 @@ function* patchGroup(action: PayloadAction<PatchGroupAction>) {
     const { groupId, name } = action.payload;
     const group = yield call(updateGroup, groupId, name);
     yield put(groupsActions.groupReceived({ group: group }));
-    yield call(message.success, 'Successfully updated group');
+    yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
     yield call(message.error, `Patch group Fail: ${error}`);
   }

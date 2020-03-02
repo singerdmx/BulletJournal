@@ -1,3 +1,6 @@
+## Before Submission
+Run command `./gradlew build`
+
 ## How to run Spring Boot App locally
 
 Make sure port 8080 is available and then start backend by running the following command:
@@ -14,8 +17,8 @@ e.g.
 DOCKER_BUILDKIT=1 docker build -t mwangxx/bulletjournal-backend .
 docker push mwangxx/bulletjournal-backend:latest
 ```
-## checkstyle
-- command `./gradlew checkstyleMain`
+
+## check style
 - config location: config/checkstyle
 - report location: build/reports
 

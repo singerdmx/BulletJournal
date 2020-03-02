@@ -10,17 +10,22 @@ public class UpdateTaskParams {
 
     private String name;
 
+    // In minutes
+    private Integer duration;
+
     private ReminderSetting reminderSetting;
 
     public UpdateTaskParams() {
     }
 
     public UpdateTaskParams(
-            String assignedTo, String dueDate, String dueTime, String name, ReminderSetting reminderSetting) {
+            String assignedTo, String dueDate, String dueTime, String name, Integer duration,
+            ReminderSetting reminderSetting) {
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;
+        this.duration = duration;
         this.reminderSetting = reminderSetting;
     }
 
@@ -82,5 +87,17 @@ public class UpdateTaskParams {
 
     public boolean hasReminderSetting() {
         return reminderSetting != null;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
+    public boolean hasDuration() {
+        return this.duration != null;
     }
 }

@@ -24,6 +24,10 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "timezone")
     private String timezone;
 
+    // In minutes
+    @Column
+    private Integer duration;
+
     @Column(name = "reminder_date", length = 15)
     private String reminderDate; // "yyyy-MM-dd"
 
@@ -61,6 +65,14 @@ public abstract class TaskModel extends ProjectItemModel {
     public String getTimezone() { return timezone; }
 
     public void setTimezone(String timezone) { this.timezone = timezone; }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
 
     public String getReminderDate() {
         return reminderDate;
@@ -136,6 +148,7 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getDueTime(),
                 this.getTimezone(),
                 this.getName(),
+                this.getDuration(),
                 this.getProject(),
                 reminderSetting);
     }

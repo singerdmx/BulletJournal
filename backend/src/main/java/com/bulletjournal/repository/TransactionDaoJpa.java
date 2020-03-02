@@ -22,6 +22,8 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Repository
 public class TransactionDaoJpa {
@@ -41,12 +43,15 @@ public class TransactionDaoJpa {
      * @projectId Long - Project identifier to retrieve project from project repository
      * @retVal List<Transaction> - List of transaction
      */
-    public List<Transaction> getTransactions(Long projectId) {
+    public List<com.bulletjournal.controller.models.Transaction> getTransactions(Long projectId) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
-        return this.transactionRepository.findTransactionsByProject(project);
+        return this.transactionRepository.findAllByProject(project)
+                .stream()
+                .map(Transaction::toPresentationModel)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -72,12 +77,10 @@ public class TransactionDaoJpa {
      * @endTime ZoneDateTime - End Time to retrieve transaction from ledger repository
      * @retVal Transaction - Transaction object
      */
-    public List<Transaction> findTransactionsByInterval(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<Transaction> transactions = this.transactionRepository.findTransactionsByPayerInterval(
-                payer,
-                Timestamp.from(startTime.toInstant()),
-                Timestamp.from(endTime.toInstant()));
-        return transactions;
+    public List<com.bulletjournal.controller.models.Transaction> findTransactionsByInterval(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+        return this.transactionRepository.findTransactionsByPayerInterval(payer,
+                Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
+                .stream().map(Transaction::toPresentationModel).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -108,7 +111,7 @@ public class TransactionDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Transaction partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
+    public List<Event> partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.transactionRepository
                 .findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction " + transactionId + " not found"));
@@ -120,8 +123,7 @@ public class TransactionDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasName(), updateTransactionParams.getName(), transaction::setName);
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasPayer(), updateTransactionParams.getPayer(), transaction::setPayer);
+        List<Event> events = this.updatePayer(requester, transactionId, updateTransactionParams, transaction);
 
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasTransactionType(), TransactionType.getType(
@@ -144,7 +146,26 @@ public class TransactionDaoJpa {
                 Timestamp.from(IntervalHelper.getEndTime(transaction.getDate(), transaction.getTime(),
                         transaction.getTimezone()).toInstant()), transaction::setEndTime);
 
-        return this.transactionRepository.save(transaction);
+        this.transactionRepository.save(transaction);
+
+        return events;
+    }
+
+    private List<Event> updatePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+        String oldPayer = transaction.getPayer();
+        String newPayer = updateTransactionParams.getPayer();
+        List<Event> events  = new ArrayList<>();
+
+        if (!Objects.equals(oldPayer, newPayer)) {
+            transaction.setPayer(newPayer);
+            if (!Objects.equals(requester, newPayer)) {
+                events.add(new Event(newPayer, transactionId, transaction.getName()));
+            }
+            if (!Objects.equals(requester, oldPayer)) {
+                events.add(new Event(oldPayer, transactionId, transaction.getName()));
+            }
+        }
+        return events;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

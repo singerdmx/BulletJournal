@@ -36,7 +36,10 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
 
 function* taskCreate(action: PayloadAction<CreateTask>) {
     try {
-      const data = yield call(createTask, action.payload.projectId, action.payload.name);
+      const payload = action.payload;
+      const data = yield call(createTask, payload.projectId,
+        payload.name, payload.assignedTo, payload.dueDate, payload.dueTime,
+        payload.duration, payload.reminderSetting);
       const task = yield data.json();
       yield put(updateTasks(action.payload.projectId));
     } catch (error) {
@@ -63,8 +66,9 @@ function* getTask(action: PayloadAction<GetTask>) {
 
 function* patchTask(action: PayloadAction<PatchTask>) {
   try {
-    yield call(updateTask, action.payload.taskId, action.payload.name, action.payload.dueDate,
-      action.payload.dueTime, action.payload.reminderSetting);
+    const payload = action.payload;
+    yield call(updateTask, payload.taskId, payload.name, payload.assignedTo,
+      payload.dueDate, payload.dueTime, payload.duration, payload.reminderSetting);
   } catch (error) {
     yield call(message.error, `Patch Task Error Received: ${error}`);
   }

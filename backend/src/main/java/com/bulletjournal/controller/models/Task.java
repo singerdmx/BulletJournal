@@ -33,6 +33,9 @@ public class Task {
     @NotNull
     private String name;
 
+    // In minutes
+    private Integer duration;
+
     @NotNull
     private Long projectId;
 
@@ -51,6 +54,7 @@ public class Task {
                 @NotBlank @Size(min = 5, max = 5) String dueTime,
                 @NotBlank String timezone,
                 @NotNull String name,
+                Integer duration,
                 @NotNull Project project,
                 ReminderSetting reminderSetting) {
         this.id = id;
@@ -59,6 +63,7 @@ public class Task {
         this.dueTime = dueTime;
         this.timezone = timezone;
         this.name = name;
+        this.duration = duration;
         this.projectId = project.getId();
         if (reminderSetting.hasBefore() || reminderSetting.hasDate()) {
             this.reminderSetting = reminderSetting;
@@ -113,6 +118,14 @@ public class Task {
         this.name = name;
     }
 
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
     public Long getProjectId() {
         return projectId;
     }
@@ -163,7 +176,7 @@ public class Task {
         this.setDueTime(task.getDueTime());
         this.setTimezone(task.getTimezone());
         this.setName(task.getName());
-        this.setProjectId(task.getProjectId());
+        this.setDuration(task.getDuration());
         this.setProjectId(task.getProjectId());
         if (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate()) {
             this.setReminderSetting(task.getReminderSetting());

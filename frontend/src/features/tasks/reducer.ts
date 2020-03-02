@@ -12,8 +12,10 @@ export type UpdateTasks = {
 export type CreateTask = {
     projectId: number;
     name: string;
+    assignedTo: string;
     dueDate?: string;
     dueTime?: string;
+    duration?: number;
     reminderSetting?: ReminderSetting;
 }
 
@@ -37,8 +39,10 @@ export type DeleteTask = {
 export type PatchTask = {
   taskId: number,
   name?: string;
+  assignedTo?: string;
   dueDate?: string;
   dueTime?: string;
+  duration?: number;
   reminderSetting?: ReminderSetting;
 }
 

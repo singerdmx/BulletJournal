@@ -24,12 +24,14 @@ export const deleteTaskById = (taskId: number) => {
     });
 };
 
-export const createTask = (projectId: number, name: string,
-  dueDate?: string, dueTime?: string, reminderSetting?: ReminderSetting) => {
+export const createTask = (projectId: number, name: string, assignedTo: string,
+  dueDate?: string, dueTime?: string, duration?: number, reminderSetting?: ReminderSetting) => {
   const postBody = JSON.stringify({
     name: name,
+    assignedTo: assignedTo,
     dueDate: dueDate,
     dueTime: dueTime,
+    duration: duration,
     reminderSetting: reminderSetting
   });
   return doPost(`/api/projects/${projectId}/tasks`, postBody)
@@ -52,14 +54,18 @@ export const putTasks = (projectId: number, tasks: Task[]) => {
 export const updateTask = (
   taskId: number,
   name?: string,
+  assignedTo?: string,
   dueDate?: string,
   dueTime?: string,
+  duration?: number,
   reminderSetting?: ReminderSetting
 ) => {
   const patchBody = JSON.stringify({
     name: name,
+    assignedTo: assignedTo,
     dueDate: dueDate,
     dueTime: dueTime,
+    duration: duration,
     reminderSetting: reminderSetting
   });
   return doPatch(`/api/tasks/${taskId}`, patchBody)

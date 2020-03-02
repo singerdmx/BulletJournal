@@ -176,4 +176,12 @@ VALUES (8, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P1', 'Mi
 
 -- Michael_Zhou created 1 transaction in the project of default group
 INSERT INTO public.transactions(id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
-VALUES  (0, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment1', 'Michael_Zhou', 1000, '2020-02-20', '2020-02-20 00:00:00.000000', 'Michael_Zhou', '2020-02-20 00:00:00.000000', null, 'America/Los_Angeles', 0, 8)
+VALUES (0, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment1', 'Michael_Zhou', 1000, '2020-02-20', '2020-02-20 00:00:00.000000', 'Michael_Zhou', '2020-02-20 00:00:00.000000', null, 'America/Los_Angeles', 0, 8);
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
+VALUES (1, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment2', 'Michael_Zhou', 2000, '2020-02-21', '2020-02-21 00:00:00.000000', 'Michael_Zhou', '2020-02-21 00:00:00.000000', null, 'America/Los_Angeles', 0, 8);
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
+VALUES (2, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment3', 'Michael_Zhou', 3000, '2020-02-22', '2020-02-22 00:00:00.000000', 'Michael_Zhou', '2020-02-22 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
+VALUES (3, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment4', 'Michael_Zhou', 4000, '2020-02-22', '2020-02-22 00:00:00.000000', 'Michael_Zhou', '2020-02-22 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
+VALUES (4, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment5', 'Michael_Zhou', 5000, '2020-02-23', '2020-02-23 00:00:00.000000', 'Michael_Zhou', '2020-02-23 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);

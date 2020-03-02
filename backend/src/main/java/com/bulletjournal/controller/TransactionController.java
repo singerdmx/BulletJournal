@@ -4,9 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateTransactionParams;
 import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.RemoveTransactionEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class TransactionController {
@@ -31,10 +28,7 @@ public class TransactionController {
 
     @GetMapping(TRANSACTIONS_ROUTE)
     public List<Transaction> getTransactions(@NotNull @PathVariable Long projectId) {
-        return this.transactionDaoJpa.getTransactions(projectId)
-                .stream()
-                .map(com.bulletjournal.repository.models.Transaction::toPresentationModel)
-                .collect(Collectors.toList());
+        return this.transactionDaoJpa.getTransactions(projectId);
     }
 
     @PostMapping(TRANSACTIONS_ROUTE)
@@ -54,7 +48,11 @@ public class TransactionController {
     public Transaction updateTransaction(@NotNull @PathVariable Long transactionId,
                                          @Valid @RequestBody UpdateTransactionParams updateTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return transactionDaoJpa.partialUpdate(username, transactionId, updateTransactionParams).toPresentationModel();
+        List<Event> events = transactionDaoJpa.partialUpdate(username, transactionId, updateTransactionParams);
+        if (!events.isEmpty()) {
+            notificationService.inform(new UpdateTransactionPayerEvent(events, username, updateTransactionParams.getPayer()));
+        }
+        return getTransaction(transactionId);
     }
 
     @DeleteMapping(TRANSACTION_ROUTE)
