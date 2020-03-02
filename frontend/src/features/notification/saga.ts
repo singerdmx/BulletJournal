@@ -32,7 +32,11 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     if (etag && state.notice.etag && state.notice.etag != etag) {
       navigator.serviceWorker
         .getRegistration()
-        .then(reg => reg?.showNotification("You've got new notifications"));
+        .then(reg => {
+          if (reg) {
+            reg.showNotification("You've got new notifications");
+          }
+        });
     }
 
     yield put(

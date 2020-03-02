@@ -25,7 +25,7 @@ type Config = {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
 };
 
-export function register(config?: Config) {
+function registerAfterGrantedPermissoin(config?: Config) {
   if ('serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
@@ -54,6 +54,18 @@ export function register(config?: Config) {
       } else {
         // Is not localhost. Just register service worker
         registerValidSW(swUrl, config);
+      }
+    });
+  }
+}
+
+export function register(config?: Config) {
+  if (Notification.permission === 'granted') {
+    registerAfterGrantedPermissoin(config);
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        registerAfterGrantedPermissoin(config);
       }
     });
   }
