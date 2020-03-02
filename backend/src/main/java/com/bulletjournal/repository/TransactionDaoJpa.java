@@ -50,6 +50,7 @@ public class TransactionDaoJpa {
 
         return this.transactionRepository.findAllByProject(project)
                 .stream()
+                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
                 .map(Transaction::toPresentationModel)
                 .collect(Collectors.toList());
     }
