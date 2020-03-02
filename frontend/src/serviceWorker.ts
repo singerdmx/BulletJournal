@@ -32,7 +32,7 @@ export function displayNotification(
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistration().then(reg => {
       if (reg && reg.showNotification) {
-        reg.showNotification("You've got new notifications");
+        reg.showNotification(title, options);
       }
     });
   }
