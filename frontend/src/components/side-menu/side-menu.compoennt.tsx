@@ -24,18 +24,18 @@ import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
 const { SubMenu } = Menu;
 const { TreeNode } = Tree;
-
+//props of groups
 type GroupProps = {
   groups: GroupsWithOwner[];
   updateGroups: () => void;
 };
-
+// props of projects
 type ProjectProps = {
   ownProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
   updateProjects: () => void;
 };
-
+// ??????
 const loop = (data: Project[]) =>
   data.map((item: Project) => {
     console.log(item);
@@ -50,19 +50,20 @@ const loop = (data: Project[]) =>
       <TreeNode active={true} key={item.id.toString()} title={item.owner} />
     );
   });
-
+// props of router
 type PathProps = RouteComponentProps;
-
+// class compoennt
 class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
+  // click handler when click menu item
   onClick = (menu: any) => {
     const path = menu.keyPath.reverse().join('/');
     this.props.history.push(`/${path}`);
   };
-
+  // claick handler when clicking on the groups submenu
   onGroupsClick = (menu: any) => {
     this.props.history.push(`/${menu.key}`);
   };
-
+  // load data of menu
   componentDidMount() {
     this.props.updateGroups();
     this.props.updateProjects();
@@ -71,13 +72,13 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     const { groups: groupsByOwner, ownProjects, sharedProjects } = this.props;
     return (
       <Menu
-        mode='inline'
+        mode="inline"
         defaultOpenKeys={['todo']}
         style={{ height: '100%', fontWeight: 500 }}
         onClick={this.onClick}
       >
         <SubMenu
-          key='bujo'
+          key="bujo"
           title={
             <span>
               <SketchOutlined />
@@ -85,17 +86,17 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             </span>
           }
         >
-          <Menu.Item key='today'>
+          <Menu.Item key="today">
             <BellOutlined />
             Today
           </Menu.Item>
-          <Menu.Item key='calendar'>
+          <Menu.Item key="calendar">
             <CalendarOutlined />
             Calendar
           </Menu.Item>
         </SubMenu>
         <SubMenu
-          key='projects'
+          key="projects"
           title={
             <span>
               <FolderOutlined />
@@ -104,7 +105,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           }
         >
           <SubMenu
-            key='ownedProjects'
+            key="ownedProjects"
             title={
               <span>
                 <ProfileOutlined />
@@ -112,12 +113,12 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               </span>
             }
           >
-            <Menu.Item key='addProject' title='Add New BuJo'>
+            <Menu.Item key="addProject" title="Add New BuJo">
               <FolderAddOutlined />
             </Menu.Item>
           </SubMenu>
           <SubMenu
-            key='sharedProjects'
+            key="sharedProjects"
             title={
               <span>
                 <TeamOutlined />
@@ -135,7 +136,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                     </div>
                   </div>
                   <Tree
-                    className='draggable-tree'
+                    className="draggable-tree"
                     defaultExpandedKeys={['1', '2', '4', '5']}
                     draggable
                     blockNode
@@ -150,7 +151,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           </SubMenu>
         </SubMenu>
         <SubMenu
-          key='groups'
+          key="groups"
           onTitleClick={this.onGroupsClick}
           title={
             <span>
@@ -159,16 +160,16 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             </span>
           }
         >
-          <Menu.Item key='addGroup' title='Create New Group'>
+          <Menu.Item key="addGroup" title="Create New Group">
             <UsergroupAddOutlined style={{ fontSize: 20 }} />
           </Menu.Item>
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
               <Menu.Item key={`group${group.id}`}>
-                <span className='group-title'>
+                <span className="group-title">
                   <span>
                     <Avatar
-                      size='small'
+                      size="small"
                       style={
                         index === 0
                           ? {
@@ -182,7 +183,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                       {group.owner.charAt(0)}
                     </Avatar>
                     <span
-                      className='group-name'
+                      className="group-name"
                       title={
                         'Group "' +
                         group.name +
@@ -203,11 +204,11 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             ));
           })}
         </SubMenu>
-        <Menu.Item key='labels'>
+        <Menu.Item key="labels">
           <FlagOutlined />
           Labels
         </Menu.Item>
-        <Menu.Item key='settings'>
+        <Menu.Item key="settings">
           <SettingOutlined />
           Settings
         </Menu.Item>

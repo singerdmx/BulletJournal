@@ -2,6 +2,7 @@ import React from 'react';
 import { CloseOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, List, Badge, Avatar, Typography, Popconfirm } from 'antd';
 import { connect } from 'react-redux';
+import { withRouter, RouteComponentProps } from 'react-router';
 import {
   deleteGroup,
   removeUserGroupByUsername,
@@ -27,6 +28,8 @@ type GroupProps = {
   getGroup: (groupdId: number) => void;
   patchGroup: (groupdId: number, groupName: string) => void;
 };
+
+type PathProps = RouteComponentProps;
 
 type GroupState = {
   showModal: boolean;
@@ -56,7 +59,7 @@ function getGroupUserSpan(item: User, group: Group): JSX.Element {
 
 const { Title } = Typography;
 
-class GroupCard extends React.Component<GroupProps, GroupState> {
+class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   state: GroupState = {
     showModal: false
   };
@@ -67,6 +70,7 @@ class GroupCard extends React.Component<GroupProps, GroupState> {
 
   deleteGroup = () => {
     this.props.deleteGroup(this.props.group.id, this.props.group.name);
+    this.props.history.push("/groups");
   };
 
   titleChange = (content: string) => {
@@ -151,4 +155,4 @@ export default connect(mapStateToProps, {
   removeUserGroupByUsername,
   getGroup,
   patchGroup
-})(GroupCard);
+})(withRouter(GroupCard));
