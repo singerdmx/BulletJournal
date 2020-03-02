@@ -1,8 +1,8 @@
 INSERT INTO public.users (id, created_at, updated_at, name, currency, timezone, reminder_before_task, date_format, time_format)
 VALUES (0, '2020-02-11 05:01:54.960000', '2020-02-11 05:01:54.960000', 'BulletJournal', 'US', 'America/Los_Angeles', 1, 0, 0);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
-VALUES (0, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Default', 'BulletJournal', true);
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 0, true);
+VALUES (98, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Default', 'BulletJournal', true);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (98, 0, true);
 INSERT INTO public.groups (id, created_at, updated_at, name, owner, default_group)
 VALUES (99, '2020-02-11 05:01:55.055000', '2020-02-11 05:01:55.055000', 'Bullet', 'BulletJournal', false);
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (99, 0, true);
@@ -125,11 +125,11 @@ INSERT INTO public.notifications (id, created_at, updated_at, actions, content, 
 VALUES (7, '2020-02-13 10:38:59.901000', '2020-02-13 10:38:59.901000', '["ACCEPT","DECLINE"]', null, 8, 'bean', 'BulletJournal', 'bean invited you to join Group Default', 'JoinGroupEvent');
 
 -- My default group
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 4, true);
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 5, true);
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 6, true);
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 7, true);
-INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (0, 8, true);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (98, 4, true);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (98, 5, true);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (98, 6, true);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (98, 7, true);
+INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (98, 8, true);
 
 -- DeleteGroupEvent
 INSERT INTO public.notifications (id, created_at, updated_at, actions, content, content_id, originator, target_user, title, type)

@@ -73,7 +73,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   const notifications = state.notice.notifications.filter(
     (notice: Notification) => notice.id !== notificationId
   );
-  const data = yield call(fetchSystemUpdates);
+  const data = yield call(fetchSystemUpdates, 'notificationsEtag');
   yield put(
     notificationsActions.notificationsReceived({
       notifications: notifications,

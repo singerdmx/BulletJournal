@@ -45,9 +45,11 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
 
 function* groupUpdate(action: PayloadAction<GroupUpdateAction>) {
   const state: IState = yield select();
-  yield put(
-    groupsActions.getGroup({ groupId: state.group.group.id, hideError: true })
-  );
+  if (state.group.group && state.group.group.id) {
+    yield put(
+      groupsActions.getGroup({ groupId: state.group.group.id, hideError: true })
+    );
+  }
 }
 
 function* createGroup(action: PayloadAction<GroupCreateAction>) {
