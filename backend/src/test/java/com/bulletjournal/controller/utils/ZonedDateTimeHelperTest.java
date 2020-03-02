@@ -52,4 +52,26 @@ public class ZonedDateTimeHelperTest {
 
         assertEquals("2020-02-20", resultDate);
     }
+
+    @Test
+    public void convertDateAndTime() {
+        String date = "2020-02-20";
+        String time = "11:05";
+        String timezone = "America/Los_Angeles";
+
+        ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateAndTime(date, time,timezone);
+        assertNotNull(zonedDateTime);
+        assertEquals(2020, zonedDateTime.getYear());
+        assertEquals(2, zonedDateTime.getMonthValue());
+        assertEquals(20, zonedDateTime.getDayOfMonth());
+        assertEquals(11, zonedDateTime.getHour());
+        assertEquals(5, zonedDateTime.getMinute());
+    }
+
+    @Test
+    public void convertSingleDigitToTwoDigits() {
+        assertEquals("00", ZonedDateTimeHelper.convertSingleDigitToTwoDigits(0));
+        assertEquals("05", ZonedDateTimeHelper.convertSingleDigitToTwoDigits(5));
+        assertEquals("15", ZonedDateTimeHelper.convertSingleDigitToTwoDigits(15));
+    }
 }

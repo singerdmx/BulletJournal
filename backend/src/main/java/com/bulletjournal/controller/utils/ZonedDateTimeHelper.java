@@ -28,6 +28,13 @@ public class ZonedDateTimeHelper {
     }
 
     /*
+     * Convert Date String to ZonedDateTime
+     */
+    public static ZonedDateTime convertDateAndTime(String date, String time, String timezone) {
+        return convertDateTime(date + DATE_TIME_DELIMITER + time, timezone);
+    }
+
+    /*
      * Convert ZonedDateTime to Date String
      */
     public static String getDateFromZoneDateTime(ZonedDateTime zonedDateTime) {
@@ -36,6 +43,9 @@ public class ZonedDateTimeHelper {
                 convertSingleDigitToTwoDigits(zonedDateTime.getDayOfMonth());
     }
 
+    /*
+     * Convert to one digit date to two digits
+     */
     public static String convertSingleDigitToTwoDigits(int val) {
         if (val < 10 && val >= 0) {
             return "0" + val;

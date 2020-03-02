@@ -54,7 +54,7 @@ public class ProjectItemController {
                             transactionDaoJpa.findTransactionsByInterval(username, startTime, endTime);
 
                     // Group transactions by date
-                    projectItems.addAll(ProjectItemsGrouper.groupTransactionsByDate(transactions));
+                    //projectItems.addAll(ProjectItemsGrouper.groupTransactionsByDate(transactions));
                     break;
                 default:
             }
