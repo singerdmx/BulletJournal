@@ -70,6 +70,6 @@ public class ProjectItemsGrouper {
     }
 
     public static List<ProjectItems> getProjectItemsListFromMap(Map<ZonedDateTime, ProjectItems> mergedMap) {
-        return mergedMap
+        return null;
     }
 }
