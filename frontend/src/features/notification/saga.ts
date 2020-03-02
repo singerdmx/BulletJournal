@@ -16,6 +16,7 @@ import { Notification } from './interface';
 import { IState } from '../../store';
 import { EventType } from './constants';
 import { fetchSystemUpdates } from '../../apis/systemApis';
+import { displayNotification } from '../../serviceWorker';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -30,15 +31,8 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     const state: IState = yield select();
 
     if (etag && state.notice.etag && state.notice.etag != etag) {
-      navigator.serviceWorker
-        .getRegistration()
-        .then(reg => {
-          if (reg) {
-            reg.showNotification("You've got new notifications");
-          }
-        });
+      displayNotification("You've got new notifications");
     }
-
     yield put(
       notificationsActions.notificationsReceived({
         notifications: notifications,
