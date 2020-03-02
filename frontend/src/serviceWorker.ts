@@ -72,15 +72,7 @@ function registerAfterGrantedPermissoin(config?: Config) {
 
 export function register(config?: Config) {
   if ('serviceWorker' in navigator) {
-    if (Notification.permission === 'granted') {
-      registerAfterGrantedPermissoin(config);
-    } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          registerAfterGrantedPermissoin(config);
-        }
-      });
-    }
+    registerAfterGrantedPermissoin(config);
   }
 }
 
