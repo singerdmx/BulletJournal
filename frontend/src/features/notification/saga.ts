@@ -12,11 +12,10 @@ import {
   answerNotification
 } from '../../apis/notificationApis';
 import { updateGroups, groupUpdate } from '../group/actions';
-
 import { Notification } from './interface';
-
 import { IState } from '../../store';
 import { EventType } from './constants';
+import { fetchSystemUpdates } from '../../apis/systemApis';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -27,6 +26,14 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     const data = yield call(fetchNotifications);
     const etag = data.headers.get('Etag')!;
     const notifications = yield data.json();
+
+    const state: IState = yield select();
+
+    if (etag && state.notice.etag && state.notice.etag != etag) {
+      navigator.serviceWorker
+        .getRegistration()
+        .then(reg => reg?.showNotification("You've got new notifications"));
+    }
 
     yield put(
       notificationsActions.notificationsReceived({
@@ -47,7 +54,10 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     yield call(answerNotification, notificationId, action);
     if (type.toLowerCase().includes('group')) {
       yield put(updateGroups());
-      if (type !== EventType.DeleteGroupEvent && type !== EventType.RemoveUserFromGroupEvent) {
+      if (
+        type !== EventType.DeleteGroupEvent &&
+        type !== EventType.RemoveUserFromGroupEvent
+      ) {
         yield put(groupUpdate());
       }
     }
@@ -63,10 +73,11 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   const notifications = state.notice.notifications.filter(
     (notice: Notification) => notice.id !== notificationId
   );
+  const data = yield call(fetchSystemUpdates);
   yield put(
     notificationsActions.notificationsReceived({
       notifications: notifications,
-      etag: ''
+      etag: data.notificationsEtag
     })
   );
 }
