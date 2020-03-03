@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,13 @@ public class TaskDaoJpa {
     public Task getTask(Long id) {
         return this.taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
+    }
+
+    public List<com.bulletjournal.controller.models.Task> getTasksBetween(String user, ZonedDateTime startTime, ZonedDateTime endTime) {
+        return this.taskRepository.findTasksOfAssigneeBetween(user,
+                Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
+                .stream().map(Task::toPresentationModel).collect(Collectors.toList());
+
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

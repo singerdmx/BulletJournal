@@ -78,8 +78,8 @@ public class TransactionDaoJpa {
      * @endTime ZoneDateTime - End Time to retrieve transaction from ledger repository
      * @retVal Transaction - Transaction object
      */
-    public List<com.bulletjournal.controller.models.Transaction> findTransactionsByInterval(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
-        return this.transactionRepository.findTransactionsByPayerInterval(payer,
+    public List<com.bulletjournal.controller.models.Transaction> getTransactionsBetween(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+        return this.transactionRepository.findTransactionsOfPayerBetween(payer,
                 Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
                 .stream().map(Transaction::toPresentationModel).collect(Collectors.toList());
     }

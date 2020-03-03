@@ -41,6 +41,7 @@ public abstract class TaskModel extends ProjectItemModel {
 
     @Column(name = "start_time", nullable = false)
     private Timestamp startTime;
+
     @Column(name = "end_time", nullable = false)
     private Timestamp endTime;
 

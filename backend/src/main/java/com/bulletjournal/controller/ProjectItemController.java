@@ -3,8 +3,10 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import org.slf4j.MDC;
@@ -17,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProjectItemController {
@@ -39,29 +41,37 @@ public class ProjectItemController {
             @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
 
-        List<ProjectItems> projectItems = new ArrayList<>();
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // Set start time and end time
         ZonedDateTime startTime = IntervalHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = IntervalHelper.getEndTime(endDate, null, timezone);
 
+        Map<ZonedDateTime, List<Task>> taskMap = null;
+        Map<ZonedDateTime, List<Transaction>> transactionMap = null;
+
         for (ProjectType projectType : types) {
             switch (projectType.getValue()) {
                 case 0: // Task
+                    // Query tasks from database with username, start time, end time
+                    List<Task> tasks = taskDaoJpa.getTasksBetween(username, startTime, endTime);
+
+                    // Group tasks by date
+                    taskMap = ProjectItemsGrouper.groupTasksByDate(tasks);
                     break;
                 case 2: // Ledger
                     // Query transactions from database with username, start time, end time
-                    List<Transaction> transactions =
-                            transactionDaoJpa.findTransactionsByInterval(username, startTime, endTime);
+                    List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(username, startTime, endTime);
 
                     // Group transactions by date
-                    //projectItems.addAll(ProjectItemsGrouper.groupTransactionsByDate(transactions));
+                    transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
                     break;
                 default:
             }
         }
-        return projectItems;
+
+        Map<ZonedDateTime, ProjectItems> projectItemsMap = ProjectItemsGrouper.mergeMap(taskMap, transactionMap);
+        return ProjectItemsGrouper.getProjectItems(projectItemsMap);
     }
 
 }
