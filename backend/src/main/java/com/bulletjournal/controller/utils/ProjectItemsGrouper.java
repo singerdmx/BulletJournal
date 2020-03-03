@@ -96,7 +96,7 @@ public class ProjectItemsGrouper {
 
     public static List<ProjectItems> getProjectItems(@NotNull Map<ZonedDateTime, ProjectItems> mergedMap) {
         List<ProjectItems> projectItems = new ArrayList<>();
-        for(Map.Entry<ZonedDateTime, ProjectItems> entry : mergedMap.entrySet()) {
+        for (Map.Entry<ZonedDateTime, ProjectItems> entry : mergedMap.entrySet()) {
             projectItems.add(entry.getValue());
         }
         return projectItems;

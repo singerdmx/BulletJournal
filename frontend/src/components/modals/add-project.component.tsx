@@ -1,11 +1,15 @@
 import React from 'react';
-import { Modal, Input, Form, Button } from 'antd';
-import { FolderAddOutlined } from '@ant-design/icons';
+import { Modal, Input, Form, Button, Select } from 'antd';
+import { FolderAddOutlined, CarryOutOutlined, FileTextOutlined, AccountBookOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { createProjectByName } from '../../features/project/actions';
 import { ProjectType } from '../../features/project/constants';
 
 import './modals.styles.less';
+
+const InputGroup = Input.Group;
+const { TextArea } = Input;
+const { Option } = Select;
 
 type ProjectProps = {
   createProjectByName: (description: string, groupId: number, name: string,
@@ -49,7 +53,16 @@ class AddProject extends React.Component<ProjectProps, ModalState> {
         >
           <Form>
             <Form.Item>
-              <Input placeholder="Enter BuJo Name"/>
+              <InputGroup compact>
+                <Select placeholder="Choose Project Type">
+                  <Option value="TODO" title="Project Type: TODO"><CarryOutOutlined />&nbsp;TODO</Option>
+                  <Option value="NOTE" title="Project Type: NOTE"><FileTextOutlined />&nbsp;NOTE</Option>
+                  <Option value="LEDGER" title="Project Type: LEDGER"><AccountBookOutlined />&nbsp;LEDGER</Option>
+                </Select>
+                <Input style={{ width: '60%' }} placeholder="Enter BuJo Name"/>
+                <div style={{ margin: '24px 0' }} />
+                <TextArea placeholder="Enter Description" autoSize />
+              </InputGroup>
             </Form.Item>
           </Form>
         </Modal>
