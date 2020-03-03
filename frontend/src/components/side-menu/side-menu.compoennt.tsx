@@ -5,7 +5,6 @@ import {
   BellOutlined,
   CalendarOutlined,
   FlagOutlined,
-  FolderAddOutlined,
   FolderOutlined,
   ProfileOutlined,
   SettingOutlined,
@@ -18,6 +17,7 @@ import {
 } from '@ant-design/icons';
 
 import AddGroup from '../../components/modals/add-group.component';
+import AddProject from '../../components/modals/add-project.component';
 import { Menu, Avatar, Tree } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
@@ -117,6 +117,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             </span>
           }
         >
+          <AddProject />
           <SubMenu
             key="ownedProjects"
             title={
@@ -126,9 +127,6 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               </span>
             }
           >
-            <Menu.Item key="addProject" title="Add New BuJo">
-              <FolderAddOutlined />
-            </Menu.Item>
           </SubMenu>
           <SubMenu
             key="sharedProjects"
