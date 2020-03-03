@@ -26,7 +26,7 @@ public class Group extends OwnedModel {
     @Column(name = "default_group", nullable = false, updatable = false)
     private boolean defaultGroup = false;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
     Set<UserGroup> users = new HashSet<>();
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
