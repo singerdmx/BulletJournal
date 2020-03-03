@@ -209,7 +209,7 @@ public class ProjectControllerTest {
     }
 
     private Task createTask(Project project, String taskName) {
-        CreateTaskParams task = new CreateTaskParams(taskName, null, null, null, null);
+        CreateTaskParams task = new CreateTaskParams(taskName, null, null, null, null, "America/Los_Angeles");
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
@@ -227,7 +227,7 @@ public class ProjectControllerTest {
     private Task updateTask(Task task, String assignedTo, String dueDate,
                             String dueTime, String name, ReminderSetting reminderSetting, String expectedName) {
         //update task parameter
-        UpdateTaskParams updateTaskParams = new UpdateTaskParams(assignedTo, dueDate, dueTime, name, null, reminderSetting);
+        UpdateTaskParams updateTaskParams = new UpdateTaskParams(assignedTo, dueDate, dueTime, name, null, reminderSetting, "America/Los_Angeles");
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,

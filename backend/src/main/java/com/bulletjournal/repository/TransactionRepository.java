@@ -12,13 +12,13 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    List<Transaction> findAllByProject(Project project);
+    List<Transaction> findTransactionsByProject(Project project);
 
     @Query("SELECT transaction FROM Transaction transaction where " +
             "(transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR " +
             "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime) AND " +
             "transaction.payer = :payer")
     List<Transaction> findTransactionsByPayerInterval(@Param("payer") String payer,
-                                                        @Param("startTime") Timestamp startTime,
-                                                        @Param("endTime") Timestamp endTime);
+                                                      @Param("startTime") Timestamp startTime,
+                                                      @Param("endTime") Timestamp endTime);
 }

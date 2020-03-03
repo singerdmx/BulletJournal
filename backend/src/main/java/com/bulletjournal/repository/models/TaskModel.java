@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 
 @MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
@@ -21,7 +22,7 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "due_time", length = 10)
     private String dueTime; // "HH-mm"
 
-    @Column(name = "timezone")
+    @Column(name = "timezone", nullable = false)
     private String timezone;
 
     // In minutes
@@ -37,6 +38,27 @@ public abstract class TaskModel extends ProjectItemModel {
     // reminder before task
     @Column(name = "reminder_before_task")
     private Integer reminderBeforeTask;
+
+    @Column(name = "start_time", nullable = false)
+    private Timestamp startTime;
+    @Column(name = "end_time", nullable = false)
+    private Timestamp endTime;
+
+    public Timestamp getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
+    }
+
+    public Timestamp getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
 
     public String getAssignedTo() {
         return assignedTo;
@@ -62,9 +84,13 @@ public abstract class TaskModel extends ProjectItemModel {
         this.dueTime = dueTime;
     }
 
-    public String getTimezone() { return timezone; }
+    public String getTimezone() {
+        return timezone;
+    }
 
-    public void setTimezone(String timezone) { this.timezone = timezone; }
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
 
     public Integer getDuration() {
         return duration;
@@ -90,12 +116,12 @@ public abstract class TaskModel extends ProjectItemModel {
         return reminderTime;
     }
 
-    public boolean hasReminderTime() {
-        return this.reminderTime != null;
-    }
-
     public void setReminderTime(String reminderTime) {
         this.reminderTime = reminderTime;
+    }
+
+    public boolean hasReminderTime() {
+        return this.reminderTime != null;
     }
 
     public Integer getReminderBeforeTask() {

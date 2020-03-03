@@ -5,6 +5,7 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +52,7 @@ public class TaskDaoJpa {
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         Map<Long, Task> tasks = this.taskRepository.findTaskByProject(project)
-                .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
+                .stream().collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor.processRelations(tasks, projectTasks.getTasks());
     }
 
@@ -74,6 +76,13 @@ public class TaskDaoJpa {
         task.setOwner(owner);
         task.setName(createTaskParams.getName());
         task.setReminderSetting(createTaskParams.getReminderSetting());
+        task.setTimezone(createTaskParams.getTimezone());
+        task.setStartTime(Timestamp.from(IntervalHelper.getStartTime(createTaskParams.getDueDate(),
+                createTaskParams.getDueTime(),
+                createTaskParams.getTimezone()).toInstant()));
+        task.setEndTime(Timestamp.from(IntervalHelper.getEndTime(createTaskParams.getDueDate(),
+                createTaskParams.getDueTime(),
+                createTaskParams.getTimezone()).toInstant()));
         return this.taskRepository.save(task);
     }
 
@@ -88,21 +97,35 @@ public class TaskDaoJpa {
                 taskId, task.getProject().getOwner());
 
         DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(),
-                (value) -> task.setDuration(value));
+                task::setDuration);
 
         DaoHelper.updateIfPresent(
-                updateTaskParams.hasName(), updateTaskParams.getName(), (value) -> task.setName(value));
+                updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
 
         List<Event> events = updateAssignee(requester, taskId, updateTaskParams, task);
 
         DaoHelper.updateIfPresent(
-                updateTaskParams.hasDueDate(), updateTaskParams.getDueDate(), (value) -> task.setDueDate(value));
+                updateTaskParams.hasDueDate(), updateTaskParams.getDueDate(), task::setDueDate);
 
         DaoHelper.updateIfPresent(
-                updateTaskParams.hasDueTime(), updateTaskParams.getDueTime(), (value) -> task.setDueTime(value));
+                updateTaskParams.hasDueTime(), updateTaskParams.getDueTime(), task::setDueTime);
+
+        DaoHelper.updateIfPresent(
+                updateTaskParams.hasTimezone(), updateTaskParams.getTimezone(), task::setTimezone);
 
         DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
-                (value) -> task.setReminderSetting(value));
+                task::setReminderSetting);
+
+        DaoHelper.updateIfPresent(updateTaskParams.hasDueDate() || updateTaskParams.hasDueTime(),
+                Timestamp.from(IntervalHelper.getStartTime(updateTaskParams.getDueDate(),
+                        updateTaskParams.getDueTime(), updateTaskParams.getTimezone()).toInstant()),
+                task::setStartTime);
+
+        DaoHelper.updateIfPresent(updateTaskParams.hasDueDate() || updateTaskParams.hasDueTime(),
+                Timestamp.from(IntervalHelper.getEndTime(updateTaskParams.getDueDate(),
+                        updateTaskParams.getDueTime(), updateTaskParams.getTimezone()).toInstant()),
+                task::setEndTime);
+
         this.taskRepository.save(task);
         return events;
     }
@@ -143,8 +166,7 @@ public class TaskDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateUserTasks(Long projectId, List<com.bulletjournal.controller.models.Task> tasks) {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
-        final ProjectTasks projectTasks = projectTasksOptional.isPresent() ?
-                projectTasksOptional.get() : new ProjectTasks();
+        final ProjectTasks projectTasks = projectTasksOptional.orElseGet(ProjectTasks::new);
 
         projectTasks.setTasks(TaskRelationsProcessor.processRelations(tasks));
         projectTasks.setProjectId(projectId);

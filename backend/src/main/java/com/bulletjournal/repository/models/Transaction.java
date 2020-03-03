@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "transactions",
-        indexes = {@Index(name = "payer_interval_index", columnList = "payer, start_time, end_time")})
+        indexes = {@Index(name = "transaction_payer_interval_index", columnList = "payer, start_time, end_time")})
 public class Transaction extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "transaction_generator")
@@ -30,15 +30,15 @@ public class Transaction extends ProjectItemModel {
     private String payer;
 
     @NotNull
-    @Column
+    @Column(nullable = false)
     private Double amount;
 
     @NotNull
-    @Column
+    @Column(nullable = false)
     private TransactionType transactionType;
 
     @NotNull
-    @Column
+    @Column(nullable = false)
     private String date;
 
     @Column
@@ -49,11 +49,11 @@ public class Transaction extends ProjectItemModel {
     private String timezone;
 
     @NotNull
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = false)
     private Timestamp startTime;
 
     @NotNull
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = false)
     private Timestamp endTime;
 
     public Long getId() {

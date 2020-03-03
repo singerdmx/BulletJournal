@@ -48,7 +48,7 @@ public class TransactionDaoJpa {
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
-        return this.transactionRepository.findAllByProject(project)
+        return this.transactionRepository.findTransactionsByProject(project)
                 .stream()
                 .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
                 .map(Transaction::toPresentationModel)
@@ -155,7 +155,7 @@ public class TransactionDaoJpa {
     private List<Event> updatePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
         String oldPayer = transaction.getPayer();
         String newPayer = updateTransactionParams.getPayer();
-        List<Event> events  = new ArrayList<>();
+        List<Event> events = new ArrayList<>();
 
         if (!Objects.equals(oldPayer, newPayer)) {
             transaction.setPayer(newPayer);

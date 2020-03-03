@@ -15,18 +15,21 @@ public class UpdateTaskParams {
 
     private ReminderSetting reminderSetting;
 
+    private String timezone;
+
     public UpdateTaskParams() {
     }
 
     public UpdateTaskParams(
             String assignedTo, String dueDate, String dueTime, String name, Integer duration,
-            ReminderSetting reminderSetting) {
+            ReminderSetting reminderSetting, String timezone) {
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;
         this.duration = duration;
         this.reminderSetting = reminderSetting;
+        this.timezone = timezone;
     }
 
     public String getAssignedTo() {
@@ -71,6 +74,18 @@ public class UpdateTaskParams {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
+    public boolean hasTimezone() {
+        return this.timezone != null;
     }
 
     public boolean hasName() {

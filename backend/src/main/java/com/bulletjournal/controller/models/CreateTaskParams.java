@@ -18,6 +18,8 @@ public class CreateTaskParams {
 
     private ReminderSetting reminderSetting;
 
+    private String timezone;
+
     public CreateTaskParams() {
     }
 
@@ -25,12 +27,14 @@ public class CreateTaskParams {
                             String dueDate,
                             String dueTime,
                             Integer duration,
-                            ReminderSetting reminderSetting) {
+                            ReminderSetting reminderSetting,
+                            String timezone) {
         this.name = name;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.duration = duration;
         this.reminderSetting = reminderSetting;
+        this.timezone = timezone;
     }
 
     public String getDueDate() {
@@ -75,5 +79,13 @@ public class CreateTaskParams {
 
     public void setDuration(Integer duration) {
         this.duration = duration;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 }
