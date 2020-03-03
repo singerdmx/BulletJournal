@@ -180,13 +180,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                     </Avatar>
                     <span
                       className="group-name"
-                      title={
-                        'Group "' +
-                        group.name +
-                        '" owned by "' +
-                        group.owner +
-                        '"'
-                      }
+                      title={`Group "${group.name}" (owner "${group.owner}")`}
                     >
                       {group.name}
                     </span>

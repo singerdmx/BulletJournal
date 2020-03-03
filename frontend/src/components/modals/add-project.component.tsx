@@ -1,9 +1,12 @@
 import React from 'react';
-import { Modal, Input, Form, Button, Select } from 'antd';
+import { Modal, Input, Form, Button, Select, Avatar } from 'antd';
 import { FolderAddOutlined, CarryOutOutlined, FileTextOutlined, AccountBookOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
+import { GroupsWithOwner } from '../../features/group/interfaces';
 import { createProjectByName } from '../../features/project/actions';
+import { updateGroups } from '../../features/group/actions';
 import { ProjectType } from '../../features/project/constants';
+import { IState } from '../../store';
 
 import './modals.styles.less';
 
@@ -16,11 +19,22 @@ type ProjectProps = {
                         projectType: ProjectType) => void;
 };
 
+//props of groups
+type GroupProps = {
+  groups: GroupsWithOwner[];
+  updateGroups: () => void;
+};
+
 type ModalState = {
   isShow: boolean;
 };
 
-class AddProject extends React.Component<ProjectProps, ModalState> {
+class AddProject extends React.Component<ProjectProps & GroupProps, ModalState> {
+
+  componentDidMount() {
+    this.props.updateGroups();
+  }
+
   state: ModalState = {
     isShow: false
   };
@@ -40,6 +54,7 @@ class AddProject extends React.Component<ProjectProps, ModalState> {
   };
 
   render() {
+    const { groups: groupsByOwner } = this.props;
     return (
       <div className="add-project" title='Create New BuJo'>
         <Button onClick={this.showModal} type="dashed" block>
@@ -62,6 +77,31 @@ class AddProject extends React.Component<ProjectProps, ModalState> {
                 <Input style={{ width: '60%' }} placeholder="Enter BuJo Name"/>
                 <div style={{ margin: '24px 0' }} />
                 <TextArea placeholder="Enter Description" autoSize />
+                <div style={{ margin: '24px 0' }} />
+                <Select placeholder="Choose Group" style={{width: '100%'}}>
+                {groupsByOwner.map((groupsOwner, index) => {
+                  return groupsOwner.groups.map(group => (
+                    <Option key={`group${group.id}`} value={group.id}
+                      title={`Group "${group.name}" (owner "${group.owner}")`}>
+                      <Avatar
+                      size="small"
+                      style={
+                        index === 0
+                          ? {
+                              backgroundColor: '#f56a00'
+                            }
+                          : {
+                              backgroundColor: '#fde3cf'
+                            }
+                      }
+                    >
+                      {group.owner.charAt(0)}
+                    </Avatar>
+                    &nbsp;&nbsp;Group <strong>{group.name}</strong> (owner <strong>{group.owner}</strong>)
+                    </Option>
+                  ));
+                })}
+                </Select>
               </InputGroup>
             </Form.Item>
           </Form>
@@ -71,4 +111,8 @@ class AddProject extends React.Component<ProjectProps, ModalState> {
   }
 }
 
-export default connect(null, { createProjectByName })(AddProject);
+const mapStateToProps = (state: IState) => ({
+  groups: state.group.groups,
+});
+
+export default connect(mapStateToProps, { updateGroups, createProjectByName })(AddProject);
