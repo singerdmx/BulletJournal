@@ -27,6 +27,7 @@ import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
+
 const { SubMenu } = Menu;
 //props of groups
 type GroupProps = {
@@ -143,7 +144,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               var treeNode = loop(item.projects, item.owner, index);
               return (
                 <div style={{ marginLeft: '20%'}} key={'sharedProject' + item.owner + index}>
-                  <Tree treeData={treeNode} />
+                  <Tree defaultExpandAll treeData={treeNode} />
                 </div>
               );
             })}
