@@ -35,19 +35,19 @@ type ProjectProps = {
   sharedProjects: ProjectsWithOwner[];
   updateProjects: () => void;
 };
-// ??????
-const loop = (data: Project[]) =>
+
+const loop = (data: Project[], owner: string, index: number) =>
   data.map((item: Project) => {
     console.log(item);
     if (item.subProjects && item.subProjects.length) {
       return (
-        <TreeNode active={true} key={item.id.toString()} title={item.name}>
-          {loop(item.subProjects)}
+        <TreeNode icon={<SketchOutlined />} active={true} key={item.id.toString()} title={item.name}>
+          {loop(item.subProjects, owner, index)}
         </TreeNode>
       );
     }
     return (
-      <TreeNode active={true} key={item.id.toString()} title={item.owner} />
+      <TreeNode active={true} key={item.id.toString()} title={item.name} />
     );
   });
 // props of router
@@ -128,13 +128,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           >
             {sharedProjects.map((item, index) => {
               return (
-                <div style={{ marginLeft: '20%' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <UsergroupAddOutlined style={{ fontSize: 20 }} />
-                    <div style={{ padding: '1px 1px 1px 4px' }}>
-                      {item.owner}
-                    </div>
-                  </div>
+                <div style={{ marginLeft: '20%'}} key={index}>
                   <Tree
                     className="draggable-tree"
                     defaultExpandedKeys={['1', '2', '4', '5']}
@@ -143,7 +137,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                     // onDragEnter={this.onDragEnter}
                     // onDrop={this.onDrop}
                   >
-                    {loop(item.projects)}
+                    {loop(item.projects, item.owner, index)}
                   </Tree>
                 </div>
               );
