@@ -1,6 +1,9 @@
 import React from 'react';
-import { DeleteTwoTone } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import {
+  DeleteTwoTone,
+  CheckCircleTwoTone,
+  CloseCircleTwoTone
+} from '@ant-design/icons';
 import { answerNotice } from '../../features/notification/actions';
 import { connect } from 'react-redux';
 import { ActionType } from '../../features/notification/constants';
@@ -26,39 +29,38 @@ class Actions extends React.Component<actionsProps> {
             twoToneColor="#ff0000"
             title="Remove"
             style={{ cursor: 'pointer' }}
-            onClick={() => this.handleClick('delete', notificationId, type)} />
+            onClick={() => this.handleClick('delete', notificationId, type)}
+          />
         </div>
       );
     }
     return (
       <div className="notification-operation">
         {actions.map((action, index) => {
-          let iconType = 'delete';
-          let iconColor = '#ff0000';
           switch (action) {
             case ActionType.Accept:
-              iconType = 'check-circle';
-              iconColor = '#52c41a';
-              break;
+              return (
+                <CheckCircleTwoTone
+                  twoToneColor="#52c41a"
+                  style={{ cursor: 'pointer' }}
+                  title={action}
+                  key={index}
+                  onClick={() => this.handleClick(action, notificationId, type)}
+                />
+              );
             case ActionType.Decline:
-              iconType = 'close-circle';
-              iconColor = '#eb2f96';
-              break;
+              return (
+                <CloseCircleTwoTone
+                  twoToneColor="#eb2f96"
+                  style={{ cursor: 'pointer' }}
+                  title={action}
+                  key={index}
+                  onClick={() => this.handleClick(action, notificationId, type)}
+                />
+              );
             default:
               console.error('Invalid action ' + action);
           }
-
-          return (
-            <LegacyIcon
-              key={index}
-              type={iconType}
-              theme="twoTone"
-              twoToneColor={iconColor}
-              title={action}
-              style={{ cursor: 'pointer' }}
-              onClick={() => this.handleClick(action, notificationId, type)}
-            />
-          );
         })}
       </div>
     );
