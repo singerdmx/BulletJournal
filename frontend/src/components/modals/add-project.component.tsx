@@ -8,10 +8,6 @@ import { ProjectType } from '../../features/project/constants';
 import './modals.styles.less';
 
 type ProjectProps = {
-  description: string;
-  groupId: number;
-  projectType: ProjectType;
-  name: string;
   createProjectByName: (description: string, groupId: number, name: string,
                         projectType: ProjectType) => void;
 };
