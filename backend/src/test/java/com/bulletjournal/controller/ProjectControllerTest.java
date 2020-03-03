@@ -209,7 +209,7 @@ public class ProjectControllerTest {
     }
 
     private Task createTask(Project project, String taskName) {
-        CreateTaskParams task = new CreateTaskParams(taskName, null, null, null, null, "America/Los_Angeles");
+        CreateTaskParams task = new CreateTaskParams(taskName, "2020-02-28", null, null, null, "America/Los_Angeles");
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
