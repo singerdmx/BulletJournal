@@ -105,6 +105,7 @@ public class NotificationController {
                 if (Action.ACCEPT.equals(action)) {
                     // set UserGroup's "accepted" to be true
                     userGroup.setAccepted(true);
+                    this.userGroupRepository.save(userGroup);
                 } else {
                     // remove UserGroup
                     this.userGroupRepository.delete(userGroup);
