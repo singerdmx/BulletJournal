@@ -18,6 +18,7 @@ import {
   FileTextOutlined
 } from '@ant-design/icons';
 
+import AddGroup from '../../components/modals/add-group.component';
 import { Menu, Avatar, Tree } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
@@ -158,9 +159,8 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             </span>
           }
         >
-          <Menu.Item key="addGroup" title="Create New Group">
-            <UsergroupAddOutlined style={{ fontSize: 20 }} />
-          </Menu.Item>
+            <AddGroup />
+         
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
               <Menu.Item key={`group${group.id}`}>

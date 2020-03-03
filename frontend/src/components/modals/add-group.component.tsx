@@ -1,12 +1,14 @@
 import React from 'react';
-import { Modal, Input, Form } from 'antd';
+import { Modal, Input, Form, Button } from 'antd';
 import { UsergroupAddOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { createGroupByName } from '../../features/group/actions';
 
+import './modals.styles.less';
+
 type GroupProps = {
-    createGroupByName : (name : string) => void;
-}
+  createGroupByName: (name: string) => void;
+};
 
 type ModalState = {
   isShow: boolean;
@@ -33,17 +35,24 @@ class AddGroup extends React.Component<GroupProps, ModalState> {
   render() {
     return (
       <div className="add-group">
-        <UsergroupAddOutlined style={{ fontSize: 20 }} />
-        <Modal title="Add Group" visible={this.state.isShow} onCancel={this.onCancel} onOk={() => this.addGroup}>
-            <Form>
-                <Form.Item>
-                    <Input />
-                </Form.Item>
-            </Form>
+        <Button onClick={this.showModal} type="dashed" block>
+          <UsergroupAddOutlined style={{ fontSize: 20 }} />
+        </Button>
+        <Modal
+          title="Add Group"
+          visible={this.state.isShow}
+          onCancel={this.onCancel}
+          onOk={() => this.addGroup}
+        >
+          <Form>
+            <Form.Item>
+              <Input placeholder="Input your group name"/>
+            </Form.Item>
+          </Form>
         </Modal>
       </div>
     );
   }
 }
 
-export default connect(null, {createGroupByName})(AddGroup);
+export default connect(null, { createGroupByName })(AddGroup);
