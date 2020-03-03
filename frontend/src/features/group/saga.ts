@@ -15,7 +15,7 @@ import {
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchGroups,
-  createGroups,
+  addGroup,
   addUserGroup,
   removeUserGroup,
   deleteGroup,
@@ -55,7 +55,7 @@ function* groupUpdate(action: PayloadAction<GroupUpdateAction>) {
 function* createGroup(action: PayloadAction<GroupCreateAction>) {
   const name = action.payload.name;
   try {
-    const data = yield call(createGroups, name);
+    const data = yield call(addGroup, name);
     yield put(groupsActions.groupReceived({ group: data }));
     yield put(groupsActions.groupsUpdate({}));
   } catch (error) {

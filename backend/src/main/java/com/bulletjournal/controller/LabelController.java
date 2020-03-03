@@ -41,7 +41,7 @@ public class LabelController {
     }
 
     @GetMapping(ITEMS_ROUTE)
-    public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Label> labels) {
+    public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
         return null;
     }
 }

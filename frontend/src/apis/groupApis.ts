@@ -16,7 +16,7 @@ export const getGroup = (groupId: number) => {
     });
 };
 
-export const createGroups = (name: string) => {
+export const addGroup = (name: string) => {
   const postBody = JSON.stringify({
     name: name
   });
