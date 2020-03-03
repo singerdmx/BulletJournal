@@ -12,7 +12,10 @@ import {
   SketchOutlined,
   TeamOutlined,
   UsergroupAddOutlined,
-  UserOutlined
+  UserOutlined,
+  CarryOutOutlined,
+  AccountBookOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 
 import { Menu, Avatar, Tree } from 'antd';
@@ -22,8 +25,8 @@ import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
+import { TreeNodeNormal } from 'antd/lib/tree/Tree';
 const { SubMenu } = Menu;
-const { TreeNode } = Tree;
 //props of groups
 type GroupProps = {
   groups: GroupsWithOwner[];
@@ -36,20 +39,29 @@ type ProjectProps = {
   updateProjects: () => void;
 };
 
-const loop = (data: Project[], owner: string, index: number) =>
-  data.map((item: Project) => {
-    console.log(item);
-    if (item.subProjects && item.subProjects.length) {
-      return (
-        <TreeNode icon={<SketchOutlined />} active={true} key={item.id.toString()} title={item.name}>
-          {loop(item.subProjects, owner, index)}
-        </TreeNode>
-      );
-    }
-    return (
-      <TreeNode active={true} key={item.id.toString()} title={item.name} />
-    );
-  });
+const iconMapper = {
+  TODO: <CarryOutOutlined />,
+  LEDGER: <AccountBookOutlined />,
+  NOTE: <FileTextOutlined />
+}
+
+//dfs tree data
+var loop = (data: Project[], owner: string, index: number): TreeNodeNormal[] => {
+    let res = [] as TreeNodeNormal[];
+    data.map((item: Project) => {
+      const node = {} as TreeNodeNormal;
+      if (item.subProjects && item.subProjects.length) {
+        node.children = loop(item.subProjects, owner, index);
+      }else{
+        node.children = [] as TreeNodeNormal[];
+      }
+      node.title= (<span title={'Owner '+item.owner} style={{backgroundColor: `${index%2===0?'#ffcce5': '#e0e0eb'}`}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
+      node.key = 'project' + item.id.toString();
+      res.push(node);
+    });
+    return res;
+}
+
 // props of router
 type PathProps = RouteComponentProps;
 // class compoennt
@@ -127,17 +139,12 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             }
           >
             {sharedProjects.map((item, index) => {
+              var treeNode = loop(item.projects, item.owner, index);
               return (
                 <div style={{ marginLeft: '20%'}} key={index}>
                   <Tree
-                    className="draggable-tree"
-                    defaultExpandedKeys={['1', '2', '4', '5']}
-                    draggable
-                    blockNode
-                    // onDragEnter={this.onDragEnter}
-                    // onDrop={this.onDrop}
+                    treeData={treeNode}
                   >
-                    {loop(item.projects, item.owner, index)}
                   </Tree>
                 </div>
               );
