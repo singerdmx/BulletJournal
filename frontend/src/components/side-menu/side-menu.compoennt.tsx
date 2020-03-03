@@ -141,11 +141,8 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             {sharedProjects.map((item, index) => {
               var treeNode = loop(item.projects, item.owner, index);
               return (
-                <div style={{ marginLeft: '20%'}} key={index}>
-                  <Tree
-                    treeData={treeNode}
-                  >
-                  </Tree>
+                <div style={{ marginLeft: '20%'}} key={'sharedProject' + item.owner + index}>
+                  <Tree treeData={treeNode} />
                 </div>
               );
             })}
