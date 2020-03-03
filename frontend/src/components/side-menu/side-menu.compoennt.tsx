@@ -49,7 +49,7 @@ const iconMapper = {
 //dfs tree data
 var loop = (data: Project[], owner: string, index: number): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
-    data.map((item: Project) => {
+    data.forEach((item: Project) => {
       const node = {} as TreeNodeNormal;
       if (item.subProjects && item.subProjects.length) {
         node.children = loop(item.subProjects, owner, index);
