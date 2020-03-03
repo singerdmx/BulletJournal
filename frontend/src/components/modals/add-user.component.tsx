@@ -43,6 +43,8 @@ class AddUser extends React.Component<ModalProps, ModalState> {
       } else {
         this.props.userApiErrorReceived('Username needs to have more than one character');
       }
+    } else {
+      this.props.clearUser();
     }
   };
 

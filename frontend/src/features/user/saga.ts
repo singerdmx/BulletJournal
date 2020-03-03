@@ -25,6 +25,7 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
       })
     );
   } catch (error) {
+    yield put(userActions.userClear({}));
     yield call(message.error, `User ${name} Not Found`);
   }
 }
