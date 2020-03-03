@@ -57,7 +57,7 @@ class AddGroup extends React.Component<GroupProps & RouteComponentProps, ModalSt
           ]}
         >
           <Input
-            placeholder="Input your group name"
+            placeholder="Enter Group Name"
             onChange={e => this.setState({ groupName: e.target.value })}
             onPressEnter={this.addGroup}
             allowClear
