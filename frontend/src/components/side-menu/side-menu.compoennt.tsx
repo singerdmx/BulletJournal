@@ -11,7 +11,6 @@ import {
   SettingOutlined,
   SketchOutlined,
   TeamOutlined,
-  UsergroupAddOutlined,
   UserOutlined,
   CarryOutOutlined,
   AccountBookOutlined,
