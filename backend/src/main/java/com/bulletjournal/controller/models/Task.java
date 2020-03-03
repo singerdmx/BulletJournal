@@ -23,8 +23,6 @@ public class Task {
     @Size(min = 10, max = 10)
     private String dueDate;
 
-    @NotBlank
-    @Size(min = 5, max = 5)
     private String dueTime;
 
     @NotBlank
@@ -51,7 +49,7 @@ public class Task {
     public Task(Long id,
                 @NotBlank @Size(min = 1, max = 100) String assignedTo,
                 @NotBlank @Size(min = 10, max = 10) String dueDate,
-                @NotBlank @Size(min = 5, max = 5) String dueTime,
+                String dueTime,
                 @NotBlank String timezone,
                 @NotNull String name,
                 Integer duration,

@@ -10,18 +10,19 @@ public class CreateTransactionParams {
     @Size(min = 1, max = 100)
     private String name;
 
-    @NotNull
+    @NotBlank
     private String payer;
 
     @NotNull
     private Double amount;
 
-    @NotNull
+    @NotBlank
+    @Size(min = 10, max = 10)
     private String date; // "yyyy-MM-dd"
 
     private String time; // "hh:mm"
 
-    @NotNull
+    @NotBlank
     private String timezone;
 
     @NotNull
@@ -30,13 +31,15 @@ public class CreateTransactionParams {
     public CreateTransactionParams() {
     }
 
-    public CreateTransactionParams(@NotBlank @Size(min = 1, max = 100) String name,
-                                   @NotNull String payer,
-                                   @NotNull Double amount,
-                                   @NotNull String date,
-                                   String time,
-                                   @NotNull String timezone,
-                                   @NotNull Integer transactionType) {
+
+    public CreateTransactionParams(
+            @NotBlank @Size(min = 1, max = 100) String name,
+            @NotBlank String payer,
+            @NotNull Double amount,
+            @NotBlank @Size(min = 10, max = 10) String date,
+            String time,
+            @NotBlank String timezone,
+            @NotNull Integer transactionType) {
         this.name = name;
         this.payer = payer;
         this.amount = amount;

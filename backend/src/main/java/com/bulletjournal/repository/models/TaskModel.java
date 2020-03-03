@@ -16,7 +16,7 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "assigned_to", length = 100)
     private String assignedTo;
 
-    @Column(name = "due_date", length = 15)
+    @Column(name = "due_date", length = 15, nullable = false)
     private String dueDate; // "yyyy-MM-dd"
 
     @Column(name = "due_time", length = 10)
