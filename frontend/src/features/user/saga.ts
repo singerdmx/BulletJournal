@@ -9,7 +9,7 @@ import { PayloadAction } from 'redux-starter-kit';
 import { fetchUser } from '../../apis/userApis';
 
 function* userApiErrorAction(action: PayloadAction<UserApiErrorAction>) {
-  yield call(message.error, `User Error Received: ${action.payload.error}`);
+  yield call(message.error, `${action.payload.error}`);
 }
 
 function* userUpdate(action: PayloadAction<UpdateUser>) {

@@ -1,9 +1,9 @@
 import React from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import { Modal, Input, Button, Avatar, Empty } from 'antd';
 import { connect } from 'react-redux';
 import { addUserGroupByUsername } from '../../features/group/actions';
-import { updateUser, clearUser } from '../../features/user/actions';
+import { updateUser, clearUser, userApiErrorReceived } from '../../features/user/actions';
 import { UserWithAvatar } from '../../features/user/reducer';
 import { IState } from '../../store';
 
@@ -24,6 +24,7 @@ type ModalProps = {
   ) => void;
   updateUser: (username: string) => void;
   clearUser : () => void;
+  userApiErrorReceived: (error: string) => void;
 };
 
 class AddUser extends React.Component<ModalProps, ModalState> {
@@ -36,8 +37,12 @@ class AddUser extends React.Component<ModalProps, ModalState> {
   };
 
   searchUser = (value: string) => {
-    if (value && value.length > 1) {
-      this.props.updateUser(value);
+    if (value) {
+      if (value.length > 1) {
+        this.props.updateUser(value);
+      } else {
+        this.props.userApiErrorReceived('Username needs to have more than one character');
+      }
     }
   };
 
@@ -72,7 +77,11 @@ class AddUser extends React.Component<ModalProps, ModalState> {
           width={300}
           okButtonProps={{disabled : !user.name}}
         >
-          <Input.Search allowClear onSearch={value => this.searchUser(value)} />
+          <Input.Search allowClear prefix={<UserOutlined className="site-form-item-icon" />}
+            onSearch={value => this.searchUser(value)}
+            className='input-search-box'
+            onFocus={e => e.stopPropagation()}
+            placeholder="Enter Username"/>
           <div className="search-result">
             {user.name ? (
               <Avatar size="large" src={user.avatar}/>
@@ -95,7 +104,7 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(
   mapStateToProps,
-  { addUserGroupByUsername, updateUser, clearUser },
+  { addUserGroupByUsername, updateUser, clearUser, userApiErrorReceived },
   null,
   { forwardRef: true }
 )(AddUser);
