@@ -34,19 +34,19 @@ class AddGroup extends React.Component<GroupProps, ModalState> {
 
   render() {
     return (
-      <div className="add-group">
+      <div className="add-group" title='Create New Group'>
         <Button onClick={this.showModal} type="dashed" block>
           <UsergroupAddOutlined style={{ fontSize: 20 }} />
         </Button>
         <Modal
-          title="Add Group"
+          title="Create New Group"
           visible={this.state.isShow}
           onCancel={this.onCancel}
           onOk={() => this.addGroup}
         >
           <Form>
             <Form.Item>
-              <Input placeholder="Input your group name"/>
+              <Input placeholder="Enter Group Name"/>
             </Form.Item>
           </Form>
         </Modal>

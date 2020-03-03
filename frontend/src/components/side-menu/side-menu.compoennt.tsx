@@ -123,7 +123,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             title={
               <span>
                 <ProfileOutlined />
-                <span>Owned BuJo</span>
+                <span title='BuJo created by me'>Owned BuJo</span>
               </span>
             }
           >
@@ -136,7 +136,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             title={
               <span>
                 <TeamOutlined />
-                <span>Shared BuJo</span>
+                <span title='BuJo shared with me'>Shared BuJo</span>
               </span>
             }
           >
