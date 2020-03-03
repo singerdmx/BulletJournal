@@ -16,23 +16,9 @@ public class Label {
     }
 
     public Label(Long id,
-                 @NotBlank @Size(min = 1, max = 100) String name,
-                 @NotBlank @Size(min = 1, max = 100) String owner) {
+                 @NotBlank @Size(min = 1, max = 100) String name) {
         this.id = id;
         this.name = name;
-        this.owner = owner;
-    }
-
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String owner;
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
     }
 
     public Long getId() {

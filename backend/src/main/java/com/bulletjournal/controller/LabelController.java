@@ -5,7 +5,7 @@ import com.bulletjournal.controller.models.CreateLabelParams;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
-import com.bulletjournal.repository.LabelDaoJap;
+import com.bulletjournal.repository.LabelDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,13 +23,13 @@ public class LabelController {
     protected static final String ITEMS_ROUTE = "/api/items";
 
     @Autowired
-    private LabelDaoJap labelDaoJap;
+    private LabelDaoJpa labelDaoJpa;
 
     @PostMapping(LABELS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Label createLabel(@Valid @RequestBody CreateLabelParams label) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return labelDaoJap.create(label.getValue(), username).toPresentationModel();
+        return labelDaoJpa.create(label.getValue(), username).toPresentationModel();
     }
 
     @PatchMapping(LABELS_ROUTE)

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class LabelDaoJap {
+public class LabelDaoJpa {
 
     @Autowired
     private LabelRepository labelRepository;
