@@ -176,7 +176,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                             }
                       }
                     >
-                      {group.owner.charAt(0)}
+                      {group.name.charAt(0)}
                     </Avatar>
                     <span
                       className="group-name"

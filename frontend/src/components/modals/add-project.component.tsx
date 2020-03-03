@@ -95,7 +95,7 @@ class AddProject extends React.Component<ProjectProps & GroupProps, ModalState> 
                             }
                       }
                     >
-                      {group.owner.charAt(0)}
+                      {group.name.charAt(0)}
                     </Avatar>
                     &nbsp;&nbsp;Group <strong>{group.name}</strong> (owner <strong>{group.owner}</strong>)
                     </Option>
