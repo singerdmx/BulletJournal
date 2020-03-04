@@ -5,6 +5,7 @@ import { IState } from '../store';
 import { connect } from 'react-redux';
 import { Menu, Dropdown } from 'antd';
 import { getProject } from '../features/project/actions';
+import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, MoreOutlined, EditOutlined } from '@ant-design/icons';
 
 type ProjectPathParams = {
@@ -59,7 +60,9 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
     return (
       <div className="project">
         <div className="project-header">
-          <h2>{project.name}</h2>
+          <h2 title={`${project.projectType} ${project.name}`}>
+            {iconMapper[project.projectType]}&nbsp;{project.name}
+          </h2>
           <div className="project-control">
             <span className="add-project-button">
               <h2
@@ -71,9 +74,12 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
               </h2>
             </span>
             <Dropdown overlay={editMenu} trigger={['click']}>
-              <h2 style={{cursor : 'pointer', marginLeft : '0.5em'}}><MoreOutlined title="Edit"/></h2>
+              <h2 style={{ cursor: 'pointer', marginLeft: '0.5em' }}>
+                <MoreOutlined title="Edit" />
+              </h2>
             </Dropdown>
           </div>
+          
         </div>
         <div>{project.description}</div>
       </div>
