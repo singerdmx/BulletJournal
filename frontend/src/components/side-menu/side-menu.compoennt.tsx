@@ -57,12 +57,12 @@ var loop = (data: Project[], owner: string, index: number, history: History<Hist
       } else {
         node.children = [] as TreeNodeNormal[];
       }
-      if (item.name) {
-        node.title = (<span onClick={(e)=>history.push(`/projects/${item.id}`)} title={'Owner '+item.owner}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
-        node.key = item.id.toString();
+      if (item.owner) {
+        node.title = (<span onClick={(e)=>history.push(`/projects/${item.id}`)} title={'Owner: '+item.owner}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
       } else {
-        node.title = (<span></span>);
+        node.title = (<span title='Not Shared' style={{color: '#e0e0eb'}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
       }
+      node.key = item.id.toString();
       res.push(node);
     });
     return res;

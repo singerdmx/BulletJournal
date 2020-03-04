@@ -1,6 +1,7 @@
 package com.bulletjournal.hierarchy;
 
 import com.bulletjournal.controller.models.Project;
+import com.bulletjournal.controller.models.ProjectType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -37,6 +38,10 @@ public class ProjectRelationsProcessor {
         if (selectedProjects == null || selectedProjects.contains(project.getId())) {
             project.clone(m.get(project.getId()).toPresentationModel());
             count++;
+        } else {
+            // unselected project only shows name and type, without owner
+            project.setName(m.get(project.getId()).getName());
+            project.setProjectType(ProjectType.getType(m.get(project.getId()).getType()));
         }
         project.setSubProjects(new ArrayList<>());
 
