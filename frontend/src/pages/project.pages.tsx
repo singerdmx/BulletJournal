@@ -61,12 +61,13 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
       <div className="project">
         <div className="project-header">
           <h2>
+            <span title={project.owner}>
+              <Avatar size="large" src={project.ownerAvatar} />
+            </span>
+            &nbsp;&nbsp;&nbsp;
             <span title={`${project.projectType} ${project.name}`}>
               {iconMapper[project.projectType]}
               &nbsp;{project.name}
-            </span>
-            <span title={project.owner}>
-              &nbsp;<Avatar size="small" src={project.ownerAvatar} />
             </span>
           </h2>
 
