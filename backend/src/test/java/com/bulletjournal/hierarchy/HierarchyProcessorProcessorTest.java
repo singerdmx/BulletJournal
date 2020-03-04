@@ -148,12 +148,15 @@ public class HierarchyProcessorProcessorTest {
                 ImmutableSet.of(3L, 4L, 6L));
         assertEquals(2, projects.size());
         assertEquals(p1.getId(), projects.get(0).getId());
-        assertNull(projects.get(0).getName());
+        assertNotNull(projects.get(0).getName());
+        assertNull(projects.get(0).getOwner());
         assertEquals(p5.getId(), projects.get(1).getId());
-        assertNull(projects.get(1).getName());
+        assertNotNull(projects.get(1).getName());
+        assertNull(projects.get(1).getOwner());
         assertEquals(2, projects.get(0).getSubProjects().size());
         assertEquals(p2.getId(), projects.get(0).getSubProjects().get(0).getId());
-        assertNull(projects.get(0).getSubProjects().get(0).getName());
+        assertNotNull(projects.get(0).getSubProjects().get(0).getName());
+        assertNull(projects.get(0).getSubProjects().get(0).getOwner());
         assertEquals(p4.getId(), projects.get(0).getSubProjects().get(1).getId());
         assertNotNull(projects.get(0).getSubProjects().get(1).getName());
         assertEquals(1, projects.get(1).getSubProjects().size());
