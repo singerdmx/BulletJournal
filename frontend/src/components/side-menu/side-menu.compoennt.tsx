@@ -26,6 +26,7 @@ import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
+import { History } from 'history';
 
 const { SubMenu } = Menu;
 //props of groups
@@ -47,16 +48,16 @@ const iconMapper = {
 }
 
 //dfs tree data
-var loop = (data: Project[], owner: string, index: number): TreeNodeNormal[] => {
+var loop = (data: Project[], owner: string, index: number, history: History<History.PoorMansUnknown>): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Project) => {
       const node = {} as TreeNodeNormal;
       if (item.subProjects && item.subProjects.length) {
-        node.children = loop(item.subProjects, owner, index);
+        node.children = loop(item.subProjects, owner, index, history);
       }else{
         node.children = [] as TreeNodeNormal[];
       }
-      node.title= (<span title={'Owner '+item.owner} style={{backgroundColor: `${index%2===0?'#ffcce5': '#e0e0eb'}`}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
+      node.title= (<span onClick={(e)=>history.push(`/projects/${item.id}`)} title={'Owner '+item.owner} style={{backgroundColor: `${index%2===0?'#ffcce5': '#e0e0eb'}`}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
       node.key = item.id.toString();
       res.push(node);
     });
@@ -73,7 +74,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     this.props.history.push(`/${path}`);
   };
 
-  onProjectClick =(projectId: any) => {
+  onProjectClick = (projectId: any) => {
     this.props.history.push(`/projects/${projectId}`)
   }
 
@@ -145,10 +146,10 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             }
           >
             {sharedProjects.map((item, index) => {
-              var treeNode = loop(item.projects, item.owner, index);
+              var treeNode = loop(item.projects, item.owner, index, this.props.history);
               return (
                 <div style={{ marginLeft: '20%'}} key={'sharedProject' + item.owner + index}>
-                  <Tree defaultExpandAll treeData={treeNode} onSelect={this.onProjectClick}/>
+                  <Tree defaultExpandAll treeData={treeNode} selectable={false}/>
                 </div>
               );
             })}
