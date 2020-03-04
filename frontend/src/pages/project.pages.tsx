@@ -3,9 +3,12 @@ import { RouteComponentProps } from 'react-router';
 import { Project } from '../features/project/interfaces';
 import { IState } from '../store';
 import { connect } from 'react-redux';
+import { Menu, Dropdown } from 'antd';
 import { getProject } from '../features/project/actions';
 import {
-  TeamOutlined
+  TeamOutlined,
+  MoreOutlined,
+  EditOutlined
 } from '@ant-design/icons';
 
 type ProjectPathParams = {
@@ -20,6 +23,14 @@ type ProjectPageProps = {
   project: Project;
   getProject: (projectId: number) => void;
 };
+
+const editMenu = (
+  <Menu>
+    <Menu.Item key="changeName"><EditOutlined />&nbsp;Change Name</Menu.Item>
+    <Menu.Item key="changeGroup"><EditOutlined />&nbsp;Change Group</Menu.Item>
+    <Menu.Item key="changeDescription"><EditOutlined />&nbsp;Change Description</Menu.Item>
+  </Menu>
+);
 
 class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
 
@@ -45,11 +56,19 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
       <div className='todo'>
         <div className='todo-header'>
           <h2>{project.name}</h2>
-          <h2 className='add-todo-button'
-            title={project.group && `Group: ${project.group.name}`}
-            onClick={(e) => this.onClickGroup(project.group.id)}>
-            <TeamOutlined /> {project.group && project.group.users.length}
-          </h2>
+          <span className='add-todo-button'>
+            <h2 onClick={(e) => this.onClickGroup(project.group.id)}
+              title={project.group && `Group: ${project.group.name}`}>
+              <TeamOutlined />
+              {project.group && project.group.users.length}
+            </h2>
+          </span>
+          <Dropdown overlay={editMenu} trigger={['click']}>
+            <MoreOutlined title='Edit'/>
+          </Dropdown>
+        </div>
+        <div>
+          {project.description}
         </div>
       </div>
     );
