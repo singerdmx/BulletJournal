@@ -4,8 +4,9 @@ import { Project } from '../features/project/interfaces';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { getProject } from '../features/project/actions';
-
-
+import {
+  TeamOutlined
+} from '@ant-design/icons';
 
 type ProjectPathParams = {
   projectId: string;
@@ -34,11 +35,22 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
     }
   }
 
+  onClickGroup = (groupId: number) => {
+    this.props.history.push(`/groups/group${groupId}`);
+  };
+
   render() {
     const { project } = this.props;
     return (
-      <div className='project-page'>
-        {project.name}
+      <div className='todo'>
+        <div className='todo-header'>
+          <h2>{project.name}</h2>
+          <h2 className='add-todo-button'
+            title={project.group && `Group: ${project.group.name}`}
+            onClick={(e) => this.onClickGroup(project.group.id)}>
+            <TeamOutlined /> {project.group && project.group.users.length}
+          </h2>
+        </div>
       </div>
     );
   }
