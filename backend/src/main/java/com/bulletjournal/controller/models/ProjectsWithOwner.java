@@ -8,6 +8,8 @@ public class ProjectsWithOwner {
 
     private String owner;
 
+    private String ownerAvatar;
+
     private List<Project> projects = new ArrayList<>();
 
     public ProjectsWithOwner() {
@@ -24,6 +26,14 @@ public class ProjectsWithOwner {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getOwnerAvatar() {
+        return ownerAvatar;
+    }
+
+    public void setOwnerAvatar(String ownerAvatar) {
+        this.ownerAvatar = ownerAvatar;
     }
 
     public List<Project> getProjects() {

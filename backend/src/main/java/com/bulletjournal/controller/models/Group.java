@@ -19,6 +19,8 @@ public class Group {
     @Size(min = 1, max = 100)
     private String owner;
 
+    private String ownerAvatar;
+
     private List<UserGroup> users;
 
     private Boolean isDefault;
@@ -72,6 +74,14 @@ public class Group {
 
     public void setDefault(Boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    public String getOwnerAvatar() {
+        return ownerAvatar;
+    }
+
+    public void setOwnerAvatar(String ownerAvatar) {
+        this.ownerAvatar = ownerAvatar;
     }
 
     @Override

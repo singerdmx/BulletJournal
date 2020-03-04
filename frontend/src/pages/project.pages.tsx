@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { Project } from '../features/project/interfaces';
 import { IState } from '../store';
 import { connect } from 'react-redux';
-import { Menu, Dropdown } from 'antd';
+import { Menu, Dropdown, Avatar } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, MoreOutlined, EditOutlined } from '@ant-design/icons';
@@ -60,9 +60,17 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
     return (
       <div className="project">
         <div className="project-header">
-          <h2 title={`${project.projectType} ${project.name}`}>
-            {iconMapper[project.projectType]}&nbsp;{project.name}
+          <h2>
+            <span title={project.owner}>
+              <Avatar size="large" src={project.ownerAvatar} />
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span title={`${project.projectType} ${project.name}`}>
+              {iconMapper[project.projectType]}
+              &nbsp;{project.name}
+            </span>
           </h2>
+
           <div className="project-control">
             <span className="add-project-button">
               <h2

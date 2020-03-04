@@ -31,6 +31,9 @@ public class ProjectController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private UserClient userClient;
+
     @GetMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -47,12 +50,24 @@ public class ProjectController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(ownedProjectsEtag + "|" + sharedProjectsEtag);
 
+        projects.getOwned().forEach((p) -> addOwnerAvatar(p));
+        projects.getShared().forEach((p) -> {
+            p.setOwnerAvatar(this.userClient.getUser(p.getOwner()).getAvatar());
+            p.getProjects().forEach((pp) -> addOwnerAvatar(pp));
+        });
         return ResponseEntity.ok().headers(responseHeader).body(projects);
     }
     @GetMapping(PROJECT_ROUTE)
     public Project getProject(@NotNull @PathVariable Long projectId) {
-        return this.projectDaoJpa.getProject(projectId).toVerbosePresentationModel();
+        Project project = this.projectDaoJpa.getProject(projectId).toVerbosePresentationModel();
+        return addOwnerAvatar(project);
     }
+
+    private Project addOwnerAvatar(Project project) {
+        project.setOwnerAvatar(this.userClient.getUser(project.getOwner()).getAvatar());
+        return project;
+    }
+
     @PostMapping(PROJECTS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
