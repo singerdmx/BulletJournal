@@ -5,6 +5,7 @@ import { IState } from '../store';
 import { connect } from 'react-redux';
 import { Menu, Dropdown } from 'antd';
 import { getProject } from '../features/project/actions';
+import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import {
   TeamOutlined,
   MoreOutlined,
@@ -55,7 +56,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
     return (
       <div className='todo'>
         <div className='todo-header'>
-          <h2>{project.name}</h2>
+          <h2 title={`${project.projectType} ${project.name}`}>{iconMapper[project.projectType]}&nbsp;{project.name}</h2>
           <span className='add-todo-button'>
             <h2 onClick={(e) => this.onClickGroup(project.group.id)}
               title={project.group && `Group: ${project.group.name}`}>

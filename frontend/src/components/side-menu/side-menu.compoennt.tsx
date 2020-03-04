@@ -41,7 +41,7 @@ type ProjectProps = {
   updateProjects: () => void;
 };
 
-const iconMapper = {
+export const iconMapper = {
   TODO: <CarryOutOutlined />,
   LEDGER: <AccountBookOutlined />,
   NOTE: <FileTextOutlined />
