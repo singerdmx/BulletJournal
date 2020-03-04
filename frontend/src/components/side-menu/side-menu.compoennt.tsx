@@ -60,7 +60,7 @@ var loop = (data: Project[], owner: string, index: number, history: History<Hist
       if (item.owner) {
         node.title = (<span onClick={(e)=>history.push(`/projects/${item.id}`)} title={'Owner: '+item.owner}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
       } else {
-        node.title = (<span title='Not Shared' style={{color: '#e0e0eb'}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
+        node.title = (<span title='Not Shared' style={{color: '#e0e0eb', cursor: 'default'}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
       }
       node.key = item.id.toString();
       res.push(node);
