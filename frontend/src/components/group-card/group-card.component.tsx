@@ -116,7 +116,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
                     title={getGroupUserTitle(item, group)}
                   >
                     <Badge dot={!item.accepted}>
-                      <Avatar src={item.avatar} />
+                      <Avatar size={item.name === group.owner ? 'large' : 'default'} src={item.avatar} />
                     </Badge>
                     {getGroupUserSpan(item, group)}
                   </div>
