@@ -54,11 +54,15 @@ var loop = (data: Project[], owner: string, index: number, history: History<Hist
       const node = {} as TreeNodeNormal;
       if (item.subProjects && item.subProjects.length) {
         node.children = loop(item.subProjects, owner, index, history);
-      }else{
+      } else {
         node.children = [] as TreeNodeNormal[];
       }
-      node.title= (<span onClick={(e)=>history.push(`/projects/${item.id}`)} title={'Owner '+item.owner}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
-      node.key = item.id.toString();
+      if (item.name) {
+        node.title = (<span onClick={(e)=>history.push(`/projects/${item.id}`)} title={'Owner '+item.owner}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
+        node.key = item.id.toString();
+      } else {
+        node.title = (<span></span>);
+      }
       res.push(node);
     });
     return res;
