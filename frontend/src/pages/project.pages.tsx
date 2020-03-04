@@ -72,7 +72,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
           </h2>
 
           <div className="project-control">
-            <span className="add-project-button">
+            <span style={{cursor: 'pointer'}}>
               <h2
                 onClick={e => this.onClickGroup(project.group.id)}
                 title={project.group && `Group: ${project.group.name}`}
