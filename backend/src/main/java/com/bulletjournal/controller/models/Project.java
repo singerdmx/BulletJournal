@@ -22,6 +22,8 @@ public class Project {
     @Size(min = 1, max = 100)
     private String owner;
 
+    private String ownerAvatar;
+
     @NotNull
     private ProjectType projectType;
 
@@ -109,6 +111,14 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getOwnerAvatar() {
+        return ownerAvatar;
+    }
+
+    public void setOwnerAvatar(String ownerAvatar) {
+        this.ownerAvatar = ownerAvatar;
     }
 
     public void clone(Project other) {

@@ -83,20 +83,7 @@ class AddProject extends React.Component<ProjectProps & GroupProps, ModalState> 
                   return groupsOwner.groups.map(group => (
                     <Option key={`group${group.id}`} value={group.id}
                       title={`Group "${group.name}" (owner "${group.owner}")`}>
-                      <Avatar
-                      size="small"
-                      style={
-                        index === 0
-                          ? {
-                              backgroundColor: '#f56a00'
-                            }
-                          : {
-                              backgroundColor: '#fde3cf'
-                            }
-                      }
-                    >
-                      {group.name.charAt(0)}
-                    </Avatar>
+                      <Avatar size="small" src={group.ownerAvatar} />
                     &nbsp;&nbsp;Group <strong>{group.name}</strong> (owner <strong>{group.owner}</strong>)
                     </Option>
                   ));

@@ -176,20 +176,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               <Menu.Item key={`group${group.id}`}>
                 <span className="group-title">
                   <span>
-                    <Avatar
-                      size="small"
-                      style={
-                        index === 0
-                          ? {
-                              backgroundColor: '#f56a00'
-                            }
-                          : {
-                              backgroundColor: '#fde3cf'
-                            }
-                      }
-                    >
-                      {group.name.charAt(0)}
-                    </Avatar>
+                    <Avatar size="small" src={group.ownerAvatar} />
                     <span
                       className="group-name"
                       title={`Group "${group.name}" (owner "${group.owner}")`}

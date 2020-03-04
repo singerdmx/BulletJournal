@@ -44,7 +44,7 @@ public class GroupController {
     @ResponseStatus(HttpStatus.CREATED)
     public Group createGroup(@Valid @RequestBody CreateGroupParams group) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return groupDaoJpa.create(group.getName(), username).toPresentationModel();
+        return addOwnerAvatar(groupDaoJpa.create(group.getName(), username).toPresentationModel());
     }
 
     @DeleteMapping(GROUP_ROUTE)
@@ -69,6 +69,11 @@ public class GroupController {
         if (g.isDefaultGroup()) {
             group.setDefault(true);
         }
+        return addOwnerAvatar(group);
+    }
+
+    private Group addOwnerAvatar(Group group) {
+        group.setOwnerAvatar(this.userClient.getUser(group.getOwner()).getAvatar());
         return group;
     }
 
@@ -109,6 +114,10 @@ public class GroupController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(groupsEtag);
 
+        result.forEach((r) -> {
+            r.setOwnerAvatar(this.userClient.getUser(r.getOwner()).getAvatar());
+            r.getGroups().forEach((g) -> addOwnerAvatar(g));
+        });
         return ResponseEntity.ok().headers(responseHeader).body(result);
     }
 

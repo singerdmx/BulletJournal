@@ -13,6 +13,8 @@ public class GroupsWithOwner {
     @Size(min = 1, max = 100)
     private String owner;
 
+    private String ownerAvatar;
+
     @NotNull
     private List<Group> groups = new ArrayList<>();
 
@@ -38,6 +40,14 @@ public class GroupsWithOwner {
 
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    public String getOwnerAvatar() {
+        return ownerAvatar;
+    }
+
+    public void setOwnerAvatar(String ownerAvatar) {
+        this.ownerAvatar = ownerAvatar;
     }
 
     @Override
