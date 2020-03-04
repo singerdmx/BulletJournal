@@ -45,7 +45,6 @@ class BujoPage extends React.Component<BujoRouteProps, todoState> {
     return (
       <div className='todo'>
         <div className='todo-header'>
-          <h2>{category.toUpperCase()} </h2>
           <Checkbox.Group defaultValue={['todo']} className='header-check'>
             <Checkbox value='todo'>
               <CarryOutOutlined title='TODO' />
