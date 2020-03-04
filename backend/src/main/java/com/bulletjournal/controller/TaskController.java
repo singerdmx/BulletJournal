@@ -4,11 +4,14 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,8 +34,15 @@ public class TaskController {
     private NotificationService notificationService;
 
     @GetMapping(TASKS_ROUTE)
-    public List<Task> getTasks(@NotNull @PathVariable Long projectId) {
-        return this.taskDaoJpa.getTasks(projectId);
+    public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId) {
+        List<Task> tasks = this.taskDaoJpa.getTasks(projectId);
+        String tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE, tasks);
+
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setETag(tasksEtag);
+
+        return ResponseEntity.ok().headers(responseHeader).body(tasks);
     }
 
     @GetMapping(TASK_ROUTE)

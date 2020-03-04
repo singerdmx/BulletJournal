@@ -88,27 +88,31 @@ public class ProjectControllerTest {
         deleteProject(p1);
 
         createTasks(p5);
-        Note note1 = createNotes(p5, "test111");
-        Note note2 = createNotes(p5, "test2");
-        Note note3 = createNotes(p5, "test3");
-        updateNoteRelations(p5, note1, note2, note3);
-        updateNote(note1);
-        deleteNote(note1);
+        createNotes(p5);
         getNotifications(notificationsEtag);
     }
 
-    private Note createNotes(Project p5, String noteName) {
+    private void createNotes(Project p) {
+        Note note1 = createNote(p, "test111");
+        Note note2 = createNote(p, "test2");
+        Note note3 = createNote(p, "test3");
+        updateNoteRelations(p, note1, note2, note3);
+        updateNote(note1);
+        deleteNote(note1);
+    }
+
+    private Note createNote(Project p, String noteName) {
             CreateNoteParams note = new CreateNoteParams(noteName);
             ResponseEntity<Note> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(note),
                 Note.class,
-                p5.getId());
+                p.getId());
         Note created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(noteName, created.getName());
-        assertEquals(p5.getId(), created.getProjectId());
+        assertEquals(p.getId(), created.getProjectId());
         return created;
     }
 
@@ -206,6 +210,54 @@ public class ProjectControllerTest {
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
         updateTask(t1, expectedOwner, "2020-02-28", null, null, null, t1.getName());
+
+        // Get Tasks
+        ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Task[].class,
+                project.getId());
+        String etag = tasksResponse.getHeaders().getETag();
+        List<Task> groupsBody = Arrays.asList(tasksResponse.getBody());
+//        if (expected != null) {
+//            assertEquals(expected.size(), groupsBody.size());
+//            for (int i = 0; i < expected.size(); i++) {
+//                assertEquals(expected.get(i), groupsBody.get(i));
+//            }
+//        }
+    }
+
+    private void updateTaskRelations(Project project, Task task1, Task note2, Note note3) {
+//        task1
+//          |
+//           --task2
+//               |
+//                --- task3
+        note1.addSubNote(note2);
+        note2.addSubNote(note3);
+        ResponseEntity<?> updateNoteRelationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(ImmutableList.of(note1)),
+                Project.class,
+                project.getId()
+        );
+        assertEquals(HttpStatus.OK, updateNoteRelationsResponse.getStatusCode());
+
+        ResponseEntity<Note[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
+                HttpMethod.GET,
+                null,
+                Note[].class,
+                project.getId());
+        Note[] notes = response.getBody();
+        assertEquals(1, notes.length);
+        assertEquals(note1, notes[0]);
+        assertEquals(1, notes[0].getSubNotes().size());
+        assertEquals(note2, notes[0].getSubNotes().get(0));
+        assertEquals(1, notes[0].getSubNotes().get(0).getSubNotes().size());
+        assertEquals(note3, notes[0].getSubNotes().get(0).getSubNotes().get(0));
     }
 
     private Task createTask(Project project, String taskName) {
