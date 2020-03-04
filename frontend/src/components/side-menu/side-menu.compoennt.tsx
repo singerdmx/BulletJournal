@@ -57,7 +57,7 @@ var loop = (data: Project[], owner: string, index: number): TreeNodeNormal[] => 
         node.children = [] as TreeNodeNormal[];
       }
       node.title= (<span title={'Owner '+item.owner} style={{backgroundColor: `${index%2===0?'#ffcce5': '#e0e0eb'}`}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
-      node.key = 'project' + item.id.toString();
+      node.key = item.id.toString();
       res.push(node);
     });
     return res;
@@ -72,6 +72,12 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     const path = menu.keyPath.reverse().join('/');
     this.props.history.push(`/${path}`);
   };
+
+  onProjectClick =(projectId: any) => {
+    this.props.history.push(`/projects/${projectId}`)
+  }
+
+
   // claick handler when clicking on the groups submenu
   onGroupsClick = (menu: any) => {
     this.props.history.push(`/${menu.key}`);
@@ -116,6 +122,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               <span>Bullet Journal</span>
             </span>
           }
+          onTitleClick={this.onGroupsClick}
         >
           <AddProject />
           <SubMenu
@@ -141,7 +148,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               var treeNode = loop(item.projects, item.owner, index);
               return (
                 <div style={{ marginLeft: '20%'}} key={'sharedProject' + item.owner + index}>
-                  <Tree defaultExpandAll treeData={treeNode} />
+                  <Tree defaultExpandAll treeData={treeNode} onSelect={this.onProjectClick}/>
                 </div>
               );
             })}
