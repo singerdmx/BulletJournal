@@ -92,13 +92,18 @@ public class ProjectItemsGrouper {
         return mergedMap;
     }
 
-
-
-    public static List<ProjectItems> getProjectItems(@NotNull Map<ZonedDateTime, ProjectItems> mergedMap) {
+    /*
+     * Convert <ZonedDateTime, ProjectItems> map into a list and sort the list by date
+     *
+     * @projectItems List<ProjectItems> - List of Project Items
+     */
+    public static List<ProjectItems> getSortedProjectItems(@NotNull Map<ZonedDateTime, ProjectItems> mergedMap) {
+        List<Map.Entry<ZonedDateTime, ProjectItems>> entries = new ArrayList<>(mergedMap.entrySet());
+        entries.sort(Map.Entry.comparingByKey());
         List<ProjectItems> projectItems = new ArrayList<>();
-        for (Map.Entry<ZonedDateTime, ProjectItems> entry : mergedMap.entrySet()) {
-            projectItems.add(entry.getValue());
-        }
+        entries.forEach(e -> {
+            projectItems.add(e.getValue());
+        });
         return projectItems;
     }
 }

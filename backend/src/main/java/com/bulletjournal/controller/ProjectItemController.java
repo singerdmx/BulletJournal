@@ -71,7 +71,7 @@ public class ProjectItemController {
         }
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap = ProjectItemsGrouper.mergeMap(taskMap, transactionMap);
-        return ProjectItemsGrouper.getProjectItems(projectItemsMap);
+        return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
     }
 
 }
