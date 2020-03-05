@@ -20,6 +20,7 @@ import java.util.List;
 public class LabelController {
 
     protected static final String LABELS_ROUTE = "/api/labels";
+    protected static final String LABEL_ROUTE = "/api/labels/{labelId}";
     protected static final String ITEMS_ROUTE = "/api/items";
 
     @Autowired
@@ -32,10 +33,11 @@ public class LabelController {
         return labelDaoJpa.create(label.getValue(), username).toPresentationModel();
     }
 
-    @PatchMapping(LABELS_ROUTE)
+    @PatchMapping(LABEL_ROUTE)
     public Label updateLabel(@NotNull @PathVariable Long labelId,
                              @Valid @RequestBody UpdateLabelParams updateLabelParams) {
-        return null;
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return labelDaoJpa.partialUpdate(username, labelId, updateLabelParams).toPresentationModel();
     }
 
     @DeleteMapping(LABELS_ROUTE)

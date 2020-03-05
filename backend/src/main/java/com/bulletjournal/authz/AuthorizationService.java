@@ -25,6 +25,7 @@ public class AuthorizationService {
             case TRANSACTION:
                 checkAuthorizedToOperateOnProjectItem(owner, requester, operation, contentId, other);
                 break;
+            case LABEL:
             default:
         }
     }
