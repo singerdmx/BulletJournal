@@ -26,6 +26,22 @@ public class AuthorizationService {
                 checkAuthorizedToOperateOnProjectItem(owner, requester, operation, contentId, other);
                 break;
             case LABEL:
+                checkAuthorizedToOperateOnLabel(owner, requester, operation, contentId);
+                break;
+            default:
+        }
+    }
+
+    private void checkAuthorizedToOperateOnLabel(
+            String owner, String requester, Operation operation, Long contentId) {
+        switch (operation) {
+            case DELETE:
+            case UPDATE:
+                if (!Objects.equals(owner, requester)) {
+                    throw new UnAuthorizedException("Label " + contentId + " is owner by " +
+                            owner + " while request is from " + requester);
+                }
+                break;
             default:
         }
     }
