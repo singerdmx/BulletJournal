@@ -1,14 +1,14 @@
 import React from 'react';
 import { Modal, Input, Form, Button, Select, Avatar } from 'antd';
 import {
-  FolderAddOutlined,
+  EditOutlined,
   CarryOutOutlined,
   FileTextOutlined,
   AccountBookOutlined
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interfaces';
-import { createProjectByName } from '../../features/project/actions';
+import { getProject } from '../../features/project/actions';
 import { updateGroups } from '../../features/group/actions';
 import { ProjectType } from '../../features/project/constants';
 import { IState } from '../../store';
@@ -19,14 +19,7 @@ const InputGroup = Input.Group;
 const { TextArea } = Input;
 const { Option } = Select;
 
-type ProjectProps = {
-  createProjectByName: (
-    description: string,
-    groupId: number,
-    name: string,
-    projectType: ProjectType
-  ) => void;
-};
+type ProjectProps = {};
 
 //props of groups
 type GroupProps = {
@@ -38,7 +31,7 @@ type ModalState = {
   isShow: boolean;
 };
 
-class AddProject extends React.Component<
+class EditProject extends React.Component<
   ProjectProps & GroupProps,
   ModalState
 > {
@@ -54,13 +47,7 @@ class AddProject extends React.Component<
     this.setState({ isShow: true });
   };
 
-  addProject = (
-    name: string,
-    description: string,
-    groupId: number,
-    projectType: ProjectType
-  ) => {
-    this.props.createProjectByName(description, groupId, name, projectType);
+  updateProject = () => {
     this.setState({ isShow: false });
   };
 
@@ -71,15 +58,18 @@ class AddProject extends React.Component<
   render() {
     const { groups: groupsByOwner } = this.props;
     return (
-      <div className='add-project' title='Create New BuJo'>
-        <Button onClick={this.showModal} type='dashed' block>
-          <FolderAddOutlined style={{ fontSize: 20 }} />
-        </Button>
+      <div className='add-project' title='Edit Project'>
+        <EditOutlined
+          title='Edit Project'
+          onClick={this.showModal}
+          style={{ fontSize: 20 }}
+        />
+
         <Modal
-          title='Create New BuJo'
+          title='Edit BuJo'
           visible={this.state.isShow}
           onCancel={this.onCancel}
-          onOk={() => this.addProject}
+          onOk={() => this.updateProject}
         >
           <Form>
             <Form.Item>
@@ -128,9 +118,8 @@ class AddProject extends React.Component<
 }
 
 const mapStateToProps = (state: IState) => ({
+  project: state.project.project,
   groups: state.group.groups
 });
 
-export default connect(mapStateToProps, { updateGroups, createProjectByName })(
-  AddProject
-);
+export default connect(mapStateToProps, { updateGroups })(EditProject);

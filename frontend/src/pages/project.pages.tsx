@@ -3,13 +3,24 @@ import { RouteComponentProps } from 'react-router';
 import { Project } from '../features/project/interfaces';
 import { IState } from '../store';
 import { connect } from 'react-redux';
-import { Menu, Dropdown, Avatar } from 'antd';
+import { GroupsWithOwner } from '../features/group/interfaces';
+import { Avatar, Input, Select, Popconfirm } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
-import { TeamOutlined, MoreOutlined, EditOutlined } from '@ant-design/icons';
+import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
+import EditProject from '../components/modals/edit-project.component';
 
 type ProjectPathParams = {
   projectId: string;
+};
+
+type ModalState = {
+  isShow: boolean;
+  groupName: string;
+};
+
+type GroupProps = {
+  groups: GroupsWithOwner[];
 };
 
 interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
@@ -21,24 +32,15 @@ type ProjectPageProps = {
   getProject: (projectId: number) => void;
 };
 
-const editMenu = (
-  <Menu>
-    <Menu.Item key="changeName">
-      <EditOutlined />
-      &nbsp;Change Name
-    </Menu.Item>
-    <Menu.Item key="changeGroup">
-      <EditOutlined />
-      &nbsp;Change Group
-    </Menu.Item>
-    <Menu.Item key="changeDescription">
-      <EditOutlined />
-      &nbsp;Change Description
-    </Menu.Item>
-  </Menu>
-);
+class ProjectPage extends React.Component<
+  ProjectPageProps & ProjectPathProps & GroupProps,
+  ModalState
+> {
+  state: ModalState = {
+    isShow: false,
+    groupName: ''
+  };
 
-class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
   componentDidMount() {
     const projectId = this.props.match.params.projectId;
     this.props.getProject(parseInt(projectId));
@@ -55,14 +57,24 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
     this.props.history.push(`/groups/group${groupId}`);
   };
 
+  saveProject = () => {
+    this.setState({ isShow: false });
+  };
+
+  onCancel = () => {
+    this.setState({ isShow: false });
+  };
+
   render() {
+    const { groups: groupsByOwner } = this.props;
     const { project } = this.props;
+
     return (
-      <div className="project">
-        <div className="project-header">
+      <div className='project'>
+        <div className='project-header'>
           <h2>
             <span title={project.owner}>
-              <Avatar size="large" src={project.ownerAvatar} />
+              <Avatar size='large' src={project.ownerAvatar} />
             </span>
             &nbsp;&nbsp;&nbsp;
             <span title={`${project.projectType} ${project.name}`}>
@@ -71,8 +83,8 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
             </span>
           </h2>
 
-          <div className="project-control">
-            <span style={{cursor: 'pointer'}}>
+          <div className='project-control'>
+            <span style={{ cursor: 'pointer' }}>
               <h2
                 onClick={e => this.onClickGroup(project.group.id)}
                 title={project.group && `Group: ${project.group.name}`}
@@ -81,13 +93,22 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
                 {project.group && project.group.users.length}
               </h2>
             </span>
-            <Dropdown overlay={editMenu} trigger={['click']}>
-              <h2 style={{ cursor: 'pointer', marginLeft: '0.5em' }}>
-                <MoreOutlined title="Edit" />
-              </h2>
-            </Dropdown>
+
+            <EditProject />
+
+            <Popconfirm
+              title='Are you sure?'
+              okText='Yes'
+              cancelText='No'
+              onConfirm={() => console.log('aa')}
+              className='group-setting'
+            >
+              <DeleteOutlined
+                title='Delete Project'
+                style={{ fontSize: 20, marginLeft: '10px', cursor: 'pointer' }}
+              />
+            </Popconfirm>
           </div>
-          
         </div>
         <div>{project.description}</div>
       </div>
@@ -96,7 +117,8 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  project: state.project.project
+  project: state.project.project,
+  groups: state.group.groups
 });
 
 export default connect(mapStateToProps, { getProject })(ProjectPage);
