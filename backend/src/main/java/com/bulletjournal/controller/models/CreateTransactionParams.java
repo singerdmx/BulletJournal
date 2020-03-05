@@ -11,6 +11,7 @@ public class CreateTransactionParams {
     private String name;
 
     @NotBlank
+    @Size(min = 2, max = 100)
     private String payer;
 
     @NotNull

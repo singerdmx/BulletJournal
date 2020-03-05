@@ -37,7 +37,7 @@ public class Transaction extends ProjectItemModel {
     @Column(nullable = false)
     private TransactionType transactionType;
 
-    @NotNull
+    @NotBlank
     @Column(nullable = false)
     private String date;
 

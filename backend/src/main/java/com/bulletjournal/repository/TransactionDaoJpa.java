@@ -4,8 +4,10 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTransactionParams;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
@@ -89,6 +91,9 @@ public class TransactionDaoJpa {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        if (!ProjectType.LEDGER.equals(ProjectType.getType(project.getType()))) {
+            throw new BadRequestException("Project Type expected to be LEDGER while request is " + project.getType());
+        }
 
         Transaction transaction = new Transaction();
         transaction.setProject(project);
@@ -126,9 +131,10 @@ public class TransactionDaoJpa {
 
         List<Event> events = this.updatePayer(requester, transactionId, updateTransactionParams, transaction);
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasTransactionType(), TransactionType.getType(
-                        updateTransactionParams.getTransactionType()), transaction::setTransactionType);
+        DaoHelper.updateIfPresent(updateTransactionParams.hasTransactionType(),
+                updateTransactionParams.hasTransactionType() ?
+                        TransactionType.getType(updateTransactionParams.getTransactionType()) : null,
+                transaction::setTransactionType);
 
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasAmount(), updateTransactionParams.getAmount(), transaction::setAmount);
@@ -139,23 +145,30 @@ public class TransactionDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasTime(), updateTransactionParams.getTime(), transaction::setTime);
 
-        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime(),
-                Timestamp.from(IntervalHelper.getStartTime(transaction.getDate(), transaction.getTime(),
-                        transaction.getTimezone()).toInstant()), transaction::setStartTime);
+        String date = updateTransactionParams.hasDate() ? updateTransactionParams.getDate() : transaction.getDate();
+        String time = updateTransactionParams.hasTime() ? updateTransactionParams.getTime() : transaction.getTime();
+        String timezone = updateTransactionParams.hasTimezone() ? updateTransactionParams.getTimezone() : transaction.getTimezone();
 
-        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime(),
-                Timestamp.from(IntervalHelper.getEndTime(transaction.getDate(), transaction.getTime(),
-                        transaction.getTimezone()).toInstant()), transaction::setEndTime);
+        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime() || updateTransactionParams.hasTimezone(),
+                Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()), transaction::setStartTime);
+
+        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime() || updateTransactionParams.hasTimezone(),
+                Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()), transaction::setEndTime);
+
+        DaoHelper.updateIfPresent(updateTransactionParams.hasTimezone(), updateTransactionParams.getTimezone(), transaction::setTimezone);
 
         this.transactionRepository.save(transaction);
-
         return events;
     }
 
     private List<Event> updatePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+        List<Event> events = new ArrayList<>();
+
+        if (!updateTransactionParams.hasPayer())
+            return events;
+
         String oldPayer = transaction.getPayer();
         String newPayer = updateTransactionParams.getPayer();
-        List<Event> events = new ArrayList<>();
 
         if (!Objects.equals(oldPayer, newPayer)) {
             transaction.setPayer(newPayer);

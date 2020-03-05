@@ -45,10 +45,9 @@ public class ProjectControllerTest {
             "0518",
             "Scarlet",
             "lsx9981"};
-    private TestRestTemplate restTemplate = new TestRestTemplate();
-
     @LocalServerPort
     int randomServerPort;
+    private TestRestTemplate restTemplate = new TestRestTemplate();
 
     @Before
     public void setup() {
@@ -67,29 +66,40 @@ public class ProjectControllerTest {
         }
 
         for (String username : Arrays.asList(sampleUsers).subList(0, 2)) {
-            removeUserFromGroup(group, username,  --count);
+            removeUserFromGroup(group, username, --count);
         }
 
         group = groups.get(0).getGroups().get(2);
         addUsersToGroup(group, Arrays.asList(sampleUsers).subList(0, 5));
         removeUsersFromGroup(group, Arrays.asList(sampleUsers).subList(0, 5), 1);
 
-        Project p1 = createProject(projectName, expectedOwner, group);
+        Project p1 = createProject(projectName, expectedOwner, group, ProjectType.TODO);
         p1 = updateProject(p1);
 
         // create other projects
-        Project p2 = createProject("P2", expectedOwner, group);
-        Project p3 = createProject("P3", expectedOwner, group);
-        Project p4 = createProject("P4", expectedOwner, group);
-        Project p5 = createProject("P5", expectedOwner, group);
-        Project p6 = createProject("P6", expectedOwner, group);
+        Project p2 = createProject("P2", expectedOwner, group, ProjectType.LEDGER);
+        Project p3 = createProject("P3", expectedOwner, group, ProjectType.NOTE);
+        Project p4 = createProject("P4", expectedOwner, group, ProjectType.TODO);
+        Project p5 = createProject("P5", expectedOwner, group, ProjectType.NOTE);
+        Project p6 = createProject("P6", expectedOwner, group, ProjectType.LEDGER);
         updateProjectRelations(p1, p2, p3, p4, p5, p6);
-
         deleteProject(p1);
+        Project p7 = createProject("P7", expectedOwner, group, ProjectType.TODO);
+        updateProjectRelations(p5, p6, p7);
 
-        createTasks(p5);
+        createTasks(p7);
         createNotes(p5);
+        createTransactions(p6);
+
         getNotifications(notificationsEtag);
+    }
+
+    private void createTransactions(Project p) {
+        Transaction transaction1 = createTransaction(p, "transaction1", "2020-03-03");
+        Transaction transaction2 = createTransaction(p, "transaction2", "2020-03-04");
+        Transaction transaction3 = createTransaction(p, "transaction3", "2020-03-05");
+        transaction1 = updateTransaction(transaction1);
+        deleteTransactions(p, transaction1, transaction2, transaction3);
     }
 
     private void createNotes(Project p) {
@@ -101,9 +111,81 @@ public class ProjectControllerTest {
         deleteNote(note1);
     }
 
+    private void deleteTransactions(Project project, Transaction... transactions) {
+        ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Transaction[].class,
+                project.getId());
+        Transaction[] t = getResponse.getBody();
+        int size = t.length;
+
+        for (Transaction transaction : transactions) {
+            t = deleteTransaction(transaction);
+            assertEquals(--size, t.length);
+        }
+    }
+
+    private Transaction[] deleteTransaction(Transaction t) {
+
+        ResponseEntity<Transaction> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTION_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Transaction.class,
+                t.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Transaction[].class,
+                t.getProjectId());
+        Transaction[] transactions = getResponse.getBody();
+        assertNotNull(transactions);
+        return transactions;
+    }
+
+    private Transaction updateTransaction(Transaction t) {
+        String transactionName = "transaction4";
+        UpdateTransactionParams update = new UpdateTransactionParams();
+        update.setName(transactionName);
+        ResponseEntity<Transaction> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTION_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(update),
+                Transaction.class,
+                t.getId());
+        t = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assert t != null;
+        assertEquals(transactionName, t.getName());
+        return t;
+    }
+
+    private Transaction createTransaction(Project project, String name, String date) {
+        CreateTransactionParams transaction =
+                new CreateTransactionParams(name, "BulletJournal", 1000.0,
+                        date, null, "America/Los_Angeles", 1);
+        ResponseEntity<Transaction> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(transaction),
+                Transaction.class,
+                project.getId());
+        Transaction created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+        assertEquals(name, created.getName());
+        assertEquals(project.getId(), created.getProjectId());
+        return created;
+    }
+
     private Note createNote(Project p, String noteName) {
-            CreateNoteParams note = new CreateNoteParams(noteName);
-            ResponseEntity<Note> response = this.restTemplate.exchange(
+        CreateNoteParams note = new CreateNoteParams(noteName);
+        ResponseEntity<Note> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(note),
@@ -111,22 +193,23 @@ public class ProjectControllerTest {
                 p.getId());
         Note created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assert created != null;
         assertEquals(noteName, created.getName());
         assertEquals(p.getId(), created.getProjectId());
         return created;
     }
 
     private Note getNote(Note note1) {
-           ResponseEntity<Note> response = this.restTemplate.exchange(
-                   ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
-                   HttpMethod.GET,
-                   null,
-                   Note.class,
-                   note1.getId());
-           Note outputNote = response.getBody();
-           assertEquals(HttpStatus.OK, response.getStatusCode());
-           assertEquals(note1.getName(), outputNote.getName());
-           return outputNote;
+        ResponseEntity<Note> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
+                HttpMethod.GET,
+                null,
+                Note.class,
+                note1.getId());
+        Note outputNote = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(note1.getName(), outputNote.getName());
+        return outputNote;
     }
 
     private Note updateNote(Note n1) {
@@ -365,6 +448,39 @@ public class ProjectControllerTest {
         assertEquals(expectedEtag, etag);
     }
 
+    private void updateProjectRelations(Project p5, Project p6, Project p7) {
+        /**
+         *  p5
+         *   |
+         *    -- p6
+         *        |
+         *        --p7
+         */
+        p6.addSubProject(p7);
+        // Set user's project relations
+        ResponseEntity<?> updateProjectRelationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(ImmutableList.of(p5)),
+                Void.class
+        );
+        assertEquals(HttpStatus.OK, updateProjectRelationsResponse.getStatusCode());
+
+        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
+        List<Project> projects = projectsResponse.getBody().getOwned();
+        assertEquals(1, projects.size());
+        assertEquals(p5, projects.get(0));
+        assertEquals(1, projects.get(0).getSubProjects().size());
+        assertEquals(p6, projects.get(0).getSubProjects().get(0));
+        assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
+        assertEquals(p7, projects.get(0).getSubProjects().get(0).getSubProjects().get(0));
+    }
+
     private void updateProjectRelations(Project p1, Project p2, Project p3, Project p4, Project p5, Project p6) {
         ResponseEntity<Projects> getProjectsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
@@ -512,7 +628,7 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(projectNewName, p1.getName());
         assertEquals(expectedOwner, p1.getOwner());
-        assertEquals(ProjectType.LEDGER, p1.getProjectType());
+        assertEquals(ProjectType.TODO, p1.getProjectType());
         assertEquals("G1", p1.getGroup().getName());
         assertEquals(expectedOwner, p1.getGroup().getOwner());
         assertEquals("d2", p1.getDescription());
@@ -745,9 +861,9 @@ public class ProjectControllerTest {
         return created;
     }
 
-    private Project createProject(String projectName, String expectedOwner, Group g) {
+    private Project createProject(String projectName, String expectedOwner, Group g, ProjectType projectType) {
         CreateProjectParams project = new CreateProjectParams(
-                projectName, ProjectType.LEDGER, "d1", g.getId());
+                projectName, projectType, "d1", g.getId());
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
@@ -757,7 +873,7 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(projectName, created.getName());
         assertEquals(expectedOwner, created.getOwner());
-        assertEquals(ProjectType.LEDGER, created.getProjectType());
+        assertEquals(projectType, created.getProjectType());
         assertEquals("G1", created.getGroup().getName());
         assertEquals(expectedOwner, created.getGroup().getOwner());
         assertEquals("d1", created.getDescription());

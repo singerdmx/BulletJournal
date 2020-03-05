@@ -4,8 +4,10 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTaskParams;
 import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
@@ -75,6 +77,9 @@ public class TaskDaoJpa {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
+            throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
+        }
 
         Task task = new Task();
         task.setProject(project);
