@@ -49,11 +49,11 @@ public class ProjectItemControllerTest {
         Group group = createGroup();
         String projectName = "P8";
         Project p = createProject(projectName, group);
-        Transaction t1 = createTransactions(p, "T1", "2020-02-29");
-        Transaction t2 = createTransactions(p, "T2", "2020-03-01");
-        Transaction t3 = createTransactions(p, "T3", "2020-03-02");
-        Transaction t4 = createTransactions(p, "T4", "2020-03-02");
-        Transaction t5 = createTransactions(p, "T5", "2020-03-04");
+        Transaction t1 = createTransaction(p, "T1", "2020-02-29");
+        Transaction t2 = createTransaction(p, "T2", "2020-03-01");
+        Transaction t3 = createTransaction(p, "T3", "2020-03-02");
+        Transaction t4 = createTransaction(p, "T4", "2020-03-02");
+        Transaction t5 = createTransaction(p, "T5", "2020-03-04");
 
         List<ProjectItems> projectItems = getProjectItems("2020-02-29",
                                                             "2020-03-02",
@@ -116,7 +116,7 @@ public class ProjectItemControllerTest {
         return Arrays.asList(response.getBody());
     }
 
-    private Transaction createTransactions(Project project, String name, String date) {
+    private Transaction createTransaction(Project project, String name, String date) {
         CreateTransactionParams transaction =
                 new CreateTransactionParams( name, "BulletJournal", 1000.0,
                                     date, null, "America/Los_Angeles", 1 );

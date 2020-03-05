@@ -16,6 +16,9 @@ public class UpdateTransactionParams {
 
     private Integer transactionType;
 
+    public UpdateTransactionParams() {
+    }
+
     public UpdateTransactionParams(String name,
                                    String payer,
                                    Double amount,
@@ -73,12 +76,12 @@ public class UpdateTransactionParams {
         this.time = time;
     }
 
-    public String getTimeZone() {
+    public String getTimezone() {
         return timezone;
     }
 
-    public void setTimeZone(String timeZone) {
-        this.timezone = timeZone;
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 
     public Integer getTransactionType() {

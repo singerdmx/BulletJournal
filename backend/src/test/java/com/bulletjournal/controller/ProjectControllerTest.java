@@ -45,10 +45,9 @@ public class ProjectControllerTest {
             "0518",
             "Scarlet",
             "lsx9981"};
-    private TestRestTemplate restTemplate = new TestRestTemplate();
-
     @LocalServerPort
     int randomServerPort;
+    private TestRestTemplate restTemplate = new TestRestTemplate();
 
     @Before
     public void setup() {
@@ -67,7 +66,7 @@ public class ProjectControllerTest {
         }
 
         for (String username : Arrays.asList(sampleUsers).subList(0, 2)) {
-            removeUserFromGroup(group, username,  --count);
+            removeUserFromGroup(group, username, --count);
         }
 
         group = groups.get(0).getGroups().get(2);
@@ -88,22 +87,97 @@ public class ProjectControllerTest {
         deleteProject(p1);
 
         createTasks(p5);
-        createNotes(p5);
+        Note note1 = createNote(p5, "test111");
+        Note note2 = createNote(p5, "test2");
+        Note note3 = createNote(p5, "test3");
+        updateNoteRelations(p5, note1, note2, note3);
+        updateNote(note1);
+        deleteNote(note1);
+
+        Transaction transaction1 = createTransaction(p5, "transaction1", "2020-03-03");
+        Transaction transaction2 = createTransaction(p5, "transaction2", "2020-03-04");
+        Transaction transaction3 = createTransaction(p5, "transaction3", "2020-03-05");
+        transaction1 = updateTransaction(transaction1);
+        deleteTransactions(p5, transaction1, transaction2, transaction3);
+
         getNotifications(notificationsEtag);
     }
 
-    private void createNotes(Project p) {
-        Note note1 = createNote(p, "test111");
-        Note note2 = createNote(p, "test2");
-        Note note3 = createNote(p, "test3");
-        updateNoteRelations(p, note1, note2, note3);
-        updateNote(note1);
-        deleteNote(note1);
+    private void deleteTransactions(Project project, Transaction... transactions) {
+        ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Transaction[].class,
+                project.getId());
+        Transaction[] t = getResponse.getBody();
+        int size = t.length;
+
+        for (Transaction transaction : transactions) {
+            t = deleteTransaction(transaction);
+            assertEquals(--size, t.length);
+        }
+    }
+
+    private Transaction[] deleteTransaction(Transaction t) {
+
+        ResponseEntity<Transaction> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTION_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Transaction.class,
+                t.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Transaction[].class,
+                t.getProjectId());
+        Transaction[] transactions = getResponse.getBody();
+        assertNotNull(transactions);
+        return transactions;
+    }
+
+    private Transaction updateTransaction(Transaction t) {
+        String transactionName = "transaction4";
+        UpdateTransactionParams update = new UpdateTransactionParams();
+        update.setName(transactionName);
+        ResponseEntity<Transaction> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTION_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(update),
+                Transaction.class,
+                t.getId());
+        t = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assert t != null;
+        assertEquals(transactionName, t.getName());
+        return t;
+    }
+
+    private Transaction createTransaction(Project project, String name, String date) {
+        CreateTransactionParams transaction =
+                new CreateTransactionParams(name, "BulletJournal", 1000.0,
+                        date, null, "America/Los_Angeles", 1);
+        ResponseEntity<Transaction> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(transaction),
+                Transaction.class,
+                project.getId());
+        Transaction created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+        assertEquals(name, created.getName());
+        assertEquals(project.getId(), created.getProjectId());
+        return created;
     }
 
     private Note createNote(Project p, String noteName) {
-            CreateNoteParams note = new CreateNoteParams(noteName);
-            ResponseEntity<Note> response = this.restTemplate.exchange(
+        CreateNoteParams note = new CreateNoteParams(noteName);
+        ResponseEntity<Note> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(note),
@@ -111,22 +185,23 @@ public class ProjectControllerTest {
                 p.getId());
         Note created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assert created != null;
         assertEquals(noteName, created.getName());
         assertEquals(p.getId(), created.getProjectId());
         return created;
     }
 
     private Note getNote(Note note1) {
-           ResponseEntity<Note> response = this.restTemplate.exchange(
-                   ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
-                   HttpMethod.GET,
-                   null,
-                   Note.class,
-                   note1.getId());
-           Note outputNote = response.getBody();
-           assertEquals(HttpStatus.OK, response.getStatusCode());
-           assertEquals(note1.getName(), outputNote.getName());
-           return outputNote;
+        ResponseEntity<Note> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
+                HttpMethod.GET,
+                null,
+                Note.class,
+                note1.getId());
+        Note outputNote = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(note1.getName(), outputNote.getName());
+        return outputNote;
     }
 
     private Note updateNote(Note n1) {

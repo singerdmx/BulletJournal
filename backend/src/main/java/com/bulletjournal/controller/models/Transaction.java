@@ -2,25 +2,30 @@ package com.bulletjournal.controller.models;
 
 import com.bulletjournal.repository.models.Project;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
 public class Transaction {
     private Long id;
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 100)
     private String name;
 
     @NotNull
     private Long projectId;
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 100)
     private String payer;
 
     @NotNull
     private Double amount;
 
-    @NotNull
+    @NotBlank
+    @Size(min = 10, max = 10)
     private String date;
 
     @NotNull
@@ -28,7 +33,7 @@ public class Transaction {
 
     private String time;
 
-    @NotNull
+    @NotBlank
     private String timezone;
 
     public Transaction() {
