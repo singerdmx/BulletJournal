@@ -5,7 +5,6 @@ import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.repository.models.Project;
-
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -128,13 +127,13 @@ public class ProjectItemsGrouperTest {
     }
 
     /*
-    *  task 1         Timestamp: 2020-03-03
-    *  task 2         Timestamp: 2020-03-04
-    *  transaction 1  Timestamp: 2020-03-07
-    *  transaction 2  Timestamp: 2020-03-04
-    *
-    *  Result: task1 -> task2 -> transaction2 -> transaction1
-    */
+     *  task 1         Timestamp: 2020-03-03
+     *  task 2         Timestamp: 2020-03-04
+     *  transaction 1  Timestamp: 2020-03-07
+     *  transaction 2  Timestamp: 2020-03-04
+     *
+     *  Result: task1 -> task2 -> transaction2 -> transaction1
+     */
     @Test
     public void getProjectItems() {
         ProjectStub projectStub = new ProjectStub();
@@ -197,8 +196,8 @@ public class ProjectItemsGrouperTest {
     }
 
     /*
-    * Stub class for Project
-    */
+     * Stub class for Project
+     */
     private static class ProjectStub extends Project {
         @Override
         public Long getId() {
