@@ -1,0 +1,32 @@
+version: '2.1'
+
+services:
+  elasticsearch:
+    build:
+      context: elk/elasticsearch/
+      args:
+        ELK_VERSION: 7.6.0
+    volumes:
+      - ./elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - $HOME/docker/volumes/postgres/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms256m"
+      ELASTIC_PASSWORD: 1o24bbs
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks
+      # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+
+  kibana:
+    build:
+      context: elk/kibana/
+      args:
+        ELK_VERSION: 7.6.0
+    volumes:
+      - ./elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch

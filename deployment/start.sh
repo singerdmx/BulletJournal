@@ -5,10 +5,5 @@ mkdir -p "$HOME/docker/volumes/postgres"
 mkdir -p "$HOME/docker/volumes/log"
 
 echo -e '\n==>step 2 / 2: docker-compose up -d'
+docker-compose -f docker-compose.yml -f ../elk/docker-compose-prod.yml up -d
 
-if [ "$#" -ne 0 -a "$1" eq 'elk']
-then
-    docker-compose -f ./docker-compose.yml -f ./elk/docker-compose.yml up -d
-else
-    docker-compose -f ./docker-compose.yml up -d
-fi
