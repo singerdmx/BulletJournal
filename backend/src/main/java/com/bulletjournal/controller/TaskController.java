@@ -26,6 +26,7 @@ public class TaskController {
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
     protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
     protected static final String COMPLETED_TASKS_ROUTE = "/api/projects/{projectId}/completedTasks";
+    protected static final String TASK_SET_LABELS_ROUTE = "/api/tasks/{taskId}/setLabels";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -96,4 +97,9 @@ public class TaskController {
         }
     }
 
+    @PutMapping(TASK_SET_LABELS_ROUTE)
+    public Task setLabels(@NotNull @PathVariable Long taskId,
+                          @NotNull @RequestBody List<Long> labels) {
+        return null;
+    }
 }
