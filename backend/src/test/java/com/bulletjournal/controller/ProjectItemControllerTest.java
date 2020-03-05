@@ -48,7 +48,7 @@ public class ProjectItemControllerTest {
     public void testGetProjectItems() throws Exception {
         Group group = createGroup();
         String projectName = "P8";
-        Project p = createProject(projectName, group);
+        Project p = createProject(projectName, group, ProjectType.LEDGER);
         Transaction t1 = createTransaction(p, "T1", "2020-02-29");
         Transaction t2 = createTransaction(p, "T2", "2020-03-01");
         Transaction t3 = createTransaction(p, "T3", "2020-03-02");
@@ -134,9 +134,9 @@ public class ProjectItemControllerTest {
         return created;
     }
 
-    private Project createProject(String projectName, Group g) {
+    private Project createProject(String projectName, Group g, ProjectType projectType) {
         CreateProjectParams project = new CreateProjectParams(
-                projectName, ProjectType.LEDGER, "d14", g.getId());
+                projectName, projectType, "d14", g.getId());
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
@@ -147,7 +147,7 @@ public class ProjectItemControllerTest {
         assertNotNull(created);
         assertEquals(projectName, created.getName());
         assertEquals("BulletJournal", created.getOwner());
-        assertEquals(ProjectType.LEDGER, created.getProjectType());
+        assertEquals(projectType, created.getProjectType());
         assertEquals("G14", created.getGroup().getName());
         assertEquals("BulletJournal", created.getGroup().getOwner());
         assertEquals("d14", created.getDescription());

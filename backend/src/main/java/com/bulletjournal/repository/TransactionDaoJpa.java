@@ -4,8 +4,10 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTransactionParams;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
@@ -89,6 +91,9 @@ public class TransactionDaoJpa {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        if (!ProjectType.LEDGER.equals(ProjectType.getType(project.getType()))) {
+            throw new BadRequestException("Project Type expected to be LEDGER while request is " + project.getType());
+        }
 
         Transaction transaction = new Transaction();
         transaction.setProject(project);
