@@ -170,11 +170,11 @@ VALUES ('Scarlet', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '
 INSERT INTO public.user_projects (owner, created_at, updated_at, owned_projects, shared_projects)
 VALUES ('lsx9981', '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', '[{"id":7,"s":[]}]', null);
 
--- Michael_Zhou created 1 project in default group
+-- Michael_Zhou created 1 ledger project in group 14
 INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
 VALUES (8, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P1', 'Michael_Zhou', null, 2, 14);
 
--- Michael_Zhou created 1 transaction in the project of default group
+-- Michael_Zhou created 5 transactions in the project of group 14
 INSERT INTO public.transactions(id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
 VALUES (0, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment1', 'Michael_Zhou', 1000, '2020-02-20', '2020-02-20 00:00:00.000000', 'Michael_Zhou', '2020-02-20 00:00:00.000000', null, 'America/Los_Angeles', 0, 8);
 INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
@@ -185,3 +185,27 @@ INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount
 VALUES (3, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment4', 'Michael_Zhou', 4000, '2020-02-22', '2020-02-22 00:00:00.000000', 'Michael_Zhou', '2020-02-22 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);
 INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
 VALUES (4, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment5', 'Michael_Zhou', 5000, '2020-02-23', '2020-02-23 00:00:00.000000', 'Michael_Zhou', '2020-02-23 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);
+
+-- Michael_Zhou created 1 task project in group 14
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (9, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P7', 'Michael_Zhou', 'Chicken Soup', 0, 14);
+
+-- Michael_Zhou created 5 tasks in the project of group 14
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (1, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task1', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (2, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task2', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 2, '2020-03-08', '09:50', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (3, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task3', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 3, '2020-03-08', '09:30', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (4, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task4', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (5, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task5', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+
+-- Michael_Zhou created 3 completed tasks in the project of group 14
+INSERT INTO public.completed_tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (6, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task5', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.completed_tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (7, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task6', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.completed_tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
+VALUES (8, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task7', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
