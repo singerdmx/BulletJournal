@@ -8,7 +8,7 @@ services:
         ELK_VERSION: 7.6.0
     volumes:
       - ./elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - $HOME/docker/volumes/postgres/elasticsearch:/usr/share/elasticsearch/data
+      - $HOME/docker/volumes/elasticsearch:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
