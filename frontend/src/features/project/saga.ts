@@ -78,7 +78,6 @@ function* updateSharedProjectOwnersOrder(
 ) {
   try {
     const { projectOwners } = action.payload;
-    yield call(updateSharedProjectsOrder, projectOwners);
     const state: IState = yield select();
     yield put(
       projectActions.projectsReceived({
@@ -89,6 +88,7 @@ function* updateSharedProjectOwnersOrder(
         sharedProjectsEtag: ''
       })
     );
+    yield call(updateSharedProjectsOrder, projectOwners);
   } catch (error) {
     console.log(error);
     yield call(message.error, `updateSharedProjectsOrder Fail: ${error}`);
