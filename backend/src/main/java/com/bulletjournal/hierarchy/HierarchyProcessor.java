@@ -2,6 +2,7 @@ package com.bulletjournal.hierarchy;
 
 import com.bulletjournal.exceptions.BadRequestException;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,5 +91,15 @@ public class HierarchyProcessor {
     private static List<HierarchyItem> getItemsFromJson(String jsonString) {
         return Arrays.asList(GSON.fromJson(
                 jsonString, HierarchyItem[].class));
+    }
+
+    public static String addItem(String jsonString, Long id) {
+        if (StringUtils.isBlank(jsonString)) {
+            jsonString = "[]";
+        }
+
+        List<HierarchyItem> list = new ArrayList<>(getItemsFromJson(jsonString));
+        list.add(new HierarchyItem(id));
+        return GSON.toJson(list);
     }
 }

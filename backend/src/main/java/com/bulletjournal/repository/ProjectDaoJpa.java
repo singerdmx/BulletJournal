@@ -160,7 +160,16 @@ public class ProjectDaoJpa {
         project.setType(createProjectParams.getProjectType().getValue());
         project.setGroup(this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " cannot be found")));
-        this.projectRepository.save(project);
+        project = this.projectRepository.save(project);
+
+        Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
+        final UserProjects userProjects = userProjectsOptional.isPresent() ?
+                userProjectsOptional.get() : new UserProjects();
+
+        String newRelations = HierarchyProcessor.addItem(userProjects.getOwnedProjects(), project.getId());
+        userProjects.setOwnedProjects(newRelations);
+        userProjects.setOwner(owner);
+        this.userProjectsRepository.save(userProjects);
         return project;
     }
 

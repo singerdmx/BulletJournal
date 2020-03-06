@@ -11,6 +11,13 @@ public class HierarchyItem {
 
     private List<HierarchyItem> s = new ArrayList<>();
 
+    public HierarchyItem() {
+    }
+
+    public HierarchyItem(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
