@@ -292,7 +292,8 @@ public class ProjectControllerTest {
         Task t1 = createTask(project, "t1");
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
-        updateTask(t1, expectedOwner, "2020-02-27", null, null, null, t1.getName());
+        updateTaskRelations(project, t1, t2, t3);
+        t1 = updateTask(t1, expectedOwner, "2020-02-28", null, null, null, t1.getName());
 
         // Get Tasks
         ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
@@ -301,46 +302,63 @@ public class ProjectControllerTest {
                 null,
                 Task[].class,
                 project.getId());
-        String etag = tasksResponse.getHeaders().getETag();
-        List<Task> groupsBody = Arrays.asList(tasksResponse.getBody());
-//        if (expected != null) {
-//            assertEquals(expected.size(), groupsBody.size());
-//            for (int i = 0; i < expected.size(); i++) {
-//                assertEquals(expected.get(i), groupsBody.get(i));
-//            }
-//        }
+        String etag1 = tasksResponse.getHeaders().getETag();
+        List<Task> tasks = Arrays.asList(tasksResponse.getBody());
+
+        tasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Task[].class,
+                project.getId());
+        String etag2 = tasksResponse.getHeaders().getETag();
+        assertEquals(etag1, etag2);
+        deleteTask(t2);
+        tasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Task[].class,
+                project.getId());
+        String etag3 = tasksResponse.getHeaders().getETag();
+        tasks = Arrays.asList(tasksResponse.getBody());
+        // assertNotEquals(etag1, etag3);
+
+        assertEquals(1, tasks.size());
+        assertEquals(t1, tasks.get(0));
+        assertEquals(0, tasks.get(0).getSubTasks().size());
     }
 
-    private void updateTaskRelations(Project project, Task task1, Task note2, Note note3) {
-//        task1
-//          |
-//           --task2
-//               |
-//                --- task3
-//        note1.addSubNote(note2);
-//        note2.addSubNote(note3);
-//        ResponseEntity<?> updateNoteRelationsResponse = this.restTemplate.exchange(
-//                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
-//                HttpMethod.PUT,
-//                new HttpEntity<>(ImmutableList.of(note1)),
-//                Project.class,
-//                project.getId()
-//        );
-//        assertEquals(HttpStatus.OK, updateNoteRelationsResponse.getStatusCode());
-//
-//        ResponseEntity<Note[]> response = this.restTemplate.exchange(
-//                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
-//                HttpMethod.GET,
-//                null,
-//                Note[].class,
-//                project.getId());
-//        Note[] notes = response.getBody();
-//        assertEquals(1, notes.length);
-//        assertEquals(note1, notes[0]);
-//        assertEquals(1, notes[0].getSubNotes().size());
-//        assertEquals(note2, notes[0].getSubNotes().get(0));
-//        assertEquals(1, notes[0].getSubNotes().get(0).getSubNotes().size());
-//        assertEquals(note3, notes[0].getSubNotes().get(0).getSubNotes().get(0));
+    private void updateTaskRelations(Project project, Task task1, Task task2, Task task3) {
+        //        task1
+        //          |
+        //           --task2
+        //               |
+        //                --- task3
+        task1.addSubTask(task2);
+        task2.addSubTask(task3);
+        ResponseEntity<?> updateTaskRelationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(ImmutableList.of(task1)),
+                Project.class,
+                project.getId()
+        );
+        assertEquals(HttpStatus.OK, updateTaskRelationsResponse.getStatusCode());
+
+        ResponseEntity<Task[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Task[].class,
+                project.getId());
+        Task[] tasks = response.getBody();
+        assertEquals(1, tasks.length);
+        assertEquals(task1, tasks[0]);
+        assertEquals(1, tasks[0].getSubTasks().size());
+        assertEquals(task2, tasks[0].getSubTasks().get(0));
+        assertEquals(1, tasks[0].getSubTasks().get(0).getSubTasks().size());
+        assertEquals(task3, tasks[0].getSubTasks().get(0).getSubTasks().get(0));
     }
 
     private Task createTask(Project project, String taskName) {
@@ -376,6 +394,17 @@ public class ProjectControllerTest {
         assertEquals(dueTime, updated.getDueTime());
         assertEquals(expectedName, updated.getName());
         return updated;
+    }
+
+    private void deleteTask(Task task){
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASK_ROUTE, // this is TASK bc one task?
+                HttpMethod.DELETE,
+                null,
+                Task.class,
+                task.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     private void deleteProject(Project p) {

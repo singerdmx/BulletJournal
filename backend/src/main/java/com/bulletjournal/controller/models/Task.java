@@ -136,6 +136,10 @@ public class Task {
         return reminderSetting;
     }
 
+    public boolean hasReminderSetting() {
+        return reminderSetting != null;
+    }
+
     public void setReminderSetting(ReminderSetting reminderSetting) {
         this.reminderSetting = reminderSetting;
     }
@@ -146,6 +150,10 @@ public class Task {
 
     public void setSubTasks(List<Task> subTasks) {
         this.subTasks = subTasks;
+    }
+
+    public void addSubTask(Task task) {
+        this.subTasks.add(task);
     }
 
     @Override
@@ -176,7 +184,8 @@ public class Task {
         this.setName(task.getName());
         this.setDuration(task.getDuration());
         this.setProjectId(task.getProjectId());
-        if (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate()) {
+        if (task.hasReminderSetting() &&
+                (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate())) {
             this.setReminderSetting(task.getReminderSetting());
         }
     }
