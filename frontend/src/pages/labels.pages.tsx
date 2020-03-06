@@ -1,13 +1,16 @@
 import React from 'react';
-import { Tabs } from 'antd';
+import { Divider, Button } from 'antd';
+import { PlusCircleOutlined } from '@ant-design/icons';
 
 import './pages.style.less';
 
-const { TabPane } = Tabs;
-
 const LablesPage = () => {
   return (
-    <div className='setting'>
+    <div className='labels'>
+        <Button title="Add New Label" type="primary" shape="round" icon={<PlusCircleOutlined />} >
+          New Label
+        </Button>
+        <Divider />
     </div>
   );
 };
