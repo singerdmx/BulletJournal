@@ -103,11 +103,17 @@ class ProjectPage extends React.Component<
               cancelText='No'
               onConfirm={() => console.log('aa')}
               className='group-setting'
+              placement='bottom'
             >
-            <DeleteOutlined
-              title='Delete Project'
-              style={{ fontSize: 20, marginLeft: '10px', cursor: 'pointer', marginBottom: '0.5em' }}
-            />
+              <DeleteOutlined
+                title='Delete Project'
+                style={{
+                  fontSize: 20,
+                  marginLeft: '10px',
+                  cursor: 'pointer',
+                  marginBottom: '0.5em'
+                }}
+              />
             </Popconfirm>
           </div>
         </div>
