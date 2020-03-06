@@ -7,6 +7,8 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveProjectEvent;
 import com.bulletjournal.repository.ProjectDaoJpa;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,11 +18,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
 public class ProjectController {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
     protected static final String PROJECTS_ROUTE = "/api/projects";
     protected static final String PROJECT_ROUTE = "/api/projects/{projectId}";
     protected static final String UPDATE_SHARED_PROJECTS_ORDER_ROUTE = "/api/updateSharedProjectsOrder";
@@ -96,6 +99,8 @@ public class ProjectController {
     public void updateSharedProjectsOrder(
             @Valid @RequestBody UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        LOGGER.info("updateSharedProjectsOrderParams {}",
+                Arrays.toString(updateSharedProjectsOrderParams.getProjectOwners()));
         this.projectDaoJpa.updateSharedProjectsOrder(username, updateSharedProjectsOrderParams);
     }
     @PutMapping(PROJECTS_ROUTE)

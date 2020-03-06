@@ -43,7 +43,6 @@ export const updateSharedProjectsOrder = (projectOwners: string[]) => {
   console.log(postBody);
 
   return doPost('/api/updateSharedProjectsOrder', postBody)
-    .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
     });
