@@ -44,7 +44,7 @@ export const iconMapper = {
   TODO: <CarryOutOutlined />,
   LEDGER: <AccountBookOutlined />,
   NOTE: <FileTextOutlined />
-}
+};
 
 // props of router
 type PathProps = RouteComponentProps;
@@ -57,8 +57,8 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   };
 
   onProjectClick = (projectId: any) => {
-    this.props.history.push(`/projects/${projectId}`)
-  }
+    this.props.history.push(`/projects/${projectId}`);
+  };
 
   // claick handler when clicking on the groups submenu
   onGroupsClick = (menu: any) => {
@@ -69,18 +69,18 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     this.props.updateGroups();
     this.props.updateProjects();
   }
-  
+
   render() {
-    const { groups: groupsByOwner } = this.props;
+    const { groups: groupsByOwner, history } = this.props;
     return (
       <Menu
-        mode="inline"
+        mode='inline'
         defaultOpenKeys={['todo']}
         style={{ height: '100%', fontWeight: 500 }}
         onClick={this.onClick}
       >
         <SubMenu
-          key="bujo"
+          key='bujo'
           title={
             <span>
               <SketchOutlined />
@@ -88,17 +88,17 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             </span>
           }
         >
-          <Menu.Item key="today">
+          <Menu.Item key='today'>
             <BellOutlined />
             Today
           </Menu.Item>
-          <Menu.Item key="calendar">
+          <Menu.Item key='calendar'>
             <CalendarOutlined />
             Calendar
           </Menu.Item>
         </SubMenu>
         <SubMenu
-          key="projects"
+          key='projects'
           title={
             <span>
               <FolderOutlined />
@@ -107,19 +107,18 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           }
           onTitleClick={this.onGroupsClick}
         >
-          <AddProject />
+          <AddProject history={this.props.history} />
           <SubMenu
-            key="ownedProjects"
+            key='ownedProjects'
             title={
               <span>
                 <ProfileOutlined />
                 <span title='BuJo created by me'>Owned BuJo</span>
               </span>
             }
-          >
-          </SubMenu>
+          ></SubMenu>
           <SubMenu
-            key="sharedProjects"
+            key='sharedProjects'
             title={
               <span>
                 <TeamOutlined />
@@ -131,7 +130,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           </SubMenu>
         </SubMenu>
         <SubMenu
-          key="groups"
+          key='groups'
           onTitleClick={this.onGroupsClick}
           title={
             <span>
@@ -140,16 +139,16 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             </span>
           }
         >
-            <AddGroup />
-         
+          <AddGroup />
+
           {groupsByOwner.map((groupsOwner, index) => {
             return groupsOwner.groups.map(group => (
               <Menu.Item key={`group${group.id}`}>
-                <span className="group-title">
+                <span className='group-title'>
                   <span>
-                    <Avatar size="small" src={group.ownerAvatar} />
+                    <Avatar size='small' src={group.ownerAvatar} />
                     <span
-                      className="group-name"
+                      className='group-name'
                       title={`Group "${group.name}" (owner "${group.owner}")`}
                     >
                       {group.name}
@@ -164,11 +163,11 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             ));
           })}
         </SubMenu>
-        <Menu.Item key="labels">
+        <Menu.Item key='labels'>
           <FlagOutlined />
           Labels
         </Menu.Item>
-        <Menu.Item key="settings">
+        <Menu.Item key='settings'>
           <SettingOutlined />
           Settings
         </Menu.Item>

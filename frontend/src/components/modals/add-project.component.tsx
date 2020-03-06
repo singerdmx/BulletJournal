@@ -12,6 +12,9 @@ import { createProjectByName } from '../../features/project/actions';
 import { updateGroups } from '../../features/group/actions';
 import { ProjectType, toProjectType } from '../../features/project/constants';
 import { IState } from '../../store';
+import { Project } from '../../features/project/interfaces';
+import { History } from 'history';
+import { actions as projectActions } from '../../features/project/reducer';
 
 import './modals.styles.less';
 
@@ -20,11 +23,14 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 type ProjectProps = {
+  history: History<History.PoorMansUnknown>;
+  project: Project;
   createProjectByName: (
     description: string,
     groupId: number,
     name: string,
-    projectType: ProjectType
+    projectType: ProjectType,
+    history: History<History.PoorMansUnknown>
   ) => void;
 };
 
@@ -62,10 +68,10 @@ class AddProject extends React.Component<
     this.setState({ isShow: true });
   };
 
-  addProject = () => {
+  addProject = (history: History<History.PoorMansUnknown>) => {
     const { description, groupId, name, projectType } = this.state;
     let type: ProjectType = toProjectType(projectType);
-    this.props.createProjectByName(description, groupId, name, type);
+    this.props.createProjectByName(description, groupId, name, type, history);
     this.setState({
       isShow: false,
       name: '',
@@ -96,7 +102,7 @@ class AddProject extends React.Component<
   };
 
   render() {
-    const { groups: groupsByOwner } = this.props;
+    const { groups: groupsByOwner, history } = this.props;
     return (
       <div className='add-project menu' title='Create New BuJo'>
         <Button onClick={this.showModal} type='dashed' block>
@@ -106,7 +112,19 @@ class AddProject extends React.Component<
           title='Create New BuJo'
           visible={this.state.isShow}
           onCancel={this.onCancel}
-          onOk={this.addProject}
+          onOk={() => this.addProject(history)}
+          footer={[
+            <Button key='cancel' onClick={this.onCancel}>
+              Cancel
+            </Button>,
+            <Button
+              key='create'
+              type='primary'
+              onClick={() => this.addProject(history)}
+            >
+              Create
+            </Button>
+          ]}
         >
           <Form>
             <Form.Item>
@@ -179,7 +197,8 @@ class AddProject extends React.Component<
 }
 
 const mapStateToProps = (state: IState) => ({
-  groups: state.group.groups
+  groups: state.group.groups,
+  project: state.project.project
 });
 
 export default connect(mapStateToProps, { updateGroups, createProjectByName })(

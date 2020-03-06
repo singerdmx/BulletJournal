@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Projects } from './reducer';
 import { updateProjects, createProjectByName } from './actions';
 import { ProjectType } from './constants';
+import { History } from 'history';
 
 type ProjectsProps = {
   projects: Projects;
@@ -12,7 +13,8 @@ type ProjectsProps = {
     description: string,
     groupId: number,
     name: string,
-    projectType: ProjectType
+    projectType: ProjectType,
+    history: History<History.PoorMansUnknown>
   ) => void;
 };
 
@@ -22,20 +24,7 @@ class ProjectList extends React.Component<ProjectsProps> {
   }
 
   render() {
-    return (
-      <div
-        onClick={() =>
-          this.props.createProjectByName(
-            'aaaaaaabbbbbbbb',
-            0,
-            'aaaaas',
-            ProjectType.LEDGER
-          )
-        }
-      >
-        project
-      </div>
-    );
+    return <div>project</div>;
   }
 }
 

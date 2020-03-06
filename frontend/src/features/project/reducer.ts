@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { ProjectType } from './constants';
 import { Project, ProjectsWithOwner } from './interfaces';
+import { History } from 'history';
 
 export type ProjectApiErrorAction = {
   error: string;
@@ -21,6 +22,7 @@ export type ProjectCreateAction = {
   groupId: number;
   name: string;
   projectType: ProjectType;
+  history: History<History.PoorMansUnknown>;
 };
 
 export type UpdateSharedProjectsOrderAction = {

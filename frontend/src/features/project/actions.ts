@@ -1,18 +1,21 @@
 import { actions } from './reducer';
 import { Project } from './interfaces';
 import { ProjectType } from './constants';
+import { History } from 'history';
 export const updateProjects = () => actions.projectsUpdate({});
 export const createProjectByName = (
   description: string,
   groupId: number,
   name: string,
-  projectType: ProjectType
+  projectType: ProjectType,
+  history: History<History.PoorMansUnknown>
 ) =>
   actions.createProject({
     description: description,
     groupId: groupId,
     name: name,
-    projectType: projectType
+    projectType: projectType,
+    history: history
   });
 export const getProject = (projectId: number) =>
   actions.getProject({ projectId: projectId });

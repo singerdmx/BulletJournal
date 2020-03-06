@@ -22,6 +22,7 @@ import {
   updateProjectRelations
 } from '../../apis/projectApis';
 import { IState } from '../../store';
+import { Project } from './interfaces';
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
   yield call(message.error, `Project Error Received: ${action.payload.error}`);
@@ -53,10 +54,9 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
 }
 
 function* addProject(action: PayloadAction<ProjectCreateAction>) {
-  const { description, groupId, name, projectType } = action.payload;
-
+  const { description, groupId, name, projectType, history } = action.payload;
   try {
-    const data = yield call(
+    const data: Project = yield call(
       createProject,
       description,
       groupId,
@@ -64,6 +64,8 @@ function* addProject(action: PayloadAction<ProjectCreateAction>) {
       projectType
     );
     yield put(projectActions.projectReceived({ project: data }));
+    yield put(projectActions.projectsUpdate({}));
+    history.push(`/projects/${data.id}`);
   } catch (error) {
     if (error.message === '400') {
       yield call(message.error, `Project with ${name} already exists`);
@@ -83,7 +85,11 @@ function* updateSharedProjectOwnersOrder(
       projectActions.projectsReceived({
         owned: state.project.owned,
         shared: state.project.shared
-          .slice().sort((p1, p2) => projectOwners.indexOf(p1.owner) - projectOwners.indexOf(p2.owner)),
+          .slice()
+          .sort(
+            (p1, p2) =>
+              projectOwners.indexOf(p1.owner) - projectOwners.indexOf(p2.owner)
+          ),
         ownedProjectsEtag: '',
         sharedProjectsEtag: ''
       })
@@ -99,7 +105,6 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
   try {
     const { projectId } = action.payload;
     const data = yield call(getProject, projectId);
-    console.log(data);
     yield put(projectActions.projectReceived({ project: data }));
   } catch (error) {
     yield call(message.error, `Get Project Error Received: ${error}`);
@@ -110,7 +115,7 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
   try {
     const { projectId, name } = action.payload;
     yield call(deleteProject, projectId);
-    yield put(projectActions.projectsUpdate);
+    yield put(projectActions.projectsUpdate({}));
     yield call(message.success, `Project ${name} deleted`);
   } catch (error) {
     yield call(message.error, `Delete project fail: ${error}`);
@@ -121,7 +126,7 @@ function* patchProject(action: PayloadAction<PatchProjectAction>) {
   try {
     const { projectId, description, groupId, name } = action.payload;
     yield call(updateProject, projectId, description, groupId, name);
-    yield put(projectActions.projectsUpdate);
+    yield put(projectActions.projectsUpdate({}));
     yield call(message.success, 'Successfully updated project');
   } catch (error) {
     yield call(message.error, `update Project Fail: ${error}`);
