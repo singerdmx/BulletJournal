@@ -172,7 +172,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, assignedTo, dueDate, dueTime, timezone, name, projectId);
+        return Objects.hash(id, assignedTo, dueDate, dueTime, timezone, name, projectId, subTasks);
     }
 
     public void clone(Task task) {

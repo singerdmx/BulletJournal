@@ -81,7 +81,7 @@ public class Note {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, projectId);
+        return Objects.hash(id, name, projectId, subNotes );
     }
 
     public void clone(Note note) {
