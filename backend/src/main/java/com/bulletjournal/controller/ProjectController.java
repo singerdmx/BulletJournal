@@ -75,7 +75,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return projectDaoJpa.create(project, username).toPresentationModel();
+        return projectDaoJpa.create(project, username).toVerbosePresentationModel();
     }
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
