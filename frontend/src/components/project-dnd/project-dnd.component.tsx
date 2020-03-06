@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { withRouter, RouteComponentProps } from 'react-router';
-import { connect } from 'react-redux'; 
+import { connect } from 'react-redux';
 
 export const iconMapper = {
   TODO: <CarryOutOutlined />,
@@ -72,61 +72,65 @@ const reorder = (
 
 type ProjectProps = {
   sharedProjects: ProjectsWithOwner[];
-  updateSharedProjectsOrder : (projectOwners : string[]) => void;
+  updateSharedProjectsOrder: (projectOwners: string[]) => void;
 };
 
 class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
   onDragEnd = (result: any) => {
     console.log(result);
     const newOwners = reorder(
-        this.props.sharedProjects,
-        result.source.index,
-        result.destination.index
+      this.props.sharedProjects,
+      result.source.index,
+      result.destination.index
     );
     this.props.updateSharedProjectsOrder(newOwners);
   };
   render() {
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
-        <Droppable droppableId="project-droppable">
-          {(provided, snapshot) => (
-            <div {...provided.droppableProps} ref={provided.innerRef}>
-              {this.props.sharedProjects.map((item, index) => {
-                const treeNode = getTree(
-                  item.projects,
-                  item.owner,
-                  index,
-                  this.props.history
-                );
-                return (
-                  <Draggable
-                    key={`${item.owner}+${item.owner}`}
-                    draggableId={`${item.owner}+${item.owner}`}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <Tree
-                          defaultExpandAll
-                          treeData={treeNode}
-                          selectable={false}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                );
-              })}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <div className="draggable-projects">
+        <DragDropContext onDragEnd={this.onDragEnd}>
+          <Droppable droppableId="project-droppable">
+            {(provided, snapshot) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {this.props.sharedProjects.map((item, index) => {
+                  const treeNode = getTree(
+                    item.projects,
+                    item.owner,
+                    index,
+                    this.props.history
+                  );
+                  return (
+                    <Draggable
+                      key={`${item.owner}+${item.owner}`}
+                      draggableId={`${item.owner}+${item.owner}`}
+                      index={index}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <Tree
+                            defaultExpandAll
+                            treeData={treeNode}
+                            selectable={false}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
     );
   }
 }
 
-export default connect(null, {updateSharedProjectsOrder})(withRouter(ProjectDnd));
+export default connect(null, { updateSharedProjectsOrder })(
+  withRouter(ProjectDnd)
+);

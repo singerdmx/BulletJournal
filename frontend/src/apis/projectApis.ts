@@ -40,6 +40,7 @@ export const updateSharedProjectsOrder = (projectOwners: string[]) => {
   const postBody = JSON.stringify({
     projectOwners: projectOwners
   });
+  console.log(postBody);
 
   return doPost('/api/updateSharedProjectsOrder', postBody)
     .then(res => res.json())
