@@ -71,7 +71,7 @@ class AddProject extends React.Component<
   render() {
     const { groups: groupsByOwner } = this.props;
     return (
-      <div className='add-project' title='Create New BuJo'>
+      <div className='add-project menu' title='Create New BuJo'>
         <Button onClick={this.showModal} type='dashed' block>
           <FolderAddOutlined style={{ fontSize: 20 }} />
         </Button>
