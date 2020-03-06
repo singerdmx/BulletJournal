@@ -1,11 +1,12 @@
 package com.bulletjournal.controller.models;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SystemUpdates {
-    
+
     private String ownedProjectsEtag;
 
     private String sharedProjectsEtag;

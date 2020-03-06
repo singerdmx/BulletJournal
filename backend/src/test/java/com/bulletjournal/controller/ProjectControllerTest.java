@@ -396,7 +396,7 @@ public class ProjectControllerTest {
         return updated;
     }
 
-    private void deleteTask(Task task){
+    private void deleteTask(Task task) {
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE, // this is TASK bc one task?
                 HttpMethod.DELETE,
