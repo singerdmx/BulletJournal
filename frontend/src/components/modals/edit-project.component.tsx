@@ -88,7 +88,7 @@ class EditProject extends React.Component<
   render() {
     const { project, groups: groupsByOwner } = this.props;
     return (
-      <div className='add-project' title='Edit Project'>
+      <div className='edit-project' title='Edit Project'>
         <EditOutlined
           title='Edit Project'
           onClick={this.showModal}
