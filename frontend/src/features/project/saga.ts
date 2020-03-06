@@ -21,6 +21,7 @@ import {
   updateProject,
   updateProjectRelations
 } from '../../apis/projectApis';
+import { IState } from '../../store';
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
   yield call(message.error, `Project Error Received: ${action.payload.error}`);
@@ -78,8 +79,18 @@ function* updateSharedProjectOwnersOrder(
   try {
     const { projectOwners } = action.payload;
     yield call(updateSharedProjectsOrder, projectOwners);
-    // yield put(projectActions.projectsUpdate);
+    const state: IState = yield select();
+    yield put(
+      projectActions.projectsReceived({
+        owned: state.project.owned,
+        shared: state.project.shared
+          .slice().sort((p1, p2) => projectOwners.indexOf(p1.owner) - projectOwners.indexOf(p2.owner)),
+        ownedProjectsEtag: '',
+        sharedProjectsEtag: ''
+      })
+    );
   } catch (error) {
+    console.log(error);
     yield call(message.error, `updateSharedProjectsOrder Fail: ${error}`);
   }
 }
