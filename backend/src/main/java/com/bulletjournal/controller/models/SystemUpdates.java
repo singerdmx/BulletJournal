@@ -5,19 +5,15 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class SystemUpdates {
-
-    @NotBlank
+    
     private String ownedProjectsEtag;
 
-    @NotBlank
     private String sharedProjectsEtag;
 
-    @NotBlank
     private String groupsEtag;
 
-    @NotBlank
     private String notificationsEtag;
-    
+
     private List<Task> reminders;
 
     public String getOwnedProjectsEtag() {
