@@ -34,8 +34,12 @@ type ProjectPageProps = {
   getProject: (projectId: number) => void;
 };
 
+type MyselfProps = {
+  myself: string;
+}
+
 class ProjectPage extends React.Component<
-  ProjectPageProps & ProjectPathProps & GroupProps,
+  ProjectPageProps & ProjectPathProps & GroupProps & MyselfProps,
   ModalState
 > {
   state: ModalState = {
@@ -68,13 +72,36 @@ class ProjectPage extends React.Component<
   };
 
   render() {
-    const { project } = this.props;
+    const { project, myself } = this.props;
 
-    var createContent = null;
-    if(project.projectType===ProjectType.NOTE){
-      createContent = <AddNote />
-    }else{
-      createContent = null
+    let createContent = null;
+    if (project.projectType === ProjectType.NOTE) {
+      createContent = <AddNote />;
+    }
+
+    let editContent = null;
+    let deleteContent = null;
+    if (myself === project.owner) {
+      editContent = <EditProject />;
+      deleteContent = (
+      <Popconfirm
+        title='Are you sure?'
+        okText='Yes'
+        cancelText='No'
+        onConfirm={() => console.log('aa')}
+        className='group-setting'
+        placement='bottom'
+      >
+        <DeleteOutlined
+          title='Delete Project'
+          style={{
+            fontSize: 20,
+            marginLeft: '10px',
+            cursor: 'pointer',
+            marginBottom: '0.5em'
+          }}
+        />
+      </Popconfirm>);
     }
 
     return (
@@ -103,26 +130,8 @@ class ProjectPage extends React.Component<
             </span>
 
             {createContent}
-            <EditProject />
-
-            <Popconfirm
-              title='Are you sure?'
-              okText='Yes'
-              cancelText='No'
-              onConfirm={() => console.log('aa')}
-              className='group-setting'
-              placement='bottom'
-            >
-              <DeleteOutlined
-                title='Delete Project'
-                style={{
-                  fontSize: 20,
-                  marginLeft: '10px',
-                  cursor: 'pointer',
-                  marginBottom: '0.5em'
-                }}
-              />
-            </Popconfirm>
+            {editContent}
+            {deleteContent}
           </div>
           
         </div>
@@ -135,7 +144,8 @@ class ProjectPage extends React.Component<
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
-  groups: state.group.groups
+  groups: state.group.groups,
+  myself: state.myself.username
 });
 
 export default connect(mapStateToProps, { getProject })(ProjectPage);
