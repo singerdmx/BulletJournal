@@ -14,8 +14,14 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findTaskByProject(Project project);
 
-    @Query("SELECT task FROM Task task where (task.startTime >= :startTime AND task.startTime <= :endTime) OR " +
-            "(task.endTime >= :startTime AND task.endTime <= :endTime) AND task.assignedTo = :assignee")
+    List<Task> findTasksByAssignedToAndReminderDateTimeAfterAndStartTimeBefore(String assignedTo,
+                                                                               Timestamp reminderDateTime,
+                                                                               Timestamp dueDateTime);
+
+    @Query("SELECT task FROM Task task where " +
+            "(task.startTime >= :startTime AND task.startTime <= :endTime) OR " +
+            "(task.endTime >= :startTime AND task.endTime <= :endTime) AND " +
+            "task.assignedTo = :assignee")
     List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee,
                                           @Param("startTime") Timestamp startTime,
                                           @Param("endTime") Timestamp endTime);

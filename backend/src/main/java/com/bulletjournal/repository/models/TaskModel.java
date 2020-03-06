@@ -1,12 +1,16 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.utils.IntervalHelper;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 @MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
@@ -44,6 +48,9 @@ public abstract class TaskModel extends ProjectItemModel {
 
     @Column(name = "end_time", nullable = false)
     private Timestamp endTime;
+
+    @Column(name = "reminder_date_time")
+    private Timestamp reminderDateTime;
 
     public Timestamp getStartTime() {
         return startTime;
@@ -137,21 +144,68 @@ public abstract class TaskModel extends ProjectItemModel {
         return this.reminderBeforeTask != null;
     }
 
+    public Timestamp getReminderDateTime() {
+        return reminderDateTime;
+    }
+
+    public void setReminderDateTime(Timestamp reminderDateTime) {
+        this.reminderDateTime = reminderDateTime;
+    }
+
     public void setReminderSetting(ReminderSetting reminderSetting) {
         if (reminderSetting == null) {
             return;
         }
+
         if (reminderSetting.hasBefore()) {
             this.setReminderBeforeTask(reminderSetting.getBefore());
+            this.setReminderDateTime(getReminderDateTime(this.getStartTime(), reminderSetting.getBefore()));
             return;
         }
 
         if (reminderSetting.hasDate()) {
             this.setReminderDate(reminderSetting.getDate());
         }
+
         if (reminderSetting.hasTime()) {
             this.setReminderTime(reminderSetting.getTime());
         }
+
+        if (reminderSetting.hasDate() || reminderSetting.hasTime()) {
+            ZonedDateTime reminderZonedDateTime = IntervalHelper.getStartTime(this.getReminderDate(),
+                    this.getReminderTime(), this.getTimezone());
+            this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
+        }
+    }
+
+    private Timestamp getReminderDateTime(Timestamp startTime, Integer before) {
+        Instant reminderInstant = null;
+        switch (before) {
+            case 0:
+                reminderInstant = startTime.toInstant();
+                break;
+            case 1:
+                reminderInstant = startTime.toInstant().minus(5, ChronoUnit.MINUTES);
+                break;
+            case 2:
+                reminderInstant = startTime.toInstant().minus(10, ChronoUnit.MINUTES);
+                break;
+            case 3:
+                reminderInstant = startTime.toInstant().minus(30, ChronoUnit.MINUTES);
+                break;
+            case 4:
+                reminderInstant = startTime.toInstant().minus(1, ChronoUnit.HOURS);
+                break;
+            case 5:
+                reminderInstant = startTime.toInstant().minus(2, ChronoUnit.HOURS);
+                break;
+            case 6:
+                reminderInstant = Instant.MAX;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        return Timestamp.from(reminderInstant);
     }
 
     public com.bulletjournal.controller.models.Task toPresentationModel() {

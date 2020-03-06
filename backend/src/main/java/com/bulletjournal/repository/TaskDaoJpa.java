@@ -45,6 +45,9 @@ public class TaskDaoJpa {
     @Autowired
     private CompletedTaskRepository completedTaskRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId) {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
@@ -65,11 +68,43 @@ public class TaskDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
     }
 
-    public List<com.bulletjournal.controller.models.Task> getTasksBetween(String user, ZonedDateTime startTime, ZonedDateTime endTime) {
-        return this.taskRepository.findTasksOfAssigneeBetween(user,
+    /*
+     * Get reminding tasks from database.
+     *
+     * Reminding tasks qualifications:
+     * 1. Reminding Time is before current time.
+     * 2. Starting time is after the current time.
+     *
+     * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks to be reminded
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Task> getRemindingTask(String assignee, ZonedDateTime now) {
+        List<User> user = this.userRepository.findByName(assignee);
+        if (user.size() == 0)
+            throw new ResourceNotFoundException("Assignee " + assignee + " not found");
+
+        Timestamp currentTime = Timestamp.from(now.toInstant());
+        return this.taskRepository
+                .findTasksByAssignedToAndReminderDateTimeAfterAndStartTimeBefore(assignee, currentTime, currentTime)
+                .stream()
+                .map(TaskModel::toPresentationModel)
+                .collect(Collectors.toList());
+    }
+
+    /*
+     * Get user's tasks between the request start time and request end time.
+     *
+     * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<User> user = this.userRepository.findByName(assignee);
+        if (user.size() == 0)
+            throw new ResourceNotFoundException("Assignee " + assignee + " not found");
+
+        return this.taskRepository.findTasksOfAssigneeBetween(assignee,
                 Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
                 .stream().map(Task::toPresentationModel).collect(Collectors.toList());
-
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

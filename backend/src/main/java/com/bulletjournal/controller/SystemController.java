@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.Group;
 import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.models.Projects;
@@ -9,6 +10,7 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
+import com.bulletjournal.repository.TaskDaoJpa;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +38,9 @@ public class SystemController {
     @Autowired
     private GroupDaoJpa groupDaoJpa;
 
+    @Autowired
+    private TaskDaoJpa taskDaoJpa;
+
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -46,6 +52,8 @@ public class SystemController {
         String sharedProjectsEtag = null;
         String notificationsEtag = null;
         String groupsEtag = null;
+        List<Task> remindingTasks = null;
+
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
             Projects projects = this.projectDaoJpa.getProjects(username);
             ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -67,12 +75,16 @@ public class SystemController {
                     EtagGenerator.HashType.TO_HASHCODE,
                     groupList);
         }
+        if (targetEtags == null || targetEtags.contains("taskReminders")) {
+            remindingTasks = this.taskDaoJpa.getRemindingTask(username, ZonedDateTime.now());
+        }
 
         SystemUpdates systemUpdates = new SystemUpdates();
         systemUpdates.setOwnedProjectsEtag(ownedProjectsEtag);
         systemUpdates.setSharedProjectsEtag(sharedProjectsEtag);
         systemUpdates.setNotificationsEtag(notificationsEtag);
         systemUpdates.setGroupsEtag(groupsEtag);
+        systemUpdates.setReminders(remindingTasks);
         return systemUpdates;
     }
 }
