@@ -37,7 +37,7 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
 function* noteCreate(action: PayloadAction<CreateNote>) {
     try {
       const data = yield call(createNote, action.payload.projectId, action.payload.name);
-      const note = yield data.json();
+      // const note = yield data.json();
       yield put(updateNotes(action.payload.projectId));
     } catch (error) {
       yield call(message.error, `Note Error Received: ${error}`);

@@ -9,6 +9,7 @@ import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
 import EditProject from '../components/modals/edit-project.component';
+import AddNote from '../components/modals/add-note.component';
 
 type ProjectPathParams = {
   projectId: string;
@@ -93,6 +94,7 @@ class ProjectPage extends React.Component<
               </h2>
             </span>
 
+            <AddNote />
             <EditProject />
 
             <Popconfirm
@@ -102,10 +104,10 @@ class ProjectPage extends React.Component<
               onConfirm={() => console.log('aa')}
               className='group-setting'
             >
-              <DeleteOutlined
-                title='Delete Project'
-                style={{ fontSize: 20, marginLeft: '10px', cursor: 'pointer', marginBottom: '0.5em' }}
-              />
+            <DeleteOutlined
+              title='Delete Project'
+              style={{ fontSize: 20, marginLeft: '10px', cursor: 'pointer', marginBottom: '0.5em' }}
+            />
             </Popconfirm>
           </div>
         </div>
