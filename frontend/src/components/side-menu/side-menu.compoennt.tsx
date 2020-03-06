@@ -18,15 +18,14 @@ import {
 
 import AddGroup from '../../components/modals/add-group.component';
 import AddProject from '../../components/modals/add-project.component';
-import { Menu, Avatar, Tree } from 'antd';
+import ProjectDnd from '../../components/project-dnd/project-dnd.component';
+import { Menu, Avatar } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
-import { TreeNodeNormal } from 'antd/lib/tree/Tree';
-import { History } from 'history';
 
 const { SubMenu } = Menu;
 //props of groups
@@ -47,27 +46,6 @@ export const iconMapper = {
   NOTE: <FileTextOutlined />
 }
 
-//dfs tree data
-var loop = (data: Project[], owner: string, index: number, history: History<History.PoorMansUnknown>): TreeNodeNormal[] => {
-    let res = [] as TreeNodeNormal[];
-    data.forEach((item: Project) => {
-      const node = {} as TreeNodeNormal;
-      if (item.subProjects && item.subProjects.length) {
-        node.children = loop(item.subProjects, owner, index, history);
-      } else {
-        node.children = [] as TreeNodeNormal[];
-      }
-      if (item.owner) {
-        node.title = (<span onClick={(e)=>history.push(`/projects/${item.id}`)} title={'Owner: '+item.owner}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
-      } else {
-        node.title = (<span title='Not Shared' style={{color: '#e0e0eb', cursor: 'default'}}>{iconMapper[item.projectType]}&nbsp;{item.name}</span>);
-      }
-      node.key = item.id.toString();
-      res.push(node);
-    });
-    return res;
-}
-
 // props of router
 type PathProps = RouteComponentProps;
 // class compoennt
@@ -82,7 +60,6 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     this.props.history.push(`/projects/${projectId}`)
   }
 
-
   // claick handler when clicking on the groups submenu
   onGroupsClick = (menu: any) => {
     this.props.history.push(`/${menu.key}`);
@@ -92,8 +69,9 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     this.props.updateGroups();
     this.props.updateProjects();
   }
+  
   render() {
-    const { groups: groupsByOwner, ownProjects, sharedProjects } = this.props;
+    const { groups: groupsByOwner } = this.props;
     return (
       <Menu
         mode="inline"
@@ -149,14 +127,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               </span>
             }
           >
-            {sharedProjects.map((item, index) => {
-              var treeNode = loop(item.projects, item.owner, index, this.props.history);
-              return (
-                <div style={{ marginLeft: '20%'}} key={'sharedProject' + item.owner + index}>
-                  <Tree defaultExpandAll treeData={treeNode} selectable={false}/>
-                </div>
-              );
-            })}
+            <ProjectDnd sharedProjects={this.props.sharedProjects} />
           </SubMenu>
         </SubMenu>
         <SubMenu

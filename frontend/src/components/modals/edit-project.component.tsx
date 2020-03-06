@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Form, Button, Select, Avatar } from 'antd';
+import { Modal, Input, Form, Select, Avatar } from 'antd';
 import {
   EditOutlined,
   CarryOutOutlined,
@@ -8,9 +8,7 @@ import {
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interfaces';
-import { getProject } from '../../features/project/actions';
 import { updateGroups } from '../../features/group/actions';
-import { ProjectType } from '../../features/project/constants';
 import { IState } from '../../store';
 
 import './modals.styles.less';
@@ -93,7 +91,7 @@ class EditProject extends React.Component<
                 <TextArea placeholder='Enter Description' autoSize />
                 <div style={{ margin: '24px 0' }} />
                 <Select placeholder='Choose Group' style={{ width: '100%' }}>
-                  {groupsByOwner.map((groupsOwner, index) => {
+                  {groupsByOwner.map((groupsOwner) => {
                     return groupsOwner.groups.map(group => (
                       <Option
                         key={`group${group.id}`}

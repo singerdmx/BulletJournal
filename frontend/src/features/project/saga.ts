@@ -78,6 +78,7 @@ function* updateSharedProjectOwnersOrder(
   try {
     const { projectOwners } = action.payload;
     yield call(updateSharedProjectsOrder, projectOwners);
+    yield put(projectActions.projectsUpdate);
     yield call(
       message.success,
       'Successfully updated SharedProjectOwnersOrder'

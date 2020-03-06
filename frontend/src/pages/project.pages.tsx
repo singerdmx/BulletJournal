@@ -4,7 +4,7 @@ import { Project } from '../features/project/interfaces';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../features/group/interfaces';
-import { Avatar, Input, Select, Popconfirm } from 'antd';
+import { Avatar, Popconfirm } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -66,7 +66,6 @@ class ProjectPage extends React.Component<
   };
 
   render() {
-    const { groups: groupsByOwner } = this.props;
     const { project } = this.props;
 
     return (
