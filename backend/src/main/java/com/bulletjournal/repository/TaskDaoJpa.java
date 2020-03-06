@@ -131,7 +131,16 @@ public class TaskDaoJpa {
         task.setEndTime(Timestamp.from(IntervalHelper.getEndTime(createTaskParams.getDueDate(),
                 createTaskParams.getDueTime(),
                 createTaskParams.getTimezone()).toInstant()));
-        return this.taskRepository.save(task);
+        task = this.taskRepository.save(task);
+
+        Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
+        final ProjectTasks projectTasks = projectTasksOptional.orElseGet(ProjectTasks::new);
+
+        String newRelations = HierarchyProcessor.addItem(projectTasks.getTasks(), task.getId());
+        projectTasks.setProjectId(projectId);
+        projectTasks.setTasks(newRelations);
+        this.projectTasksRepository.save(projectTasks);
+        return task;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
