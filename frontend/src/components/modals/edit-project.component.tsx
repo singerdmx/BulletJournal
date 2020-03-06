@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
+import { Project } from '../../features/project/interfaces';
+import { iconMapper } from '../../components/side-menu/side-menu.compoennt';
 
 import './modals.styles.less';
 
@@ -17,7 +19,9 @@ const InputGroup = Input.Group;
 const { TextArea } = Input;
 const { Option } = Select;
 
-type ProjectProps = {};
+type ProjectProps = {
+  project: Project;
+};
 
 //props of groups
 type GroupProps = {
@@ -27,6 +31,9 @@ type GroupProps = {
 
 type ModalState = {
   isShow: boolean;
+  name: string;
+  description: string;
+  group_id: number;
 };
 
 class EditProject extends React.Component<
@@ -38,11 +45,24 @@ class EditProject extends React.Component<
   }
 
   state: ModalState = {
-    isShow: false
+    isShow: false,
+    name: this.props.project.name,
+    description: this.props.project.description,
+    group_id:
+      this.props.project && this.props.project.group
+        ? this.props.project.group.id
+        : 0
   };
 
   showModal = () => {
-    this.setState({ isShow: true });
+    const { name, description, group } = this.props.project;
+    const group_id = group.id;
+    this.setState({
+      isShow: true,
+      name: name,
+      description: description,
+      group_id: group_id
+    });
   };
 
   updateProject = () => {
@@ -53,8 +73,20 @@ class EditProject extends React.Component<
     this.setState({ isShow: false });
   };
 
+  onChangeName = (name: string) => {
+    this.setState({ name: name });
+  };
+
+  onChangeDescription = (description: string) => {
+    this.setState({ description: description });
+  };
+
+  onChangeGroupId = (group_id: number) => {
+    this.setState({ group_id: group_id });
+  };
+
   render() {
-    const { groups: groupsByOwner } = this.props;
+    const { project, groups: groupsByOwner } = this.props;
     return (
       <div className='add-project' title='Edit Project'>
         <EditOutlined
@@ -72,26 +104,34 @@ class EditProject extends React.Component<
           <Form>
             <Form.Item>
               <InputGroup compact>
-                <Select placeholder='Choose Project Type'>
-                  <Option value='TODO' title='Project Type: TODO'>
-                    <CarryOutOutlined />
-                    &nbsp;TODO
-                  </Option>
-                  <Option value='NOTE' title='Project Type: NOTE'>
-                    <FileTextOutlined />
-                    &nbsp;NOTE
-                  </Option>
-                  <Option value='LEDGER' title='Project Type: LEDGER'>
-                    <AccountBookOutlined />
-                    &nbsp;LEDGER
-                  </Option>
-                </Select>
-                <Input style={{ width: '60%' }} placeholder='Enter BuJo Name' />
+                <div style={{ alignItems: 'center', width: '100%' }}>
+                  <span title={`${project.projectType}`}>
+                    <strong>{iconMapper[project.projectType]}</strong>
+                  </span>
+                  <Input
+                    style={{ width: '90%', marginLeft: '20px' }}
+                    placeholder='Enter BuJo Name'
+                    value={this.state.name}
+                    onChange={e => this.onChangeName(e.target.value)}
+                  />
+                </div>
+
                 <div style={{ margin: '24px 0' }} />
-                <TextArea placeholder='Enter Description' autoSize />
+                <TextArea
+                  placeholder='Enter Description'
+                  autoSize
+                  value={this.state.description}
+                  onChange={e => this.onChangeDescription(e.target.value)}
+                />
+
                 <div style={{ margin: '24px 0' }} />
-                <Select placeholder='Choose Group' style={{ width: '100%' }}>
-                  {groupsByOwner.map((groupsOwner) => {
+                <Select
+                  placeholder='Choose Group'
+                  style={{ width: '100%' }}
+                  value={this.state.group_id}
+                  onChange={value => this.onChangeGroupId(value)}
+                >
+                  {groupsByOwner.map(groupsOwner => {
                     return groupsOwner.groups.map(group => (
                       <Option
                         key={`group${group.id}`}
