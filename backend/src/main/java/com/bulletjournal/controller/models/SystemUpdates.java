@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class SystemUpdates {
@@ -16,8 +17,7 @@ public class SystemUpdates {
 
     @NotBlank
     private String notificationsEtag;
-
-    @NotBlank
+    
     private List<Task> reminders;
 
     public String getOwnedProjectsEtag() {
