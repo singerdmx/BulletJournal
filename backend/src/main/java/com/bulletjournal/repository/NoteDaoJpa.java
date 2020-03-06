@@ -66,7 +66,14 @@ public class NoteDaoJpa {
         note.setProject(project);
         note.setOwner(owner);
         note.setName(createNoteParams.getName());
-        return this.noteRepository.save(note);
+        note = this.noteRepository.save(note);
+        Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
+        final ProjectNotes projectNotes = projectNotesOptional.isPresent() ?
+                projectNotesOptional.get() : new ProjectNotes();
+        String newRelations = HierarchyProcessor.addItem(projectNotes.getNotes(), note.getId());
+        projectNotes.setNotes(newRelations);
+        projectNotes.setProjectId(projectId);
+        return note;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
