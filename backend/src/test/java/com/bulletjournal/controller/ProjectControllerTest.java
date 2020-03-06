@@ -322,7 +322,7 @@ public class ProjectControllerTest {
                 project.getId());
         String etag3 = tasksResponse.getHeaders().getETag();
         tasks = Arrays.asList(tasksResponse.getBody());
-        // assertNotEquals(etag1, etag3);
+        assertNotEquals(etag1, etag3);
 
         assertEquals(1, tasks.size());
         assertEquals(t1, tasks.get(0));
