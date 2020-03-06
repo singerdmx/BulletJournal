@@ -38,7 +38,6 @@ class AddNote extends React.Component<NoteProps & RouteComponentProps, ModalStat
   };
   
   render() {
-    console.log("AddNote -> addNote -> this.props.projectId", this.props.projectId)
     return (
       <div className="add-note" title='Create New Note'>
         <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Note' />

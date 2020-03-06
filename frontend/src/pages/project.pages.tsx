@@ -10,6 +10,7 @@ import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
 import EditProject from '../components/modals/edit-project.component';
 import AddNote from '../components/modals/add-note.component';
+import { ProjectType } from '../features/project/constants';
 
 type ProjectPathParams = {
   projectId: string;
@@ -69,6 +70,13 @@ class ProjectPage extends React.Component<
   render() {
     const { project } = this.props;
 
+    var createContent = null;
+    if(project.projectType===ProjectType.NOTE){
+      createContent = <AddNote />
+    }else{
+      createContent = null
+    }
+
     return (
       <div className='project'>
         <div className='project-header'>
@@ -94,7 +102,7 @@ class ProjectPage extends React.Component<
               </h2>
             </span>
 
-            <AddNote />
+            {createContent}
             <EditProject />
 
             <Popconfirm
@@ -116,7 +124,9 @@ class ProjectPage extends React.Component<
               />
             </Popconfirm>
           </div>
+          
         </div>
+        <div className='project-content'></div>
         <div>{project.description}</div>
       </div>
     );
