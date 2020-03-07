@@ -11,6 +11,8 @@ type TaskProps = {
   data: string[];
   updateExpandedMyself: (updateSettings: boolean) => void;
   timezone: string;
+  startDate: string;
+  endDate: string;
 };
 
 class TaskList extends React.Component<TaskProps> {
@@ -19,24 +21,31 @@ class TaskList extends React.Component<TaskProps> {
   }
 
   render() {
-    const dateFormat = 'YYYY-MM-DD';
+    const dateFormat = 'MM-DD-YYYY';
 
     const { RangePicker } = DatePicker;
     return (
       <div className='todo-list'>
         <div className='todo-panel'>
           <RangePicker
-            defaultValue={[
-              moment('2015-01-01', dateFormat),
-              moment('2015-01-01', dateFormat)
+            value={[
+              moment(
+                this.props.startDate
+                  ? this.props.startDate
+                  : new Date().toLocaleString(),
+                dateFormat
+              ),
+              moment(
+                this.props.endDate
+                  ? this.props.endDate
+                  : new Date().toLocaleString(),
+                dateFormat
+              )
             ]}
             format={dateFormat}
           />
-          <Tooltip placement="top" title='Change Time Zone'>
-            <Link
-              to='/settings'
-              style={{ paddingLeft: '30px' }}
-            >
+          <Tooltip placement='top' title='Change Time Zone'>
+            <Link to='/settings' style={{ paddingLeft: '30px' }}>
               {this.props.timezone}
             </Link>
           </Tooltip>
@@ -52,7 +61,9 @@ class TaskList extends React.Component<TaskProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  timezone: state.myself.timezone
+  timezone: state.myself.timezone,
+  startDate: state.myBuJo.startDate,
+  endDate: state.myBuJo.endDate
 });
 
 export default connect(mapStateToProps, {

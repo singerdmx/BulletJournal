@@ -20,10 +20,8 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
     return (
       <div className='bujo-calendar'>
         <div className='timezone-container'>
-          <Tooltip placement="top" title='Change Time Zone'>
-            <Link to='/settings'>
-              {this.props.timezone}
-            </Link>
+          <Tooltip placement='top' title='Change Time Zone'>
+            <Link to='/settings'>{this.props.timezone}</Link>
           </Tooltip>
         </div>
         <Calendar />

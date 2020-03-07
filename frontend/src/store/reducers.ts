@@ -7,6 +7,7 @@ import { reducer as userReducer } from '../features/user/reducer';
 import { reducer as settingsReducer } from '../components/settings/reducer';
 import { reducer as noteReducer } from '../features/notes/reducer';
 import { reducer as labelReducer } from '../features/label/reducer';
+import { reducer as myBuJoReducer } from '../features/myBuJo/reducer';
 
 export default {
   settings: settingsReducer,
@@ -17,5 +18,6 @@ export default {
   system: systemReducer,
   user: userReducer,
   note: noteReducer,
-  label: labelReducer
+  label: labelReducer,
+  myBuJo: myBuJoReducer
 };

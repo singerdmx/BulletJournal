@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as myselfActions,
@@ -7,7 +7,9 @@ import {
   PatchMyself,
   UpdateExpandedMyself
 } from './reducer';
+import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
+import { updateMyBuJoDates } from '../../features/myBuJo/actions';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself } from '../../apis/myselfApis';
 
@@ -20,6 +22,9 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
     const { updateSettings } = action.payload;
 
     const data = yield call(fetchMyself, true);
+    let currentTime = new Date().toLocaleString('en-US', {
+      timeZone: data.timezone
+    });
 
     yield put(
       myselfActions.myselfDataReceived({
@@ -30,6 +35,11 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
         currency: data.currency
       })
     );
+    const state: IState = yield select();
+    if (!state.myBuJo.startDate) {
+      yield put(updateMyBuJoDates(currentTime, currentTime));
+    }
+
     if (updateSettings) {
       yield put(settingsActions.updateTimezone({ timezone: data.timezone }));
       yield put(
@@ -61,6 +71,9 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
   try {
     const { timezone, before, currency } = action.payload;
     yield call(patchMyself, timezone, before, currency);
+    let currentTime = new Date().toLocaleString('en-US', {
+      timeZone: timezone
+    });
     yield put(
       myselfActions.myselfDataReceived({
         timezone: timezone,
@@ -68,6 +81,7 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
         currency: currency
       })
     );
+    yield put(updateMyBuJoDates(currentTime, currentTime));
     yield call(message.success, 'User Settings updated successfully');
   } catch (error) {
     yield call(message.error, `Myself Patch Error Received: ${error}`);
