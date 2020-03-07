@@ -16,7 +16,8 @@ export default () => {
   const middleware = [loggerMiddleware, sagaMiddleware]
   const middlewares = applyMiddleware(...middleware);
   const store = createStore(reducer, composeEnhancers(middlewares));
-
+  //enable access to store from window
+  (window as any).store = store;
   sagaMiddleware.run(sagas);
 
   return store;
