@@ -81,7 +81,8 @@ public class ProjectController {
     public Project updateProject(@NotNull @PathVariable Long projectId,
                                  @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams).toPresentationModel();
+        this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams);
+        return getProject(projectId);
     }
 
     /**
