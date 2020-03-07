@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { IState } from '../store/index';
-import { Divider, Tag, Collapse, Tooltip } from 'antd';
+import { Tag, Collapse, Button, AutoComplete, Tooltip } from 'antd';
 import AddLabel from '../components/modals/add-label.component';
 import { Label, stringToRGB } from '../features/label/interfaces'
 import { labelsUpdate, deleteLabel } from '../features/label/actions';
-import { TagOutlined } from '@ant-design/icons';
+import { TagOutlined, SearchOutlined } from '@ant-design/icons';
 import { TweenOneGroup } from 'rc-tween-one';
 
 import './pages.style.less';
@@ -19,12 +19,16 @@ type LabelsProps = {
 }
 
 class LablesPage extends React.Component<LabelsProps> {
+
   componentDidMount() {
     this.props.labelsUpdate();
   }
 
   handleClose = (removedLabel: Label) => {
     this.props.deleteLabel(removedLabel.id, removedLabel.name);
+  };
+
+  handleClickSearch = (e: any) => {
   };
 
   forMap = (label: Label) => {
@@ -53,8 +57,10 @@ class LablesPage extends React.Component<LabelsProps> {
     return (
       <div className='labels'>
           <AddLabel />
-          <Divider />
-          <Collapse defaultActiveKey={['availableLabels']}>
+          <Tooltip title="search">
+            <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={this.handleClickSearch} />
+          </Tooltip>
+          <Collapse defaultActiveKey={'availableLabels'}>
             <Panel header='' key="availableLabels">
               <div>
                 <TweenOneGroup
