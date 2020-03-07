@@ -45,7 +45,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
     if (this.props.ownedProjects.length === 0) {
       plusIcon = <AddProject history={this.props.history} mode={'complex'}/>
     } else {
-      plusIcon = <AddProjectItem history={this.props.history} mode={'complex'}/>
+      plusIcon = <AddProjectItem />
     }
     return (
       <div className='myselfContainer'>
