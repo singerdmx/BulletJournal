@@ -21,8 +21,7 @@ const AddLabel: React.FC<RouteComponentProps & LabelCreateFormProps> = (props) =
   const openModal = () => setVisible(true);
 
     return (
-    <Tooltip placement="top" title='Create New Label'>
-      <div className="add-label" >
+      <Tooltip placement="top" title='Create New Label'>
           <Button type="primary" shape="round" icon={<PlusCircleOutlined />} onClick={openModal}>
             New Label
           </Button>
@@ -53,8 +52,7 @@ const AddLabel: React.FC<RouteComponentProps & LabelCreateFormProps> = (props) =
               </Form.Item>
           </Form>
         </Modal>
-      </div>
-    </Tooltip>
+      </Tooltip>
     );
 }
 

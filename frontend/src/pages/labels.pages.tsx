@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { IState } from '../store/index';
-import { Divider, Tag, Collapse, Tooltip } from 'antd';
+import { Tag, Collapse, Button, AutoComplete, Tooltip } from 'antd';
 import AddLabel from '../components/modals/add-label.component';
 import { Label, stringToRGB } from '../features/label/interfaces'
 import { labelsUpdate, deleteLabel } from '../features/label/actions';
-import { TagOutlined } from '@ant-design/icons';
+import { TagOutlined, SearchOutlined } from '@ant-design/icons';
 import { TweenOneGroup } from 'rc-tween-one';
 
 import './pages.style.less';
@@ -19,12 +19,16 @@ type LabelsProps = {
 }
 
 class LablesPage extends React.Component<LabelsProps> {
+
   componentDidMount() {
     this.props.labelsUpdate();
   }
 
   handleClose = (removedLabel: Label) => {
-    this.props.deleteLabel(removedLabel.id, removedLabel.name);
+    this.props.deleteLabel(removedLabel.id, removedLabel.value);
+  };
+
+  handleClickSearch = (e: any) => {
   };
 
   forMap = (label: Label) => {
@@ -32,17 +36,17 @@ class LablesPage extends React.Component<LabelsProps> {
       <Tag
         className='label'
         closable
-        color={stringToRGB(label.name)}
+        color={stringToRGB(label.value)}
         onClose={(e: any)  => {
           e.preventDefault();
           this.handleClose(label);
         }}
       >
-        <TagOutlined/ > &nbsp; {label.name}
+        <TagOutlined/ > &nbsp; {label.value}
       </Tag>
     );
     return (
-      <span key={label.name} style={{ display: 'inline-block' }}>
+      <span key={label.value} style={{ display: 'inline-block' }}>
         {tagElem}
       </span>
     );
@@ -53,8 +57,16 @@ class LablesPage extends React.Component<LabelsProps> {
     return (
       <div className='labels'>
           <AddLabel />
-          <Divider />
-          <Collapse defaultActiveKey={['availableLabels']}>
+          <Tooltip title="search">
+            <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={this.handleClickSearch} />
+          </Tooltip>
+          <AutoComplete
+            style={{ width: 200 }}
+            options={this.props.labels}
+            placeholder="Enter Label"
+            filterOption={(inputValue: string, option: any) => option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+          />
+          <Collapse defaultActiveKey={'availableLabels'}>
             <Panel header='' key="availableLabels">
               <div>
                 <TweenOneGroup
