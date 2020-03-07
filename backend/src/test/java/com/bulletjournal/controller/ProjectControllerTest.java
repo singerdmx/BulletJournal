@@ -293,7 +293,7 @@ public class ProjectControllerTest {
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
         updateTaskRelations(project, t1, t2, t3);
-        t1 = updateTask(t1, expectedOwner, "2020-02-28", null, null, null, t1.getName());
+        t1 = updateTask(t1, expectedOwner, "2020-02-27", null, null, null, t1.getName());
 
         // Get Tasks
         ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
