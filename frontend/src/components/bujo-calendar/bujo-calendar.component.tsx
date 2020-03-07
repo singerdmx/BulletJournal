@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar } from 'antd';
+import { Calendar, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
@@ -20,9 +20,11 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
     return (
       <div className='bujo-calendar'>
         <div className='timezone-container'>
-          <Link to='/settings' title='Change Time Zone'>
-            {this.props.timezone}
-          </Link>
+          <Tooltip placement="top" title='Change Time Zone'>
+            <Link to='/settings'>
+              {this.props.timezone}
+            </Link>
+          </Tooltip>
         </div>
         <Calendar />
       </div>
