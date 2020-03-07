@@ -13,7 +13,7 @@ const { Content } = Layout;
 class ContentLayout extends React.Component {
   render() {
     return (
-      <Content>
+      <Content className="content">
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route exact path="/bujo/:category" component={BujoPage} />
