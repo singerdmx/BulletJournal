@@ -73,6 +73,7 @@ public class NoteDaoJpa {
         String newRelations = HierarchyProcessor.addItem(projectNotes.getNotes(), note.getId());
         projectNotes.setNotes(newRelations);
         projectNotes.setProjectId(projectId);
+        projectNotesRepository.save(projectNotes);
         return note;
     }
 
