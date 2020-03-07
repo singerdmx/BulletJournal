@@ -111,7 +111,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
             renderItem={item => {
               return (
                 <List.Item key={item.id}>
-                  <Tooltip placement="top" title={getGroupUserTitle(item, group)}>
+                  <Tooltip placement="right" title={getGroupUserTitle(item, group)}>
                   <div
                     className="group-user"
                   >
@@ -123,7 +123,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
                   </Tooltip>
                   {item.name !== group.owner &&
                     group.owner === this.props.myself.username && (
-                      <Tooltip placement="top" title={item.accepted ? 'Remove' : 'Cancel Invitation'}>
+                      <Tooltip placement="right" title={item.accepted ? 'Remove' : 'Cancel Invitation'}>
                         <Button
                           type="link"
                           size="small"

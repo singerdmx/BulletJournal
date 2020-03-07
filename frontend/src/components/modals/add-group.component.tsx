@@ -38,7 +38,7 @@ class AddGroup extends React.Component<GroupProps & RouteComponentProps, ModalSt
 
   render() {
     return (
-      <Tooltip placement="top" title='Create New Group'>
+      <Tooltip placement="right" title='Create New Group'>
         <div className="add-group">
           <Button onClick={this.showModal} type="dashed" block>
             <UsergroupAddOutlined style={{ fontSize: 20 }} />
