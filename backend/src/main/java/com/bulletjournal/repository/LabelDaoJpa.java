@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Repository
 public class LabelDaoJpa {
@@ -71,7 +72,10 @@ public class LabelDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Label> getLabels(String owner) {
-        List<Label> labels = this.labelRepository.findByOwner(owner);
+        List<Label> labels = this.labelRepository.findByOwner(owner)
+                .stream()
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                .collect(Collectors.toList());
         return labels;
     }
 
