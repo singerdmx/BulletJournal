@@ -7,6 +7,8 @@ import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component
 import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
 import AddProject from '../../components/modals/add-project.component';
+import AddProjectItem from '../../components/modals/add-project-item.component';
+import { Project } from '../../features/project/interfaces';
 import { updateMyself, updateExpandedMyself } from './actions';
 import { updateGroups, groupUpdate } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
@@ -16,6 +18,7 @@ import './myself.styles.less';
 type MyselfProps = {
   username: string;
   avatar: string;
+  ownedProjects: Project[];
   updateMyself: () => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateGroups: () => void;
@@ -38,7 +41,12 @@ class Myself extends React.Component<MyselfProps & PathProps> {
   };
 
   render() {
-    let plusIcon = <AddProject history={this.props.history} mode={'complex'}/>
+    let plusIcon = null;
+    if (this.props.ownedProjects.length === 0) {
+      plusIcon = <AddProject history={this.props.history} mode={'complex'}/>
+    } else {
+      plusIcon = <AddProjectItem history={this.props.history} mode={'complex'}/>
+    }
     return (
       <div className='myselfContainer'>
         {plusIcon}
@@ -74,6 +82,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
 const mapStateToProps = (state: IState) => ({
   username: state.myself.username,
   avatar: state.myself.avatar,
+  ownedProjects: state.project.owned
 });
 
 export default connect(mapStateToProps, {
