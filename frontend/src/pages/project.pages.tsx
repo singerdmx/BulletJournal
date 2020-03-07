@@ -10,6 +10,8 @@ import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
 import EditProject from '../components/modals/edit-project.component';
 import AddNote from '../components/modals/add-note.component';
+import AddTask from '../components/modals/add-task.component';
+import AddTransaction from '../components/modals/add-transaction.component';
 import { ProjectType } from '../features/project/constants';
 
 type ProjectPathParams = {
@@ -75,8 +77,15 @@ class ProjectPage extends React.Component<
     const { project, myself } = this.props;
 
     let createContent = null;
-    if (project.projectType === ProjectType.NOTE) {
-      createContent = <AddNote />;
+    switch (project.projectType) {
+      case ProjectType.NOTE:
+        createContent = <AddNote />;
+        break;
+      case ProjectType.TODO:
+        createContent = <AddTask />;
+        break;
+      case ProjectType.LEDGER:
+        createContent = <AddTransaction />
     }
 
     let editContent = null;
