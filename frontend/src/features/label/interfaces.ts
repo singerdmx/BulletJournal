@@ -1,6 +1,6 @@
 export interface Label {
   id: number;
-  name: string;
+  value: string;
 }
 
 export function stringToRGB(str: string) {

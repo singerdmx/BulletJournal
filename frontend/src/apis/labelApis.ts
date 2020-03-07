@@ -8,9 +8,9 @@ export const fetchLabels = () => {
     });
 };
 
-export const addLabel = (name: string) => {
+export const addLabel = (value: string) => {
     const postBody = JSON.stringify({
-      name: name
+      value: value
     });
     return doPost('/api/labels', postBody)
       .then(res => res.json())
@@ -25,9 +25,9 @@ export const deleteLabel = (labelId: number) => {
     });
 };
 
-export const updateLabel = (labelId: number, name: string) => {
+export const updateLabel = (labelId: number, value: string) => {
     const patchBody = JSON.stringify({
-      name: name
+      value: value
     });
 
     return doPatch(`/api/labels/${labelId}`, patchBody)

@@ -1,8 +1,8 @@
 import { actions } from './reducer';
-export const createLabel = (name: string) =>
-  actions.createLabel({ name: name });
-export const deleteLabel = (labelId: number, name: string) =>
-  actions.deleteLabel({ labelId: labelId, name: name });
-export const patchLabel = (labelId: number, name: string) =>
-  actions.patchLabel({ labelId: labelId, name: name });
+export const createLabel = (value: string) =>
+  actions.createLabel({ value: value });
+export const deleteLabel = (labelId: number, value: string) =>
+  actions.deleteLabel({ labelId: labelId, value: value });
+export const patchLabel = (labelId: number, value: string) =>
+  actions.patchLabel({ labelId: labelId, value: value });
 export const labelsUpdate = () => actions.labelsUpdate({});

@@ -25,7 +25,7 @@ class LablesPage extends React.Component<LabelsProps> {
   }
 
   handleClose = (removedLabel: Label) => {
-    this.props.deleteLabel(removedLabel.id, removedLabel.name);
+    this.props.deleteLabel(removedLabel.id, removedLabel.value);
   };
 
   handleClickSearch = (e: any) => {
@@ -36,17 +36,17 @@ class LablesPage extends React.Component<LabelsProps> {
       <Tag
         className='label'
         closable
-        color={stringToRGB(label.name)}
+        color={stringToRGB(label.value)}
         onClose={(e: any)  => {
           e.preventDefault();
           this.handleClose(label);
         }}
       >
-        <TagOutlined/ > &nbsp; {label.name}
+        <TagOutlined/ > &nbsp; {label.value}
       </Tag>
     );
     return (
-      <span key={label.name} style={{ display: 'inline-block' }}>
+      <span key={label.value} style={{ display: 'inline-block' }}>
         {tagElem}
       </span>
     );
@@ -60,6 +60,12 @@ class LablesPage extends React.Component<LabelsProps> {
           <Tooltip title="search">
             <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={this.handleClickSearch} />
           </Tooltip>
+          <AutoComplete
+            style={{ width: 200 }}
+            options={this.props.labels}
+            placeholder="Enter Label"
+            filterOption={(inputValue: string, option: any) => option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+          />
           <Collapse defaultActiveKey={'availableLabels'}>
             <Panel header='' key="availableLabels">
               <div>

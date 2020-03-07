@@ -13,12 +13,12 @@ export type LabelsAction = {
 export type GroupUpdateAction = {};
 
 export type LabelCreateAction = {
-  name: string;
+  value: string;
 };
 
 export type DeleteLabelAction = {
   labelId: number;
-  name: string;
+  value: string;
 };
 
 export type GetGroupAction = {
@@ -28,7 +28,7 @@ export type GetGroupAction = {
 
 export type PatchLabelAction = {
   labelId: number;
-  name: string;
+  value: string;
 };
 
 export type UpdateLabels = {};

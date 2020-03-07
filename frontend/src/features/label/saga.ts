@@ -33,18 +33,18 @@ function* labelsUpdate(action: PayloadAction<UpdateLabels>) {
 }
 
 function* createLabel(action: PayloadAction<LabelCreateAction>) {
-  const name = action.payload.name;
+  const value = action.payload.value;
   try {
-    const data = yield call(addLabel, name);
+    const data = yield call(addLabel, value);
     
     const state: IState = yield select();
     const labels = Object.assign([], state.label.labels);
     labels.unshift(data);
     yield put(labelActions.labelsReceived({ labels: labels, etag: '' }));
-    yield call(message.info, `Label ${name} created`);
+    yield call(message.info, `Label ${value} created`);
   } catch (error) {
     if (error.message === '400') {
-      yield call(message.error, `Label "${action.payload.name}" already exists`);
+      yield call(message.error, `Label "${action.payload.value}" already exists`);
     } else {
       yield call(message.error, `Label Create Fail: ${error}`);
     }
@@ -53,8 +53,8 @@ function* createLabel(action: PayloadAction<LabelCreateAction>) {
 
 function* patchLabel(action: PayloadAction<PatchLabelAction>) {
   try {
-    const { labelId, name } = action.payload;
-    const label = yield call(updateLabel, labelId, name);
+    const { labelId, value } = action.payload;
+    const label = yield call(updateLabel, labelId, value);
     yield put(labelActions.labelsUpdate({}));
   } catch (error) {
     yield call(message.error, `Patch label Fail: ${error}`);
@@ -63,10 +63,10 @@ function* patchLabel(action: PayloadAction<PatchLabelAction>) {
 
 function* removeLabel(action: PayloadAction<DeleteLabelAction>) {
   try {
-    const { labelId, name } = action.payload;
+    const { labelId, value } = action.payload;
     yield call(deleteLabel, labelId);
     yield put(labelActions.labelsUpdate({}));
-    yield call(message.success, `Label "${name}" deleted`);
+    yield call(message.success, `Label "${value}" deleted`);
   } catch (error) {
     yield call(message.error, `Delete label fail: ${error}`);
   }
