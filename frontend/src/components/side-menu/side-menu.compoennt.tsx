@@ -107,7 +107,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           }
           onTitleClick={this.onGroupsClick}
         >
-          <AddProject history={this.props.history} />
+          <AddProject history={this.props.history} mode={'singular'}/>
           <SubMenu
             key='ownedProjects'
             title={

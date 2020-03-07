@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { PlusOutlined, SyncOutlined } from '@ant-design/icons';
+import { SyncOutlined } from '@ant-design/icons';
 import { Avatar, Popover, Tooltip } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
+import AddProject from '../../components/modals/add-project.component';
 import { updateMyself, updateExpandedMyself } from './actions';
 import { updateGroups, groupUpdate } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
@@ -37,11 +38,10 @@ class Myself extends React.Component<MyselfProps & PathProps> {
   };
 
   render() {
+    let plusIcon = <AddProject history={this.props.history} mode={'complex'}/>
     return (
       <div className='myselfContainer'>
-        <Tooltip placement="bottom" title='Create New BuJo' >
-          <PlusOutlined className='rotateIcon' />
-        </Tooltip>
+        {plusIcon}
         <Tooltip placement="bottom" title='Refresh' >
           <SyncOutlined
             className='rotateIcon'
@@ -73,7 +73,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
 
 const mapStateToProps = (state: IState) => ({
   username: state.myself.username,
-  avatar: state.myself.avatar
+  avatar: state.myself.avatar,
 });
 
 export default connect(mapStateToProps, {

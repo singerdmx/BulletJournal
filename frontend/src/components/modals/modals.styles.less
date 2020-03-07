@@ -48,3 +48,18 @@
     padding-bottom: 0.5em;
     padding-left: 0.5em;
 }
+
+.rotateIcon {
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover {
+    transform: rotate(180deg);
+    transition-duration: 1s;
+  }
+
+  &:active {
+    color: pink;
+    transition-duration: 0s;
+  }
+}

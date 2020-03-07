@@ -4,7 +4,8 @@ import {
   FolderAddOutlined,
   CarryOutOutlined,
   FileTextOutlined,
-  AccountBookOutlined
+  AccountBookOutlined,
+  PlusOutlined
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interfaces';
@@ -14,7 +15,6 @@ import { ProjectType, toProjectType } from '../../features/project/constants';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interfaces';
 import { History } from 'history';
-import { actions as projectActions } from '../../features/project/reducer';
 
 import './modals.styles.less';
 
@@ -25,6 +25,7 @@ const { Option } = Select;
 type ProjectProps = {
   history: History<History.PoorMansUnknown>;
   project: Project;
+  mode: string;
   createProjectByName: (
     description: string,
     groupId: number,
@@ -103,104 +104,117 @@ class AddProject extends React.Component<
 
   render() {
     const { groups: groupsByOwner, history } = this.props;
-    return (
-      <Tooltip placement="right" title='Create New BuJo'>
-        <div className='add-project menu' >
-          <Button onClick={this.showModal} type='dashed' block>
-            <FolderAddOutlined style={{ fontSize: 20 }} />
-          </Button>
-          <Modal
-            title='Create New BuJo'
-            visible={this.state.isShow}
-            onCancel={this.onCancel}
-            onOk={() => this.addProject(history)}
-            footer={[
-              <Button key='cancel' onClick={this.onCancel}>
-                Cancel
-              </Button>,
-              <Button
-                key='create'
-                type='primary'
-                onClick={() => this.addProject(history)}
-              >
-                Create
+
+    const modal = (
+    <Modal
+      title='Create New BuJo'
+      visible={this.state.isShow}
+      onCancel={this.onCancel}
+      onOk={() => this.addProject(history)}
+      footer={[
+        <Button key='cancel' onClick={this.onCancel}>
+          Cancel
+        </Button>,
+        <Button
+          key='create'
+          type='primary'
+          onClick={() => this.addProject(history)}
+        >
+          Create
+        </Button>
+      ]}
+    >
+      <Form>
+        <Form.Item>
+          <InputGroup compact>
+            <Select
+              style={{ width: '40%' }}
+              placeholder='Choose Project Type'
+              value={
+                this.state.projectType ? this.state.projectType : undefined
+              }
+              onChange={e => this.onChangeProjectType(e)}
+            >
+              <Option value='TODO' title='Project Type: TODO'>
+                <CarryOutOutlined />
+                &nbsp;TODO
+              </Option>
+              <Option value='NOTE' title='Project Type: NOTE'>
+                <FileTextOutlined />
+                &nbsp;NOTE
+              </Option>
+              <Option value='LEDGER' title='Project Type: LEDGER'>
+                <AccountBookOutlined />
+                &nbsp;LEDGER
+              </Option>
+            </Select>
+            <Input
+              style={{ width: '60%' }}
+              placeholder='Enter BuJo Name'
+              value={this.state.name}
+              onChange={e => this.onChangeName(e.target.value)}
+            />
+            <div style={{ margin: '24px 0' }} />
+            <TextArea
+              placeholder='Enter Description'
+              autoSize
+              value={this.state.description}
+              onChange={e => this.onChangeDescription(e.target.value)}
+            />
+            <div style={{ margin: '24px 0' }} />
+            <Select
+              placeholder='Choose Group'
+              style={{ width: '100%' }}
+              value={
+                this.state.groupId < 0 ? undefined : this.state.groupId
+              }
+              onChange={e => this.onChangeGroupId(e)}
+            >
+              {groupsByOwner.map((groupsOwner, index) => {
+                return groupsOwner.groups.map(group => (
+                  <Option
+                    key={`group${group.id}`}
+                    value={group.id}
+                    title={`Group "${group.name}" (owner "${group.owner}")`}
+                  >
+                    <Avatar size='small' src={group.ownerAvatar} />
+                    &nbsp;&nbsp;Group <strong>
+                      {group.name}
+                    </strong> (owner <strong>{group.owner}</strong>)
+                  </Option>
+                ));
+              })}
+            </Select>
+          </InputGroup>
+        </Form.Item>
+      </Form>
+    </Modal>);
+      if (this.props.mode === 'singular') {
+        return (
+          <Tooltip placement="right" title='Create New BuJo'>
+            <div className='add-project menu' >
+              <Button onClick={this.showModal} type='dashed' block>
+                <FolderAddOutlined style={{ fontSize: 20 }} />
               </Button>
-            ]}
-          >
-            <Form>
-              <Form.Item>
-                <InputGroup compact>
-                  <Select
-                    style={{ width: '40%' }}
-                    placeholder='Choose Project Type'
-                    value={
-                      this.state.projectType ? this.state.projectType : undefined
-                    }
-                    onChange={e => this.onChangeProjectType(e)}
-                  >
-                    <Option value='TODO' title='Project Type: TODO'>
-                      <CarryOutOutlined />
-                      &nbsp;TODO
-                    </Option>
-                    <Option value='NOTE' title='Project Type: NOTE'>
-                      <FileTextOutlined />
-                      &nbsp;NOTE
-                    </Option>
-                    <Option value='LEDGER' title='Project Type: LEDGER'>
-                      <AccountBookOutlined />
-                      &nbsp;LEDGER
-                    </Option>
-                  </Select>
-                  <Input
-                    style={{ width: '60%' }}
-                    placeholder='Enter BuJo Name'
-                    value={this.state.name}
-                    onChange={e => this.onChangeName(e.target.value)}
-                  />
-                  <div style={{ margin: '24px 0' }} />
-                  <TextArea
-                    placeholder='Enter Description'
-                    autoSize
-                    value={this.state.description}
-                    onChange={e => this.onChangeDescription(e.target.value)}
-                  />
-                  <div style={{ margin: '24px 0' }} />
-                  <Select
-                    placeholder='Choose Group'
-                    style={{ width: '100%' }}
-                    value={
-                      this.state.groupId < 0 ? undefined : this.state.groupId
-                    }
-                    onChange={e => this.onChangeGroupId(e)}
-                  >
-                    {groupsByOwner.map((groupsOwner, index) => {
-                      return groupsOwner.groups.map(group => (
-                        <Option
-                          key={`group${group.id}`}
-                          value={group.id}
-                          title={`Group "${group.name}" (owner "${group.owner}")`}
-                        >
-                          <Avatar size='small' src={group.ownerAvatar} />
-                          &nbsp;&nbsp;Group <strong>
-                            {group.name}
-                          </strong> (owner <strong>{group.owner}</strong>)
-                        </Option>
-                      ));
-                    })}
-                  </Select>
-                </InputGroup>
-              </Form.Item>
-            </Form>
-          </Modal>
+              {modal}
+            </div>
+          </Tooltip>
+        );
+      }
+      return (
+        <div>
+          <Tooltip placement="bottom" title='Create New BuJo' >
+            <PlusOutlined className='rotateIcon' onClick={this.showModal}/>
+          </Tooltip>
+          {modal}
         </div>
-      </Tooltip>
-    );
+      );
   }
 }
 
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
-  project: state.project.project
+  project: state.project.project,
 });
 
 export default connect(mapStateToProps, { updateGroups, createProjectByName })(
