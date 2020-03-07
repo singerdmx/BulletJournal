@@ -1,73 +1,61 @@
-import React from 'react';
-import { Modal, Input, Button, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Modal, Input, Button, Tooltip, Form } from 'antd';
 import { UsergroupAddOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps} from 'react-router';
+import { withRouter, RouteComponentProps } from 'react-router';
 import { createGroupByName } from '../../features/group/actions';
 
 import './modals.styles.less';
 
-type GroupProps = {
+interface GroupCreateFormProps {
   createGroupByName: (name: string) => void;
-};
-
-type ModalState = {
-  isShow: boolean;
-  groupName: string;
-};
-
-class AddGroup extends React.Component<GroupProps & RouteComponentProps, ModalState> {
-  state: ModalState = {
-    isShow: false,
-    groupName: ''
-  };
-
-  showModal = () => {
-    this.setState({ isShow: true });
-  };
-
-  addGroup = () => {
-    this.props.createGroupByName(this.state.groupName);
-    this.setState({ isShow: false });
-    this.props.history.push("/groups")
-  };
-
-  onCancel = () => {
-    this.setState({ isShow: false });
-  };
-
-  render() {
-    return (
-      <Tooltip placement="right" title='Create New Group'>
-        <div className="add-group">
-          <Button onClick={this.showModal} type="dashed" block>
-            <UsergroupAddOutlined style={{ fontSize: 20 }} />
-          </Button>
-          <Modal
-            title="Create New Group"
-            visible={this.state.isShow}
-            onCancel={this.onCancel}
-            onOk={() => this.addGroup}
-            footer={[
-              <Button key="cancel" onClick={this.onCancel}>
-                Cancel
-              </Button>,
-              <Button key="create" type="primary" onClick={this.addGroup}>
-                Create
-              </Button>
-            ]}
-          >
-            <Input
-              placeholder="Enter Group Name"
-              onChange={e => this.setState({ groupName: e.target.value })}
-              onPressEnter={this.addGroup}
-              allowClear
-            />
-          </Modal>
-        </div>
-      </Tooltip>
-    );
-  }
 }
+
+const AddGroup: React.FC<RouteComponentProps & GroupCreateFormProps> = (props) => {
+  const [form] = Form.useForm();
+  const [visible, setVisible] = useState(false);
+  const addGroup = (values: any) => {
+    props.createGroupByName(values.groupName);
+    setVisible(false);
+  };
+  const onCancel = () => setVisible(false);
+  const openModal = () => setVisible(true);
+  return (
+    <Tooltip placement="right" title="Create New Group">
+      <div className="add-group">
+        <Button onClick={openModal} type="dashed" block>
+          <UsergroupAddOutlined style={{ fontSize: 20 }} />
+        </Button>
+        <Modal
+          title="Create New Group"
+          visible={visible}
+          okText="Create Group"
+          onCancel={onCancel}
+          onOk={() => {
+            form
+              .validateFields()
+              .then(values => {
+                console.log(values);
+                form.resetFields();
+                addGroup(values);
+              })
+              .catch(info => console.log(info));
+          }}
+        >
+          <Form form={form}>
+            <Form.Item
+              name="groupName"
+              rules={[
+                { required: true, message: 'Please input your groupname!' }
+              ]}
+            >
+              <Input placeholder="Enter Group Name" allowClear />
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    </Tooltip>
+  );
+};
 
 export default connect(null, { createGroupByName })(withRouter(AddGroup));
