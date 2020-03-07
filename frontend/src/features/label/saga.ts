@@ -34,7 +34,9 @@ function* labelsUpdate(action: PayloadAction<UpdateLabels>) {
 function* createLabel(action: PayloadAction<LabelCreateAction>) {
   const name = action.payload.name;
   try {
+    console.log('createLabel');
     const data = yield call(addLabel, name);
+    yield call(message.info, `Label ${name} created`);
   } catch (error) {
     if (error.message === '400') {
       yield call(message.error, `Label with ${name} already exists`);

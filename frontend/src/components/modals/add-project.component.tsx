@@ -104,7 +104,7 @@ class AddProject extends React.Component<
   render() {
     const { groups: groupsByOwner, history } = this.props;
     return (
-      <Tooltip placement="top" title='Create New BuJo'>
+      <Tooltip placement="right" title='Create New BuJo'>
         <div className='add-project menu' >
           <Button onClick={this.showModal} type='dashed' block>
             <FolderAddOutlined style={{ fontSize: 20 }} />

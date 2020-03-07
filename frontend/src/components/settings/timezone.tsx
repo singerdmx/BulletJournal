@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
+import { Select, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import {
@@ -439,32 +439,34 @@ class TimezonePicker extends React.Component<TimezoneProps> {
             </Option>
           ))}
         </Select>
-        <CheckCircleOutlined
-          onClick={() => this.handleOnClick(true)}
-          style={{
-            marginLeft: '20px',
-            cursor: 'pointer',
-            color: '#00e600',
-            fontSize: 20,
-            visibility:
-              this.props.currentTimezone !== this.props.originalTimezone
-                ? 'visible'
-                : 'hidden'
-          }}
-          title='Save' />
-        <CloseCircleOutlined
-          onClick={() => this.handleOnClick(false)}
-          style={{
-            marginLeft: '20px',
-            cursor: 'pointer',
-            color: '#ff0000',
-            fontSize: 20,
-            visibility:
-              this.props.currentTimezone !== this.props.originalTimezone
-                ? 'visible'
-                : 'hidden'
-          }}
-          title='Cancel' />
+        <Tooltip placement="top" title='Save'>
+          <CheckCircleOutlined
+            onClick={() => this.handleOnClick(true)}
+            style={{
+              marginLeft: '20px',
+              cursor: 'pointer',
+              color: '#00e600',
+              fontSize: 20,
+              visibility:
+                this.props.currentTimezone !== this.props.originalTimezone
+                  ? 'visible'
+                  : 'hidden'
+            }} />
+          </Tooltip>
+          <Tooltip placement="top" title='Cancel'>
+            <CloseCircleOutlined
+              onClick={() => this.handleOnClick(false)}
+              style={{
+                marginLeft: '20px',
+                cursor: 'pointer',
+                color: '#ff0000',
+                fontSize: 20,
+                visibility:
+                  this.props.currentTimezone !== this.props.originalTimezone
+                    ? 'visible'
+                    : 'hidden'
+              }} />
+          </Tooltip>
       </span>
     );
   }

@@ -35,7 +35,7 @@ const getTree = (
     }
     if (item.owner) {
       node.title = (
-        <Tooltip placement="top" title={'Owner: ' + item.owner}>
+        <Tooltip placement="right" title={'Owner: ' + item.owner}>
           <span
             onClick={e => history.push(`/projects/${item.id}`)}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
@@ -44,7 +44,7 @@ const getTree = (
       );
     } else {
       node.title = (
-        <Tooltip placement="top" title="Not Shared">
+        <Tooltip placement="right" title="Not Shared">
           <span
             style={{ color: '#e0e0eb', cursor: 'default' }}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
