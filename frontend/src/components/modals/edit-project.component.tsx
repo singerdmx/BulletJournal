@@ -9,6 +9,7 @@ import {
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { updateGroups } from '../../features/group/actions';
+import { updateProject } from '../../features/project/actions';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interfaces';
 import { iconMapper } from '../../components/side-menu/side-menu.compoennt';
@@ -21,6 +22,12 @@ const { Option } = Select;
 
 type ProjectProps = {
   project: Project;
+  updateProject: (
+    projectId: number,
+    description: string,
+    groupId: number,
+    name: string
+  ) => void;
 };
 
 //props of groups
@@ -33,7 +40,7 @@ type ModalState = {
   isShow: boolean;
   name: string;
   description: string;
-  group_id: number;
+  groupId: number;
 };
 
 class EditProject extends React.Component<
@@ -48,7 +55,7 @@ class EditProject extends React.Component<
     isShow: false,
     name: this.props.project.name,
     description: this.props.project.description,
-    group_id:
+    groupId:
       this.props.project && this.props.project.group
         ? this.props.project.group.id
         : 0
@@ -56,17 +63,21 @@ class EditProject extends React.Component<
 
   showModal = () => {
     const { name, description, group } = this.props.project;
-    const group_id = group.id;
+    const groupId = group.id;
     this.setState({
       isShow: true,
       name: name,
       description: description,
-      group_id: group_id
+      groupId: groupId
     });
   };
 
   updateProject = () => {
+    console.log('oiuoiuoiui');
     this.setState({ isShow: false });
+    const { id } = this.props.project;
+    const { name, description, groupId } = this.state;
+    this.props.updateProject(id, description, groupId, name);
   };
 
   onCancel = () => {
@@ -81,8 +92,8 @@ class EditProject extends React.Component<
     this.setState({ description: description });
   };
 
-  onChangeGroupId = (group_id: number) => {
-    this.setState({ group_id: group_id });
+  onChangeGroupId = (groupId: number) => {
+    this.setState({ groupId: groupId });
   };
 
   render() {
@@ -99,7 +110,7 @@ class EditProject extends React.Component<
           title='Edit BuJo'
           visible={this.state.isShow}
           onCancel={this.onCancel}
-          onOk={() => this.updateProject}
+          onOk={this.updateProject}
         >
           <Form>
             <Form.Item>
@@ -128,7 +139,7 @@ class EditProject extends React.Component<
                 <Select
                   placeholder='Choose Group'
                   style={{ width: '100%' }}
-                  value={this.state.group_id}
+                  value={this.state.groupId}
                   onChange={value => this.onChangeGroupId(value)}
                 >
                   {groupsByOwner.map(groupsOwner => {
@@ -160,4 +171,6 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups
 });
 
-export default connect(mapStateToProps, { updateGroups })(EditProject);
+export default connect(mapStateToProps, { updateGroups, updateProject })(
+  EditProject
+);

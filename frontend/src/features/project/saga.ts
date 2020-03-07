@@ -125,7 +125,14 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
 function* patchProject(action: PayloadAction<PatchProjectAction>) {
   try {
     const { projectId, description, groupId, name } = action.payload;
-    yield call(updateProject, projectId, description, groupId, name);
+    const data = yield call(
+      updateProject,
+      projectId,
+      description,
+      groupId,
+      name
+    );
+    yield put(projectActions.projectReceived({ project: data }));
     yield put(projectActions.projectsUpdate({}));
     yield call(message.success, 'Successfully updated project');
   } catch (error) {
