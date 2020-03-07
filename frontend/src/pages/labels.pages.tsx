@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { IState } from '../store/index';
 import { Divider, Tag, Button, Tooltip } from 'antd';
 import AddLabel from '../components/modals/add-label.component';
-import { Label } from '../features/label/interfaces'
+import { Label, stringToRGB } from '../features/label/interfaces'
 import { labelsUpdate, deleteLabel } from '../features/label/actions';
 import { TagOutlined } from '@ant-design/icons';
 import { TweenOneGroup } from 'rc-tween-one';
@@ -30,6 +30,7 @@ class LablesPage extends React.Component<LabelsProps> {
       <Tag
         className='label'
         closable
+        color={stringToRGB(label.name)}
         onClose={(e: any)  => {
           e.preventDefault();
           this.handleClose(label);
