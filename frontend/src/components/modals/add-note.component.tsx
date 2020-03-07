@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, Input, Button, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Modal, Input, Tooltip, Form } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps} from 'react-router';
@@ -8,65 +8,56 @@ import { IState } from '../../store';
 import './modals.styles.less';
 
 type NoteProps = {
-    projectId: number,
-    createNote: (projectId: number, name: string) => void;
+    projectId: number;
 };
 
-type ModalState = {
-  isShow: boolean;
-  noteName: string;
+interface NoteCreateFormProps {
+  createNote: (projectId: number, name: string) => void;
 };
 
-class AddNote extends React.Component<NoteProps & RouteComponentProps, ModalState> {
-  state: ModalState = {
-    isShow: false,
-    noteName: ''
+const AddNote: React.FC<RouteComponentProps & NoteProps & NoteCreateFormProps> = (props) => {
+  const [form] = Form.useForm();
+  const [visible, setVisible] = useState(false);
+  const addNote = (values: any) => {
+    props.createNote(props.projectId, values.noteName);
+    setVisible(false);
   };
-
-  showModal = () => {
-    this.setState({ isShow: true });
-  };
-
-  addNote = () => {
-    this.props.createNote(this.props.projectId, this.state.noteName);
-    this.setState({ isShow: false });
-    this.props.history.push("/notes")
-  };
-
-  onCancel = () => {
-    this.setState({ isShow: false });
-  };
-  
-  render() {
+  const onCancel = () => setVisible(false);
+  const openModal = () => setVisible(true);
     return (
       <Tooltip placement="top" title='Create New Note'>
         <div className="add-note" >
-          <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Note' />
+          <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={openModal} title='Create New Note' />
           <Modal
             title="Create New Note"
-            visible={this.state.isShow}
-            onCancel={this.onCancel}
-            onOk={() => this.addNote}
-            footer={[
-              <Button key="cancel" onClick={this.onCancel}>
-                Cancel
-              </Button>,
-              <Button key="create" type="primary" onClick={this.addNote}>
-                Create
-              </Button>
-            ]}
+            visible={visible}
+            okText="Create"
+            onCancel={onCancel}
+            onOk={() => {
+              form
+                .validateFields()
+                .then(values => {
+                  console.log(values);
+                  form.resetFields();
+                  addNote(values);
+                })
+                .catch(info => console.log(info));
+            }}
           >
-            <Input
-              placeholder="Enter Note Name"
-              onChange={e => this.setState({ noteName: e.target.value })}
-              onPressEnter={this.addNote}
-              allowClear
-            />
+              <Form form={form}>
+                <Form.Item
+                  name="noteName"
+                  rules={[
+                    { required: true, message: 'Please input Note Name!' }
+                  ]}
+                >
+                  <Input placeholder="Enter Note Name" allowClear />
+                </Form.Item>
+            </Form>
           </Modal>
         </div>
       </Tooltip>
     );
-  }
 }
 
 const mapStateToProps = (state: IState) => ({
