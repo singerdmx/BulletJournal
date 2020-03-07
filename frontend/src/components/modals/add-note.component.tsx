@@ -70,7 +70,7 @@ class AddNote extends React.Component<NoteProps & RouteComponentProps, ModalStat
 }
 
 const mapStateToProps = (state: IState) => ({
-    projectId: state.project.project.id
-  });
+  projectId: state.project.project.id
+});
 
 export default connect(mapStateToProps, { createNote })(withRouter(AddNote));

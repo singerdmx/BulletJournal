@@ -4,6 +4,7 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps} from 'react-router';
 import { createLabel } from '../../features/label/actions';
+import { IState } from '../../store';
 import './modals.styles.less';
 
 type LabelProps = {
@@ -26,9 +27,10 @@ class AddLabel extends React.Component<LabelProps & RouteComponentProps, ModalSt
   };
 
   addLabel = () => {
+    console.log('addLabel');
     this.props.createLabel(this.state.labelName);
-    this.setState({ isShow: false });
-    this.props.history.push("/labels")
+    this.setState({ isShow: false, labelName: '' });
+    // this.props.history.push("/labels")
   };
 
   onCancel = () => {
@@ -69,4 +71,8 @@ class AddLabel extends React.Component<LabelProps & RouteComponentProps, ModalSt
   }
 }
 
-export default connect(null, { createLabel })(withRouter(AddLabel));
+const mapStateToProps = (state: IState) => ({
+  labels: state.label.labels
+});
+
+export default connect(mapStateToProps, { createLabel })(withRouter(AddLabel));
