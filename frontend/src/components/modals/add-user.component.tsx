@@ -1,21 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PlusOutlined, UserOutlined } from '@ant-design/icons';
-import { Modal, Input, Button, Avatar, Empty, Tooltip } from 'antd';
+import {
+  Modal,
+  Input,
+  Button,
+  Avatar,
+  Empty,
+  Tooltip,
+  Form
+} from 'antd';
 import { connect } from 'react-redux';
 import { addUserGroupByUsername } from '../../features/group/actions';
-import { updateUser, clearUser, userApiErrorReceived } from '../../features/user/actions';
+import {
+  updateUser,
+  clearUser,
+  userApiErrorReceived
+} from '../../features/user/actions';
 import { UserWithAvatar } from '../../features/user/reducer';
 import { IState } from '../../store';
 
 import './modals.styles.less';
 
-type ModalState = {
-  isShow: boolean;
-};
-
 type ModalProps = {
   groupId: number;
-  groupName : string;
+  groupName: string;
   user: UserWithAvatar;
   addUserGroupByUsername: (
     groupId: number,
@@ -23,91 +31,90 @@ type ModalProps = {
     groupName: string
   ) => void;
   updateUser: (username: string) => void;
-  clearUser : () => void;
+  clearUser: () => void;
   userApiErrorReceived: (error: string) => void;
 };
 
-class AddUser extends React.Component<ModalProps, ModalState> {
-  state: ModalState = {
-    isShow: false
+const AddUser: React.FC<ModalProps> = props => {
+  const [visible, setVisible] = useState(false);
+  const [form] = Form.useForm();
+  const searchUser = (value: string) => {
+      props.updateUser(value);
+      props.clearUser();
   };
 
-  showModal = () => {
-    this.setState({ isShow: true });
+  const addUser = (groupId: number, username: string, groupName: string) => {
+    props.addUserGroupByUsername(groupId, username, groupName);
+    setVisible(false);
   };
 
-  searchUser = (value: string) => {
-    if (value) {
-      if (value.length > 1) {
-        this.props.updateUser(value);
-      } else {
-        this.props.userApiErrorReceived('Username needs to have more than one character');
-      }
-    } else {
-      this.props.clearUser();
-    }
+  const onCancel = () => {
+    props.clearUser();
+    setVisible(false);
   };
 
-  addUser =  (groupId: number, username : string, groupName: string) => {
-    this.props.addUserGroupByUsername(groupId, username, groupName);
-    this.setState({isShow : false});
-  }
-
-  onCancel = () => {
-    this.props.clearUser();
-    this.setState({isShow: false});
-  }
-
-  render() {
-    const {groupId, user, groupName} = this.props;
-    return (
-      <div className="group-footer">
-        <Tooltip placement="top" title="Add User">
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            shape="round"
-            onClick={this.showModal}
-          />
-        </Tooltip>
-        <Modal
-          title="Add User"
-          visible={this.state.isShow}
-          onCancel={this.onCancel}
-          onOk={() => this.addUser(groupId, user.name, groupName)}
-          okText="Add User"
-          centered={true}
-          width={300}
-          okButtonProps={{disabled : !user.name}}
-        >
-          <Input.Search allowClear prefix={<UserOutlined className="site-form-item-icon" />}
-            onSearch={value => this.searchUser(value)}
-            className='input-search-box'
-            onFocus={e => e.stopPropagation()}
-            placeholder="Enter Username"/>
-          <div className="search-result">
-            {user.name ? (
-              <Avatar size="large" src={user.avatar}/>
-            ) : (
-              <Empty
-                description="No result found"
-                imageStyle={{ height: '50px' }}
-              />
-            )}
-          </div>
-        </Modal>
-      </div>
-    );
-  }
-}
+  const { groupId, user, groupName } = props;
+  return (
+    <div className="group-footer">
+      <Tooltip placement="top" title="Add User">
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          shape="round"
+          onClick={() => setVisible(true)}
+        />
+      </Tooltip>
+      <Modal
+        title="Add User"
+        visible={visible}
+        onCancel={onCancel}
+        onOk={() => addUser(groupId, user.name, groupName)}
+        okText="Add User"
+        centered={true}
+        width={300}
+        okButtonProps={{ disabled: !user.name }}
+      >
+        <Form form={form}>
+          <Form.Item name="username" rules={[{ min: 1, required : true }]}>
+            <Input.Search
+              allowClear
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              onSearch={() =>
+                form
+                  .validateFields()
+                  .then(values => {
+                    form.resetFields();
+                    searchUser(values.username);
+                  })
+                  .catch(info => console.log(info))
+              }
+              className="input-search-box"
+              placeholder="Enter Username"
+            />
+          </Form.Item>
+        </Form>
+        <div className="search-result">
+          {user.name ? (
+            <Avatar size="large" src={user.avatar} />
+          ) : (
+            <Empty
+              description="No result found"
+              imageStyle={{ height: '50px' }}
+            />
+          )}
+        </div>
+      </Modal>
+    </div>
+  );
+};
 
 const mapStateToProps = (state: IState) => ({
   user: state.user
 });
 
-export default connect(
-  mapStateToProps,
-  { addUserGroupByUsername, updateUser, clearUser, userApiErrorReceived },
-  null,
-  { forwardRef: true }
-)(AddUser);
+export default connect(mapStateToProps, {
+  addUserGroupByUsername,
+  updateUser,
+  clearUser,
+  userApiErrorReceived
+})(AddUser);
