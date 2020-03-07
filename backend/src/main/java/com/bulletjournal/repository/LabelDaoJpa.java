@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Repository
@@ -67,4 +68,11 @@ public class LabelDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Label" + id + "not found"));
         return label;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Label> getLabels(String owner) {
+        List<Label> labels = this.labelRepository.findByOwner(owner);
+        return labels;
+    }
+
 }

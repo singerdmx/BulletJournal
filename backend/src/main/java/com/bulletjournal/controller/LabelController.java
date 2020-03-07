@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class LabelController {
@@ -43,6 +44,16 @@ public class LabelController {
     @GetMapping(LABEL_ROUTE)
     public Label getLabel(@NotNull @PathVariable Long labelId) {
         return this.labelDaoJpa.getLabel(labelId).toPresentationModel();
+    }
+
+    @GetMapping(LABELS_ROUTE)
+    public ResponseEntity<List<Label>> getLabels() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Label> labels = this.labelDaoJpa.getLabels(username)
+                .stream().map(label -> label.toPresentationModel())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(labels);
     }
 
     @DeleteMapping(LABELS_ROUTE)
