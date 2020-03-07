@@ -2,6 +2,9 @@ package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.repository.utils.LongArrayType;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -12,6 +15,12 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
+@TypeDefs({
+        @TypeDef(
+                name = "long-array",
+                typeClass = LongArrayType.class
+        )
+})
 @MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
 

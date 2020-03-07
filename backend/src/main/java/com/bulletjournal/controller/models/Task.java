@@ -39,6 +39,16 @@ public class Task {
 
     private ReminderSetting reminderSetting;
 
+    private Long[] labels;
+
+    public Long[] getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Long[] labels) {
+        this.labels = labels;
+    }
+
     @Expose
     @Valid
     private List<Task> subTasks = new ArrayList<>();

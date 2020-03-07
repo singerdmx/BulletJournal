@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 
 /**
@@ -20,6 +22,22 @@ public class Task extends TaskModel {
             initialValue = 100
     )
     private Long id;
+
+    public Long[] getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Long[] labels) {
+        this.labels = labels;
+    }
+
+    @Type(type = "long-array")
+    @Column(
+            name = "labels",
+            columnDefinition = "bigint[]"
+    )
+    private Long[] labels;
+
 
     @Override
     public Long getId() {
