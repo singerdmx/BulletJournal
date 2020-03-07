@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Form } from '@ant-design/compatible';
 import '@ant-design/compatible/assets/index.css';
-import { Modal, Input, Checkbox } from 'antd';
+import { Modal, Input, Checkbox, Tooltip } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 
 type BujoRouteParams = {
@@ -47,10 +47,14 @@ class BujoPage extends React.Component<BujoRouteProps, todoState> {
         <div className='todo-header'>
           <Checkbox.Group defaultValue={['todo']} className='header-check'>
             <Checkbox value='todo'>
-              <CarryOutOutlined title='TODO' />
+              <Tooltip placement="top" title='TODO'>
+                <CarryOutOutlined  />
+              </Tooltip>
             </Checkbox>
             <Checkbox value='ledger'>
-              <AccountBookOutlined title='LEDGER' />
+              <Tooltip placement="top" title='LEDGER'>
+                <AccountBookOutlined />
+              </Tooltip>
             </Checkbox>
           </Checkbox.Group>
 

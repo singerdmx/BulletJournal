@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input, Button, Tooltip } from 'antd';
 import { UsergroupAddOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps} from 'react-router';
@@ -38,32 +38,34 @@ class AddGroup extends React.Component<GroupProps & RouteComponentProps, ModalSt
 
   render() {
     return (
-      <div className="add-group" title='Create New Group'>
-        <Button onClick={this.showModal} type="dashed" block>
-          <UsergroupAddOutlined style={{ fontSize: 20 }} />
-        </Button>
-        <Modal
-          title="Create New Group"
-          visible={this.state.isShow}
-          onCancel={this.onCancel}
-          onOk={() => this.addGroup}
-          footer={[
-            <Button key="cancel" onClick={this.onCancel}>
-              Cancel
-            </Button>,
-            <Button key="create" type="primary" onClick={this.addGroup}>
-              Create
-            </Button>
-          ]}
-        >
-          <Input
-            placeholder="Enter Group Name"
-            onChange={e => this.setState({ groupName: e.target.value })}
-            onPressEnter={this.addGroup}
-            allowClear
-          />
-        </Modal>
-      </div>
+      <Tooltip placement="top" title='Create New Group'>
+        <div className="add-group">
+          <Button onClick={this.showModal} type="dashed" block>
+            <UsergroupAddOutlined style={{ fontSize: 20 }} />
+          </Button>
+          <Modal
+            title="Create New Group"
+            visible={this.state.isShow}
+            onCancel={this.onCancel}
+            onOk={() => this.addGroup}
+            footer={[
+              <Button key="cancel" onClick={this.onCancel}>
+                Cancel
+              </Button>,
+              <Button key="create" type="primary" onClick={this.addGroup}>
+                Create
+              </Button>
+            ]}
+          >
+            <Input
+              placeholder="Enter Group Name"
+              onChange={e => this.setState({ groupName: e.target.value })}
+              onPressEnter={this.addGroup}
+              allowClear
+            />
+          </Modal>
+        </div>
+      </Tooltip>
     );
   }
 }

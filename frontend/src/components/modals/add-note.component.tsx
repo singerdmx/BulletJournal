@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input, Button, Tooltip } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps} from 'react-router';
@@ -39,30 +39,32 @@ class AddNote extends React.Component<NoteProps & RouteComponentProps, ModalStat
   
   render() {
     return (
-      <div className="add-note" title='Create New Note'>
-        <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Note' />
-        <Modal
-          title="Create New Note"
-          visible={this.state.isShow}
-          onCancel={this.onCancel}
-          onOk={() => this.addNote}
-          footer={[
-            <Button key="cancel" onClick={this.onCancel}>
-              Cancel
-            </Button>,
-            <Button key="create" type="primary" onClick={this.addNote}>
-              Create
-            </Button>
-          ]}
-        >
-          <Input
-            placeholder="Enter Note Name"
-            onChange={e => this.setState({ noteName: e.target.value })}
-            onPressEnter={this.addNote}
-            allowClear
-          />
-        </Modal>
-      </div>
+      <Tooltip placement="top" title='Create New Note'>
+        <div className="add-note" >
+          <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Note' />
+          <Modal
+            title="Create New Note"
+            visible={this.state.isShow}
+            onCancel={this.onCancel}
+            onOk={() => this.addNote}
+            footer={[
+              <Button key="cancel" onClick={this.onCancel}>
+                Cancel
+              </Button>,
+              <Button key="create" type="primary" onClick={this.addNote}>
+                Create
+              </Button>
+            ]}
+          >
+            <Input
+              placeholder="Enter Note Name"
+              onChange={e => this.setState({ noteName: e.target.value })}
+              onPressEnter={this.addNote}
+              allowClear
+            />
+          </Modal>
+        </div>
+      </Tooltip>
     );
   }
 }

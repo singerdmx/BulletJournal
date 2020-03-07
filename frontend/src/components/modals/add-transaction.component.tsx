@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input, Button, Tooltip } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps} from 'react-router';
@@ -40,30 +40,32 @@ class AddTransaction extends React.Component<TransactionProps & RouteComponentPr
   
   render() {
     return (
-      <div className="add-transaction" title='Create New Transaction'>
-        <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Transaction' />
-        <Modal
-          title="Create New Transaction"
-          visible={this.state.isShow}
-          onCancel={this.onCancel}
-          onOk={() => this.addTransaction}
-          footer={[
-            <Button key="cancel" onClick={this.onCancel}>
-              Cancel
-            </Button>,
-            <Button key="create" type="primary" onClick={this.addTransaction}>
-              Create
-            </Button>
-          ]}
-        >
-          <Input
-            placeholder="Enter Transaction Name"
-            onChange={e => this.setState({ transactionName: e.target.value })}
-            onPressEnter={this.addTransaction}
-            allowClear
-          />
-        </Modal>
-      </div>
+      <Tooltip placement="top" title='Create New Transaction'>
+        <div className="add-transaction" >
+          <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Transaction' />
+          <Modal
+            title="Create New Transaction"
+            visible={this.state.isShow}
+            onCancel={this.onCancel}
+            onOk={() => this.addTransaction}
+            footer={[
+              <Button key="cancel" onClick={this.onCancel}>
+                Cancel
+              </Button>,
+              <Button key="create" type="primary" onClick={this.addTransaction}>
+                Create
+              </Button>
+            ]}
+          >
+            <Input
+              placeholder="Enter Transaction Name"
+              onChange={e => this.setState({ transactionName: e.target.value })}
+              onPressEnter={this.addTransaction}
+              allowClear
+            />
+          </Modal>
+        </div>
+      </Tooltip>
     );
   }
 }

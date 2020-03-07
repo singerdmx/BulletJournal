@@ -1,6 +1,6 @@
 import React from 'react';
 import { CloseOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, List, Badge, Avatar, Typography, Popconfirm } from 'antd';
+import { Button, List, Badge, Avatar, Typography, Popconfirm, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import {
@@ -111,27 +111,30 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
             renderItem={item => {
               return (
                 <List.Item key={item.id}>
+                  <Tooltip placement="top" title={getGroupUserTitle(item, group)}>
                   <div
                     className="group-user"
-                    title={getGroupUserTitle(item, group)}
                   >
                     <Badge dot={!item.accepted}>
                       <Avatar size={item.name === group.owner ? 'large' : 'default'} src={item.avatar} />
                     </Badge>
                     {getGroupUserSpan(item, group)}
                   </div>
+                  </Tooltip>
                   {item.name !== group.owner &&
                     group.owner === this.props.myself.username && (
-                      <Button
-                        type="link"
-                        size="small"
-                        title={item.accepted ? 'Remove' : 'Cancel Invitation'}
-                        onClick={() =>
-                          this.deleteUser(group.id, item.name, group.name)
-                        }
-                      >
-                        <CloseOutlined />
-                      </Button>
+                      <Tooltip placement="top" title={item.accepted ? 'Remove' : 'Cancel Invitation'}>
+                        <Button
+                          type="link"
+                          size="small"
+                          
+                          onClick={() =>
+                            this.deleteUser(group.id, item.name, group.name)
+                          }
+                        >
+                          <CloseOutlined />
+                        </Button>
+                      </Tooltip>
                     )}
                 </List.Item>
               );

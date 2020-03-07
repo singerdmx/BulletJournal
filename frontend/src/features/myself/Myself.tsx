@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PlusOutlined, SyncOutlined } from '@ant-design/icons';
-import { Avatar, Popover } from 'antd';
+import { Avatar, Popover, Tooltip } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
@@ -39,11 +39,14 @@ class Myself extends React.Component<MyselfProps & PathProps> {
   render() {
     return (
       <div className='myselfContainer'>
-        <PlusOutlined title='Create New BuJo' className='rotateIcon' />
-        <SyncOutlined
-          title='Refresh'
-          className='rotateIcon'
-          onClick={this.handleRefreshOnClick} />
+        <Tooltip placement="bottom" title='Create New BuJo' >
+          <PlusOutlined className='rotateIcon' />
+        </Tooltip>
+        <Tooltip placement="bottom" title='Refresh' >
+          <SyncOutlined
+            className='rotateIcon'
+            onClick={this.handleRefreshOnClick} />
+        </Tooltip>
         <Notifications />
         <Popover
           content={

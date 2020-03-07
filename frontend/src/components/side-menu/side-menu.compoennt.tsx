@@ -19,7 +19,7 @@ import {
 import AddGroup from '../../components/modals/add-group.component';
 import AddProject from '../../components/modals/add-project.component';
 import ProjectDnd from '../../components/project-dnd/project-dnd.component';
-import { Menu, Avatar } from 'antd';
+import { Menu, Avatar, Tooltip } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interfaces';
 import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
@@ -113,7 +113,9 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             title={
               <span>
                 <ProfileOutlined />
-                <span title='BuJo created by me'>Owned BuJo</span>
+                <Tooltip placement="top" title='BuJo created by me'>
+                  <span>Owned BuJo</span>
+                </Tooltip>
               </span>
             }
           ></SubMenu>
@@ -122,7 +124,9 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             title={
               <span>
                 <TeamOutlined />
-                <span title='BuJo shared with me'>Shared BuJo</span>
+                <Tooltip placement="top" title='BuJo shared with me'>
+                  <span>Shared BuJo</span>
+                </Tooltip>
               </span>
             }
           >
@@ -147,12 +151,13 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                 <span className='group-title'>
                   <span>
                     <Avatar size='small' src={group.ownerAvatar} />
-                    <span
-                      className='group-name'
-                      title={`Group "${group.name}" (owner "${group.owner}")`}
-                    >
-                      {group.name}
-                    </span>
+                    <Tooltip placement="top" title={`Group "${group.name}" (owner "${group.owner}")`}>
+                      <span
+                        className='group-name'
+                      >
+                        {group.name}
+                      </span>
+                    </Tooltip>
                   </span>
                   <span>
                     <UserOutlined />

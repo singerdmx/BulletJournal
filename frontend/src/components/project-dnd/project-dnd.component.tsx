@@ -1,6 +1,6 @@
 import React from 'react';
 import { History } from 'history';
-import { Tree } from 'antd';
+import { Tree, Tooltip } from 'antd';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
 import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
 import { updateSharedProjectsOrder } from '../../features/project/actions';
@@ -35,21 +35,21 @@ const getTree = (
     }
     if (item.owner) {
       node.title = (
-        <span
-          onClick={e => history.push(`/projects/${item.id}`)}
-          title={'Owner: ' + item.owner}
-        >
-          {iconMapper[item.projectType]}&nbsp;{item.name}
-        </span>
+        <Tooltip placement="top" title={'Owner: ' + item.owner}>
+          <span
+            onClick={e => history.push(`/projects/${item.id}`)}>
+            {iconMapper[item.projectType]}&nbsp;{item.name}
+          </span>
+        </Tooltip>
       );
     } else {
       node.title = (
-        <span
-          title="Not Shared"
-          style={{ color: '#e0e0eb', cursor: 'default' }}
-        >
-          {iconMapper[item.projectType]}&nbsp;{item.name}
-        </span>
+        <Tooltip placement="top" title="Not Shared">
+          <span
+            style={{ color: '#e0e0eb', cursor: 'default' }}>
+            {iconMapper[item.projectType]}&nbsp;{item.name}
+          </span>
+        </Tooltip>
       );
     }
     node.key = item.id.toString();

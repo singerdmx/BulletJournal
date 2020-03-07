@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Button } from 'antd';
+import { Divider, Button, Tooltip } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 
 import './pages.style.less';
@@ -7,9 +7,11 @@ import './pages.style.less';
 const LablesPage = () => {
   return (
     <div className='labels'>
-        <Button title="Add New Label" type="primary" shape="round" icon={<PlusCircleOutlined />} >
-          New Label
-        </Button>
+        <Tooltip placement="top" title="Add New Label">
+          <Button type="primary" shape="round" icon={<PlusCircleOutlined />} >
+            New Label
+          </Button>
+        </Tooltip>
         <Divider />
     </div>
   );

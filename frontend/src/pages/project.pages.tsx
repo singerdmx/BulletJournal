@@ -4,7 +4,7 @@ import { Project } from '../features/project/interfaces';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../features/group/interfaces';
-import { Avatar, Popconfirm } from 'antd';
+import { Avatar, Popconfirm, Tooltip } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -117,25 +117,30 @@ class ProjectPage extends React.Component<
       <div className='project'>
         <div className='project-header'>
           <h2>
-            <span title={project.owner}>
-              <Avatar size='large' src={project.ownerAvatar} />
-            </span>
+            <Tooltip placement="top" title={project.owner}>
+              <span>
+                <Avatar size='large' src={project.ownerAvatar} />
+              </span>
+            </Tooltip>
             &nbsp;&nbsp;&nbsp;
-            <span title={`${project.projectType} ${project.name}`}>
-              {iconMapper[project.projectType]}
-              &nbsp;{project.name}
-            </span>
+            <Tooltip placement="top" title={`${project.projectType} ${project.name}`}>
+              <span>
+                {iconMapper[project.projectType]}
+                &nbsp;{project.name}
+              </span>
+            </Tooltip>
           </h2>
 
           <div className='project-control'>
             <span style={{ cursor: 'pointer' }}>
-              <h2
-                onClick={e => this.onClickGroup(project.group.id)}
-                title={project.group && `Group: ${project.group.name}`}
-              >
-                <TeamOutlined />
-                {project.group && project.group.users.length}
-              </h2>
+              <Tooltip placement="top" title={project.group && `Group: ${project.group.name}`}>
+                <h2
+                  onClick={e => this.onClickGroup(project.group.id)}
+                >
+                  <TeamOutlined />
+                  {project.group && project.group.users.length}
+                </h2>
+              </Tooltip>
             </span>
 
             {createContent}

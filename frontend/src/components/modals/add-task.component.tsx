@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input, Button, Tooltip } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps} from 'react-router';
@@ -41,30 +41,32 @@ class AddTask extends React.Component<TaskProps & RouteComponentProps, ModalStat
   
   render() {
     return (
-      <div className="add-task" title='Create New Task'>
-        <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Note' />
-        <Modal
-          title="Create New Task"
-          visible={this.state.isShow}
-          onCancel={this.onCancel}
-          onOk={() => this.addTask}
-          footer={[
-            <Button key="cancel" onClick={this.onCancel}>
-              Cancel
-            </Button>,
-            <Button key="create" type="primary" onClick={this.addTask}>
-              Create
-            </Button>
-          ]}
-        >
-          <Input
-            placeholder="Enter Task Name"
-            onChange={e => this.setState({ taskName: e.target.value })}
-            onPressEnter={this.addTask}
-            allowClear
-          />
-        </Modal>
-      </div>
+      <Tooltip placement="top" title='Create New Task'>
+        <div className="add-task" >
+            <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Note' />
+            <Modal
+            title="Create New Task"
+            visible={this.state.isShow}
+            onCancel={this.onCancel}
+            onOk={() => this.addTask}
+            footer={[
+                <Button key="cancel" onClick={this.onCancel}>
+                Cancel
+                </Button>,
+                <Button key="create" type="primary" onClick={this.addTask}>
+                Create
+                </Button>
+            ]}
+            >
+            <Input
+                placeholder="Enter Task Name"
+                onChange={e => this.setState({ taskName: e.target.value })}
+                onPressEnter={this.addTask}
+                allowClear
+            />
+            </Modal>
+        </div>
+      </Tooltip>
     );
   }
 }
