@@ -1,6 +1,6 @@
 import React from 'react';
 import TodoItem from '../../components/todo-item/todo-item.component';
-import { List, DatePicker } from 'antd';
+import { List, DatePicker, Tooltip } from 'antd';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
@@ -32,13 +32,14 @@ class TaskList extends React.Component<TaskProps> {
             ]}
             format={dateFormat}
           />
-          <Link
-            to='/settings'
-            title='Change Time Zone'
-            style={{ paddingLeft: '30px' }}
-          >
-            {this.props.timezone}
-          </Link>
+          <Tooltip placement="top" title='Change Time Zone'>
+            <Link
+              to='/settings'
+              style={{ paddingLeft: '30px' }}
+            >
+              {this.props.timezone}
+            </Link>
+          </Tooltip>
         </div>
         <List
           itemLayout='horizontal'
