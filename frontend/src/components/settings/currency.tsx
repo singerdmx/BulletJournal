@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
+import { Select, Tooltip } from 'antd';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
@@ -97,34 +97,35 @@ class CurrencyPicker extends React.Component<CurrencyProps> {
             </Option>
           ))}
         </Select>
-        <CheckCircleOutlined
-          onClick={() => this.handleOnClick(true)}
-          style={{
-            marginLeft: '20px',
-            cursor: 'pointer',
-            color: '#00e600',
-            fontSize: 20,
-            visibility:
-              this.props.currentCurrency !== this.props.originalCurrency
-                ? 'visible'
-                : 'hidden'
-          }}
-          title='Save'
-        />
-        <CloseCircleOutlined
-          onClick={() => this.handleOnClick(false)}
-          style={{
-            marginLeft: '20px',
-            cursor: 'pointer',
-            color: '#ff0000',
-            fontSize: 20,
-            visibility:
-              this.props.currentCurrency !== this.props.originalCurrency
-                ? 'visible'
-                : 'hidden'
-          }}
-          title='Cancel'
-        />
+        <Tooltip placement="top" title='Save'>
+          <CheckCircleOutlined
+            onClick={() => this.handleOnClick(true)}
+            style={{
+              marginLeft: '20px',
+              cursor: 'pointer',
+              color: '#00e600',
+              fontSize: 20,
+              visibility:
+                this.props.currentCurrency !== this.props.originalCurrency
+                  ? 'visible'
+                  : 'hidden'
+            }}
+          />
+        </Tooltip>
+        <Tooltip placement="top" title='Cancel'>
+          <CloseCircleOutlined
+            onClick={() => this.handleOnClick(false)}
+            style={{
+              marginLeft: '20px',
+              cursor: 'pointer',
+              color: '#ff0000',
+              fontSize: 20,
+              visibility:
+                this.props.currentCurrency !== this.props.originalCurrency
+                  ? 'visible'
+                  : 'hidden'
+            }} />
+        </Tooltip>
       </span>
     );
   }
