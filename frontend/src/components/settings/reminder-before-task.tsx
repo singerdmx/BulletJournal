@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
+import { Select, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { ReminderBeforeTaskText } from './reducer';
@@ -49,32 +49,34 @@ class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {
             </Option>
           ))}
         </Select>
-        <CheckCircleOutlined
-          onClick={() => this.handleOnClick(true)}
-          style={{
-            marginLeft: '20px',
-            cursor: 'pointer',
-            color: '#00e600',
-            fontSize: 20,
-            visibility:
-              this.props.currentBefore !== this.props.originalBefore
-                ? 'visible'
-                : 'hidden'
-          }}
-          title='Save' />
-        <CloseCircleOutlined
-          onClick={() => this.handleOnClick(false)}
-          style={{
-            marginLeft: '20px',
-            cursor: 'pointer',
-            color: '#ff0000',
-            fontSize: 20,
-            visibility:
-              this.props.currentBefore !== this.props.originalBefore
-                ? 'visible'
-                : 'hidden'
-          }}
-          title='Cancel' />
+        <Tooltip placement="top" title='Save'>
+          <CheckCircleOutlined
+            onClick={() => this.handleOnClick(true)}
+            style={{
+              marginLeft: '20px',
+              cursor: 'pointer',
+              color: '#00e600',
+              fontSize: 20,
+              visibility:
+                this.props.currentBefore !== this.props.originalBefore
+                  ? 'visible'
+                  : 'hidden'
+            }} />
+        </Tooltip>
+        <Tooltip placement="top" title='Cancel'>
+          <CloseCircleOutlined
+            onClick={() => this.handleOnClick(false)}
+            style={{
+              marginLeft: '20px',
+              cursor: 'pointer',
+              color: '#ff0000',
+              fontSize: 20,
+              visibility:
+                this.props.currentBefore !== this.props.originalBefore
+                  ? 'visible'
+                  : 'hidden'
+            }} />
+        </Tooltip>
       </span>
     );
   }
