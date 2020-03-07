@@ -46,7 +46,9 @@ const slice = createSlice({
     labelsReceived: (state, action: PayloadAction<LabelsAction>) => {
       const { labels, etag } = action.payload;
       state.labels = labels;
-      state.etag = etag;
+      if (etag && etag.length > 0) {
+        state.etag = etag;
+      }
     },
     labelsUpdate: (state, action: PayloadAction<UpdateLabels>) => state,
     labelsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>

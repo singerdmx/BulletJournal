@@ -6,15 +6,13 @@ import BujoCalendar from '../components/bujo-calendar/bujo-calendar.component';
 import {
   AccountBookOutlined,
   CarryOutOutlined,
-  PlusOutlined
 } from '@ant-design/icons';
 import { IState } from '../store/index';
 import { Project } from '../features/project/interfaces';
 import AddProject from '../components/modals/add-project.component';
 import AddProjectItem from '../components/modals/add-project-item.component';
-import { Form } from '@ant-design/compatible';
 import '@ant-design/compatible/assets/index.css';
-import { Modal, Input, Checkbox, Tooltip } from 'antd';
+import { Checkbox, Tooltip } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 
 type BujoRouteParams = {
