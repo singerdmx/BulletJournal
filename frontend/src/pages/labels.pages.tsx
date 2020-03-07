@@ -4,7 +4,7 @@ import { IState } from '../store/index';
 import { Divider, Tag, Button, Tooltip } from 'antd';
 import AddLabel from '../components/modals/add-label.component';
 import { Label } from '../features/label/interfaces'
-import { labelsUpdate } from '../features/label/actions';
+import { labelsUpdate, deleteLabel } from '../features/label/actions';
 import { TagOutlined } from '@ant-design/icons';
 import { TweenOneGroup } from 'rc-tween-one';
 
@@ -13,6 +13,7 @@ import './pages.style.less';
 type LabelsProps = {
   labels: Label[];
   labelsUpdate: () => void;
+  deleteLabel: (labelId: number, name: string) => void;
 }
 
 class LablesPage extends React.Component<LabelsProps> {
@@ -21,7 +22,7 @@ class LablesPage extends React.Component<LabelsProps> {
   }
 
   handleClose = (removedLabel: Label) => {
-    
+    this.props.deleteLabel(removedLabel.id, removedLabel.name);
   };
 
   forMap = (label: Label) => {
@@ -73,4 +74,4 @@ const mapStateToProps = (state: IState) => ({
   labels: state.label.labels
 });
 
-export default connect(mapStateToProps, { labelsUpdate })(LablesPage);
+export default connect(mapStateToProps, { labelsUpdate, deleteLabel })(LablesPage);
