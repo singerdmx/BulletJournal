@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { IState } from '../store/index';
-import { Divider, Tag, Button, Tooltip } from 'antd';
+import { Divider, Tag, Collapse, Tooltip } from 'antd';
 import AddLabel from '../components/modals/add-label.component';
 import { Label, stringToRGB } from '../features/label/interfaces'
 import { labelsUpdate, deleteLabel } from '../features/label/actions';
@@ -9,6 +9,8 @@ import { TagOutlined } from '@ant-design/icons';
 import { TweenOneGroup } from 'rc-tween-one';
 
 import './pages.style.less';
+
+const { Panel } = Collapse;
 
 type LabelsProps = {
   labels: Label[];
@@ -52,20 +54,24 @@ class LablesPage extends React.Component<LabelsProps> {
       <div className='labels'>
           <AddLabel />
           <Divider />
-          <div>
-            <TweenOneGroup
-              enter={{
-                scale: 0.8,
-                opacity: 0,
-                type: 'from',
-                duration: 100,
-              }}
-              leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
-              appear={false}
-            >
-              {tagChild}
-            </TweenOneGroup>
-          </div>
+          <Collapse defaultActiveKey={['availableLabels']}>
+            <Panel header='' key="availableLabels">
+              <div>
+                <TweenOneGroup
+                  enter={{
+                    scale: 0.8,
+                    opacity: 0,
+                    type: 'from',
+                    duration: 100,
+                  }}
+                  leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
+                  appear={false}
+                >
+                  {tagChild}
+                </TweenOneGroup>
+              </div>
+            </Panel>
+          </Collapse>
       </div>
     );
   }
