@@ -13,6 +13,7 @@ import AddNote from '../components/modals/add-note.component';
 import AddTask from '../components/modals/add-task.component';
 import AddTransaction from '../components/modals/add-transaction.component';
 import { ProjectType } from '../features/project/constants';
+import { deleteProject } from '../features/project/actions';
 
 type ProjectPathParams = {
   projectId: string;
@@ -34,11 +35,12 @@ interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
 type ProjectPageProps = {
   project: Project;
   getProject: (projectId: number) => void;
+  deleteProject: (projectId: number, name: string) => void;
 };
 
 type MyselfProps = {
   myself: string;
-}
+};
 
 class ProjectPage extends React.Component<
   ProjectPageProps & ProjectPathProps & GroupProps & MyselfProps,
@@ -85,7 +87,7 @@ class ProjectPage extends React.Component<
         createContent = <AddTask />;
         break;
       case ProjectType.LEDGER:
-        createContent = <AddTransaction />
+        createContent = <AddTransaction />;
     }
 
     let editContent = null;
@@ -93,37 +95,44 @@ class ProjectPage extends React.Component<
     if (myself === project.owner) {
       editContent = <EditProject />;
       deleteContent = (
-      <Popconfirm
-        title='Are you sure?'
-        okText='Yes'
-        cancelText='No'
-        onConfirm={() => console.log('aa')}
-        className='group-setting'
-        placement='bottom'
-      >
-        <DeleteOutlined
-          title='Delete Project'
-          style={{
-            fontSize: 20,
-            marginLeft: '10px',
-            cursor: 'pointer',
-            marginBottom: '0.5em'
+        <Popconfirm
+          title='Are you sure?'
+          okText='Yes'
+          cancelText='No'
+          onConfirm={() => {
+            this.props.deleteProject(project.id, project.name);
+            this.props.history.push('/projects');
           }}
-        />
-      </Popconfirm>);
+          className='group-setting'
+          placement='bottom'
+        >
+          <DeleteOutlined
+            title='Delete Project'
+            style={{
+              fontSize: 20,
+              marginLeft: '10px',
+              cursor: 'pointer',
+              marginBottom: '0.5em'
+            }}
+          />
+        </Popconfirm>
+      );
     }
 
     return (
       <div className='project'>
         <div className='project-header'>
           <h2>
-            <Tooltip placement="top" title={project.owner}>
+            <Tooltip placement='top' title={project.owner}>
               <span>
                 <Avatar size='large' src={project.ownerAvatar} />
               </span>
             </Tooltip>
             &nbsp;&nbsp;&nbsp;
-            <Tooltip placement="top" title={`${project.projectType} ${project.name}`}>
+            <Tooltip
+              placement='top'
+              title={`${project.projectType} ${project.name}`}
+            >
               <span>
                 {iconMapper[project.projectType]}
                 &nbsp;{project.name}
@@ -133,7 +142,10 @@ class ProjectPage extends React.Component<
 
           <div className='project-control'>
             <span style={{ cursor: 'pointer' }}>
-              <Tooltip placement="top" title={project.group && `Group: ${project.group.name}`}>
+              <Tooltip
+                placement='top'
+                title={project.group && `Group: ${project.group.name}`}
+              >
                 <h2 onClick={e => this.onClickGroup(project.group.id)}>
                   <TeamOutlined />
                   {project.group && project.group.users.length}
@@ -145,7 +157,6 @@ class ProjectPage extends React.Component<
             {editContent}
             {deleteContent}
           </div>
-          
         </div>
         <div className='project-content'></div>
         <div>{project.description}</div>
@@ -160,4 +171,6 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself.username
 });
 
-export default connect(mapStateToProps, { getProject })(ProjectPage);
+export default connect(mapStateToProps, { getProject, deleteProject })(
+  ProjectPage
+);
