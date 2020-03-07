@@ -134,9 +134,7 @@ class ProjectPage extends React.Component<
           <div className='project-control'>
             <span style={{ cursor: 'pointer' }}>
               <Tooltip placement="top" title={project.group && `Group: ${project.group.name}`}>
-                <h2
-                  onClick={e => this.onClickGroup(project.group.id)}
-                >
+                <h2 onClick={e => this.onClickGroup(project.group.id)}>
                   <TeamOutlined />
                   {project.group && project.group.users.length}
                 </h2>
