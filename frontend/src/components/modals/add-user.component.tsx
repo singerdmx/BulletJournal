@@ -1,6 +1,6 @@
 import React from 'react';
 import { PlusOutlined, UserOutlined } from '@ant-design/icons';
-import { Modal, Input, Button, Avatar, Empty } from 'antd';
+import { Modal, Input, Button, Avatar, Empty, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { addUserGroupByUsername } from '../../features/group/actions';
 import { updateUser, clearUser, userApiErrorReceived } from '../../features/user/actions';
@@ -62,13 +62,14 @@ class AddUser extends React.Component<ModalProps, ModalState> {
     const {groupId, user, groupName} = this.props;
     return (
       <div className="group-footer">
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          shape="round"
-          title="Add User"
-          onClick={this.showModal}
-        />
+        <Tooltip placement="top" title="Add User">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            shape="round"
+            onClick={this.showModal}
+          />
+        </Tooltip>
         <Modal
           title="Add User"
           visible={this.state.isShow}

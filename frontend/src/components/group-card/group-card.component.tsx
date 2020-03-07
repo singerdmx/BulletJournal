@@ -100,7 +100,9 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
                 onConfirm={this.deleteGroup}
                 className="group-setting"
               >
-                <DeleteOutlined title="Delete Group" />
+                <Tooltip placement="top" title="Delete Group" >
+                  <DeleteOutlined />
+                </Tooltip>
               </Popconfirm>
             )}
           </h3>
