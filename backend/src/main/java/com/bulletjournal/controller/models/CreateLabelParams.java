@@ -7,21 +7,21 @@ public class CreateLabelParams {
 
     @NotBlank
     @Size(min = 1, max = 50)
-    private String value;
+    private String name;
 
     public CreateLabelParams() {
     }
 
     public CreateLabelParams(
-            @NotBlank @Size(min = 1, max = 50) String value) {
-        this.value = value;
+            @NotBlank @Size(min = 1, max = 50) String name) {
+        this.name = name;
     }
 
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setName(String name) {
+        this.name = name;
     }
 }

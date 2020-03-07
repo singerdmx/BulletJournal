@@ -30,7 +30,7 @@ public class LabelController {
     @ResponseStatus(HttpStatus.CREATED)
     public Label createLabel(@Valid @RequestBody CreateLabelParams label) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return labelDaoJpa.create(label.getValue(), username).toPresentationModel();
+        return labelDaoJpa.create(label.getName(), username).toPresentationModel();
     }
 
     @PatchMapping(LABEL_ROUTE)
