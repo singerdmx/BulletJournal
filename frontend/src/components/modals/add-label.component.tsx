@@ -1,78 +1,61 @@
-import React from 'react';
-import { Modal, Input, Button, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Modal, Input, Button, Tooltip, Form } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps} from 'react-router';
 import { createLabel } from '../../features/label/actions';
-import { IState } from '../../store';
 import './modals.styles.less';
 
-type LabelProps = {
+interface LabelCreateFormProps {
     createLabel: (name: string) => void;
 };
 
-type ModalState = {
-  isShow: boolean;
-  labelName: string;
-};
-
-class AddLabel extends React.Component<LabelProps & RouteComponentProps, ModalState> {
-  state: ModalState = {
-    isShow: false,
-    labelName: ''
+const AddLabel: React.FC<RouteComponentProps & LabelCreateFormProps> = (props) => {
+  const [form] = Form.useForm();
+  const [visible, setVisible] = useState(false);
+  const addLabel = (values: any) => {
+    props.createLabel(values.labelName);
+    setVisible(false);
   };
+  const onCancel = () => setVisible(false);
+  const openModal = () => setVisible(true);
 
-  showModal = () => {
-    this.setState({ isShow: true });
-  };
-
-  addLabel = () => {
-    console.log('addLabel');
-    this.props.createLabel(this.state.labelName);
-    this.setState({ isShow: false, labelName: '' });
-    // this.props.history.push("/labels")
-  };
-
-  onCancel = () => {
-    this.setState({ isShow: false });
-  };
-  
-  render() {
     return (
-      <Tooltip placement="top" title='Create New Label'>
-        <div className="add-label" >
-            <Button type="primary" shape="round" icon={<PlusCircleOutlined />} onClick={this.showModal}>
-              New Label
-            </Button>
-            <Modal
-            title="Create New Label"
-            visible={this.state.isShow}
-            onCancel={this.onCancel}
-            onOk={() => this.addLabel}
-            footer={[
-                <Button key="cancel" onClick={this.onCancel}>
-                Cancel
-                </Button>,
-                <Button key="create" type="primary" onClick={this.addLabel}>
-                Create
-                </Button>
-            ]}
-            >
-            <Input
-                placeholder="Enter Label Name"
-                onChange={e => this.setState({ labelName: e.target.value })}
-                onPressEnter={this.addLabel}
-                allowClear
-            />
-            </Modal>
-        </div>
-      </Tooltip>
+    <Tooltip placement="top" title='Create New Label'>
+      <div className="add-label" >
+          <Button type="primary" shape="round" icon={<PlusCircleOutlined />} onClick={openModal}>
+            New Label
+          </Button>
+          <Modal
+          title="Create New Label"
+          visible={visible}
+          okText="Create"
+          onCancel={onCancel}
+          onOk={() => {
+            form
+              .validateFields()
+              .then(values => {
+                console.log(values);
+                form.resetFields();
+                addLabel(values);
+              })
+              .catch(info => console.log(info));
+          }}
+          >
+            <Form form={form}>
+              <Form.Item
+                name="labelName"
+                rules={[
+                  { required: true, message: 'Please input Label Name!' }
+                ]}
+              >
+                <Input placeholder="Enter Label Name" allowClear />
+              </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    </Tooltip>
     );
-  }
 }
 
-const mapStateToProps = (state: IState) => ({
-  labels: state.label.labels
-});
-
-export default connect(mapStateToProps, { createLabel })(withRouter(AddLabel));
+export default connect(null, { createLabel })(withRouter(AddLabel));

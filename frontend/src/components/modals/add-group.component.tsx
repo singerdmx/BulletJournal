@@ -29,7 +29,7 @@ const AddGroup: React.FC<RouteComponentProps & GroupCreateFormProps> = (props) =
         <Modal
           title="Create New Group"
           visible={visible}
-          okText="Create Group"
+          okText="Create"
           onCancel={onCancel}
           onOk={() => {
             form
@@ -46,7 +46,7 @@ const AddGroup: React.FC<RouteComponentProps & GroupCreateFormProps> = (props) =
             <Form.Item
               name="groupName"
               rules={[
-                { required: true, message: 'Please input your groupname!' }
+                { required: true, message: 'Please input Group Name!' }
               ]}
             >
               <Input placeholder="Enter Group Name" allowClear />
