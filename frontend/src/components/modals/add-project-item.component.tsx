@@ -14,6 +14,10 @@ import { History } from 'history';
 
 import './modals.styles.less';
 
+type ProjectItemProps = {
+  mode: string;
+}
+
 //props of groups
 type GroupProps = {
   groups: GroupsWithOwner[];
@@ -24,7 +28,7 @@ type ModalState = {
   isShow: boolean;
 };
 
-class AddProjectItem extends React.Component<GroupProps,
+class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
   ModalState
 > {
   componentDidMount() {
@@ -64,6 +68,18 @@ class AddProjectItem extends React.Component<GroupProps,
       ]}
     >
     </Modal>);
+      if (this.props.mode === 'MyBuJo') {
+        return (
+          <div>
+            <Tooltip placement="bottom" title='Create New BuJo Item' >
+              <h2 className='add-todo-button' onClick={this.showModal}>
+                <PlusOutlined />
+              </h2>
+            </Tooltip>
+            {modal}
+          </div>
+        );
+      }
       return (
         <div>
           <Tooltip placement="bottom" title='Create New BuJo Item' >

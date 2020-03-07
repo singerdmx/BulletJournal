@@ -201,6 +201,17 @@ class AddProject extends React.Component<
           </Tooltip>
         );
       }
+      if (this.props.mode === 'MyBuJo') {
+        return (
+          <div>
+            <Tooltip placement="bottom" title='Create New BuJo' >
+              <h2 className='add-todo-button' onClick={this.showModal}>
+                <PlusOutlined />
+              </h2>
+            </Tooltip>
+            {modal}
+          </div>);
+      }
       return (
         <div>
           <Tooltip placement="bottom" title='Create New BuJo' >
