@@ -40,6 +40,11 @@ public class LabelController {
         return labelDaoJpa.partialUpdate(username, labelId, updateLabelParams).toPresentationModel();
     }
 
+    @GetMapping(LABEL_ROUTE)
+    public Label getLabel(@NotNull @PathVariable Long labelId) {
+        return this.labelDaoJpa.getLabel(labelId).toPresentationModel();
+    }
+
     @DeleteMapping(LABELS_ROUTE)
     public ResponseEntity<?> deleteLabel(@PathVariable Long labelId) {
         return null;

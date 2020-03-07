@@ -60,4 +60,11 @@ public class LabelDaoJpa {
 
         return this.labelRepository.save(label);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Label getLabel(Long id) {
+        Label label = this.labelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Label" + id + "not found"));
+        return label;
+    }
 }
