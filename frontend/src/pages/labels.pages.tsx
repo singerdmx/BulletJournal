@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { IState } from '../store/index';
-import { Tag, Collapse, Button, AutoComplete, Tooltip } from 'antd';
+import { Tag, Collapse, Button, AutoComplete, Typography, Tooltip } from 'antd';
 import AddLabel from '../components/modals/add-label.component';
 import { Label, stringToRGB } from '../features/label/interfaces'
 import { labelsUpdate, deleteLabel, addSelectedLabel, removeSelectedLabel } from '../features/label/actions';
-import { TagOutlined, SearchOutlined } from '@ant-design/icons';
+import { TagOutlined, SearchOutlined, DeleteOutlined, Popconfirm } from '@ant-design/icons';
 import { TweenOneGroup } from 'rc-tween-one';
 
 import './pages.style.less';
@@ -21,6 +21,8 @@ type LabelsProps = {
   addSelectedLabel: (val: string) => void;
   removeSelectedLabel: (val: string) => void;
 }
+
+const { Text } = Typography;
 
 class LablesPage extends React.Component<LabelsProps> {
 
@@ -45,17 +47,19 @@ class LablesPage extends React.Component<LabelsProps> {
 
   forMap = (label: Label) => {
     const tagElem = (
-      <Tag
-        className='label'
-        closable
-        color={stringToRGB(label.value)}
-        onClose={(e: any)  => {
-          e.preventDefault();
-          this.handleClose(label);
-        }}
-      >
-        <TagOutlined/ > &nbsp; {label.value}
-      </Tag>
+      <Tooltip title={label.value} placement="topLeft">
+        <Tag
+          className='label'
+          closable
+          color={stringToRGB(label.value)}
+          onClose={(e: any)  => {
+            e.preventDefault();
+            this.handleClose(label);
+          }}
+        >
+        <TagOutlined /> &nbsp; {label.value}
+        </Tag>
+      </Tooltip>
     );
     return (
       <span key={label.value} style={{ display: 'inline-block' }}>
@@ -66,17 +70,29 @@ class LablesPage extends React.Component<LabelsProps> {
 
   mapLabels = (label: Label) => {
     const tagElem = (
-      <Tag
-        className='label'
-        closable
-        color={stringToRGB(label.value)}
-        onClose={(e: any)  => {
-          e.preventDefault();
-          this.handleClose(label);
-        }}
-      >
-        <TagOutlined/ > &nbsp; {label.value}
-      </Tag>
+      <Tooltip title={label.value} placement="topLeft">
+        <Tag
+          className='label'
+          color={stringToRGB(label.value)}
+          onClose={(e: any)  => {
+            e.preventDefault();
+            this.handleClose(label);
+          }}
+        >
+          <TagOutlined />
+          &nbsp; <Text editable={true}>{label.value}</Text>
+          <Tooltip title="Delete" placement="top">
+            <DeleteOutlined
+              title='Delete'
+              style={{
+                marginLeft: '10px',
+                cursor: 'pointer',
+                marginBottom: '0.5em'
+              }}
+            />
+          </Tooltip>
+        </Tag>
+      </Tooltip>
     );
     return (
       <span key={label.value} style={{ display: 'inline-block' }}>
@@ -89,7 +105,7 @@ class LablesPage extends React.Component<LabelsProps> {
     return (
       <div className='labels'>
           <AddLabel />
-          <Tooltip title="search">
+          <Tooltip title="Search">
             <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={this.handleClickSearch} />
           </Tooltip>
           <AutoComplete
