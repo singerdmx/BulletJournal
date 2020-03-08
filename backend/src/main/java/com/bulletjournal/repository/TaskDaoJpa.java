@@ -84,7 +84,6 @@ public class TaskDaoJpa {
         if (user.size() == 0)
             throw new ResourceNotFoundException("Assignee " + assignee + " not found");
 
-        List<Task> tasks = this.taskRepository.findTaskByAssignedTo(assignee);
         Timestamp currentTime = Timestamp.from(now.toInstant());
         return this.taskRepository
                 .findRemindingTask(assignee, currentTime)

@@ -76,6 +76,7 @@ public abstract class TaskModel extends ProjectItemModel {
     public void setLabels(Long[] labels) {
         this.labels = labels;
     }
+
     public Timestamp getStartTime() {
         return startTime;
     }

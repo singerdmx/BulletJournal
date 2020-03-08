@@ -88,14 +88,14 @@ public class SystemControllerTest {
 
     @SafeVarargs
     private final <T> void assertIfContains(List<T> container, T... objects) {
-        for(T object : objects) {
+        for (T object : objects) {
             assertTrue(container.contains(object));
         }
     }
 
     @SafeVarargs
     private final <T> void assertIfNotContains(List<T> container, T... objects) {
-        for(T object : objects) {
+        for (T object : objects) {
             assertFalse(container.contains(object));
         }
     }
