@@ -25,6 +25,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
     let currentTime = new Date().toLocaleString('fr-CA', {
       timeZone: data.timezone
     });
+    if (currentTime) currentTime = currentTime.substring(0, 10);
 
     yield put(
       myselfActions.myselfDataReceived({

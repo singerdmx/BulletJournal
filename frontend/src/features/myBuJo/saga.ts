@@ -43,7 +43,7 @@ function* getProjectItemsAfterUpdateSelect(
       todoSelected,
       ledgerSelected
     } = action.payload;
-
+    if (!startDate || !endDate) return;
     yield put(
       projectItemsActions.updateSelected({
         todoSelected: todoSelected,
