@@ -22,7 +22,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
     const { updateSettings } = action.payload;
 
     const data = yield call(fetchMyself, true);
-    let currentTime = new Date().toLocaleString('en-US', {
+    let currentTime = new Date().toLocaleString('fr-CA', {
       timeZone: data.timezone
     });
 
@@ -71,7 +71,7 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
   try {
     const { timezone, before, currency } = action.payload;
     yield call(patchMyself, timezone, before, currency);
-    let currentTime = new Date().toLocaleString('en-US', {
+    let currentTime = new Date().toLocaleString('fr-CA', {
       timeZone: timezone
     });
     yield put(

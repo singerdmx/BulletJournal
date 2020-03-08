@@ -25,6 +25,21 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests {@link ProjectController}
+ *
+ *          Transaction:
+ *               "2020-02-29"
+ *               "2020-03-01"
+ *               "2020-03-02"
+ *               "2020-03-02"
+ *               "2020-03-04"
+ *          Task:
+ *               "2020-02-28"
+ *               "2020-02-29"
+ *               "2020-03-01"
+ *               "2020-03-02"
+ *               "2020-03-02"
+ *               "2020-03-04"
+ *               "2020-03-04"
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

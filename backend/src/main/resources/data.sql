@@ -209,3 +209,13 @@ INSERT INTO public.completed_tasks (id, created_at, updated_at, name, owner, ass
 VALUES (7, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task6', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
 INSERT INTO public.completed_tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, reminder_before_task, reminder_date, reminder_time, start_time, timezone, project_id)
 VALUES (8, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task7', 'Michael_Zhou', 'Michael_Zhou', '2020-03-08', '10:00', 1, '2020-03-08 10:00:00.000000', 1, '2020-03-08', '09:55', '2020-03-08 10:00:00.000000', 'America/Los_Angeles', 9);
+
+-- Michael_Zhou created 2 tasks due on 2020-03-10 and 2 transactions on 2020-03-10
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, labels, reminder_before_task, reminder_date, reminder_date_time, reminder_time, start_time, timezone, project_id)
+VALUES (6, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task6', 'Michael_Zhou', 'Michael_Zhou', '2020-03-10', '10:00', 1, '2020-03-10 10:00:00.000000', null, 1, '2020-03-08', null, '09:55', '2020-03-10 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, labels, reminder_before_task, reminder_date, reminder_date_time, reminder_time, start_time, timezone, project_id)
+VALUES (7, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task7', 'Michael_Zhou', 'Michael_Zhou', '2020-03-10', '10:00', 1, '2020-03-10 10:00:00.000000', null, 1, '2020-03-08', null, '09:55', '2020-03-10 10:00:00.000000', 'America/Los_Angeles', 9);
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
+VALUES (5, '2020-02-10 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment6', 'Michael_Zhou', 10, '2020-03-10', '2020-03-10 00:00:00.000000', 'Michael_Zhou', '2020-03-10 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
+VALUES (6, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment7', 'Michael_Zhou', 150000, '2020-03-10', '2020-03-10 00:00:00.000000', 'Michael_Zhou', '2020-03-10 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);

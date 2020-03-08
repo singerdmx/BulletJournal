@@ -50,7 +50,7 @@ public class SystemControllerTest {
     }
 
     @Test
-    public void testGetUpdates() throws Exception {
+    public void testRemindingTask() throws Exception {
         // Create default testing group
         Group group = createGroup();
 
@@ -62,12 +62,56 @@ public class SystemControllerTest {
         Task t4 = createRemindingTask(p1, "T4", 3, null, null);
         Task t5 = createRemindingTask(p1, "T5", 6, null, null);
 
-        List<Task> remindingTasks = getRemindingTasks(p1);
+        SystemUpdates systemUpdates = getRemindingTasks(p1);
+        List<Task> remindingTasks = systemUpdates.getReminders();
+
+        assertEquals(4, systemUpdates.getReminders().size());
         assertIfContains(remindingTasks, t1, t2, t3, t4);
         assertIfNotContains(remindingTasks, t5);
+
+        deleteTask(t1);
+
+        systemUpdates = getRemindingTasks(p1);
+        remindingTasks = systemUpdates.getReminders();
+
+        assertEquals(3, systemUpdates.getReminders().size());
+        assertIfContains(remindingTasks, t2, t3, t4);
+        assertIfNotContains(remindingTasks, t5);
+
+        String remindingTaskEtag = systemUpdates.getRemindingTaskEtag();
+        systemUpdates = testRemindingTaskEtagMatch(p1, remindingTaskEtag);
+        assertNull(systemUpdates.getReminders());
     }
 
-    private List<Task> getRemindingTasks(Project p) {
+    private void deleteTask(Task task) {
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASK_ROUTE, // this is TASK bc one task?
+                HttpMethod.DELETE,
+                actAsOtherUser(null, sampleUsers[0]),
+                Task.class,
+                task.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    private SystemUpdates testRemindingTaskEtagMatch(Project p, String eTag) {
+        String url = ROOT_URL + randomServerPort + SystemController.UPDATES_ROUTE;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("targets", "taskReminders");
+
+        ResponseEntity<SystemUpdates> response = this.restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                actAsOtherUser(null, sampleUsers[0], eTag),
+                SystemUpdates.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        SystemUpdates systemUpdates = response.getBody();
+        assertNotNull(systemUpdates);
+        return systemUpdates;
+    }
+
+    private SystemUpdates getRemindingTasks(Project p) {
         String url = ROOT_URL + randomServerPort + SystemController.UPDATES_ROUTE;
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("targets", "taskReminders");
@@ -81,9 +125,8 @@ public class SystemControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         SystemUpdates systemUpdates = response.getBody();
         assertNotNull(systemUpdates);
-        assertEquals(4, systemUpdates.getReminders().size());
 
-        return systemUpdates.getReminders();
+        return systemUpdates;
     }
 
     @SafeVarargs
@@ -173,9 +216,12 @@ public class SystemControllerTest {
         return created;
     }
 
-    private <T> HttpEntity actAsOtherUser(T body, String username) {
+    private <T> HttpEntity actAsOtherUser(T body, String username, String... eTags) {
         final HttpHeaders headers = new HttpHeaders();
         headers.set(UserClient.USER_NAME_KEY, username);
+
+        if (eTags.length > 0)
+            headers.setIfNoneMatch(eTags[0]);
 
         if (body == null)
             return new HttpEntity<>(headers);
