@@ -52,4 +52,20 @@ public class ZonedDateTimeHelper {
         }
         return String.valueOf(val);
     }
+
+    /*
+     * 1. Get now ZonedDateTime.
+     * 2. Remove second and nano second.
+     */
+    public static ZonedDateTime getNow() {
+        ZonedDateTime now = ZonedDateTime.now();
+        return  ZonedDateTime.of(now.getYear(),
+                now.getMonthValue(),
+                now.getDayOfMonth(),
+                now.getHour(),
+                now.getMinute(),
+                0,
+                0,
+                now.getZone());
+    }
 }

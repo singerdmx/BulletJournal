@@ -119,4 +119,21 @@ public class UpdateTransactionParams {
     public boolean hasTransactionType() {
         return this.transactionType != null;
     }
+
+    public boolean needsUpdateDateTime() {
+        return this.hasDate() || this.hasTime() || this.hasTimezone();
+    }
+
+    public String getOrDefaultDate(String defaultDate) {
+        return this.hasDate() ? this.getDate() : defaultDate;
+    }
+
+    public String getOrDefaultTime(String defaultTime) {
+        return this.hasTime() ? this.getTime() : defaultTime;
+    }
+
+    public String getOrDefaultTimezone(String defaultTimezone) {
+        return this.hasTimezone() ? this.getTimezone() : defaultTimezone;
+    }
+
 }

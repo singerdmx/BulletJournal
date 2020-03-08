@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -14,11 +15,14 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findTaskByProject(Project project);
 
-    List<Task> findTasksByAssignedToAndReminderDateTimeAfterAndStartTimeBefore(String assignedTo,
-                                                                               Timestamp reminderDateTime,
-                                                                               Timestamp dueDateTime);
+    List<Task> findTaskByAssignedTo(String assignTo);
 
-    @Query("SELECT task FROM Task task where " +
+    @Query("SELECT task FROM Task task WHERE " +
+            "task.startTime >= :now AND task.reminderDateTime <= :now AND " +
+            "task.assignedTo = :assignee")
+    List<Task> findRemindingTask(@Param("assignee") String assignee, @Param("now") Timestamp now);
+
+    @Query("SELECT task FROM Task task WHERE " +
             "(task.startTime >= :startTime AND task.startTime <= :endTime) OR " +
             "(task.endTime >= :startTime AND task.endTime <= :endTime) AND " +
             "task.assignedTo = :assignee")

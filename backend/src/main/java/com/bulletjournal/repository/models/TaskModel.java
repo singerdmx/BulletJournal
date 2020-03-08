@@ -196,8 +196,8 @@ public abstract class TaskModel extends ProjectItemModel {
         }
 
         if (reminderSetting.hasDate() || reminderSetting.hasTime()) {
-            ZonedDateTime reminderZonedDateTime = IntervalHelper.getStartTime(this.getReminderDate(),
-                    this.getReminderTime(), this.getTimezone());
+            ZonedDateTime reminderZonedDateTime =
+                    IntervalHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
             this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
         }
     }

@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.models.Projects;
 import com.bulletjournal.controller.models.SystemUpdates;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
@@ -76,7 +77,7 @@ public class SystemController {
                     groupList);
         }
         if (targetEtags == null || targetEtags.contains("taskReminders")) {
-            remindingTasks = this.taskDaoJpa.getRemindingTask(username, ZonedDateTime.now());
+            remindingTasks = this.taskDaoJpa.getRemindingTask(username, ZonedDateTimeHelper.getNow());
         }
 
         SystemUpdates systemUpdates = new SystemUpdates();

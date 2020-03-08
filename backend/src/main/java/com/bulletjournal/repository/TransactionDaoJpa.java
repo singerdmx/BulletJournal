@@ -105,14 +105,13 @@ public class TransactionDaoJpa {
         transaction.setTime(createTransaction.getTime());
         transaction.setTimezone(createTransaction.getTimezone());
         transaction.setTransactionType(TransactionType.getType(createTransaction.getTransactionType()));
-        transaction.setStartTime(Timestamp.from(IntervalHelper.getStartTime(createTransaction.getDate(),
-                createTransaction.getTime(),
-                createTransaction.getTimezone())
-                .toInstant()));
-        transaction.setEndTime(Timestamp.from(IntervalHelper.getEndTime(createTransaction.getDate(),
-                createTransaction.getTime(),
-                createTransaction.getTimezone())
-                .toInstant()));
+
+        String date = createTransaction.getDate();
+        String time = createTransaction.getTime();
+        String timezone = createTransaction.getTimezone();
+        transaction.setStartTime(Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()));
+        transaction.setEndTime(Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()));
+
         return this.transactionRepository.save(transaction);
     }
 
@@ -145,17 +144,18 @@ public class TransactionDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTransactionParams.hasTime(), updateTransactionParams.getTime(), transaction::setTime);
 
-        String date = updateTransactionParams.hasDate() ? updateTransactionParams.getDate() : transaction.getDate();
-        String time = updateTransactionParams.hasTime() ? updateTransactionParams.getTime() : transaction.getTime();
-        String timezone = updateTransactionParams.hasTimezone() ? updateTransactionParams.getTimezone() : transaction.getTimezone();
+        DaoHelper.updateIfPresent(
+                updateTransactionParams.hasTimezone(), updateTransactionParams.getTimezone(), transaction::setTimezone);
 
-        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime() || updateTransactionParams.hasTimezone(),
+        String date = updateTransactionParams.getOrDefaultDate(transaction.getDate());
+        String time = updateTransactionParams.getOrDefaultTime(transaction.getTime());
+        String timezone = updateTransactionParams.getOrDefaultTimezone(transaction.getTimezone());
+
+        DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
                 Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()), transaction::setStartTime);
 
-        DaoHelper.updateIfPresent(updateTransactionParams.hasDate() || updateTransactionParams.hasTime() || updateTransactionParams.hasTimezone(),
+        DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
                 Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()), transaction::setEndTime);
-
-        DaoHelper.updateIfPresent(updateTransactionParams.hasTimezone(), updateTransactionParams.getTimezone(), transaction::setTimezone);
 
         this.transactionRepository.save(transaction);
         return events;

@@ -84,9 +84,10 @@ public class TaskDaoJpa {
         if (user.size() == 0)
             throw new ResourceNotFoundException("Assignee " + assignee + " not found");
 
+        List<Task> tasks = this.taskRepository.findTaskByAssignedTo(assignee);
         Timestamp currentTime = Timestamp.from(now.toInstant());
         return this.taskRepository
-                .findTasksByAssignedToAndReminderDateTimeAfterAndStartTimeBefore(assignee, currentTime, currentTime)
+                .findRemindingTask(assignee, currentTime)
                 .stream()
                 .map(TaskModel::toPresentationModel)
                 .collect(Collectors.toList());
@@ -124,14 +125,15 @@ public class TaskDaoJpa {
         task.setDueTime(createTaskParams.getDueTime());
         task.setOwner(owner);
         task.setName(createTaskParams.getName());
-        task.setReminderSetting(createTaskParams.getReminderSetting());
         task.setTimezone(createTaskParams.getTimezone());
-        task.setStartTime(Timestamp.from(IntervalHelper.getStartTime(createTaskParams.getDueDate(),
-                createTaskParams.getDueTime(),
-                createTaskParams.getTimezone()).toInstant()));
-        task.setEndTime(Timestamp.from(IntervalHelper.getEndTime(createTaskParams.getDueDate(),
-                createTaskParams.getDueTime(),
-                createTaskParams.getTimezone()).toInstant()));
+
+        String date = createTaskParams.getDueDate();
+        String time = createTaskParams.getDueTime();
+        String timezone = createTaskParams.getTimezone();
+        task.setStartTime(Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()));
+        task.setEndTime(Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()));
+        task.setReminderSetting(createTaskParams.getReminderSetting());
+
         task = this.taskRepository.save(task);
 
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
@@ -171,18 +173,18 @@ public class TaskDaoJpa {
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasTimezone(), updateTaskParams.getTimezone(), task::setTimezone);
 
+        String date = updateTaskParams.getOrDefaultDate(task.getDueDate());
+        String time = updateTaskParams.getOrDefaultTime(task.getDueTime());
+        String timezone = updateTaskParams.getOrDefaultTimezone(updateTaskParams.getTimezone());
+
+        DaoHelper.updateIfPresent(updateTaskParams.needsUpdateDateTime(),
+                Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()), task::setStartTime);
+
+        DaoHelper.updateIfPresent(updateTaskParams.needsUpdateDateTime(),
+                Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()), task::setEndTime);
+
         DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
                 task::setReminderSetting);
-
-        DaoHelper.updateIfPresent(updateTaskParams.hasDueDate() || updateTaskParams.hasDueTime(),
-                Timestamp.from(IntervalHelper.getStartTime(updateTaskParams.getDueDate(),
-                        updateTaskParams.getDueTime(), updateTaskParams.getTimezone()).toInstant()),
-                task::setStartTime);
-
-        DaoHelper.updateIfPresent(updateTaskParams.hasDueDate() || updateTaskParams.hasDueTime(),
-                Timestamp.from(IntervalHelper.getEndTime(updateTaskParams.getDueDate(),
-                        updateTaskParams.getDueTime(), updateTaskParams.getTimezone()).toInstant()),
-                task::setEndTime);
 
         this.taskRepository.save(task);
         return events;

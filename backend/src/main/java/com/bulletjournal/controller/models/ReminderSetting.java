@@ -19,8 +19,8 @@ public class ReminderSetting {
     }
 
     public ReminderSetting(
-            @NotBlank @Size(min = 10, max = 10) String date,
-            @NotBlank @Size(min = 5, max = 5) String time,
+            @Size(min = 10, max = 10) String date,
+            @Size(min = 5, max = 5) String time,
             Integer before) {
         this.date = date;
         this.time = time;

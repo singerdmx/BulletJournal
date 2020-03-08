@@ -62,7 +62,7 @@ public class ProjectItemControllerTest {
          *     "2020-03-02"
          *     "2020-03-04"
          */
-        Project p1 = createProject("p8", group, ProjectType.LEDGER);
+        Project p1 = createProject("p_ProjectItem_Ledger", group, ProjectType.LEDGER);
         addTransactions(p1);
 
         /*
@@ -75,7 +75,7 @@ public class ProjectItemControllerTest {
          *     "2020-03-04"
          *     "2020-03-04"
          */
-        Project p2 = createProject("p9", group, ProjectType.TODO);
+        Project p2 = createProject("p_ProjectItem_Task", group, ProjectType.TODO);
         addTasks(p2);
 
         /*
@@ -281,14 +281,14 @@ public class ProjectItemControllerTest {
         assertEquals(projectName, created.getName());
         assertEquals("Michael_Zhou", created.getOwner());
         assertEquals(type, created.getProjectType());
-        assertEquals("G14", created.getGroup().getName());
+        assertEquals("Group_ProjectItem", created.getGroup().getName());
         assertEquals("Michael_Zhou", created.getGroup().getOwner());
         assertEquals("d14", created.getDescription());
         return created;
     }
 
     private Group createGroup() {
-        CreateGroupParams group = new CreateGroupParams("G14");
+        CreateGroupParams group = new CreateGroupParams("Group_ProjectItem");
 
         ResponseEntity<Group> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
@@ -299,7 +299,7 @@ public class ProjectItemControllerTest {
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
-        assertEquals("G14", created.getName());
+        assertEquals("Group_ProjectItem", created.getName());
         assertEquals("Michael_Zhou", created.getOwner());
 
         return created;
