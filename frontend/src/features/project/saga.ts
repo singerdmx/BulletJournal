@@ -22,7 +22,7 @@ import {
   updateProjectRelations
 } from '../../apis/projectApis';
 import { IState } from '../../store';
-import { Project } from './interfaces';
+import { Project } from './interface';
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
   yield call(message.error, `Project Error Received: ${action.payload.error}`);

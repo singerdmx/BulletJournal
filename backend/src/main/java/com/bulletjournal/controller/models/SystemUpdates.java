@@ -15,6 +15,8 @@ public class SystemUpdates {
 
     private String notificationsEtag;
 
+    private String remindingTaskEtag;
+
     private List<Task> reminders;
 
     public String getOwnedProjectsEtag() {
@@ -53,8 +55,9 @@ public class SystemUpdates {
         return reminders;
     }
 
-    public void setReminders(List<Task> reminders) {
-        this.reminders = reminders;
-    }
+    public void setReminders(List<Task> reminders) { this.reminders = reminders; }
 
+    public String getRemindingTaskEtag() { return remindingTaskEtag; }
+
+    public void setRemindingTaskEtag(String remindingTaskEtag) { this.remindingTaskEtag = remindingTaskEtag; }
 }

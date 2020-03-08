@@ -1,5 +1,5 @@
 import { ProjectType } from './constants';
-import { Group } from '../group/interfaces';
+import { Group } from '../group/interface';
 export interface Project {
   description: string;
   group: Group;

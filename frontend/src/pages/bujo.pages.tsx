@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import TaskList from '../components/task-list/task-list.component';
+import ProjectItemList from '../components/project-item-list/project-item-list.component';
 import BujoCalendar from '../components/bujo-calendar/bujo-calendar.component';
 import {
   AccountBookOutlined,
   CarryOutOutlined,
 } from '@ant-design/icons';
 import { IState } from '../store/index';
-import { Project } from '../features/project/interfaces';
+import { Project } from '../features/project/interface';
 import AddProject from '../components/modals/add-project.component';
 import AddProjectItem from '../components/modals/add-project-item.component';
 import '@ant-design/compatible/assets/index.css';
@@ -25,8 +25,6 @@ interface BujoRouteProps extends RouteComponentProps<BujoRouteParams> {
 type todoState = {
   showForm: boolean;
 };
-
-const fakeData = ['Frontend', 'Bakcend', 'UI designer'];
 
 type ProjectProps = {
   ownedProjects: Project[];
@@ -64,7 +62,7 @@ class BujoPage extends React.Component<BujoRouteProps & ProjectProps, todoState>
           {plusIcon}
         </div>
 
-        {category === 'today' ? <TaskList data={fakeData} /> : <BujoCalendar />}
+        {category === 'today' ? <ProjectItemList /> : <BujoCalendar />}
       </div>
     );
   }

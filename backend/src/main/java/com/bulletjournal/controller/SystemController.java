@@ -12,13 +12,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class SystemController {
@@ -38,7 +38,8 @@ public class SystemController {
     private TaskDaoJpa taskDaoJpa;
 
     @GetMapping(UPDATES_ROUTE)
-    public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets) {
+    public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
+                                    @RequestHeader(IF_NONE_MATCH) Optional<String> remindingTaskRequestEtag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Set<String> targetEtags = null;
         if (StringUtils.isNotBlank(targets)) {
@@ -48,6 +49,7 @@ public class SystemController {
         String sharedProjectsEtag = null;
         String notificationsEtag = null;
         String groupsEtag = null;
+        String remindingTaskEtag = null;
         List<Task> remindingTasks = null;
 
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
@@ -73,6 +75,12 @@ public class SystemController {
         }
         if (targetEtags == null || targetEtags.contains("taskReminders")) {
             remindingTasks = this.taskDaoJpa.getRemindingTask(username, ZonedDateTimeHelper.getNow());
+            remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE,
+                    remindingTasks);
+            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
+                remindingTasks = null;
+            }
         }
 
         SystemUpdates systemUpdates = new SystemUpdates();
@@ -81,6 +89,7 @@ public class SystemController {
         systemUpdates.setNotificationsEtag(notificationsEtag);
         systemUpdates.setGroupsEtag(groupsEtag);
         systemUpdates.setReminders(remindingTasks);
+        systemUpdates.setRemindingTaskEtag(remindingTaskEtag);
         return systemUpdates;
     }
 }

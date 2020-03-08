@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { IState } from '../store/index';
 import { Input, Form, Tag, AutoComplete, message } from 'antd';
-import { Label, stringToRGB } from '../features/label/interfaces';
+import { Label, stringToRGB } from '../features/label/interface';
 import { createLabel } from '../features/label/actions';
 import {
   labelsUpdate,

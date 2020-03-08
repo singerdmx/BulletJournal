@@ -2,7 +2,7 @@ import React from 'react';
 import { History } from 'history';
 import { Tree, Tooltip } from 'antd';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
-import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { updateSharedProjectsOrder } from '../../features/project/actions';
 import {
   CarryOutOutlined,

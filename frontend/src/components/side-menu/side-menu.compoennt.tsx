@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import {
   BellOutlined,
   CalendarOutlined,
-  FlagOutlined,
+  TagsOutlined,
   FolderOutlined,
   ProfileOutlined,
   SettingOutlined,
@@ -21,8 +21,8 @@ import AddProject from '../../components/modals/add-project.component';
 import ProjectDnd from '../../components/project-dnd/project-dnd.component';
 import { Menu, Avatar, Tooltip } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
-import { GroupsWithOwner } from '../../features/group/interfaces';
-import { Project, ProjectsWithOwner } from '../../features/project/interfaces';
+import { GroupsWithOwner } from '../../features/group/interface';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
@@ -169,7 +169,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           })}
         </SubMenu>
         <Menu.Item key='labels'>
-          <FlagOutlined />
+          <TagsOutlined />
           Labels
         </Menu.Item>
         <Menu.Item key='settings'>
