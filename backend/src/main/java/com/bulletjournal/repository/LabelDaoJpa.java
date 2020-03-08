@@ -79,4 +79,14 @@ public class LabelDaoJpa {
         return labels;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void delete(final Long labelId, final String requester) {
+        Label label = getLabel(labelId);
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                label.getOwner(), requester, ContentType.LABEL, Operation.DELETE, labelId);
+
+        this.labelRepository.delete(label);
+    }
+
 }
