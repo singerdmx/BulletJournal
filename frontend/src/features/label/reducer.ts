@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Label } from './interfaces';
+import { Label } from './interface';
 
 export type ApiErrorAction = {
   error: string;

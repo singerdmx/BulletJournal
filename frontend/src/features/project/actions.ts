@@ -1,5 +1,5 @@
 import { actions } from './reducer';
-import { Project } from './interfaces';
+import { Project } from './interface';
 import { ProjectType } from './constants';
 import { History } from 'history';
 export const updateProjects = () => actions.projectsUpdate({});

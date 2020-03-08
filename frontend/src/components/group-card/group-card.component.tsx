@@ -9,7 +9,7 @@ import {
   getGroup,
   patchGroup
 } from '../../features/group/actions';
-import { Group, User } from '../../features/group/interfaces';
+import { Group, User } from '../../features/group/interface';
 import { MyselfWithAvatar } from '../../features/myself/reducer';
 import { IState } from '../../store';
 
