@@ -14,6 +14,7 @@ import AddTask from '../components/modals/add-task.component';
 import AddTransaction from '../components/modals/add-transaction.component';
 import { ProjectType } from '../features/project/constants';
 import { deleteProject } from '../features/project/actions';
+import { NoteTree } from '../components/note-tree';
 
 type ProjectPathParams = {
   projectId: string;
@@ -158,7 +159,7 @@ class ProjectPage extends React.Component<
             {deleteContent}
           </div>
         </div>
-        <div className='project-content'></div>
+        <div className='project-content'><NoteTree /></div>
         <div>{project.description}</div>
       </div>
     );
