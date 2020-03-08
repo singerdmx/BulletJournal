@@ -96,7 +96,10 @@ public class LabelDaoJpa {
 
         List<Task> tasks = this.taskRepository.findTasksByLabelId(labelId);
 
-        tasks.stream().forEach(task -> task.setLabels((Long[]) Arrays.stream(task.getLabels()).filter(id -> id != labelId).toArray()));
+        tasks.stream().forEach(
+                task -> task.setLabels(
+                        Arrays.stream(task.getLabels()).filter(id
+                             -> id != labelId).toArray(Long[]::new)));
 
         this.taskRepository.saveAll(tasks);
 

@@ -1,7 +1,6 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.repository.models.Task;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -19,8 +18,8 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
 
     @Override
     public List<Task> findTasksByLabelId(Long labelId) {
-        Query query = entityManager.createNativeQuery("SELECT task.* FROM Task task WHERE ANY(task.labels) = :labelId", Task.class);
-        query.setParameter("labelId", labelId);
+        Query query = entityManager.createNativeQuery("SELECT * FROM tasks WHERE ? =  ANY(tasks.labels)", Task.class);
+        query.setParameter(1, labelId);
         return query.getResultList();
     }
 }
