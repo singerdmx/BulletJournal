@@ -23,22 +23,6 @@ public class Task extends TaskModel {
     )
     private Long id;
 
-    public Long[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(Long[] labels) {
-        this.labels = labels;
-    }
-
-    @Type(type = "long-array")
-    @Column(
-            name = "labels",
-            columnDefinition = "bigint[]"
-    )
-    private Long[] labels;
-
-
     @Override
     public Long getId() {
         return id;

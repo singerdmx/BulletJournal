@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
@@ -100,6 +101,6 @@ public class TaskController {
     @PutMapping(TASK_SET_LABELS_ROUTE)
     public Task setLabels(@NotNull @PathVariable Long taskId,
                           @NotNull @RequestBody List<Long> labels) {
-        return null;
+        return this.taskDaoJpa.setLabels(taskId, labels);
     }
 }

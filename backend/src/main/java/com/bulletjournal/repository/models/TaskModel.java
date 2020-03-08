@@ -3,6 +3,7 @@ package com.bulletjournal.repository.models;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.repository.utils.LongArrayType;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
@@ -61,6 +62,20 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "reminder_date_time")
     private Timestamp reminderDateTime;
 
+    @Type(type = "long-array")
+    @Column(
+            name = "labels",
+            columnDefinition = "bigint[]"
+    )
+    private Long[] labels;
+
+    public Long[] getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Long[] labels) {
+        this.labels = labels;
+    }
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -240,6 +255,7 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getName(),
                 this.getDuration(),
                 this.getProject(),
+                this.getLabels(),
                 reminderSetting);
     }
 

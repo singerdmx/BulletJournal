@@ -15,6 +15,7 @@ import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -281,5 +282,13 @@ public class TaskDaoJpa {
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         return this.completedTaskRepository.findCompletedTaskByProject(project);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public com.bulletjournal.controller.models.Task setLabels(Long taskId, List<Long>labels) {
+        Task task = this.taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        task.setLabels(Iterables.toArray(labels, Long.class));
+        return task.toPresentationModel();
     }
 }

@@ -41,14 +41,6 @@ public class Task {
 
     private Long[] labels;
 
-    public Long[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(Long[] labels) {
-        this.labels = labels;
-    }
-
     @Expose
     @Valid
     private List<Task> subTasks = new ArrayList<>();
@@ -64,6 +56,7 @@ public class Task {
                 @NotNull String name,
                 Integer duration,
                 @NotNull Project project,
+                Long[] labels,
                 ReminderSetting reminderSetting) {
         this.id = id;
         this.assignedTo = assignedTo;
@@ -73,6 +66,7 @@ public class Task {
         this.name = name;
         this.duration = duration;
         this.projectId = project.getId();
+        this.labels = labels;
         if (reminderSetting.hasBefore() || reminderSetting.hasDate()) {
             this.reminderSetting = reminderSetting;
         }
@@ -166,6 +160,14 @@ public class Task {
         this.subTasks.add(task);
     }
 
+    public Long[] getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Long[] labels) {
+        this.labels = labels;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -177,12 +179,13 @@ public class Task {
                 Objects.equals(dueTime, task.dueTime) &&
                 Objects.equals(timezone, task.timezone) &&
                 Objects.equals(name, task.name) &&
+                Objects.equals(labels, task.labels) &&
                 Objects.equals(projectId, task.projectId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, assignedTo, dueDate, dueTime, timezone, name, projectId, subTasks);
+        return Objects.hash(id, assignedTo, dueDate, dueTime, timezone, name, projectId, subTasks, labels);
     }
 
     public void clone(Task task) {
@@ -194,6 +197,7 @@ public class Task {
         this.setName(task.getName());
         this.setDuration(task.getDuration());
         this.setProjectId(task.getProjectId());
+        this.setLabels(task.getLabels());
         if (task.hasReminderSetting() &&
                 (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate())) {
             this.setReminderSetting(task.getReminderSetting());
