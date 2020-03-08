@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Form, message, AutoComplete, Input, PageHeader } from 'antd';
+import { Form, message, AutoComplete, Input, PageHeader, Tag } from 'antd';
 import { Label } from '../../features/label/interface';
+import {
+  addSelectedLabel,
+  removeSelectedLabel
+} from '../../features/label/actions';
+import { IState } from '../../store';
 
 type LabelSearchProps = {
   labelOptions: Label[];
-  endSearching : () => void;
+  labelsSelected: Label[];
+  addSelectedLabel: (val: string) => void;
+  removeSelectedLabel: (val: string) => void;
+  endSearching: () => void;
 };
 
 const LabelsSearching: React.FC<LabelSearchProps> = props => {
   const [form] = Form.useForm();
   return (
     <div className="labels-search-container">
-      <PageHeader title="Search Item With Label" onBack={props.endSearching}/>
+      <PageHeader title="Search Item With Label" onBack={props.endSearching} />
       <div className="label-search-input">
         <Form form={form}>
           <Form.Item
@@ -36,12 +44,31 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
                 />
               }
               options={props.labelOptions}
+              onSelect={value => props.addSelectedLabel(value)}
             />
           </Form.Item>
         </Form>
+      </div>
+      <div className="selected-labels">
+        {props.labelsSelected.map(label => (
+          <Tag
+            key={label.id}
+            closable
+            onClose={() => props.removeSelectedLabel(label.value)}
+          >
+            {label.value}
+          </Tag>
+        ))}
       </div>
     </div>
   );
 };
 
-export default LabelsSearching;
+const mapStateToProps = (state: IState) => ({
+  labelsSelected: state.label.labelsSelected
+});
+
+export default connect(mapStateToProps, {
+  addSelectedLabel,
+  removeSelectedLabel
+})(LabelsSearching);
