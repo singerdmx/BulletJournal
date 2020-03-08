@@ -1,5 +1,5 @@
 import React from 'react';
-import {DatePicker, Tooltip} from 'antd';
+import {DatePicker, Tooltip, Divider, Timeline } from 'antd';
 import moment from 'moment';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
@@ -23,6 +23,7 @@ type ProjectItemProps = {
 };
 
 class ProjectItemList extends React.Component<ProjectItemProps> {
+
   componentDidMount() {
     this.props.updateExpandedMyself(true);
   }
@@ -61,6 +62,21 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
             </Link>
           </Tooltip>
         </div>
+          <Divider></Divider>
+          <div>
+          {
+              <Timeline mode={"left"}>
+                  {
+                      this.props.projectItems.map((items, index) => {
+                          return (
+                              <Timeline.Item label={items.date}>
+                                  {items.dayOfWeek}
+                              </Timeline.Item>);
+                      })
+                  }
+              </Timeline>
+          }
+          </div>
       </div>
     );
   }
