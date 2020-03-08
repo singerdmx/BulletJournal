@@ -82,7 +82,7 @@ public class ProjectItemsGrouper {
                     // Sort task by end time
                     ZonedDateTime z1 = IntervalHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
                     ZonedDateTime z2 = IntervalHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
-                    return z1.compareTo(z2);
+                    return z2.compareTo(z1);
                 });
                 projectItem.setTasks(tasksMap.get(zonedDateTime));
                 mergedMap.put(zonedDateTime, projectItem);
@@ -99,7 +99,9 @@ public class ProjectItemsGrouper {
      */
     public static List<ProjectItems> getSortedProjectItems(@NotNull Map<ZonedDateTime, ProjectItems> mergedMap) {
         List<Map.Entry<ZonedDateTime, ProjectItems>> entries = new ArrayList<>(mergedMap.entrySet());
-        entries.sort(Map.Entry.comparingByKey());
+        entries.sort((e1, e2) -> {
+            return e2.getKey().compareTo(e1.getKey());
+        });
         List<ProjectItems> projectItems = new ArrayList<>();
         entries.forEach(e -> {
             projectItems.add(e.getValue());

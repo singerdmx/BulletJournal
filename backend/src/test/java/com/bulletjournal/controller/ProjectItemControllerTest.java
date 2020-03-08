@@ -109,21 +109,21 @@ public class ProjectItemControllerTest {
 
         assertNotNull(projectItems);
         assertEquals(5, projectItems.size());
-        assertEquals("2020-02-28", projectItems.get(0).getDate());
-        assertEquals(0, projectItems.get(0).getTransactions().size());
-        assertEquals(1, projectItems.get(0).getTasks().size());
-        assertEquals("2020-02-29", projectItems.get(1).getDate());
-        assertEquals(1, projectItems.get(1).getTransactions().size());
-        assertEquals(1, projectItems.get(1).getTasks().size());
+        assertEquals("2020-03-04", projectItems.get(0).getDate());
+        assertEquals(1, projectItems.get(0).getTransactions().size());
+        assertEquals(2, projectItems.get(0).getTasks().size());
+        assertEquals("2020-03-02", projectItems.get(1).getDate());
+        assertEquals(2, projectItems.get(1).getTransactions().size());
+        assertEquals(2, projectItems.get(1).getTasks().size());
         assertEquals("2020-03-01", projectItems.get(2).getDate());
         assertEquals(1, projectItems.get(2).getTransactions().size());
         assertEquals(1, projectItems.get(2).getTasks().size());
-        assertEquals("2020-03-02", projectItems.get(3).getDate());
-        assertEquals(2, projectItems.get(3).getTransactions().size());
-        assertEquals(2, projectItems.get(3).getTasks().size());
-        assertEquals("2020-03-04", projectItems.get(4).getDate());
-        assertEquals(1, projectItems.get(4).getTransactions().size());
-        assertEquals(2, projectItems.get(4).getTasks().size());
+        assertEquals("2020-02-29", projectItems.get(3).getDate());
+        assertEquals(1, projectItems.get(3).getTransactions().size());
+        assertEquals(1, projectItems.get(3).getTasks().size());
+        assertEquals("2020-02-28", projectItems.get(4).getDate());
+        assertEquals(0, projectItems.get(4).getTransactions().size());
+        assertEquals(1, projectItems.get(4).getTasks().size());
     }
 
     private void addTransactions(Project p) {

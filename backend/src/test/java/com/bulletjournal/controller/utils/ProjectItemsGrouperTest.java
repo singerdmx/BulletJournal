@@ -185,14 +185,14 @@ public class ProjectItemsGrouperTest {
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(map);
 
         assertEquals(3, projectItems.size());
-        assertEquals(task1.getDueDate(), projectItems.get(0).getDate());
-        assertEquals(task2.getDueDate(), projectItems.get(1).getDate());
-        assertEquals(transaction1.getDate(), projectItems.get(2).getDate());
+        assertEquals(transaction1.getDate(), projectItems.get(0).getDate());
         assertEquals(transaction2.getDate(), projectItems.get(1).getDate());
-        assertEquals(1, projectItems.get(0).getTasks().size());
-        assertEquals(1, projectItems.get(1).getTransactions().size());
+        assertEquals(task2.getDueDate(), projectItems.get(1).getDate());
+        assertEquals(task1.getDueDate(), projectItems.get(2).getDate());
+        assertEquals(1, projectItems.get(0).getTransactions().size());
         assertEquals(1, projectItems.get(1).getTasks().size());
-        assertEquals(1, projectItems.get(2).getTransactions().size());
+        assertEquals(1, projectItems.get(1).getTransactions().size());
+        assertEquals(1, projectItems.get(2).getTasks().size());
     }
 
     /*
