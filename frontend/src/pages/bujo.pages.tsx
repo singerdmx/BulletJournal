@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import TaskList from '../components/task-list/task-list.component';
+import ProjectItemList from '../components/project-item-list/project-item-list.component';
 import BujoCalendar from '../components/bujo-calendar/bujo-calendar.component';
 import {
   AccountBookOutlined,
@@ -25,8 +25,6 @@ interface BujoRouteProps extends RouteComponentProps<BujoRouteParams> {
 type todoState = {
   showForm: boolean;
 };
-
-const fakeData = ['Frontend', 'Bakcend', 'UI designer'];
 
 type ProjectProps = {
   ownedProjects: Project[];
@@ -64,7 +62,7 @@ class BujoPage extends React.Component<BujoRouteProps & ProjectProps, todoState>
           {plusIcon}
         </div>
 
-        {category === 'today' ? <TaskList data={fakeData} /> : <BujoCalendar />}
+        {category === 'today' ? <ProjectItemList /> : <BujoCalendar />}
       </div>
     );
   }

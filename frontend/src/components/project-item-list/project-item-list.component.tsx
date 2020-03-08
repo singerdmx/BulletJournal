@@ -1,6 +1,5 @@
 import React from 'react';
-import TodoItem from '../../components/todo-item/todo-item.component';
-import {DatePicker, List, Tooltip} from 'antd';
+import {DatePicker, Tooltip} from 'antd';
 import moment from 'moment';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
@@ -11,8 +10,9 @@ import {getProjectItems, updateMyBuJoDates} from '../../features/myBuJo/actions'
 import {ProjectType} from "../../features/project/constants";
 import {ProjectItems} from "../../features/myBuJo/interface";
 
-type TaskProps = {
-  data: string[];
+const { RangePicker } = DatePicker;
+
+type ProjectItemProps = {
   timezone: string;
   startDate: string;
   endDate: string;
@@ -22,21 +22,18 @@ type TaskProps = {
   getProjectItems: (types: ProjectType[], startDate: string, endDate: string, timezone: string) => void;
 };
 
-class TaskList extends React.Component<TaskProps> {
+class ProjectItemList extends React.Component<ProjectItemProps> {
   componentDidMount() {
     this.props.updateExpandedMyself(true);
   }
 
   handleRangeChange = (dates: any, dateStrings: string[]) => {
-      console.log(dates);
-      console.log(dateStrings);
       this.props.updateMyBuJoDates(dateStrings[0], dateStrings[1]);
       this.props.getProjectItems([ProjectType.LEDGER, ProjectType.TODO], dateStrings[0], dateStrings[1],
           this.props.timezone);
   };
 
   render() {
-    const { RangePicker } = DatePicker;
     return (
       <div className='todo-list'>
         <div className='todo-panel'>
@@ -64,11 +61,6 @@ class TaskList extends React.Component<TaskProps> {
             </Link>
           </Tooltip>
         </div>
-        <List
-          itemLayout='horizontal'
-          dataSource={this.props.data}
-          renderItem={item => <TodoItem title={item} />}
-        />
       </div>
     );
   }
@@ -83,4 +75,4 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   updateExpandedMyself, updateMyBuJoDates, getProjectItems
-})(TaskList);
+})(ProjectItemList);
