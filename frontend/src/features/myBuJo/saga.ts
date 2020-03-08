@@ -20,6 +20,8 @@ function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
 function* getProjectItems(action: PayloadAction<GetProjectItemsAction>) {
   try {
     const { types, startDate, endDate, timezone } = action.payload;
+    if (!startDate || !endDate) return;
+
     let data = [];
     if (types.length > 0) {
       data = yield call(fetchProjectItems, types, timezone, startDate, endDate);
