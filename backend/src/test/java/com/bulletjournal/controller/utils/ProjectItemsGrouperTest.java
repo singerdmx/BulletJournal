@@ -50,10 +50,10 @@ public class ProjectItemsGrouperTest {
         List<Task> tasks = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting();
-        Task t1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, reminderSetting);
-        Task t2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, reminderSetting);
-        Task t3 = new Task(1L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, reminderSetting);
-        Task t4 = new Task(1L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, reminderSetting);
+        Task t1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task t2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task t3 = new Task(1L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null,  reminderSetting);
+        Task t4 = new Task(1L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
 
         tasks.add(t1);
         tasks.add(t2);
@@ -90,8 +90,8 @@ public class ProjectItemsGrouperTest {
         Transaction transaction1 = new Transaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
         Transaction transaction2 = new Transaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, reminderSetting);
-        Task task2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, reminderSetting);
+        Task task1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null,  reminderSetting);
+        Task task2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1 = IntervalHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
         ZonedDateTime time2 = IntervalHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());
@@ -142,8 +142,8 @@ public class ProjectItemsGrouperTest {
         Transaction transaction1 = new Transaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
         Transaction transaction2 = new Transaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, reminderSetting);
-        Task task2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, reminderSetting);
+        Task task1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1 = IntervalHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
         ZonedDateTime time2 = IntervalHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());

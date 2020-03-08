@@ -285,7 +285,7 @@ public class TaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public com.bulletjournal.controller.models.Task setLabels(Long taskId, List<Long>labels) {
+    public com.bulletjournal.controller.models.Task setLabels(Long taskId, List<Long> labels) {
         Task task = this.taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
         task.setLabels(Iterables.toArray(labels, Long.class));
