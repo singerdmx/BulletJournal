@@ -112,7 +112,10 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
             <Timeline mode={'left'}>
               {this.props.projectItems.map((items, index) => {
                 return (
-                  <Timeline.Item label={items.date}>
+                  <Timeline.Item
+                    label={items.date}
+                    style={{ marginLeft: '-65%' }}
+                  >
                     <Collapse
                       defaultActiveKey={[
                         'tasks' + index,
