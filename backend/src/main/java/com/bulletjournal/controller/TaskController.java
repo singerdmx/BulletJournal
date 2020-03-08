@@ -51,7 +51,7 @@ public class TaskController {
 
     @GetMapping(TASK_ROUTE)
     public Task getTask(@NotNull @PathVariable Long taskId) {
-        return this.taskDaoJpa.getTask(taskId).toPresentationModel();
+        return this.taskDaoJpa.getTask(taskId);
     }
 
     @PostMapping(TASKS_ROUTE)
@@ -82,7 +82,8 @@ public class TaskController {
     @PostMapping(COMPLETE_TASK_ROUTE)
     public Task completeTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.complete(username, taskId).toPresentationModel();
+        this.taskDaoJpa.complete(username, taskId);
+        return getTask(taskId);
     }
 
     @GetMapping(COMPLETED_TASKS_ROUTE)
@@ -103,6 +104,7 @@ public class TaskController {
     @PutMapping(TASK_SET_LABELS_ROUTE)
     public Task setLabels(@NotNull @PathVariable Long taskId,
                           @NotNull @RequestBody List<Long> labels) {
-        return this.taskDaoJpa.setLabels(taskId, labels);
+        this.taskDaoJpa.setLabels(taskId, labels);
+        return getTask(taskId);
     }
 }

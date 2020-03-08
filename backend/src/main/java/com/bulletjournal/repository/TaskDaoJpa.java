@@ -47,6 +47,9 @@ public class TaskDaoJpa {
     private CompletedTaskRepository completedTaskRepository;
 
     @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -64,9 +67,16 @@ public class TaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task getTask(Long id) {
-        return this.taskRepository.findById(id)
+    public com.bulletjournal.controller.models.Task getTask(Long id) {
+        Task task = this.taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
+        Long[] labels = task.getLabels();
+        List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
+        if (labels != null && labels.length > 0) {
+            labelsForPresentation = this.labelRepository.findAllById(Arrays.asList(labels)).stream()
+            .map(Label::toPresentationModel).collect(Collectors.toList());
+        }
+        return task.toPresentationModel(labelsForPresentation);
     }
 
     /*
@@ -286,10 +296,10 @@ public class TaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public com.bulletjournal.controller.models.Task setLabels(Long taskId, List<Long> labels) {
+    public void setLabels(Long taskId, List<Long> labels) {
         Task task = this.taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
         task.setLabels(Iterables.toArray(labels, Long.class));
-        return task.toPresentationModel();
+        this.taskRepository.save(task);
     }
 }

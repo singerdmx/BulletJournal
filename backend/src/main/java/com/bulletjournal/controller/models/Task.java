@@ -39,7 +39,7 @@ public class Task {
 
     private ReminderSetting reminderSetting;
 
-    private Long[] labels;
+    private List<Label> labels;
 
     @Expose
     @Valid
@@ -56,7 +56,7 @@ public class Task {
                 @NotNull String name,
                 Integer duration,
                 @NotNull Project project,
-                Long[] labels,
+                List<Label> labels,
                 ReminderSetting reminderSetting) {
         this.id = id;
         this.assignedTo = assignedTo;
@@ -160,11 +160,11 @@ public class Task {
         this.subTasks.add(task);
     }
 
-    public Long[] getLabels() {
+    public List<Label> getLabels() {
         return labels;
     }
 
-    public void setLabels(Long[] labels) {
+    public void setLabels(List<Label> labels) {
         this.labels = labels;
     }
 

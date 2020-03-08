@@ -15,6 +15,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.List;
 
 @TypeDefs({
         @TypeDef(
@@ -233,6 +235,11 @@ public abstract class TaskModel extends ProjectItemModel {
     }
 
     public com.bulletjournal.controller.models.Task toPresentationModel() {
+        return toPresentationModel(Collections.emptyList());
+    }
+
+    public com.bulletjournal.controller.models.Task toPresentationModel(
+            List<com.bulletjournal.controller.models.Label> labels) {
 
         ReminderSetting reminderSetting = new ReminderSetting();
         if (this.hasReminderBeforeTask()) {
@@ -255,7 +262,7 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getName(),
                 this.getDuration(),
                 this.getProject(),
-                this.getLabels(),
+                labels,
                 reminderSetting);
     }
 
