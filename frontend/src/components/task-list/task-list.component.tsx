@@ -1,21 +1,25 @@
 import React from 'react';
 import TodoItem from '../../components/todo-item/todo-item.component';
-import { List, DatePicker, Tooltip } from 'antd';
+import {DatePicker, List, Tooltip} from 'antd';
 import moment from 'moment';
-import { connect } from 'react-redux';
-import { IState } from '../../store';
-import { Link } from 'react-router-dom';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { dateFormat } from "../../features/myBuJo/constants";
-import { updateMyBuJoDates } from '../../features/myBuJo/actions';
+import {connect} from 'react-redux';
+import {IState} from '../../store';
+import {Link} from 'react-router-dom';
+import {updateExpandedMyself} from '../../features/myself/actions';
+import {dateFormat} from "../../features/myBuJo/constants";
+import {getProjectItems, updateMyBuJoDates} from '../../features/myBuJo/actions';
+import {ProjectType} from "../../features/project/constants";
+import {ProjectItems} from "../../features/myBuJo/interface";
 
 type TaskProps = {
   data: string[];
   timezone: string;
   startDate: string;
   endDate: string;
+  projectItems: ProjectItems[];
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateMyBuJoDates: (startDate: string, endDate: string) => void;
+  getProjectItems: (types: ProjectType[], startDate: string, endDate: string, timezone: string) => void;
 };
 
 class TaskList extends React.Component<TaskProps> {
@@ -27,6 +31,8 @@ class TaskList extends React.Component<TaskProps> {
       console.log(dates);
       console.log(dateStrings);
       this.props.updateMyBuJoDates(dateStrings[0], dateStrings[1]);
+      this.props.getProjectItems([ProjectType.LEDGER, ProjectType.TODO], dateStrings[0], dateStrings[1],
+          this.props.timezone);
   };
 
   render() {
@@ -39,13 +45,13 @@ class TaskList extends React.Component<TaskProps> {
               moment(
                 this.props.startDate
                   ? this.props.startDate
-                  : new Date().toLocaleString(),
+                  : new Date().toLocaleString('fr-CA'),
                 dateFormat
               ),
               moment(
                 this.props.endDate
                   ? this.props.endDate
-                  : new Date().toLocaleString(),
+                  : new Date().toLocaleString('fr-CA'),
                 dateFormat
               )
             ]}
@@ -71,9 +77,10 @@ class TaskList extends React.Component<TaskProps> {
 const mapStateToProps = (state: IState) => ({
   timezone: state.myself.timezone,
   startDate: state.myBuJo.startDate,
-  endDate: state.myBuJo.endDate
+  endDate: state.myBuJo.endDate,
+  projectItems: state.myBuJo.projectItems
 });
 
 export default connect(mapStateToProps, {
-  updateExpandedMyself, updateMyBuJoDates
+  updateExpandedMyself, updateMyBuJoDates, getProjectItems
 })(TaskList);

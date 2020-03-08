@@ -1,1 +1,1 @@
-export const dateFormat = 'MM-DD-YYYY';
+export const dateFormat = 'YYYY-MM-DD';
