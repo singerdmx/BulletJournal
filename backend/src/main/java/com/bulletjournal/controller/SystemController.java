@@ -1,11 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.Task;
-import com.bulletjournal.controller.models.Group;
-import com.bulletjournal.controller.models.Notification;
-import com.bulletjournal.controller.models.Projects;
-import com.bulletjournal.controller.models.SystemUpdates;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.GroupDaoJpa;
@@ -19,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
