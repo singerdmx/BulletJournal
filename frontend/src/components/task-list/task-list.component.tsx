@@ -6,13 +6,16 @@ import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { Link } from 'react-router-dom';
 import { updateExpandedMyself } from '../../features/myself/actions';
+import { dateFormat } from "../../features/myBuJo/constants";
+import { updateMyBuJoDates } from '../../features/myBuJo/actions';
 
 type TaskProps = {
   data: string[];
-  updateExpandedMyself: (updateSettings: boolean) => void;
   timezone: string;
   startDate: string;
   endDate: string;
+  updateExpandedMyself: (updateSettings: boolean) => void;
+  updateMyBuJoDates: (startDate: string, endDate: string) => void;
 };
 
 class TaskList extends React.Component<TaskProps> {
@@ -20,9 +23,13 @@ class TaskList extends React.Component<TaskProps> {
     this.props.updateExpandedMyself(true);
   }
 
-  render() {
-    const dateFormat = 'MM-DD-YYYY';
+  handleRangeChange = (dates: any, dateStrings: string[]) => {
+      console.log(dates);
+      console.log(dateStrings);
+      this.props.updateMyBuJoDates(dateStrings[0], dateStrings[1]);
+  };
 
+  render() {
     const { RangePicker } = DatePicker;
     return (
       <div className='todo-list'>
@@ -43,6 +50,7 @@ class TaskList extends React.Component<TaskProps> {
               )
             ]}
             format={dateFormat}
+            onChange={this.handleRangeChange}
           />
           <Tooltip placement='top' title='Change Time Zone'>
             <Link to='/settings' style={{ paddingLeft: '30px' }}>
@@ -67,5 +75,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-  updateExpandedMyself
+  updateExpandedMyself, updateMyBuJoDates
 })(TaskList);

@@ -1,7 +1,6 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.repository.models.Task;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
