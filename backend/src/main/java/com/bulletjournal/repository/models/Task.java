@@ -1,7 +1,5 @@
 package com.bulletjournal.repository.models;
 
-import org.hibernate.annotations.Type;
-
 import javax.persistence.*;
 
 /**
