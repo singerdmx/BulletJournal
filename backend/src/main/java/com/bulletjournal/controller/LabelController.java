@@ -57,9 +57,9 @@ public class LabelController {
     }
 
     @DeleteMapping(LABEL_ROUTE)
-    public ResponseEntity<?> deleteLabel(@NotNull @PathVariable Long labelId) {
+    public ResponseEntity<?> deleteLabel(@PathVariable Long labelId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.labelDaoJpa.delete(labelId, username);
+        this.labelDaoJpa.delete(username, labelId);
         return ResponseEntity.ok().build();
     }
 

@@ -7,12 +7,14 @@ import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Label;
+import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -22,6 +24,9 @@ public class LabelDaoJpa {
 
     @Autowired
     private LabelRepository labelRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private AuthorizationService authorizationService;
@@ -80,13 +85,20 @@ public class LabelDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void delete(final Long labelId, final String requester) {
-        Label label = getLabel(labelId);
+    public void delete(String requester, Long labelId) {
+        Label label = this.labelRepository.findById(labelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Label" + labelId + "not found"));
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                label.getOwner(), requester, ContentType.LABEL, Operation.DELETE, labelId);
+        this.authorizationService.checkAuthorizedToOperateOnContent(label.getOwner(), requester,
+                ContentType.LABEL, Operation.DELETE, labelId);
 
         this.labelRepository.delete(label);
-    }
 
+        List<Task> tasks = this.taskRepository.findTasksByLabelId(labelId);
+
+        tasks.stream().forEach(task -> task.setLabels((Long[]) Arrays.stream(task.getLabels()).filter(id -> id != labelId).toArray()));
+
+        this.taskRepository.saveAll(tasks);
+
+    }
 }
