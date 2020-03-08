@@ -1,3 +1,5 @@
+import {Label} from "../label/interface";
+
 export interface ReminderSetting {
     date: string,
     time: string,
@@ -13,5 +15,6 @@ export interface Task {
     dueDate: string,
     dueTime: string,
     timezone: string,
-    reminderSetting: ReminderSetting
+    reminderSetting: ReminderSetting,
+    labels: Label[]
 }
