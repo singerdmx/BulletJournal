@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import {
   BellOutlined,
   CalendarOutlined,
-  FlagOutlined,
+  TagsOutlined,
   FolderOutlined,
   ProfileOutlined,
   SettingOutlined,
@@ -169,7 +169,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           })}
         </SubMenu>
         <Menu.Item key='labels'>
-          <FlagOutlined />
+          <TagsOutlined />
           Labels
         </Menu.Item>
         <Menu.Item key='settings'>
