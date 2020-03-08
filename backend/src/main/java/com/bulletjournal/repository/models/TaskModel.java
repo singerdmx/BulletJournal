@@ -225,8 +225,7 @@ public abstract class TaskModel extends ProjectItemModel {
                 reminderInstant = startTime.toInstant().minus(2, ChronoUnit.HOURS);
                 break;
             case 6:
-                reminderInstant = Instant.MAX;
-                break;
+                return null;
             default:
                 throw new IllegalArgumentException();
         }
