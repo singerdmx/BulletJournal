@@ -56,8 +56,8 @@ public class LabelController {
         return ResponseEntity.ok().body(labels);
     }
 
-    @DeleteMapping(LABELS_ROUTE)
-    public ResponseEntity<?> deleteLabel(@PathVariable Long labelId) {
+    @DeleteMapping(LABEL_ROUTE)
+    public ResponseEntity<?> deleteLabel(@NotNull @PathVariable Long labelId) {
         return null;
     }
 
