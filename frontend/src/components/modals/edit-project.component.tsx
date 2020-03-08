@@ -7,11 +7,11 @@ import {
   AccountBookOutlined
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interfaces';
+import { GroupsWithOwner } from '../../features/group/interface';
 import { updateGroups } from '../../features/group/actions';
 import { updateProject } from '../../features/project/actions';
 import { IState } from '../../store';
-import { Project } from '../../features/project/interfaces';
+import { Project } from '../../features/project/interface';
 import { iconMapper } from '../../components/side-menu/side-menu.compoennt';
 
 import './modals.styles.less';

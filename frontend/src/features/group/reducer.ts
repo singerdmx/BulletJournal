@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Group, GroupsWithOwner } from './interfaces';
+import { Group, GroupsWithOwner } from './interface';
 
 export type ApiErrorAction = {
   error: string;

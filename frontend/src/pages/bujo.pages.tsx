@@ -8,7 +8,7 @@ import {
   CarryOutOutlined,
 } from '@ant-design/icons';
 import { IState } from '../store/index';
-import { Project } from '../features/project/interfaces';
+import { Project } from '../features/project/interface';
 import AddProject from '../components/modals/add-project.component';
 import AddProjectItem from '../components/modals/add-project-item.component';
 import '@ant-design/compatible/assets/index.css';

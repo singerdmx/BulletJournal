@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { IState } from '../store/index';
 import { Tag, Collapse, Button, AutoComplete, Typography, Tooltip } from 'antd';
 import AddLabel from '../components/modals/add-label.component';
-import { Label, stringToRGB } from '../features/label/interfaces'
+import { Label, stringToRGB } from '../features/label/interface'
 import { labelsUpdate, deleteLabel, addSelectedLabel, removeSelectedLabel } from '../features/label/actions';
 import { TagOutlined, SearchOutlined, DeleteOutlined, Popconfirm } from '@ant-design/icons';
 import { TweenOneGroup } from 'rc-tween-one';

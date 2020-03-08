@@ -2,7 +2,7 @@ import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
 import { getGroup, deleteGroup } from '../features/group/actions';
-import { Group } from '../features/group/interfaces';
+import { Group } from '../features/group/interface';
 import { IState } from '../store';
 import GroupCard from '../components/group-card/group-card.component';
 

@@ -8,7 +8,7 @@ import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
 import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
-import { Project } from '../../features/project/interfaces';
+import { Project } from '../project/interface';
 import { updateMyself, updateExpandedMyself } from './actions';
 import { updateGroups, groupUpdate } from '../group/actions';
 import { updateNotifications } from '../notification/actions';

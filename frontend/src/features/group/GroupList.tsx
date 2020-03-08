@@ -1,7 +1,7 @@
 import React from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { GroupsWithOwner } from './interfaces';
+import { GroupsWithOwner } from './interface';
 import { updateGroups, createGroupByName } from './actions';
 
 type GroupsProps = {

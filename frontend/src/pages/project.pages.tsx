@@ -1,9 +1,9 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Project } from '../features/project/interfaces';
+import { Project } from '../features/project/interface';
 import { IState } from '../store';
 import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../features/group/interfaces';
+import { GroupsWithOwner } from '../features/group/interface';
 import { Avatar, Popconfirm, Tooltip } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
