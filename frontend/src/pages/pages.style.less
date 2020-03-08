@@ -108,10 +108,35 @@
 .labels-page {
   .pages-property();
 
+  .labels-search-container {
+    margin: 1em 1em;
+
+    .label-search-input {
+      width: 60%;
+      margin-left: 20%;
+
+      .ant-select-selection-search-input {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid grey;
+        font-size: 18px;
+        transition: ease 0.5s;
+
+        &::placeholder {
+          color: grey;
+        }
+
+        &:focus {
+          outline: none !important;
+          border-bottom: 3px solid @primary-color;
+        }
+      }
+    }
+  }
   .labels-create {
     width: 60%;
     margin-left: 20%;
-    margin-top: 20%;
+    margin-top: 10%;
 
     .ant-select-selection-search-input {
       width: 100%;
@@ -140,6 +165,9 @@
     .labels-control {
       display: flex;
       justify-content: flex-end;
+      .edit-button {
+        margin-left: 1em;
+      }
     }
     .labels-list {
       margin-top: 1em;
@@ -159,6 +187,7 @@
         .anticon {
           font-size: 16px;
           font-weight: 600;
+          color: black;
         }
       }
     }

@@ -6,7 +6,7 @@ import BujoPage from '../../pages/bujo.pages';
 import GroupPage from '../../pages/group.pages';
 import GroupsPage from '../../pages/groups.pages';
 import ProjectPage from '../../pages/project.pages';
-import LabelsPage from '../../pages/labels.pages';
+import LabelsPage from '../../pages/labels';
 import { Layout } from 'antd';
 
 const { Content } = Layout;
