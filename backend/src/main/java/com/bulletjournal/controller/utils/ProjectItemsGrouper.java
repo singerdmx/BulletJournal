@@ -64,7 +64,7 @@ public class ProjectItemsGrouper {
                     // Sort transaction by end time
                     ZonedDateTime z1 = IntervalHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
                     ZonedDateTime z2 = IntervalHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
-                    return z1.compareTo(z2);
+                    return z2.compareTo(z1);
                 });
                 projectItem.setTransactions(transactions);
                 mergedMap.put(zonedDateTime, projectItem);
