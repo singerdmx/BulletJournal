@@ -24,7 +24,7 @@ function* getProjectItems(action: PayloadAction<GetProjectItemsAction>) {
     }
 }
 
-export default function* labelSagas() {
+export default function* myBuJoSagas() {
     yield all([
         yield takeLatest(
             projectItemsActions.projectItemsApiErrorReceived.type,
