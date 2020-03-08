@@ -1,4 +1,4 @@
-.setting {
+.pages-property {
   background: #fff;
   margin: 5vh 15vw;
   padding: 1vh 2vw;
@@ -8,24 +8,12 @@
     0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
 }
 
-.labels {
-  background: #fff;
-  margin: 5vh 15vw;
-  padding: 1vh 2vw;
-  min-height: 90vh;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
-    0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
+.setting {
+  .pages-property();
 }
 
 .project {
-  background: #fff;
-  margin: 5vh 15vw;
-  padding: 1vh 2vw;
-  min-height: 90vh;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
-    0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
+  .pages-property();
   
   .project-header {
     display: flex;
@@ -45,13 +33,8 @@
 }
 
 .todo {
-  background: #fff;
-  margin: 5vh 15vw;
-  padding: 1vh 2vw;
-  min-height: 90vh;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
-    0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
+  .pages-property();
+  
   .todo-header {
     border-bottom: 1px solid #e0e6ed;
     display: flex;
@@ -68,13 +51,7 @@
 }
 
 .add-group-page {
-  background: #fff;
-  margin: 5vh 15vw;
-  padding: 1vh 2vw;
-  min-height: 90vh;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
-    0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
+  .pages-property();
 }
 
 .groups-page {
@@ -128,9 +105,47 @@
   }
 }
 
-.label {
-  font-weight: bold;
-  font-size: 16px !important;
-  padding: 8px !important;
-  margin: 6px !important;
+.labels-page {
+  .pages-property();
+
+  .labels-create {
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 20%;
+
+    .ant-select-selection-search-input {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid grey;
+      font-size: 18px;
+      transition: ease 0.5s;
+
+      &::placeholder {
+        color: grey;
+      }
+
+      &:focus {
+        outline: none !important;
+        border-bottom: 3px solid @primary-color;
+      }
+    }
+  }
+  .label-list {
+    width: 60%;
+    margin-left: 20%;
+
+    .labels {
+      display: inline-block;
+      font-size: 18px;
+      font-weight: 500;
+      padding: 5px 10px;
+      margin: 0.5em 0.5em;
+      border-radius: 10px;
+
+      .anticon {
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
+  }
 }

@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { IState } from '../store/index';
-import { Tag, Collapse, Button, AutoComplete, Typography, Tooltip } from 'antd';
-import AddLabel from '../components/modals/add-label.component';
-import { Label, stringToRGB } from '../features/label/interfaces'
-import { labelsUpdate, deleteLabel, addSelectedLabel, removeSelectedLabel } from '../features/label/actions';
-import { TagOutlined, SearchOutlined, DeleteOutlined, Popconfirm } from '@ant-design/icons';
-import { TweenOneGroup } from 'rc-tween-one';
+import { Input, Form, Tag, AutoComplete, message } from 'antd';
+import { Label, stringToRGB } from '../features/label/interfaces';
+import { createLabel } from '../features/label/actions';
+import {
+  labelsUpdate,
+  deleteLabel,
+  addSelectedLabel,
+  removeSelectedLabel
+} from '../features/label/actions';
 
 import './pages.style.less';
-
-const { Panel } = Collapse;
 
 type LabelsProps = {
   labels: Label[];
@@ -20,137 +21,80 @@ type LabelsProps = {
   deleteLabel: (labelId: number, name: string) => void;
   addSelectedLabel: (val: string) => void;
   removeSelectedLabel: (val: string) => void;
-}
+  createLabel: (name: string) => void;
+};
 
-const { Text } = Typography;
+const LablesPage: React.FC<LabelsProps> = props => {
+  const [form] = Form.useForm();
+  const [editable, setEditable] = useState(false);
+  const [newLable, setNewLable] = useState('');
+  useEffect(() => {
+    props.labelsUpdate();
+  }, []);
 
-class LablesPage extends React.Component<LabelsProps> {
-
-  componentDidMount() {
-    this.props.labelsUpdate();
-  }
-
-  handleClose = (removedLabel: Label) => {
-    this.props.removeSelectedLabel(removedLabel.value);
+  const handleDelete = (labelId: number, name: string) => {
+    props.deleteLabel(labelId, name);
   };
 
-  handleDelete = (removedLabel: Label) => {
-    this.props.deleteLabel(removedLabel.id, removedLabel.value);
+  const handleChange = (e: any) => {
+    setEditable(e.target.value);
   };
 
-  handleClickSearch = (e: any) => {
-  };
-
-  handleSelectSearch = (val: string) => {
-    this.props.addSelectedLabel(val);
-  };
-
-  forMap = (label: Label) => {
-    const tagElem = (
-      <Tooltip title={label.value} placement="topLeft">
-        <Tag
-          className='label'
-          closable
-          color={stringToRGB(label.value)}
-          onClose={(e: any)  => {
-            e.preventDefault();
-            this.handleClose(label);
-          }}
-        >
-        <TagOutlined /> &nbsp; {label.value}
-        </Tag>
-      </Tooltip>
-    );
-    return (
-      <span key={label.value} style={{ display: 'inline-block' }}>
-        {tagElem}
-      </span>
-    );
-  };
-
-  mapLabels = (label: Label) => {
-    const tagElem = (
-      <Tooltip title={label.value} placement="topLeft">
-        <Tag
-          className='label'
-          color={stringToRGB(label.value)}
-          onClose={(e: any)  => {
-            e.preventDefault();
-            this.handleClose(label);
-          }}
-        >
-          <TagOutlined />
-          &nbsp; <Text editable={true}>{label.value}</Text>
-          <Tooltip title="Delete" placement="top">
-            <DeleteOutlined
-              title='Delete'
-              style={{
-                marginLeft: '10px',
-                cursor: 'pointer',
-                marginBottom: '0.5em'
-              }}
+  return (
+    <div className="labels-page">
+      <div className="labels-create">
+        <Form form={form}>
+          <Form.Item
+            name="labelName"
+            rules={[{ required: true, message: 'Please input Label Name!' }]}
+          >
+            <AutoComplete
+              children={
+                <Input
+                  placeholder="Add Label"
+                  className="labels-input"
+                  onPressEnter={e => {
+                    form
+                      .validateFields()
+                      .then(values => {
+                        props.createLabel(values.labelName);
+                        form.resetFields();
+                      })
+                      .catch(info => message.error(info));
+                  }}
+                />
+              }
+              options={props.labelOptions}
+              value={newLable}
+              onChange={value => setNewLable(value)}
             />
-          </Tooltip>
-        </Tag>
-      </Tooltip>
-    );
-    return (
-      <span key={label.value} style={{ display: 'inline-block' }}>
-        {tagElem}
-      </span>
-    );
-  };
-
-  render() {
-    return (
-      <div className='labels'>
-          <AddLabel />
-          <Tooltip title="Search">
-            <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={this.handleClickSearch} />
-          </Tooltip>
-          <AutoComplete
-            style={{ width: 200 }}
-            options={this.props.labelOptions}
-            placeholder="Enter Label"
-            allowClear
-            onSelect={this.handleSelectSearch}
-            filterOption={(inputValue: string, option: any) => option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-          />
-          <div>
-                <TweenOneGroup
-                  enter={{
-                    scale: 0.8,
-                    opacity: 0,
-                    type: 'from',
-                    duration: 100,
-                  }}
-                  leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
-                  appear={false}
-                >
-                  {this.props.labelsSelected.map(this.forMap)}
-                </TweenOneGroup>
-              </div>
-          <Collapse defaultActiveKey={'availableLabels'}>
-            <Panel header='' key="availableLabels">
-              <div>
-                <TweenOneGroup
-                  enter={{
-                    scale: 0.8,
-                    opacity: 0,
-                    type: 'from',
-                    duration: 100,
-                  }}
-                  leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
-                  appear={false}
-                >
-                  {this.props.labels.map(this.mapLabels)}
-                </TweenOneGroup>
-              </div>
-            </Panel>
-          </Collapse>
+          </Form.Item>
+        </Form>
       </div>
-    );
-  }
+      <div className="label-list">
+        {props.labels.map(label => {
+          return editable ? (
+            <Input
+              value={newLable}
+              type="text"
+              size="small"
+              onChange={e => handleChange(e)}
+            />
+          ) : (
+            <Tag
+              key={label.id}
+              className="labels"
+              color={stringToRGB(label.value)}
+              closable
+              onClose={() => handleDelete(label.id, label.value)}
+            >
+              {label.value}
+            </Tag>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 const mapStateToProps = (state: IState) => ({
@@ -159,4 +103,10 @@ const mapStateToProps = (state: IState) => ({
   labelOptions: state.label.labelOptions
 });
 
-export default connect(mapStateToProps, { labelsUpdate, deleteLabel, addSelectedLabel, removeSelectedLabel })(LablesPage);
+export default connect(mapStateToProps, {
+  labelsUpdate,
+  deleteLabel,
+  addSelectedLabel,
+  removeSelectedLabel,
+  createLabel
+})(LablesPage);
