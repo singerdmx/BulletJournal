@@ -109,5 +109,5 @@ public class EtagGenerator {
     public enum HashAlgorithm {
         MD5, ADLER32, SHA256
     }
-    
+
 }
