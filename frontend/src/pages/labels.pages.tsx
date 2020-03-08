@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { IState } from '../store/index';
-import { Input, Form, Tag, AutoComplete, message } from 'antd';
+import { Input, Form, Tag, AutoComplete, message, Button } from 'antd';
 import { Label, stringToRGB } from '../features/label/interface';
 import { createLabel } from '../features/label/actions';
 import {
@@ -71,27 +71,30 @@ const LablesPage: React.FC<LabelsProps> = props => {
           </Form.Item>
         </Form>
       </div>
-      <div className="label-list">
-        {props.labels.map(label => {
-          return editable ? (
-            <Input
-              value={newLable}
-              type="text"
-              size="small"
-              onChange={e => handleChange(e)}
-            />
-          ) : (
-            <Tag
-              key={label.id}
-              className="labels"
-              color={stringToRGB(label.value)}
-              closable
-              onClose={() => handleDelete(label.id, label.value)}
-            >
-              {label.value}
-            </Tag>
-          );
-        })}
+      <div className="labels-container">
+        <div className="labels-control">
+          <div className="label-search">
+            <Input.Search placeholder="Search Label" />
+          </div>
+          <div className="edit-button">
+            <Button type="primary" onClick={() => setEditable(editable => !editable)}>{editable ? "Done" : "Edit"}</Button>
+          </div>
+        </div>
+        <div className="labels-list">
+          {props.labels.map(label => {
+            return (
+              <Tag
+                key={label.id}
+                className="labels"
+                color={stringToRGB(label.value)}
+                closable={editable}
+                onClose={() => handleDelete(label.id, label.value)}
+              >
+                {editable ? <Input size="small" className="labels-edit" defaultValue={label.value}/> : label.value}
+              </Tag>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

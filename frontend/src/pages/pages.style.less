@@ -14,7 +14,7 @@
 
 .project {
   .pages-property();
-  
+
   .project-header {
     display: flex;
     justify-content: space-between;
@@ -34,7 +34,7 @@
 
 .todo {
   .pages-property();
-  
+
   .todo-header {
     border-bottom: 1px solid #e0e6ed;
     display: flex;
@@ -130,21 +130,36 @@
       }
     }
   }
-  .label-list {
+
+  .labels-container {
+    display: flex;
+    flex-direction: column;
     width: 60%;
     margin-left: 20%;
 
-    .labels {
-      display: inline-block;
-      font-size: 18px;
-      font-weight: 500;
-      padding: 5px 10px;
-      margin: 0.5em 0.5em;
-      border-radius: 10px;
-
-      .anticon {
+    .labels-control {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .labels-list {
+      margin-top: 1em;
+      .labels {
+        display: inline-block;
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 500;
+        padding: 5px 10px;
+        margin: 0.5em 0.5em;
+        border-radius: 10px;
+
+        .labels-edit {
+          width: 78px;
+          background-color: transparent;
+        }
+
+        .anticon {
+          font-size: 16px;
+          font-weight: 600;
+        }
       }
     }
   }
