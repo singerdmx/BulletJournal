@@ -2,9 +2,6 @@ import React from 'react';
 import { Modal, Input, Form, Select, Avatar, Tooltip } from 'antd';
 import {
   EditOutlined,
-  CarryOutOutlined,
-  FileTextOutlined,
-  AccountBookOutlined
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interface';

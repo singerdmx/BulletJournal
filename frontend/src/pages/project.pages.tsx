@@ -4,7 +4,7 @@ import { Project } from '../features/project/interface';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../features/group/interface';
-import { Avatar, Popconfirm, Tooltip, Descriptions } from 'antd';
+import { Avatar, Popconfirm, Tooltip } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -123,9 +123,11 @@ class ProjectPage extends React.Component<
 
     let description = null;
     if (project.description) {
-      description = (<Descriptions>
-        <Descriptions.Item label="Description">{project.description}</Descriptions.Item>
-      </Descriptions>);
+      description = (<div className='project-description'>
+        {project.description.split("\n").map((s,key) => {
+          return <p>{s}</p>;
+        })}
+      </div>);
     }
 
     return (
@@ -168,7 +170,7 @@ class ProjectPage extends React.Component<
           </div>
         </div>
         <div className='project-content'><NoteTree /></div>
-        <div>{project.description}</div>
+        <div>{description}</div>
       </div>
     );
   }
