@@ -42,9 +42,7 @@ export const createTask = (projectId: number, name: string, assignedTo: string,
 };
 
 export const putTasks = (projectId: number, tasks: Task[]) => {
-  const putBody = JSON.stringify({
-    tasks: tasks,
-  });
+  const putBody = JSON.stringify(tasks);
   return doPut(`/api/projects/${projectId}/tasks`, putBody)
     .catch(err => {
       throw Error(err.message);
