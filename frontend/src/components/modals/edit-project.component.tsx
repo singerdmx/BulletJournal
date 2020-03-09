@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Form, Select, Avatar } from 'antd';
+import { Modal, Input, Form, Select, Avatar, Tooltip } from 'antd';
 import {
   EditOutlined,
   CarryOutOutlined,
@@ -73,7 +73,6 @@ class EditProject extends React.Component<
   };
 
   updateProject = () => {
-    console.log('oiuoiuoiui');
     this.setState({ isShow: false });
     const { id } = this.props.project;
     const { name, description, groupId } = this.state;
@@ -100,11 +99,12 @@ class EditProject extends React.Component<
     const { project, groups: groupsByOwner } = this.props;
     return (
       <div className='edit-project' title='Edit Project'>
-        <EditOutlined
-          title='Edit Project'
-          onClick={this.showModal}
-          style={{ fontSize: 20 }}
-        />
+        <Tooltip placement='top' title='Edit Project'>
+          <EditOutlined
+            onClick={this.showModal}
+            style={{ fontSize: 20 }}
+          />
+        </Tooltip>
 
         <Modal
           title='Edit BuJo'

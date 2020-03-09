@@ -4,7 +4,7 @@ import { Project } from '../features/project/interface';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../features/group/interface';
-import { Avatar, Popconfirm, Tooltip } from 'antd';
+import { Avatar, Popconfirm, Tooltip, Descriptions } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -107,17 +107,25 @@ class ProjectPage extends React.Component<
           className='group-setting'
           placement='bottom'
         >
-          <DeleteOutlined
-            title='Delete Project'
-            style={{
-              fontSize: 20,
-              marginLeft: '10px',
-              cursor: 'pointer',
-              marginBottom: '0.5em'
-            }}
-          />
+          <Tooltip placement='top' title='Delete Project'>
+            <DeleteOutlined
+              style={{
+                fontSize: 20,
+                marginLeft: '10px',
+                cursor: 'pointer',
+                marginBottom: '0.5em'
+              }}
+            />
+          </Tooltip>
         </Popconfirm>
       );
+    }
+
+    let description = null;
+    if (project.description) {
+      description = (<Descriptions>
+        <Descriptions.Item label="Description">{project.description}</Descriptions.Item>
+      </Descriptions>);
     }
 
     return (
