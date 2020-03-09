@@ -3,7 +3,10 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.ProjectItems;
+import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.models.UpdateLabelParams;
+import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Label;
@@ -14,9 +17,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -103,5 +105,18 @@ public class LabelDaoJpa {
 
         this.taskRepository.saveAll(tasks);
 
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<ProjectItems> getItemsByLabels(List<Long> labels) {
+        List<Task> taskList = this.taskRepository.findTasksByLabelIds(labels);
+        List<com.bulletjournal.controller.models.Task> tasks = taskList.stream().
+                map(Task::toPresentationModel).collect(Collectors.toList());
+        Map<ZonedDateTime, List<com.bulletjournal.controller.models.Task>> taskMap =  ProjectItemsGrouper.groupTasksByDate(tasks);
+
+        //dummy, it is an empty implementation, also need to add note.
+        Map<ZonedDateTime, List<Transaction>> transactionMap = ProjectItemsGrouper.groupTransactionsByDate(new ArrayList<>());
+        Map<ZonedDateTime, ProjectItems> projectItemsMap = ProjectItemsGrouper.mergeMap(taskMap, transactionMap);
+        return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
     }
 }

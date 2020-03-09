@@ -65,6 +65,6 @@ public class LabelController {
 
     @GetMapping(ITEMS_ROUTE)
     public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
-        return null;
+        return this.labelDaoJpa.getItemsByLabels(labels);
     }
 }

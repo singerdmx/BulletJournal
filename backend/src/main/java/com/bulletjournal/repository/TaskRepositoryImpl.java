@@ -22,4 +22,17 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
         query.setParameter(1, labelId);
         return query.getResultList();
     }
+
+    @Override
+    public List<Task> findTasksByLabelIds(List<Long> labelIds) {
+        String queryString = "SELECT * FROM tasks WHERE ? =  ANY(tasks.labels)";
+        for (int i = 1; i < labelIds.size(); i++) {
+            queryString = queryString + " and ? = ANY(tasks.labels)";
+        }
+        Query query = entityManager.createNativeQuery(queryString, Task.class);
+        for (int i = 1; i <= labelIds.size(); i++) {
+            query.setParameter(i, labelIds.get(i - 1));
+        }
+        return query.getResultList();
+    }
 }
