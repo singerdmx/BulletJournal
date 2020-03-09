@@ -105,7 +105,9 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: a
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
     const { projectId, notes, putNote } = props;
     useEffect(()=>{
-        props.updateNotes(projectId);
+        if (projectId) {
+          props.updateNotes(projectId);
+        }
     }, [projectId])
     let treeNote = getTree(notes, `project${projectId}`, projectId);
 

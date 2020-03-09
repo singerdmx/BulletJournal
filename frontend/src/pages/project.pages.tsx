@@ -4,7 +4,7 @@ import { Project } from '../features/project/interface';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../features/group/interface';
-import { Avatar, Popconfirm, Tooltip } from 'antd';
+import { Avatar, Popconfirm, Tooltip, Divider } from 'antd';
 import { getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.compoennt';
 import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -80,9 +80,11 @@ class ProjectPage extends React.Component<
     const { project, myself } = this.props;
 
     let createContent = null;
+    let projectContent = null;
     switch (project.projectType) {
       case ProjectType.NOTE:
         createContent = <AddNote />;
+        projectContent = <NoteTree />;
         break;
       case ProjectType.TODO:
         createContent = <AddTask />;
@@ -127,6 +129,7 @@ class ProjectPage extends React.Component<
         {project.description.split("\n").map((s,key) => {
           return <p>{s}</p>;
         })}
+        <Divider style={{marginTop: '8px'}} />
       </div>);
     }
 
@@ -169,8 +172,8 @@ class ProjectPage extends React.Component<
             {deleteContent}
           </div>
         </div>
-        <div className='project-content'><NoteTree /></div>
         <div>{description}</div>
+        <div className='project-content'>{projectContent}</div>
       </div>
     );
   }
