@@ -45,7 +45,7 @@ public class ProjectItemController {
         if (types.isEmpty()) {
             return Collections.emptyList();
         }
-        
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // Set start time and end time
