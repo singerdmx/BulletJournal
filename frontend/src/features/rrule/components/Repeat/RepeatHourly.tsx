@@ -1,6 +1,5 @@
 import React from 'react';
-import { Select, Input } from 'antd';
-const { Option } = Select;
+import { Input } from 'antd';
 
 type EndProps = {};
 

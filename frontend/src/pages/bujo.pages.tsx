@@ -60,7 +60,7 @@ class BujoPage extends React.Component<
 
   handleOnChange = (type: string) => {
     const { category } = this.props.match.params;
-    let { ledgerSelected, todoSelected, startDate, endDate } = this.props;
+    let { ledgerSelected, todoSelected } = this.props;
     if (type === 'todo') {
       todoSelected = !todoSelected;
     } else {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Select, Input, Checkbox } from 'antd';
-import { DatePicker } from 'antd';
 const { Option } = Select;
 
 type EndProps = {};

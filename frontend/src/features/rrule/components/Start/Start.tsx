@@ -1,7 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { DatePicker } from 'antd';
-//import translateLabel from '../utils/translateLabel';
 
 function onChange(date: any, dateString: string) {
   console.log(date, dateString);
