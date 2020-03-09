@@ -61,7 +61,6 @@ const findNoteById = (notes: Note[], noteId: number): Note => {
         }
     }
     return res;
-    ;
 }
 
 const dragNoteById = (notes: Note[], noteId: number): Note[] => {
