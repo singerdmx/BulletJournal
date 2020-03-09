@@ -11,7 +11,6 @@ import {
   getProjectItems,
   updateMyBuJoDates
 } from '../../features/myBuJo/actions';
-import { ProjectType } from '../../features/project/constants';
 import { ProjectItems } from '../../features/myBuJo/interface';
 
 const { RangePicker } = DatePicker;
@@ -27,10 +26,10 @@ type ProjectItemProps = {
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateMyBuJoDates: (startDate: string, endDate: string) => void;
   getProjectItems: (
-    types: ProjectType[],
     startDate: string,
     endDate: string,
-    timezone: string
+    timezone: string,
+    category: string
   ) => void;
 };
 
@@ -40,15 +39,12 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
   }
 
   handleRangeChange = (dates: any, dateStrings: string[]) => {
-    let projectTypeArray = [];
-    if (this.props.ledgerSelected) projectTypeArray.push(ProjectType.LEDGER);
-    if (this.props.todoSelected) projectTypeArray.push(ProjectType.TODO);
     this.props.updateMyBuJoDates(dateStrings[0], dateStrings[1]);
     this.props.getProjectItems(
-      projectTypeArray,
       dateStrings[0],
       dateStrings[1],
-      this.props.timezone
+      this.props.timezone,
+      'today'
     );
   };
 
@@ -113,6 +109,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
               {this.props.projectItems.map((items, index) => {
                 return (
                   <Timeline.Item
+                    key={items.date}
                     label={items.date}
                     style={{ marginLeft: '-65%' }}
                   >

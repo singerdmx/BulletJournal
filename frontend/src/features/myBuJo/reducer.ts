@@ -1,11 +1,14 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { ProjectItems } from './interface';
-import { ProjectType } from '../project/constants';
 
 export type MyBuJo = {
   startDate: string;
   endDate: string;
 };
+
+export type SelectedCalendarDayAction = {
+  selectedCalendarDay: string;
+}
 
 export type UpdateSelectedAction = {
   todoSelected: boolean;
@@ -17,22 +20,24 @@ export type ApiErrorAction = {
 };
 
 export type GetProjectItemsAction = {
-  types: ProjectType[];
   startDate: string;
   endDate: string;
   timezone: string;
+  category: string;
 };
 
 export type GetProjectItemsAfterUpdateSelectAction = {
   todoSelected: boolean;
   ledgerSelected: boolean;
-  startDate: string;
-  endDate: string;
-  timezone: string;
+  category: string;
 };
 
 export type ProjectItemsReceivedAction = {
   items: ProjectItems[];
+};
+
+export type CalendarModeAction = {
+  calendarMode: string;
 };
 
 let initialState = {
@@ -40,7 +45,10 @@ let initialState = {
   endDate: '',
   projectItems: [] as ProjectItems[],
   todoSelected: true,
-  ledgerSelected: false
+  ledgerSelected: false,
+  calendarMode: 'month',
+  selectedCalendarDay: '',
+  projectItemsForCalendar: [] as ProjectItems[],
 };
 
 const slice = createSlice({
@@ -55,6 +63,10 @@ const slice = createSlice({
       const { startDate, endDate } = action.payload;
       state.startDate = startDate;
       state.endDate = endDate;
+    },
+    selectedCalendarDayReceived: (state, action: PayloadAction<SelectedCalendarDayAction>) => {
+      const { selectedCalendarDay } = action.payload;
+      state.selectedCalendarDay = selectedCalendarDay;
     },
     updateSelected: (state, action: PayloadAction<UpdateSelectedAction>) => {
       const { todoSelected, ledgerSelected } = action.payload;
@@ -73,7 +85,21 @@ const slice = createSlice({
     ) => {
       const { items } = action.payload;
       state.projectItems = items;
-    }
+    },
+    projectItemsForCalenderReceived: (
+      state,
+      action: PayloadAction<ProjectItemsReceivedAction>
+    ) => {
+      const { items } = action.payload;
+      state.projectItemsForCalendar = items;
+    },
+    calendarModeReceived: (
+      state,
+      action: PayloadAction<CalendarModeAction>
+    ) => {
+      const { calendarMode } = action.payload;
+      state.calendarMode = calendarMode;
+    },
   }
 });
 

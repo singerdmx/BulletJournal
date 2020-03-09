@@ -2,6 +2,10 @@ import { doFetch } from './api-helper';
 
 export const fetchProjectItems = (projectTypes: string[], timezone: string,
     startDate: string, endDate: string) => {
+  if (projectTypes.length == 0) {
+    return Promise.resolve([]);
+  }
+
   // e.g. "/api/projectItems?types=TODO&types=LEDGER&timezone=America%2FLos_Angeles"
   return doFetch('/api/projectItems?'
     + projectTypes.map(p => `types=${p}`).join('&')

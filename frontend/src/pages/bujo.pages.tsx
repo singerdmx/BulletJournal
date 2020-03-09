@@ -15,7 +15,6 @@ import {
   getProjectItemsAfterUpdateSelect,
   getProjectItems
 } from '../features/myBuJo/actions';
-import { ProjectType } from '../features/project/constants';
 
 type BujoProps = {
   todoSelected: boolean;
@@ -26,15 +25,13 @@ type BujoProps = {
   getProjectItemsAfterUpdateSelect: (
     todoSelected: boolean,
     ledgerSelected: boolean,
-    startDate: string,
-    endDate: string,
-    timezone: string
+    category: string
   ) => void;
   getProjectItems: (
-    types: ProjectType[],
     startDate: string,
     endDate: string,
-    timezone: string
+    timezone: string,
+    category: string
   ) => void;
 };
 
@@ -62,24 +59,19 @@ class BujoPage extends React.Component<
   };
 
   handleOnChange = (type: string) => {
-    const { ledgerSelected, todoSelected, startDate, endDate } = this.props;
+    const { category } = this.props.match.params;
+    let { ledgerSelected, todoSelected, startDate, endDate } = this.props;
     if (type === 'todo') {
-      this.props.getProjectItemsAfterUpdateSelect(
-        !todoSelected,
-        ledgerSelected,
-        startDate,
-        endDate,
-        this.props.timezone
-      );
-    } else if (type === 'ledger') {
-      this.props.getProjectItemsAfterUpdateSelect(
-        todoSelected,
-        !ledgerSelected,
-        startDate,
-        endDate,
-        this.props.timezone
-      );
+      todoSelected = !todoSelected;
+    } else {
+      ledgerSelected = !ledgerSelected;
     }
+
+    this.props.getProjectItemsAfterUpdateSelect(
+      todoSelected,
+      ledgerSelected,
+      category
+    );
   };
 
   render() {

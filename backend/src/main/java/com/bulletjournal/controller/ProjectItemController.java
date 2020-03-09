@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,10 @@ public class ProjectItemController {
             @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
 
+        if (types.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // Set start time and end time

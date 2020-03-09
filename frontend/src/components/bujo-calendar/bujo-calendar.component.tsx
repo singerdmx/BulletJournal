@@ -6,12 +6,29 @@ import { IState } from '../../store';
 import moment from 'moment';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
+import { ProjectItems } from '../../features/myBuJo/interface';
+import {
+  getProjectItems,
+  calendarModeReceived,
+  updateSelectedCalendarDay
+} from '../../features/myBuJo/actions';
 import './bujo-calendar.styles.less';
+import { CalendarMode } from 'antd/lib/calendar/generateCalendar';
 
 type BujoCalendarProps = {
-  startDate: string;
+  selectedCalendarDay: string;
   timezone: string;
+  calendarMode: string;
+  projectItems: ProjectItems[];
   updateExpandedMyself: (updateSettings: boolean) => void;
+  calendarModeReceived: (calendarMode: string) => void;
+  updateSelectedCalendarDay: (selectedCalendarDay: string) => void;
+  getProjectItems: (
+    startDate: string,
+    endDate: string,
+    timezone: string,
+    category: string
+  ) => void;
 };
 
 class BujoCalendar extends React.Component<BujoCalendarProps> {
@@ -19,7 +36,33 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
     this.props.updateExpandedMyself(true);
   }
 
+  dateCellRender = (value: moment.Moment) => {
+    const target = this.props.projectItems
+      .filter((p: ProjectItems) => p.date === value.format(dateFormat));
+    if (target.length === 0) {
+      return null;
+    }
+
+    const targetDay = target[0];
+    return (<div>
+      <div>{targetDay.dayOfWeek}</div>
+    </div>);
+  };
+
+  onPanelChange = (value: moment.Moment, mode: CalendarMode) => {
+    const date = value.format(dateFormat);
+    this.props.calendarModeReceived(mode);
+    this.props.updateSelectedCalendarDay(date);
+    if (mode === 'month') {
+      this.props.getProjectItems(
+        value.add(-60, 'days').format(dateFormat),
+        value.add(120, 'days').format(dateFormat), // because it deducts 60 first
+        this.props.timezone, 'calendar');
+    }
+  };
+
   render() {
+    var mode : CalendarMode = this.props.calendarMode as CalendarMode;
     return (
       <div className='bujo-calendar'>
         <div className='timezone-container'>
@@ -27,12 +70,16 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
             <Link to='/settings'>{this.props.timezone}</Link>
           </Tooltip>
         </div>
-        <Calendar value={moment(
-                this.props.startDate
-                  ? this.props.startDate
-                  : new Date().toLocaleString('fr-CA'),
-                dateFormat
-              )}/>
+        <Calendar
+          dateCellRender={(date) => this.dateCellRender(date)}
+          onPanelChange={(date, mode) => this.onPanelChange(date, mode)}
+          mode={mode}
+          value={moment(
+            this.props.selectedCalendarDay
+              ? this.props.selectedCalendarDay
+              : new Date().toLocaleString('fr-CA'),
+            dateFormat
+          )}/>
       </div>
     );
   }
@@ -40,9 +87,14 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
 
 const mapStateToProps = (state: IState) => ({
   timezone: state.myself.timezone,
-  startDate: state.myBuJo.startDate,
+  selectedCalendarDay: state.myBuJo.selectedCalendarDay,
+  calendarMode: state.myBuJo.calendarMode,
+  projectItems: state.myBuJo.projectItemsForCalendar,
 });
 
 export default connect(mapStateToProps, {
-  updateExpandedMyself
+  updateExpandedMyself,
+  calendarModeReceived,
+  getProjectItems,
+  updateSelectedCalendarDay
 })(BujoCalendar);

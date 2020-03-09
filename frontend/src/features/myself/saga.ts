@@ -9,9 +9,11 @@ import {
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
-import { updateMyBuJoDates } from '../../features/myBuJo/actions';
+import { updateMyBuJoDates, updateSelectedCalendarDay, getProjectItems } from '../../features/myBuJo/actions';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself } from '../../apis/myselfApis';
+import moment from 'moment';
+import { dateFormat } from '../myBuJo/constants';
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -39,6 +41,15 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
     const state: IState = yield select();
     if (!state.myBuJo.startDate) {
       yield put(updateMyBuJoDates(currentTime, currentTime));
+      yield put(getProjectItems(currentTime, currentTime, data.timezone, 'today'));
+    }
+
+    if (!state.myBuJo.selectedCalendarDay) {
+      yield put(updateSelectedCalendarDay(currentTime));
+      yield put(getProjectItems(
+        moment(new Date()).add(-60, 'days').format(dateFormat),
+        moment(new Date()).add(60, 'days').format(dateFormat),
+        data.timezone, 'calendar'));
     }
 
     if (updateSettings) {
