@@ -12,13 +12,17 @@ public class Label {
     @Size(min = 1, max = 100)
     private String value;
 
+    private String icon;
+
     public Label() {
     }
 
     public Label(Long id,
-                 @NotBlank @Size(min = 1, max = 100) String value) {
+                 @NotBlank @Size(min = 1, max = 100) String value,
+                 String icon) {
         this.id = id;
         this.value = value;
+        this.icon = icon;
     }
 
     public Long getId() {
@@ -35,5 +39,13 @@ public class Label {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

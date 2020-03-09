@@ -25,9 +25,10 @@ export const deleteLabel = (labelId: number) => {
     });
 };
 
-export const updateLabel = (labelId: number, value: string) => {
+export const updateLabel = (labelId: number, value?: string, icon?: string) => {
     const patchBody = JSON.stringify({
-      value: value
+      value: value,
+      icon: icon
     });
 
     return doPatch(`/api/labels/${labelId}`, patchBody)

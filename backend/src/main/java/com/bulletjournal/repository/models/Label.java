@@ -20,6 +20,9 @@ public class Label extends OwnedModel {
     )
     private Long id;
 
+    @Column(length = 100)
+    private String icon;
+
     public Long getId() {
         return id;
     }
@@ -28,8 +31,16 @@ public class Label extends OwnedModel {
         this.id = id;
     }
 
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
     public com.bulletjournal.controller.models.Label toPresentationModel() {
         return new com.bulletjournal.controller.models.Label(
-                this.getId(), this.getName());
+                this.getId(), this.getName(), this.getIcon());
     }
 }

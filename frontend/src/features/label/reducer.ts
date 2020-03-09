@@ -26,7 +26,8 @@ export type GetItemsByLabelsAction = {
 
 export type PatchLabelAction = {
   labelId: number;
-  value: string;
+  value?: string;
+  icon?: string;
 };
 
 export type UpdateLabels = {};

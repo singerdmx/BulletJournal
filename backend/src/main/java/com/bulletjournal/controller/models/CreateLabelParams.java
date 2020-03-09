@@ -9,12 +9,16 @@ public class CreateLabelParams {
     @Size(min = 1, max = 50)
     private String value;
 
+    private String icon;
+
     public CreateLabelParams() {
     }
 
     public CreateLabelParams(
-            @NotBlank @Size(min = 1, max = 50) String value) {
+            @NotBlank @Size(min = 1, max = 50) String value,
+            String icon) {
         this.value = value;
+        this.icon = icon;
     }
 
     public String getValue() {
@@ -23,5 +27,13 @@ public class CreateLabelParams {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

@@ -4,12 +4,15 @@ public class UpdateLabelParams {
 
     private String value;
 
+    private String icon;
+
     public UpdateLabelParams() {
 
     }
 
-    public UpdateLabelParams(String value) {
+    public UpdateLabelParams(String value, String icon) {
         this.value = value;
+        this.icon = icon;
     }
 
     public String getValue() {
@@ -22,5 +25,17 @@ public class UpdateLabelParams {
 
     public boolean hasValue() {
         return this.value != null;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public boolean hasIcon() {
+        return this.icon != null;
     }
 }

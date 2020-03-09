@@ -34,10 +34,11 @@ public class LabelDaoJpa {
     private AuthorizationService authorizationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Label create(String name, String owner) {
+    public Label create(String name, String owner, String icon) {
         Label label = new Label();
         label.setName(name);
         label.setOwner(owner);
+        label.setIcon(icon);
 
         if (!this.labelRepository.findByNameAndOwner(name, owner).isEmpty()) {
             throw new ResourceAlreadyExistException("Label with name " + name + " already exists");
@@ -65,7 +66,10 @@ public class LabelDaoJpa {
         }
 
         DaoHelper.updateIfPresent(updateLabelParams.hasValue(), updateLabelParams.getValue(),
-                (value) -> label.setName(value));
+                label::setName);
+
+        DaoHelper.updateIfPresent(updateLabelParams.hasIcon(), updateLabelParams.getIcon(),
+                label::setIcon);
 
         return this.labelRepository.save(label);
     }
