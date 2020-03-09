@@ -1,6 +1,7 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.repository.models.Task;
+import com.google.common.collect.ImmutableList;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -18,18 +19,16 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
 
     @Override
     public List<Task> findTasksByLabelId(Long labelId) {
-        Query query = entityManager.createNativeQuery("SELECT * FROM tasks WHERE ? =  ANY(tasks.labels)", Task.class);
-        query.setParameter(1, labelId);
-        return query.getResultList();
+        return findTasksByLabelIds(ImmutableList.of(labelId));
     }
 
     @Override
     public List<Task> findTasksByLabelIds(List<Long> labelIds) {
-        String queryString = "SELECT * FROM tasks WHERE ? =  ANY(tasks.labels)";
+        StringBuilder queryString = new StringBuilder("SELECT * FROM tasks WHERE ? = ANY(tasks.labels)");
         for (int i = 1; i < labelIds.size(); i++) {
-            queryString = queryString + " and ? = ANY(tasks.labels)";
+            queryString.append(" and ? = ANY(tasks.labels)");
         }
-        Query query = entityManager.createNativeQuery(queryString, Task.class);
+        Query query = entityManager.createNativeQuery(queryString.toString(), Task.class);
         for (int i = 1; i <= labelIds.size(); i++) {
             query.setParameter(i, labelIds.get(i - 1));
         }

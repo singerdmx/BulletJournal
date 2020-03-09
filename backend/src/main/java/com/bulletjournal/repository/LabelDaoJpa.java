@@ -101,7 +101,7 @@ public class LabelDaoJpa {
         tasks.stream().forEach(
                 task -> task.setLabels(
                         Arrays.stream(task.getLabels()).filter(id
-                             -> id != labelId).toArray(Long[]::new)));
+                                -> id != labelId).toArray(Long[]::new)));
 
         this.taskRepository.saveAll(tasks);
 
@@ -112,7 +112,7 @@ public class LabelDaoJpa {
         List<Task> taskList = this.taskRepository.findTasksByLabelIds(labels);
         List<com.bulletjournal.controller.models.Task> tasks = taskList.stream().
                 map(Task::toPresentationModel).collect(Collectors.toList());
-        Map<ZonedDateTime, List<com.bulletjournal.controller.models.Task>> taskMap =  ProjectItemsGrouper.groupTasksByDate(tasks);
+        Map<ZonedDateTime, List<com.bulletjournal.controller.models.Task>> taskMap = ProjectItemsGrouper.groupTasksByDate(tasks);
 
         //dummy, it is an empty implementation, also need to add note.
         Map<ZonedDateTime, List<Transaction>> transactionMap = ProjectItemsGrouper.groupTransactionsByDate(new ArrayList<>());
