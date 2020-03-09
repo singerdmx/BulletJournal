@@ -60,6 +60,8 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
           </Tag>
         ))}
       </div>
+      <div className="search-results">
+      </div>
     </div>
   );
 };
