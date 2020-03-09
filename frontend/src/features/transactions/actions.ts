@@ -1,5 +1,4 @@
 import { actions } from './reducer';
-import { Transaction } from './interface';
 export const updateTransactions = (projectId: number) => actions.TransactionsUpdate({projectId: projectId});
 export const createTransaction = (projectId: number, amount: number, name: string, payer: string,
     date: string, time: string, transactionType: number) =>

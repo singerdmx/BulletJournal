@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {withRouter, RouteComponentProps} from 'react-router';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
@@ -39,7 +39,6 @@ const getTree = (
     return res;
 };
 
-
 const onDragEnter = (info: any) => {
     console.log(info.node)
     // expandedKeys 需要受控时设置
@@ -64,7 +63,6 @@ const findNoteById = (notes: Note[], noteId: number): Note => {
     return res;
     ;
 }
-
 
 const dragNoteById = (notes: Note[], noteId: number): Note[] => {
     let res = [] as Note[];

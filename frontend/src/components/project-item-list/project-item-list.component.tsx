@@ -53,7 +53,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
   };
 
   getTasksPanel = (items: ProjectItems, index: number) => {
-    if (items.tasks.length == 0) {
+    if (items.tasks.length === 0) {
       return null;
     }
     return (
@@ -66,7 +66,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
   };
 
   getTransactionsPanel = (items: ProjectItems, index: number) => {
-    if (items.transactions.length == 0) {
+    if (items.transactions.length === 0) {
       return null;
     }
     return (

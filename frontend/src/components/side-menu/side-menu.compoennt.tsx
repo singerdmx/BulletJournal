@@ -71,7 +71,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   }
 
   render() {
-    const { groups: groupsByOwner, history } = this.props;
+    const { groups: groupsByOwner } = this.props;
     return (
       <Menu
         mode='inline'

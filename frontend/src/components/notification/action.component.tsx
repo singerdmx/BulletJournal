@@ -60,6 +60,7 @@ class Actions extends React.Component<actionsProps> {
               );
             default:
               console.error('Invalid action ' + action);
+              return null;
           }
         })}
       </div>

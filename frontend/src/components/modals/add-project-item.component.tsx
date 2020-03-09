@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Form, Button, Select, Avatar, Tooltip } from 'antd';
+import { Modal, Button, Tooltip } from 'antd';
 import {
   PlusOutlined
 } from '@ant-design/icons';
@@ -7,10 +7,7 @@ import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interface';
 import { createProjectByName } from '../../features/project/actions';
 import { updateGroups } from '../../features/group/actions';
-import { ProjectType, toProjectType } from '../../features/project/constants';
 import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { History } from 'history';
 
 import './modals.styles.less';
 
@@ -48,8 +45,6 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
   };
 
   render() {
-    const { groups: groupsByOwner } = this.props;
-
     const modal = (
     <Modal
       title='Create New BuJo Item'

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Label } from './interface';
+import { ProjectItems } from '../myBuJo/interface';
 
 export type ApiErrorAction = {
   error: string;
@@ -10,8 +11,6 @@ export type LabelsAction = {
   etag: string;
 };
 
-export type GroupUpdateAction = {};
-
 export type LabelCreateAction = {
   value: string;
 };
@@ -21,9 +20,8 @@ export type DeleteLabelAction = {
   value: string;
 };
 
-export type GetGroupAction = {
-  groupId: number;
-  hideError?: boolean;
+export type GetItemsByLabelsAction = {
+  labels: number[];
 };
 
 export type PatchLabelAction = {
@@ -37,12 +35,17 @@ export type SelectedLabelAction = {
   val: string;
 }
 
+export type ItemsByLabelsAction = {
+  items: ProjectItems[];
+}
+
 let initialState = {
   labels: [] as Label[],
   labelsSelected: [] as Label[],
   labelOptions: [] as Label[],
   etag: '',
-  label: {} as Label
+  label: {} as Label,
+  items: [] as ProjectItems[],
 };
 
 const slice = createSlice({
@@ -76,6 +79,11 @@ const slice = createSlice({
     createLabel: (state, action: PayloadAction<LabelCreateAction>) => state,
     deleteLabel: (state, action: PayloadAction<DeleteLabelAction>) => state,
     patchLabel: (state, action: PayloadAction<PatchLabelAction>) => state,
+    getItemsByLabels: (state, action: PayloadAction<GetItemsByLabelsAction>) => state,
+    itemsByLabelsReceived: (state, action: PayloadAction<ItemsByLabelsAction>) => {
+      const { items } = action.payload;
+      state.items = items;
+    }
   }
 });
 
