@@ -8,7 +8,7 @@ import userSaga from '../features/user/saga';
 import noteSaga from '../features/notes/saga';
 import labelSaga from '../features/label/saga';
 import myBuJoSagas from '../features/myBuJo/saga';
-import rRuleSagas from '../features/rRule/saga';
+import rRuleSagas from '../features/rrule/saga';
 
 export default function* root() {
   yield spawn(myselfSaga);
