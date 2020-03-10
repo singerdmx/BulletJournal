@@ -1,2 +1,3 @@
 import NoteTree from './note-tree.component';
-export { NoteTree };
+import TreeTitle from './note-tree-title.component';
+export { NoteTree, TreeTitle };

@@ -2,7 +2,11 @@ import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {withRouter, RouteComponentProps} from 'react-router';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
-import {Tree} from 'antd';
+import { Tree } from 'antd';
+import { TreeTitle } from '.';
+import {
+    FormOutlined
+  } from '@ant-design/icons';
 import {
     deleteNote,
     updateNotes,
@@ -10,6 +14,7 @@ import {
 } from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
 import {IState} from '../../store';
+import './note-tree.component.styles.less';
 
 type NotesProps = {
     notes: Note[];
@@ -32,7 +37,7 @@ const getTree = (
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        node.title = <span>{item.name}</span>;
+        node.title = <TreeTitle title={item.name}/>;
         node.key = item.id.toString();
         res.push(node);
     });
@@ -116,10 +121,12 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
     let treeNote = getTree(notes, `project${projectId}`, projectId);
 
     return (<Tree
-        className="draggable-tree"
+        className="ant-tree"
+        multiple
         draggable
         blockNode
         onDragEnter={onDragEnter}
+        // switcherIcon={<FormOutlined/>}
         onDrop={onDrop(notes, putNote, projectId)}
         treeData={treeNote}/>);
 }
