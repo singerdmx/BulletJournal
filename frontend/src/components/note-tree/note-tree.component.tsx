@@ -55,7 +55,7 @@ const findNoteById = (notes: Note[], noteId: number): Note => {
     } else {
         for (let i = 0; i < notes.length; i++) {
             const searchSubNote = findNoteById(notes[i].subNotes, noteId);
-            if (searchSubNote) {
+            if (searchSubNote.id) {
                 res = searchSubNote;
             }
         }
@@ -94,16 +94,23 @@ const DropNoteById = (notes: Note[], dropId: number, dropNote: Note): Note[] => 
 
 const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: any) => {
     const targetNote = findNoteById(notes, parseInt(info.dragNode.key));
+    const dropPos = info.node.props.pos.split('-');
+    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
     const dragNotes = dragNoteById(notes, parseInt(info.dragNode.key));
-    const resNotes = DropNoteById(dragNotes, parseInt(info.node.key), targetNote)
+    let resNotes = [] as Note[];
+    if(dropPosition===-1){
+        resNotes = [...dragNotes, targetNote];
+    }else{
+       resNotes = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
+    }
     putNote(projectId, resNotes);
 }
 
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
-    const {projectId, notes, putNote} = props;
+    const {projectId, notes, putNote, updateNotes} = props;
     useEffect(() => {
         if (projectId) {
-            props.updateNotes(projectId);
+            updateNotes(projectId);
         }
     }, [projectId])
     let treeNote = getTree(notes, `project${projectId}`, projectId);
