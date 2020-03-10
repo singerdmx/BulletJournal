@@ -93,16 +93,27 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
   }
 
   onPanelChange = (value: moment.Moment, mode: CalendarMode) => {
-    const date = value.format(dateFormat);
+    const modeChanged = this.props.calendarMode !== mode;
     this.props.calendarModeReceived(mode);
+    const date = value.format(dateFormat);
+    const monthChanged = date.substring(0, 7) !== this.props.selectedCalendarDay.substring(0, 7);
+    const yearChanged = date.substring(0, 4) !== this.props.selectedCalendarDay.substring(0, 4);
     this.props.updateSelectedCalendarDay(date);
     if (mode === 'month') {
+      if (!monthChanged) {
+        console.log('month unchanged');
+        return;
+      }
       this.props.getProjectItems(
         value.add(-60, 'days').format(dateFormat),
         value.add(120, 'days').format(dateFormat), // because it deducts 60 first
         this.props.timezone, 'calendar');
     } else { // mode is 'year'
         const year = value.format(dateFormat).substring(0, 4);
+        if (!yearChanged) {
+          console.log('year unchanged');
+          return;
+        }
         this.props.getProjectItems(
           year + '-01-01',
           year + '-12-31', // for the whole year
