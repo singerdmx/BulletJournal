@@ -100,7 +100,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
     const yearChanged = date.substring(0, 4) !== this.props.selectedCalendarDay.substring(0, 4);
     this.props.updateSelectedCalendarDay(date);
     if (mode === 'month') {
-      if (!monthChanged) {
+      if (!modeChanged && !monthChanged) {
         console.log('month unchanged');
         return;
       }
@@ -110,7 +110,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
         this.props.timezone, 'calendar');
     } else { // mode is 'year'
         const year = value.format(dateFormat).substring(0, 4);
-        if (!yearChanged) {
+        if (!modeChanged && !yearChanged) {
           console.log('year unchanged');
           return;
         }
