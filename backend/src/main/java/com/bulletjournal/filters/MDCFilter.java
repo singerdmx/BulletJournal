@@ -56,7 +56,7 @@ public class MDCFilter implements Filter {
         final String username;
         if (!StringUtils.isEmpty(request.getHeader(UserClient.USER_NAME_KEY))) {
             username = request.getHeader(UserClient.USER_NAME_KEY);
-        } else if (this.authConfig.isEnableDefaultUser()){
+        } else if (this.authConfig.isEnableDefaultUser()) {
             username = this.authConfig.getDefaultUsername();
         } else {
             username = "Unknown";
