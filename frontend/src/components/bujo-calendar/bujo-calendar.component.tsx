@@ -5,11 +5,9 @@ import { connect } from 'react-redux';
 import { IState } from '../../store';
 import moment from 'moment';
 import {
-  FolderAddOutlined,
   CarryOutOutlined,
   FileTextOutlined,
   AccountBookOutlined,
-  PlusOutlined
 } from '@ant-design/icons';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { dateFormat } from '../../features/myBuJo/constants';

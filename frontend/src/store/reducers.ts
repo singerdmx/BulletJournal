@@ -8,7 +8,7 @@ import { reducer as settingsReducer } from '../components/settings/reducer';
 import { reducer as noteReducer } from '../features/notes/reducer';
 import { reducer as labelReducer } from '../features/label/reducer';
 import { reducer as myBuJoReducer } from '../features/myBuJo/reducer';
-import { reducer as rRuleReducer } from '../features/rrule/reducer';
+import { reducer as rRuleReducer } from '../features/recurrence/reducer';
 
 export default {
   settings: settingsReducer,
