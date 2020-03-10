@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Tooltip } from 'antd';
+import { Calendar, Tooltip, Popover } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
@@ -44,20 +44,36 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
     }
 
     const targetDay = target[0];
-    return (<div>
-      <div>{targetDay.dayOfWeek}</div>
-    </div>);
+    const content =(
+      <div>
+          {targetDay.notes.map(n => <div>{n.name}</div>)}
+          {targetDay.tasks.map(t => <div>{t.name}</div>)}
+          {targetDay.transactions.map(t => <div>{t.name}</div>)}
+        </div>
+    );
+    return (
+      <Popover content={content}
+        title={`${targetDay.date} ${targetDay.dayOfWeek}`}>
+        {content}
+      </Popover>);
   };
 
   onPanelChange = (value: moment.Moment, mode: CalendarMode) => {
     const date = value.format(dateFormat);
     this.props.calendarModeReceived(mode);
     this.props.updateSelectedCalendarDay(date);
+    console.log(mode);
     if (mode === 'month') {
       this.props.getProjectItems(
         value.add(-60, 'days').format(dateFormat),
         value.add(120, 'days').format(dateFormat), // because it deducts 60 first
         this.props.timezone, 'calendar');
+    } else { // mode is 'year'
+        const year = value.format(dateFormat).substring(0, 4);
+        this.props.getProjectItems(
+          year + '-00-00',
+          year + '-12-31', // for the whole year
+          this.props.timezone, 'calendar');
     }
   };
 
