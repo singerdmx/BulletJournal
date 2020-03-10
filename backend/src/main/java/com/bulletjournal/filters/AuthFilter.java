@@ -27,7 +27,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(0)
 public class AuthFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilter.class);
 
