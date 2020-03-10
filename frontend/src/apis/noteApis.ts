@@ -2,7 +2,7 @@ import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
 import { Note } from '../features/notes/interface';
 
 export const fetchNotes = (projectId: number) => {
-  return doFetch(`http://localhost:8081/api/projects/${projectId}/notes`)
+  return doFetch(`/api/projects/${projectId}/notes`)
     .then(res => res)
     .catch(err => {
       throw Error(err.message);
@@ -10,7 +10,7 @@ export const fetchNotes = (projectId: number) => {
 };
 
 export const getNoteById = (noteId: number) => {
-  return doFetch(`http://localhost:8081/api/notes/${noteId}`)
+  return doFetch(`/api/notes/${noteId}`)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -18,7 +18,7 @@ export const getNoteById = (noteId: number) => {
 };
 
 export const deleteNoteById = (noteId: number) => {
-  return doDelete(`http://localhost:8081/api/notes/${noteId}`)
+  return doDelete(`/api/notes/${noteId}`)
     .catch(err => {
       throw Error(err.message);
     });
@@ -28,7 +28,7 @@ export const createNote = (projectId: number, name: string) => {
   const postBody = JSON.stringify({
     name: name,
   });
-  return doPost(`http://localhost:8081/api/projects/${projectId}/notes`, postBody)
+  return doPost(`/api/projects/${projectId}/notes`, postBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -37,7 +37,7 @@ export const createNote = (projectId: number, name: string) => {
 
 export const putNotes = (projectId: number, notes: Note[]) => {
   const putBody = JSON.stringify(notes);
-  return doPut(`http://localhost:8081/api/projects/${projectId}/notes`, putBody)
+  return doPut(`/api/projects/${projectId}/notes`, putBody)
     .catch(err => {
       throw Error(err.message);
     });
