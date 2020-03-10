@@ -9,7 +9,7 @@ const computeStart = ({ onDate: { date } }) => {
   }
 
   return {
-    dtstart: moment(date).toDate(),
+    dtstart: moment(date).toDate()
   };
 };
 
