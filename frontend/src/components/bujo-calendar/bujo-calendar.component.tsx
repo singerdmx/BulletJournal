@@ -1,9 +1,16 @@
 import React from 'react';
-import { Calendar, Tooltip, Popover } from 'antd';
+import { Calendar, Tooltip, Popover, Badge } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import moment from 'moment';
+import {
+  FolderAddOutlined,
+  CarryOutOutlined,
+  FileTextOutlined,
+  AccountBookOutlined,
+  PlusOutlined
+} from '@ant-design/icons';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
 import { ProjectItems } from '../../features/myBuJo/interface';
@@ -46,10 +53,10 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
     const targetDay = target[0];
     const content =(
       <div>
-          {targetDay.notes.map(n => <div>{n.name}</div>)}
-          {targetDay.tasks.map(t => <div>{t.name}</div>)}
-          {targetDay.transactions.map(t => <div>{t.name}</div>)}
-        </div>
+          {targetDay.notes.map(n => <div key={`notes${n.id}`}><Badge><FileTextOutlined />&nbsp;{n.name}</Badge></div>)}
+          {targetDay.tasks.map(t => <div key={`tasks${t.id}`}><Badge><CarryOutOutlined />&nbsp;{t.name}</Badge></div>)}
+          {targetDay.transactions.map(t => <div key={`transactions${t.id}`}><Badge><AccountBookOutlined />&nbsp;{t.name}</Badge></div>)}
+      </div>
     );
     return (
       <Popover content={content}
@@ -58,11 +65,37 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
       </Popover>);
   };
 
+  monthCellRender = (value: moment.Moment) => {
+    const title = value.format("YYYY-MM");
+    const targets = this.props.projectItems
+      .filter((p: ProjectItems) => p.date.substring(0, 7) === title);
+    if (targets.length === 0) {
+      return null;
+    }
+
+    const content = (
+      <div>
+        {
+          targets.map((targetDay: ProjectItems, index: number) => {
+            return (<div key={`bujo${index}`}>
+              {targetDay.notes.map(n => <div key={`notes${n.id}`}><Badge><FileTextOutlined />&nbsp;{n.name}</Badge></div>)}
+              {targetDay.tasks.map(t => <div key={`tasks${t.id}`}><Badge><CarryOutOutlined />&nbsp;{t.name}</Badge></div>)}
+              {targetDay.transactions.map(t => <div key={`transactions${t.id}`}><Badge><AccountBookOutlined />&nbsp;{t.name}</Badge></div>)}
+            </div>)
+          })
+        }
+      </div>
+    );
+    return (<Popover content={content}
+      title={title}>
+      {content}
+    </Popover>);
+  }
+
   onPanelChange = (value: moment.Moment, mode: CalendarMode) => {
     const date = value.format(dateFormat);
     this.props.calendarModeReceived(mode);
     this.props.updateSelectedCalendarDay(date);
-    console.log(mode);
     if (mode === 'month') {
       this.props.getProjectItems(
         value.add(-60, 'days').format(dateFormat),
@@ -71,7 +104,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
     } else { // mode is 'year'
         const year = value.format(dateFormat).substring(0, 4);
         this.props.getProjectItems(
-          year + '-00-00',
+          year + '-01-01',
           year + '-12-31', // for the whole year
           this.props.timezone, 'calendar');
     }
@@ -89,6 +122,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
         <Calendar
           dateCellRender={(date) => this.dateCellRender(date)}
           onPanelChange={(date, mode) => this.onPanelChange(date, mode)}
+          monthCellRender={(date) => this.monthCellRender(date)}
           mode={mode}
           value={moment(
             this.props.selectedCalendarDay

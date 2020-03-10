@@ -70,10 +70,16 @@ function* getProjectItemsAfterUpdateSelect(
 
     console.log(types);
     if (category === 'calendar') {
-      data = yield call(fetchProjectItems, types, state.myself.timezone,
-        moment(state.myBuJo.selectedCalendarDay).add(-60, 'days').format(dateFormat),
-        moment(state.myBuJo.selectedCalendarDay).add(60, 'days').format(dateFormat));
-        console.log(data);
+      if (state.myBuJo.calendarMode === 'month') {
+        data = yield call(fetchProjectItems, types, state.myself.timezone,
+          moment(state.myBuJo.selectedCalendarDay).add(-60, 'days').format(dateFormat),
+          moment(state.myBuJo.selectedCalendarDay).add(60, 'days').format(dateFormat));
+      } else { // calendarMode is 'year'
+        const year = state.myBuJo.selectedCalendarDay.substring(0, 4);
+        data = yield call(fetchProjectItems, types, state.myself.timezone,
+          year + '-01-01',
+          year + '-12-31');
+      }
       yield put(projectItemsActions.projectItemsForCalenderReceived({ items: data }));
     } else {
       data = yield call(fetchProjectItems, types, state.myself.timezone,
