@@ -1,6 +1,5 @@
 package com.bulletjournal.filters;
 
-import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.config.MDCConfig;
 import org.slf4j.MDC;
