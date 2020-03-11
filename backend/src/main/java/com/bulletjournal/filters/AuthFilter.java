@@ -44,7 +44,6 @@ public class AuthFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         Enumeration<String> headerNames = request.getHeaderNames();
 
-        LOGGER.info(request.getRequestURI());
         String username = null;
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
@@ -63,11 +62,13 @@ public class AuthFilter implements Filter {
         }
 
         if (username == null) {
-            LOGGER.error("not logged in");
+            LOGGER.error(request.getRequestURI() + ": user not logged in");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
+
         MDC.put(UserClient.USER_NAME_KEY, username);
+        LOGGER.info(request.getRequestURI());
         if (UserController.LOGOUT_MYSELF_ROUTE.equals(request.getRequestURI())) {
             Cookie cookie = new Cookie("__discourse_proxy", null);
             cookie.setPath("/");

@@ -35,33 +35,17 @@ public class MDCFilter implements Filter {
 
             final String requestId = extractRequestId(httpRequest);
             final String clientIP = extractClientIp(httpRequest);
-            final String requester = extractUsername(httpRequest);
 
             MDC.put(mdcConfig.getDefaultRequestIdKey(), requestId);
             MDC.put(mdcConfig.getDefaultClientIpKey(), clientIP);
-            MDC.put(mdcConfig.getDefaultUsernameKey(), requester);
 
             httpResponse.setHeader(mdcConfig.getDefaultRequestIdKey(), requestId);
-            httpResponse.setHeader(mdcConfig.getDefaultUsernameKey(), requester);
 
             chain.doFilter(request, response);
         } finally {
             MDC.remove(mdcConfig.getDefaultRequestIdKey());
             MDC.remove(mdcConfig.getDefaultClientIpKey());
-            MDC.remove(mdcConfig.getDefaultUsernameKey());
         }
-    }
-
-    private String extractUsername(HttpServletRequest request) {
-        final String username;
-        if (!StringUtils.isEmpty(request.getHeader(UserClient.USER_NAME_KEY))) {
-            username = request.getHeader(UserClient.USER_NAME_KEY);
-        } else if (this.authConfig.isEnableDefaultUser()) {
-            username = this.authConfig.getDefaultUsername();
-        } else {
-            username = "Unknown";
-        }
-        return username;
     }
 
     private String extractRequestId(HttpServletRequest request) {

@@ -9,7 +9,6 @@ public class MDCConfig {
 
     private String defaultRequestIdKey;
     private String defaultClientIpKey;
-    private String defaultUsernameKey;
 
     public String getDefaultRequestIdKey() {
         return defaultRequestIdKey;
@@ -27,11 +26,4 @@ public class MDCConfig {
         this.defaultClientIpKey = defaultClientIpKey;
     }
 
-    public String getDefaultUsernameKey() {
-        return defaultUsernameKey;
-    }
-
-    public void setDefaultUsernameKey(String defaultUsernameKey) {
-        this.defaultUsernameKey = defaultUsernameKey;
-    }
 }
