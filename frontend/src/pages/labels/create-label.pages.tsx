@@ -11,21 +11,24 @@ import {
   Input,
   Form,
   Tag,
-  AutoComplete,
   Button,
   Modal,
   Select,
   message
 } from 'antd';
 import { iconOptions, icons } from '../../assets/icons/index';
-import { SearchOutlined, PlusCircleOutlined, TagOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  PlusCircleOutlined,
+  TagOutlined
+} from '@ant-design/icons';
 
 type LabelsProps = {
   labels: Label[];
   labelsUpdate: () => void;
   deleteLabel: (labelId: number, name: string) => void;
   createLabel: (name: string, icon: string) => void;
-  patchLabel: (labelId: number, value: string) => void;
+  patchLabel: (labelId: number, value: string, icon: string) => void;
   startSearching: () => void;
 };
 
@@ -56,6 +59,7 @@ const Labels: React.FC<LabelsProps> = props => {
 
   const handleDelete = (labelId: number, name: string) => {
     props.deleteLabel(labelId, name);
+    setEditable(false);
   };
 
   const handleEditModal = (label: Label) => {
@@ -67,7 +71,7 @@ const Labels: React.FC<LabelsProps> = props => {
     editFrom
       .validateFields()
       .then(values => {
-        props.patchLabel(labelId, values.labelValue);
+        props.patchLabel(labelId, values.labelValue, values.labelIcon);
         editFrom.resetFields();
         setEditable(false);
       })
@@ -78,7 +82,7 @@ const Labels: React.FC<LabelsProps> = props => {
 
   const getIcon = (icon: string) => {
     let res = icons.filter(item => item.name === icon);
-    return res.length > 0 ? res[0].icon : <TagOutlined />
+    return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
   return (
@@ -86,16 +90,27 @@ const Labels: React.FC<LabelsProps> = props => {
       <div className="labels-create">
         <Form form={createForm} layout="inline" onFinish={handleCreate}>
           <Form.Item
-            style={{flex : 1}}
+            style={{ flex: 1 }}
             name="labelIcon"
             rules={[{ required: true, message: 'Please input Label Name!' }]}
           >
-            <Select bordered={false} onSelect={() => setFocus(true)}>{iconOptions}</Select>
-          </Form.Item >
-          <Form.Item name="labelName" rules={[{ required: true }]} style={{flex : 7}}>
-            <Input placeholder="input a name" className="labels-create-input" autoFocus={inputFocus} onBlur={() => setFocus(false)}/>
+            <Select bordered={false} onSelect={() => setFocus(true)}>
+              {iconOptions}
+            </Select>
           </Form.Item>
-          <Form.Item style={{flex : 1}}>
+          <Form.Item
+            name="labelName"
+            rules={[{ required: true }]}
+            style={{ flex: 7 }}
+          >
+            <Input
+              placeholder="input a name"
+              className="labels-create-input"
+              autoFocus={inputFocus}
+              onBlur={() => setFocus(false)}
+            />
+          </Form.Item>
+          <Form.Item style={{ flex: 1 }}>
             <Button type="link" htmlType="submit">
               <PlusCircleOutlined />
             </Button>
@@ -119,7 +134,6 @@ const Labels: React.FC<LabelsProps> = props => {
                 key={label.id}
                 className="labels"
                 color={stringToRGB(label.value)}
-                onClose={() => handleDelete(label.id, label.value)}
                 onClick={() => handleEditModal(label)}
               >
                 {getIcon(label.icon)} &nbsp;
@@ -135,28 +149,32 @@ const Labels: React.FC<LabelsProps> = props => {
         onCancel={() => setEditable(false)}
         centered
         footer={[
-          <Button onClick={() => setEditable(false)} type="default">
+          <Button key="cancel" onClick={() => setEditable(false)} type="default">
             Cancel
           </Button>,
           <Button
             onClick={() =>
-              props.deleteLabel(currentLabel.id, currentLabel.value)
+              handleDelete(currentLabel.id, currentLabel.value)
             }
             type="danger"
+            key="delete"
           >
             Delete
           </Button>,
           <Button
             onClick={() => handleUpdate(currentLabel.id, currentLabel.value)}
             type="primary"
+            key="update"
           >
             Update
           </Button>
         ]}
       >
         <Form form={editFrom}>
-          <Form.Item label="Icon" name="labelIcon">
-            <AutoComplete value={currentLabel.icon}></AutoComplete>
+          <Form.Item name="labelIcon">
+            <Select onSelect={() => setFocus(true)} defaultValue={currentLabel.icon}>
+              {iconOptions}
+            </Select>
           </Form.Item>
           <Form.Item label="Value" name="labelValue">
             <Input
