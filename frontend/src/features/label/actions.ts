@@ -3,7 +3,7 @@ export const createLabel = (value: string, icon: string) =>
   actions.createLabel({ value: value, icon: icon });
 export const deleteLabel = (labelId: number, value: string) =>
   actions.deleteLabel({ labelId: labelId, value: value });
-export const patchLabel = (labelId: number, value: string, icon?: string) =>
+export const patchLabel = (labelId: number, value?: string, icon?: string) =>
   actions.patchLabel({ labelId: labelId, value: value, icon: icon });
 export const labelsUpdate = () => actions.labelsUpdate({});
 export const addSelectedLabel = (val: string) =>

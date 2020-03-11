@@ -54,8 +54,8 @@ function* createLabel(action: PayloadAction<LabelCreateAction>) {
 
 function* patchLabel(action: PayloadAction<PatchLabelAction>) {
   try {
-    const { labelId, value } = action.payload;
-    yield call(updateLabel, labelId, value);
+    const { labelId, value, icon } = action.payload;
+    yield call(updateLabel, labelId, value, icon);
     yield put(labelActions.labelsUpdate({}));
   } catch (error) {
     yield call(message.error, `Patch label Fail: ${error}`);
