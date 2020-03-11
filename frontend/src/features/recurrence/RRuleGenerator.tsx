@@ -13,6 +13,7 @@ import moment from 'moment';
 type RRuleGeneratorProps = {
   startDate: string;
   rRuleStartString: string;
+  rRuleEndString: string;
   updateStartString: (startDate: string) => void;
 };
 
@@ -25,6 +26,7 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
         <End />
         {console.log(moment(this.props.startDate).toDate())}
         <div>{this.props.rRuleStartString}</div>
+        <div>{this.props.rRuleEndString}</div>
       </div>
     );
   }
@@ -32,7 +34,8 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
 
 const mapStateToProps = (state: IState) => ({
   rRuleStartString: state.rRule.rRuleStartString,
-  startDate: state.rRule.startDate
+  startDate: state.rRule.startDate,
+  rRuleEndString: state.rRule.rRuleEndString
 });
 
 export default connect(mapStateToProps, { updateStartString })(

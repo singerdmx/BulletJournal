@@ -6,9 +6,18 @@ export type StartDateAction = {
   startDate: string;
 };
 
+export type EndDateAction = {
+  mode: string;
+  endDate: string;
+  endCount: number;
+};
+
 let initialState = {
   startDate: '',
-  rRuleStartString: ''
+  rRuleStartString: '',
+  endDate: '',
+  endCount: 0,
+  rRuleEndString: ''
 };
 
 const slice = createSlice({
@@ -17,10 +26,24 @@ const slice = createSlice({
   reducers: {
     updateStart: (state, action: PayloadAction<StartDateAction>) => {
       const { startDate } = action.payload;
+      state.startDate = startDate;
       //update rrule start string
       const test = { dtstart: moment(startDate).toDate() };
       state.rRuleStartString = new RRule(test).toString();
-      state.startDate = startDate;
+    },
+    updateEnd: (state, action: PayloadAction<EndDateAction>) => {
+      const { endDate, endCount, mode } = action.payload;
+      console.log(mode);
+      state.endDate = endDate;
+      state.endCount = endCount;
+      //update rrule end string here
+      let end = {};
+      if (mode === 'After') {
+        end.count = endCount;
+      } else if (mode === 'On date') {
+        end.until = moment(endDate).format();
+      }
+      state.rRuleEndString = new RRule(end).toString();
     }
   }
 });

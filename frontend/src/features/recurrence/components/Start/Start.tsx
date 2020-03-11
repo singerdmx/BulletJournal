@@ -7,8 +7,8 @@ import { updateStartString } from '../../actions';
 import moment from 'moment';
 
 type StartProps = {
-  rRuleStartString: string;
-  updateStartString: (rRuleStartString: string) => void;
+  startDate: string;
+  updateStartString: (startDate: string) => void;
 };
 
 class Start extends React.Component<StartProps> {
@@ -23,11 +23,7 @@ class Start extends React.Component<StartProps> {
           <strong>Start</strong>
         </label>
         <DatePicker
-          value={
-            this.props.rRuleStartString
-              ? moment(this.props.rRuleStartString)
-              : null
-          }
+          value={this.props.startDate ? moment(this.props.startDate) : null}
           onChange={this.onChange}
         />
       </div>
@@ -35,7 +31,7 @@ class Start extends React.Component<StartProps> {
   }
 }
 const mapStateToProps = (state: IState) => ({
-  rRuleStartString: state.rRule.startDate
+  startDate: state.rRule.startDate
 });
 
 export default connect(mapStateToProps, { updateStartString })(Start);
