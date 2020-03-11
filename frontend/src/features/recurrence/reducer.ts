@@ -2,6 +2,11 @@ import { createSlice, PayloadAction } from 'redux-starter-kit';
 import moment from 'moment';
 import RRule from 'rrule';
 
+export type End = {
+  count?: any;
+  until?: any;
+};
+
 export type StartDateAction = {
   startDate: string;
 };
@@ -37,7 +42,7 @@ const slice = createSlice({
       state.endDate = endDate;
       state.endCount = endCount;
       //update rrule end string here
-      let end = {};
+      let end = {} as End;
       if (mode === 'After') {
         end.count = endCount;
       } else if (mode === 'On date') {
