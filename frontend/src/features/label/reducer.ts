@@ -13,6 +13,7 @@ export type LabelsAction = {
 
 export type LabelCreateAction = {
   value: string;
+  icon: string;
 };
 
 export type DeleteLabelAction = {

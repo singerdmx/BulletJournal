@@ -8,9 +8,10 @@ export const fetchLabels = () => {
     });
 };
 
-export const addLabel = (value: string) => {
+export const addLabel = (value: string, icon: string) => {
     const postBody = JSON.stringify({
-      value: value
+      value: value,
+      icon: icon
     });
     return doPost('/api/labels', postBody)
       .then(res => res.json())

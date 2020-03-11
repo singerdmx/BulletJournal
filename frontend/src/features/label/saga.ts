@@ -34,9 +34,9 @@ function* labelsUpdate(action: PayloadAction<UpdateLabels>) {
 }
 
 function* createLabel(action: PayloadAction<LabelCreateAction>) {
-  const value = action.payload.value;
+  const { value, icon } = action.payload;
   try {
-    const data = yield call(addLabel, value);
+    const data = yield call(addLabel, value, icon);
     
     const state: IState = yield select();
     const labels = Object.assign([], state.label.labels);
