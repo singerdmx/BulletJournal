@@ -7,29 +7,52 @@ import {
   patchLabel,
   createLabel
 } from '../../features/label/actions';
-import { Input, Form, Tag, AutoComplete, message, Button, Modal } from 'antd';
+import {
+  Input,
+  Form,
+  Tag,
+  AutoComplete,
+  Button,
+  Modal,
+  Select,
+  message
+} from 'antd';
+import { iconOptions, icons } from '../../assets/icons/index';
+import { SearchOutlined, PlusCircleOutlined, TagOutlined } from '@ant-design/icons';
 
-import { SearchOutlined } from '@ant-design/icons';
 type LabelsProps = {
   labels: Label[];
   labelsUpdate: () => void;
   deleteLabel: (labelId: number, name: string) => void;
-  createLabel: (name: string) => void;
+  createLabel: (name: string, icon: string) => void;
   patchLabel: (labelId: number, value: string) => void;
   startSearching: () => void;
 };
 
 const Labels: React.FC<LabelsProps> = props => {
   let initialLabel: Label = {} as Label;
-  const [form] = Form.useForm();
+  const [createForm] = Form.useForm();
   const [editFrom] = Form.useForm();
   const [editable, setEditable] = useState(false);
   const [currentLabel, setCurrentLabel] = useState(initialLabel);
-  const [newLable, setNewLable] = useState('');
+  const [inputFocus, setFocus] = useState(false);
 
   useEffect(() => {
     props.labelsUpdate();
   }, []);
+
+  const handleCreate = () => {
+    createForm
+      .validateFields()
+      .then(values => {
+        console.log(values);
+        props.createLabel(values.labelName, values.labelIcon);
+        createForm.resetFields();
+      })
+      .catch(info => {
+        message.error(info);
+      });
+  };
 
   const handleDelete = (labelId: number, name: string) => {
     props.deleteLabel(labelId, name);
@@ -41,41 +64,41 @@ const Labels: React.FC<LabelsProps> = props => {
   };
 
   const handleUpdate = (labelId: number, name: string) => {
-    editFrom.validateFields().then(values => {
-      props.patchLabel(labelId, values.labelValue);
-      form.resetFields();
-      setEditable(false);
-    });
+    editFrom
+      .validateFields()
+      .then(values => {
+        props.patchLabel(labelId, values.labelValue);
+        editFrom.resetFields();
+        setEditable(false);
+      })
+      .catch(err => {
+        message.error(err);
+      });
+  };
+
+  const getIcon = (icon: string) => {
+    let res = icons.filter(item => item.name === icon);
+    return res.length > 0 ? res[0].icon : <TagOutlined />
   };
 
   return (
     <div className="labels-create-page">
       <div className="labels-create">
-        <Form form={form}>
+        <Form form={createForm} layout="inline" onFinish={handleCreate}>
           <Form.Item
-            name="labelName"
+            style={{flex : 1}}
+            name="labelIcon"
             rules={[{ required: true, message: 'Please input Label Name!' }]}
           >
-            <AutoComplete
-              children={
-                <Input
-                  placeholder="Add Label"
-                  className="labels-input"
-                  onPressEnter={e => {
-                    form
-                      .validateFields()
-                      .then(values => {
-                        props.createLabel(values.labelName);
-                        form.resetFields();
-                      })
-                      .catch(info => message.error(info));
-                  }}
-                />
-              }
-              options={[]}
-              value={newLable}
-              onChange={value => setNewLable(value)}
-            />
+            <Select bordered={false} onSelect={() => setFocus(true)}>{iconOptions}</Select>
+          </Form.Item >
+          <Form.Item name="labelName" rules={[{ required: true }]} style={{flex : 7}}>
+            <Input placeholder="input a name" className="labels-create-input" autoFocus={inputFocus} onBlur={() => setFocus(false)}/>
+          </Form.Item>
+          <Form.Item style={{flex : 1}}>
+            <Button type="link" htmlType="submit">
+              <PlusCircleOutlined />
+            </Button>
           </Form.Item>
         </Form>
       </div>
@@ -99,6 +122,7 @@ const Labels: React.FC<LabelsProps> = props => {
                 onClose={() => handleDelete(label.id, label.value)}
                 onClick={() => handleEditModal(label)}
               >
+                {getIcon(label.icon)} &nbsp;
                 {label.value}
               </Tag>
             );

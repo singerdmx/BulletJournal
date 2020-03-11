@@ -20,7 +20,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
   const [form] = Form.useForm();
   return (
     <div className="labels-search-container">
-      <PageHeader title="Search Item With Label" onBack={props.endSearching} />
+      <PageHeader title="Search Item With Label" subTitle="Click To Choose Label" onBack={props.endSearching} />
       <div className="label-search-input">
         <Form form={form}>
           <Form.Item
@@ -30,7 +30,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
             <AutoComplete
               children={
                 <Input
-                  placeholder="Seach By Label"
+                  placeholder="Press Enter To Get Result"
                   className="label-search-input"
                   onPressEnter={e => {
                     form

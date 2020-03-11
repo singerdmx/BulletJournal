@@ -155,26 +155,19 @@
     width: 60%;
     margin-left: 20%;
     margin-top: 10%;
+    border-bottom: 1px solid @primary-color;
 
-    .ant-select-selection-search-input {
+    .ant-input {
       width: 100%;
-      border: 0;
-      border-bottom: 1px solid grey;
-      font-size: 18px;
-      transition: ease 0.5s;
-
-      &::placeholder {
-        color: grey;
-      }
-
+      border: none;
       &:focus {
-        outline: none !important;
-        border-bottom: 3px solid @primary-color;
+        outline: 0;
       }
     }
   }
 
   .labels-container {
+    margin-top: 1em;
     display: flex;
     flex-direction: column;
     width: 60%;
