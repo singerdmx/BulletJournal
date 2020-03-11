@@ -28,6 +28,7 @@ public class TaskController {
     protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
     protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
+    protected static final String UNCOMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/uncomplete";
     protected static final String COMPLETED_TASKS_ROUTE = "/api/projects/{projectId}/completedTasks";
     protected static final String TASK_SET_LABELS_ROUTE = "/api/tasks/{taskId}/setLabels";
 
@@ -83,6 +84,13 @@ public class TaskController {
     public Task completeTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.taskDaoJpa.complete(username, taskId);
+        return getTask(taskId);
+    }
+
+    @PostMapping(UNCOMPLETE_TASK_ROUTE)
+    public Task uncompleteTask(@NotNull @PathVariable Long taskId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.uncomplete(username, taskId);
         return getTask(taskId);
     }
 

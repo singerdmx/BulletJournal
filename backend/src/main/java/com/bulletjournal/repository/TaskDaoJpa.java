@@ -302,4 +302,8 @@ public class TaskDaoJpa {
         task.setLabels(Iterables.toArray(labels, Long.class));
         this.taskRepository.save(task);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void uncomplete(String username, Long taskId) {
+    }
 }
