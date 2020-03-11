@@ -49,6 +49,7 @@ public class ProjectItemControllerTest {
     private final String expectedOwner = "BulletJournal";
     private final String[] sampleUsers = {
             "Michael_Zhou",
+            "Xavier"
     };
     @LocalServerPort
     int randomServerPort;
@@ -124,6 +125,33 @@ public class ProjectItemControllerTest {
         assertEquals("2020-02-28", projectItems.get(4).getDate());
         assertEquals(0, projectItems.get(4).getTransactions().size());
         assertEquals(1, projectItems.get(4).getTasks().size());
+
+        List<ProjectItems> projectItemsOtherUser = getProjectItemsOtherUser("2020-02-28",
+                "2020-03-04",
+                "America/Los_Angeles",
+                types);
+        assertNotNull(projectItemsOtherUser);
+        assertEquals(0, projectItemsOtherUser.size());
+    }
+
+    private List<ProjectItems> getProjectItemsOtherUser(String startDate, String endDate, String timezone, List<ProjectType> types) {
+
+        String url = ROOT_URL + randomServerPort + ProjectItemController.PROJECT_ITEMS_ROUTE;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("types", types)
+                .queryParam("startDate", startDate)
+                .queryParam("endDate", endDate)
+                .queryParam("timezone", timezone);
+
+        ResponseEntity<ProjectItems[]> response = this.restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                actAsOtherUser(null, sampleUsers[1]),
+                ProjectItems[].class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        return Arrays.asList(response.getBody());
     }
 
     private void addTransactions(Project p) {

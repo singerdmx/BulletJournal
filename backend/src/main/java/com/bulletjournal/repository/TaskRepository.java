@@ -20,8 +20,8 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     List<Task> findRemindingTask(@Param("assignee") String assignee, @Param("now") Timestamp now);
 
     @Query("SELECT task FROM Task task WHERE " +
-            "(task.startTime >= :startTime AND task.startTime <= :endTime) OR " +
-            "(task.endTime >= :startTime AND task.endTime <= :endTime) AND " +
+            "((task.startTime >= :startTime AND task.startTime <= :endTime) OR " +
+            "(task.endTime >= :startTime AND task.endTime <= :endTime)) AND " +
             "task.assignedTo = :assignee")
     List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee,
                                           @Param("startTime") Timestamp startTime,
