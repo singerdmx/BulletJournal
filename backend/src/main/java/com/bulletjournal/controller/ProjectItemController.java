@@ -3,12 +3,12 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.Task;
-import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +76,9 @@ public class ProjectItemController {
             }
         }
 
-        Map<ZonedDateTime, ProjectItems> projectItemsMap = ProjectItemsGrouper.mergeMap(taskMap, transactionMap);
+        Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
+        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, taskMap);
+        projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionMap);
         return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
     }
 

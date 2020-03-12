@@ -108,14 +108,13 @@ public class TaskDaoJpa {
      * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<User> user = this.userRepository.findByName(assignee);
         if (user.size() == 0)
             throw new ResourceNotFoundException("Assignee " + assignee + " not found");
 
         return this.taskRepository.findTasksOfAssigneeBetween(assignee,
-                Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
-                .stream().map(Task::toPresentationModel).collect(Collectors.toList());
+                Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
