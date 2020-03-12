@@ -2,8 +2,9 @@ package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.controller.models.Task;
-import com.bulletjournal.controller.models.Transaction;
+import com.bulletjournal.ledger.TransactionType;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.Project;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -27,10 +29,10 @@ public class ProjectItemsGrouperTest {
     public void testGroupTransactionsByDate() {
         List<Transaction> transactions = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
-        Transaction t1 = new Transaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction t2 = new Transaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
-        Transaction t3 = new Transaction(1L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
-        Transaction t4 = new Transaction(1L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
+        Transaction t1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction t2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction t3 = getTransaction(1L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
+        Transaction t4 = getTransaction(1L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
 
         transactions.add(t1);
         transactions.add(t2);
@@ -50,10 +52,10 @@ public class ProjectItemsGrouperTest {
         List<Task> tasks = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting();
-        Task t1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task t2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
-        Task t3 = new Task(1L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
-        Task t4 = new Task(1L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
+        Task t1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task t2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task t3 = getTask(1L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
+        Task t4 = getTask(1L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
 
         tasks.add(t1);
         tasks.add(t2);
@@ -87,11 +89,11 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting();
 
-        Transaction transaction1 = new Transaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = new Transaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1 = IntervalHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
         ZonedDateTime time2 = IntervalHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());
@@ -104,7 +106,9 @@ public class ProjectItemsGrouperTest {
         taskMap.computeIfAbsent(time3, t -> new ArrayList<>()).add(task1);
         taskMap.computeIfAbsent(time4, t -> new ArrayList<>()).add(task2);
 
-        Map<ZonedDateTime, ProjectItems> map = ProjectItemsGrouper.mergeMap(taskMap, transactionMap);
+        Map<ZonedDateTime, ProjectItems> map = new HashMap<>();
+        map = ProjectItemsGrouper.mergeTasksMap(map, taskMap);
+        map = ProjectItemsGrouper.mergeTransactionsMap(map, transactionMap);
         assertEquals(3, map.size());
 
         ProjectItems p1 = map.get(time1);
@@ -139,11 +143,11 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting();
 
-        Transaction transaction1 = new Transaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = new Transaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = new Task(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = new Task(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1 = IntervalHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
         ZonedDateTime time2 = IntervalHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());
@@ -153,27 +157,27 @@ public class ProjectItemsGrouperTest {
         List<Transaction> tr1 = new ArrayList<>();
         tr1.add(transaction1);
         ProjectItems p1 = new ProjectItems();
-        p1.setTransactions(tr1);
+        p1.setTransactions(tr1.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
         p1.setDate(transaction1.getDate());
         p1.setDayOfWeek(time1.getDayOfWeek());
 
         List<Transaction> tr2 = new ArrayList<>();
         tr2.add(transaction2);
         ProjectItems p2 = new ProjectItems();
-        p2.setTransactions(tr2);
+        p2.setTransactions(tr2.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
         p2.setDate(transaction2.getDate());
         p2.setDayOfWeek(time2.getDayOfWeek());
 
         List<Task> ta1 = new ArrayList<>();
         ta1.add(task1);
         ProjectItems p3 = new ProjectItems();
-        p3.setTasks(ta1);
+        p3.setTasks(ta1.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
         p3.setDate(task1.getDueDate());
         p3.setDayOfWeek(time3.getDayOfWeek());
 
         List<Task> ta2 = new ArrayList<>();
         ta2.add(task2);
-        p2.setTasks(ta2);
+        p2.setTasks(ta2.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
         p2.setDate(task2.getDueDate());
         p2.setDayOfWeek(time4.getDayOfWeek());
 
@@ -203,5 +207,34 @@ public class ProjectItemsGrouperTest {
         public Long getId() {
             return 1L;
         }
+    }
+
+    private Transaction getTransaction(Long id, String name, Project project, String payer, Double amount, String date, String time, String timezone, Integer transactionType) {
+        Transaction transaction = new Transaction();
+        transaction.setId(id);
+        transaction.setName(name);
+        transaction.setProject(project);
+        transaction.setPayer(payer);
+        transaction.setAmount(amount);
+        transaction.setDate(date);
+        transaction.setTime(time);
+        transaction.setTimezone(timezone);
+        transaction.setTransactionType(TransactionType.getType(transactionType));
+        return transaction;
+    }
+
+    private Task getTask(Long id, String assignedTo, String dueDate, String dueTime, String timezone, String name, Integer duration, Project project, Long[] labels, ReminderSetting reminderSetting) {
+        Task task = new Task();
+        task.setId(id);
+        task.setAssignedTo(assignedTo);
+        task.setDueDate(dueDate);
+        task.setDueTime(dueTime);
+        task.setTimezone(timezone);
+        task.setName(name);
+        task.setDuration(duration);
+        task.setProject(project);
+        task.setLabels(labels);
+        task.setReminderSetting(reminderSetting);
+        return task;
     }
 }
