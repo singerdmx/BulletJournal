@@ -7,11 +7,13 @@ import {
   CreateNote,
   PutNote,
   GetNote,
-  PatchNote
+  PatchNote,
+  SetNoteLabels
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchNotes, createNote, putNotes, getNoteById, updateNote
+  fetchNotes, createNote, putNotes, getNoteById, updateNote,
+  setNoteLabels
 } from '../../apis/noteApis';
 import { updateNotes } from './actions';
 
@@ -68,6 +70,16 @@ function* patchNote(action: PayloadAction<PatchNote>) {
   }
 }
 
+function* noteSetLabels(action: PayloadAction<SetNoteLabels>) {
+  try {
+    const { noteId, labels } = action.payload;
+    const data = yield call(setNoteLabels, noteId, labels);
+    yield put(updateNotes(data.projectId));
+  } catch (error) {
+    yield call(message.error, `noteSetLabels Error Received: ${error}`);
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -93,6 +105,10 @@ export default function* noteSagas() {
     yield takeLatest(
       notesActions.NotePatch.type,
       patchNote
+    ),
+    yield takeLatest(
+      notesActions.NoteSetLabels.type,
+      noteSetLabels
     )
   ]);
 }

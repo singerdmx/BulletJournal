@@ -1,5 +1,4 @@
-import { doFetch, doPost, doDelete, doPatch } from './api-helper';
-import { Transaction } from '../features/transactions/interface';
+import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
 
 export const fetchTransactions = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/transactions`)
@@ -67,3 +66,12 @@ export const updateTransaction = (
       throw Error(err);
     });
 };
+
+export const setTransactionLabels = (transactionId: number, labels: number[]) => {
+  const putBody = JSON.stringify(labels);
+  return doPut(`/api/transactions/{transactionId}/setLabels`, putBody)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err.message);
+    });
+}

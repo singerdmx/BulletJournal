@@ -5,3 +5,4 @@ export const createNote = (projectId: number, name: string) => actions.NotesCrea
 export const putNote = (projectId: number, notes: Note[]) => actions.NotePut({ projectId: projectId, notes: notes });
 export const deleteNote = (noteId: number) => actions.NoteDelete({ noteId: noteId });
 export const patchNote = (noteId: number, name: string) => actions.NotePatch({noteId: noteId, name: name});
+export const setNoteLabels = (noteId: number, labels: number[]) => actions.NoteSetLabels({ noteId: noteId, labels: labels });

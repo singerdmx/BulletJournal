@@ -36,6 +36,11 @@ export type PatchNote = {
   name: string
 }
 
+export type SetNoteLabels = {
+  noteId: number,
+  labels: number[]
+}
+
 let initialState = {
   notes: [] as Array<Note>
 };
@@ -61,7 +66,8 @@ const slice = createSlice({
     NoteGet: (state, action: PayloadAction<GetNote>) => state,
     NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
     NotePatch: (state, action: PayloadAction<PatchNote>) => state,
-    }
+    NoteSetLabels: (state, action: PayloadAction<SetNoteLabels>) => state,
+  }
 });
 
 export const reducer = slice.reducer;

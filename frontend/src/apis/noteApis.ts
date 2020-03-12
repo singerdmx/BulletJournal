@@ -56,3 +56,12 @@ export const updateNote = (
       throw Error(err);
     });
 };
+
+export const setNoteLabels = (noteId: number, labels: number[]) => {
+  const putBody = JSON.stringify(labels);
+  return doPut(`/api/notes/{noteId}/setLabels`, putBody)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err.message);
+    });
+}

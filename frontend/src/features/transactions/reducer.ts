@@ -43,6 +43,11 @@ export type PatchTransaction = {
   timezone?: string;
 }
 
+export type SetTransactionLabels = {
+  transactionId: number,
+  labels: number[]
+}
+
 let initialState = {
   transactions: [] as Array<Transaction>
 };
@@ -67,7 +72,8 @@ const slice = createSlice({
     TransactionGet: (state, action: PayloadAction<GetTransaction>) => state,
     TransactionDelete: (state, action: PayloadAction<DeleteTransaction>) => state,
     TransactionPatch: (state, action: PayloadAction<PatchTransaction>) => state,
-    }
+    TransactionSetLabels: (state, action: PayloadAction<SetTransactionLabels>) => state,
+  }
 });
 
 export const reducer = slice.reducer;

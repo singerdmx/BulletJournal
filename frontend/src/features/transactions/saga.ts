@@ -6,11 +6,12 @@ import {
   UpdateTransactions,
   CreateTransaction,
   GetTransaction,
-  PatchTransaction
+  PatchTransaction,
+  SetTransactionLabels
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchTransactions, createTransaction, getTransactionById, updateTransaction
+  fetchTransactions, createTransaction, getTransactionById, updateTransaction, setTransactionLabels
 } from '../../apis/transactionApis';
 import { updateTransactions } from './actions';
 
@@ -64,6 +65,16 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
   }
 }
 
+function* transactionSetLabels(action: PayloadAction<SetTransactionLabels>) {
+  try {
+    const { transactionId, labels } = action.payload;
+    const data = yield call(setTransactionLabels, transactionId, labels);
+    yield put(updateTransactions(data.projectId));
+  } catch (error) {
+    yield call(message.error, `transactionSetLabels Error Received: ${error}`);
+  }
+}
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -85,6 +96,10 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.TransactionPatch.type,
       patchTransaction
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionSetLabels.type,
+      transactionSetLabels
     ),
   ]);
 }

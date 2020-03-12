@@ -8,3 +8,4 @@ export const deleteTransaction = (transactionId: number) => actions.TransactionD
 export const patchTransaction = (transactionId: number, amount: number, name: string, payer: string,
     date: string, time: string, transactionType: number) => actions.TransactionPatch({ transactionId: transactionId,
     amount: amount, name: name, payer: payer, date: date, time: time, transactionType: transactionType });
+export const setTransactionLabels = (transactionId: number, labels: number[]) => actions.TransactionSetLabels({ transactionId: transactionId, labels: labels });
