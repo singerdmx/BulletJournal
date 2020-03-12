@@ -101,6 +101,40 @@ public class ProjectControllerTest {
         Transaction transaction2 = createTransaction(p, "transaction2", "2020-03-04");
         Transaction transaction3 = createTransaction(p, "transaction3", "2020-03-05");
         transaction1 = updateTransaction(transaction1);
+
+        // Get transactions
+        ResponseEntity<Transaction[]> transactionsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Transaction[].class,
+                p.getId());
+        String etag1 = transactionsResponse.getHeaders().getETag();
+        List<Transaction> transactions = Arrays.asList(transactionsResponse.getBody());
+
+        transactionsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Transaction[].class,
+                p.getId());
+        String etag2 = transactionsResponse.getHeaders().getETag();
+        assertEquals(etag1, etag2);
+
+        deleteTransaction(transaction2);
+        transactionsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Transaction[].class,
+                p.getId());
+        String etag3 = transactionsResponse.getHeaders().getETag();
+        transactions = Arrays.asList(transactionsResponse.getBody());
+        assertNotEquals(etag1, etag3);
+
+        assertEquals(2, transactions.size());
+
+
         deleteTransactions(p, transaction1, transaction2, transaction3);
     }
 

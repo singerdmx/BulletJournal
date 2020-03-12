@@ -4,11 +4,14 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.CreateTransactionParams;
 import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,8 +30,16 @@ public class TransactionController {
     private NotificationService notificationService;
 
     @GetMapping(TRANSACTIONS_ROUTE)
-    public List<Transaction> getTransactions(@NotNull @PathVariable Long projectId) {
-        return this.transactionDaoJpa.getTransactions(projectId);
+    public ResponseEntity<List<Transaction>> getTransactions(@NotNull @PathVariable Long projectId) {
+
+        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId);
+        String transactionsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE, transactions);
+
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setETag(transactionsEtag);
+
+        return ResponseEntity.ok().headers(responseHeader).body(transactions);
     }
 
     @PostMapping(TRANSACTIONS_ROUTE)
