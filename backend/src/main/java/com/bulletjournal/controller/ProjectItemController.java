@@ -11,6 +11,8 @@ import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -53,6 +55,14 @@ public class ProjectItemController {
         ZonedDateTime startTime = IntervalHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = IntervalHelper.getEndTime(endDate, null, timezone);
 
+        Map<ZonedDateTime, ProjectItems> projectItemsMap =
+                getZonedDateTimeProjectItemsMap(types, username, startTime, endTime);
+        return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(
+            List<ProjectType> types, String username, ZonedDateTime startTime, ZonedDateTime endTime) {
         Map<ZonedDateTime, List<Task>> taskMap = null;
         Map<ZonedDateTime, List<Transaction>> transactionMap = null;
 
@@ -79,7 +89,7 @@ public class ProjectItemController {
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, taskMap);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionMap);
-        return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+        return projectItemsMap;
     }
 
 }
