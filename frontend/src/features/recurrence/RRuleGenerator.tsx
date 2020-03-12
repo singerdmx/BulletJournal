@@ -14,6 +14,7 @@ type RRuleGeneratorProps = {
   startDate: string;
   rRuleStartString: string;
   rRuleEndString: string;
+  rRuleRepeatString: string;
   updateStartString: (startDate: string) => void;
 };
 
@@ -27,6 +28,7 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
         {console.log(moment(this.props.startDate).toDate())}
         <div>{this.props.rRuleStartString}</div>
         <div>{this.props.rRuleEndString}</div>
+        <div>{this.props.rRuleRepeatString}</div>
       </div>
     );
   }
@@ -35,7 +37,8 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
 const mapStateToProps = (state: IState) => ({
   rRuleStartString: state.rRule.rRuleStartString,
   startDate: state.rRule.startDate,
-  rRuleEndString: state.rRule.rRuleEndString
+  rRuleEndString: state.rRule.rRuleEndString,
+  rRuleRepeatString: state.rRule.rRuleRepeatString
 });
 
 export default connect(mapStateToProps, { updateStartString })(

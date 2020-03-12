@@ -26,3 +26,5 @@ export const DAYS = [
   'Weekday',
   'Weekend day'
 ];
+
+export const WHICHS = ['First', 'Second', 'Third', 'Fourth', 'Last'];
