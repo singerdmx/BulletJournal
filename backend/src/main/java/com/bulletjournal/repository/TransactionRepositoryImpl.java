@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @Transactional
-public class TransactionRepositoryImpl implements TransactionRepositoryCustom{
+public class TransactionRepositoryImpl implements TransactionRepositoryCustom {
 
     @PersistenceContext
     EntityManager entityManager;
