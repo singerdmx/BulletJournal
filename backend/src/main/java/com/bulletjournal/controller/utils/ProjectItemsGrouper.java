@@ -50,7 +50,9 @@ public class ProjectItemsGrouper {
      */
     public static Map<ZonedDateTime, List<Note>> groupNotesByDate(List<Note> notes) {
         Map<ZonedDateTime, List<Note>> map = new HashMap<>();
-        map.put(ZonedDateTime.now(), notes);
+        if (notes.size() > 0) {
+            map.put(ZonedDateTime.now(), notes);
+        }
         return map;
     }
 

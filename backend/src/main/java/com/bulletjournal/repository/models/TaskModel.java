@@ -64,21 +64,6 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "reminder_date_time")
     private Timestamp reminderDateTime;
 
-    @Type(type = "long-array")
-    @Column(
-            name = "labels",
-            columnDefinition = "bigint[]"
-    )
-    private Long[] labels;
-
-    public Long[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(Long[] labels) {
-        this.labels = labels;
-    }
-
     public Timestamp getStartTime() {
         return startTime;
     }
