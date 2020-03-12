@@ -3,7 +3,6 @@ package com.bulletjournal.repository.models;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.repository.utils.LongArrayType;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
