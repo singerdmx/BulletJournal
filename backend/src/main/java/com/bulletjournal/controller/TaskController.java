@@ -1,9 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.CreateTaskParams;
-import com.bulletjournal.controller.models.Task;
-import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
@@ -31,6 +29,8 @@ public class TaskController {
     protected static final String UNCOMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/uncomplete";
     protected static final String COMPLETED_TASKS_ROUTE = "/api/projects/{projectId}/completedTasks";
     protected static final String TASK_SET_LABELS_ROUTE = "/api/tasks/{taskId}/setLabels";
+    protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
+    protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -113,5 +113,13 @@ public class TaskController {
                           @NotNull @RequestBody List<Long> labels) {
         this.taskDaoJpa.setLabels(taskId, labels);
         return getTask(taskId);
+    }
+
+    @PostMapping(MOVE_TASK_ROUTE)
+    public void moveTask(@NotNull @RequestBody MoveTaskParams moveTaskParams) {
+    }
+
+    @PostMapping(SHARE_TASK_ROUTE)
+    public void shareTask(@NotNull @RequestBody ShareTaskParams shareTaskParams) {
     }
 }
