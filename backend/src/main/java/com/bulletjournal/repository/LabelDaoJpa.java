@@ -4,13 +4,14 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Label;
+import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -29,6 +30,12 @@ public class LabelDaoJpa {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private NoteRepository noteRepository;
 
     @Autowired
     private AuthorizationService authorizationService;
@@ -113,14 +120,20 @@ public class LabelDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItems> getItemsByLabels(List<Long> labels) {
-        List<Task> taskList = this.taskRepository.findTasksByLabelIds(labels);
-        List<com.bulletjournal.controller.models.Task> tasks = taskList.stream().
-                map(Task::toPresentationModel).collect(Collectors.toList());
-        Map<ZonedDateTime, List<com.bulletjournal.controller.models.Task>> taskMap = ProjectItemsGrouper.groupTasksByDate(tasks);
+        Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
 
-        //dummy, it is an empty implementation, also need to add note.
-        Map<ZonedDateTime, List<Transaction>> transactionMap = ProjectItemsGrouper.groupTransactionsByDate(new ArrayList<>());
-        Map<ZonedDateTime, ProjectItems> projectItemsMap = ProjectItemsGrouper.mergeMap(taskMap, transactionMap);
+        List<Task> tasks = this.taskRepository.findTasksByLabelIds(labels);
+        Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks);
+        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
+
+        List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelIds(labels);
+        Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
+        projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
+
+        List<Note> notes = this.noteRepository.findNotesByLabelIds(labels);
+        Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes);
+        projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
+
         return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
     }
 }

@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long>, TransactionRepositoryCustom {
     List<Transaction> findTransactionsByProject(Project project);
 
     @Query("SELECT transaction FROM Transaction transaction where " +

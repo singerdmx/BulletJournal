@@ -1,16 +1,15 @@
 package com.bulletjournal.controller.utils;
 
+import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.controller.models.Task;
-import com.bulletjournal.controller.models.Transaction;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProjectItemsGrouper {
 
@@ -30,9 +29,9 @@ public class ProjectItemsGrouper {
     }
 
     /*
-     * Convert list of transactions to a Map and convert map into List of Project Items
+     * Convert list of tasks to a <ZonedDateTime, Task List> Map
      *
-     * @transactions Map<ZonedDateTime, List<Transaction>> - List of Transactions
+     * @tasks Map<ZonedDateTime, List<Task>> - List of Tasks
      */
     public static Map<ZonedDateTime, List<Task>> groupTasksByDate(List<Task> tasks) {
         Map<ZonedDateTime, List<Task>> map = new HashMap<>();
@@ -45,17 +44,26 @@ public class ProjectItemsGrouper {
     }
 
     /*
-     * Merge transaction list and task list into one Map
+     * Convert list of notes to a <ZonedDateTime, Note List> Map
      *
-     * @transactions Map<ZonedDateTime, List<Transaction>> - List of Transactions
+     * @notes Map<ZonedDateTime, List<Note>> - List of Notes
      */
-    public static Map<ZonedDateTime, ProjectItems> mergeMap(@Nullable Map<ZonedDateTime, List<Task>> tasksMap,
-                                                            @Nullable Map<ZonedDateTime, List<Transaction>> transactionsMap) {
-        Map<ZonedDateTime, ProjectItems> mergedMap = new HashMap<>();
+    public static Map<ZonedDateTime, List<Note>> groupNotesByDate(List<Note> notes) {
+        Map<ZonedDateTime, List<Note>> map = new HashMap<>();
+        map.put(ZonedDateTime.now(), notes);
+        return map;
+    }
 
+    /*
+     * Merge transactions map to target projectItems map
+     *
+     * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
+     */
+    public static Map<ZonedDateTime, ProjectItems> mergeTransactionsMap(Map<ZonedDateTime, ProjectItems> mergedMap,
+                                                                        @Nullable Map<ZonedDateTime, List<Transaction>> transactionsMap) {
         if (transactionsMap != null) {
             transactionsMap.keySet().forEach(zonedDateTime -> {
-                ProjectItems projectItem = new ProjectItems();
+                ProjectItems projectItem = mergedMap.getOrDefault(zonedDateTime, new ProjectItems());
                 projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(zonedDateTime));
                 projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
                 List<Transaction> transactions = transactionsMap.get(zonedDateTime);
@@ -66,11 +74,20 @@ public class ProjectItemsGrouper {
                     ZonedDateTime z2 = IntervalHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
                     return z2.compareTo(z1);
                 });
-                projectItem.setTransactions(transactions);
+                projectItem.setTransactions(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
                 mergedMap.put(zonedDateTime, projectItem);
             });
         }
+        return mergedMap;
+    }
 
+    /*
+     * Merge tasks map to target projectItems map
+     *
+     * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
+     */
+    public static Map<ZonedDateTime, ProjectItems> mergeTasksMap(Map<ZonedDateTime, ProjectItems> mergedMap,
+                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap) {
         if (tasksMap != null) {
             tasksMap.keySet().forEach(zonedDateTime -> {
                 ProjectItems projectItem = mergedMap.getOrDefault(zonedDateTime, new ProjectItems());
@@ -84,11 +101,33 @@ public class ProjectItemsGrouper {
                     ZonedDateTime z2 = IntervalHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
                     return z2.compareTo(z1);
                 });
-                projectItem.setTasks(tasksMap.get(zonedDateTime));
+                projectItem.setTasks(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
                 mergedMap.put(zonedDateTime, projectItem);
             });
         }
+        return mergedMap;
+    }
 
+    /*
+     * Merge notes map to target projectItems map
+     *
+     * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
+     */
+    public static Map<ZonedDateTime, ProjectItems> mergeNotesMap(Map<ZonedDateTime, ProjectItems> mergedMap,
+                                                                    @Nullable Map<ZonedDateTime, List<Note>> notesMap) {
+        if (notesMap != null) {
+            notesMap.keySet().forEach(zonedDateTime -> {
+                ProjectItems projectItem = mergedMap.getOrDefault(zonedDateTime, new ProjectItems());
+                projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(zonedDateTime));
+                projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
+                List<Note> notes = notesMap.get(zonedDateTime);
+
+                // Sort note by update time
+                notes.sort((t1, t2) -> t2.getUpdatedAt().compareTo(t1.getUpdatedAt()));
+                projectItem.setNotes(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
+                mergedMap.put(zonedDateTime, projectItem);
+            });
+        }
         return mergedMap;
     }
 
