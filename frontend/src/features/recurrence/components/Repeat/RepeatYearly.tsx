@@ -12,7 +12,7 @@ import { YearlyOn, YearlyOnThe } from '../../interface';
 import { updateRepeatYearlyOn, updateRepeatYearlyOnThe } from '../../actions';
 const { Option } = Select;
 
-const daysInMonth = moment('Jan', 'MMM').daysInMonth();
+var daysOn = moment('Jan', 'MMM').daysInMonth();
 
 type RepeatYealyProps = {
   repeatYearlyOn: YearlyOn;
@@ -41,8 +41,9 @@ class RepeatYearly extends React.Component<RepeatYealyProps, SelectState> {
   onChangeOnMonth = (e: string) => {
     let update = {
       month: e,
-      day: this.props.repeatYearlyOn.day
+      day: 1
     } as YearlyOn;
+    daysOn = moment(e, 'MMM').daysInMonth();
     this.props.updateRepeatYearlyOn(update);
   };
 
@@ -107,7 +108,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps, SelectState> {
             onChange={this.onChangeOnDay}
             value={this.props.repeatYearlyOn.day}
           >
-            {range(0, daysInMonth).map(i => (
+            {range(0, daysOn).map(i => (
               <option key={i} value={i + 1}>
                 {i + 1}
               </option>
