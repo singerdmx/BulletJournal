@@ -118,16 +118,16 @@ public class ProjectItemsGrouperTest {
 
         assertEquals(p2, p4);
         assertEquals(1, p1.getTransactions().size());
-        assertEquals(transaction1, p1.getTransactions().get(0));
+        assertEquals(transaction1.toPresentationModel(), p1.getTransactions().get(0));
 
         assertEquals(1, p2.getTransactions().size());
-        assertEquals(transaction2, p2.getTransactions().get(0));
+        assertEquals(transaction2.toPresentationModel(), p2.getTransactions().get(0));
 
         assertEquals(1, p3.getTasks().size());
-        assertEquals(task1, p3.getTasks().get(0));
+        assertEquals(task1.toPresentationModel(), p3.getTasks().get(0));
 
         assertEquals(1, p2.getTasks().size());
-        assertEquals(task2, p2.getTasks().get(0));
+        assertEquals(task2.toPresentationModel(), p2.getTasks().get(0));
     }
 
     /*
