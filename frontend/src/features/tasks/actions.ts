@@ -1,6 +1,7 @@
 import { actions } from './reducer';
 import { Task, ReminderSetting } from './interface';
 export const updateTasks = (projectId: number) => actions.TasksUpdate({projectId: projectId});
+export const updateCompletedTasks = (projectId: number) => actions.CompletedTasksUpdate({projectId: projectId});
 export const createTask = (projectId: number, name: string, assignedTo: string,
     dueDate: string, dueTime: string, duration: number, reminderSetting: ReminderSetting) =>
     actions.TasksCreate({projectId: projectId, name: name, assignedTo: assignedTo,
@@ -12,3 +13,6 @@ export const patchTask = (taskId: number, name: string, assignedTo: string,
     reminderSetting: ReminderSetting) => actions.TaskPatch({ taskId: taskId, name: name,
         assignedTo: assignedTo, dueDate: dueDate, dueTime: dueTime,
         duration: duration, reminderSetting: reminderSetting });
+export const completeTask = (taskId: number) => actions.TaskComplete({ taskId: taskId });
+export const uncompleteTask = (taskId: number) => actions.TaskUncomplete({ taskId: taskId });
+export const setTaskLabels = (taskId: number, labels: number[]) => actions.TaskSetLabels({ taskId: taskId, labels: labels });

@@ -12,7 +12,7 @@ export function doFetch(endpoint: string) {
   });
 }
 
-export function doPost(endpoint: string, body: string) {
+export function doPost(endpoint: string, body?: string) {
   if (process.env.REACT_APP_ENV === 'debug') {
     console.log(endpoint);
   }

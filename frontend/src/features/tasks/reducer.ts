@@ -46,8 +46,26 @@ export type PatchTask = {
   reminderSetting?: ReminderSetting;
 }
 
+export type CompleteTask = {
+  taskId: number
+}
+
+export type UncompleteTask = {
+  taskId: number
+}
+
+export type SetTaskLabels = {
+  taskId: number,
+  labels: number[]
+}
+
+export type GetCompletedTasks = {
+  projectId: number
+}
+
 let initialState = {
-  tasks: [] as Array<Task>
+  tasks: [] as Array<Task>,
+  completedTasks: [] as Array<Task>
 };
 
 const slice = createSlice({
@@ -61,17 +79,28 @@ const slice = createSlice({
       const { tasks } = action.payload;
       state.tasks = tasks;
     },
+    completedTasksReceived: (
+      state,
+      action: PayloadAction<TasksAction>
+    ) => {
+      const { tasks } = action.payload;
+      state.completedTasks = tasks;
+    },
     taskApiErrorReceived: (
       state,
       action: PayloadAction<TaskApiErrorAction>
     ) => state,
-    TasksUpdate: (state, action: PayloadAction<UpdateTasks>) =>state,
+    TasksUpdate: (state, action: PayloadAction<UpdateTasks>) => state,
+    CompletedTasksUpdate: (state, action: PayloadAction<UpdateTasks>) =>state,
     TasksCreate: (state, action: PayloadAction<CreateTask>) => state,
     TaskPut: (state, action: PayloadAction<PutTask>) => state,
     TaskGet: (state, action: PayloadAction<GetTask>) => state,
     TaskDelete: (state, action: PayloadAction<DeleteTask>) => state,
     TaskPatch: (state, action: PayloadAction<PatchTask>) => state,
-    }
+    TaskComplete: (state, action: PayloadAction<CompleteTask>) => state,
+    TaskUncomplete: (state, action: PayloadAction<UncompleteTask>) => state,
+    TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state,
+  }
 });
 
 export const reducer = slice.reducer;

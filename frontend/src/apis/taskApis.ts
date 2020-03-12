@@ -9,6 +9,14 @@ export const fetchTasks = (projectId: number) => {
     });
 };
 
+export const fetchCompletedTasks = (projectId: number) => {
+  return doFetch(`/api/projects/${projectId}/completedTasks`)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err.message);
+    });
+};
+
 export const getTaskById = (taskId: number) => {
   return doFetch(`/api/tasks/${taskId}`)
     .then(res => res.json())
@@ -72,3 +80,32 @@ export const updateTask = (
       throw Error(err);
     });
 };
+
+export const completeTaskById = (
+  taskId: number
+) => {
+  return doPost(`/api/tasks/${taskId}/complete`)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err);
+    });
+}
+
+export const uncompleteTaskById = (
+  taskId: number
+) => {
+  return doPost(`/api/tasks/${taskId}/uncomplete`)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err);
+    });
+}
+
+export const setTaskLabels = (taskId: number, labels: number[]) => {
+  const putBody = JSON.stringify(labels);
+  return doPut(`/api/tasks/{taskId}/setLabels`, putBody)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err.message);
+    });
+}

@@ -74,7 +74,6 @@ public class TaskController {
         return getTask(taskId);
     }
 
-
     @PutMapping(TASKS_ROUTE)
     public void updateTaskRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Task> tasks) {
         this.taskDaoJpa.updateUserTasks(projectId, tasks);
