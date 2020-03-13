@@ -3,9 +3,9 @@ package com.bulletjournal.controller.utils;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.ledger.TransactionType;
+import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.models.Project;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -207,16 +207,6 @@ public class ProjectItemsGrouperTest {
         assertEquals(1, projectItems.get(2).getTasks().size());
     }
 
-    /*
-     * Stub class for Project
-     */
-    private static class ProjectStub extends Project {
-        @Override
-        public Long getId() {
-            return 1L;
-        }
-    }
-
     private Transaction getTransaction(Long id, String name, Project project, String payer, Double amount, String date, String time, String timezone, Integer transactionType) {
         Transaction transaction = new Transaction();
         transaction.setId(id);
@@ -244,5 +234,15 @@ public class ProjectItemsGrouperTest {
         task.setLabels(labels);
         task.setReminderSetting(reminderSetting);
         return task;
+    }
+
+    /*
+     * Stub class for Project
+     */
+    private static class ProjectStub extends Project {
+        @Override
+        public Long getId() {
+            return 1L;
+        }
     }
 }
