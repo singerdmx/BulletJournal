@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { History } from 'history';
 import { Tree, Tooltip } from 'antd';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
@@ -61,8 +61,8 @@ const getTree = (
 type ProjectProps = {
     id: number,
     ownerName: string,
-  ownProjects: Project[];
-  updateProjectRelations: (Projects: Project[]) => void;
+    ownProjects: Project[];
+    updateProjectRelations: (Projects: Project[]) => void;
 };
 
 const onDragEnter = (info: any) => {
@@ -89,21 +89,21 @@ const findNoteById = (notes: Project[], noteId: number): Project => {
   return res;
 }
 
-const dragNoteById = (notes: Project[], noteId: number): Project[] => {
+const dragNoteById = (projects: Project[], projectId: number): Project[] => {
   let res = [] as Project[];
-  notes.forEach((item, index) => {
-      let note = {} as Project;
-      const subProjects = dragNoteById(item.subProjects, noteId);
-      note = {...item, subProjects: subProjects};
-      if (note.id !== noteId) res.push(note);
+  projects.forEach((item, index) => {
+      let project = {} as Project;
+      const subProjects = dragNoteById(item.subProjects, projectId);
+      project = {...item, subProjects: subProjects};
+      if (project.id !== projectId) res.push(project);
 
   })
   return res;
 }
 
-const DropNoteById = (notes: Project[], dropId: number, dropNote: Project): Project[] => {
+const DropNoteById = (projects: Project[], dropId: number, dropNote: Project): Project[] => {
   let res = [] as Project[];
-  notes.forEach((item, index) => {
+  projects.forEach((item, index) => {
       let note = {} as Project;
       let subProjects = [] as Project[];
       if (item.id === dropId) {
@@ -118,25 +118,25 @@ const DropNoteById = (notes: Project[], dropId: number, dropNote: Project): Proj
   return res;
 }
 
-const onDrop = (notes: Project[], updateProjectRelations: Function) => (info: any) => {
-  console.log("onDrop -> info", info.dragNode.key)
-  const targetNote = findNoteById(notes, parseInt(info.dragNode.key));
+const onDrop = (notes: Project[], updateProject: Function) => (info: any) => {
+  const projectId = parseInt(info.dragNode.key)
+  const targetNote = findNoteById(notes, projectId);
   const dropPos = info.node.props.pos.split('-');
   const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
   const dragNotes = dragNoteById(notes, parseInt(info.dragNode.key));
-  let resNotes = [] as Project[];
+  let resProjects = [] as Project[];
   if(dropPosition===-1){
-      resNotes = [...dragNotes, targetNote];
+    resProjects = [...dragNotes, targetNote];
   }else{
-     resNotes = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
+    resProjects = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
   }
-  console.log("onDrop -> resNotes", resNotes)
-  updateProjectRelations(resNotes);
+  updateProject(resProjects);
 }
 
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
     const { ownProjects, history, ownerName, id, updateProjectRelations } = props;
     const treeNode = getTree(ownProjects,ownerName,id,history);
+
     return (<div style={{marginLeft: '20%'}}><Tree
             className="ant-tree"
             multiple

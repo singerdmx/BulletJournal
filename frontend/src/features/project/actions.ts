@@ -35,6 +35,4 @@ export const updateProject = (
     groupId: groupId,
     name: name
   });
-export const updateProjectRelations = (projects: Project[]) => {
-  actions.updateProjectRelations({ projects: projects });
-};
+export const updateProjectRelations = (projects: Project[]) => actions.updateProjectRelations({ projects: projects });
