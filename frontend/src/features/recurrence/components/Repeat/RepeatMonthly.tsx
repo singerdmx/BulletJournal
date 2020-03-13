@@ -1,6 +1,5 @@
 import React from 'react';
 import { Select, Input, Radio } from 'antd';
-import moment from 'moment';
 import { range } from 'lodash';
 import { WHICHS, DAYS } from '../../constants/index';
 //used for redux

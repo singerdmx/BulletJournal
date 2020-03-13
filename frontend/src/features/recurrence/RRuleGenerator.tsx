@@ -6,9 +6,6 @@ import End from './components/End/End';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateStartString } from './actions';
-//rrule
-import RRule from 'rrule';
-import moment from 'moment';
 
 type RRuleGeneratorProps = {
   rRuleString: string;

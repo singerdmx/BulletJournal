@@ -60,23 +60,23 @@ class Repeat extends React.Component<RepeatProps, SelectState> {
 
   onChangeValue = (value: string) => {
     this.setState({ value: value });
-    if (value == 'Yearly') {
+    if (value === 'Yearly') {
       if (this.props.yearlyOn) {
         this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
       } else {
         this.props.updateRepeatYearlyOnThe(this.props.repeatYearlyOnThe);
       }
-    } else if (value == 'Monthly') {
+    } else if (value === 'Monthly') {
       if (this.props.monthlyOn) {
         this.props.updateRepeatMonthlyOn(this.props.repeatMonthlyOn);
       } else {
         this.props.updateRepeatMonthlyOnThe(this.props.repeatMonthlyOnThe);
       }
-    } else if (value == 'Weekly') {
+    } else if (value === 'Weekly') {
       this.props.updateRepeatWeekly(this.props.repeatWeekly);
-    } else if (value == 'Daily') {
+    } else if (value === 'Daily') {
       this.props.updateRepeatDaily(this.props.repeatDaily);
-    } else if (value == 'Hourly') {
+    } else if (value === 'Hourly') {
       this.props.updateRepeatHourly(this.props.repeatHourly);
     }
   };

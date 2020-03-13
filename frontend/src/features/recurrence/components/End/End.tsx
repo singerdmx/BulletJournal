@@ -72,7 +72,7 @@ class End extends React.Component<EndProps, SelectState> {
               value={this.props.endCount ? this.props.endCount : 0}
               onChange={this.onChangeCount}
             />
-            <div>executions.</div>
+            <div>times.</div>
           </div>
         ) : null}
       </div>

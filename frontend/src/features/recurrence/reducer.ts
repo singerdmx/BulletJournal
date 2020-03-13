@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import moment from 'moment';
-import RRule, { WeekdayStr } from 'rrule';
+import RRule from 'rrule';
 import {
   Hourly,
   Daily,
