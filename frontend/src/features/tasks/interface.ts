@@ -14,6 +14,7 @@ export interface Task {
     assignedTo: string,
     dueDate: string,
     dueTime: string,
+    duration?: number,
     timezone: string,
     reminderSetting: ReminderSetting,
     labels: Label[]

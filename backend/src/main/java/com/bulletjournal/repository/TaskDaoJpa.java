@@ -134,6 +134,7 @@ public class TaskDaoJpa {
         task.setOwner(owner);
         task.setName(createTaskParams.getName());
         task.setTimezone(createTaskParams.getTimezone());
+        task.setDuration(createTaskParams.getDuration());
 
         String date = createTaskParams.getDueDate();
         String time = createTaskParams.getDueTime();

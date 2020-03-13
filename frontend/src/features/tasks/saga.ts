@@ -57,10 +57,11 @@ function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
 
 function* taskCreate(action: PayloadAction<CreateTask>) {
     try {
-      const payload = action.payload;
-      const data = yield call(createTask, payload.projectId,
-        payload.name, payload.assignedTo, payload.dueDate, payload.dueTime,
-        payload.duration, payload.reminderSetting);
+      const { projectId, name, assignedTo, dueDate, dueTime, duration,
+        reminderSetting } = action.payload;
+      const data = yield call(createTask, projectId,
+        name, assignedTo, dueDate, dueTime,
+        duration, reminderSetting);
       const task = yield data.json();
       yield put(updateTasks(action.payload.projectId));
     } catch (error) {
@@ -72,7 +73,12 @@ function* taskPut(action: PayloadAction<PutTask>) {
     try{
       const { projectId, tasks } = action.payload;
       const data = yield call(putTasks, projectId, tasks);
-      yield put(updateTasks(projectId));
+      const updatedTasks = yield data.json();
+      yield put(
+          tasksActions.tasksReceived({
+          tasks: updatedTasks
+        })
+      );
     } catch (error) {
       yield call(message.error, `Put Task Error Received: ${error}`);
     }
@@ -98,9 +104,10 @@ function* getTask(action: PayloadAction<GetTask>) {
 
 function* patchTask(action: PayloadAction<PatchTask>) {
   try {
-    const payload = action.payload;
-    yield call(updateTask, payload.taskId, payload.name, payload.assignedTo,
-      payload.dueDate, payload.dueTime, payload.duration, payload.reminderSetting);
+    const { taskId, name, assignedTo, dueDate, dueTime,
+      duration, reminderSetting } = action.payload;
+    yield call(updateTask, taskId, name, assignedTo,
+      dueDate, dueTime, duration, reminderSetting);
   } catch (error) {
     yield call(message.error, `Patch Task Error Received: ${error}`);
   }
