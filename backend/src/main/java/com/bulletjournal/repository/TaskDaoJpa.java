@@ -6,7 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTaskParams;
-import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -138,8 +138,8 @@ public class TaskDaoJpa {
         String date = createTaskParams.getDueDate();
         String time = createTaskParams.getDueTime();
         String timezone = createTaskParams.getTimezone();
-        task.setStartTime(Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()));
-        task.setEndTime(Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()));
+        task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+        task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
         task.setReminderSetting(createTaskParams.getReminderSetting());
 
         task = this.taskRepository.save(task);
@@ -186,10 +186,10 @@ public class TaskDaoJpa {
         String timezone = updateTaskParams.getOrDefaultTimezone(updateTaskParams.getTimezone());
 
         DaoHelper.updateIfPresent(updateTaskParams.needsUpdateDateTime(),
-                Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()), task::setStartTime);
+                Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()), task::setStartTime);
 
         DaoHelper.updateIfPresent(updateTaskParams.needsUpdateDateTime(),
-                Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()), task::setEndTime);
+                Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()), task::setEndTime);
 
         DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
                 task::setReminderSetting);
@@ -221,13 +221,29 @@ public class TaskDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                task.getOwner(), requester, ContentType.TASK, Operation.UPDATE, taskId);
+                task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
+                taskId, task.getProject().getOwner());
 
         CompletedTask completedTask = new CompletedTask(task);
         this.completedTaskRepository.save(completedTask);
-        this.taskRepository.delete(task);
+        //this.taskRepository.delete(task);
 
         // TODO: remove task in relations
+        Long projectId = task.getProject().getId();
+        ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("ProjectTasks by " + projectId + " not found"));
+
+        String relations = projectTasks.getTasks();
+
+        // delete tasks and its subTasks
+        List<Task> targetTasks = this.taskRepository.findAllById(HierarchyProcessor.getSubItems(relations, taskId));
+        this.taskRepository.deleteAll(targetTasks);
+
+        // Update task relations
+        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, taskId);
+        projectTasks.setTasks(GSON.toJson(hierarchy));
+        this.projectTasksRepository.save(projectTasks);
+
         return completedTask;
     }
 
@@ -291,7 +307,11 @@ public class TaskDaoJpa {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
-        return this.completedTaskRepository.findCompletedTaskByProject(project);
+        List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
+        completedTasks.stream().sorted((c1, c2) -> {
+            return c2.getUpdatedAt().compareTo(c1.getUpdatedAt());
+        });
+        return completedTasks;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

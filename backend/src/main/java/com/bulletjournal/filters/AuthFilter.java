@@ -1,19 +1,5 @@
 package com.bulletjournal.filters;
 
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.config.SSOConfig;
@@ -24,6 +10,15 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 @Component
 @Order(0)
@@ -51,6 +46,7 @@ public class AuthFilter implements Filter {
                 String val = request.getHeader(name);
                 if (UserClient.USER_NAME_KEY.equals(name)) {
                     username = URLDecoder.decode(val, StandardCharsets.UTF_8.toString());
+                    MDC.put(UserClient.USER_NAME_KEY, username);
                     LOGGER.info("User " + username + " logged in");
                     break;
                 }
@@ -59,6 +55,7 @@ public class AuthFilter implements Filter {
 
         if (username == null && this.authConfig.isEnableDefaultUser()) {
             username = this.authConfig.getDefaultUsername();
+            MDC.put(UserClient.USER_NAME_KEY, username);
         }
 
         if (username == null) {
@@ -67,7 +64,6 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        MDC.put(UserClient.USER_NAME_KEY, username);
         LOGGER.info(request.getRequestURI());
         if (UserController.LOGOUT_MYSELF_ROUTE.equals(request.getRequestURI())) {
             Cookie cookie = new Cookie("__discourse_proxy", null);

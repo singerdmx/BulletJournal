@@ -1,6 +1,7 @@
 package com.bulletjournal.repository.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "completed_tasks",
@@ -20,13 +21,24 @@ public class CompletedTask extends TaskModel {
     }
 
     public CompletedTask(Task task) {
+        this.setId(task.getId());
+        this.setName(task.getName());
+        this.setOwner(task.getOwner());
+        this.setProject(task.getProject());
         this.setAssignedTo(task.getAssignedTo());
         this.setDueDate(task.getDueDate());
         this.setDueTime(task.getDueTime());
-        this.setName(task.getName());
+        this.setDuration(task.getDuration());
+        this.setStartTime(task.getStartTime());
+        this.setEndTime(task.getEndTime());
+        this.setTimezone(task.getTimezone());
         this.setReminderBeforeTask(task.getReminderBeforeTask());
         this.setReminderDate(task.getReminderDate());
         this.setReminderTime(task.getReminderTime());
+        this.setReminderDateTime(task.getReminderDateTime());
+        this.setCreatedAt(task.getCreatedAt());
+        this.setUpdatedAt(task.getUpdatedAt());
+        this.setLabels(task.getLabels());
     }
 
     @Override
@@ -36,5 +48,18 @@ public class CompletedTask extends TaskModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CompletedTask)) return false;
+        CompletedTask that = (CompletedTask) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

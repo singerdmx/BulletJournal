@@ -1,7 +1,7 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.utils.LongArrayType;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -184,7 +184,7 @@ public abstract class TaskModel extends ProjectItemModel {
 
         if (reminderSetting.hasDate() || reminderSetting.hasTime()) {
             ZonedDateTime reminderZonedDateTime =
-                    IntervalHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
+                    ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
             this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
         }
     }

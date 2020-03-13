@@ -2,6 +2,7 @@ package com.bulletjournal.notifications;
 
 import com.bulletjournal.config.NotificationConfig;
 import com.bulletjournal.repository.NotificationDaoJpa;
+import com.bulletjournal.thread.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class NotificationCleaner {
 
     @Autowired
     public NotificationCleaner(NotificationDaoJpa notificationDaoJpa) {
-        this.executorService = Executors.newSingleThreadScheduledExecutor();
+        this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("notification-cleaner"));
         this.notificationDaoJpa = notificationDaoJpa;
     }
 

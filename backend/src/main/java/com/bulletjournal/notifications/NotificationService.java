@@ -1,6 +1,7 @@
 package com.bulletjournal.notifications;
 
 import com.bulletjournal.repository.NotificationDaoJpa;
+import com.bulletjournal.thread.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class NotificationService {
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa) {
         this.notificationDaoJpa = notificationDaoJpa;
-        this.executorService = Executors.newSingleThreadExecutor();
+        this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("notification-service"));
         this.eventQueue = new LinkedBlockingQueue<>();
     }
 

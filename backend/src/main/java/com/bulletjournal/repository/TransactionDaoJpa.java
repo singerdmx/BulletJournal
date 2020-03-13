@@ -6,7 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTransactionParams;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
-import com.bulletjournal.controller.utils.IntervalHelper;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
@@ -108,8 +108,8 @@ public class TransactionDaoJpa {
         String date = createTransaction.getDate();
         String time = createTransaction.getTime();
         String timezone = createTransaction.getTimezone();
-        transaction.setStartTime(Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()));
-        transaction.setEndTime(Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()));
+        transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+        transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
 
         return this.transactionRepository.save(transaction);
     }
@@ -151,10 +151,10 @@ public class TransactionDaoJpa {
         String timezone = updateTransactionParams.getOrDefaultTimezone(transaction.getTimezone());
 
         DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(IntervalHelper.getStartTime(date, time, timezone).toInstant()), transaction::setStartTime);
+                Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()), transaction::setStartTime);
 
         DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(IntervalHelper.getEndTime(date, time, timezone).toInstant()), transaction::setEndTime);
+                Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()), transaction::setEndTime);
 
         this.transactionRepository.save(transaction);
         return events;

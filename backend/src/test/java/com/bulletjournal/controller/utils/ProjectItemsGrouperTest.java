@@ -95,10 +95,14 @@ public class ProjectItemsGrouperTest {
         Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
         Task task2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
-        ZonedDateTime time1 = IntervalHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
-        ZonedDateTime time2 = IntervalHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());
-        ZonedDateTime time3 = IntervalHelper.getStartTime(task1.getDueDate(), task1.getDueTime(), task1.getTimezone());
-        ZonedDateTime time4 = IntervalHelper.getStartTime(task2.getDueDate(), task2.getDueTime(), task2.getTimezone());
+        ZonedDateTime time1
+                = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
+        ZonedDateTime time2
+                = ZonedDateTimeHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());
+        ZonedDateTime time3
+                = ZonedDateTimeHelper.getStartTime(task1.getDueDate(), task1.getDueTime(), task1.getTimezone());
+        ZonedDateTime time4
+                = ZonedDateTimeHelper.getStartTime(task2.getDueDate(), task2.getDueTime(), task2.getTimezone());
 
         transactionMap.computeIfAbsent(time1, t -> new ArrayList<>()).add(transaction1);
         transactionMap.computeIfAbsent(time2, t -> new ArrayList<>()).add(transaction2);
@@ -149,10 +153,14 @@ public class ProjectItemsGrouperTest {
         Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
         Task task2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
-        ZonedDateTime time1 = IntervalHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
-        ZonedDateTime time2 = IntervalHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());
-        ZonedDateTime time3 = IntervalHelper.getStartTime(task1.getDueDate(), task1.getDueTime(), task1.getTimezone());
-        ZonedDateTime time4 = IntervalHelper.getStartTime(task2.getDueDate(), task2.getDueTime(), task2.getTimezone());
+        ZonedDateTime time1
+                = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
+        ZonedDateTime time2
+                = ZonedDateTimeHelper.getStartTime(transaction2.getDate(), transaction2.getTime(), transaction2.getTimezone());
+        ZonedDateTime time3
+                = ZonedDateTimeHelper.getStartTime(task1.getDueDate(), task1.getDueTime(), task1.getTimezone());
+        ZonedDateTime time4
+                = ZonedDateTimeHelper.getStartTime(task2.getDueDate(), task2.getDueTime(), task2.getTimezone());
 
         List<Transaction> tr1 = new ArrayList<>();
         tr1.add(transaction1);

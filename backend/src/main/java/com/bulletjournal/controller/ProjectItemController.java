@@ -3,8 +3,8 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.utils.IntervalHelper;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import com.bulletjournal.repository.models.Task;
@@ -52,8 +52,8 @@ public class ProjectItemController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // Set start time and end time
-        ZonedDateTime startTime = IntervalHelper.getStartTime(startDate, null, timezone);
-        ZonedDateTime endTime = IntervalHelper.getEndTime(endDate, null, timezone);
+        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap =
                 getZonedDateTimeProjectItemsMap(types, username, startTime, endTime);
@@ -63,33 +63,31 @@ public class ProjectItemController {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(
             List<ProjectType> types, String username, ZonedDateTime startTime, ZonedDateTime endTime) {
+
         Map<ZonedDateTime, List<Task>> taskMap = null;
         Map<ZonedDateTime, List<Transaction>> transactionMap = null;
 
-        for (ProjectType projectType : types) {
-            switch (projectType.getValue()) {
-                case 0: // Task
-                    // Query tasks from database with username, start time, end time
-                    List<Task> tasks = taskDaoJpa.getTasksBetween(username, startTime, endTime);
+        // Task query
+        if (types.contains(ProjectType.TODO)) {
+            List<Task> tasks = taskDaoJpa.getTasksBetween(username, startTime, endTime);
 
-                    // Group tasks by date
-                    taskMap = ProjectItemsGrouper.groupTasksByDate(tasks);
-                    break;
-                case 2: // Ledger
-                    // Query transactions from database with username, start time, end time
-                    List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(username, startTime, endTime);
+            // Group tasks by date
+            taskMap = ProjectItemsGrouper.groupTasksByDate(tasks);
+        }
+        // Ledger query
+        if (types.contains(ProjectType.LEDGER)) {
+            List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(username, startTime, endTime);
 
-                    // Group transactions by date
-                    transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
-                    break;
-                default:
-            }
+            // Group transaction by date
+            transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         }
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, taskMap);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionMap);
+
         return projectItemsMap;
+
     }
 
 }

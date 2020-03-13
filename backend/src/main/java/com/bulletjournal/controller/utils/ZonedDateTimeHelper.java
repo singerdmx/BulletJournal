@@ -11,6 +11,31 @@ public class ZonedDateTimeHelper {
     public static final String DATE_DELIMITER = "-";
     public static final String DEFAULT_TIME = "00:00";
     public static final String PATTERN = "yyyy-MM-dd HH:mm";
+    private static final String MIN_TIME = "00:00";
+    private static final String MAX_TIME = "23:59";
+
+    /*
+     * Return ZoneDateTime type for start time. If time is null, will replace time with 00:00.
+     */
+    private static String getDateTime(String date, String time) {
+        return date + ZonedDateTimeHelper.DATE_TIME_DELIMITER + time;
+    }
+
+    /*
+     * Return ZoneDateTime type for start time. If time is null, will replace time with 00:00.
+     */
+    public static ZonedDateTime getStartTime(String date, String time, String timezone) {
+        return time == null ? convertDateTime(getDateTime(date, MIN_TIME), timezone) :
+                convertDateTime(getDateTime(date, time), timezone);
+    }
+
+    /*
+     * Return ZoneDateTime type for end time. If time is null, will replace time with 23:59.
+     */
+    public static ZonedDateTime getEndTime(String date, String time, String timezone) {
+        return time == null ? convertDateTime(getDateTime(date, MAX_TIME), timezone) :
+                convertDateTime(getDateTime(date, time), timezone);
+    }
 
     /*
      * Convert DateTime String to ZonedDateTime

@@ -1,14 +1,17 @@
 package com.bulletjournal.controller.utils;
 
-import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.controller.models.ProjectItems;
+import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProjectItemsGrouper {
@@ -75,8 +78,8 @@ public class ProjectItemsGrouper {
             transactions.sort((t1, t2) -> {
 
                 // Sort transaction by end time
-                ZonedDateTime z1 = IntervalHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
-                ZonedDateTime z2 = IntervalHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
+                ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
+                ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
                 return z2.compareTo(z1);
             });
             projectItem.setTransactions(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
@@ -104,8 +107,8 @@ public class ProjectItemsGrouper {
             tasks.sort((t1, t2) -> {
 
                 // Sort task by end time
-                ZonedDateTime z1 = IntervalHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
-                ZonedDateTime z2 = IntervalHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
+                ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
+                ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
                 return z2.compareTo(z1);
             });
             projectItem.setTasks(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
