@@ -73,6 +73,14 @@ public class Note {
         this.subNotes.add(note);
     }
 
+    public List<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

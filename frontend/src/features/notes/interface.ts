@@ -1,6 +1,5 @@
-export interface Note {
-    id: number,
-    name: string,
-    projectId: number,
+import { ProjectItem } from "../myBuJo/interface";
+
+export interface Note extends ProjectItem {
     subNotes: Note[]
 }

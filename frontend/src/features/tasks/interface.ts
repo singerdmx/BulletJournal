@@ -1,4 +1,4 @@
-import {Label} from "../label/interface";
+import { ProjectItem } from "../myBuJo/interface";
 
 export interface ReminderSetting {
     date: string,
@@ -6,10 +6,7 @@ export interface ReminderSetting {
     before: number
 }
 
-export interface Task {
-    id: number,
-    name: string,
-    projectId: number,
+export interface Task extends ProjectItem {
     subTasks: Task[],
     assignedTo: string,
     dueDate: string,
@@ -17,5 +14,4 @@ export interface Task {
     duration?: number,
     timezone: string,
     reminderSetting: ReminderSetting,
-    labels: Label[]
 }

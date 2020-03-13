@@ -1,9 +1,8 @@
-export interface Transaction {
-    id: number,
+import { ProjectItem } from "../myBuJo/interface";
+
+export interface Transaction extends ProjectItem {
     amount: number,
-    name: string,
     payer: string,
-    projectId: number,
     date: string,
     time: string,
     timezone: string,
