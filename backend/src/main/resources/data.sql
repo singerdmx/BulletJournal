@@ -141,6 +141,23 @@ INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (12, 0, true
 -- Joined lsx9981's Default Group
 INSERT INTO public.user_groups (group_id, user_id, accepted) VALUES (13, 0, true);
 
+--Bullet Journal create 5 project
+
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (11, '2020-02-15 07:11:22.535000', '2020-02-16 07:11:22.535000', 'test1', 'BulletJournal', null, 0, 98);
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (12, '2020-02-15 08:11:22.535000', '2020-02-16 07:11:22.535000', 'test2', 'BulletJournal', null, 1, 98);
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (13, '2020-02-15 09:11:22.535000', '2020-02-16 07:11:22.535000', 'test3', 'BulletJournal', null, 2, 98);
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (14, '2020-02-15 10:11:22.535000', '2020-02-16 07:11:22.535000', 'test4', 'BulletJournal', null, 1, 98);
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (15, '2020-02-15 11:11:22.535000', '2020-02-16 07:11:22.535000', 'test5', 'BulletJournal', null, 1, 98);
+INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
+VALUES (16, '2020-02-16 11:11:22.535000', '2020-02-16 07:11:22.535000', 'test6', 'BulletJournal', null, 0, 98);
+--update relation
+INSERT INTO public.user_projects (owner, created_at, updated_at, owned_projects, shared_projects)
+VALUES ('BulletJournal', '2020-02-18 07:11:22.535000', '2020-02-19 07:11:22.535000', '[{"id":11,"s":[{"id":12,"s":[{"id":13,"s":[]}]},{"id":14,"s":[]}]},{"id":15,"s":[{"id":16,"s":[]}]}]', null);
 -- Scarlet creates 6 projects
 INSERT INTO public.projects (id, created_at, updated_at, name, owner, description, type, group_id)
 VALUES (1, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'P1', 'Scarlet', null, 0, 12);
