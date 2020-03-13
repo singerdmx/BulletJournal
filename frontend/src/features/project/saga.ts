@@ -145,7 +145,20 @@ function* putProjectRelations(
 ) {
   try {
     const { projects } = action.payload;
-    yield call(updateProjectRelations, projects);
+    const data = yield call(updateProjectRelations, projects);
+    const updatedProjects = yield data.json();
+    const etags = data.headers.get('Etag')!.split('|');
+    const ownEtag = etags[0];
+    const shared = etags[1];
+
+    yield put(
+      projectActions.projectsReceived({
+        owned: updatedProjects.owned,
+        shared: updatedProjects.shared,
+        ownedProjectsEtag: ownEtag,
+        sharedProjectsEtag: shared
+      })
+    );
     yield call(message.success, 'Successfully updated project relations');
   } catch (error) {
     yield call(message.error, `update Project relations Fail: ${error}`);

@@ -74,7 +74,9 @@ export const updateProject = (
 
 export const updateProjectRelations = (projects: Project[]) => {
   const putBody = JSON.stringify(projects);
-  return doPut('/api/projects', putBody).catch(err => {
-    throw Error(err.message);
-  });
+  return doPut('/api/projects', putBody)
+    .then(res => res)
+    .catch(err => {
+      throw Error(err.message);
+    });
 };

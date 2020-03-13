@@ -70,13 +70,6 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     this.props.updateProjects();
   }
 
-  componentDidUpdate(prevProps:ProjectProps) {
-    // Typical usage (don't forget to compare props):
-    if (this.props.ownProjects !== prevProps.ownProjects) {
-      this.props.updateProjects();
-    }
-  }
-
   render() {
     const { groups: groupsByOwner, ownProjects } = this.props;    
     return (

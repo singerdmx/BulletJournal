@@ -116,8 +116,9 @@ public class ProjectController {
     }
 
     @PutMapping(PROJECTS_ROUTE)
-    public void updateProjectRelations(@Valid @RequestBody List<Project> projects) {
+    public ResponseEntity<Projects> updateProjectRelations(@Valid @RequestBody List<Project> projects) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.projectDaoJpa.updateUserOwnedProjects(username, projects);
+        return getProjects();
     }
 }
