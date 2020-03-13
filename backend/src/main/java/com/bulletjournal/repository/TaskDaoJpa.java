@@ -226,9 +226,7 @@ public class TaskDaoJpa {
 
         CompletedTask completedTask = new CompletedTask(task);
         this.completedTaskRepository.save(completedTask);
-        //this.taskRepository.delete(task);
 
-        // TODO: remove task in relations
         Long projectId = task.getProject().getId();
         ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("ProjectTasks by " + projectId + " not found"));
@@ -238,7 +236,9 @@ public class TaskDaoJpa {
         // delete tasks and its subTasks
         List<Task> targetTasks = this.taskRepository.findAllById(HierarchyProcessor.getSubItems(relations, taskId));
         targetTasks.forEach(t -> {
-            this.completedTaskRepository.save(new CompletedTask(t));
+            if (t.getId() != task.getId()) {
+                this.completedTaskRepository.save(new CompletedTask(t));
+            }
         });
         this.taskRepository.deleteAll(targetTasks);
 
@@ -306,14 +306,11 @@ public class TaskDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> getCompletedTasks(Long projectId) {
-        // TODO: sort by last_updated
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
-        completedTasks.stream().sorted((c1, c2) -> {
-            return c2.getUpdatedAt().compareTo(c1.getUpdatedAt());
-        });
+        completedTasks.stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()));
         return completedTasks;
     }
 
