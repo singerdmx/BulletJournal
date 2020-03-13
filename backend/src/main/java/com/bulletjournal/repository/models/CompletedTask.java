@@ -21,7 +21,6 @@ public class CompletedTask extends TaskModel {
     }
 
     public CompletedTask(Task task) {
-        this.setId(task.getId());
         this.setName(task.getName());
         this.setOwner(task.getOwner());
         this.setProject(task.getProject());
