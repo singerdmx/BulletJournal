@@ -70,19 +70,17 @@ public class TaskDaoJpa {
     public com.bulletjournal.controller.models.Task getTask(Long id) {
         Task task = this.taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
-        Long[] labels = task.getLabels();
-        List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
-        if (labels != null && labels.length > 0) {
-            labelsForPresentation = this.labelRepository.findAllById(Arrays.asList(labels)).stream()
-                    .map(Label::toPresentationModel).collect(Collectors.toList());
-        }
-        return task.toPresentationModel(labelsForPresentation);
+        return addLabelsToTask(task);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getCompletedTask(Long id) {
         CompletedTask task = this.completedTaskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
+        return addLabelsToTask(task);
+    }
+
+    private <T extends TaskModel> com.bulletjournal.controller.models.Task addLabelsToTask(T task) {
         Long[] labels = task.getLabels();
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
         if (labels != null && labels.length > 0) {
@@ -91,7 +89,6 @@ public class TaskDaoJpa {
         }
         return task.toPresentationModel(labelsForPresentation);
     }
-
 
     /*
      * Get reminding tasks from database.
