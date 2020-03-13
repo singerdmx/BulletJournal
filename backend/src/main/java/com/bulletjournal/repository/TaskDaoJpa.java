@@ -15,9 +15,9 @@ import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +28,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class TaskDaoJpa {
+public class TaskDaoJpa extends ProjectItemDaoJpa {
 
     private static final Gson GSON = new Gson();
+
     @Autowired
     private TaskRepository taskRepository;
 
@@ -52,6 +53,11 @@ public class TaskDaoJpa {
     @Autowired
     private UserRepository userRepository;
 
+    @Override
+    public JpaRepository getJpaRepository() {
+        return this.taskRepository;
+    }
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId) {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
@@ -68,26 +74,17 @@ public class TaskDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getTask(Long id) {
-        Task task = this.taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
-        return addLabelsToTask(task);
+        Task task = (Task) this.getProjectItem(id);
+        List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
+        return task.toPresentationModel(labels);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getCompletedTask(Long id) {
         CompletedTask task = this.completedTaskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
-        return addLabelsToTask(task);
-    }
-
-    private <T extends TaskModel> com.bulletjournal.controller.models.Task addLabelsToTask(T task) {
-        Long[] labels = task.getLabels();
-        List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
-        if (labels != null && labels.length > 0) {
-            labelsForPresentation = this.labelRepository.findAllById(Arrays.asList(labels)).stream()
-                    .map(Label::toPresentationModel).collect(Collectors.toList());
-        }
-        return task.toPresentationModel(labelsForPresentation);
+        List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
+        return task.toPresentationModel(labels);
     }
 
     /*
@@ -324,14 +321,6 @@ public class TaskDaoJpa {
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
         completedTasks.stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()));
         return completedTasks;
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void setLabels(Long taskId, List<Long> labels) {
-        Task task = this.taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
-        task.setLabels(Iterables.toArray(labels, Long.class));
-        this.taskRepository.save(task);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
