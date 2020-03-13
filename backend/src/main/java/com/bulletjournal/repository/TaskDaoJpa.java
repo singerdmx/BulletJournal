@@ -237,6 +237,9 @@ public class TaskDaoJpa {
 
         // delete tasks and its subTasks
         List<Task> targetTasks = this.taskRepository.findAllById(HierarchyProcessor.getSubItems(relations, taskId));
+        targetTasks.forEach(t -> {
+            this.completedTaskRepository.save(new CompletedTask(t));
+        });
         this.taskRepository.deleteAll(targetTasks);
 
         // Update task relations
