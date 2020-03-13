@@ -75,8 +75,9 @@ public class TaskController {
     }
 
     @PutMapping(TASKS_ROUTE)
-    public void updateTaskRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Task> tasks) {
+    public ResponseEntity<List<Task>> updateTaskRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Task> tasks) {
         this.taskDaoJpa.updateUserTasks(projectId, tasks);
+        return getTasks(projectId);
     }
 
     @PostMapping(COMPLETE_TASK_ROUTE)
