@@ -147,7 +147,7 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Project create(CreateProjectParams createProjectParams, String owner) {
+    public Project create(CreateProjectParams createProjectParams, String owner, List<Event> events) {
         String name = createProjectParams.getName();
         if (!this.projectRepository.findByNameAndOwner(name, owner).isEmpty()) {
             throw new ResourceAlreadyExistException("Project with name " + name + " already exists");
@@ -158,8 +158,9 @@ public class ProjectDaoJpa {
         project.setOwner(owner);
         project.setName(name);
         project.setType(createProjectParams.getProjectType().getValue());
-        project.setGroup(this.groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " cannot be found")));
+        Group group = this.groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " cannot be found"));
+        project.setGroup(group);
         project = this.projectRepository.save(project);
 
         Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
@@ -170,7 +171,21 @@ public class ProjectDaoJpa {
         userProjects.setOwnedProjects(newRelations);
         userProjects.setOwner(owner);
         this.userProjectsRepository.save(userProjects);
+        events.addAll(generateEvents(group, owner, project));
         return project;
+    }
+
+    private List<Event> generateEvents(Group group, String requester, Project project) {
+        List<Event> events = new ArrayList<>();
+        for (UserGroup userGroup : group.getUsers()) {
+            String targetUser = userGroup.getUser().getName();
+            if (targetUser.equals(requester)) {
+                continue;
+            }
+            Event event = new Event(targetUser, project.getId(), project.getName());
+            events.add(event);
+        }
+        return events;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

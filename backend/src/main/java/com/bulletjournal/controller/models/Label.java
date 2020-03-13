@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 

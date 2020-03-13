@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.notifications.CreateProjectEvent;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveProjectEvent;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,6 +62,7 @@ public class ProjectController {
         });
         return ResponseEntity.ok().headers(responseHeader).body(projects);
     }
+
     @GetMapping(PROJECT_ROUTE)
     public Project getProject(@NotNull @PathVariable Long projectId) {
         Project project = this.projectDaoJpa.getProject(projectId).toVerbosePresentationModel();
@@ -75,8 +78,14 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return projectDaoJpa.create(project, username).toVerbosePresentationModel();
+        List<Event> events = new ArrayList<>();
+        Project createdProject = projectDaoJpa.create(project, username, events).toVerbosePresentationModel();
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new CreateProjectEvent(events, username));
+        }
+        return createdProject;
     }
+
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
                                  @Valid @RequestBody UpdateProjectParams updateProjectParams) {
@@ -96,6 +105,7 @@ public class ProjectController {
             this.notificationService.inform(new RemoveProjectEvent(events, username));
         }
     }
+
     @PostMapping(UPDATE_SHARED_PROJECTS_ORDER_ROUTE)
     public void updateSharedProjectsOrder(
             @Valid @RequestBody UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams) {
@@ -104,6 +114,7 @@ public class ProjectController {
                 Arrays.toString(updateSharedProjectsOrderParams.getProjectOwners()));
         this.projectDaoJpa.updateSharedProjectsOrder(username, updateSharedProjectsOrderParams);
     }
+
     @PutMapping(PROJECTS_ROUTE)
     public void updateProjectRelations(@Valid @RequestBody List<Project> projects) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

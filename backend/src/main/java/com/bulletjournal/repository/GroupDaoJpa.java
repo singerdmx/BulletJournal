@@ -197,7 +197,7 @@ public class GroupDaoJpa {
             List<RemoveUserGroupParams> removeUserGroupsParams) {
 
         List<Event> events = new ArrayList<>();
-        for (RemoveUserGroupParams removeUserGroupParams: removeUserGroupsParams) {
+        for (RemoveUserGroupParams removeUserGroupParams : removeUserGroupsParams) {
             String username = removeUserGroupParams.getUsername();
             if (Objects.equals(username, owner)) {
                 throw new BadRequestException("can not remove owner");

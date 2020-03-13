@@ -7,5 +7,6 @@ import java.util.List;
 public interface TaskRepositoryCustom {
 
     List<Task> findTasksByLabelId(Long labelId);
+
     List<Task> findTasksByLabelIds(List<Long> labelIds);
 }

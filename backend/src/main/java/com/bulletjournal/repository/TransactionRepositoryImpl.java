@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.repository.models.Transaction;
 import org.springframework.stereotype.Repository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;

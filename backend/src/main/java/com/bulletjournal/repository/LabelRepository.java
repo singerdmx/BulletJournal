@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface LabelRepository extends JpaRepository<Label, Long> {
     List<Label> findByOwner(String owner);
+
     List<Label> findByNameAndOwner(String name, String owner);
 }

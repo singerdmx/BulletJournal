@@ -74,7 +74,7 @@ public class TaskDaoJpa {
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
         if (labels != null && labels.length > 0) {
             labelsForPresentation = this.labelRepository.findAllById(Arrays.asList(labels)).stream()
-            .map(Label::toPresentationModel).collect(Collectors.toList());
+                    .map(Label::toPresentationModel).collect(Collectors.toList());
         }
         return task.toPresentationModel(labelsForPresentation);
     }

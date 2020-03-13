@@ -120,7 +120,7 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeNotesMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                    @Nullable Map<ZonedDateTime, List<Note>> notesMap) {
+                                                                 @Nullable Map<ZonedDateTime, List<Note>> notesMap) {
         if (notesMap == null) {
             return mergedMap;
         }

@@ -102,7 +102,7 @@ public class NoteDaoJpa {
     public void updateUserNotes(Long projectId, List<com.bulletjournal.controller.models.Note> notes) {
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
         final ProjectNotes projectNotes = projectNotesOptional.isPresent() ?
-        projectNotesOptional.get() : new ProjectNotes();
+                projectNotesOptional.get() : new ProjectNotes();
 
         projectNotes.setNotes(NoteRelationsProcessor.processRelations(notes));
         projectNotes.setProjectId(projectId);

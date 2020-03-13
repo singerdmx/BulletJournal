@@ -7,7 +7,7 @@ import javax.persistence.*;
         indexes = {@Index(name = "label_owner_index", columnList = "owner"),
                 @Index(name = "label_owner_name_index", columnList = "owner, name")},
         uniqueConstraints = {
-            @UniqueConstraint(columnNames = {"owner", "name"})
+                @UniqueConstraint(columnNames = {"owner", "name"})
         })
 public class Label extends OwnedModel {
 

@@ -59,7 +59,7 @@ public class ZonedDateTimeHelper {
      */
     public static ZonedDateTime getNow() {
         ZonedDateTime now = ZonedDateTime.now();
-        return  ZonedDateTime.of(now.getYear(),
+        return ZonedDateTime.of(now.getYear(),
                 now.getMonthValue(),
                 now.getDayOfMonth(),
                 now.getHour(),

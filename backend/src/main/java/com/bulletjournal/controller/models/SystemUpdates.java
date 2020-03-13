@@ -55,9 +55,15 @@ public class SystemUpdates {
         return reminders;
     }
 
-    public void setReminders(List<Task> reminders) { this.reminders = reminders; }
+    public void setReminders(List<Task> reminders) {
+        this.reminders = reminders;
+    }
 
-    public String getRemindingTaskEtag() { return remindingTaskEtag; }
+    public String getRemindingTaskEtag() {
+        return remindingTaskEtag;
+    }
 
-    public void setRemindingTaskEtag(String remindingTaskEtag) { this.remindingTaskEtag = remindingTaskEtag; }
+    public void setRemindingTaskEtag(String remindingTaskEtag) {
+        this.remindingTaskEtag = remindingTaskEtag;
+    }
 }

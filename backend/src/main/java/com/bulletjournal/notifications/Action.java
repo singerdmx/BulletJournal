@@ -20,7 +20,7 @@ public enum Action {
     }
 
     public String getPastTenseDescription() {
-       return this.pastTenseDescription;
+        return this.pastTenseDescription;
     }
 
     public static Action getAction(String description) {
