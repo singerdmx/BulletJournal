@@ -19,7 +19,7 @@ type SelectState = {
 
 class End extends React.Component<EndProps, SelectState> {
   state: SelectState = {
-    value: ''
+    value: 'Never'
   };
 
   onChangeValue = (value: string) => {

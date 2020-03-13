@@ -71,7 +71,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   }
 
   render() {
-    const { groups: groupsByOwner, ownProjects } = this.props;    
+    const { groups: groupsByOwner, ownProjects } = this.props;
     return (
       <Menu
         mode='inline'
@@ -107,26 +107,26 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
           }
           onTitleClick={this.onGroupsClick}
         >
-          <AddProject history={this.props.history} mode={'singular'}/>
+          <AddProject history={this.props.history} mode={'singular'} />
           <SubMenu
             key='ownedProjects'
             title={
               <span>
                 <ProfileOutlined />
-                <Tooltip placement="right" title='BuJo created by me'>
+                <Tooltip placement='right' title='BuJo created by me'>
                   <span>Owned BuJo</span>
                 </Tooltip>
               </span>
             }
           >
-            <OwnProject ownProjects={ownProjects} ownerName={'test'} id={1}/>
+            <OwnProject ownProjects={ownProjects} ownerName={'test'} id={1} />
           </SubMenu>
           <SubMenu
             key='sharedProjects'
             title={
               <span>
                 <TeamOutlined />
-                <Tooltip placement="right" title='BuJo shared with me'>
+                <Tooltip placement='right' title='BuJo shared with me'>
                   <span>Shared BuJo</span>
                 </Tooltip>
               </span>
@@ -153,12 +153,11 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                 <span className='group-title'>
                   <span>
                     <Avatar size='small' src={group.ownerAvatar} />
-                    <Tooltip placement="right" title={`Group "${group.name}" (owner "${group.owner}")`}>
-                      <span
-                        className='group-name'
-                      >
-                        {group.name}
-                      </span>
+                    <Tooltip
+                      placement='right'
+                      title={`Group "${group.name}" (owner "${group.owner}")`}
+                    >
+                      <span className='group-name'>{group.name}</span>
                     </Tooltip>
                   </span>
                   <span>

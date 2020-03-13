@@ -16,3 +16,22 @@ export interface YearlyOnThe {
   day: string;
   which: string;
 }
+
+export interface MonthlyOn {
+  day: number;
+}
+
+export interface MonthlyOnThe {
+  day: string;
+  which: string;
+}
+
+export interface Weekly {
+  mon: boolean;
+  tue: boolean;
+  wed: boolean;
+  thu: boolean;
+  fri: boolean;
+  sat: boolean;
+  sun: boolean;
+}
