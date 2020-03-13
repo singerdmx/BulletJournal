@@ -18,7 +18,7 @@ import {
 
 import AddGroup from '../../components/modals/add-group.component';
 import AddProject from '../../components/modals/add-project.component';
-import ProjectDnd from '../../components/project-dnd/project-dnd.component';
+import { ProjectDnd, OwnProject } from '../../components/project-dnd';
 import { Menu, Avatar, Tooltip } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { GroupsWithOwner } from '../../features/group/interface';
@@ -71,7 +71,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   }
 
   render() {
-    const { groups: groupsByOwner } = this.props;
+    const { groups: groupsByOwner, ownProjects } = this.props;    
     return (
       <Menu
         mode='inline'
@@ -118,7 +118,9 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                 </Tooltip>
               </span>
             }
-          ></SubMenu>
+          >
+            <OwnProject ownProjects={ownProjects} ownerName={'test'} id={1}/>
+          </SubMenu>
           <SubMenu
             key='sharedProjects'
             title={
@@ -182,6 +184,8 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
+  ownerName: state.user.name,
+  id: state.user.id,
   groups: state.group.groups,
   timezone: state.myself.timezone,
   ownProjects: state.project.owned,
