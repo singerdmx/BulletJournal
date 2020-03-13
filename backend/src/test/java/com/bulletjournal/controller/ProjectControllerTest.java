@@ -24,8 +24,6 @@ import static org.junit.Assert.*;
 
 /**
  * Tests {@link ProjectController}
- *
- *
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -356,6 +354,48 @@ public class ProjectControllerTest {
         assertEquals(1, tasks.size());
         assertEquals(t1, tasks.get(0));
         assertEquals(0, tasks.get(0).getSubTasks().size());
+
+        ResponseEntity<Task> completedTaskResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.COMPLETE_TASK_ROUTE,
+                HttpMethod.POST,
+                null,
+                Task.class,
+                t1.getId());
+
+        assertEquals(HttpStatus.OK, completedTaskResponse.getStatusCode());
+        assertNotNull(completedTaskResponse.getBody());
+        Task completedTask = completedTaskResponse.getBody();
+        assertEquals(t1.getName(), completedTask.getName());
+        assertEquals(t1.getTimezone(), completedTask.getTimezone());
+        assertEquals(t1.getLabels(), completedTask.getLabels());
+        assertEquals(t1.getAssignedTo(), completedTask.getAssignedTo());
+        assertEquals(t1.getDueDate(), completedTask.getDueDate());
+        assertEquals(t1.getDueTime(), completedTask.getDueTime());
+
+        ResponseEntity<Task[]> completedTasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.COMPLETED_TASKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Task[].class,
+                project.getId());
+
+        assertEquals(HttpStatus.OK, completedTasksResponse.getStatusCode());
+        assertNotNull(completedTasksResponse.getBody());
+        List<Task> completedTasks = Arrays.asList(completedTasksResponse.getBody());
+        assertEquals(1, completedTasks.size());
+        assertEquals(completedTask, completedTasks.get(0));
+
+        tasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Task[].class,
+                project.getId());
+
+        assertEquals(HttpStatus.OK, tasksResponse.getStatusCode());
+        assertNotNull(tasksResponse.getBody());
+        tasks = Arrays.asList(tasksResponse.getBody());
+        assertFalse(tasks.contains(t1));
     }
 
     private void updateTaskRelations(Project project, Task task1, Task task2, Task task3) {

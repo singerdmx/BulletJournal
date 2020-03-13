@@ -8,6 +8,7 @@ import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveTaskEvent;
 import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.models.CompletedTask;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -55,6 +56,11 @@ public class TaskController {
         return this.taskDaoJpa.getTask(taskId);
     }
 
+    @GetMapping(COMPLETE_TASK_ROUTE)
+    public Task getCompleteTask(@NotNull @PathVariable Long taskId) {
+        return this.taskDaoJpa.getCompletedTask(taskId);
+    }
+
     @PostMapping(TASKS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Task createTask(@NotNull @PathVariable Long projectId,
@@ -83,8 +89,8 @@ public class TaskController {
     @PostMapping(COMPLETE_TASK_ROUTE)
     public Task completeTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.complete(username, taskId);
-        return getTask(taskId);
+        CompletedTask task = this.taskDaoJpa.complete(username, taskId);
+        return getCompleteTask(task.getId());
     }
 
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
