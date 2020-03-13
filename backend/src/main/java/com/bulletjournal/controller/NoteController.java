@@ -64,8 +64,9 @@ public class NoteController {
     }
 
     @PutMapping(NOTES_ROUTE)
-    public void updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
+    public List<Note> updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
         this.noteDaoJpa.updateUserNotes(projectId, notes);
+        return getNotes(projectId);
     }
 
 }

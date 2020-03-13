@@ -273,21 +273,14 @@ public class ProjectControllerTest {
 //                --- note3
         note1.addSubNote(note2);
         note2.addSubNote(note3);
-        ResponseEntity<?> updateNoteRelationsResponse = this.restTemplate.exchange(
+        ResponseEntity<Note[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
                 HttpMethod.PUT,
                 new HttpEntity<>(ImmutableList.of(note1)),
-                Project.class,
+                Note[].class,
                 project.getId()
         );
-        assertEquals(HttpStatus.OK, updateNoteRelationsResponse.getStatusCode());
-
-        ResponseEntity<Note[]> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
-                HttpMethod.GET,
-                null,
-                Note[].class,
-                project.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         Note[] notes = response.getBody();
         assertEquals(1, notes.length);
         assertEquals(note1, notes[0]);
@@ -373,21 +366,14 @@ public class ProjectControllerTest {
         //                --- task3
         task1.addSubTask(task2);
         task2.addSubTask(task3);
-        ResponseEntity<?> updateTaskRelationsResponse = this.restTemplate.exchange(
+        ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.PUT,
                 new HttpEntity<>(ImmutableList.of(task1)),
-                Project.class,
+                Task[].class,
                 project.getId()
         );
-        assertEquals(HttpStatus.OK, updateTaskRelationsResponse.getStatusCode());
-
-        ResponseEntity<Task[]> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
-                HttpMethod.GET,
-                null,
-                Task[].class,
-                project.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         Task[] tasks = response.getBody();
         assertEquals(1, tasks.length);
         assertEquals(task1, tasks[0]);
@@ -523,21 +509,14 @@ public class ProjectControllerTest {
          */
         p6.addSubProject(p7);
         // Set user's project relations
-        ResponseEntity<?> updateProjectRelationsResponse = this.restTemplate.exchange(
+        ResponseEntity<Projects> updateProjectRelationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.PUT,
                 new HttpEntity<>(ImmutableList.of(p5)),
-                Void.class
+                Projects.class
         );
         assertEquals(HttpStatus.OK, updateProjectRelationsResponse.getStatusCode());
-
-        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.GET,
-                null,
-                Projects.class);
-        assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        List<Project> projects = projectsResponse.getBody().getOwned();
+        List<Project> projects = updateProjectRelationsResponse.getBody().getOwned();
         assertEquals(1, projects.size());
         assertEquals(p5, projects.get(0));
         assertEquals(1, projects.get(0).getSubProjects().size());
@@ -574,21 +553,14 @@ public class ProjectControllerTest {
         List<Project> projectRelations = HierarchyProcessorProcessorTest.createSampleProjectRelations(
                 p1, p2, p3, p4, p5, p6);
         // Set user's project relations
-        ResponseEntity<?> updateProjectRelationsResponse = this.restTemplate.exchange(
+        ResponseEntity<Projects> updateProjectRelationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.PUT,
                 new HttpEntity<>(projectRelations),
-                Void.class
+                Projects.class
         );
         assertEquals(HttpStatus.OK, updateProjectRelationsResponse.getStatusCode());
-
-        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.GET,
-                null,
-                Projects.class);
-        assertEquals(HttpStatus.OK, projectsResponse.getStatusCode());
-        List<Project> projects = projectsResponse.getBody().getOwned();
+        List<Project> projects = updateProjectRelationsResponse.getBody().getOwned();
         assertEquals(2, projects.size());
         assertEquals(p1, projects.get(0));
         assertEquals(p5, projects.get(1));
@@ -600,7 +572,7 @@ public class ProjectControllerTest {
         assertEquals(1, projects.get(0).getSubProjects().get(0).getSubProjects().size());
         assertEquals(p3, projects.get(0).getSubProjects().get(0).getSubProjects().get(0));
 
-        List<ProjectsWithOwner> l = projectsResponse.getBody().getShared();
+        List<ProjectsWithOwner> l = updateProjectRelationsResponse.getBody().getShared();
         assertEquals(2, l.size());
         projects = l.get(0).getProjects();
         assertEquals("Scarlet", l.get(0).getOwner());
@@ -629,7 +601,7 @@ public class ProjectControllerTest {
                 new HttpEntity<>(updateSharedProjectsOrderParams),
                 Void.class);
         assertEquals(HttpStatus.OK, updateSharedProjectsOrderResponse.getStatusCode());
-        projectsResponse = this.restTemplate.exchange(
+        ResponseEntity<Projects> projectsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
                 null,
