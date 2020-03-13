@@ -135,7 +135,7 @@ public class ProjectControllerTest {
         assertEquals(2, transactions.size());
 
 
-        deleteTransactions(p, transaction1, transaction2, transaction3);
+        deleteTransactions(p, transaction1, transaction3);
     }
 
     private void createNotes(Project p) {
