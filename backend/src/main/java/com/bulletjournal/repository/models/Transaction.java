@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.ledger.TransactionType;
 
 import javax.persistence.*;
@@ -7,6 +8,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class is for ProjectType.LEDGER
@@ -129,6 +132,11 @@ public class Transaction extends ProjectItemModel {
     }
 
     public com.bulletjournal.controller.models.Transaction toPresentationModel() {
+        return this.toPresentationModel(Collections.emptyList());
+    }
+
+    public com.bulletjournal.controller.models.Transaction toPresentationModel(
+            List<Label> labels) {
         return new com.bulletjournal.controller.models.Transaction(
                 this.getId(),
                 this.getName(),
@@ -138,6 +146,7 @@ public class Transaction extends ProjectItemModel {
                 this.getDate(),
                 this.getTime(),
                 this.getTimezone(),
-                this.getTransactionType().getValue());
+                this.getTransactionType().getValue(),
+                labels);
     }
 }

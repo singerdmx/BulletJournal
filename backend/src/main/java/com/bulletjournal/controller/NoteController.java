@@ -44,7 +44,7 @@ public class NoteController {
 
     @GetMapping(NOTE_ROUTE)
     public Note getNote(@NotNull @PathVariable Long noteId) {
-        return this.noteDaoJpa.getNote(noteId).toPresentationModel();
+        return this.noteDaoJpa.getNote(noteId);
     }
 
     @PatchMapping(NOTE_ROUTE)

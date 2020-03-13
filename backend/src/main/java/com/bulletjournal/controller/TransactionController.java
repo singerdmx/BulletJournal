@@ -52,7 +52,7 @@ public class TransactionController {
 
     @GetMapping(TRANSACTION_ROUTE)
     public Transaction getTransaction(@NotNull @PathVariable Long transactionId) {
-        return this.transactionDaoJpa.getTransaction(transactionId).toPresentationModel();
+        return this.transactionDaoJpa.getTransaction(transactionId);
     }
 
     @PatchMapping(TRANSACTION_ROUTE)

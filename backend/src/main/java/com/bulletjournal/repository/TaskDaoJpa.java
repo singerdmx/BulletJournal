@@ -48,9 +48,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     private CompletedTaskRepository completedTaskRepository;
 
     @Autowired
-    private LabelRepository labelRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Override

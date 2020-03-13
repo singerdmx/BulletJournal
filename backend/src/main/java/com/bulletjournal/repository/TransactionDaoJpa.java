@@ -11,11 +11,10 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Repository
-public class TransactionDaoJpa {
+public class TransactionDaoJpa extends ProjectItemDaoJpa {
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -37,6 +36,10 @@ public class TransactionDaoJpa {
     @Autowired
     private AuthorizationService authorizationService;
 
+    @Override
+    public JpaRepository getJpaRepository() {
+        return transactionRepository;
+    }
     /**
      * Get transactions list from project
      * <p>
@@ -65,9 +68,10 @@ public class TransactionDaoJpa {
      * @id Long - Transaction identifier to retrieve transaction from ledger repository
      * @retVal Transaction - Transaction object
      */
-    public Transaction getTransaction(Long id) {
-        return this.transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction " + id + " not found"));
+    public com.bulletjournal.controller.models.Transaction getTransaction(Long id) {
+        Transaction transaction = (Transaction) this.getProjectItem(id);
+        List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(transaction);
+        return transaction.toPresentationModel(labels);
     }
 
     /**
@@ -209,6 +213,4 @@ public class TransactionDaoJpa {
         }
         return events;
     }
-
-
 }

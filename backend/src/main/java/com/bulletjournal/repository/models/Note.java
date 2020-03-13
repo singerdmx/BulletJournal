@@ -1,6 +1,10 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.Label;
+
 import javax.persistence.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class is for ProjectType.NOTE
@@ -26,10 +30,15 @@ public class Note extends ProjectItemModel {
     }
 
     public com.bulletjournal.controller.models.Note toPresentationModel() {
+        return toPresentationModel(Collections.emptyList());
+    }
 
+    public com.bulletjournal.controller.models.Note toPresentationModel(
+            List<Label> labels) {
         return new com.bulletjournal.controller.models.Note(
                 this.getId(),
                 this.getName(),
-                this.getProject());
+                this.getProject(),
+                labels);
     }
 }

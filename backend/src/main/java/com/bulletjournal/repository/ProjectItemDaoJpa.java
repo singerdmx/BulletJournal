@@ -21,13 +21,14 @@ abstract class ProjectItemDaoJpa {
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
-    //getProjectItem
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public ProjectItemModel getProjectItem(Long projectItemId) {
         ProjectItemModel projectItem = this.getJpaRepository().findById(projectItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("projectItem " + projectItemId + " not found"));
         return projectItem;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabelsToProjectItem(T projectItem) {
         Long[] labels = projectItem.getLabels();
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();

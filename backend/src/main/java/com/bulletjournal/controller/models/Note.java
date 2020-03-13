@@ -18,6 +18,8 @@ public class Note {
     @NotNull
     private Long projectId;
 
+    private List<Label> labels;
+
     @Expose
     @Valid
     private List<Note> subNotes = new ArrayList<>();
@@ -27,10 +29,12 @@ public class Note {
 
     public Note(Long id,
                 @NotNull String name,
-                @NotNull Project project) {
+                @NotNull Project project,
+                List<Label> labels) {
         this.id = id;
         this.name = name;
         this.projectId = project.getId();
+        this.labels = labels;
     }
 
     public Long getId() {

@@ -11,12 +11,15 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.NoteRelationsProcessor;
-import com.bulletjournal.repository.models.*;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.repository.models.Note;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.ProjectNotes;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,21 +28,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class NoteDaoJpa {
+public class NoteDaoJpa extends ProjectItemDaoJpa {
 
+    private static final Gson GSON = new Gson();
     @Autowired
     private NoteRepository noteRepository;
-
     @Autowired
     private ProjectRepository projectRepository;
-
     @Autowired
     private AuthorizationService authorizationService;
-
     @Autowired
     private ProjectNotesRepository projectNotesRepository;
 
-    private static final Gson GSON = new Gson();
+    @Override
+    public JpaRepository getJpaRepository() {
+        return this.noteRepository;
+    }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId) {
@@ -93,9 +97,10 @@ public class NoteDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Note getNote(Long id) {
-        return this.noteRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Note " + id + " not found"));
+    public com.bulletjournal.controller.models.Note getNote(Long id) {
+        Note note = (Note) this.getProjectItem(id);
+        List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(note);
+        return note.toPresentationModel(labels);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -5,6 +5,7 @@ import com.bulletjournal.repository.models.Project;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Objects;
 
 public class Transaction {
@@ -36,6 +37,8 @@ public class Transaction {
     @NotBlank
     private String timezone;
 
+    private List<Label> labels;
+
     public Transaction() {
     }
 
@@ -47,7 +50,8 @@ public class Transaction {
                        @NotNull String date,
                        String time,
                        @NotNull String timezone,
-                       @NotNull Integer transactionType) {
+                       @NotNull Integer transactionType,
+                       List<Label> labels) {
         this.id = id;
         this.name = name;
         this.projectId = project.getId();
@@ -57,6 +61,7 @@ public class Transaction {
         this.time = time;
         this.timezone = timezone;
         this.transactionType = transactionType;
+        this.labels = labels;
     }
 
     public Long getId() {
@@ -130,6 +135,10 @@ public class Transaction {
     public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
     }
+
+    public List<Label> getLabels() { return labels; }
+
+    public void setLabels(List<Label> labels) { this.labels = labels; }
 
     @Override
     public boolean equals(Object o) {
