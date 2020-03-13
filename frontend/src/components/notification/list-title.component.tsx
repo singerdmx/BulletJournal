@@ -20,6 +20,14 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
         </span>
       );
       break;
+    case EventType.CreateProjectEvent:
+      beg = title.indexOf(' created Project ');
+      titleText = (
+        <span>
+          <strong>{title.slice(0, beg)}</strong> created Project <strong>{title.slice(beg + 17)}</strong>
+        </span>
+      );
+      break;
     case EventType.RemoveUserFromGroupEvent:
       beg = title.indexOf(' removed you from Group ');
       titleText = (

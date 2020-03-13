@@ -13,5 +13,6 @@ export enum EventType {
     RemoveTaskEvent = 'RemoveTaskEvent',
     RemoveTransactionEvent = 'RemoveTransactionEvent',
     UpdateTaskAssigneeEvent = 'UpdateTaskAssigneeEvent',
-    UpdateTransactionPayerEvent = 'UpdateTransactionPayerEvent'
+    UpdateTransactionPayerEvent = 'UpdateTransactionPayerEvent',
+    CreateProjectEvent = 'CreateProjectEvent'
 }
