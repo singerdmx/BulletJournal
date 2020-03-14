@@ -86,7 +86,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
             onChange={this.onChangeCount}
             value={this.props.repeatMonthlyCount}
           />
-          <span>week(s)</span>
+          <span>month(s)</span>
         </div>
 
         <Radio.Group
