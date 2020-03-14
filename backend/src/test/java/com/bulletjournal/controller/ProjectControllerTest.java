@@ -17,8 +17,10 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -87,11 +89,37 @@ public class ProjectControllerTest {
         Project p7 = createProject("P7", expectedOwner, group, ProjectType.TODO);
         updateProjectRelations(p5, p6, p7);
 
-        createTasks(p7);
+        List<Label> labels = createLabels();
+        createTasks(p7, labels);
         createNotes(p5);
         createTransactions(p6);
 
         getNotifications(notificationsEtag);
+    }
+
+    private List<Label> createLabels() {
+        List<Label> labels = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            CreateLabelParams createLabelParams =
+                    new CreateLabelParams("Label" + i, "Icon" + i);
+            ResponseEntity<Label> response = this.restTemplate.exchange(
+                    ROOT_URL + randomServerPort + LabelController.LABELS_ROUTE,
+                    HttpMethod.POST,
+                    new HttpEntity<>(createLabelParams),
+                    Label.class);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            labels.add(response.getBody());
+        }
+
+        ResponseEntity<Label[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + LabelController.LABELS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Label[].class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Label[] labelsCreated = response.getBody();
+        assertEquals(5, labelsCreated.length);
+        return labels;
     }
 
     private void createTransactions(Project p) {
@@ -315,12 +343,23 @@ public class ProjectControllerTest {
         return new HttpEntity<>(headers);
     }
 
-    private void createTasks(Project project) {
+    private void createTasks(Project project, List<Label> labels) {
         Task t1 = createTask(project, "t1");
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
         updateTaskRelations(project, t1, t2, t3);
         t1 = updateTask(t1, expectedOwner, "2020-02-27", null, null, null, t1.getName());
+
+        // Attach Labels to tasks
+        ResponseEntity<Task> setLabelResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASK_SET_LABELS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(labels.stream().map(l -> l.getId()).collect(Collectors.toList())),
+                Task.class,
+                t1.getId());
+        assertEquals(HttpStatus.OK, setLabelResponse.getStatusCode());
+        t1 = setLabelResponse.getBody();
+        assertEquals(labels.size(), t1.getLabels().size());
 
         // Get Tasks
         ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
@@ -339,6 +378,8 @@ public class ProjectControllerTest {
                 Task[].class,
                 project.getId());
         String etag2 = tasksResponse.getHeaders().getETag();
+        List<Task> taskList = Arrays.asList(tasksResponse.getBody());
+        assertEquals(tasks, taskList);
         assertEquals(etag1, etag2);
         deleteTask(t2);
         tasksResponse = this.restTemplate.exchange(
@@ -367,7 +408,6 @@ public class ProjectControllerTest {
         Task completedTask = completeTaskResponse.getBody();
         assertEquals(t1.getName(), completedTask.getName());
         assertEquals(t1.getTimezone(), completedTask.getTimezone());
-        assertEquals(t1.getLabels(), completedTask.getLabels());
         assertEquals(t1.getAssignedTo(), completedTask.getAssignedTo());
         assertEquals(t1.getDueDate(), completedTask.getDueDate());
         assertEquals(t1.getDueTime(), completedTask.getDueTime());

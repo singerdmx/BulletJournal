@@ -64,9 +64,17 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         ProjectTasks projectTasks = projectTasksOptional.get();
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
-        Map<Long, Task> tasks = this.taskRepository.findTaskByProject(project)
+        Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
                 .stream().collect(Collectors.toMap(Task::getId, n -> n));
-        return TaskRelationsProcessor.processRelations(tasks, projectTasks.getTasks());
+        return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks())
+                .stream()
+                .map(task -> {
+                    List<com.bulletjournal.controller.models.Label> labels =
+                            TaskDaoJpa.this.getLabelsToProjectItem(tasksMap.get(task.getId()));
+                    task.setLabels(labels);
+                    return task;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -80,8 +88,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     public com.bulletjournal.controller.models.Task getCompletedTask(Long id) {
         CompletedTask task = this.completedTaskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
-        List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
-        return task.toPresentationModel(labels);
+        return task.toPresentationModel();
     }
 
     /*

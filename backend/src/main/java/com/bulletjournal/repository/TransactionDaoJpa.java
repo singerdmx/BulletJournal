@@ -56,7 +56,11 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
         return this.transactionRepository.findTransactionsByProject(project)
                 .stream()
                 .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
-                .map(Transaction::toPresentationModel)
+                .map(transaction -> {
+                    List<com.bulletjournal.controller.models.Label> labels =
+                            TransactionDaoJpa.this.getLabelsToProjectItem(transaction);
+                    return transaction.toPresentationModel(labels);
+                })
                 .collect(Collectors.toList());
     }
 

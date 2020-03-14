@@ -34,7 +34,9 @@ abstract class ProjectItemDaoJpa {
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
         if (labels != null && labels.length > 0) {
             labelsForPresentation = this.labelRepository.findAllById(Arrays.asList(labels)).stream()
-                    .map(Label::toPresentationModel).collect(Collectors.toList());
+                    .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                    .map(Label::toPresentationModel)
+                    .collect(Collectors.toList());
         }
         return labelsForPresentation;
     }

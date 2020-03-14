@@ -54,9 +54,17 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
         ProjectNotes projectNotes = projectNotesOptional.get();
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
-        Map<Long, Note> notes = this.noteRepository.findNoteByProject(project)
+        Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project)
                 .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
-        return NoteRelationsProcessor.processRelations(notes, projectNotes.getNotes());
+        return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes())
+                .stream()
+                .map(note -> {
+                    List<com.bulletjournal.controller.models.Label> labels =
+                            NoteDaoJpa.this.getLabelsToProjectItem(notesMap.get(note.getId()));
+                    note.setLabels(labels);
+                    return note;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
