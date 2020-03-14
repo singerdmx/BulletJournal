@@ -22,6 +22,7 @@ public class NoteController {
 
     protected static final String NOTES_ROUTE = "/api/projects/{projectId}/notes";
     protected static final String NOTE_ROUTE = "/api/notes/{noteId}";
+    protected static final String NOTE_SET_LABELS_ROUTE = "/api/notes/{noteId}/setLabels";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -67,6 +68,13 @@ public class NoteController {
     public List<Note> updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
         this.noteDaoJpa.updateUserNotes(projectId, notes);
         return getNotes(projectId);
+    }
+
+    @PutMapping(NOTE_SET_LABELS_ROUTE)
+    public Note setLabels(@NotNull @PathVariable Long noteId,
+                          @NotNull @RequestBody List<Long> labels) {
+        this.noteDaoJpa.setLabels(noteId, labels);
+        return getNote(noteId);
     }
 
 }
