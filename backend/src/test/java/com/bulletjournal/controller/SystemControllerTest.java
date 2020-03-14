@@ -66,7 +66,11 @@ public class SystemControllerTest {
         List<Task> remindingTasks = systemUpdates.getReminders();
 
         assertEquals(4, systemUpdates.getReminders().size());
+
+        // Check if t1, t2, t3, t4 in the reminding tasks
         assertIfContains(remindingTasks, t1, t2, t3, t4);
+
+        // Check if t5 not in the reminding tasks
         assertIfNotContains(remindingTasks, t5);
 
         deleteTask(t1);
@@ -75,7 +79,11 @@ public class SystemControllerTest {
         remindingTasks = systemUpdates.getReminders();
 
         assertEquals(3, systemUpdates.getReminders().size());
+
+        // Check if t2, t3, t4 in the reminding tasks
         assertIfContains(remindingTasks, t2, t3, t4);
+
+        // Check if t5 not in the reminding tasks
         assertIfNotContains(remindingTasks, t5);
 
         String remindingTaskEtag = systemUpdates.getRemindingTaskEtag();
