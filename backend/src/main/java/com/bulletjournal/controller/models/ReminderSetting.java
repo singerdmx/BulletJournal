@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 public class ReminderSetting {
 
@@ -61,5 +62,20 @@ public class ReminderSetting {
 
     public boolean hasBefore() {
         return this.before != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReminderSetting)) return false;
+        ReminderSetting that = (ReminderSetting) o;
+        return Objects.equals(getDate(), that.getDate()) &&
+                Objects.equals(getTime(), that.getTime()) &&
+                Objects.equals(getBefore(), that.getBefore());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDate(), getTime(), getBefore());
     }
 }
