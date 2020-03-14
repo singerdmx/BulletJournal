@@ -11,7 +11,6 @@ import {
   Weekly
 } from './interface';
 import { MONTHS } from './constants';
-import { IState } from '../../store';
 
 export type End = {
   count?: any;

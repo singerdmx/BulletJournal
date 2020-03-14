@@ -79,6 +79,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
       <div className='todo-list'>
         <div className='todo-panel'>
           <RangePicker
+            allowClear={false}
             value={[
               moment(
                 this.props.startDate

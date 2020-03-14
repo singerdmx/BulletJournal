@@ -5,7 +5,6 @@ import RepeatMonthly from './RepeatMonthly';
 import RepeatWeekly from './RepeatWeekly';
 import RepeatDaily from './RepeatDaily';
 import RepeatHourly from './RepeatHourly';
-import moment from 'moment';
 //used for redux
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
