@@ -7,6 +7,7 @@ import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -54,7 +55,7 @@ public class UserDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User getByName(String name) {
-        if(name == null) {
+        if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("Missing username");
         }
 
