@@ -36,7 +36,8 @@
     "redux-saga": "^1.1.1",
     "redux-starter-kit": "^1.0.1",
     "rrule": "^2.6.4",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "uuid": "^7.0.2"
   },
   "scripts": {
     "start": "react-app-rewired start",
