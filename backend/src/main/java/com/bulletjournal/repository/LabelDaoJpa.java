@@ -3,8 +3,6 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.Project;
-import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
