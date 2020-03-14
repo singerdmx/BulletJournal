@@ -5,7 +5,10 @@ import com.bulletjournal.controller.models.CreateTransactionParams;
 import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveTransactionEvent;
+import com.bulletjournal.notifications.UpdateTransactionPayerEvent;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import java.util.List;
 public class TransactionController {
     protected static final String TRANSACTIONS_ROUTE = "/api/projects/{projectId}/transactions";
     protected static final String TRANSACTION_ROUTE = "/api/transactions/{transactionId}";
+    protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -73,5 +77,12 @@ public class TransactionController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTransactionEvent(events, username));
         }
+    }
+
+    @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
+    public Transaction setLabels(@NotNull @PathVariable Long transactionId,
+                          @NotNull @RequestBody List<Long> labels) {
+        this.transactionDaoJpa.setLabels(transactionId, labels);
+        return getTransaction(transactionId);
     }
 }

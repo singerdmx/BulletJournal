@@ -8,10 +8,7 @@ import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.repository.models.Label;
-import com.bulletjournal.repository.models.Note;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -119,24 +116,34 @@ public class LabelDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<ProjectItems> getItemsByLabels(String timezone, List<Long> labels) {
-        Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
+    public List<ProjectItems> getItemsByLabels(String timezone, List<Long> labels, String requester) {
+        List<Label> l = this.labelRepository.findAllById(labels);
 
+        Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
         List<Task> tasks = this.taskRepository.findTasksByLabelIds(labels);
+        List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelIds(labels);
+        List<Note> notes = this.noteRepository.findNotesByLabelIds(labels);
+
+        if (l.stream().filter(label -> !label.getOwner().equals(requester)).findAny().isPresent()) {
+            tasks = filter(tasks, requester);
+            transactions = filter(transactions, requester);
+            notes = filter(notes, requester);
+        }
+
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
-
-        List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelIds(labels);
         Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
-
-        List<Note> notes = this.noteRepository.findNotesByLabelIds(labels);
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
-
-        //Map<Long, Pro>
-        //projectItemsMap.values().stream()
-
         return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+    }
+
+    private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester) {
+        return projectItems.stream().filter(
+                item -> item.getProject().getGroup().getUsers().stream().filter(
+                        u -> requester.equals(u.getUser().getName())
+                ).findAny().isPresent()
+        ).collect(Collectors.toList());
     }
 }

@@ -72,6 +72,6 @@ public class LabelController {
     public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         User user = this.userDaoJpa.getByName(username);
-        return this.labelDaoJpa.getItemsByLabels(user.getTimezone(), labels);
+        return this.labelDaoJpa.getItemsByLabels(user.getTimezone(), labels, username);
     }
 }
