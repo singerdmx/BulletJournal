@@ -65,6 +65,7 @@ public class LabelController {
 
     @GetMapping(ITEMS_ROUTE)
     public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
-        return this.labelDaoJpa.getItemsByLabels(labels);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.labelDaoJpa.getItemsByLabels(username, labels);
     }
 }

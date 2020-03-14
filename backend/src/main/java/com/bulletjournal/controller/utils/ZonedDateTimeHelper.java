@@ -56,7 +56,8 @@ public class ZonedDateTimeHelper {
      * Convert Date String to ZonedDateTime
      */
     public static ZonedDateTime convertDateAndTime(String date, String time, String timezone) {
-        return convertDateTime(date + DATE_TIME_DELIMITER + time, timezone);
+        return time == null ? convertDateOnly(date, timezone) :
+                convertDateTime(date + DATE_TIME_DELIMITER + time, timezone);
     }
 
     /*
@@ -92,5 +93,21 @@ public class ZonedDateTimeHelper {
                 0,
                 0,
                 now.getZone());
+    }
+
+    /*
+     * 1. Get now ZonedDateTime.
+     * 2. Remove second and nano second.
+     */
+    public static ZonedDateTime getNow(String timezone) {
+        ZonedDateTime now = ZonedDateTime.now();
+        return ZonedDateTime.of(now.getYear(),
+                now.getMonthValue(),
+                now.getDayOfMonth(),
+                now.getHour(),
+                now.getMinute(),
+                0,
+                0,
+                ZoneId.of(timezone));
     }
 }

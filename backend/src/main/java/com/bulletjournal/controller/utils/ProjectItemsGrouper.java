@@ -51,10 +51,12 @@ public class ProjectItemsGrouper {
      *
      * @notes Map<ZonedDateTime, List<Note>> - List of Notes
      */
-    public static Map<ZonedDateTime, List<Note>> groupNotesByDate(List<Note> notes) {
+    public static Map<ZonedDateTime, List<Note>> groupNotesByDate(List<Note> notes, String timezone) {
         Map<ZonedDateTime, List<Note>> map = new HashMap<>();
         if (notes.size() > 0) {
-            map.put(ZonedDateTime.now(), notes);
+            ZonedDateTime zonedDateTime
+                    = timezone == null ? ZonedDateTimeHelper.getNow() : ZonedDateTimeHelper.getNow(timezone);
+            map.put(zonedDateTime, notes);
         }
         return map;
     }
