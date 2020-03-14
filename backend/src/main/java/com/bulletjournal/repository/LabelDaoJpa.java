@@ -124,7 +124,7 @@ public class LabelDaoJpa {
         List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelIds(labels);
         List<Note> notes = this.noteRepository.findNotesByLabelIds(labels);
 
-        if (l.stream().filter(label -> !label.getOwner().equals(requester)).findAny().isPresent()) {
+        if (l.stream().anyMatch(label -> !label.getOwner().equals(requester))) {
             tasks = filter(tasks, requester);
             transactions = filter(transactions, requester);
             notes = filter(notes, requester);
@@ -141,9 +141,8 @@ public class LabelDaoJpa {
 
     private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester) {
         return projectItems.stream().filter(
-                item -> item.getProject().getGroup().getUsers().stream().filter(
-                        u -> requester.equals(u.getUser().getName())
-                ).findAny().isPresent()
+                item -> item.getProject().getGroup().getUsers().stream().anyMatch(
+                        u -> requester.equals(u.getUser().getName()))
         ).collect(Collectors.toList());
     }
 }
