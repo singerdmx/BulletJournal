@@ -12,6 +12,7 @@
     "@types/lodash": "^4.14.149",
     "@types/node": "^12.12.26",
     "@types/redux-logger": "^3.0.7",
+    "@types/uuid": "^7.0.0",
     "antd": "^4.0.0-rc.0",
     "country-code": "0.0.3",
     "flag-icon-css": "^3.4.6",
