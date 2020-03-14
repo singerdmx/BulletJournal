@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.ProjectItemType;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
@@ -108,8 +109,8 @@ public class LabelDaoJpa {
 
         tasks.stream().forEach(
                 task -> task.setLabels(
-                        Arrays.stream(task.getLabels()).filter(id
-                                -> id != labelId).toArray(Long[]::new)));
+                        task.getLabels().stream().filter(id
+                                -> id != labelId).collect(Collectors.toList())));
 
         this.taskRepository.saveAll(tasks);
 
@@ -130,13 +131,25 @@ public class LabelDaoJpa {
             notes = filter(notes, requester);
         }
 
+        Map<ProjectItemType, Map<Long, List<Long>>> labelIds = new HashMap<>();
+        Map<Long, List<Long>> tasklabels = tasks.stream().collect(
+                Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
+        labelIds.put(ProjectItemType.TASK, tasklabels);
+        Map<Long, List<Long>> transactionlabels = transactions.stream().collect(
+                Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
+        labelIds.put(ProjectItemType.TRANSACTION, transactionlabels);
+        Map<Long, List<Long>> notelabels = transactions.stream().collect(
+                Collectors.toMap(n -> n.getId(), n -> n.getLabels()));
+        labelIds.put(ProjectItemType.NOTE, notelabels);
+
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
         Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
-        return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+        List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+        return getLabelsForProjectItems(projectItems, labelIds);
     }
 
     private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester) {
@@ -144,5 +157,42 @@ public class LabelDaoJpa {
                 item -> item.getProject().getGroup().getUsers().stream().anyMatch(
                         u -> requester.equals(u.getUser().getName()))
         ).collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<ProjectItems> getLabelsForProjectItems(
+            List<ProjectItems> projectItems,
+            Map<ProjectItemType, Map<Long, List<Long>>> labelIds) {
+        Map<Long, Label> labelMap = new HashMap<>();
+        projectItems.forEach(p -> {
+            p.getTasks().forEach(t -> labelMap.put(t.getId(), null));
+            p.getTransactions().forEach(t -> labelMap.put(t.getId(), null));
+            p.getNotes().forEach(n -> labelMap.put(n.getId(), null));
+        });
+
+        List<Label> labels = this.labelRepository.findAllById(labelMap.keySet());
+        for (Label label : labels) {
+            labelMap.put(label.getId(), label);
+        }
+
+        projectItems.forEach(p -> {
+            p.getTasks().forEach(t -> t.setLabels(getLabels(labelIds.get(ProjectItemType.TASK).get(t.getId()))));
+            p.getTransactions().forEach(t ->
+                    t.setLabels(getLabels(labelIds.get(ProjectItemType.TRANSACTION).get(t.getId()))));
+            p.getNotes().forEach(t -> t.setLabels(getLabels(labelIds.get(ProjectItemType.NOTE).get(t.getId()))));
+        });
+        return projectItems;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabels(List<Long> labels) {
+        List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
+        if (labels != null && !labels.isEmpty()) {
+            labelsForPresentation = this.labelRepository.findAllById(labels).stream()
+                    .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                    .map(Label::toPresentationModel)
+                    .collect(Collectors.toList());
+        }
+        return labelsForPresentation;
     }
 }

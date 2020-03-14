@@ -16,6 +16,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,10 +92,30 @@ public class ProjectControllerTest {
 
         List<Label> labels = createLabels();
         createTasks(p7, labels);
-        createNotes(p5);
-        createTransactions(p6);
+        createNotes(p5, labels);
+        createTransactions(p6, labels);
 
         getNotifications(notificationsEtag);
+    }
+
+    private void findItemsByLabels(List<Label> labels, List<ProjectItems> expectedItems) {
+        String url = ROOT_URL + randomServerPort + LabelController.ITEMS_ROUTE;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("labels", labels.stream().map(l -> l.getId()).collect(Collectors.toList()));
+        ResponseEntity<ProjectItems[]> response = this.restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                null,
+                ProjectItems[].class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        List<ProjectItems> items = Arrays.asList(response.getBody());
+        for (int i = 0; i < expectedItems.size(); i++) {
+            assertEquals(expectedItems.get(i).getNotes(), items.get(i).getNotes());
+            assertEquals(expectedItems.get(i).getTasks(), items.get(i).getTasks());
+            assertEquals(expectedItems.get(i).getTransactions(), items.get(i).getTransactions());
+        }
     }
 
     private List<Label> createLabels() {
@@ -122,11 +143,22 @@ public class ProjectControllerTest {
         return labels;
     }
 
-    private void createTransactions(Project p) {
+    private void createTransactions(Project p, List<Label> labels) {
         Transaction transaction1 = createTransaction(p, "transaction1", "2020-03-03");
         Transaction transaction2 = createTransaction(p, "transaction2", "2020-03-04");
         Transaction transaction3 = createTransaction(p, "transaction3", "2020-03-05");
         transaction1 = updateTransaction(transaction1);
+
+        // Attach Labels to transactions
+        ResponseEntity<Transaction> setLabelResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTION_SET_LABELS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(labels.stream().map(l -> l.getId()).collect(Collectors.toList())),
+                Transaction.class,
+                transaction3.getId());
+        assertEquals(HttpStatus.OK, setLabelResponse.getStatusCode());
+        transaction3 = setLabelResponse.getBody();
+        assertEquals(labels.size(), transaction3.getLabels().size());
 
         // Get transactions
         ResponseEntity<Transaction[]> transactionsResponse = this.restTemplate.exchange(
@@ -164,12 +196,24 @@ public class ProjectControllerTest {
         deleteTransactions(p, transaction1, transaction3);
     }
 
-    private void createNotes(Project p) {
+    private void createNotes(Project p, List<Label> labels) {
         Note note1 = createNote(p, "test111");
         Note note2 = createNote(p, "test2");
         Note note3 = createNote(p, "test3");
         updateNoteRelations(p, note1, note2, note3);
         updateNote(note1);
+
+        // Attach Labels to notes
+        ResponseEntity<Note> setLabelResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTE_SET_LABELS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(labels.stream().map(l -> l.getId()).collect(Collectors.toList())),
+                Note.class,
+                note2.getId());
+        assertEquals(HttpStatus.OK, setLabelResponse.getStatusCode());
+        note2 = setLabelResponse.getBody();
+        assertEquals(labels.size(), note2.getLabels().size());
+
         deleteNote(note1);
     }
 
@@ -261,16 +305,16 @@ public class ProjectControllerTest {
         return created;
     }
 
-    private Note getNote(Note note1) {
+    private Note getNote(Note note) {
         ResponseEntity<Note> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
                 HttpMethod.GET,
                 null,
                 Note.class,
-                note1.getId());
+                note.getId());
         Note outputNote = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(note1.getName(), outputNote.getName());
+        assertEquals(note.getName(), outputNote.getName());
         return outputNote;
     }
 
@@ -360,6 +404,10 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, setLabelResponse.getStatusCode());
         t1 = setLabelResponse.getBody();
         assertEquals(labels.size(), t1.getLabels().size());
+
+        ProjectItems projectItems = new ProjectItems();
+        projectItems.setTasks(ImmutableList.of(t1));
+        findItemsByLabels(labels, ImmutableList.of(projectItems));
 
         // Get Tasks
         ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(

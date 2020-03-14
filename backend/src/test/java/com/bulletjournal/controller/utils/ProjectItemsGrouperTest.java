@@ -10,10 +10,7 @@ import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -221,7 +218,8 @@ public class ProjectItemsGrouperTest {
         return transaction;
     }
 
-    private Task getTask(Long id, String assignedTo, String dueDate, String dueTime, String timezone, String name, Integer duration, Project project, Long[] labels, ReminderSetting reminderSetting) {
+    private Task getTask(Long id, String assignedTo, String dueDate, String dueTime, String timezone, String name,
+                         Integer duration, Project project, List<Long> labels, ReminderSetting reminderSetting) {
         Task task = new Task();
         task.setId(id);
         task.setAssignedTo(assignedTo);

@@ -5,6 +5,9 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Parent class for items under a project.
@@ -28,12 +31,15 @@ public abstract class ProjectItemModel extends OwnedModel {
     )
     private Long[] labels;
 
-    public Long[] getLabels() {
-        return labels;
+    public List<Long> getLabels() {
+        if (this.labels == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(this.labels);
     }
 
-    public void setLabels(Long[] labels) {
-        this.labels = labels;
+    public void setLabels(List<Long> labels) {
+        this.labels = labels == null ? null : labels.stream().toArray(Long[]::new);
     }
 
     public Project getProject() {
