@@ -26,6 +26,7 @@ public class TaskController {
 
     protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
+    protected static final String COMPLETED_TASK_ROUTE = "/api/completeTasks/{taskId}";
     protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
     protected static final String UNCOMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/uncomplete";
     protected static final String COMPLETED_TASKS_ROUTE = "/api/projects/{projectId}/completedTasks";
@@ -56,8 +57,8 @@ public class TaskController {
         return this.taskDaoJpa.getTask(taskId);
     }
 
-    @GetMapping(COMPLETE_TASK_ROUTE)
-    public Task getCompleteTask(@NotNull @PathVariable Long taskId) {
+    @GetMapping(COMPLETED_TASK_ROUTE)
+    public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
         return this.taskDaoJpa.getCompletedTask(taskId);
     }
 
@@ -90,7 +91,7 @@ public class TaskController {
     public Task completeTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         CompletedTask task = this.taskDaoJpa.complete(username, taskId);
-        return getCompleteTask(task.getId());
+        return getCompletedTask(task.getId());
     }
 
     @PostMapping(UNCOMPLETE_TASK_ROUTE)

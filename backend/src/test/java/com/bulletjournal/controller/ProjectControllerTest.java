@@ -355,16 +355,16 @@ public class ProjectControllerTest {
         assertEquals(t1, tasks.get(0));
         assertEquals(0, tasks.get(0).getSubTasks().size());
 
-        ResponseEntity<Task> completedTaskResponse = this.restTemplate.exchange(
+        ResponseEntity<Task> completeTaskResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.COMPLETE_TASK_ROUTE,
                 HttpMethod.POST,
                 null,
                 Task.class,
                 t1.getId());
 
-        assertEquals(HttpStatus.OK, completedTaskResponse.getStatusCode());
-        assertNotNull(completedTaskResponse.getBody());
-        Task completedTask = completedTaskResponse.getBody();
+        assertEquals(HttpStatus.OK, completeTaskResponse.getStatusCode());
+        assertNotNull(completeTaskResponse.getBody());
+        Task completedTask = completeTaskResponse.getBody();
         assertEquals(t1.getName(), completedTask.getName());
         assertEquals(t1.getTimezone(), completedTask.getTimezone());
         assertEquals(t1.getLabels(), completedTask.getLabels());
