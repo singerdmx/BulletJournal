@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Task {
-    @Expose
-    private Long id;
+public class Task extends ProjectItem {
 
     @NotBlank
     @Size(min = 1, max = 100)
@@ -28,18 +26,10 @@ public class Task {
     @NotBlank
     private String timezone;
 
-    @NotNull
-    private String name;
-
     // In minutes
     private Integer duration;
 
-    @NotNull
-    private Long projectId;
-
     private ReminderSetting reminderSetting;
-
-    private List<Label> labels;
 
     @Expose
     @Valid
@@ -58,26 +48,15 @@ public class Task {
                 @NotNull Project project,
                 List<Label> labels,
                 ReminderSetting reminderSetting) {
-        this.id = id;
+        super(id, name, project, labels);
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.timezone = timezone;
-        this.name = name;
         this.duration = duration;
-        this.projectId = project.getId();
-        this.labels = labels;
         if (reminderSetting.hasBefore() || reminderSetting.hasDate()) {
             this.reminderSetting = reminderSetting;
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getAssignedTo() {
@@ -112,13 +91,6 @@ public class Task {
         this.timezone = timezone;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Integer getDuration() {
         return duration;
@@ -126,14 +98,6 @@ public class Task {
 
     public void setDuration(Integer duration) {
         this.duration = duration;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
     }
 
     public ReminderSetting getReminderSetting() {
@@ -160,44 +124,35 @@ public class Task {
         this.subTasks.add(task);
     }
 
-    public List<Label> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(List<Label> labels) {
-        this.labels = labels;
-    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Task)) return false;
+        if (!super.equals(o)) return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) &&
-                Objects.equals(assignedTo, task.assignedTo) &&
-                Objects.equals(dueDate, task.dueDate) &&
-                Objects.equals(dueTime, task.dueTime) &&
-                Objects.equals(timezone, task.timezone) &&
-                Objects.equals(name, task.name) &&
-                Objects.equals(labels, task.labels) &&
-                Objects.equals(projectId, task.projectId);
+        return Objects.equals(getAssignedTo(), task.getAssignedTo()) &&
+                Objects.equals(getDueDate(), task.getDueDate()) &&
+                Objects.equals(getDueTime(), task.getDueTime()) &&
+                Objects.equals(getTimezone(), task.getTimezone()) &&
+                Objects.equals(getDuration(), task.getDuration()) &&
+                Objects.equals(getReminderSetting(), task.getReminderSetting()) &&
+                Objects.equals(getSubTasks(), task.getSubTasks());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, assignedTo, dueDate, dueTime, timezone, name, projectId, subTasks, labels);
+        return Objects.hash(super.hashCode(), getAssignedTo(), getDueDate(),
+                getDueTime(), getTimezone(), getDuration(), getReminderSetting(), getSubTasks());
     }
 
     public void clone(Task task) {
-        this.setId(task.getId());
+        super.clone(task);
         this.setAssignedTo(task.getAssignedTo());
         this.setDueDate(task.getDueDate());
         this.setDueTime(task.getDueTime());
         this.setTimezone(task.getTimezone());
-        this.setName(task.getName());
         this.setDuration(task.getDuration());
-        this.setProjectId(task.getProjectId());
-        this.setLabels(task.getLabels());
         if (task.hasReminderSetting() &&
                 (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate())) {
             this.setReminderSetting(task.getReminderSetting());

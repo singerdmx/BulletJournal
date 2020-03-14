@@ -8,17 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.*;
 
-public class Note {
-    @Expose
-    private Long id;
-
-    @NotNull
-    private String name;
-
-    @NotNull
-    private Long projectId;
-
-    private List<Label> labels;
+public class Note extends ProjectItem {
 
     @Expose
     @Valid
@@ -31,35 +21,9 @@ public class Note {
                 @NotNull String name,
                 @NotNull Project project,
                 List<Label> labels) {
-        this.id = id;
-        this.name = name;
-        this.projectId = project.getId();
-        this.labels = labels;
+        super(id, name, project, labels);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
 
     public List<Note> getSubNotes() {
         return subNotes;
@@ -73,32 +37,17 @@ public class Note {
         this.subNotes.add(note);
     }
 
-    public List<Label> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(List<Label> labels) {
-        this.labels = labels;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Note)) return false;
+        if (!super.equals(o)) return false;
         Note note = (Note) o;
-        return Objects.equals(id, note.id) &&
-                Objects.equals(name, note.name) &&
-                Objects.equals(projectId, note.projectId);
+        return Objects.equals(getSubNotes(), note.getSubNotes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, projectId, subNotes);
-    }
-
-    public void clone(Note note) {
-        this.setId(note.getId());
-        this.setName(note.getName());
-        this.setProjectId(note.getProjectId());
+        return Objects.hash(super.hashCode(), getSubNotes());
     }
 }

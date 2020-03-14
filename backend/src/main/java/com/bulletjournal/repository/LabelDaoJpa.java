@@ -134,6 +134,9 @@ public class LabelDaoJpa {
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
 
+        //Map<Long, Pro>
+        //projectItemsMap.values().stream()
+
         return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
     }
 }

@@ -8,16 +8,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
 
-public class Transaction {
-    private Long id;
-
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String name;
-
-    @NotNull
-    private Long projectId;
-
+public class Transaction extends ProjectItem {
     @NotBlank
     @Size(min = 2, max = 100)
     private String payer;
@@ -37,8 +28,6 @@ public class Transaction {
     @NotBlank
     private String timezone;
 
-    private List<Label> labels;
-
     public Transaction() {
     }
 
@@ -52,40 +41,13 @@ public class Transaction {
                        @NotNull String timezone,
                        @NotNull Integer transactionType,
                        List<Label> labels) {
-        this.id = id;
-        this.name = name;
-        this.projectId = project.getId();
+        super(id, name, project, labels);
         this.payer = payer;
         this.amount = amount;
         this.date = date;
         this.time = time;
         this.timezone = timezone;
         this.transactionType = transactionType;
-        this.labels = labels;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
     }
 
     public String getPayer() {
@@ -136,28 +98,22 @@ public class Transaction {
         this.transactionType = transactionType;
     }
 
-    public List<Label> getLabels() { return labels; }
-
-    public void setLabels(List<Label> labels) { this.labels = labels; }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Transaction)) return false;
+        if (!super.equals(o)) return false;
         Transaction that = (Transaction) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(projectId, that.projectId) &&
-                Objects.equals(payer, that.payer) &&
-                Objects.equals(amount, that.amount) &&
-                Objects.equals(date, that.date) &&
-                Objects.equals(transactionType, that.transactionType) &&
-                Objects.equals(time, that.time) &&
-                Objects.equals(timezone, that.timezone);
+        return Objects.equals(getPayer(), that.getPayer()) &&
+                Objects.equals(getAmount(), that.getAmount()) &&
+                Objects.equals(getDate(), that.getDate()) &&
+                Objects.equals(getTransactionType(), that.getTransactionType()) &&
+                Objects.equals(getTime(), that.getTime()) &&
+                Objects.equals(getTimezone(), that.getTimezone());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, projectId, payer, amount, date, transactionType, time, timezone);
+        return Objects.hash(super.hashCode(), getPayer(), getAmount(), getDate(), getTransactionType(), getTime(), getTimezone());
     }
 }
