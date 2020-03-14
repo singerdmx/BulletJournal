@@ -49,8 +49,9 @@ public class MDCFilter implements Filter {
 
     private String extractRequestId(HttpServletRequest request) {
         final String token;
-        if (!StringUtils.isEmpty(request.getHeader(mdcConfig.getDefaultRequestIdKey()))) {
-            token = request.getHeader("requestId");
+        String requestId = request.getHeader(mdcConfig.getDefaultRequestIdKey());
+        if (!StringUtils.isEmpty(requestId)) {
+            token = requestId;
         } else {
             token = UUID.randomUUID().toString().toUpperCase().replace("-", "");
         }
