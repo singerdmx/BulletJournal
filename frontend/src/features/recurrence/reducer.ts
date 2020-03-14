@@ -11,6 +11,7 @@ import {
   Weekly
 } from './interface';
 import { MONTHS } from './constants';
+import { IState } from '../../store';
 
 export type End = {
   count?: any;
@@ -72,15 +73,13 @@ export type YearlyOnAction = {
 };
 
 let initialState = {
-  startDate: moment(
-    new Date().toLocaleString('fr-CA', { timeZone: 'America/New_York' }),
+  startDate: moment(new Date().toLocaleString('fr-CA'), 'YYYY-MM-DD').format(
     'YYYY-MM-DD'
-  ).format('YYYY-MM-DD'),
-  endDate: moment(
-    new Date().toLocaleString('fr-CA', { timeZone: 'America/New_York' }),
+  ),
+  endDate: moment(new Date().toLocaleString('fr-CA'), 'YYYY-MM-DD').format(
     'YYYY-MM-DD'
-  ).format('YYYY-MM-DD'),
-  endCount: 0,
+  ),
+  endCount: 1,
   repeatHourly: { interval: 1 } as Hourly,
   repeatDaily: { interval: 1 } as Daily,
   yearlyOn: true,
@@ -95,7 +94,7 @@ let initialState = {
     day: 1
   } as MonthlyOn,
   repeatMonthlyOnThe: {
-    day: 'Jan',
+    day: 'Monday',
     which: 'First'
   } as MonthlyOnThe,
   repeatMonthlyCount: 1,
@@ -148,7 +147,8 @@ const slice = createSlice({
       if (mode === 'After') {
         end.count = endCount;
       } else if (mode === 'On date') {
-        end.until = moment(endDate).format();
+        //end until use date type because .toText only recognize Date() type
+        end.until = new Date(endDate);
       }
       state.end = end;
       state.rRuleString = new RRule({
@@ -162,6 +162,7 @@ const slice = createSlice({
       state.repeatHourly = repeatHourly;
       //update rrule end string here
       const repeat = { freq: RRule.HOURLY, interval: repeatHourly.interval };
+      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,
@@ -173,6 +174,7 @@ const slice = createSlice({
       state.repeatDaily = repeatDaily;
       //update rrule end string here
       const repeat = { freq: RRule.DAILY, interval: repeatDaily.interval };
+      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,
@@ -191,6 +193,7 @@ const slice = createSlice({
         bymonth: MONTHS.indexOf(repeatYearlyOn.month) + 1,
         bymonthday: repeatYearlyOn.day
       };
+      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,

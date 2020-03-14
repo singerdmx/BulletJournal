@@ -8,6 +8,7 @@ import { updateEndString } from '../../actions';
 const { Option } = Select;
 
 type EndProps = {
+  timezone: string;
   endDate: string;
   updateEndString: (mode: string, endDate: string, endCount: number) => void;
   endCount: number;
@@ -20,6 +21,17 @@ type SelectState = {
 class End extends React.Component<EndProps, SelectState> {
   state: SelectState = {
     value: 'Never'
+  };
+
+  componentDidMount = () => {
+    const initEndDate = moment(
+      new Date().toLocaleString(
+        'fr-CA',
+        this.props.timezone ? { timeZone: this.props.timezone } : {}
+      ),
+      'YYYY-MM-DD'
+    ).format('YYYY-MM-DD');
+    this.props.updateEndString('', initEndDate, this.props.endCount);
   };
 
   onChangeValue = (value: string) => {
@@ -65,6 +77,7 @@ class End extends React.Component<EndProps, SelectState> {
           <DatePicker
             value={this.props.endDate ? moment(this.props.endDate) : null}
             onChange={this.onChangeDate}
+            allowClear={false}
           />
         ) : this.state.value === 'After' ? (
           <div style={{ width: '40%', display: 'flex', alignItems: 'center' }}>
@@ -81,6 +94,7 @@ class End extends React.Component<EndProps, SelectState> {
 }
 const mapStateToProps = (state: IState) => ({
   endDate: state.rRule.endDate,
-  endCount: state.rRule.endCount
+  endCount: state.rRule.endCount,
+  timezone: state.settings.timezone
 });
 export default connect(mapStateToProps, { updateEndString })(End);

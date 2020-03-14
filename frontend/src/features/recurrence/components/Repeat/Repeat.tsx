@@ -5,6 +5,7 @@ import RepeatMonthly from './RepeatMonthly';
 import RepeatWeekly from './RepeatWeekly';
 import RepeatDaily from './RepeatDaily';
 import RepeatHourly from './RepeatHourly';
+import moment from 'moment';
 //used for redux
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
@@ -20,6 +21,7 @@ import {
 } from '../../interface';
 //used for action
 import {
+  updateStartString,
   updateRepeatYearlyOn,
   updateRepeatYearlyOnThe,
   updateRepeatDaily,
@@ -31,6 +33,7 @@ import {
 const { Option } = Select;
 
 type RepeatProps = {
+  startDate: string;
   repeatHourly: any;
   repeatDaily: any;
   repeatWeekly: any;
@@ -40,6 +43,7 @@ type RepeatProps = {
   repeatYearlyOn: any;
   monthlyOn: boolean;
   yearlyOn: boolean;
+  updateStartString: (startDate: any) => void;
   updateRepeatYearlyOn: (repeatYearlyOn: YearlyOn) => void;
   updateRepeatYearlyOnThe: (repeatYearlyOnThe: YearlyOnThe) => void;
   updateRepeatMonthlyOn: (repeatMonthlyOn: MonthlyOn) => void;
@@ -56,6 +60,11 @@ type SelectState = {
 class Repeat extends React.Component<RepeatProps, SelectState> {
   state: SelectState = {
     value: 'Yearly'
+  };
+
+  componentDidMount = () => {
+    this.props.updateStartString(this.props.startDate);
+    this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
   };
 
   onChangeValue = (value: string) => {
@@ -112,6 +121,7 @@ class Repeat extends React.Component<RepeatProps, SelectState> {
 }
 
 const mapStateToProps = (state: IState) => ({
+  startDate: state.rRule.startDate,
   monthlyOn: state.rRule.monthlyOn,
   yearlyOn: state.rRule.yearlyOn,
   repeatYearlyOn: state.rRule.repeatYearlyOn,
@@ -123,6 +133,7 @@ const mapStateToProps = (state: IState) => ({
   repeatHourly: state.rRule.repeatHourly
 });
 export default connect(mapStateToProps, {
+  updateStartString,
   updateRepeatYearlyOn,
   updateRepeatYearlyOnThe,
   updateRepeatDaily,
