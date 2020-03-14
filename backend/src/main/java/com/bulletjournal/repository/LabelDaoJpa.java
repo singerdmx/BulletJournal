@@ -8,7 +8,10 @@ import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.Label;
+import com.bulletjournal.repository.models.Note;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -36,9 +39,6 @@ public class LabelDaoJpa {
 
     @Autowired
     private AuthorizationService authorizationService;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Label create(String name, String owner, String icon) {
@@ -119,19 +119,8 @@ public class LabelDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<ProjectItems> getItemsByLabels(String requester, List<Long> labels) {
+    public List<ProjectItems> getItemsByLabels(String timezone, List<Long> labels) {
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
-
-        List<User> userList = this.userRepository.findByName(requester);
-        if (userList.isEmpty()) {
-            throw new ResourceNotFoundException("User " + requester + " does not exist");
-        }
-
-        if (userList.size() > 1) {
-            throw new IllegalStateException("More than one user " + requester + " exist");
-        }
-
-        String timezone = userList.get(0).getTimezone();
 
         List<Task> tasks = this.taskRepository.findTasksByLabelIds(labels);
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks);

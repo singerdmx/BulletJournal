@@ -6,6 +6,8 @@ import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.repository.LabelDaoJpa;
+import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.repository.models.User;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,9 @@ public class LabelController {
 
     @Autowired
     private LabelDaoJpa labelDaoJpa;
+
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     @PostMapping(LABELS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -66,6 +71,7 @@ public class LabelController {
     @GetMapping(ITEMS_ROUTE)
     public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.labelDaoJpa.getItemsByLabels(username, labels);
+        User user = this.userDaoJpa.getByName(username);
+        return this.labelDaoJpa.getItemsByLabels(user.getTimezone(), labels);
     }
 }

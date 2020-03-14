@@ -54,6 +54,10 @@ public class UserDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User getByName(String name) {
+        if(name == null) {
+            throw new IllegalArgumentException("Missing username");
+        }
+
         List<User> userList = this.userRepository.findByName(name);
         if (userList.isEmpty()) {
             throw new ResourceNotFoundException("User " + name + " does not exist");
