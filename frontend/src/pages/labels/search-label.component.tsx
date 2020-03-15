@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { Form, Select, PageHeader, Tag, Button } from 'antd';
-import { Label, stringToRGB } from '../../features/label/interface';
+import { Form, Select, PageHeader, Button } from 'antd';
+import { Label } from '../../features/label/interface';
 import { getItemsByLabels } from '../../features/label/actions';
 import { IState } from '../../store';
 import { SearchOutlined } from '@ant-design/icons';
@@ -23,9 +23,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
       props.getItemsByLabels(values.selectLabels);
     });
   };
-  const tagsRender = (props: any) => {
-    console.log(props);
-  };
+
   return (
     <div className="labels-search-container">
       <PageHeader
@@ -37,7 +35,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
         <Form form={form} layout="inline" onFinish={handleSearch}>
           <Form.Item
             name="selectLabels"
-            rules={[{ required: true, message: 'Please input Label Name!' }]}
+            rules={[{ required: true, message: 'Please choose Label(s)' }]}
             style={{ flex: 5 }}
           >
             <Select mode="multiple">

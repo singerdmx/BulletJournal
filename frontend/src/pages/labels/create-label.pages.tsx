@@ -92,7 +92,7 @@ const Labels: React.FC<LabelsProps> = props => {
           <Form.Item
             style={{ flex: 1 }}
             name="labelIcon"
-            rules={[{ required: true, message: 'Please input Label Name!' }]}
+            rules={[{ required: true, message: 'Choose Icon' }]}
           >
             <Select bordered={false} onSelect={() => setFocus(true)}>
               {iconOptions}
@@ -100,7 +100,7 @@ const Labels: React.FC<LabelsProps> = props => {
           </Form.Item>
           <Form.Item
             name="labelName"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: 'Specify Label Name' }]}
             style={{ flex: 7 }}
           >
             <Input
