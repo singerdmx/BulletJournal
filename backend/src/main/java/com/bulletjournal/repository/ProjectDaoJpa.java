@@ -225,22 +225,20 @@ public class ProjectDaoJpa {
         return this.projectRepository.save(project);
     }
 
-    private void generateEvents(List<Event> joined, List<Event> removed, Project project, Set<String> oldUsers, Set<String> newUsers){
+    private void generateEvents(List<Event> joined, List<Event> removed, Project project, Set<String> oldUsers, Set<String> newUsers) {
         Set<String> newJoins = new HashSet<>(newUsers);
         newJoins.retainAll(oldUsers);
-        for(String user : oldUsers){
-            if(!newJoins.contains(user)){
+        for (String user : oldUsers) {
+            if (!newJoins.contains(user)) {
                 removed.add(new Event(user, project.getId(), project.getName()));
             }
         }
-        for(String user : newUsers){
-            if(!newJoins.contains(user)){
+        for (String user : newUsers) {
+            if (!newJoins.contains(user)) {
                 joined.add(new Event(user, project.getId(), project.getName()));
             }
         }
     }
-
-
 
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

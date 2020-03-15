@@ -4,13 +4,13 @@ import com.bulletjournal.contents.ContentType;
 
 import java.util.List;
 
-public class RemoveFromProjectEvent extends Informed{
+public class RemoveFromProjectEvent extends Informed {
 
-    public RemoveFromProjectEvent(Event event, String originator){
+    public RemoveFromProjectEvent(Event event, String originator) {
         super(event, originator);
     }
 
-    public RemoveFromProjectEvent(List<Event> events, String originator){
+    public RemoveFromProjectEvent(List<Event> events, String originator) {
         super(events, originator);
     }
 

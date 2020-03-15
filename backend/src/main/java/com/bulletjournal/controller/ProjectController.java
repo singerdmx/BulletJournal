@@ -90,10 +90,10 @@ public class ProjectController {
         List<Event> joined = new ArrayList<>();
         List<Event> removed = new ArrayList<>();
         this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams, joined, removed);
-        if(!joined.isEmpty()){
+        if (!joined.isEmpty()) {
             this.notificationService.inform(new JoinProjectEvent(joined, username));
         }
-        if(!removed.isEmpty()){
+        if (!removed.isEmpty()) {
             this.notificationService.inform(new RemoveFromProjectEvent(removed, username));
         }
         return getProject(projectId);

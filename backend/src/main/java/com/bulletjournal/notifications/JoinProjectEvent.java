@@ -2,18 +2,15 @@ package com.bulletjournal.notifications;
 
 import com.bulletjournal.contents.ContentType;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-public class JoinProjectEvent extends Informed{
-    
+public class JoinProjectEvent extends Informed {
 
-    public JoinProjectEvent(Event event, String originator){
+    public JoinProjectEvent(Event event, String originator) {
         super(event, originator);
     }
 
-    public JoinProjectEvent(List<Event> events, String originator){
+    public JoinProjectEvent(List<Event> events, String originator) {
         super(events, originator);
     }
 
