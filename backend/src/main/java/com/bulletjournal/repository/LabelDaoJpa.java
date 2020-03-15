@@ -138,7 +138,7 @@ public class LabelDaoJpa {
         Map<Long, List<Long>> transactionlabels = transactions.stream().collect(
                 Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
         labelIds.put(ProjectItemType.TRANSACTION, transactionlabels);
-        Map<Long, List<Long>> notelabels = transactions.stream().collect(
+        Map<Long, List<Long>> notelabels = notes.stream().collect(
                 Collectors.toMap(n -> n.getId(), n -> n.getLabels()));
         labelIds.put(ProjectItemType.NOTE, notelabels);
 

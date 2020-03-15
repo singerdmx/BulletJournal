@@ -160,6 +160,10 @@ public class ProjectControllerTest {
         transaction3 = setLabelResponse.getBody();
         assertEquals(labels.size(), transaction3.getLabels().size());
 
+        ProjectItems projectItems = new ProjectItems();
+        projectItems.setTransactions(ImmutableList.of(transaction3));
+        findItemsByLabels(labels, ImmutableList.of(projectItems));
+
         // Get transactions
         ResponseEntity<Transaction[]> transactionsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
@@ -213,6 +217,10 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, setLabelResponse.getStatusCode());
         note2 = setLabelResponse.getBody();
         assertEquals(labels.size(), note2.getLabels().size());
+
+        ProjectItems projectItems = new ProjectItems();
+        projectItems.setNotes(ImmutableList.of(note2));
+        findItemsByLabels(labels, ImmutableList.of(projectItems));
 
         deleteNote(note1);
     }
