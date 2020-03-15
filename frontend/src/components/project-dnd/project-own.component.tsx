@@ -123,10 +123,18 @@ const onDrop = (notes: Project[], updateProject: Function) => (info: any) => {
   const targetNote = findNoteById(notes, projectId);
   const dropPos = info.node.props.pos.split('-');
   const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+  const droppingIndex = info.dropPosition+1;
   const dragNotes = dragNoteById(notes, parseInt(info.dragNode.key));
   let resProjects = [] as Project[];
   if(dropPosition===-1){
-    resProjects = [...dragNotes, targetNote];
+    const dragIndex = notes.findIndex(note=>note.id===targetNote.id);
+    if(dragIndex>=droppingIndex){
+      dragNotes.splice(droppingIndex, 0, targetNote);
+      resProjects = dragNotes;
+    }else{
+      dragNotes.splice(droppingIndex-1, 0, targetNote);
+      resProjects = dragNotes;
+    }
   }else{
     resProjects = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
   }
@@ -139,7 +147,6 @@ const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
 
     return (<div style={{marginLeft: '20%'}}><Tree
             className="ant-tree"
-            multiple
             draggable
             blockNode
             onDragEnter={onDragEnter}
