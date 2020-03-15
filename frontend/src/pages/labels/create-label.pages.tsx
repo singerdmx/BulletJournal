@@ -14,7 +14,8 @@ import {
   Button,
   Modal,
   Select,
-  message
+  message,
+  Tooltip
 } from 'antd';
 import { iconOptions, icons } from '../../assets/icons/index';
 import {
@@ -120,11 +121,13 @@ const Labels: React.FC<LabelsProps> = props => {
       <div className="labels-container">
         <div className="labels-control">
           <div className="label-search">
-            <Button
-              shape="circle"
-              icon={<SearchOutlined />}
-              onClick={props.startSearching}
-            />
+            <Tooltip placement="top" title="Click to search by label(s)">
+              <Button
+                shape="circle"
+                icon={<SearchOutlined />}
+                onClick={props.startSearching}
+              />
+            </Tooltip>
           </div>
         </div>
         <div className="labels-list">
