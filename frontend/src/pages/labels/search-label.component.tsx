@@ -27,8 +27,8 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
   return (
     <div className="labels-search-container">
       <PageHeader
-        title="Search Item With Label"
-        subTitle="Click To Choose Label"
+        title="Search By Label(s)"
+        subTitle="Click to choose label(s)"
         onBack={props.endSearching}
       />
       <div className="label-search-input">
