@@ -161,6 +161,7 @@ const Labels: React.FC<LabelsProps> = props => {
                 className="labels"
                 color={stringToRGB(label.value)}
                 onClick={() => handleEditModal(label)}
+                style={{ cursor: 'pointer' }}
               >
                 {getIcon(label.icon)} &nbsp;
                 {label.value}
@@ -168,6 +169,7 @@ const Labels: React.FC<LabelsProps> = props => {
             );
           })}
         </div>
+        <span>Click to Edit Tag</span>
       </div>
       <Modal
         title={
