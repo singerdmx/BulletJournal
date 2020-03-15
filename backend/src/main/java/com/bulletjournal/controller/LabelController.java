@@ -5,11 +5,13 @@ import com.bulletjournal.controller.models.CreateLabelParams;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.repository.LabelDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,8 +59,13 @@ public class LabelController {
         List<Label> labels = this.labelDaoJpa.getLabels(username)
                 .stream().map(label -> label.toPresentationModel())
                 .collect(Collectors.toList());
+        String labelsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE,
+                labels);
 
-        return ResponseEntity.ok().body(labels);
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setETag(labelsEtag);
+        return ResponseEntity.ok().headers(responseHeader).body(labels);
     }
 
     @DeleteMapping(LABEL_ROUTE)
