@@ -139,7 +139,7 @@ public class ProjectControllerTest {
                 Label[].class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Label[] labelsCreated = response.getBody();
-        assertEquals(5, labelsCreated.length);
+        assertEquals(7, labelsCreated.length);
         return labels;
     }
 

@@ -236,3 +236,15 @@ INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount
 VALUES (5, '2020-02-10 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment6', 'Michael_Zhou', 10, '2020-03-10', '2020-03-10 00:00:00.000000', 'Michael_Zhou', '2020-03-10 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);
 INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id)
 VALUES (6, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment7', 'Michael_Zhou', 150000, '2020-03-10', '2020-03-10 00:00:00.000000', 'Michael_Zhou', '2020-03-10 00:00:00.000000', null, 'America/Los_Angeles', 1, 8);
+
+-- Labels
+INSERT INTO public.labels (id, created_at, updated_at, name, owner, icon) VALUES (1, '2020-03-15 19:17:15.787000', '2020-03-15 19:17:15.787000', 'Frontend', 'BulletJournal', 'StarTwoTone');
+INSERT INTO public.labels (id, created_at, updated_at, name, owner, icon) VALUES (2, '2020-03-15 19:17:21.393000', '2020-03-15 19:17:21.393000', 'Backend', 'BulletJournal', 'FastForwardOutlined');
+INSERT INTO public.tasks (id, created_at, updated_at, name, owner, assigned_to, due_date, due_time, duration, end_time, labels, reminder_before_task, reminder_date, reminder_date_time, reminder_time, start_time, timezone, project_id)
+VALUES (8, '2020-03-04 23:44:05.000000', '2020-03-04 23:44:08.000000', 'task8', 'BulletJournal', 'BulletJournal', '2020-03-10', '10:00', 1, '2020-03-10 10:00:00.000000', '{1,2}', 1, '2020-03-08', null, '09:55', '2020-03-10 10:00:00.000000', 'America/Los_Angeles', 11);
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id, labels)
+VALUES (7, '2020-02-10 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment7', 'BulletJournal', 10, '2020-03-10', '2020-03-10 00:00:00.000000', 'BulletJournal', '2020-03-10 00:00:00.000000', null, 'America/Los_Angeles', 1, 13, '{1}');
+INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id, labels)
+VALUES (8, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment8', 'BulletJournal', 150000, '2020-03-10', '2020-03-10 00:00:00.000000', 'BulletJournal', '2020-03-10 00:00:00.000000', null, 'America/Los_Angeles', 1, 13, '{2}');
+INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
+VALUES (1, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Note1', 'BulletJournal', 12, '{1,2}');
