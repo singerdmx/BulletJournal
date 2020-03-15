@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { connect } from 'react-redux';
 import { Label, stringToRGB } from '../../features/label/interface';
 import {
@@ -31,6 +31,29 @@ type LabelsProps = {
   createLabel: (name: string, icon: string) => void;
   patchLabel: (labelId: number, value: string, icon: string) => void;
   startSearching: () => void;
+};
+
+type titleProps = {
+  labelId: number;
+  labelName: string;
+  deleteHelper: (labelId: number, name: string) => void;
+};
+
+const EditorTitle: React.FC<titleProps> = props => {
+  const { labelId, labelName, deleteHelper } = props;
+  return (
+    <span>
+      {`Edit ${labelName} or `}
+      <Button
+        type="link"
+        danger
+        onClick={() => deleteHelper(labelId, labelName)}
+        style={{ padding: 0, fontWeight: 500 }}
+      >
+        DELETE
+      </Button>
+    </span>
+  );
 };
 
 const Labels: React.FC<LabelsProps> = props => {
@@ -147,22 +170,23 @@ const Labels: React.FC<LabelsProps> = props => {
         </div>
       </div>
       <Modal
-        title={`Edit ${currentLabel.value} or Delete`}
+        title={
+          <EditorTitle
+            labelId={currentLabel.id}
+            labelName={currentLabel.value}
+            deleteHelper={handleDelete}
+          />
+        }
         visible={editable}
         onCancel={() => setEditable(false)}
         centered
         footer={[
-          <Button key="cancel" onClick={() => setEditable(false)} type="default">
-            Cancel
-          </Button>,
           <Button
-            onClick={() =>
-              handleDelete(currentLabel.id, currentLabel.value)
-            }
-            type="danger"
-            key="delete"
+            key="cancel"
+            onClick={() => setEditable(false)}
+            type="default"
           >
-            Delete
+            Cancel
           </Button>,
           <Button
             onClick={() => handleUpdate(currentLabel.id, currentLabel.value)}
@@ -175,7 +199,10 @@ const Labels: React.FC<LabelsProps> = props => {
       >
         <Form form={editFrom}>
           <Form.Item name="labelIcon">
-            <Select onSelect={() => setFocus(true)} defaultValue={currentLabel.icon}>
+            <Select
+              onSelect={() => setFocus(true)}
+              defaultValue={currentLabel.icon}
+            >
               {iconOptions}
             </Select>
           </Form.Item>
