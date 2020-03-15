@@ -179,7 +179,7 @@ const Labels: React.FC<LabelsProps> = props => {
               {iconOptions}
             </Select>
           </Form.Item>
-          <Form.Item label="Value" name="labelValue">
+          <Form.Item label="Name" name="labelValue">
             <Input
               defaultValue={currentLabel.value}
               value={currentLabel.value}
