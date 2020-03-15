@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Tooltip } from 'antd';
+import { Modal, Button, Tooltip, Select } from 'antd';
 import {
   PlusOutlined
 } from '@ant-design/icons';
@@ -8,11 +8,16 @@ import { GroupsWithOwner } from '../../features/group/interface';
 import { createProjectByName } from '../../features/project/actions';
 import { updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
 
 import './modals.styles.less';
 
+const { Option } = Select;
+
 type ProjectItemProps = {
   mode: string;
+  ownedProjects: Project[];
+  sharedProjects: ProjectsWithOwner[];
 }
 
 //props of groups
@@ -45,6 +50,9 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
   };
 
   render() {
+    console.log(this.props.ownedProjects);
+    console.log(this.props.sharedProjects);
+    const projects: Project[] = [];
     const modal = (
     <Modal
       title='Create New BuJo Item'
@@ -62,6 +70,13 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
         </Button>
       ]}
     >
+      <div>
+        <Select defaultValue="lucy" style={{ width: 120 }}>
+          <Option value="jack">Jack</Option>
+          <Option value="lucy">Lucy</Option>
+          <Option value="Yiminghe">yiminghe</Option>
+        </Select>
+      </div>
     </Modal>);
       if (this.props.mode === 'MyBuJo') {
         return (
@@ -89,6 +104,8 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
   project: state.project.project,
+  ownedProjects: state.project.owned,
+  sharedProjects: state.project.shared
 });
 
 export default connect(mapStateToProps, { updateGroups, createProjectByName })(
