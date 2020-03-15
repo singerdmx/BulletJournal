@@ -35,7 +35,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
         <Form form={form} layout="inline" onFinish={handleSearch}>
           <Form.Item
             name="selectLabels"
-            rules={[{ required: true, message: 'Please choose Label(s)' }]}
+            rules={[{ required: true, message: 'Missing Label(s)' }]}
             style={{ flex: 5 }}
           >
             <Select mode="multiple">
