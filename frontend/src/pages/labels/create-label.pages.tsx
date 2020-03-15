@@ -197,7 +197,7 @@ const Labels: React.FC<LabelsProps> = props => {
           </Button>
         ]}
       >
-        <Form form={editFrom}>
+        <Form form={editFrom} layout="inline">
           <Form.Item name="labelIcon">
             <Select
               onSelect={() => setFocus(true)}
