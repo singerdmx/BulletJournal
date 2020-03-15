@@ -791,6 +791,7 @@ public class ProjectControllerTest {
         UpdateProjectParams updateProjectParams = new UpdateProjectParams();
         updateProjectParams.setName(projectNewName);
         updateProjectParams.setDescription("d2");
+
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,

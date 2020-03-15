@@ -3,10 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.notifications.CreateProjectEvent;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.RemoveProjectEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +87,15 @@ public class ProjectController {
     public Project updateProject(@NotNull @PathVariable Long projectId,
                                  @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams);
+        List<Event> joined = new ArrayList<>();
+        List<Event> removed = new ArrayList<>();
+        this.projectDaoJpa.partialUpdate(username, projectId, updateProjectParams, joined, removed);
+        if(!joined.isEmpty()){
+            this.notificationService.inform(new JoinProjectEvent(joined, username));
+        }
+        if(!removed.isEmpty()){
+            this.notificationService.inform(new RemoveFromProjectEvent(removed, username));
+        }
         return getProject(projectId);
     }
 

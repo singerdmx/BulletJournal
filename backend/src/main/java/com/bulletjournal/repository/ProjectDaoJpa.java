@@ -189,7 +189,7 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Project partialUpdate(String requester, Long projectId, UpdateProjectParams updateProjectParams) {
+    public Project partialUpdate(String requester, Long projectId, UpdateProjectParams updateProjectParams, List<Event> joined, List<Event> removed) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -206,17 +206,42 @@ public class ProjectDaoJpa {
                 (value) -> project.setDescription(value)
         );
 
+        Group oldGroup = project.getGroup();
         if (updateProjectParams.hasGroupId() &&
-                !Objects.equals(updateProjectParams.getGroupId(), project.getGroup().getId())) {
+                !Objects.equals(updateProjectParams.getGroupId(), oldGroup.getId())) {
             Group group = this.groupRepository
                     .findById(updateProjectParams.getGroupId())
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Group " + updateProjectParams.getGroupId() + " not found"));
             project.setGroup(group);
+
+            Set<String> oldUsers = oldGroup.getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toSet());
+            Set<String> newUsers = group.getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toSet());
+
+            generateEvents(joined, removed, project, oldUsers, newUsers);
+
         }
 
         return this.projectRepository.save(project);
     }
+
+    private void generateEvents(List<Event> joined, List<Event> removed, Project project, Set<String> oldUsers, Set<String> newUsers){
+        Set<String> newJoins = new HashSet<>(newUsers);
+        newJoins.retainAll(oldUsers);
+        for(String user : oldUsers){
+            if(!newJoins.contains(user)){
+                removed.add(new Event(user, project.getId(), project.getName()));
+            }
+        }
+        for(String user : newUsers){
+            if(!newJoins.contains(user)){
+                joined.add(new Event(user, project.getId(), project.getName()));
+            }
+        }
+    }
+
+
+
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateUserOwnedProjects(String user, List<com.bulletjournal.controller.models.Project> projects) {
