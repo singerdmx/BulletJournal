@@ -42,8 +42,8 @@ type titleProps = {
 const EditorTitle: React.FC<titleProps> = props => {
   const { labelId, labelName, deleteHelper } = props;
   return (
-    <span>
-      {`Edit ${labelName} or `}
+    <span style={{display : "flex", justifyContent : "space-between", paddingRight : 20}}>
+      <span>Edit</span>
       <Button
         type="link"
         danger
