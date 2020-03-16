@@ -119,7 +119,7 @@ const Labels: React.FC<LabelsProps> = props => {
             name="labelIcon"
             rules={[{ required: true, message: 'Missing Icon' }]}
           >
-            <Select bordered={false} onSelect={() => setFocus(true)}>
+            <Select bordered={false} onSelect={() => setFocus(true)} style={{width: '58px'}}>
               {iconOptions}
             </Select>
           </Form.Item>
@@ -129,16 +129,18 @@ const Labels: React.FC<LabelsProps> = props => {
             style={{ flex: 7 }}
           >
             <Input
-              placeholder="input a name"
+              placeholder="Input Label Name"
               className="labels-create-input"
               autoFocus={inputFocus}
               onBlur={() => setFocus(false)}
             />
           </Form.Item>
           <Form.Item style={{ flex: 1 }}>
-            <Button type="link" htmlType="submit">
-              <PlusCircleOutlined />
-            </Button>
+            <Tooltip title="Click to create label">
+              <Button type="link" htmlType="submit">
+                <PlusCircleOutlined />
+              </Button>
+            </Tooltip>
           </Form.Item>
         </Form>
       </div>
