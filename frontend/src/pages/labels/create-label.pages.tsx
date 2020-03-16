@@ -157,9 +157,8 @@ const Labels: React.FC<LabelsProps> = props => {
         <div className="labels-list">
           {props.labels.map(label => {
             return (
-              <Tooltip placement="top" title="Click to edit or delete label">
+              <Tooltip placement="top" title="Click to edit or delete label" key={label.id}>
                 <Tag
-                  key={label.id}
                   className="labels"
                   color={stringToRGB(label.value)}
                   onClick={() => handleEditModal(label)}
@@ -181,6 +180,7 @@ const Labels: React.FC<LabelsProps> = props => {
             deleteHelper={handleDelete}
           />
         }
+        destroyOnClose
         visible={editable}
         onCancel={() => setEditable(false)}
         centered
