@@ -7,8 +7,10 @@ import systemSaga from '../features/system/saga';
 import userSaga from '../features/user/saga';
 import noteSaga from '../features/notes/saga';
 import labelSaga from '../features/label/saga';
-import myBuJoSagas from '../features/myBuJo/saga';
-import rRuleSagas from '../features/recurrence/saga';
+import myBuJoSaga from '../features/myBuJo/saga';
+import rRuleSaga from '../features/recurrence/saga';
+import taskSaga from '../features/tasks/saga';
+import transactionSaga from '../features/transactions/saga';
 
 export default function* root() {
   yield spawn(myselfSaga);
@@ -19,6 +21,8 @@ export default function* root() {
   yield spawn(userSaga);
   yield spawn(noteSaga);
   yield spawn(labelSaga);
-  yield spawn(myBuJoSagas);
-  yield spawn(rRuleSagas);
+  yield spawn(myBuJoSaga);
+  yield spawn(rRuleSaga);
+  yield spawn(taskSaga);
+  yield spawn(transactionSaga);
 }

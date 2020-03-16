@@ -55,7 +55,7 @@ class TimezonePicker extends React.Component<TimezoneProps> {
         <Select
           showSearch={true}
           style={{ width: 250 }}
-          placeholder='Select a timezone'
+          placeholder='Select Time Zone'
           onChange={this.handleOnChange}
           value={this.props.currentTimezone}
         >

@@ -9,6 +9,8 @@ import { reducer as noteReducer } from '../features/notes/reducer';
 import { reducer as labelReducer } from '../features/label/reducer';
 import { reducer as myBuJoReducer } from '../features/myBuJo/reducer';
 import { reducer as rRuleReducer } from '../features/recurrence/reducer';
+import { reducer as transactionReducer } from '../features/transactions/reducer';
+import { reducer as taskReducer } from '../features/tasks/reducer';
 
 export default {
   settings: settingsReducer,
@@ -21,5 +23,7 @@ export default {
   note: noteReducer,
   label: labelReducer,
   myBuJo: myBuJoReducer,
-  rRule: rRuleReducer
+  rRule: rRuleReducer,
+  transaction: transactionReducer,
+  task: taskReducer,
 };

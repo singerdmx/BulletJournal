@@ -186,7 +186,7 @@ const AddTransaction: React.FC<RouteComponentProps &
                 <Tooltip title="Time Zone">
                   <Select
                     showSearch={true}
-                    placeholder='Select a Timezone'
+                    placeholder='Select Time Zone'
                     defaultValue={props.timezone ? props.timezone : ''}
                   >
                     {zones.map((zone: string, index: number) => (
