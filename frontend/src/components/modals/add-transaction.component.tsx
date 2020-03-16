@@ -52,10 +52,13 @@ interface TransactionCreateFormProps {
     payer: string,
     date: string,
     time: string,
-    transactionType: number
+    transactionType: number,
+    timezone: string
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   currency: string;
+  timezone: string;
+  myself: string;
 }
 
 const AddTransaction: React.FC<RouteComponentProps &
@@ -64,7 +67,16 @@ const AddTransaction: React.FC<RouteComponentProps &
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const addTransaction = (values: any) => {
-    // props.createTransaction(props.projectId, values.transactionName);
+    props.createTransaction(
+      props.project.id,
+      values.amount,
+      values.transactionName,
+      values.payerName ? values.payerName : props.myself,
+      values.date,
+      values.time,
+      values.transactionType,
+      values.timezone ? values.timezone : props.timezone
+    );
     setVisible(false);
   };
   const onCancel = () => setVisible(false);
@@ -112,7 +124,7 @@ const AddTransaction: React.FC<RouteComponentProps &
               <span>Payer&nbsp;&nbsp;</span>
               <Form.Item name='payerName' style={{ width: '100%' }}>
                 {!props.group.users ? null : (
-                  <Select defaultValue={props.group.users[0].name}>
+                  <Select defaultValue={props.myself}>
                     {props.group.users.map(user => {
                       return (
                         <Option value={user.name} key={user.name}>
@@ -135,11 +147,12 @@ const AddTransaction: React.FC<RouteComponentProps &
                   placeholder='Enter Amount'
                   style={{ width: '70%' }}
                 />
-                <span>
-                  &nbsp;&nbsp;{LocaleCurrency.getCurrency(props.currency)}
-                  &nbsp;&nbsp;
-                </span>
               </Form.Item>
+              <span>
+                &nbsp;&nbsp;{LocaleCurrency.getCurrency(props.currency)}
+                &nbsp;&nbsp;
+              </span>
+
               <Form.Item
                 name='transactionType'
                 rules={[{ required: true, message: 'Missing Type!' }]}
@@ -153,16 +166,28 @@ const AddTransaction: React.FC<RouteComponentProps &
             </div>
 
             <div style={{ display: 'flex' }}>
-              <Form.Item name='Date' style={{ width: '180px' }}>
-                <DatePicker />
+              <Form.Item
+                name='date'
+                style={{ width: '180px' }}
+                rules={[{ required: true, message: 'Missing Date!' }]}
+              >
+                <DatePicker placeholder='Select Date' />
               </Form.Item>
 
               <Form.Item name='time' style={{ width: '180px' }}>
-                <TimePicker allowClear format='HH:mm' />
+                <TimePicker
+                  allowClear
+                  format='HH:mm'
+                  placeholder='Select Time'
+                />
               </Form.Item>
 
               <Form.Item name='timezone'>
-                <Select showSearch={true} placeholder='Select a timezone'>
+                <Select
+                  showSearch={true}
+                  placeholder='Select a Timezone'
+                  defaultValue={props.timezone ? props.timezone : ''}
+                >
                   {zones.map((zone: string, index: number) => (
                     <Option key={zone} value={zone}>
                       <Tooltip title={zone} placement='right'>
@@ -183,7 +208,9 @@ const AddTransaction: React.FC<RouteComponentProps &
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   group: state.group.group,
-  currency: state.settings.currency
+  currency: state.settings.currency,
+  timezone: state.settings.timezone,
+  myself: state.myself.username
 });
 
 export default connect(mapStateToProps, {

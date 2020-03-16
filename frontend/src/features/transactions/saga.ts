@@ -11,11 +11,17 @@ import {
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchTransactions, createTransaction, getTransactionById, updateTransaction, setTransactionLabels
+  fetchTransactions,
+  createTransaction,
+  getTransactionById,
+  updateTransaction,
+  setTransactionLabels
 } from '../../apis/transactionApis';
 import { updateTransactions } from './actions';
 
-function* transactionApiErrorReceived(action: PayloadAction<TransactionApiErrorAction>) {
+function* transactionApiErrorReceived(
+  action: PayloadAction<TransactionApiErrorAction>
+) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
 }
 
@@ -25,7 +31,7 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
     const transactions = yield data.json();
 
     yield put(
-        transactionsActions.transactionsReceived({
+      transactionsActions.transactionsReceived({
         transactions: transactions
       })
     );
@@ -35,17 +41,24 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
 }
 
 function* transactionCreate(action: PayloadAction<CreateTransaction>) {
-    try {
-      const data = yield call(createTransaction, action.payload.projectId,
-      action.payload.amount, action.payload.name, action.payload.payer,
-      action.payload.transactionType, action.payload.date, action.payload.time,
-      action.payload.timezone);
-      const transaction = yield data.json();
-      yield put(updateTransactions(action.payload.projectId));
-    } catch (error) {
-      yield call(message.error, `Transaction Error Received: ${error}`);
-    }
+  try {
+    const data = yield call(
+      createTransaction,
+      action.payload.projectId,
+      action.payload.amount,
+      action.payload.name,
+      action.payload.payer,
+      action.payload.transactionType,
+      action.payload.date,
+      action.payload.time,
+      action.payload.timezone
+    );
+    const transaction = yield data.json();
+    yield put(updateTransactions(action.payload.projectId));
+  } catch (error) {
+    yield call(message.error, `Transaction Error Received: ${error}`);
   }
+}
 
 function* getTransaction(action: PayloadAction<GetTransaction>) {
   try {
@@ -57,9 +70,17 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
 
 function* patchTransaction(action: PayloadAction<PatchTransaction>) {
   try {
-    yield call(updateTransaction, action.payload.transactionId, action.payload.amount,
-    action.payload.name, action.payload.payer, action.payload.transactionType,
-    action.payload.date, action.payload.time, action.payload.timezone);
+    yield call(
+      updateTransaction,
+      action.payload.transactionId,
+      action.payload.amount,
+      action.payload.name,
+      action.payload.payer,
+      action.payload.transactionType,
+      action.payload.date,
+      action.payload.time,
+      action.payload.timezone
+    );
   } catch (error) {
     yield call(message.error, `Patch Transaction Error Received: ${error}`);
   }
@@ -86,13 +107,10 @@ export default function* transactionSagas() {
       transactionsUpdate
     ),
     yield takeLatest(
-        transactionsActions.TransactionsCreate.type,
-        transactionCreate
+      transactionsActions.TransactionsCreate.type,
+      transactionCreate
     ),
-    yield takeLatest(
-          transactionsActions.TransactionGet.type,
-          getTransaction
-    ),
+    yield takeLatest(transactionsActions.TransactionGet.type, getTransaction),
     yield takeLatest(
       transactionsActions.TransactionPatch.type,
       patchTransaction
@@ -100,6 +118,6 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,
       transactionSetLabels
-    ),
+    )
   ]);
 }
