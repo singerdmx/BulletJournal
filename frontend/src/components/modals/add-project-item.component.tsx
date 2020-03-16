@@ -105,22 +105,22 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
 
 const flattenOwnedProject = (
   ownedProjects: Project[],
-  flattenProjects: Project[]
+  flattenedProjects: Project[]
 ) => {
   ownedProjects.forEach(project => {
-    flattenOwnedProject(project.subProjects, flattenProjects);
-    flattenProjects.push(project);
+    flattenOwnedProject(project.subProjects, flattenedProjects);
+    flattenedProjects.push(project);
   });
 };
 
 const flattenSharedProject = (
   sharedProjects: ProjectsWithOwner[],
-  flattenProjects: Project[]
+  flattenedProjects: Project[]
 ) => {
   sharedProjects.forEach(sharedProject => {
     sharedProject.projects.forEach(project => {
-      flattenOwnedProject(project.subProjects, flattenProjects);
-      flattenProjects.push(project);
+      flattenOwnedProject(project.subProjects, flattenedProjects);
+      flattenedProjects.push(project);
     });
   });
 };
