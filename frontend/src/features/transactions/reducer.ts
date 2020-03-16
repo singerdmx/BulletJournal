@@ -16,8 +16,8 @@ export type CreateTransaction = {
   payer: string;
   transactionType: number;
   date: string;
-  time?: string;
   timezone: string;
+  time?: string;
 };
 
 export type GetTransaction = {

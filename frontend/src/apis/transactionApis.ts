@@ -24,7 +24,7 @@ export const deleteTransactionById = (transactionId: number) => {
 };
 
 export const createTransaction = (projectId: number, amount: number, name: string, payer: string,
-  transactionType: number, date?: string, time?: string, timezone?: string) => {
+  transactionType: number, date: string, timezone: string, time?: string) => {
   const postBody = JSON.stringify({
     amount: amount,
     name: name,

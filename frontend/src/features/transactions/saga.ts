@@ -42,21 +42,23 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
 
 function* transactionCreate(action: PayloadAction<CreateTransaction>) {
   try {
+    const { projectId, amount, name, payer, transactionType, date,
+    timezone, time } = action.payload;
     const data = yield call(
       createTransaction,
-      action.payload.projectId,
-      action.payload.amount,
-      action.payload.name,
-      action.payload.payer,
-      action.payload.transactionType,
-      action.payload.date,
-      action.payload.time,
-      action.payload.timezone
+      projectId,
+      amount,
+      name,
+      payer,
+      transactionType,
+      date,
+      timezone,
+      time,
     );
     const transaction = yield data.json();
-    yield put(updateTransactions(action.payload.projectId));
+    yield put(updateTransactions(projectId));
   } catch (error) {
-    yield call(message.error, `Transaction Error Received: ${error}`);
+    yield call(message.error, `transactionCreate Error Received: ${error}`);
   }
 }
 

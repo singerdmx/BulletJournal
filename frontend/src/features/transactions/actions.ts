@@ -7,9 +7,9 @@ export const createTransaction = (
   name: string,
   payer: string,
   date: string,
-  time: string,
   transactionType: number,
-  timezone: string
+  timezone: string,
+  time?: string,
 ) =>
   actions.TransactionsCreate({
     projectId: projectId,
@@ -17,9 +17,9 @@ export const createTransaction = (
     name: name,
     payer: payer,
     date: date,
-    time: time,
     transactionType: transactionType,
-    timezone: timezone
+    timezone: timezone,
+    time: time,
   });
 export const deleteTransaction = (transactionId: number) =>
   actions.TransactionDelete({ transactionId: transactionId });

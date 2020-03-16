@@ -51,9 +51,9 @@ interface TransactionCreateFormProps {
     name: string,
     payer: string,
     date: string,
-    time: string,
     transactionType: number,
-    timezone: string
+    timezone: string,
+    time: string,
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   currency: string;
@@ -73,9 +73,9 @@ const AddTransaction: React.FC<RouteComponentProps &
       values.transactionName,
       values.payerName ? values.payerName : props.myself,
       values.date,
-      values.time,
       values.transactionType,
-      values.timezone ? values.timezone : props.timezone
+      values.timezone ? values.timezone : props.timezone,
+      values.time
     );
     setVisible(false);
   };
@@ -183,19 +183,21 @@ const AddTransaction: React.FC<RouteComponentProps &
               </Form.Item>
 
               <Form.Item name='timezone'>
-                <Select
-                  showSearch={true}
-                  placeholder='Select a Timezone'
-                  defaultValue={props.timezone ? props.timezone : ''}
-                >
-                  {zones.map((zone: string, index: number) => (
-                    <Option key={zone} value={zone}>
-                      <Tooltip title={zone} placement='right'>
-                        {zone}
-                      </Tooltip>
-                    </Option>
-                  ))}
-                </Select>
+                <Tooltip title="Time Zone">
+                  <Select
+                    showSearch={true}
+                    placeholder='Select a Timezone'
+                    defaultValue={props.timezone ? props.timezone : ''}
+                  >
+                    {zones.map((zone: string, index: number) => (
+                      <Option key={zone} value={zone}>
+                        <Tooltip title={zone} placement='right'>
+                          {zone}
+                        </Tooltip>
+                      </Option>
+                    ))}
+                  </Select>
+                </Tooltip>
               </Form.Item>
             </div>
           </Form>
