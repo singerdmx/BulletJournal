@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface TransactionRepositoryCustom {
     List<Transaction> findTransactionsByLabelIds(List<Long> labelIds);
+
+    List<Transaction> findTransactionsByLabelId(Long labelId);
 }

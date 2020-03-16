@@ -1,6 +1,7 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.repository.models.Note;
+import com.google.common.collect.ImmutableList;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -27,5 +28,10 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
             query.setParameter(i, labelIds.get(i - 1));
         }
         return query.getResultList();
+    }
+
+    @Override
+    public List<Note> findNotesByLabelId(Long labelId) {
+        return findNotesByLabelIds(ImmutableList.of(labelId));
     }
 }

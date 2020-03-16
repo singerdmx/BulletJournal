@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 
 import com.bulletjournal.repository.models.Transaction;
+import com.google.common.collect.ImmutableList;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -28,5 +29,10 @@ public class TransactionRepositoryImpl implements TransactionRepositoryCustom {
             query.setParameter(i, labelIds.get(i - 1));
         }
         return query.getResultList();
+    }
+
+    @Override
+    public List<Transaction> findTransactionsByLabelId(Long labelId) {
+        return findTransactionsByLabelIds(ImmutableList.of(labelId));
     }
 }

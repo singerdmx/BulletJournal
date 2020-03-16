@@ -106,14 +106,25 @@ public class LabelDaoJpa {
         this.labelRepository.delete(label);
 
         List<Task> tasks = this.taskRepository.findTasksByLabelId(labelId);
-
         tasks.stream().forEach(
                 task -> task.setLabels(
                         task.getLabels().stream().filter(id
                                 -> id != labelId).collect(Collectors.toList())));
-
         this.taskRepository.saveAll(tasks);
 
+        List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelId(labelId);
+        transactions.stream().forEach(
+                transaction -> transaction.setLabels(
+                        transaction.getLabels().stream().filter(id
+                                -> id != labelId).collect(Collectors.toList())));
+        this.transactionRepository.saveAll(transactions);
+
+        List<Note> notes = this.noteRepository.findNotesByLabelId(labelId);
+        notes.stream().forEach(
+                note -> note.setLabels(
+                        note.getLabels().stream().filter(id
+                                -> id != labelId).collect(Collectors.toList())));
+        this.noteRepository.saveAll(notes);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
