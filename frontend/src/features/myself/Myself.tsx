@@ -8,7 +8,7 @@ import Notifications from '../notification/Notifications';
 import { IState } from '../../store/index';
 import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
-import { Project } from '../project/interface';
+import { Project, ProjectsWithOwner } from '../project/interface';
 import { updateMyself, updateExpandedMyself } from './actions';
 import { updateGroups, groupUpdate } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
@@ -19,6 +19,7 @@ type MyselfProps = {
   username: string;
   avatar: string;
   ownedProjects: Project[];
+  sharedProjects: ProjectsWithOwner[];
   updateMyself: () => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateGroups: () => void;
@@ -42,7 +43,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
 
   render() {
     let plusIcon = null;
-    if (this.props.ownedProjects.length === 0) {
+    if (this.props.ownedProjects.length === 0 && this.props.sharedProjects.length === 0) {
       plusIcon = <AddProject history={this.props.history} mode={'complex'}/>
     } else {
       plusIcon = <AddProjectItem mode={'complex'}/>
@@ -82,7 +83,8 @@ class Myself extends React.Component<MyselfProps & PathProps> {
 const mapStateToProps = (state: IState) => ({
   username: state.myself.username,
   avatar: state.myself.avatar,
-  ownedProjects: state.project.owned
+  ownedProjects: state.project.owned,
+  sharedProjects: state.project.shared
 });
 
 export default connect(mapStateToProps, {
