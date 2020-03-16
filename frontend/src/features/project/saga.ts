@@ -11,6 +11,7 @@ import {
   PatchProjectAction,
   UpdateProjectRelationsAction
 } from './reducer';
+import { actions as groupsActions } from '../group/reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchProjects,
@@ -104,8 +105,9 @@ function* updateSharedProjectOwnersOrder(
 function* getUserProject(action: PayloadAction<GetProjectAction>) {
   try {
     const { projectId } = action.payload;
-    const data = yield call(getProject, projectId);
+    const data: Project = yield call(getProject, projectId);
     yield put(projectActions.projectReceived({ project: data }));
+    yield put(groupsActions.getGroup({ groupId: data.group.id }));
   } catch (error) {
     yield call(message.error, `Get Project Error Received: ${error}`);
   }
