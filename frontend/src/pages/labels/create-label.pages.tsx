@@ -156,20 +156,21 @@ const Labels: React.FC<LabelsProps> = props => {
         <div className="labels-list">
           {props.labels.map(label => {
             return (
-              <Tag
-                key={label.id}
-                className="labels"
-                color={stringToRGB(label.value)}
-                onClick={() => handleEditModal(label)}
-                style={{ cursor: 'pointer' }}
-              >
-                {getIcon(label.icon)} &nbsp;
-                {label.value}
-              </Tag>
+              <Tooltip placement="top" title="Click to edit or delete label">
+                <Tag
+                  key={label.id}
+                  className="labels"
+                  color={stringToRGB(label.value)}
+                  onClick={() => handleEditModal(label)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {getIcon(label.icon)} &nbsp;
+                  {label.value}
+                </Tag>
+              </Tooltip>
             );
           })}
         </div>
-        <span>Click to Edit Tag</span>
       </div>
       <Modal
         title={
