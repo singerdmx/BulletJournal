@@ -1,77 +1,69 @@
-import React from 'react';
-import { Modal, Input, Button, Tooltip } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps} from 'react-router';
-import { createTransaction } from '../../features/transactions/actions';
-import { IState } from '../../store';
+import React, {useState} from 'react';
+import {Modal, Input, Tooltip, Form} from 'antd';
+import {PlusOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {withRouter, RouteComponentProps} from 'react-router';
+import {createTransaction} from '../../features/transactions/actions';
+import {IState} from '../../store';
 import './modals.styles.less';
 
 type TransactionProps = {
-    projectId: number,
+    projectId: number;
+};
+
+interface TransactionCreateFormProps {
     createTransaction: (projectId: number, amount: number, name: string, payer: string,
-      date: string, time: string, transactionType: number) => void;
+                        date: string, time: string, transactionType: number) => void;
+
 };
 
-type ModalState = {
-  isShow: boolean;
-  transactionName: string;
-};
-
-class AddTransaction extends React.Component<TransactionProps & RouteComponentProps, ModalState> {
-  state: ModalState = {
-    isShow: false,
-    transactionName: ''
-  };
-
-  showModal = () => {
-    this.setState({ isShow: true });
-  };
-
-  addTransaction = () => {
-    // this.props.createTassk(this.props.projectId, this.state.taskName);
-    this.setState({ isShow: false });
-    this.props.history.push("/transactions")
-  };
-
-  onCancel = () => {
-    this.setState({ isShow: false });
-  };
-  
-  render() {
+const AddTransaction: React.FC<RouteComponentProps & TransactionProps & TransactionCreateFormProps> = (props) => {
+    const [form] = Form.useForm();
+    const [visible, setVisible] = useState(false);
+    const addTransaction = (values: any) => {
+        // props.createTransaction(props.projectId, values.transactionName);
+        setVisible(false);
+    };
+    const onCancel = () => setVisible(false);
+    const openModal = () => setVisible(true);
     return (
-      <Tooltip placement="top" title='Create New Transaction'>
-        <div className="add-transaction" >
-          <PlusOutlined style={{ fontSize: 20, cursor: 'pointer' }} onClick={this.showModal} title='Create New Transaction' />
-          <Modal
-            title="Create New Transaction"
-            visible={this.state.isShow}
-            onCancel={this.onCancel}
-            onOk={() => this.addTransaction}
-            footer={[
-              <Button key="cancel" onClick={this.onCancel}>
-                Cancel
-              </Button>,
-              <Button key="create" type="primary" onClick={this.addTransaction}>
-                Create
-              </Button>
-            ]}
-          >
-            <Input
-              placeholder="Enter Transaction Name"
-              onChange={e => this.setState({ transactionName: e.target.value })}
-              onPressEnter={this.addTransaction}
-              allowClear
-            />
-          </Modal>
-        </div>
-      </Tooltip>
+        <Tooltip placement="top" title='Create New Transaction'>
+            <div className="add-transaction">
+                <PlusOutlined style={{fontSize: 20, cursor: 'pointer'}} onClick={openModal} title='Create New Transaction'/>
+                <Modal
+                    title="Create New Transaction"
+                    visible={visible}
+                    okText="Create"
+                    onCancel={onCancel}
+                    onOk={() => {
+                        form
+                            .validateFields()
+                            .then(values => {
+                                console.log(values);
+                                form.resetFields();
+                                addTransaction(values);
+                            })
+                            .catch(info => console.log(info));
+                    }}
+                >
+                    <Form form={form}>
+                        <Form.Item
+                            name="transactionName"
+                            rules={[
+                                {required: true, message: 'Please input Transaction Name!'}
+                            ]}
+                        >
+                            <Input placeholder="Enter Transaction Name" allowClear/>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            </div>
+        </Tooltip>
     );
-  }
 }
 
 const mapStateToProps = (state: IState) => ({
     projectId: state.project.project.id
-  });
+});
 
-export default connect(mapStateToProps, { createTransaction })(withRouter(AddTransaction));
+export default connect(mapStateToProps, {createTransaction})(withRouter(AddTransaction));
