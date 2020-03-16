@@ -10,6 +10,10 @@ type IconType = {
 
 export const icons = [
   {
+    name: 'TagOutlined',
+    icon: <Icons.TagOutlined />
+  },
+  {
     name: 'StepBackwardOutlined',
     icon: <Icons.StepBackwardOutlined />
   },
@@ -1576,10 +1580,6 @@ export const icons = [
   {
     name: 'TabletOutlined',
     icon: <Icons.TabletOutlined />
-  },
-  {
-    name: 'TagOutlined',
-    icon: <Icons.TagOutlined />
   },
   {
     name: 'TagsOutlined',

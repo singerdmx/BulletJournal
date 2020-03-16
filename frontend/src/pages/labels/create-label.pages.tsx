@@ -21,7 +21,8 @@ import { iconOptions, icons } from '../../assets/icons/index';
 import {
   SearchOutlined,
   PlusCircleOutlined,
-  TagOutlined
+  TagOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
 
 type LabelsProps = {
@@ -44,14 +45,14 @@ const EditorTitle: React.FC<titleProps> = props => {
   return (
     <span style={{display : "flex", justifyContent : "space-between", paddingRight : 20}}>
       <span>Edit</span>
-      <Button
-        type="link"
-        danger
-        onClick={() => deleteHelper(labelId, labelName)}
-        style={{ padding: 0, fontWeight: 500 }}
-      >
-        DELETE
-      </Button>
+      <Tooltip title="Delete Label">
+        <Button
+          type="link"
+          danger
+          onClick={() => deleteHelper(labelId, labelName)}
+          style={{ padding: 0, fontWeight: 500, marginTop: '-4px'}}
+          shape="circle" icon={<DeleteOutlined />} />
+      </Tooltip>
     </span>
   );
 };
