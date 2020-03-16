@@ -28,6 +28,7 @@ type GroupProps = {
 
 type ModalState = {
   isShow: boolean;
+  selections: Project[];
 };
 
 class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
@@ -35,10 +36,13 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
 > {
   componentDidMount() {
     this.props.updateGroups();
+    flattenOwnedProject(this.props.ownedProjects, this.state.selections);
+    flattenSharedProject(this.props.sharedProjects, this.state.selections);
   }
 
   state: ModalState = {
     isShow: false,
+    selections: []
   };
 
   showModal = () => {
@@ -50,9 +54,7 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
   };
 
   render() {
-    console.log(this.props.ownedProjects);
-    console.log(this.props.sharedProjects);
-    const projects: Project[] = [];
+    console.log(this.state.selections);
     const modal = (
     <Modal
       title='Create New BuJo Item'
@@ -100,6 +102,28 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
       );
   }
 }
+
+const flattenOwnedProject = (
+  ownedProjects: Project[],
+  flattenProjects: Project[]
+) => {
+  ownedProjects.forEach(project => {
+    flattenOwnedProject(project.subProjects, flattenProjects);
+    flattenProjects.push(project);
+  });
+};
+
+const flattenSharedProject = (
+  sharedProjects: ProjectsWithOwner[],
+  flattenProjects: Project[]
+) => {
+  sharedProjects.forEach(sharedProject => {
+    sharedProject.projects.forEach(project => {
+      flattenOwnedProject(project.subProjects, flattenProjects);
+      flattenProjects.push(project);
+    });
+  });
+};
 
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
