@@ -1,12 +1,12 @@
 package com.bulletjournal.controller.models;
 
-public class ShareTaskParams {
+public class ShareProjectItemParams {
 
     private Long targetGroup;
 
     private String targetUser;
 
-    public ShareTaskParams() {
+    public ShareProjectItemParams() {
     }
 
     public Long getTargetGroup() {

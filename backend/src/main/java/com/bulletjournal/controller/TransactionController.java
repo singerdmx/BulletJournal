@@ -1,9 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.CreateTransactionParams;
-import com.bulletjournal.controller.models.Transaction;
-import com.bulletjournal.controller.models.UpdateTransactionParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
@@ -26,6 +24,8 @@ public class TransactionController {
     protected static final String TRANSACTIONS_ROUTE = "/api/projects/{projectId}/transactions";
     protected static final String TRANSACTION_ROUTE = "/api/transactions/{transactionId}";
     protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
+    protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
+    protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -84,5 +84,17 @@ public class TransactionController {
                           @NotNull @RequestBody List<Long> labels) {
         this.transactionDaoJpa.setLabels(transactionId, labels);
         return getTransaction(transactionId);
+    }
+
+    @PostMapping(MOVE_TRANSACTION_ROUTE)
+    public void moveTransaction(@NotNull @PathVariable Long transactionId,
+                         @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+        this.transactionDaoJpa.move(transactionId, moveProjectItemParams.getTargetProject());
+    }
+
+    @PostMapping(SHARE_TRANSACTION_ROUTE)
+    public void shareTransaction(
+            @NotNull @PathVariable Long transactionId,
+            @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
     }
 }

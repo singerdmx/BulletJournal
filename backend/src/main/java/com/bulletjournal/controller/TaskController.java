@@ -124,10 +124,14 @@ public class TaskController {
     }
 
     @PostMapping(MOVE_TASK_ROUTE)
-    public void moveTask(@NotNull @RequestBody MoveTaskParams moveTaskParams) {
+    public void moveTask(@NotNull @PathVariable Long taskId,
+                         @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+        this.taskDaoJpa.move(taskId, moveProjectItemParams.getTargetProject());
     }
 
     @PostMapping(SHARE_TASK_ROUTE)
-    public void shareTask(@NotNull @RequestBody ShareTaskParams shareTaskParams) {
+    public void shareTask(
+            @NotNull @PathVariable Long taskId,
+            @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
     }
 }

@@ -2,15 +2,15 @@ package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotNull;
 
-public class MoveTaskParams {
+public class MoveProjectItemParams {
 
     @NotNull
     private Long targetProject;
 
-    public MoveTaskParams() {
+    public MoveProjectItemParams() {
     }
 
-    public MoveTaskParams(@NotNull Long targetProject) {
+    public MoveProjectItemParams(@NotNull Long targetProject) {
         this.targetProject = targetProject;
     }
 

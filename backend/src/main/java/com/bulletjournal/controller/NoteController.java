@@ -1,9 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.CreateNoteParams;
-import com.bulletjournal.controller.models.Note;
-import com.bulletjournal.controller.models.UpdateNoteParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
@@ -23,6 +21,8 @@ public class NoteController {
     protected static final String NOTES_ROUTE = "/api/projects/{projectId}/notes";
     protected static final String NOTE_ROUTE = "/api/notes/{noteId}";
     protected static final String NOTE_SET_LABELS_ROUTE = "/api/notes/{noteId}/setLabels";
+    protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
+    protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -77,4 +77,15 @@ public class NoteController {
         return getNote(noteId);
     }
 
+    @PostMapping(MOVE_NOTE_ROUTE)
+    public void moveNote(@NotNull @PathVariable Long noteId,
+                         @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+        this.noteDaoJpa.move(noteId, moveProjectItemParams.getTargetProject());
+    }
+
+    @PostMapping(SHARE_NOTE_ROUTE)
+    public void shareNote(
+            @NotNull @PathVariable Long noteId,
+            @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+    }
 }
