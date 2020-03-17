@@ -90,12 +90,35 @@ public class ProjectControllerTest {
         Project p7 = createProject("P7", expectedOwner, group, ProjectType.TODO);
         updateProjectRelations(p5, p6, p7);
 
+        // test notification for adding and removing users
+        group = groups.get(0).getGroups().get(2);
+        Project p8 = createProject("P8", expectedOwner, group, ProjectType.TODO);
+        p8 = updateProjectGroup(p8, groups.get(0).getGroups().get(0).getId());
+
+
         List<Label> labels = createLabels();
         createTasks(p7, labels);
         createNotes(p5, labels);
         createTransactions(p6, labels);
 
         getNotifications(notificationsEtag);
+    }
+
+    private Project updateProjectGroup(Project p8, Long id) {
+        UpdateProjectParams updateProjectParams = new UpdateProjectParams();
+        updateProjectParams.setGroupId(id);
+        ResponseEntity<Project> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateProjectParams),
+                Project.class,
+                p8.getId());
+        p8 = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Default", p8.getGroup().getName());
+        assertEquals(expectedOwner, p8.getOwner());
+        assertEquals(98L, (long) p8.getGroup().getId());
+        return p8;
     }
 
     private void findItemsByLabels(List<Label> labels, List<ProjectItems> expectedItems) {
