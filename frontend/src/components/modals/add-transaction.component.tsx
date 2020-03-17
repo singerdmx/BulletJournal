@@ -122,40 +122,38 @@ const AddTransaction: React.FC<RouteComponentProps &
             >
               <Input placeholder="Enter Transaction Name" allowClear />
             </Form.Item>
-            <div style={{ display: 'flex' }}>
-              <Form.Item
-                name="payerName"
-                style={{ width: '100%' }}
-                label=" Payer"
-              >
-                {!props.group.users ? null : (
-                  <Select defaultValue={props.myself}>
-                    {props.group.users.map(user => {
-                      return (
-                        <Option value={user.name} key={user.name}>
-                          <Avatar size="small" src={user.avatar} />
-                          &nbsp;&nbsp; <strong>{user.name}</strong>
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                )}
-              </Form.Item>
-            </div>
+            <Form.Item
+              name="payerName"
+              label=" Payer"
+              wrapperCol={{ span: 12 }}
+            >
+              {!props.group.users ? null : (
+                <Select defaultValue={props.myself}>
+                  {props.group.users.map(user => {
+                    return (
+                      <Option value={user.name} key={user.name}>
+                        <Avatar size="small" src={user.avatar} />
+                        &nbsp;&nbsp; <strong>{user.name}</strong>
+                      </Option>
+                    );
+                  })}
+                </Select>
+              )}
+            </Form.Item>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Form.Item
                 name="amount"
                 label="Amount"
                 rules={[{ required: true, message: 'Missing Amount!' }]}
-                style={{ display: 'flex' }}
               >
                 <InputNumber
-                  placeholder="Enter Amount"
                   style={{ width: 180 }}
                   formatter={value =>
                     `${LocaleCurrency.getCurrency(props.currency)} ${value}`
                   }
-                  parser={value => (value ? value.replace(/\w+\s?/g, '') : '0')}
+                  parser={value => {
+                    return value ? value.replace(/^[A-Za-z]+\s?/g, '') : 0;
+                  }}
                 />
               </Form.Item>
 
