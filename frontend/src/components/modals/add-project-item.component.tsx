@@ -11,6 +11,7 @@ import { IState } from '../../store';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
 
 import './modals.styles.less';
+import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects.pages";
 
 const { Option } = Select;
 
@@ -102,28 +103,6 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
       );
   }
 }
-
-const flattenOwnedProject = (
-  ownedProjects: Project[],
-  flattenedProjects: Project[]
-) => {
-  ownedProjects.forEach(project => {
-    flattenOwnedProject(project.subProjects, flattenedProjects);
-    flattenedProjects.push(project);
-  });
-};
-
-const flattenSharedProject = (
-  sharedProjects: ProjectsWithOwner[],
-  flattenedProjects: Project[]
-) => {
-  sharedProjects.forEach(sharedProject => {
-    sharedProject.projects.forEach(project => {
-      flattenOwnedProject(project.subProjects, flattenedProjects);
-      flattenedProjects.push(project);
-    });
-  });
-};
 
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,

@@ -37,7 +37,8 @@ zones.sort((a, b) => {
   }
   return 0;
 });
-var LocaleCurrency = require('locale-currency'); //currency code
+
+const LocaleCurrency = require('locale-currency'); //currency code
 
 type TransactionProps = {
   project: Project;

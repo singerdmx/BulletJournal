@@ -9,7 +9,7 @@ import { updateGroups } from '../../features/group/actions';
 import { updateProject } from '../../features/project/actions';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
-import { iconMapper } from '../../components/side-menu/side-menu.compoennt';
+import { iconMapper } from '../side-menu/side-menu.component';
 
 import './modals.styles.less';
 

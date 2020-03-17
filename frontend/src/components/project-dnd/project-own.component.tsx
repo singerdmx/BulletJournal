@@ -21,14 +21,13 @@ export const iconMapper = {
 
 const getTree = (
     data: Project[],
-    owner: string,
     index: number
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Project) => {
         const node = {} as TreeNodeNormal;
         if (item.subProjects && item.subProjects.length) {
-            node.children = getTree(item.subProjects, owner, index);
+            node.children = getTree(item.subProjects, index);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
@@ -45,7 +44,6 @@ const getTree = (
 
 type ProjectProps = {
     id: number,
-    ownerName: string,
     ownProjects: Project[];
     updateProjectRelations: (Projects: Project[]) => void;
 };
@@ -133,8 +131,8 @@ const onClick = (history: History<History.PoorMansUnknown>) => (e:any) => {
 
 
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
-    const {ownProjects, history, ownerName, id, updateProjectRelations} = props;
-    const treeNode = getTree(ownProjects, ownerName, id);
+    const {ownProjects, history, id, updateProjectRelations} = props;
+    const treeNode = getTree(ownProjects, id);
 
     if (ownProjects.length === 0) {
         return <Empty />;

@@ -48,7 +48,7 @@ export const iconMapper = {
 
 // props of router
 type PathProps = RouteComponentProps;
-// class compoennt
+// class component
 class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   // click handler when click menu item
   onClick = (menu: any) => {
@@ -60,7 +60,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     this.props.history.push(`/projects/${projectId}`);
   };
 
-  // claick handler when clicking on the groups submenu
+  // click handler when clicking on the groups submenu
   onGroupsClick = (menu: any) => {
     this.props.history.push(`/${menu.key}`);
   };
@@ -119,7 +119,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
               </span>
             }
           >
-            <OwnProject ownProjects={ownProjects} ownerName={'test'} id={1} />
+            <OwnProject ownProjects={ownProjects} id={1} />
           </SubMenu>
           <SubMenu
             key='sharedProjects'

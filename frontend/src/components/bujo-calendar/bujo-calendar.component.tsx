@@ -19,7 +19,7 @@ import {
 } from '../../features/myBuJo/actions';
 import './bujo-calendar.styles.less';
 import { CalendarMode } from 'antd/lib/calendar/generateCalendar';
-import {iconMapper} from "../side-menu/side-menu.compoennt";
+import {iconMapper} from "../side-menu/side-menu.component";
 import {ProjectType} from "../../features/project/constants";
 
 type BujoCalendarProps = {

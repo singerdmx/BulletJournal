@@ -6,6 +6,7 @@ import BujoPage from '../../pages/bujo.pages';
 import GroupPage from '../../pages/group.pages';
 import GroupsPage from '../../pages/groups.pages';
 import ProjectPage from '../../pages/project.pages';
+import ProjectsPage from '../../pages/projects.pages';
 import LabelsPage from '../../pages/labels';
 import { Layout } from 'antd';
 
@@ -18,6 +19,7 @@ class ContentLayout extends React.Component {
           <Route exact path="/" component={HomePage} />
           <Route exact path="/bujo/:category" component={BujoPage} />
           <Route exact path="/settings" component={SettingPage} />
+          <Route exact path="/projects" component={ProjectsPage} />
           <Route exact path="/projects/:projectId" component={ProjectPage} />
           <Route exact path="/groups" component={GroupsPage} />
           <Route exact path="/groups/:groupId" component={GroupPage} />

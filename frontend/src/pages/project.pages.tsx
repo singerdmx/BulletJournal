@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {GroupsWithOwner} from '../features/group/interface';
 import {Avatar, Divider, Popconfirm, Tooltip} from 'antd';
 import {deleteProject, getProject} from '../features/project/actions';
-import {iconMapper} from '../components/side-menu/side-menu.compoennt';
+import {iconMapper} from '../components/side-menu/side-menu.component';
 import {DeleteOutlined, TeamOutlined} from '@ant-design/icons';
 import EditProject from '../components/modals/edit-project.component';
 import AddNote from '../components/modals/add-note.component';

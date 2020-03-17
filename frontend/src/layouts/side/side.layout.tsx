@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout } from 'antd';
-import SideMenu from '../../components/side-menu/side-menu.compoennt';
+import SideMenu from '../../components/side-menu/side-menu.component';
 import * as logo from '../../assets/favicon466.ico';
 
 import './side.styles.less';
