@@ -215,8 +215,8 @@ public class ProjectDaoJpa {
                             new ResourceNotFoundException("Group " + updateProjectParams.getGroupId() + " not found"));
             project.setGroup(group);
 
-            Set<String> oldUsers = oldGroup.getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toSet());
-            Set<String> newUsers = group.getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toSet());
+            Set<String> oldUsers = oldGroup.getUsers().stream().filter(u -> u.isAccepted()).map(u -> u.getUser().getName()).collect(Collectors.toSet());
+            Set<String> newUsers = group.getUsers().stream().filter(u -> u.isAccepted()).map(u -> u.getUser().getName()).collect(Collectors.toSet());
 
             generateEvents(joined, removed, project, oldUsers, newUsers);
 
