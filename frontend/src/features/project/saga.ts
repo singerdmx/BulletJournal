@@ -34,8 +34,8 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
     const data = yield call(fetchProjects);
     const projects = yield data.json();
     const state = yield select();
-    var ownEtag = state.project.ownedProjectsEtag;
-    var shared = state.project.sharedProjectsEtag;
+    let ownEtag = state.project.ownedProjectsEtag;
+    let shared = state.project.sharedProjectsEtag;
     if (data.headers.get('Etag')) {
       const etags = data.headers.get('Etag').split('|');
       ownEtag = etags[0];
@@ -115,10 +115,11 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
 
 function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
   try {
-    const { projectId, name } = action.payload;
+    const { projectId, name, history } = action.payload;
     yield call(deleteProject, projectId);
     yield put(projectActions.projectsUpdate({}));
     yield call(message.success, `Project ${name} deleted`);
+    history.goBack();
   } catch (error) {
     yield call(message.error, `Delete project fail: ${error}`);
   }
@@ -136,6 +137,7 @@ function* patchProject(action: PayloadAction<PatchProjectAction>) {
     );
     yield put(projectActions.projectReceived({ project: data }));
     yield put(projectActions.projectsUpdate({}));
+    yield put(groupsActions.getGroup({ groupId: data.group.id }));
     yield call(message.success, 'Successfully updated project');
   } catch (error) {
     yield call(message.error, `update Project Fail: ${error}`);

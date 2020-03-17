@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Group, GroupsWithOwner } from './interface';
+import {History} from "history";
 
 export type ApiErrorAction = {
   error: string;
@@ -37,6 +38,7 @@ export type RemoveUserGroupAction = {
 export type DeleteGroupAction = {
   groupId: number;
   groupName: string;
+  history: History<History.PoorMansUnknown>
 };
 
 export type GetGroupAction = {

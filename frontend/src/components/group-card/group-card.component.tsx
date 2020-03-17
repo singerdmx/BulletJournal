@@ -15,18 +15,19 @@ import { IState } from '../../store';
 
 import './group-card.styles.less';
 import AddUser from '../modals/add-user.component';
+import {History} from "history";
 
 type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
-  deleteGroup: (groupId: number, groupName: string) => void;
+  deleteGroup: (groupId: number, groupName: string, history: History<History.PoorMansUnknown>) => void;
   removeUserGroupByUsername: (
     groupId: number,
     username: string,
     groupName: string
   ) => void;
-  getGroup: (groupdId: number) => void;
-  patchGroup: (groupdId: number, groupName: string) => void;
+  getGroup: (groupId: number) => void;
+  patchGroup: (groupId: number, groupName: string) => void;
 };
 
 type PathProps = RouteComponentProps;
@@ -69,8 +70,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   };
 
   deleteGroup = () => {
-    this.props.deleteGroup(this.props.group.id, this.props.group.name);
-    this.props.history.push("/groups");
+    this.props.deleteGroup(this.props.group.id, this.props.group.name, this.props.history);
   };
 
   titleChange = (content: string) => {

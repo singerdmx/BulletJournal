@@ -1,20 +1,20 @@
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import { Project } from '../features/project/interface';
-import { IState } from '../store';
-import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../features/group/interface';
-import { Avatar, Popconfirm, Tooltip, Divider } from 'antd';
-import { getProject } from '../features/project/actions';
-import { iconMapper } from '../components/side-menu/side-menu.compoennt';
-import { TeamOutlined, DeleteOutlined } from '@ant-design/icons';
+import {RouteComponentProps} from 'react-router';
+import {Project} from '../features/project/interface';
+import {IState} from '../store';
+import {connect} from 'react-redux';
+import {GroupsWithOwner} from '../features/group/interface';
+import {Avatar, Divider, Popconfirm, Tooltip} from 'antd';
+import {deleteProject, getProject} from '../features/project/actions';
+import {iconMapper} from '../components/side-menu/side-menu.compoennt';
+import {DeleteOutlined, TeamOutlined} from '@ant-design/icons';
 import EditProject from '../components/modals/edit-project.component';
 import AddNote from '../components/modals/add-note.component';
 import AddTask from '../components/modals/add-task.component';
 import AddTransaction from '../components/modals/add-transaction.component';
-import { ProjectType } from '../features/project/constants';
-import { deleteProject } from '../features/project/actions';
-import { NoteTree } from '../components/note-tree';
+import {ProjectType} from '../features/project/constants';
+import {NoteTree} from '../components/note-tree';
+import {History} from "history";
 
 type ProjectPathParams = {
   projectId: string;
@@ -34,19 +34,18 @@ interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
 }
 
 type ProjectPageProps = {
+  history: History<History.PoorMansUnknown>;
   project: Project;
   getProject: (projectId: number) => void;
-  deleteProject: (projectId: number, name: string) => void;
+  deleteProject: (projectId: number, name: string, history: History<History.PoorMansUnknown>) => void;
 };
 
 type MyselfProps = {
   myself: string;
 };
 
-class ProjectPage extends React.Component<
-  ProjectPageProps & ProjectPathProps & GroupProps & MyselfProps,
-  ModalState
-> {
+class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & GroupProps & MyselfProps,
+    ModalState> {
   state: ModalState = {
     isShow: false,
     groupName: ''
@@ -69,112 +68,111 @@ class ProjectPage extends React.Component<
   };
 
   saveProject = () => {
-    this.setState({ isShow: false });
+    this.setState({isShow: false});
   };
 
   onCancel = () => {
-    this.setState({ isShow: false });
+    this.setState({isShow: false});
   };
 
   render() {
-    const { project, myself } = this.props;
+    const {project, myself, history} = this.props;
 
     let createContent = null;
     let projectContent = null;
     switch (project.projectType) {
       case ProjectType.NOTE:
-        createContent = <AddNote />;
-        projectContent = <NoteTree />;
+        createContent = <AddNote/>;
+        projectContent = <NoteTree/>;
         break;
       case ProjectType.TODO:
-        createContent = <AddTask />;
+        createContent = <AddTask/>;
         break;
       case ProjectType.LEDGER:
-        createContent = <AddTransaction />;
+        createContent = <AddTransaction/>;
     }
 
     let editContent = null;
     let deleteContent = null;
     if (myself === project.owner) {
-      editContent = <EditProject />;
+      editContent = <EditProject/>;
       deleteContent = (
-        <Popconfirm
-          title='Are you sure?'
-          okText='Yes'
-          cancelText='No'
-          onConfirm={() => {
-            this.props.deleteProject(project.id, project.name);
-            this.props.history.push('/projects');
-          }}
-          className='group-setting'
-          placement='bottom'
-        >
-          <Tooltip placement='top' title='Delete Project'>
-            <DeleteOutlined
-              style={{
-                fontSize: 20,
-                marginLeft: '10px',
-                cursor: 'pointer',
-                marginBottom: '0.5em'
+          <Popconfirm
+              title='Are you sure?'
+              okText='Yes'
+              cancelText='No'
+              onConfirm={() => {
+                this.props.deleteProject(project.id, project.name, history);
               }}
-            />
-          </Tooltip>
-        </Popconfirm>
+              className='group-setting'
+              placement='bottom'
+          >
+            <Tooltip placement='top' title='Delete Project'>
+              <DeleteOutlined
+                  style={{
+                    fontSize: 20,
+                    marginLeft: '10px',
+                    cursor: 'pointer',
+                    marginBottom: '0.5em'
+                  }}
+              />
+            </Tooltip>
+          </Popconfirm>
       );
     }
 
     let description = null;
     if (project.description) {
       description = (<div className='project-description'>
-        {project.description.split("\n").map((s,key) => {
+        {project.description.split("\n").map((s, key) => {
           return <p>{s}</p>;
         })}
-        <Divider style={{marginTop: '8px'}} />
+        <Divider style={{marginTop: '8px'}}/>
       </div>);
     }
 
     return (
-      <div className='project'>
-        <div className='project-header'>
-          <h2>
-            <Tooltip placement='top' title={project.owner}>
+        <div className='project'>
+          <div className='project-header'>
+            <h2>
+              <Tooltip placement='top' title={project.owner}>
               <span>
-                <Avatar size='large' src={project.ownerAvatar} />
+                <Avatar size='large' src={project.ownerAvatar}/>
               </span>
-            </Tooltip>
-            &nbsp;&nbsp;&nbsp;
-            <Tooltip
-              placement='top'
-              title={`${project.projectType} ${project.name}`}
-            >
+              </Tooltip>
+              &nbsp;&nbsp;&nbsp;
+              <Tooltip
+                  placement='top'
+                  title={`${project.projectType} ${project.name}`}
+              >
               <span>
                 {iconMapper[project.projectType]}
                 &nbsp;{project.name}
               </span>
-            </Tooltip>
-          </h2>
+              </Tooltip>
+            </h2>
 
-          <div className='project-control'>
-            <span style={{ cursor: 'pointer' }}>
+            <div className='project-control'>
+            <span style={{cursor: 'pointer'}}>
               <Tooltip
-                placement='top'
-                title={project.group && `Group: ${project.group.name}`}
+                  placement='top'
+                  title={project.group && `Group: ${project.group.name}`}
               >
                 <h2 onClick={e => this.onClickGroup(project.group.id)}>
-                  <TeamOutlined />
+                  <TeamOutlined/>
                   {project.group && project.group.users.length}
                 </h2>
               </Tooltip>
             </span>
 
-            {createContent}
-            {editContent}
-            {deleteContent}
+              {createContent}
+              {editContent}
+              {deleteContent}
+            </div>
           </div>
+          <div>{description}</div>
+          <div className='project-content'>{projectContent}</div>
         </div>
-        <div>{description}</div>
-        <div className='project-content'>{projectContent}</div>
-      </div>
     );
   }
 }
@@ -185,6 +183,6 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself.username
 });
 
-export default connect(mapStateToProps, { getProject, deleteProject })(
-  ProjectPage
+export default connect(mapStateToProps, {getProject, deleteProject})(
+    ProjectPage
 );

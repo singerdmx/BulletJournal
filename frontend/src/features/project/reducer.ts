@@ -43,6 +43,7 @@ export type UpdateProjectRelationsAction = {
 export type DeleteProjectAction = {
   projectId: number;
   name: string;
+  history: History<History.PoorMansUnknown>;
 };
 
 export type Projects = {

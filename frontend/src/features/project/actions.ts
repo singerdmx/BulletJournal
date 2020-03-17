@@ -21,8 +21,8 @@ export const getProject = (projectId: number) =>
   actions.getProject({ projectId: projectId });
 export const updateSharedProjectsOrder = (projectOwners: string[]) =>
   actions.updateSharedProjectsOrder({ projectOwners: projectOwners });
-export const deleteProject = (projectId: number, name: string) =>
-  actions.deleteProject({ projectId: projectId, name: name });
+export const deleteProject = (projectId: number, name: string, history: History<History.PoorMansUnknown>) =>
+  actions.deleteProject({ projectId: projectId, name: name, history: history});
 export const updateProject = (
   projectId: number,
   description: string,

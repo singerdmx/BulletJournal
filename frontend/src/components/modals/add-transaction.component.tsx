@@ -126,12 +126,13 @@ const AddTransaction: React.FC<RouteComponentProps &
             </Form.Item>
             <Form.Item
               name="payerName"
-              label=" Payer"
+              label="Payer"
               labelCol={{span: 4}}
+              style={{marginLeft: '10px'}}
               wrapperCol={{ span: 20 }}
             >
               {!props.group.users ? null : (
-                <Select defaultValue={props.myself}>
+                <Select defaultValue={props.myself} style={{marginLeft: '-8px'}}>
                   {props.group.users.map(user => {
                     return (
                       <Option value={user.name} key={user.name}>
@@ -177,18 +178,21 @@ const AddTransaction: React.FC<RouteComponentProps &
 
             <div style={{ display: 'flex' }}>
               <Form.Item
-                label="Time"
                 name="date"
                 rules={[{ required: true, message: 'Missing Date!' }]}
               >
-                <DatePicker placeholder="Select Date" />
+                <Tooltip title="Select Date">
+                  <DatePicker placeholder="Select Date" />
+                </Tooltip>
               </Form.Item>
               <Form.Item name="time" style={{ width: '100px' }}>
-                <TimePicker
-                  allowClear
-                  format="HH:mm"
-                  placeholder="Select Time"
-                />
+                <Tooltip title="Select Time">
+                  <TimePicker
+                    allowClear
+                    format="HH:mm"
+                    placeholder="Select Time"
+                  />
+                </Tooltip>
               </Form.Item>
 
               <Form.Item name="timezone">
