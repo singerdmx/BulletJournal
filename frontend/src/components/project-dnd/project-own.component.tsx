@@ -1,6 +1,6 @@
 import React from 'react';
 import {History} from 'history';
-import {Tree} from 'antd';
+import {Tree,Empty} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
 import {updateProjectRelations} from '../../features/project/actions';
@@ -135,6 +135,10 @@ const onClick = (history: History<History.PoorMansUnknown>) => (e:any) => {
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
     const {ownProjects, history, ownerName, id, updateProjectRelations} = props;
     const treeNode = getTree(ownProjects, ownerName, id);
+
+    if (ownProjects.length === 0) {
+        return <Empty />;
+    }
 
     return (<div style={{marginLeft: '20%'}}><Tree
         className="ant-tree"

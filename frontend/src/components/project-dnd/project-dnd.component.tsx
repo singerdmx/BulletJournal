@@ -1,6 +1,6 @@
 import React from 'react';
 import { History } from 'history';
-import { Tree, Tooltip } from 'antd';
+import {Tree, Tooltip, Empty} from 'antd';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { updateSharedProjectsOrder } from '../../features/project/actions';
@@ -77,7 +77,6 @@ type ProjectProps = {
 
 class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
   onDragEnd = (result: any) => {
-    console.log(result);
     const newOwners = reorder(
       this.props.sharedProjects,
       result.source.index,
@@ -86,6 +85,9 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
     this.props.updateSharedProjectsOrder(newOwners);
   };
   render() {
+    if (this.props.sharedProjects.length === 0) {
+      return <Empty />;
+    }
     return (
       <div className="draggable-projects">
         <DragDropContext onDragEnd={this.onDragEnd}>
