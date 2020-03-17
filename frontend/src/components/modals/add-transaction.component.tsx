@@ -53,7 +53,7 @@ interface TransactionCreateFormProps {
     date: string,
     transactionType: number,
     timezone: string,
-    time: string,
+    time: string
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   currency: string;
@@ -89,18 +89,19 @@ const AddTransaction: React.FC<RouteComponentProps &
   }, []);
 
   return (
-    <Tooltip placement='top' title='Create New Transaction'>
-      <div className='add-transaction'>
+    <Tooltip placement="top" title="Create New Transaction">
+      <div className="add-transaction">
         <PlusOutlined
           style={{ fontSize: 20, cursor: 'pointer' }}
           onClick={openModal}
-          title='Create New Transaction'
+          title="Create New Transaction"
         />
         <Modal
           destroyOnClose
-          title='Create New Transaction'
+          centered
+          title="Create New Transaction"
           visible={visible}
-          okText='Create'
+          okText="Create"
           onCancel={onCancel}
           onOk={() => {
             form
@@ -113,22 +114,26 @@ const AddTransaction: React.FC<RouteComponentProps &
               .catch(info => console.log(info));
           }}
         >
-          <Form form={form}>
+          <Form form={form} labelAlign="left">
             <Form.Item
-              name='transactionName'
+              name="transactionName"
+              label="Name"
               rules={[{ required: true, message: 'Missing Transaction Name!' }]}
             >
-              <Input placeholder='Enter Transaction Name' allowClear />
+              <Input placeholder="Enter Transaction Name" allowClear />
             </Form.Item>
             <div style={{ display: 'flex' }}>
-              <span>Payer&nbsp;&nbsp;</span>
-              <Form.Item name='payerName' style={{ width: '100%' }}>
+              <Form.Item
+                name="payerName"
+                style={{ width: '100%' }}
+                label=" Payer"
+              >
                 {!props.group.users ? null : (
                   <Select defaultValue={props.myself}>
                     {props.group.users.map(user => {
                       return (
                         <Option value={user.name} key={user.name}>
-                          <Avatar size='small' src={user.avatar} />
+                          <Avatar size="small" src={user.avatar} />
                           &nbsp;&nbsp; <strong>{user.name}</strong>
                         </Option>
                       );
@@ -137,24 +142,25 @@ const AddTransaction: React.FC<RouteComponentProps &
                 )}
               </Form.Item>
             </div>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Form.Item
-                name='amount'
+                name="amount"
+                label="Amount"
                 rules={[{ required: true, message: 'Missing Amount!' }]}
                 style={{ display: 'flex' }}
               >
                 <InputNumber
-                  placeholder='Enter Amount'
-                  style={{ width: '70%' }}
+                  placeholder="Enter Amount"
+                  style={{ width: 180 }}
+                  formatter={value =>
+                    `${LocaleCurrency.getCurrency(props.currency)} ${value}`
+                  }
+                  parser={value => (value ? value.replace(/\w+\s?/g, '') : '0')}
                 />
               </Form.Item>
-              <span>
-                &nbsp;&nbsp;{LocaleCurrency.getCurrency(props.currency)}
-                &nbsp;&nbsp;
-              </span>
 
               <Form.Item
-                name='transactionType'
+                name="transactionType"
                 rules={[{ required: true, message: 'Missing Type!' }]}
                 style={{ marginLeft: '30px' }}
               >
@@ -167,31 +173,30 @@ const AddTransaction: React.FC<RouteComponentProps &
 
             <div style={{ display: 'flex' }}>
               <Form.Item
-                name='date'
-                style={{ width: '180px' }}
+                label="Time"
+                name="date"
                 rules={[{ required: true, message: 'Missing Date!' }]}
               >
-                <DatePicker placeholder='Select Date' />
+                <DatePicker placeholder="Select Date" />
               </Form.Item>
-
-              <Form.Item name='time' style={{ width: '180px' }}>
+              <Form.Item name="time" style={{ width: '100px' }}>
                 <TimePicker
                   allowClear
-                  format='HH:mm'
-                  placeholder='Select Time'
+                  format="HH:mm"
+                  placeholder="Select Time"
                 />
               </Form.Item>
 
-              <Form.Item name='timezone'>
+              <Form.Item name="timezone">
                 <Tooltip title="Time Zone">
                   <Select
                     showSearch={true}
-                    placeholder='Select Time Zone'
+                    placeholder="Select Time Zone"
                     defaultValue={props.timezone ? props.timezone : ''}
                   >
                     {zones.map((zone: string, index: number) => (
                       <Option key={zone} value={zone}>
-                        <Tooltip title={zone} placement='right'>
+                        <Tooltip title={zone} placement="right">
                           {zone}
                         </Tooltip>
                       </Option>
