@@ -102,9 +102,17 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: a
     const dropPos = info.node.props.pos.split('-');
     const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
     const dragNotes = dragNoteById(notes, parseInt(info.dragNode.key));
+    const droppingIndex = info.dropPosition + 1;
     let resNotes = [] as Note[];
     if(dropPosition===-1){
-        resNotes = [...dragNotes, targetNote];
+        const dragIndex = notes.findIndex(note => note.id === targetNote.id);
+        if (dragIndex >= droppingIndex) {
+            dragNotes.splice(droppingIndex, 0, targetNote);
+            resNotes = dragNotes;
+        } else {
+            dragNotes.splice(droppingIndex - 1, 0, targetNote);
+            resNotes = dragNotes;
+        }
     }else{
        resNotes = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
     }
