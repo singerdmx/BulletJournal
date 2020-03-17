@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Tooltip, Select } from 'antd';
+import { Modal, Button, Tooltip, Select, Avatar } from 'antd';
 import {
   PlusOutlined
 } from '@ant-design/icons';
@@ -9,6 +9,7 @@ import { createProjectByName } from '../../features/project/actions';
 import { updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
+import { iconMapper } from "../side-menu/side-menu.component";
 
 import './modals.styles.less';
 import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects.pages";
@@ -74,12 +75,19 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
       ]}
     >
       <div>
-        <Select defaultValue="lucy" style={{ width: 120 }}>
-          <Option value="jack">Jack</Option>
-          <Option value="lucy">Lucy</Option>
-          <Option value="Yiminghe">yiminghe</Option>
-        </Select>
-      </div>
+        <Select placeholder="Choose Project" style={{ width: "100%" }}>
+          {this.state.selections.map(project => {
+            return (
+              <Option value={project.id} key={project.id}>
+                <Avatar size="small" src={project.ownerAvatar} />
+                &nbsp; {iconMapper[project.projectType]}
+                &nbsp; {project.name}
+                &nbsp; (Group {project.group.name})
+              </Option>
+             );
+           })}
+         </Select>
+       </div>
     </Modal>);
       if (this.props.mode === 'MyBuJo') {
         return (
