@@ -29,7 +29,7 @@ function* getProjectItems(action: PayloadAction<GetProjectItemsAction>) {
     let types = [] as ProjectType[];
     if (state.myBuJo.ledgerSelected) types.push(ProjectType.LEDGER);
     if (state.myBuJo.todoSelected) types.push(ProjectType.TODO);
-    
+
     let data = [];
     if (!startDate || !endDate) return;
 
@@ -54,6 +54,9 @@ function* getProjectItemsAfterUpdateSelect(
       category
     } = action.payload;
 
+    console.log("sssss");
+    console.log(ledgerSelected);
+
     yield put(
       projectItemsActions.updateSelected({
         todoSelected: todoSelected,
@@ -68,7 +71,6 @@ function* getProjectItemsAfterUpdateSelect(
     let data = [];
     const state: IState = yield select();
 
-    console.log(types);
     if (category === 'calendar') {
       if (state.myBuJo.calendarMode === 'month') {
         data = yield call(fetchProjectItems, types, state.myself.timezone,

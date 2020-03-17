@@ -1,6 +1,6 @@
 import React from 'react';
 import {History} from 'history';
-import {Tree, Tooltip} from 'antd';
+import {Tree} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
 import {updateProjectRelations} from '../../features/project/actions';

@@ -1,14 +1,12 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Button, Collapse, Divider, Form, PageHeader, Select, Tooltip} from 'antd';
+import {Button, Divider, Form, PageHeader, Select, Tooltip} from 'antd';
 import {Label} from '../../features/label/interface';
 import {getItemsByLabels} from '../../features/label/actions';
 import {IState} from '../../store';
 import {SearchOutlined} from '@ant-design/icons';
 import {ProjectItems} from '../../features/myBuJo/interface';
 import ProjectModelItems from "../../components/project-item/project-model-items.component";
-
-const {Panel} = Collapse;
 
 type LabelSearchProps = {
   labelOptions: Label[];
