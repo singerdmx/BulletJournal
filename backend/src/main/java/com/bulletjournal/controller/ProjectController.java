@@ -68,6 +68,9 @@ public class ProjectController {
 
     private Project addOwnerAvatar(Project project) {
         project.setOwnerAvatar(this.userClient.getUser(project.getOwner()).getAvatar());
+        for (Project child : project.getSubProjects()) {
+            addOwnerAvatar(child);
+        }
         return project;
     }
 
