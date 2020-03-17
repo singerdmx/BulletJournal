@@ -3,10 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.Informed;
-import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.RemoveUserFromGroupEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.MDC;
@@ -50,7 +47,10 @@ public class GroupController {
     @DeleteMapping(GROUP_ROUTE)
     public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.delete(groupId, username);
+        List<Event> events = this.groupDaoJpa.delete(groupId, username);
+        this.notificationService.inform(
+                new DeleteGroupEvent(events,
+                        username));
         return ResponseEntity.ok().build();
     }
 

@@ -16,7 +16,6 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.UserGroupKey;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -61,7 +60,7 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void delete(final Long groupId, final String requester) {
+    public List<Event> delete(final Long groupId, final String requester) {
 
         Group group = this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
@@ -76,17 +75,14 @@ public class GroupDaoJpa {
         List<Event> events = new ArrayList<>();
         for (UserGroup userGroup : group.getUsers()) {
             this.userGroupRepository.delete(userGroup);
-            events.add(new Event(
-                    userGroup.getUser().getName(), userGroup.getGroup().getId(), userGroup.getGroup().getName()));
+            String targetUser = userGroup.getUser().getName();
+            if (!Objects.equals(targetUser, requester)) {
+                events.add(new Event(targetUser, userGroup.getGroup().getId(), userGroup.getGroup().getName()));
+            }
         }
 
         this.groupRepository.delete(group);
-
-        this.notificationService.inform(
-                new DeleteGroupEvent(
-                        events.stream().filter(u -> !Objects.equals(u.getTargetUser(), requester))
-                                .collect(Collectors.toList()),
-                        requester));
+        return events;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -181,7 +177,7 @@ public class GroupDaoJpa {
         }
         this.userGroupRepository.save(new UserGroup(user, group, false));
 
-        return new JoinGroupEvent(ImmutableList.of(new Event(username, groupId, group.getName())), owner);
+        return new JoinGroupEvent(new Event(username, groupId, group.getName()), owner);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
