@@ -1,20 +1,16 @@
 import React from 'react';
-import { DatePicker, Tooltip, Divider, Timeline, Collapse } from 'antd';
+import {DatePicker, Divider, Tooltip} from 'antd';
 import moment from 'moment';
-import { connect } from 'react-redux';
-import { IState } from '../../store';
-import { Link } from 'react-router-dom';
-import { AccountBookOutlined, CarryOutOutlined } from '@ant-design/icons';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { dateFormat } from '../../features/myBuJo/constants';
-import {
-  getProjectItems,
-  updateMyBuJoDates
-} from '../../features/myBuJo/actions';
-import { ProjectItems } from '../../features/myBuJo/interface';
+import {connect} from 'react-redux';
+import {IState} from '../../store';
+import {Link} from 'react-router-dom';
+import {updateExpandedMyself} from '../../features/myself/actions';
+import {dateFormat} from '../../features/myBuJo/constants';
+import {getProjectItems, updateMyBuJoDates} from '../../features/myBuJo/actions';
+import {ProjectItems} from '../../features/myBuJo/interface';
+import ProjectModelItems from "../project-item/project-model-items.component";
 
-const { RangePicker } = DatePicker;
-const { Panel } = Collapse;
+const {RangePicker} = DatePicker;
 
 type ProjectItemProps = {
   todoSelected: boolean;
@@ -26,10 +22,10 @@ type ProjectItemProps = {
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateMyBuJoDates: (startDate: string, endDate: string) => void;
   getProjectItems: (
-    startDate: string,
-    endDate: string,
-    timezone: string,
-    category: string
+      startDate: string,
+      endDate: string,
+      timezone: string,
+      category: string
   ) => void;
 };
 
@@ -41,95 +37,47 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
   handleRangeChange = (dates: any, dateStrings: string[]) => {
     this.props.updateMyBuJoDates(dateStrings[0], dateStrings[1]);
     this.props.getProjectItems(
-      dateStrings[0],
-      dateStrings[1],
-      this.props.timezone,
-      'today'
-    );
-  };
-
-  getTasksPanel = (items: ProjectItems, index: number) => {
-    if (items.tasks.length === 0) {
-      return null;
-    }
-    return (
-      <Panel
-        header={items.dayOfWeek}
-        key={`tasks${index}`}
-        extra={<CarryOutOutlined />}
-      ></Panel>
-    );
-  };
-
-  getTransactionsPanel = (items: ProjectItems, index: number) => {
-    if (items.transactions.length === 0) {
-      return null;
-    }
-    return (
-      <Panel
-        header={items.dayOfWeek}
-        key={`transactions${index}`}
-        extra={<AccountBookOutlined />}
-      ></Panel>
+        dateStrings[0],
+        dateStrings[1],
+        this.props.timezone,
+        'today'
     );
   };
 
   render() {
     return (
-      <div className='todo-list'>
-        <div className='todo-panel'>
-          <RangePicker
-            allowClear={false}
-            value={[
-              moment(
-                this.props.startDate
-                  ? this.props.startDate
-                  : new Date().toLocaleString('fr-CA'),
-                dateFormat
-              ),
-              moment(
-                this.props.endDate
-                  ? this.props.endDate
-                  : new Date().toLocaleString('fr-CA'),
-                dateFormat
-              )
-            ]}
-            format={dateFormat}
-            onChange={this.handleRangeChange}
-          />
-          <Tooltip placement='top' title='Change Time Zone'>
-            <Link to='/settings' style={{ paddingLeft: '30px' }}>
-              {this.props.timezone}
-            </Link>
-          </Tooltip>
+        <div className='todo-list'>
+          <div className='todo-panel'>
+            <RangePicker
+                allowClear={false}
+                value={[
+                  moment(
+                      this.props.startDate
+                          ? this.props.startDate
+                          : new Date().toLocaleString('fr-CA'),
+                      dateFormat
+                  ),
+                  moment(
+                      this.props.endDate
+                          ? this.props.endDate
+                          : new Date().toLocaleString('fr-CA'),
+                      dateFormat
+                  )
+                ]}
+                format={dateFormat}
+                onChange={this.handleRangeChange}
+            />
+            <Tooltip placement='top' title='Change Time Zone'>
+              <Link to='/settings' style={{paddingLeft: '30px'}}>
+                {this.props.timezone}
+              </Link>
+            </Tooltip>
+          </div>
+          <Divider></Divider>
+          <div>
+            <ProjectModelItems projectItems={this.props.projectItems}/>
+          </div>
         </div>
-        <Divider></Divider>
-        <div>
-          {
-            <Timeline mode={'left'}>
-              {this.props.projectItems.map((items, index) => {
-                return (
-                  <Timeline.Item
-                    key={items.date}
-                    label={items.date}
-                    style={{ marginLeft: '-65%' }}
-                  >
-                    <Collapse
-                      defaultActiveKey={[
-                        'tasks' + index,
-                        'transactions' + index
-                      ]}
-                    >
-                      {this.getTasksPanel(items, index)}
-                      {this.getTransactionsPanel(items, index)}
-                    </Collapse>
-                  </Timeline.Item>
-                );
-              })}
-            </Timeline>
-          }
-        </div>
-      </div>
     );
   }
 }
