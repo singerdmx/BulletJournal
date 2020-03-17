@@ -33,6 +33,7 @@ export const flattenOwnedProject = (
         flattenOwnedProject(project.subProjects, flattenedProjects);
         flattenedProjects.push(project);
     });
+    return flattenedProjects;
 };
 
 export const flattenSharedProject = (
@@ -45,6 +46,7 @@ export const flattenSharedProject = (
             flattenedProjects.push(project);
         });
     });
+    return flattenedProjects;
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
