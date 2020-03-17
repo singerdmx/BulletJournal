@@ -56,18 +56,20 @@ class AddProjectItem extends React.Component<GroupProps & ProjectItemProps,
     let projectSelections = null;
     if (this.state.selections && this.state.selections[0]) {
       projectSelections =
-          <Select placeholder="Choose Project" style={{width: "100%"}} defaultValue={this.state.selections[0].id}>
-            {this.state.selections.map(project => {
-              return (
-                  <Option value={project.id} key={project.id}>
-                    <Avatar size="small" src={project.ownerAvatar}/>
-                    &nbsp; {iconMapper[project.projectType]}
-                    &nbsp; <strong>{project.name}</strong>
-                    &nbsp; (Group <strong>{project.group.name}</strong>)
-                  </Option>
-              );
-            })}
-          </Select>
+          <Tooltip title='Choose Project' placement='topLeft'>
+              <Select placeholder="Choose Project" style={{width: "100%"}} defaultValue={this.state.selections[0].id}>
+                {this.state.selections.map(project => {
+                  return (
+                      <Option value={project.id} key={project.id}>
+                        <Avatar size="small" src={project.ownerAvatar}/>
+                        &nbsp; {iconMapper[project.projectType]}
+                        &nbsp; <strong>{project.name}</strong>
+                        &nbsp; (Group <strong>{project.group.name}</strong>)
+                      </Option>
+                  );
+                })}
+              </Select>
+          </Tooltip>
     }
     const modal = (
         <Modal
