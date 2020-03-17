@@ -1,17 +1,10 @@
 import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
-import {withRouter, RouteComponentProps} from 'react-router';
+import {RouteComponentProps, withRouter} from 'react-router';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
-import { Tree } from 'antd';
-import { TreeTitle } from '.';
-import {
-    FormOutlined
-  } from '@ant-design/icons';
-import {
-    deleteNote,
-    updateNotes,
-    putNote
-} from '../../features/notes/actions';
+import {Tree} from 'antd';
+import {TreeTitle} from '.';
+import {deleteNote, putNote, updateNotes} from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
 import {IState} from '../../store';
 import './note-tree.component.styles.less';
@@ -37,7 +30,7 @@ const getTree = (
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        node.title = <TreeTitle  title={item.name}/>;
+        node.title = <TreeTitle title={item.name}/>;
         node.key = item.id.toString();
         res.push(node);
     });
@@ -66,7 +59,7 @@ const findNoteById = (notes: Note[], noteId: number): Note => {
         }
     }
     return res;
-}
+};
 
 const dragNoteById = (notes: Note[], noteId: number): Note[] => {
     let res = [] as Note[];
@@ -76,9 +69,9 @@ const dragNoteById = (notes: Note[], noteId: number): Note[] => {
         note = {...item, subNotes: subNotes};
         if (note.id !== noteId) res.push(note);
 
-    })
+    });
     return res;
-}
+};
 
 const DropNoteById = (notes: Note[], dropId: number, dropNote: Note): Note[] => {
     let res = [] as Note[];
@@ -91,11 +84,11 @@ const DropNoteById = (notes: Note[], dropId: number, dropNote: Note): Note[] => 
         } else {
             subNotes = DropNoteById(item.subNotes, dropId, dropNote);
         }
-        note = {...item, subNotes: subNotes}
+        note = {...item, subNotes: subNotes};
         res.push(note);
-    })
+    });
     return res;
-}
+};
 
 const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: any) => {
     const targetNote = findNoteById(notes, parseInt(info.dragNode.key));
@@ -104,7 +97,7 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: a
     const dragNotes = dragNoteById(notes, parseInt(info.dragNode.key));
     const droppingIndex = info.dropPosition + 1;
     let resNotes = [] as Note[];
-    if(dropPosition===-1){
+    if (dropPosition === -1) {
         const dragIndex = notes.findIndex(note => note.id === targetNote.id);
         if (dragIndex >= droppingIndex) {
             dragNotes.splice(droppingIndex, 0, targetNote);
@@ -113,11 +106,11 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: a
             dragNotes.splice(droppingIndex - 1, 0, targetNote);
             resNotes = dragNotes;
         }
-    }else{
-       resNotes = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
+    } else {
+        resNotes = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
     }
     putNote(projectId, resNotes);
-}
+};
 
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
     const {projectId, notes, putNote, updateNotes} = props;
@@ -125,7 +118,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
         if (projectId) {
             updateNotes(projectId);
         }
-    }, [projectId])
+    }, [projectId]);
     let treeNote = getTree(notes, `project${projectId}`, projectId);
 
     return (<Tree
@@ -133,10 +126,9 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
         draggable
         blockNode
         onDragEnter={onDragEnter}
-        // switcherIcon={<FormOutlined/>}
         onDrop={onDrop(notes, putNote, projectId)}
         treeData={treeNote}/>);
-}
+};
 
 const mapStateToProps = (state: IState) => ({
     projectId: state.project.project.id,
