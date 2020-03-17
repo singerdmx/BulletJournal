@@ -2,7 +2,7 @@ import React from 'react';
 import { DashOutlined } from '@ant-design/icons';
 import { List, Checkbox, Menu, Dropdown } from 'antd';
 
-import './todo-item.styles.less';
+import './project-item.styles.less';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 
 interface ItemProps {

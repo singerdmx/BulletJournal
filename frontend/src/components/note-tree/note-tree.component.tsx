@@ -37,7 +37,7 @@ const getTree = (
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        node.title = <TreeTitle title={item.name}/>;
+        node.title = <TreeTitle  title={item.name}/>;
         node.key = item.id.toString();
         res.push(node);
     });
@@ -122,7 +122,6 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
 
     return (<Tree
         className="ant-tree"
-        multiple
         draggable
         blockNode
         onDragEnter={onDragEnter}

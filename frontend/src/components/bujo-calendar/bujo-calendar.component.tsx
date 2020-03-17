@@ -19,6 +19,8 @@ import {
 } from '../../features/myBuJo/actions';
 import './bujo-calendar.styles.less';
 import { CalendarMode } from 'antd/lib/calendar/generateCalendar';
+import {iconMapper} from "../side-menu/side-menu.compoennt";
+import {ProjectType} from "../../features/project/constants";
 
 type BujoCalendarProps = {
   selectedCalendarDay: string;
@@ -76,9 +78,9 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
         {
           targets.map((targetDay: ProjectItems, index: number) => {
             return (<div key={`bujo${index}`}>
-              {targetDay.notes.map(n => <div key={`notes${n.id}`}><Badge><FileTextOutlined />&nbsp;{n.name}</Badge></div>)}
-              {targetDay.tasks.map(t => <div key={`tasks${t.id}`}><Badge><CarryOutOutlined />&nbsp;{t.name}</Badge></div>)}
-              {targetDay.transactions.map(t => <div key={`transactions${t.id}`}><Badge><AccountBookOutlined />&nbsp;{t.name}</Badge></div>)}
+              {targetDay.notes.map(n => <div key={`notes${n.id}`}><Badge>{iconMapper[ProjectType.NOTE]}&nbsp;{n.name}</Badge></div>)}
+              {targetDay.tasks.map(t => <div key={`tasks${t.id}`}><Badge>{iconMapper[ProjectType.TODO]}&nbsp;{t.name}</Badge></div>)}
+              {targetDay.transactions.map(t => <div key={`transactions${t.id}`}><Badge>{iconMapper[ProjectType.LEDGER]}&nbsp;{t.name}</Badge></div>)}
             </div>)
           })
         }

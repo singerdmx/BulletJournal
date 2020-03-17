@@ -44,13 +44,11 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
       yield put(getProjectItems(currentTime, currentTime, data.timezone, 'today'));
     }
 
-    if (!state.myBuJo.selectedCalendarDay) {
-      yield put(updateSelectedCalendarDay(currentTime));
-      yield put(getProjectItems(
-        moment(new Date()).add(-60, 'days').format(dateFormat),
-        moment(new Date()).add(60, 'days').format(dateFormat),
-        data.timezone, 'calendar'));
-    }
+    yield put(updateSelectedCalendarDay(currentTime));
+    yield put(getProjectItems(
+      moment(new Date()).add(-60, 'days').format(dateFormat),
+      moment(new Date()).add(60, 'days').format(dateFormat),
+      data.timezone, 'calendar'));
 
     if (updateSettings) {
       yield put(settingsActions.updateTimezone({ timezone: data.timezone }));

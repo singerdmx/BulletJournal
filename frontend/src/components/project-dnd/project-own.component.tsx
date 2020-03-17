@@ -1,6 +1,6 @@
 import React from 'react';
 import {History} from 'history';
-import {Tree, Tooltip} from 'antd';
+import {Tree} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
 import {updateProjectRelations} from '../../features/project/actions';
@@ -22,36 +22,21 @@ export const iconMapper = {
 const getTree = (
     data: Project[],
     owner: string,
-    index: number,
-    history: History<History.PoorMansUnknown>
+    index: number
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Project) => {
         const node = {} as TreeNodeNormal;
         if (item.subProjects && item.subProjects.length) {
-            node.children = getTree(item.subProjects, owner, index, history);
+            node.children = getTree(item.subProjects, owner, index);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        if (item.owner) {
-            node.title = (
-                <Tooltip placement="right" title={'Owner: ' + item.owner}>
-          <span
-              onClick={e => history.push(`/projects/${item.id}`)}>
+        node.title = (
+          <span style={{width: '100%'}}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
           </span>
-                </Tooltip>
-            );
-        } else {
-            node.title = (
-                <Tooltip placement="right" title="Not Shared">
-          <span
-              style={{color: '#e0e0eb', cursor: 'default'}}>
-            {iconMapper[item.projectType]}&nbsp;{item.name}
-          </span>
-                </Tooltip>
-            );
-        }
+        );
         node.key = item.id.toString();
         res.push(node);
     });
@@ -96,7 +81,6 @@ const dragProjectById = (projects: Project[], projectId: number): Project[] => {
         const subProjects = dragProjectById(item.subProjects, projectId);
         project = {...item, subProjects: subProjects};
         if (project.id !== projectId) res.push(project);
-
     })
     return res;
 }
@@ -141,16 +125,24 @@ const onDrop = (projects: Project[], updateProject: Function) => (info: any) => 
     updateProject(resProjects);
 }
 
+const onClick = (history: History<History.PoorMansUnknown>) => (e:any) => {
+  if(e.length){
+    history.push(`/projects/${e[0]}`)
+  }
+}
+
+
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
     const {ownProjects, history, ownerName, id, updateProjectRelations} = props;
-    const treeNode = getTree(ownProjects, ownerName, id, history);
+    const treeNode = getTree(ownProjects, ownerName, id);
 
     return (<div style={{marginLeft: '20%'}}><Tree
         className="ant-tree"
         draggable
         blockNode
         onDragEnter={onDragEnter}
-        // switcherIcon={<FormOutlined/>}
+        selectable={true}
+        onSelect={onClick(history)}
         onDrop={onDrop(ownProjects, updateProjectRelations)}
         treeData={treeNode}/></div>);
 }

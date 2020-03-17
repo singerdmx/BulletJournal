@@ -10,7 +10,7 @@ type NoteProps = {
 const NoteTitle: React.FC<NoteProps> = props => {
     const { title } = props;
 
-    return (<div>
+    return (<div style={{width: '100%'}}>
         <FormOutlined/>
         <span style={{padding: '0 5px'}}>{title}</span>
     </div>);
