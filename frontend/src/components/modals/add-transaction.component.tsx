@@ -118,6 +118,8 @@ const AddTransaction: React.FC<RouteComponentProps &
             <Form.Item
               name="transactionName"
               label="Name"
+              labelCol={{span: 4}}
+              wrapperCol={{ span: 20 }}
               rules={[{ required: true, message: 'Missing Transaction Name!' }]}
             >
               <Input placeholder="Enter Transaction Name" allowClear />
@@ -125,7 +127,8 @@ const AddTransaction: React.FC<RouteComponentProps &
             <Form.Item
               name="payerName"
               label=" Payer"
-              wrapperCol={{ span: 12 }}
+              labelCol={{span: 4}}
+              wrapperCol={{ span: 20 }}
             >
               {!props.group.users ? null : (
                 <Select defaultValue={props.myself}>
@@ -140,14 +143,16 @@ const AddTransaction: React.FC<RouteComponentProps &
                 </Select>
               )}
             </Form.Item>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex'}}>
               <Form.Item
                 name="amount"
                 label="Amount"
+                labelCol={{span: 8}}
+                wrapperCol={{span: 8}}
                 rules={[{ required: true, message: 'Missing Amount!' }]}
               >
                 <InputNumber
-                  style={{ width: 180 }}
+                  style={{ width: 160 }}
                   formatter={value =>
                     `${LocaleCurrency.getCurrency(props.currency)} ${value}`
                   }
@@ -159,8 +164,9 @@ const AddTransaction: React.FC<RouteComponentProps &
 
               <Form.Item
                 name="transactionType"
+                style={{marginLeft : 15}}
+                colon={false}
                 rules={[{ required: true, message: 'Missing Type!' }]}
-                style={{ marginLeft: '30px' }}
               >
                 <Radio.Group>
                   <Radio value={0}>Income</Radio>
