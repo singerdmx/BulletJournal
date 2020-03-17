@@ -93,8 +93,9 @@ public class TransactionController {
     }
 
     @PostMapping(SHARE_TRANSACTION_ROUTE)
-    public void shareTransaction(
+    public String shareTransaction(
             @NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+        return null; // may be generated link
     }
 }

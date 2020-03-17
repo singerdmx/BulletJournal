@@ -130,8 +130,9 @@ public class TaskController {
     }
 
     @PostMapping(SHARE_TASK_ROUTE)
-    public void shareTask(
+    public String shareTask(
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+        return null; // may be generated link
     }
 }

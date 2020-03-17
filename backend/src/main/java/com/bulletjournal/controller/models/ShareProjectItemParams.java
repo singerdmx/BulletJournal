@@ -6,6 +6,8 @@ public class ShareProjectItemParams {
 
     private String targetUser;
 
+    private boolean generateLink;
+
     public ShareProjectItemParams() {
     }
 
@@ -23,5 +25,13 @@ public class ShareProjectItemParams {
 
     public void setTargetUser(String targetUser) {
         this.targetUser = targetUser;
+    }
+
+    public boolean isGenerateLink() {
+        return generateLink;
+    }
+
+    public void setGenerateLink(boolean generateLink) {
+        this.generateLink = generateLink;
     }
 }

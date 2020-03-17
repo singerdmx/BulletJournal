@@ -84,8 +84,9 @@ public class NoteController {
     }
 
     @PostMapping(SHARE_NOTE_ROUTE)
-    public void shareNote(
+    public String shareNote(
             @NotNull @PathVariable Long noteId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+        return null; // may be generated link
     }
 }
