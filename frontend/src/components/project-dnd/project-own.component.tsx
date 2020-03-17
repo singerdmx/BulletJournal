@@ -33,25 +33,11 @@ const getTree = (
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        if (item.owner) {
-            node.title = (
-                <Tooltip placement="right" title={'Owner: ' + item.owner}>
-          <span
-              onClick={e => history.push(`/projects/${item.id}`)}>
+        node.title = (
+          <span onClick={e => history.push(`/projects/${item.id}`)}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
           </span>
-                </Tooltip>
-            );
-        } else {
-            node.title = (
-                <Tooltip placement="right" title="Not Shared">
-          <span
-              style={{color: '#e0e0eb', cursor: 'default'}}>
-            {iconMapper[item.projectType]}&nbsp;{item.name}
-          </span>
-                </Tooltip>
-            );
-        }
+        );
         node.key = item.id.toString();
         res.push(node);
     });
