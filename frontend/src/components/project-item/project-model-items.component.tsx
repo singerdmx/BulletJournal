@@ -1,5 +1,5 @@
 import React from 'react';
-import {Collapse, Timeline} from 'antd';
+import {Collapse, Timeline, Empty} from 'antd';
 import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
 import {ProjectItems} from '../../features/myBuJo/interface';
 
@@ -49,6 +49,9 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
 };
 
 const ProjectModelItems: React.FC<ProjectModelItemsProps> = props => {
+    if (!props.projectItems || props.projectItems.length === 0) {
+        return <Empty />;
+    }
     return (
         <Timeline mode={'left'}>
             {props.projectItems.map((items, index) => {
