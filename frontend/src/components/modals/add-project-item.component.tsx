@@ -71,6 +71,7 @@ const AddProjectItem : React.FC<GroupProps & ProjectItemProps> = props => {
                 title='Create New BuJo Item'
                 destroyOnClose
                 centered
+                okText="Create"
                 visible={visible}
                 onCancel={onCancel}
                 onOk={() => {
