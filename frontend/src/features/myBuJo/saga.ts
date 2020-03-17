@@ -54,9 +54,6 @@ function* getProjectItemsAfterUpdateSelect(
       category
     } = action.payload;
 
-    console.log("sssss");
-    console.log(ledgerSelected);
-
     yield put(
       projectItemsActions.updateSelected({
         todoSelected: todoSelected,
