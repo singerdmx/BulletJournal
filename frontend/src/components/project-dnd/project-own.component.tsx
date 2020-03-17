@@ -22,19 +22,18 @@ export const iconMapper = {
 const getTree = (
     data: Project[],
     owner: string,
-    index: number,
-    history: History<History.PoorMansUnknown>
+    index: number
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Project) => {
         const node = {} as TreeNodeNormal;
         if (item.subProjects && item.subProjects.length) {
-            node.children = getTree(item.subProjects, owner, index, history);
+            node.children = getTree(item.subProjects, owner, index);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
         node.title = (
-          <span onClick={e => history.push(`/projects/${item.id}`)}>
+          <span style={{width: '100%'}}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
           </span>
         );
@@ -82,7 +81,6 @@ const dragProjectById = (projects: Project[], projectId: number): Project[] => {
         const subProjects = dragProjectById(item.subProjects, projectId);
         project = {...item, subProjects: subProjects};
         if (project.id !== projectId) res.push(project);
-
     })
     return res;
 }
@@ -127,16 +125,24 @@ const onDrop = (projects: Project[], updateProject: Function) => (info: any) => 
     updateProject(resProjects);
 }
 
+const onClick = (history: History<History.PoorMansUnknown>) => (e:any) => {
+  if(e.length){
+    history.push(`/projects/${e[0]}`)
+  }
+}
+
+
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
     const {ownProjects, history, ownerName, id, updateProjectRelations} = props;
-    const treeNode = getTree(ownProjects, ownerName, id, history);
+    const treeNode = getTree(ownProjects, ownerName, id);
 
     return (<div style={{marginLeft: '20%'}}><Tree
         className="ant-tree"
         draggable
         blockNode
         onDragEnter={onDragEnter}
-        // switcherIcon={<FormOutlined/>}
+        selectable={true}
+        onSelect={onClick(history)}
         onDrop={onDrop(ownProjects, updateProjectRelations)}
         treeData={treeNode}/></div>);
 }
