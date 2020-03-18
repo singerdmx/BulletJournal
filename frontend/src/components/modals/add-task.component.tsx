@@ -50,7 +50,7 @@ const AddTask: React.FC<RouteComponentProps & TaskProps & TaskCreateFormProps> =
                         <Form.Item
                             name="taskName"
                             rules={[
-                                {required: true, message: 'Please input Task Name!'}
+                                {required: true, message: 'Missing Task Name!'}
                             ]}
                         >
                             <Input placeholder="Enter Task Name" allowClear/>
@@ -60,7 +60,7 @@ const AddTask: React.FC<RouteComponentProps & TaskProps & TaskCreateFormProps> =
             </div>
         </Tooltip>
     );
-}
+};
 
 const mapStateToProps = (state: IState) => ({
     projectId: state.project.project.id

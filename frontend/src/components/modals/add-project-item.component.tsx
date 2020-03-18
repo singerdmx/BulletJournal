@@ -28,7 +28,7 @@ type GroupProps = {
 
 const AddProjectItem : React.FC<GroupProps & ProjectItemProps> = props => {
 
-    const [selections, setSelections] = useState<Project[]>([])
+    const [selections, setSelections] = useState<Project[]>([]);
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
 

@@ -58,7 +58,7 @@ const AddNote: React.FC<RouteComponentProps & NoteProps & NoteCreateFormProps> =
             </div>
         </Tooltip>
     );
-}
+};
 
 const mapStateToProps = (state: IState) => ({
     projectId: state.project.project.id
