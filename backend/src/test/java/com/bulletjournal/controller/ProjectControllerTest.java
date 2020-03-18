@@ -18,6 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +36,17 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test")
 public class ProjectControllerTest {
     private static final String ROOT_URL = "http://localhost:";
+    private static String TIMEZONE;
+    static {
+        try {
+            TIMEZONE = URLEncoder.encode("America/Los_Angeles", StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final String expectedOwner = "BulletJournal";
+
     private final String[] sampleUsers = {
             "Xavier",
             "bbs1024",
@@ -188,37 +201,37 @@ public class ProjectControllerTest {
         findItemsByLabels(labels, ImmutableList.of(projectItems));
 
         // Get transactions
+        String url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.MONTHLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .buildAndExpand(p.getId()).toUriString();
         ResponseEntity<Transaction[]> transactionsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class,
-                p.getId());
+                Transaction[].class);
         String etag1 = transactionsResponse.getHeaders().getETag();
         List<Transaction> transactions = Arrays.asList(transactionsResponse.getBody());
 
         transactionsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class,
-                p.getId());
+                Transaction[].class);
         String etag2 = transactionsResponse.getHeaders().getETag();
         assertEquals(etag1, etag2);
 
         deleteTransaction(transaction2);
         transactionsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class,
-                p.getId());
+                Transaction[].class);
         String etag3 = transactionsResponse.getHeaders().getETag();
         transactions = Arrays.asList(transactionsResponse.getBody());
         assertNotEquals(etag1, etag3);
-
         assertEquals(2, transactions.size());
-
 
         deleteTransactions(p, transaction1, transaction3);
     }
@@ -249,12 +262,16 @@ public class ProjectControllerTest {
     }
 
     private void deleteTransactions(Project project, Transaction... transactions) {
+        String url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.MONTHLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .buildAndExpand(project.getId()).toUriString();
         ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class,
-                project.getId());
+                Transaction[].class);
         Transaction[] t = getResponse.getBody();
         int size = t.length;
 
@@ -274,12 +291,16 @@ public class ProjectControllerTest {
                 t.getId());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        String url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.MONTHLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .buildAndExpand(t.getProjectId()).toUriString();
         ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class,
-                t.getProjectId());
+                Transaction[].class);
         Transaction[] transactions = getResponse.getBody();
         assertNotNull(transactions);
         return transactions;

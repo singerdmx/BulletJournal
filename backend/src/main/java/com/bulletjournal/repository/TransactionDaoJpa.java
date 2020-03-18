@@ -48,7 +48,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
      * @projectId Long - Project identifier to retrieve project from project repository
      * @retVal List<Transaction> - List of transaction
      */
-    public List<com.bulletjournal.controller.models.Transaction> getTransactions(Long projectId) {
+    public List<com.bulletjournal.controller.models.Transaction> getTransactions(
+            Long projectId, ZonedDateTime startTime, ZonedDateTime endTime) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));

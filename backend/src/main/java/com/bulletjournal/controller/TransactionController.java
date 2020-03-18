@@ -3,11 +3,14 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveTransactionEvent;
 import com.bulletjournal.notifications.UpdateTransactionPayerEvent;
 import com.bulletjournal.repository.TransactionDaoJpa;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -34,9 +39,29 @@ public class TransactionController {
     private NotificationService notificationService;
 
     @GetMapping(TRANSACTIONS_ROUTE)
-    public ResponseEntity<List<Transaction>> getTransactions(@NotNull @PathVariable Long projectId) {
+    public ResponseEntity<List<Transaction>> getTransactions(
+            @NotNull @PathVariable Long projectId,
+            @RequestParam(required = false) FrequencyType frequencyType,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @NotBlank @RequestParam String timezone) {
 
-        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId);
+        // Set start time and end time
+        ZonedDateTime startTime;
+        ZonedDateTime endTime;
+        if (StringUtils.isBlank(startDate) || StringUtils.isBlank(endDate)) {
+            if (frequencyType == null) {
+                throw new BadRequestException("Missing FrequencyType");
+            }
+            startTime = ZonedDateTimeHelper.getStartTime(frequencyType, timezone);
+            endTime = ZonedDateTimeHelper.getEndTime(frequencyType, timezone);
+        } else {
+            startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+            endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+        }
+
+        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(
+                projectId, startTime, endTime);
         String transactionsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, transactions);
 

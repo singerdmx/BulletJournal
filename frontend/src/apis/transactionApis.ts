@@ -1,7 +1,20 @@
 import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
 
-export const fetchTransactions = (projectId: number) => {
-  return doFetch(`/api/projects/${projectId}/transactions`)
+export const fetchTransactions = (
+  projectId: number,
+  timezone: string,
+  startDate?: string,
+  endDate?: string,
+  frequencyType?: string
+  ) => {
+  // e.g. /api/projects/105/transactions?frequencyType=MONTHLY&timezone=America%2FLos_Angeles
+  let url = `/api/projects/${projectId}/transactions?timezone=` + encodeURIComponent(timezone);
+  if (frequencyType) {
+    url += `&frequencyType=${frequencyType}`;
+  } else {
+    url += `&startDate=${startDate}&endDate=${endDate}`;
+  }
+  return doFetch(url)
     .then(res => res)
     .catch(err => {
       throw Error(err.message);

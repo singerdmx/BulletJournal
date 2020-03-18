@@ -27,7 +27,8 @@ function* transactionApiErrorReceived(
 
 function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
   try {
-    const data = yield call(fetchTransactions, action.payload.projectId);
+    const { projectId, timezone, startDate, endDate, frequencyType } = action.payload;
+    const data = yield call(fetchTransactions, projectId, timezone, startDate, endDate, frequencyType);
     const transactions = yield data.json();
 
     yield put(
@@ -56,7 +57,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       time,
     );
     const transaction = yield data.json();
-    yield put(updateTransactions(projectId));
+    yield put(updateTransactions(projectId, timezone, undefined, undefined, 'MONTHLY'));
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
   }
@@ -92,7 +93,7 @@ function* transactionSetLabels(action: PayloadAction<SetTransactionLabels>) {
   try {
     const { transactionId, labels } = action.payload;
     const data = yield call(setTransactionLabels, transactionId, labels);
-    yield put(updateTransactions(data.projectId));
+    // yield put(updateTransactions(data.projectId));
   } catch (error) {
     yield call(message.error, `transactionSetLabels Error Received: ${error}`);
   }

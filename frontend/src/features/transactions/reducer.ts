@@ -7,6 +7,10 @@ export type TransactionApiErrorAction = {
 
 export type UpdateTransactions = {
   projectId: number;
+  timezone: string;
+  startDate?: string;
+  endDate?: string;
+  frequencyType?: string;
 };
 
 export type CreateTransaction = {

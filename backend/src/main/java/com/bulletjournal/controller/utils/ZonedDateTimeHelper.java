@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.utils;
 
+import com.bulletjournal.controller.models.FrequencyType;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -30,11 +32,25 @@ public class ZonedDateTimeHelper {
     }
 
     /*
+     * Return ZoneDateTime type for start time.
+     */
+    public static ZonedDateTime getStartTime(FrequencyType frequencyType, String timezone) {
+        return null;
+    }
+
+    /*
      * Return ZoneDateTime type for end time. If time is null, will replace time with 23:59.
      */
     public static ZonedDateTime getEndTime(String date, String time, String timezone) {
         return time == null ? convertDateTime(getDateTime(date, MAX_TIME), timezone) :
                 convertDateTime(getDateTime(date, time), timezone);
+    }
+
+    /*
+     * Return ZoneDateTime type for end time.
+     */
+    public static ZonedDateTime getEndTime(FrequencyType frequencyType, String timezone) {
+        return null;
     }
 
     /*

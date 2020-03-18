@@ -1,6 +1,8 @@
 import { actions } from './reducer';
-export const updateTransactions = (projectId: number) =>
-  actions.TransactionsUpdate({ projectId: projectId });
+export const updateTransactions = (projectId: number, timezone: string,
+  startDate?: string, endDate?: string, frequencyType?: string) =>
+  actions.TransactionsUpdate({ projectId: projectId, timezone: timezone,
+    startDate: startDate, endDate: endDate, frequencyType: frequencyType });
 export const createTransaction = (
   projectId: number,
   amount: number,
