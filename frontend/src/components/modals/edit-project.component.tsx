@@ -1,29 +1,27 @@
-import React from 'react';
-import { Modal, Input, Form, Select, Avatar, Tooltip } from 'antd';
-import {
-  EditOutlined,
-} from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
-import { updateGroups } from '../../features/group/actions';
-import { updateProject } from '../../features/project/actions';
-import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { iconMapper } from '../side-menu/side-menu.component';
+import React, {useEffect, useState} from 'react';
+import {Avatar, Form, Input, Modal, Select, Tooltip} from 'antd';
+import {EditOutlined,} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {GroupsWithOwner} from '../../features/group/interface';
+import {updateGroups} from '../../features/group/actions';
+import {updateProject} from '../../features/project/actions';
+import {IState} from '../../store';
+import {Project} from '../../features/project/interface';
+import {iconMapper} from '../side-menu/side-menu.component';
 
 import './modals.styles.less';
 
 const InputGroup = Input.Group;
-const { TextArea } = Input;
-const { Option } = Select;
+const {TextArea} = Input;
+const {Option} = Select;
 
 type ProjectProps = {
   project: Project;
   updateProject: (
-    projectId: number,
-    description: string,
-    groupId: number,
-    name: string
+      projectId: number,
+      description: string,
+      groupId: number,
+      name: string
   ) => void;
 };
 
@@ -33,141 +31,136 @@ type GroupProps = {
   updateGroups: () => void;
 };
 
-type ModalState = {
-  isShow: boolean;
-  name: string;
-  description: string;
-  groupId: number;
-};
+const EditProject: React.FC<GroupProps & ProjectProps> = props => {
+  const [name, setName] = useState<string>(props.project.name);
+  const [description, setDescription] = useState<string>(props.project.description);
+  const [groupId, setGroupId] = useState<number>(props.project && props.project.group ? props.project.group.id : -1);
+  const [visible, setVisible] = useState(false);
 
-class EditProject extends React.Component<
-  ProjectProps & GroupProps,
-  ModalState
-> {
-  componentDidMount() {
-    this.props.updateGroups();
-  }
+  const [form] = Form.useForm();
 
-  state: ModalState = {
-    isShow: false,
-    name: this.props.project.name,
-    description: this.props.project.description,
-    groupId:
-      this.props.project && this.props.project.group
-        ? this.props.project.group.id
-        : 0
-  };
-
-  showModal = () => {
-    const { name, description, group } = this.props.project;
+  const onCancel = () => setVisible(false);
+  const openModal = () => {
+    const {name, description, group} = props.project;
     const groupId = group.id;
-    this.setState({
-      isShow: true,
-      name: name,
-      description: description,
-      groupId: groupId
-    });
+    setName(name);
+    setDescription(description);
+    setGroupId(groupId);
+    setVisible(true);
   };
 
-  updateProject = () => {
-    this.setState({ isShow: false });
-    const { id } = this.props.project;
-    const { name, description, groupId } = this.state;
-    this.props.updateProject(id, description, groupId, name);
+  useEffect(() => {
+    props.updateGroups();
+  }, []);
+
+  const updateProject = () => {
+    setVisible(false);
+    const {id} = props.project;
+    props.updateProject(id, description, groupId, name);
   };
 
-  onCancel = () => {
-    this.setState({ isShow: false });
+  const onChangeName = (name: string) => {
+    setName(name);
   };
 
-  onChangeName = (name: string) => {
-    this.setState({ name: name });
+  const onChangeDescription = (description: string) => {
+    setDescription(description);
   };
 
-  onChangeDescription = (description: string) => {
-    this.setState({ description: description });
+  const onChangeGroupId = (groupId: number) => {
+    setGroupId(groupId);
   };
 
-  onChangeGroupId = (groupId: number) => {
-    this.setState({ groupId: groupId });
-  };
-
-  render() {
-    const { project, groups: groupsByOwner } = this.props;
-    return (
-      <div className='edit-project' title='Edit Project'>
-        <Tooltip placement='top' title='Edit Project'>
-          <EditOutlined
-            onClick={this.showModal}
-            style={{ fontSize: 20 }}
-          />
-        </Tooltip>
-
-        <Modal
-          title='Edit BuJo'
-          visible={this.state.isShow}
-          onCancel={this.onCancel}
-          onOk={this.updateProject}
-        >
-          <Form>
-            <Form.Item>
-              <InputGroup compact>
-                <div style={{ alignItems: 'center', width: '100%' }}>
+  const getModal = () => {
+    const {project, groups: groupsByOwner} = props;
+    return <Modal
+        title='Edit BuJo'
+        destroyOnClose
+        centered
+        okText="Create"
+        visible={visible}
+        onCancel={onCancel}
+        onOk={() => {
+          form
+              .validateFields()
+              .then(values => {
+                console.log(values);
+                form.resetFields();
+                updateProject();
+              })
+              .catch(info => console.log(info));
+        }}
+    >
+      <Form>
+        <Form.Item>
+          <InputGroup compact>
+            <div style={{alignItems: 'center', width: '100%'}}>
                   <span title={`${project.projectType}`}>
                     <strong>{iconMapper[project.projectType]}</strong>
                   </span>
-                  <Input
-                    style={{ width: '90%', marginLeft: '20px' }}
-                    placeholder='Enter BuJo Name'
-                    value={this.state.name}
-                    onChange={e => this.onChangeName(e.target.value)}
-                  />
-                </div>
+              <Input
+                  style={{width: '90%', marginLeft: '20px'}}
+                  placeholder='Enter BuJo Name'
+                  value={name}
+                  onChange={e => onChangeName(e.target.value)}
+              />
+            </div>
 
-                <div style={{ margin: '24px 0' }} />
-                <TextArea
-                  placeholder='Enter Description'
-                  autoSize
-                  value={this.state.description}
-                  onChange={e => this.onChangeDescription(e.target.value)}
-                />
+            <div style={{margin: '24px 0'}}/>
+            <TextArea
+                placeholder='Enter Description'
+                autoSize
+                value={description}
+                onChange={e => onChangeDescription(e.target.value)}
+            />
 
-                <div style={{ margin: '24px 0' }} />
-                <Select
-                  placeholder='Choose Group'
-                  style={{ width: '100%' }}
-                  value={this.state.groupId}
-                  onChange={value => this.onChangeGroupId(value)}
-                >
-                  {groupsByOwner.map(groupsOwner => {
-                    return groupsOwner.groups.map(group => (
-                      <Option
+            <div style={{margin: '24px 0'}}/>
+            <Select
+                placeholder='Choose Group'
+                style={{width: '100%'}}
+                value={groupId}
+                onChange={value => onChangeGroupId(value)}
+            >
+              {groupsByOwner.map(groupsOwner => {
+                return groupsOwner.groups.map(group => (
+                    <Option
                         key={`group${group.id}`}
                         value={group.id}
                         title={`Group "${group.name}" (owner "${group.owner}")`}
-                      >
-                        <Avatar size='small' src={group.ownerAvatar} />
-                        &nbsp;&nbsp;Group <strong>
-                          {group.name}
-                        </strong> (owner <strong>{group.owner}</strong>)
-                      </Option>
-                    ));
-                  })}
-                </Select>
-              </InputGroup>
-            </Form.Item>
-          </Form>
-        </Modal>
+                    >
+                      <Avatar size='small' src={group.ownerAvatar}/>
+                      &nbsp;&nbsp;Group <strong>
+                      {group.name}
+                    </strong> (owner <strong>{group.owner}</strong>)
+                    </Option>
+                ));
+              })}
+            </Select>
+          </InputGroup>
+        </Form.Item>
+      </Form>
+    </Modal>
+  };
+
+
+  return (
+      <div className='edit-project' title='Edit Project'>
+        <Tooltip placement='top' title='Edit Project'>
+          <EditOutlined
+              onClick={openModal}
+              style={{fontSize: 20}}
+          />
+        </Tooltip>
+        {getModal()}
       </div>
-    );
-  }
-}
+  );
+};
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   groups: state.group.groups
 });
 
-export default connect(mapStateToProps, { updateGroups, updateProject })(
-  EditProject
+export default connect(mapStateToProps, {updateGroups, updateProject})(
+    EditProject
 );
