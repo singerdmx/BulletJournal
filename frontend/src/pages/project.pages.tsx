@@ -98,7 +98,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
       editContent = <EditProject/>;
       deleteContent = (
           <Popconfirm
-              title='Are you sure?'
+              title='Deleting BuJo also deletes its child BuJo. Are you sure?'
               okText='Yes'
               cancelText='No'
               onConfirm={() => {
@@ -107,7 +107,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
               className='group-setting'
               placement='bottom'
           >
-            <Tooltip placement='top' title='Delete Project'>
+            <Tooltip placement='top' title='Delete BuJo'>
               <DeleteOutlined
                   style={{
                     fontSize: 20,

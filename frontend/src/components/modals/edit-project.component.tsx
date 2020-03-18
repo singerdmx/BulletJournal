@@ -149,8 +149,8 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
 
 
   return (
-      <div className='edit-project' title='Edit Project'>
-        <Tooltip placement='top' title='Edit Project'>
+      <div className='edit-project' title='Edit BuJo'>
+        <Tooltip placement='top' title='Edit BuJo'>
           <EditOutlined
               onClick={openModal}
               style={{fontSize: 20}}
