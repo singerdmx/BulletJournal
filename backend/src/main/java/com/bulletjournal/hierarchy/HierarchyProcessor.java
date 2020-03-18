@@ -39,10 +39,10 @@ public class HierarchyProcessor {
     }
 
     private static HierarchyItem findTarget(
-            List<HierarchyItem> hierarchyItems, Long targetId, HierarchyItem[] parent) {
+            List<HierarchyItem> hierarchyItems, Long targetId, HierarchyItem[] targetParent) {
         HierarchyItem target = null;
         for (HierarchyItem item : hierarchyItems) {
-            target = findItem(item, targetId, parent);
+            target = findItem(item, targetId, null, targetParent);
             if (target != null) {
                 break;
             }
@@ -54,14 +54,15 @@ public class HierarchyProcessor {
         return target;
     }
 
-    private static HierarchyItem findItem(HierarchyItem cur, Long targetId, HierarchyItem[] parent) {
+    private static HierarchyItem findItem(HierarchyItem cur, Long targetId,
+                                          HierarchyItem parent, HierarchyItem[] targetParent) {
         if (Objects.equals(targetId, cur.getId())) {
+            targetParent[0] = parent;
             return cur;
         }
 
         for (HierarchyItem item : cur.getS()) {
-            parent[0] = cur;
-            HierarchyItem found = findItem(item, targetId, parent);
+            HierarchyItem found = findItem(item, targetId, cur, targetParent);
             if (found != null) {
                 return found;
             }

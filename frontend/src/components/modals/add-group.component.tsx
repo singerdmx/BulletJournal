@@ -46,7 +46,7 @@ const AddGroup: React.FC<RouteComponentProps & GroupCreateFormProps> = (props) =
             <Form.Item
               name="groupName"
               rules={[
-                { required: true, message: 'Please input Group Name!' }
+                { required: true, message: 'Missing Group Name!' }
               ]}
             >
               <Input placeholder="Enter Group Name" allowClear />

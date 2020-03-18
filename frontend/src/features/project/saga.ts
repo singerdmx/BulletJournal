@@ -117,9 +117,10 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
   try {
     const { projectId, name, history } = action.payload;
     yield call(deleteProject, projectId);
+    history.goBack();
     yield put(projectActions.projectsUpdate({}));
     yield call(message.success, `Project ${name} deleted`);
-    history.goBack();
+    history.push('/projects');
   } catch (error) {
     yield call(message.error, `Delete project fail: ${error}`);
   }
