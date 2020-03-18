@@ -11,7 +11,6 @@ import {iconMapper} from '../side-menu/side-menu.component';
 
 import './modals.styles.less';
 
-const InputGroup = Input.Group;
 const {TextArea} = Input;
 const {Option} = Select;
 
@@ -91,22 +90,29 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
               .catch(info => console.log(info));
         }}
     >
-      <Form>
+      <Form form={form}>
         <Form.Item>
-          <InputGroup compact>
+          <Form.Item
+              name="projectName"
+              rules={[{ required: true, message: 'Missing BuJo Name' }]}
+          >
             <div style={{alignItems: 'center', width: '100%'}}>
-                  <span title={`${project.projectType}`}>
-                    <strong>{iconMapper[project.projectType]}</strong>
-                  </span>
-              <Input
-                  style={{width: '90%', marginLeft: '20px'}}
-                  placeholder='Enter BuJo Name'
-                  value={name}
-                  onChange={e => onChangeName(e.target.value)}
-              />
-            </div>
+                <Tooltip title={`${project.projectType}`} >
+                    <span style={{fontSize: '25px'}}>
+                      <strong>{iconMapper[project.projectType]}</strong>
+                    </span>
+                </Tooltip>
 
-            <div style={{margin: '24px 0'}}/>
+                <Input
+                    style={{width: '90%', marginLeft: '20px'}}
+                    placeholder='Enter BuJo Name'
+                    value={name}
+                    onChange={e => onChangeName(e.target.value)}
+                />
+            </div>
+          </Form.Item>
+
+          <div style={{margin: '24px 0'}}/>
             <TextArea
                 placeholder='Enter Description'
                 autoSize
@@ -136,7 +142,6 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
                 ));
               })}
             </Select>
-          </InputGroup>
         </Form.Item>
       </Form>
     </Modal>

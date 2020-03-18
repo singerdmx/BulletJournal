@@ -113,11 +113,11 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
           <Form.Item>
             <Form.Item
               name="projectType"
-              rules={[{ required: true }]}
-              style={{ display: 'inline-block', width: '40%' }}
+              rules={[{ required: true, message: 'Missing Type' }]}
+              style={{ display: 'inline-block', width: '28%' }}
             >
               <Select
-                placeholder="Choose Project Type"
+                placeholder="Choose Type"
                 value={projectType ? projectType : undefined}
                 onChange={e => onChangeProjectType(e)}
               >
@@ -137,8 +137,8 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
             </Form.Item>
             <Form.Item
               name="projectName"
-              rules={[{ required: true }]}
-              style={{ display: 'inline-block', width: '60%' }}
+              rules={[{ required: true, message: 'Missing BuJo Name' }]}
+              style={{ display: 'inline-block', width: '70%' }}
             >
               <Input
                 placeholder="Enter BuJo Name"
@@ -154,7 +154,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
                 onChange={e => onChangeDescription(e.target.value)}
               />
             </Form.Item>
-            <Form.Item name="projectGroup" rules={[{ required: true }]}>
+            <Form.Item name="projectGroup" rules={[{ required: true, message: 'Missing Group' }]}>
               <Select
                 placeholder="Choose Group"
                 style={{ width: '100%' }}
