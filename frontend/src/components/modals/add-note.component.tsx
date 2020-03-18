@@ -48,7 +48,7 @@ const AddNote: React.FC<RouteComponentProps & NoteProps & NoteCreateFormProps> =
                         <Form.Item
                             name="noteName"
                             rules={[
-                                {required: true, message: 'Please input Note Name!'}
+                                {required: true, message: 'Missing Note Name!'}
                             ]}
                         >
                             <Input placeholder="Enter Note Name" allowClear/>
