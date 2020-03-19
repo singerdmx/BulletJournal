@@ -15,7 +15,7 @@ const { Panel } = Collapse;
 
 // props of projects
 type ProjectsProps = {
-    ownProjects: Project[];
+    ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     updateProjects: () => void;
 };
@@ -50,17 +50,26 @@ export const flattenSharedProject = (
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
+    const { ownedProjects, sharedProjects, updateGroups, updateProjects } = props;
 
     useEffect(() => {
-        props.updateGroups();
-        props.updateProjects();
+        updateGroups();
+        updateProjects();
     }, []);
 
-    const getOwnedBuJo = () => {
+    const getOwnedBuJo = (ownedProjects: Project[]) => {
+        const projects = flattenOwnedProject(ownedProjects, []);
+        if (projects && projects[0]) {
+            console.log(projects);
+        }
         return <Empty />;
     };
 
-    const getSharedBuJo = () => {
+    const getSharedBuJo = (sharedProjects: ProjectsWithOwner[]) => {
+        const projects = flattenSharedProject(sharedProjects, []);
+        if (projects && projects[0]) {
+            console.log(projects);
+        }
         return <Empty />;
     };
 
@@ -68,10 +77,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         <div className='project' style={{paddingTop: '30px'}}>
             <Collapse defaultActiveKey={['OwnedBuJo', 'SharedBuJo']}>
                 <Panel header="Owned BuJo" key="OwnedBuJo">
-                    {getOwnedBuJo()}
+                    {getOwnedBuJo(ownedProjects)}
                 </Panel>
                 <Panel header="Shared BuJo" key="SharedBuJo">
-                    {getSharedBuJo()}
+                    {getSharedBuJo(sharedProjects)}
                 </Panel>
             </Collapse>
         </div>

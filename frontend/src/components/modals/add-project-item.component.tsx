@@ -28,7 +28,7 @@ type GroupProps = {
 
 const AddProjectItem : React.FC<GroupProps & ProjectItemProps> = props => {
 
-    const [selections, setSelections] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
 
@@ -39,16 +39,16 @@ const AddProjectItem : React.FC<GroupProps & ProjectItemProps> = props => {
 
     useEffect(() => {
         props.updateGroups();
-        setSelections([]);
-        setSelections(flattenOwnedProject(props.ownedProjects, selections));
-        setSelections(flattenSharedProject(props.sharedProjects, selections));
+        setProjects([]);
+        setProjects(flattenOwnedProject(props.ownedProjects, projects));
+        setProjects(flattenSharedProject(props.sharedProjects, projects));
     }, []);
 
     const getProjectSelections = () => {
-        if (selections && selections[0]) {
+        if (projects && projects[0]) {
             return (<Tooltip title='Choose Project' placement='topLeft'>
-                <Select placeholder="Choose Project" style={{width: "100%"}} defaultValue={selections[0].id}>
-                    {selections.map(project => {
+                <Select placeholder="Choose Project" style={{width: "100%"}} defaultValue={projects[0].id}>
+                    {projects.map(project => {
                         return (
                             <Option value={project.id} key={project.id}>
                                 <Avatar size="small" src={project.ownerAvatar}/>
