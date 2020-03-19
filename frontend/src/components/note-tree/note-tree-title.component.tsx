@@ -6,9 +6,19 @@ import {
     MoreOutlined
   } from '@ant-design/icons';
 
+import { Popover } from 'antd';
+
 type NoteProps = {
     title: string
 };
+
+const text = <span>Title</span>;
+const content = (
+  <div>
+    <p>Content</p>
+    <p>Content</p>
+  </div>
+);
 
 const NoteTitle: React.FC<NoteProps> = props => {
     const { title } = props;
@@ -19,7 +29,9 @@ const NoteTitle: React.FC<NoteProps> = props => {
         <div style={{ width: '30%', height: '100%', position: 'absolute', top: 0, right: 0, display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
             <InfoCircleOutlined />
             <MessageOutlined />
-            <MoreOutlined style={{transform: 'rotate(90deg)', fontSize: '20px'}}/>
+            <Popover placement="bottomRight" title={text} content={content} trigger="click">
+                <MoreOutlined style={{transform: 'rotate(90deg)', fontSize: '20px'}}/>
+            </Popover>
         </div>
     </div>);
 }
