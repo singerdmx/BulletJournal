@@ -16,7 +16,7 @@ type ReminderBeforeProps = {
   currentBefore: number;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateBefore: (before: number) => void;
-  patchMyself: (timezone?: string, before?: number) => void;
+  patchMyself: (timezone?: string, before?: number, currency?: string, theme?: string) => void;
 };
 
 class ReminderBeforeTaskPicker extends React.Component<ReminderBeforeProps> {

@@ -12,6 +12,10 @@ type CurrencyAction = {
   currency: string;
 };
 
+type ThemeAction = {
+  theme: string;
+};
+
 export enum ReminderBeforeTask {
   ZERO_MIN_BEFORE = 0,
   FIVE_MIN_BEFORE = 1,
@@ -35,7 +39,8 @@ export const ReminderBeforeTaskText = [
 let initialState = {
   timezone: '',
   before: 0,
-  currency: ''
+  currency: '',
+  theme: 'LIGHT'
 };
 
 const slice = createSlice({
@@ -53,6 +58,10 @@ const slice = createSlice({
     updateCurrency: (state, action: PayloadAction<CurrencyAction>) => {
       const { currency } = action.payload;
       state.currency = currency;
+    },
+    updateTheme: (state, action: PayloadAction<ThemeAction>) => {
+      const { theme } = action.payload;
+      state.theme = theme;
     }
   }
 });

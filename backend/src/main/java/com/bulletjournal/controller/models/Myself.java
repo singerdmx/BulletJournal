@@ -11,16 +11,19 @@ public class Myself extends User {
 
     private String currency;
 
+    private String theme;
+
     public Myself() {
     }
 
-    public Myself(User user, String timezone, Before reminderBeforeTask, String currency) {
+    public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
         if (reminderBeforeTask != null) {
             this.reminderBeforeTask = reminderBeforeTask.getValue();
         }
         this.currency = currency;
+        this.theme = theme;
     }
 
     public String getTimezone() {
@@ -53,5 +56,13 @@ public class Myself extends User {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
     }
 }

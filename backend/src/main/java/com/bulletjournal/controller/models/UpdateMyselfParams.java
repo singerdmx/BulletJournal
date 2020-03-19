@@ -8,6 +8,8 @@ public class UpdateMyselfParams {
 
     private String currency;
 
+    private String theme;
+
     public String getTimezone() {
         return timezone;
     }
@@ -42,5 +44,17 @@ public class UpdateMyselfParams {
 
     public boolean hasCurrency() {
         return this.currency != null;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
+
+    public boolean hasTheme() {
+        return this.theme != null;
     }
 }

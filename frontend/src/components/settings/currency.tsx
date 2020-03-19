@@ -11,8 +11,8 @@ import {
 import { updateCurrency } from './actions';
 import 'flag-icon-css/css/flag-icon.css'; //flag icon
 
-var LocaleCurrency = require('locale-currency'); //currency code
-var cc = require('country-code'); //contry alpha2 code
+let LocaleCurrency = require('locale-currency'); //currency code
+let cc = require('country-code'); //country alpha2 code
 
 const { Option } = Select;
 
@@ -30,7 +30,7 @@ type CurrencyProps = {
   currentCurrency: string;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateCurrency: (currency: string) => void;
-  patchMyself: (timezone?: string, before?: number, currency?: string) => void;
+  patchMyself: (timezone?: string, before?: number, currency?: string, theme?: string) => void;
 };
 
 class CurrencyPicker extends React.Component<CurrencyProps> {

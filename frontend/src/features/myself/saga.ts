@@ -35,7 +35,8 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
         avatar: data.avatar,
         timezone: data.timezone,
         before: data.reminderBeforeTask,
-        currency: data.currency
+        currency: data.currency,
+        theme: data.theme
       })
     );
     const state: IState = yield select();
@@ -56,6 +57,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
         settingsActions.updateBefore({ before: data.reminderBeforeTask })
       );
       yield put(settingsActions.updateCurrency({ currency: data.currency }));
+      yield put(settingsActions.updateTheme({ theme: data.theme }));
     }
   } catch (error) {
     yield call(message.error, `Myself (Expand) Error Received: ${error}`);
@@ -79,8 +81,8 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
 
 function* myselfPatch(action: PayloadAction<PatchMyself>) {
   try {
-    const { timezone, before, currency } = action.payload;
-    yield call(patchMyself, timezone, before, currency);
+    const { timezone, before, currency, theme } = action.payload;
+    yield call(patchMyself, timezone, before, currency, theme);
     let currentTime = new Date().toLocaleString('fr-CA', {
       timeZone: timezone
     });
@@ -88,7 +90,8 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
       myselfActions.myselfDataReceived({
         timezone: timezone,
         before: before,
-        currency: currency
+        currency: currency,
+        theme: theme
       })
     );
     yield put(updateMyBuJoDates(currentTime, currentTime));

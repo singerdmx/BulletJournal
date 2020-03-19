@@ -1,10 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.Before;
-import com.bulletjournal.controller.models.Myself;
-import com.bulletjournal.controller.models.UpdateMyselfParams;
-import com.bulletjournal.controller.models.User;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.repository.UserDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +19,7 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     public static final String MYSELF_ROUTE = "/api/myself";
     public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
+    private static final String TRUE = "true";
 
     @Autowired
     private UserClient userClient;
@@ -40,15 +38,17 @@ public class UserController {
         String timezone = null;
         Before before = null;
         String currency = null;
-        if (Objects.equals(expand, "true")) {
+        String theme = null;
+        if (Objects.equals(expand, TRUE)) {
             com.bulletjournal.repository.models.User user =
                     this.userDaoJpa.getByName(username);
             timezone = user.getTimezone();
             before = user.getReminderBeforeTask();
             currency = user.getCurrency();
+            theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
         }
         User self = userClient.getUser(username);
-        return new Myself(self, timezone, before, currency);
+        return new Myself(self, timezone, before, currency, theme);
     }
 
     @PatchMapping(MYSELF_ROUTE)
@@ -57,7 +57,7 @@ public class UserController {
         com.bulletjournal.repository.models.User user =
                 this.userDaoJpa.updateMyself(username, updateMyselfParams);
         User self = userClient.getUser(username);
-        return new Myself(self, user.getTimezone(), user.getReminderBeforeTask(), user.getCurrency());
+        return getMyself(TRUE);
     }
 
     @PostMapping(LOGOUT_MYSELF_ROUTE)

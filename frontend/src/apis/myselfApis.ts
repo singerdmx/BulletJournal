@@ -19,12 +19,14 @@ export const logoutUser = () => {
 export const patchMyself = (
   timezone?: string,
   before?: number,
-  currency?: string
+  currency?: string,
+  theme?: string
 ) => {
   const patchBody = JSON.stringify({
     timezone: timezone,
     reminderBeforeTask: before,
-    currency: currency
+    currency: currency,
+    theme: theme
   });
 
   return doPatch('/api/myself', patchBody)

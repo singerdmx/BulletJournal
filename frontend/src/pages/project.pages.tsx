@@ -4,7 +4,7 @@ import { Project } from '../features/project/interface';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../features/group/interface';
-import { Avatar, Divider, Popconfirm, Tooltip, Button } from 'antd';
+import { Avatar, Divider, Popconfirm, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.component';
 import { DeleteOutlined, TeamOutlined } from '@ant-design/icons';

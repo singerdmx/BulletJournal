@@ -14,3 +14,6 @@ export const updateCurrency = (currency: string) =>
   actions.updateCurrency({
     currency: currency
   });
+
+export const updateTheme = (theme: string) =>
+    actions.updateTheme({ theme: theme});

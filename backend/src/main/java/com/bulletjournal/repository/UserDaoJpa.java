@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -40,6 +41,7 @@ public class UserDaoJpa {
         user.setDateFormat(0);
         user.setTimeFormat(0);
         user.setCurrency("US");
+        user.setTheme(Theme.LIGHT.name());
         user = this.userRepository.save(user);
 
         Group group = new Group();
@@ -82,6 +84,9 @@ public class UserDaoJpa {
         DaoHelper.updateIfPresent(updateMyselfParams.hasCurrency(),
                 updateMyselfParams.getCurrency(),
                 (value) -> self.setCurrency(value));
+        DaoHelper.updateIfPresent(updateMyselfParams.hasTheme(),
+                updateMyselfParams.getTheme(),
+                (value) -> self.setTheme(value));
         return self;
     }
 }

@@ -45,6 +45,9 @@ public class User extends NamedModel {
     @Column(name = "reminder_before_task")
     private Before reminderBeforeTask = Before.FIVE_MIN_BEFORE;
 
+    @Column
+    private String theme;
+
     public Long getId() {
         return id;
     }
@@ -111,6 +114,14 @@ public class User extends NamedModel {
 
     public void setTimeFormat(Integer timeFormat) {
         this.timeFormat = timeFormat;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
     }
 
     @Override

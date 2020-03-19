@@ -14,5 +14,6 @@ export const updateBefore = (before: number) =>
 export const patchMyself = (
   timezone?: string,
   before?: number,
-  currency?: string
-) => actions.patchMyself({ timezone, before, currency });
+  currency?: string,
+  theme?: string,
+) => actions.patchMyself({ timezone, before, currency, theme });
