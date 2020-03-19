@@ -134,13 +134,13 @@ class ProjectPage extends React.Component<
 
     return (
       <div className="project">
-        <Tooltip placement="top" title={project.owner}>
+        <Tooltip
+          placement="top"
+          title={project.owner}
+          className="project-avatar"
+        >
           <span>
-            <Avatar
-              size="large"
-              src={project.ownerAvatar}
-              className="project-avatar"
-            />
+            <Avatar size="large" src={project.ownerAvatar} />
           </span>
         </Tooltip>
         <div className="project-header">
