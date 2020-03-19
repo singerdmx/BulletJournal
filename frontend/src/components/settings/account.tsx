@@ -55,8 +55,7 @@ class Account extends React.Component<AccountProps> {
           <span>Theme&nbsp;&nbsp;&nbsp;</span>
             <span>
                 <Select
-                    showSearch={true}
-                    style={{ width: 250 }}
+                    style={{ width: 80 }}
                     placeholder='Select Theme'
                     onChange={this.handleOnThemeChange}
                     value={this.props.currentTheme}
