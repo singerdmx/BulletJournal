@@ -73,7 +73,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
               </Link>
             </Tooltip>
           </div>
-          <Divider></Divider>
+          <Divider />
           <div>
             <ProjectModelItems projectItems={this.props.projectItems}/>
           </div>

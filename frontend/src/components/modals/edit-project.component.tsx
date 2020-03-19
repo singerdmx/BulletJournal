@@ -40,11 +40,6 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
 
   const onCancel = () => setVisible(false);
   const openModal = () => {
-    const {name, description, group} = props.project;
-    const groupId = group.id;
-    setName(name);
-    setDescription(description);
-    setGroupId(groupId);
     setVisible(true);
   };
 
@@ -76,10 +71,11 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
         title='Edit BuJo'
         destroyOnClose
         centered
-        okText="Create"
+        okText="Edit"
         visible={visible}
         onCancel={onCancel}
         onOk={() => {
+          // setName(props.project.name);
           form
               .validateFields()
               .then(values => {
@@ -106,25 +102,28 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
                 <Input
                     style={{width: '90%', marginLeft: '20px'}}
                     placeholder='Enter BuJo Name'
+                    defaultValue={name}
                     value={name}
                     onChange={e => onChangeName(e.target.value)}
                 />
             </div>
           </Form.Item>
 
-          <div style={{margin: '24px 0'}}/>
+          <Form.Item name="projectDesp">
             <TextArea
                 placeholder='Enter Description'
                 autoSize
                 value={description}
+                defaultValue={description}
                 onChange={e => onChangeDescription(e.target.value)}
             />
-
-            <div style={{margin: '24px 0'}}/>
+          </Form.Item>
+          <Form.Item name="projectGroup">
             <Select
                 placeholder='Choose Group'
                 style={{width: '100%'}}
                 value={groupId}
+                defaultValue={groupId}
                 onChange={value => onChangeGroupId(value)}
             >
               {groupsByOwner.map(groupsOwner => {
@@ -142,6 +141,7 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
                 ));
               })}
             </Select>
+          </Form.Item>
         </Form.Item>
       </Form>
     </Modal>
