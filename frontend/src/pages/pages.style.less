@@ -15,19 +15,33 @@
 div.ant-popover-message {
   max-width: 180px;
 }
-
+// projects page
 .project {
+  position: relative;
   .pages-property();
 
+  .project-avatar {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
+    -moz-box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
+    -webkit-box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
+    background-color: white;
+    left: -25px;
+    top: -25px;
+  }
   .project-header {
+    margin-left: 0.5em;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
     border-bottom: 1px solid #e0e6ed;
 
     .project-control {
       display: flex;
-      align-items: center;
+      align-items: baseline;
+      font-size: 18px;
       justify-content: flex-end;
     }
   }

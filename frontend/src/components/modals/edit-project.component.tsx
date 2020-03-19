@@ -153,7 +153,6 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
         <Tooltip placement='top' title='Edit BuJo'>
           <EditOutlined
               onClick={openModal}
-              style={{fontSize: 20}}
           />
         </Tooltip>
         {getModal()}
