@@ -1,26 +1,26 @@
-import React, {useEffect, useState} from 'react';
-import {Avatar, Form, Input, Modal, Select, Tooltip} from 'antd';
-import {EditOutlined,} from '@ant-design/icons';
-import {connect} from 'react-redux';
-import {GroupsWithOwner} from '../../features/group/interface';
-import {updateGroups} from '../../features/group/actions';
-import {updateProject} from '../../features/project/actions';
-import {IState} from '../../store';
-import {Project} from '../../features/project/interface';
-import {iconMapper} from '../side-menu/side-menu.component';
+import React, { useEffect, useState } from "react";
+import { Avatar, Form, Input, Modal, Select, Tooltip } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import { connect } from "react-redux";
+import { GroupsWithOwner } from "../../features/group/interface";
+import { updateGroups } from "../../features/group/actions";
+import { updateProject } from "../../features/project/actions";
+import { IState } from "../../store";
+import { Project } from "../../features/project/interface";
+import { iconMapper } from "../side-menu/side-menu.component";
 
-import './modals.styles.less';
+import "./modals.styles.less";
 
-const {TextArea} = Input;
-const {Option} = Select;
+const { TextArea } = Input;
+const { Option } = Select;
 
 type ProjectProps = {
   project: Project;
   updateProject: (
-      projectId: number,
-      description: string,
-      groupId: number,
-      name: string
+    projectId: number,
+    description: string,
+    groupId: number,
+    name: string
   ) => void;
 };
 
@@ -32,8 +32,12 @@ type GroupProps = {
 
 const EditProject: React.FC<GroupProps & ProjectProps> = props => {
   const [name, setName] = useState<string>(props.project.name);
-  const [description, setDescription] = useState<string>(props.project.description);
-  const [groupId, setGroupId] = useState<number>(props.project && props.project.group ? props.project.group.id : -1);
+  const [description, setDescription] = useState<string>(
+    props.project.description
+  );
+  const [groupId, setGroupId] = useState<number>(
+    props.project && props.project.group ? props.project.group.id : -1
+  );
   const [visible, setVisible] = useState(false);
 
   const [form] = Form.useForm();
@@ -49,7 +53,7 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
 
   const updateProject = () => {
     setVisible(false);
-    const {id} = props.project;
+    const { id } = props.project;
     props.updateProject(id, description, groupId, name);
   };
 
@@ -66,9 +70,10 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
   };
 
   const getModal = () => {
-    const {project, groups: groupsByOwner} = props;
-    return <Modal
-        title='Edit BuJo'
+    const { project, groups: groupsByOwner } = props;
+    return (
+      <Modal
+        title="Edit BuJo"
         destroyOnClose
         centered
         okText="Edit"
@@ -77,86 +82,86 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
         onOk={() => {
           // setName(props.project.name);
           form
-              .validateFields()
-              .then(values => {
-                console.log(values);
-                form.resetFields();
-                updateProject();
-              })
-              .catch(info => console.log(info));
+            .validateFields()
+            .then(values => {
+              console.log(values);
+              form.resetFields();
+              updateProject();
+            })
+            .catch(info => console.log(info));
         }}
-    >
-      <Form form={form}>
-        <Form.Item>
-          <Form.Item
+      >
+        <Form
+          form={form}
+          initialValues={{
+            projectName: name,
+            projectDesp: description,
+            projectGroup: groupId
+          }}
+        >
+          <Form.Item>
+            <Form.Item
               name="projectName"
-              rules={[{ required: true, message: 'Missing BuJo Name' }]}
-          >
-            <div style={{alignItems: 'center', width: '100%'}}>
-                <Tooltip title={`${project.projectType}`} >
-                    <span style={{fontSize: '25px'}}>
+              rules={[{ required: true, message: "Missing BuJo Name" }]}
+            >
+              <Input
+                prefix={
+                  <Tooltip title={`${project.projectType}`}>
+                    <span>
                       <strong>{iconMapper[project.projectType]}</strong>
                     </span>
-                </Tooltip>
+                  </Tooltip>
+                }
+                placeholder="Enter BuJo Name"
+                value={name}
+                onChange={e => onChangeName(e.target.value)}
+              />
+            </Form.Item>
 
-                <Input
-                    style={{width: '90%', marginLeft: '20px'}}
-                    placeholder='Enter BuJo Name'
-                    defaultValue={name}
-                    value={name}
-                    onChange={e => onChangeName(e.target.value)}
-                />
-            </div>
-          </Form.Item>
-
-          <Form.Item name="projectDesp">
-            <TextArea
-                placeholder='Enter Description'
+            <Form.Item name="projectDesp">
+              <TextArea
+                placeholder="Enter Description"
                 autoSize
                 value={description}
-                defaultValue={description}
                 onChange={e => onChangeDescription(e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item name="projectGroup">
-            <Select
-                placeholder='Choose Group'
-                style={{width: '100%'}}
+              />
+            </Form.Item>
+            <Form.Item name="projectGroup">
+              <Select
+                placeholder="Choose Group"
+                style={{ width: "100%" }}
                 value={groupId}
-                defaultValue={groupId}
                 onChange={value => onChangeGroupId(value)}
-            >
-              {groupsByOwner.map(groupsOwner => {
-                return groupsOwner.groups.map(group => (
+              >
+                {groupsByOwner.map(groupsOwner => {
+                  return groupsOwner.groups.map(group => (
                     <Option
-                        key={`group${group.id}`}
-                        value={group.id}
-                        title={`Group "${group.name}" (owner "${group.owner}")`}
+                      key={`group${group.id}`}
+                      value={group.id}
+                      title={`Group "${group.name}" (owner "${group.owner}")`}
                     >
-                      <Avatar size='small' src={group.ownerAvatar}/>
+                      <Avatar size="small" src={group.ownerAvatar} />
                       &nbsp;&nbsp;Group <strong>
-                      {group.name}
-                    </strong> (owner <strong>{group.owner}</strong>)
+                        {group.name}
+                      </strong> (owner <strong>{group.owner}</strong>)
                     </Option>
-                ));
-              })}
-            </Select>
+                  ));
+                })}
+              </Select>
+            </Form.Item>
           </Form.Item>
-        </Form.Item>
-      </Form>
-    </Modal>
+        </Form>
+      </Modal>
+    );
   };
 
-
   return (
-      <div className='edit-project' title='Edit BuJo'>
-        <Tooltip placement='top' title='Edit BuJo'>
-          <EditOutlined
-              onClick={openModal}
-          />
-        </Tooltip>
-        {getModal()}
-      </div>
+    <div className="edit-project" title="Edit BuJo">
+      <Tooltip placement="top" title="Edit BuJo">
+        <EditOutlined onClick={openModal} />
+      </Tooltip>
+      {getModal()}
+    </div>
   );
 };
 
@@ -165,6 +170,6 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups
 });
 
-export default connect(mapStateToProps, {updateGroups, updateProject})(
-    EditProject
+export default connect(mapStateToProps, { updateGroups, updateProject })(
+  EditProject
 );
