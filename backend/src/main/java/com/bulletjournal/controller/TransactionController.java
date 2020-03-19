@@ -31,6 +31,7 @@ public class TransactionController {
     protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
     protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
     protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
+    protected static final String GET_LEDGER_SUMMARY_ROUTE = "/api/projects/{projectId}/ledger";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -122,5 +123,16 @@ public class TransactionController {
             @NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         return null; // may be generated link
+    }
+
+    @GetMapping(GET_LEDGER_SUMMARY_ROUTE)
+    public LedgerSummary getLedgerSummary(
+            @NotNull @PathVariable Long projectId,
+            @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
+            @NotNull @RequestParam FrequencyType frequencyType,
+            @NotBlank @RequestParam String timezone,
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end) {
+        return null;
     }
 }
