@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Modal,
   Input,
-  InputNumber,
   Tooltip,
   Form,
   DatePicker,
@@ -22,6 +21,21 @@ import { zones } from '../settings/constants';
 import { Group } from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
 const { Option } = Select;
+const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const currentCountry = currentZone && currentZone.split('/')[0];
+zones.sort((a, b) => {
+  if (currentZone && currentZone === a) {
+    return -1;
+  }
+  if (
+      currentCountry &&
+      a.includes(currentCountry) &&
+      !b.includes(currentCountry)
+  ) {
+    return -1;
+  }
+  return 0;
+});
 
 type TaskProps = {
   projectId: number;
@@ -153,7 +167,7 @@ const AddTask: React.FC<RouteComponentProps &
                     {zones.map((zone: string, index: number) => (
                       <Option key={zone} value={zone}>
                         <Tooltip title={zone} placement='right'>
-                          {zone}
+                          {<span>{zone}</span>}
                         </Tooltip>
                       </Option>
                     ))}
