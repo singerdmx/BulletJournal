@@ -166,7 +166,6 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  project: state.project.project,
   groups: state.group.groups
 });
 

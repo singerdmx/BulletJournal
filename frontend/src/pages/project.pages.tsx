@@ -101,7 +101,7 @@ class ProjectPage extends React.Component<
     let editContent = null;
     let deleteContent = null;
     if (myself === project.owner) {
-      editContent = <EditProject />;
+      editContent = <EditProject project={project}/>;
       deleteContent = (
         <Popconfirm
           title="Deleting BuJo also deletes its child BuJo. Are you sure?"
@@ -165,7 +165,6 @@ class ProjectPage extends React.Component<
                 {project.group && project.group.users.length}
               </Tooltip>
             </span>
-
             {createContent}
             {editContent}
             {deleteContent}
