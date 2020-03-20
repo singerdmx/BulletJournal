@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
   Modal,
   Input,
+  InputNumber,
   Tooltip,
   Form,
   DatePicker,
   TimePicker,
   Select,
-  Avatar
+  Avatar,
+  AutoComplete
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -56,6 +58,13 @@ const AddTask: React.FC<RouteComponentProps &
   useEffect(() => {
     props.updateExpandedMyself(true);
   }, []);
+  const result = ['15', '30', '45', '60'];
+  const children = result.map((option: string) => (
+    <Option key={option} value={option}>
+      {option}
+    </Option>
+  ));
+
   return (
     <Tooltip placement='top' title='Create New Task'>
       <div className='add-task'>
@@ -75,7 +84,7 @@ const AddTask: React.FC<RouteComponentProps &
               .then(values => {
                 console.log(values);
                 form.resetFields();
-                addTask(values);
+                // addTask(values);
               })
               .catch(info => console.log(info));
           }}
@@ -92,7 +101,7 @@ const AddTask: React.FC<RouteComponentProps &
             </Form.Item>
 
             <Form.Item
-              name='Assignee'
+              name='assignee'
               label='Assignee'
               labelCol={{ span: 4 }}
               style={{ marginLeft: '10px' }}
@@ -151,6 +160,19 @@ const AddTask: React.FC<RouteComponentProps &
                   </Select>
                 </Form.Item>
               </Tooltip>
+            </div>
+
+            <div style={{ display: 'flex' }}>
+              <Form.Item
+                name='duration'
+                wrapperCol={{ span: 20 }}
+                rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Duration' }]}
+              >
+                <AutoComplete placeholder='Duration' style={{ width: 87 }}>
+                  {children}
+                </AutoComplete>
+              </Form.Item>
+              <span style={{ marginTop: '5px' }}>&nbsp;&nbsp;Minutes</span>
             </div>
           </Form>
         </Modal>
