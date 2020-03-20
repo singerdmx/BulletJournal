@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Collapse,
-    Empty
-} from 'antd';
+import { Collapse, Empty, List, Tooltip, Avatar } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import {IState} from "../store";
@@ -10,6 +7,8 @@ import {GroupsWithOwner} from "../features/group/interface";
 import {updateGroups} from "../features/group/actions";
 import {Project, ProjectsWithOwner} from "../features/project/interface";
 import {updateProjects} from "../features/project/actions";
+import {iconMapper} from "../components/side-menu/side-menu.component";
+import { TeamOutlined } from "@ant-design/icons";
 
 const { Panel } = Collapse;
 
@@ -49,8 +48,25 @@ export const flattenSharedProject = (
     return flattenedProjects;
 };
 
+export const getGroupUsersNumberByProject = (
+    groups: GroupsWithOwner[],
+    project: Project
+): number => {
+    let result = 0;
+    groups.forEach(groupWithOwner => {
+        if (groupWithOwner.owner === project.owner) {
+            groupWithOwner.groups.forEach(group => {
+                if (group.id === project.group.id) {
+                  result = group.users.length;
+                }
+            });
+        }
+    });
+    return result;
+};
+
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
-    const { ownedProjects, sharedProjects, updateGroups, updateProjects } = props;
+    const { groups, ownedProjects, sharedProjects, updateGroups, updateProjects } = props;
 
     useEffect(() => {
         updateGroups();
@@ -60,7 +76,40 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
     const getOwnedBuJo = (ownedProjects: Project[]) => {
         const projects = flattenOwnedProject(ownedProjects, []);
         if (projects && projects[0]) {
-            console.log(projects);
+          return (
+            <List itemLayout="horizontal" size="small">
+              {projects.map(project => {
+                return (
+                  <Tooltip
+                    key={project.id}
+                    title={`Group: ${project.group.name}`}
+                    placement="topLeft"
+                  >
+                  <List.Item
+                    key={project.id}
+                    actions={[
+                      <span>
+                        <TeamOutlined style={{ marginRight: 5 }} />
+                        {getGroupUsersNumberByProject(groups, project)}
+                      </span>
+                    ]}
+                  >
+                  <List.Item.Meta
+                    avatar={<Avatar size="small" src={project.ownerAvatar} />}
+                    title={
+                      <span>
+                        {iconMapper[project.projectType]}
+                        &nbsp;{project.name}
+                      </span>
+                    }
+                    description={project.description}
+                  />
+                  </List.Item>
+                  </Tooltip>
+                );
+              })}
+            </List>
+          );
         }
         return <Empty />;
     };
@@ -68,7 +117,40 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
     const getSharedBuJo = (sharedProjects: ProjectsWithOwner[]) => {
         const projects = flattenSharedProject(sharedProjects, []);
         if (projects && projects[0]) {
-            console.log(projects);
+          return (
+            <List itemLayout="horizontal" size="small">
+              {projects.map(project => {
+                return (
+                  <Tooltip
+                    key={project.id}
+                    title={`Group: ${project.group.name}`}
+                    placement="topLeft"
+                  >
+                  <List.Item
+                    key={project.id}
+                    actions={[
+                      <span>
+                        <TeamOutlined style={{ marginRight: 5 }} />
+                        {getGroupUsersNumberByProject(groups, project)}
+                      </span>
+                    ]}
+                  >
+                  <List.Item.Meta
+                    avatar={<Avatar size="small" src={project.ownerAvatar} />}
+                    title={
+                      <span>
+                        {iconMapper[project.projectType]}
+                        &nbsp;{project.name}
+                      </span>
+                    }
+                    description={project.description}
+                  />
+                  </List.Item>
+                  </Tooltip>
+                );
+              })}
+            </List>
+          );
         }
         return <Empty />;
     };
