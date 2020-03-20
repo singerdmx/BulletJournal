@@ -56,7 +56,6 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       timezone,
       time,
     );
-    const transaction = yield data.json();
     yield put(updateTransactions(projectId, timezone, undefined, undefined, 'MONTHLY'));
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
