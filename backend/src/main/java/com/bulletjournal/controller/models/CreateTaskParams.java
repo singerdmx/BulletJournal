@@ -10,7 +10,9 @@ public class CreateTaskParams {
     private String name;
 
     @NotBlank
-    @Size(min = 10, max = 10)
+    @Size(min = 1, max = 100)
+    private String assignedTo;
+
     private String dueDate; // "yyyy-MM-dd"
 
     private String dueTime; // "HH-mm"
@@ -22,21 +24,27 @@ public class CreateTaskParams {
 
     private String timezone;
 
+    private String recurrenceRule;
+
     public CreateTaskParams() {
     }
 
     public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
-                            @NotBlank @Size(min = 10, max = 10) String dueDate,
+                            @NotBlank @Size(min = 1, max = 100) String assignedTo,
+                            String dueDate,
                             String dueTime,
                             Integer duration,
                             ReminderSetting reminderSetting,
-                            String timezone) {
+                            String timezone,
+                            String recurrenceRule) {
         this.name = name;
+        this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.duration = duration;
         this.reminderSetting = reminderSetting;
         this.timezone = timezone;
+        this.recurrenceRule = recurrenceRule;
     }
 
     public String getDueDate() {
@@ -61,6 +69,14 @@ public class CreateTaskParams {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
     }
 
     public ReminderSetting getReminderSetting() {
@@ -89,5 +105,13 @@ public class CreateTaskParams {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
     }
 }

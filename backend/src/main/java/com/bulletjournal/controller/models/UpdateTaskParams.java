@@ -17,12 +17,14 @@ public class UpdateTaskParams {
 
     private String timezone;
 
+    private String recurrenceRule;
+
     public UpdateTaskParams() {
     }
 
     public UpdateTaskParams(
             String assignedTo, String dueDate, String dueTime, String name, Integer duration,
-            ReminderSetting reminderSetting, String timezone) {
+            ReminderSetting reminderSetting, String timezone, String recurrenceRule) {
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -30,6 +32,7 @@ public class UpdateTaskParams {
         this.duration = duration;
         this.reminderSetting = reminderSetting;
         this.timezone = timezone;
+        this.recurrenceRule = recurrenceRule;
     }
 
     public String getAssignedTo() {
@@ -118,6 +121,18 @@ public class UpdateTaskParams {
 
     public boolean hasDuration() {
         return this.duration != null;
+    }
+
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
+    public boolean hasRecurrenceRule() {
+        return this.recurrenceRule != null;
     }
 
     public String getOrDefaultDate(String defaultDate) {

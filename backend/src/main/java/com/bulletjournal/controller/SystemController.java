@@ -74,7 +74,7 @@ public class SystemController {
                     groupList);
         }
         if (targetEtags == null || targetEtags.contains("taskReminders")) {
-            remindingTasks = this.taskDaoJpa.getRemindingTask(username, ZonedDateTimeHelper.getNow());
+            remindingTasks = this.taskDaoJpa.getRemindingTasks(username, ZonedDateTimeHelper.getNow());
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
                     remindingTasks);

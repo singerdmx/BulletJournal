@@ -9,8 +9,10 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.LabelDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.repository.models.User;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,6 +41,9 @@ public class ProjectItemController {
 
     @Autowired
     private LabelDaoJpa labelDaoJpa;
+
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
@@ -72,10 +77,11 @@ public class ProjectItemController {
 
         Map<ZonedDateTime, List<Task>> taskMap = null;
         Map<ZonedDateTime, List<Transaction>> transactionMap = null;
+        User user = this.userDaoJpa.getByName(username);
 
         // Task query
         if (types.contains(ProjectType.TODO)) {
-            List<Task> tasks = taskDaoJpa.getTasksBetween(username, startTime, endTime);
+            List<Task> tasks = taskDaoJpa.getTasksBetween(user.getName(), startTime, endTime);
             Map<Long, List<Long>> tasklabels = tasks.stream().collect(
                     Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
             labelIds.put(ProjectItemType.TASK, tasklabels);
@@ -84,7 +90,7 @@ public class ProjectItemController {
         }
         // Ledger query
         if (types.contains(ProjectType.LEDGER)) {
-            List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(username, startTime, endTime);
+            List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(user.getName(), startTime, endTime);
             Map<Long, List<Long>> transactionlabels = transactions.stream().collect(
                     Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
             labelIds.put(ProjectItemType.TRANSACTION, transactionlabels);

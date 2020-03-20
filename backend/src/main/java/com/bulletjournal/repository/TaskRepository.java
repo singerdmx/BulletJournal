@@ -14,10 +14,12 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositoryCustom {
     List<Task> findTaskByProject(Project project);
 
+    List<Task> findTasksByAssignedToAndRecurrenceRuleNotNull(String assignedTo);
+
     @Query("SELECT task FROM Task task WHERE " +
             "task.startTime >= :now AND task.reminderDateTime <= :now AND " +
             "task.assignedTo = :assignee")
-    List<Task> findRemindingTask(@Param("assignee") String assignee, @Param("now") Timestamp now);
+    List<Task> findRemindingTasks(@Param("assignee") String assignee, @Param("now") Timestamp now);
 
     @Query("SELECT task FROM Task task WHERE " +
             "((task.startTime >= :startTime AND task.startTime <= :endTime) OR " +
