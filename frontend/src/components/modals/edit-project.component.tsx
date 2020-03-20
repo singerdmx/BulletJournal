@@ -32,12 +32,8 @@ type GroupProps = {
 
 const EditProject: React.FC<GroupProps & ProjectProps> = props => {
   const [name, setName] = useState<string>(props.project.name);
-  const [description, setDescription] = useState<string>(
-    props.project.description
-  );
-  const [groupId, setGroupId] = useState<number>(
-    props.project && props.project.group ? props.project.group.id : -1
-  );
+  const [description, setDescription] = useState<string>(props.project.description);
+  const [groupId, setGroupId] = useState<number>(props.project && props.project.group ? props.project.group.id : -1);
   const [visible, setVisible] = useState(false);
 
   const [form] = Form.useForm();
@@ -50,6 +46,12 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
   useEffect(() => {
     props.updateGroups();
   }, []);
+
+  useEffect(() => {
+    setName(props.project.name);
+    setDescription(props.project.description);
+    setGroupId(props.project.group.id);
+  }, [props.project])
 
   const updateProject = () => {
     setVisible(false);
