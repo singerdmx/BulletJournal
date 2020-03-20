@@ -17,6 +17,8 @@ public class UpdateTaskParams {
 
     private String timezone;
 
+    private String recurrenceRule;
+
     public UpdateTaskParams() {
     }
 
@@ -118,6 +120,14 @@ public class UpdateTaskParams {
 
     public boolean hasDuration() {
         return this.duration != null;
+    }
+
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
     }
 
     public String getOrDefaultDate(String defaultDate) {

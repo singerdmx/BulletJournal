@@ -31,6 +31,8 @@ public class Task extends ProjectItem {
 
     private ReminderSetting reminderSetting;
 
+    private String recurrenceRule;
+
     @Expose
     @Valid
     private List<Task> subTasks = new ArrayList<>();
@@ -40,14 +42,15 @@ public class Task extends ProjectItem {
 
     public Task(Long id,
                 @NotBlank @Size(min = 1, max = 100) String assignedTo,
-                @NotBlank @Size(min = 10, max = 10) String dueDate,
+                @Size(min = 10, max = 10) String dueDate,
                 String dueTime,
                 @NotBlank String timezone,
                 @NotNull String name,
                 Integer duration,
                 @NotNull Project project,
                 List<Label> labels,
-                ReminderSetting reminderSetting) {
+                ReminderSetting reminderSetting,
+                String recurrenceRule) {
         super(id, name, project, labels);
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
@@ -57,6 +60,7 @@ public class Task extends ProjectItem {
         if (reminderSetting.hasBefore() || reminderSetting.hasDate()) {
             this.reminderSetting = reminderSetting;
         }
+        this.recurrenceRule = recurrenceRule;
     }
 
     public String getAssignedTo() {
@@ -91,7 +95,6 @@ public class Task extends ProjectItem {
         this.timezone = timezone;
     }
 
-
     public Integer getDuration() {
         return duration;
     }
@@ -104,12 +107,12 @@ public class Task extends ProjectItem {
         return reminderSetting;
     }
 
-    public boolean hasReminderSetting() {
-        return reminderSetting != null;
-    }
-
     public void setReminderSetting(ReminderSetting reminderSetting) {
         this.reminderSetting = reminderSetting;
+    }
+
+    public boolean hasReminderSetting() {
+        return reminderSetting != null;
     }
 
     public List<Task> getSubTasks() {
@@ -124,6 +127,13 @@ public class Task extends ProjectItem {
         this.subTasks.add(task);
     }
 
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -137,13 +147,13 @@ public class Task extends ProjectItem {
                 Objects.equals(getTimezone(), task.getTimezone()) &&
                 Objects.equals(getDuration(), task.getDuration()) &&
                 Objects.equals(getReminderSetting(), task.getReminderSetting()) &&
+                Objects.equals(getRecurrenceRule(), task.getRecurrenceRule()) &&
                 Objects.equals(getSubTasks(), task.getSubTasks());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getAssignedTo(), getDueDate(),
-                getDueTime(), getTimezone(), getDuration(), getReminderSetting(), getSubTasks());
+        return Objects.hash(super.hashCode(), getAssignedTo(), getDueDate(), getDueTime(), getTimezone(), getDuration(), getReminderSetting(), getRecurrenceRule(), getSubTasks());
     }
 
     public void clone(Task task) {
@@ -157,5 +167,6 @@ public class Task extends ProjectItem {
                 (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate())) {
             this.setReminderSetting(task.getReminderSetting());
         }
+        this.setRecurrenceRule(task.getRecurrenceRule());
     }
 }

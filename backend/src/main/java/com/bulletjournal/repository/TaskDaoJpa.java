@@ -14,8 +14,13 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.utils.BuJoRecurrenceRule;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.bulletjournal.repository.utils.ValidationUtil;
 import com.google.gson.Gson;
+import org.dmfs.rfc5545.DateTime;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
+import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -24,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,11 +56,19 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ValidationUtil validationUtil;
+
     @Override
     public JpaRepository getJpaRepository() {
         return this.taskRepository;
     }
 
+    /*
+     * Get tasks by project identifier
+     *
+     * @retVal List<com.bulletjournal.controller.models.Task> - a list of controller model tasks with labels
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId) {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
@@ -77,6 +91,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
                 .collect(Collectors.toList());
     }
 
+    /*
+     * Get completed task by task identifier
+     *
+     * 1. Get task from database
+     * 2. Look up task labels and add to task
+     *
+     * @retVal com.bulletjournal.controller.models.Task - controller model task with label
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getTask(Long id) {
         Task task = (Task) this.getProjectItem(id);
@@ -84,6 +106,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         return task.toPresentationModel(labels);
     }
 
+    /*
+     * Get completed tasks from database
+     *
+     * @retVal List<com.bulletjournal.controller.models.Task> - A list of completed tasks
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getCompletedTask(Long id) {
         CompletedTask task = this.completedTaskRepository.findById(id)
@@ -101,14 +128,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks to be reminded
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getRemindingTask(String assignee, ZonedDateTime now) {
-        List<User> user = this.userRepository.findByName(assignee);
-        if (user.size() == 0)
-            throw new ResourceNotFoundException("Assignee " + assignee + " not found");
+    public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
+        validationUtil.validateUser(assignee); // Validate assignee
 
         Timestamp currentTime = Timestamp.from(now.toInstant());
         return this.taskRepository
-                .findRemindingTask(assignee, currentTime)
+                .findRemindingTasks(assignee, currentTime)
                 .stream()
                 .map(TaskModel::toPresentationModel)
                 .collect(Collectors.toList());
@@ -121,16 +146,65 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<User> user = this.userRepository.findByName(assignee);
-        if (user.size() == 0)
-            throw new ResourceNotFoundException("Assignee " + assignee + " not found");
 
-        return this.taskRepository.findTasksOfAssigneeBetween(assignee,
-                Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+        validationUtil.validateUser(assignee); // Validate assignee
+
+        List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
+                assignee, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+
+        List<Task> recurrentTasks = this.getRecurrentTasks(assignee, startTime, endTime);
+
+        tasks.addAll(recurrentTasks);
+        return tasks;
     }
 
+    /*
+     * Get all recurrent tasks of an assignee
+     *
+     * @retVal List<Task> - A list of recurrent tasks within the time range
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getRecurrentTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Task> recurrentTasksBetween = new ArrayList<>();
+        List<Task> recurrentTasks = this.taskRepository.findTasksByAssignedToAndRecurrenceRuleNotNull(assignee);
+        long startMoment = startTime.getLong(ChronoField.INSTANT_SECONDS);
+        long endMoment = endTime.getLong(ChronoField.INSTANT_SECONDS);
+
+        for (Task t : recurrentTasks) {
+            String recurrenceRule = t.getRecurrenceRule();
+            try {
+                BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule);
+
+                RecurrenceRuleIterator it = rule.getIterator();
+                while (it.hasNext()) {
+                    DateTime nextInstance = it.nextDateTime();
+                    long currTime = nextInstance.getTimestamp();
+                    if (currTime > endMoment) {
+                        break;
+                    }
+                    if (currTime < startMoment) {
+                        continue;
+                    }
+
+                    recurrentTasksBetween.add(t);
+                }
+            } catch (InvalidRecurrenceRuleException e) {
+                throw new IllegalArgumentException("Recurrence rule format invalid");
+            }
+        }
+        return recurrentTasksBetween;
+    }
+
+    /*
+     * Create task based on CreateTaskParams
+     *
+     * @retVal Task - A repository task model
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
+
+        validationUtil.validateUser(owner); // Validate owner
+
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -151,9 +225,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         String date = createTaskParams.getDueDate();
         String time = createTaskParams.getDueTime();
         String timezone = createTaskParams.getTimezone();
+
         task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
         task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
         task.setReminderSetting(createTaskParams.getReminderSetting());
+        task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
 
         task = this.taskRepository.save(task);
 
@@ -167,8 +243,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         return task;
     }
 
+    /*
+     * Partially update task based on UpdateTaskParams
+     *
+     * @retVal List<Event> - a list of events that is used to notify users
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
+
+        validationUtil.validateUser(requester); // Validate requester
+
         Task task = this.taskRepository
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
@@ -211,6 +295,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         return events;
     }
 
+    /*
+     * Add assignee change event to notification
+     */
     private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams, Task task) {
         List<Event> events = new ArrayList<>();
         String newAssignee = updateTaskParams.getAssignedTo();
@@ -227,8 +314,20 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         return events;
     }
 
+    /*
+     * Set a task to complete
+     *
+     * 1. Get task from task table
+     * 2. Delete task and its sub tasks from task table
+     * 3. Add task and its sub tasks to complete task table
+     *
+     * @retVal CompleteTask - a repository model complete task object
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public CompletedTask complete(String requester, Long taskId) {
+
+        validationUtil.validateUser(requester); // Validate requester
+
         Task task = this.taskRepository
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
@@ -263,6 +362,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         return completedTask;
     }
 
+    /*
+     * Update sub tasks relation
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateUserTasks(Long projectId, List<com.bulletjournal.controller.models.Task> tasks) {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
@@ -274,8 +376,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         this.projectTasksRepository.save(projectTasks);
     }
 
+    /*
+     * Delete requester's task by task identifier
+     *
+     * @retVal List<Event> - a list of notification events
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteTask(String requester, Long taskId) {
+
+        validationUtil.validateUser(requester); // Validate requester
+
         Task task = this.taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
 
@@ -301,6 +411,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         return generateEvents(task, requester, project);
     }
 
+    /*
+     * Generate events for notification
+     *
+     * @retVal List<Event> - a list of events for notifications
+     */
     private List<Event> generateEvents(Task task, String requester, Project project) {
         List<Event> events = new ArrayList<>();
         for (UserGroup userGroup : project.getGroup().getUsers()) {

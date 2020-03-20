@@ -22,6 +22,8 @@ public class CreateTaskParams {
 
     private String timezone;
 
+    private String recurrenceRule;
+
     public CreateTaskParams() {
     }
 
@@ -30,13 +32,15 @@ public class CreateTaskParams {
                             String dueTime,
                             Integer duration,
                             ReminderSetting reminderSetting,
-                            String timezone) {
+                            String timezone,
+                            String recurrenceRule) {
         this.name = name;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.duration = duration;
         this.reminderSetting = reminderSetting;
         this.timezone = timezone;
+        this.recurrenceRule = recurrenceRule;
     }
 
     public String getDueDate() {
@@ -89,5 +93,13 @@ public class CreateTaskParams {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
     }
 }

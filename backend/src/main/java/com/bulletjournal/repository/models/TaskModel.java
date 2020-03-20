@@ -54,14 +54,17 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "reminder_before_task")
     private Integer reminderBeforeTask;
 
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time")
     private Timestamp startTime;
 
-    @Column(name = "end_time", nullable = false)
+    @Column(name = "end_time")
     private Timestamp endTime;
 
     @Column(name = "reminder_date_time")
     private Timestamp reminderDateTime;
+
+    @Column(name = "recurrence_rule")
+    private String recurrenceRule;
 
     public Timestamp getStartTime() {
         return startTime;
@@ -189,6 +192,14 @@ public abstract class TaskModel extends ProjectItemModel {
         }
     }
 
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
     private Timestamp getReminderDateTime(Timestamp startTime, Integer before) {
         Instant reminderInstant = null;
         switch (before) {
@@ -247,7 +258,8 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getDuration(),
                 this.getProject(),
                 labels,
-                reminderSetting);
+                reminderSetting,
+                this.getRecurrenceRule());
     }
 
     public abstract Long getId();

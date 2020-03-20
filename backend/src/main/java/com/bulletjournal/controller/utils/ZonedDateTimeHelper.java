@@ -1,11 +1,14 @@
 package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.FrequencyType;
+import org.dmfs.rfc5545.DateTime;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.util.TimeZone;
 
 public class ZonedDateTimeHelper {
 
@@ -83,6 +86,22 @@ public class ZonedDateTimeHelper {
         return zonedDateTime.getYear() + DATE_DELIMITER +
                 convertSingleDigitToTwoDigits(zonedDateTime.getMonthValue()) + DATE_DELIMITER +
                 convertSingleDigitToTwoDigits(zonedDateTime.getDayOfMonth());
+    }
+
+    /*
+     * Convert time and timezone to DateTime
+     */
+    public static DateTime getDateTime(long time, String timezone) {
+        TimeZone convertedTimezone = TimeZone.getTimeZone(timezone);
+        return new DateTime(convertedTimezone, time);
+    }
+
+    /*
+     * Convert ZonedDateTime to DateTime
+     */
+    public static DateTime getDateTimeFromZonedDateTime(ZonedDateTime zonedDateTime) {
+        TimeZone convertedTimezone = TimeZone.getTimeZone(zonedDateTime.getZone());
+        return new DateTime(convertedTimezone, zonedDateTime.getLong(ChronoField.INSTANT_SECONDS));
     }
 
     /*
