@@ -1,4 +1,4 @@
-package com.bulletjournal.repository.utils;
+package com.bulletjournal.util;
 
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;

@@ -14,7 +14,7 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
-import com.bulletjournal.repository.utils.BuJoRecurrenceRule;
+import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.repository.utils.ValidationUtil;
 import com.google.gson.Gson;
