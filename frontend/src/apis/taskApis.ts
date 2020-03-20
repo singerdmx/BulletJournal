@@ -26,21 +26,29 @@ export const getTaskById = (taskId: number) => {
 };
 
 export const deleteTaskById = (taskId: number) => {
-  return doDelete(`/api/task/${taskId}`)
-    .catch(err => {
-      throw Error(err.message);
-    });
+  return doDelete(`/api/task/${taskId}`).catch(err => {
+    throw Error(err.message);
+  });
 };
 
-export const createTask = (projectId: number, name: string, assignedTo: string,
-  dueDate?: string, dueTime?: string, duration?: number, reminderSetting?: ReminderSetting) => {
+export const createTask = (
+  projectId: number,
+  name: string,
+  assignedTo: string,
+  dueDate?: string,
+  dueTime?: string,
+  duration?: number,
+  reminderSetting?: ReminderSetting,
+  recurrenceRule?: string
+) => {
   const postBody = JSON.stringify({
     name: name,
     assignedTo: assignedTo,
     dueDate: dueDate,
     dueTime: dueTime,
     duration: duration,
-    reminderSetting: reminderSetting
+    reminderSetting: reminderSetting,
+    recurrenceRule: recurrenceRule
   });
   return doPost(`/api/projects/${projectId}/tasks`, postBody)
     .then(res => res.json())
@@ -51,11 +59,10 @@ export const createTask = (projectId: number, name: string, assignedTo: string,
 
 export const putTasks = (projectId: number, tasks: Task[]) => {
   const putBody = JSON.stringify(tasks);
-  return doPut(`/api/projects/${projectId}/tasks`, putBody)
-    .catch(err => {
-      throw Error(err.message);
-    });
-}
+  return doPut(`/api/projects/${projectId}/tasks`, putBody).catch(err => {
+    throw Error(err.message);
+  });
+};
 
 export const updateTask = (
   taskId: number,
@@ -81,25 +88,21 @@ export const updateTask = (
     });
 };
 
-export const completeTaskById = (
-  taskId: number
-) => {
+export const completeTaskById = (taskId: number) => {
   return doPost(`/api/tasks/${taskId}/complete`)
     .then(res => res.json())
     .catch(err => {
       throw Error(err);
     });
-}
+};
 
-export const uncompleteTaskById = (
-  taskId: number
-) => {
+export const uncompleteTaskById = (taskId: number) => {
   return doPost(`/api/tasks/${taskId}/uncomplete`)
     .then(res => res.json())
     .catch(err => {
       throw Error(err);
     });
-}
+};
 
 export const setTaskLabels = (taskId: number, labels: number[]) => {
   const putBody = JSON.stringify(labels);
@@ -108,4 +111,4 @@ export const setTaskLabels = (taskId: number, labels: number[]) => {
     .catch(err => {
       throw Error(err.message);
     });
-}
+};

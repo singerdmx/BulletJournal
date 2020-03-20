@@ -14,8 +14,16 @@ import {
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchTasks, fetchCompletedTasks, createTask, putTasks, getTaskById, updateTask, completeTaskById,
-  deleteTaskById, uncompleteTaskById, setTaskLabels
+  fetchTasks,
+  fetchCompletedTasks,
+  createTask,
+  putTasks,
+  getTaskById,
+  updateTask,
+  completeTaskById,
+  deleteTaskById,
+  uncompleteTaskById,
+  setTaskLabels
 } from '../../apis/taskApis';
 import { updateTasks } from './actions';
 
@@ -30,7 +38,7 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
     const tasks = yield data.json();
 
     yield put(
-        tasksActions.tasksReceived({
+      tasksActions.tasksReceived({
         tasks: tasks
       })
     );
@@ -46,7 +54,7 @@ function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
     const tasks = yield data.json();
 
     yield put(
-        tasksActions.completedTasksReceived({
+      tasksActions.completedTasksReceived({
         tasks: tasks
       })
     );
@@ -56,32 +64,48 @@ function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
 }
 
 function* taskCreate(action: PayloadAction<CreateTask>) {
-    try {
-      const { projectId, name, assignedTo, dueDate, dueTime, duration,
-        reminderSetting } = action.payload;
-      const data = yield call(createTask, projectId,
-        name, assignedTo, dueDate, dueTime,
-        duration, reminderSetting);
-      const task = yield data.json();
-      yield put(updateTasks(action.payload.projectId));
-    } catch (error) {
-      yield call(message.error, `Task Error Received: ${error}`);
-    }
+  try {
+    const {
+      projectId,
+      name,
+      assignedTo,
+      dueDate,
+      dueTime,
+      duration,
+      reminderSetting,
+      recurrenceRule
+    } = action.payload;
+    const data = yield call(
+      createTask,
+      projectId,
+      name,
+      assignedTo,
+      dueDate,
+      dueTime,
+      duration,
+      reminderSetting,
+      recurrenceRule
+    );
+    const task = yield data.json();
+    yield put(updateTasks(action.payload.projectId));
+  } catch (error) {
+    yield call(message.error, `Task Error Received: ${error}`);
   }
+}
 
 function* taskPut(action: PayloadAction<PutTask>) {
-    try{
-      const { projectId, tasks } = action.payload;
-      const data = yield call(putTasks, projectId, tasks);
-      const updatedTasks = yield data.json();
-      yield put(
-          tasksActions.tasksReceived({
-          tasks: updatedTasks
-        })
-      );
-    } catch (error) {
-      yield call(message.error, `Put Task Error Received: ${error}`);
-    }
+  try {
+    const { projectId, tasks } = action.payload;
+    const data = yield call(putTasks, projectId, tasks);
+    const updatedTasks = yield data.json();
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: updatedTasks
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Put Task Error Received: ${error}`);
+  }
 }
 
 function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
@@ -104,10 +128,25 @@ function* getTask(action: PayloadAction<GetTask>) {
 
 function* patchTask(action: PayloadAction<PatchTask>) {
   try {
-    const { taskId, name, assignedTo, dueDate, dueTime,
-      duration, reminderSetting } = action.payload;
-    yield call(updateTask, taskId, name, assignedTo,
-      dueDate, dueTime, duration, reminderSetting);
+    const {
+      taskId,
+      name,
+      assignedTo,
+      dueDate,
+      dueTime,
+      duration,
+      reminderSetting
+    } = action.payload;
+    yield call(
+      updateTask,
+      taskId,
+      name,
+      assignedTo,
+      dueDate,
+      dueTime,
+      duration,
+      reminderSetting
+    );
   } catch (error) {
     yield call(message.error, `Patch Task Error Received: ${error}`);
   }
@@ -146,45 +185,18 @@ export default function* taskSagas() {
       tasksActions.taskApiErrorReceived.type,
       taskApiErrorReceived
     ),
-    yield takeLatest(
-      tasksActions.TasksUpdate.type,
-      tasksUpdate
-    ),
-    yield takeLatest(
-        tasksActions.TasksCreate.type,
-        taskCreate
-    ),
-    yield takeLatest(
-          tasksActions.TaskPut.type,
-          taskPut
-    ),
-    yield takeLatest(
-          tasksActions.TaskGet.type,
-          getTask
-    ),
-    yield takeLatest(
-      tasksActions.TaskPatch.type,
-      patchTask
-    ),
-    yield takeLatest(
-      tasksActions.TaskComplete.type,
-      completeTask
-    ),
-    yield takeLatest(
-      tasksActions.TaskUncomplete.type,
-      uncompleteTask
-    ),
-    yield takeLatest(
-      tasksActions.TaskDelete.type,
-      deleteTask
-    ),
-    yield takeLatest(
-      tasksActions.TaskSetLabels.type,
-      taskSetLabels
-    ),
+    yield takeLatest(tasksActions.TasksUpdate.type, tasksUpdate),
+    yield takeLatest(tasksActions.TasksCreate.type, taskCreate),
+    yield takeLatest(tasksActions.TaskPut.type, taskPut),
+    yield takeLatest(tasksActions.TaskGet.type, getTask),
+    yield takeLatest(tasksActions.TaskPatch.type, patchTask),
+    yield takeLatest(tasksActions.TaskComplete.type, completeTask),
+    yield takeLatest(tasksActions.TaskUncomplete.type, uncompleteTask),
+    yield takeLatest(tasksActions.TaskDelete.type, deleteTask),
+    yield takeLatest(tasksActions.TaskSetLabels.type, taskSetLabels),
     yield takeLatest(
       tasksActions.CompletedTasksUpdate.type,
       completedTasksUpdate
-    ),
+    )
   ]);
 }

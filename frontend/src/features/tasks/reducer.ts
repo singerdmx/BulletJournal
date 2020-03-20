@@ -6,62 +6,63 @@ export type TaskApiErrorAction = {
 };
 
 export type UpdateTasks = {
-    projectId: number
+  projectId: number;
 };
 
 export type CreateTask = {
-    projectId: number;
-    name: string;
-    assignedTo: string;
-    dueDate?: string;
-    dueTime?: string;
-    duration?: number;
-    reminderSetting?: ReminderSetting;
-}
+  projectId: number;
+  name: string;
+  assignedTo: string;
+  dueDate?: string;
+  dueTime?: string;
+  duration?: number;
+  reminderSetting?: ReminderSetting;
+  recurrenceRule?: string;
+};
 
 export type GetTask = {
-    taskId: number;
-}
+  taskId: number;
+};
 
 export type TasksAction = {
   tasks: Array<Task>;
 };
 
 export type PutTask = {
-  projectId: number,
-  tasks: Task[]
-}
+  projectId: number;
+  tasks: Task[];
+};
 
 export type DeleteTask = {
-  taskId: number
-}
+  taskId: number;
+};
 
 export type PatchTask = {
-  taskId: number,
+  taskId: number;
   name?: string;
   assignedTo?: string;
   dueDate?: string;
   dueTime?: string;
   duration?: number;
   reminderSetting?: ReminderSetting;
-}
+};
 
 export type CompleteTask = {
-  taskId: number
-}
+  taskId: number;
+};
 
 export type UncompleteTask = {
-  taskId: number
-}
+  taskId: number;
+};
 
 export type SetTaskLabels = {
-  taskId: number,
-  labels: number[]
-}
+  taskId: number;
+  labels: number[];
+};
 
 export type GetCompletedTasks = {
-  projectId: number
-}
+  projectId: number;
+};
 
 let initialState = {
   tasks: [] as Array<Task>,
@@ -72,26 +73,18 @@ const slice = createSlice({
   name: 'task',
   initialState,
   reducers: {
-    tasksReceived: (
-      state,
-      action: PayloadAction<TasksAction>
-    ) => {
+    tasksReceived: (state, action: PayloadAction<TasksAction>) => {
       const { tasks } = action.payload;
       state.tasks = tasks;
     },
-    completedTasksReceived: (
-      state,
-      action: PayloadAction<TasksAction>
-    ) => {
+    completedTasksReceived: (state, action: PayloadAction<TasksAction>) => {
       const { tasks } = action.payload;
       state.completedTasks = tasks;
     },
-    taskApiErrorReceived: (
+    taskApiErrorReceived: (state, action: PayloadAction<TaskApiErrorAction>) =>
       state,
-      action: PayloadAction<TaskApiErrorAction>
-    ) => state,
     TasksUpdate: (state, action: PayloadAction<UpdateTasks>) => state,
-    CompletedTasksUpdate: (state, action: PayloadAction<UpdateTasks>) =>state,
+    CompletedTasksUpdate: (state, action: PayloadAction<UpdateTasks>) => state,
     TasksCreate: (state, action: PayloadAction<CreateTask>) => state,
     TaskPut: (state, action: PayloadAction<PutTask>) => state,
     TaskGet: (state, action: PayloadAction<GetTask>) => state,
@@ -99,7 +92,7 @@ const slice = createSlice({
     TaskPatch: (state, action: PayloadAction<PatchTask>) => state,
     TaskComplete: (state, action: PayloadAction<CompleteTask>) => state,
     TaskUncomplete: (state, action: PayloadAction<UncompleteTask>) => state,
-    TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state,
+    TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state
   }
 });
 
