@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Avatar, Form, Input, Modal, Select, Tooltip } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import { connect } from "react-redux";
-import { GroupsWithOwner } from "../../features/group/interface";
-import { updateGroups } from "../../features/group/actions";
-import { updateProject } from "../../features/project/actions";
-import { IState } from "../../store";
-import { Project } from "../../features/project/interface";
-import { iconMapper } from "../side-menu/side-menu.component";
+import React, { useEffect, useState } from 'react';
+import { Avatar, Form, Input, Modal, Select, Tooltip } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import { connect } from 'react-redux';
+import { GroupsWithOwner } from '../../features/group/interface';
+import { updateGroups } from '../../features/group/actions';
+import { updateProject } from '../../features/project/actions';
+import { IState } from '../../store';
+import { Project } from '../../features/project/interface';
+import { iconMapper } from '../side-menu/side-menu.component';
 
-import "./modals.styles.less";
+import './modals.styles.less';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -31,27 +31,41 @@ type GroupProps = {
 };
 
 const EditProject: React.FC<GroupProps & ProjectProps> = props => {
+  // hooks 
   const [name, setName] = useState<string>(props.project.name);
-  const [description, setDescription] = useState<string>(props.project.description);
-  const [groupId, setGroupId] = useState<number>(props.project && props.project.group ? props.project.group.id : -1);
+  const [description, setDescription] = useState<string>(
+    props.project.description
+  );
+  const [groupId, setGroupId] = useState<number>(
+    props.project && props.project.group ? props.project.group.id : -1
+  );
   const [visible, setVisible] = useState(false);
-
   const [form] = Form.useForm();
-
-  const onCancel = () => setVisible(false);
+  // initial props
+  const {updateGroups} = props;
+  // methods
+  const onCancel = () => {
+    form.resetFields();
+    setVisible(false);
+  };
   const openModal = () => {
+    form.setFieldsValue({
+      projectName: name,
+      projectDesp: description,
+      projectGroup: groupId
+    });
     setVisible(true);
   };
 
   useEffect(() => {
-    props.updateGroups();
+    updateGroups();
   }, []);
 
   useEffect(() => {
     setName(props.project.name);
     setDescription(props.project.description);
     setGroupId(props.project.group.id);
-  }, [props.project])
+  }, [props.project]);
 
   const updateProject = () => {
     setVisible(false);
@@ -104,7 +118,7 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
           <Form.Item>
             <Form.Item
               name="projectName"
-              rules={[{ required: true, message: "Missing BuJo Name" }]}
+              rules={[{ required: true, message: 'Missing BuJo Name' }]}
             >
               <Input
                 prefix={
@@ -131,7 +145,7 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
             <Form.Item name="projectGroup">
               <Select
                 placeholder="Choose Group"
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 value={groupId}
                 onChange={value => onChangeGroupId(value)}
               >
