@@ -9,6 +9,10 @@ public class CreateTaskParams {
     @Size(min = 1, max = 100)
     private String name;
 
+    @NotBlank
+    @Size(min = 1, max = 100)
+    private String assignedTo;
+
     private String dueDate; // "yyyy-MM-dd"
 
     private String dueTime; // "HH-mm"
@@ -26,6 +30,7 @@ public class CreateTaskParams {
     }
 
     public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
+                            @NotBlank @Size(min = 1, max = 100) String assignedTo,
                             String dueDate,
                             String dueTime,
                             Integer duration,
@@ -33,6 +38,7 @@ public class CreateTaskParams {
                             String timezone,
                             String recurrenceRule) {
         this.name = name;
+        this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.duration = duration;
@@ -63,6 +69,14 @@ public class CreateTaskParams {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
     }
 
     public ReminderSetting getReminderSetting() {

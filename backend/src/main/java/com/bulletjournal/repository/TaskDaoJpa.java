@@ -208,6 +208,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         task.setName(createTaskParams.getName());
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
+        task.setAssignedTo(createTaskParams.getAssignedTo());
 
         String date = createTaskParams.getDueDate();
         String time = createTaskParams.getDueTime();
