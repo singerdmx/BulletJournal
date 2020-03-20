@@ -52,9 +52,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Autowired
     private CompletedTaskRepository completedTaskRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @Override
     public JpaRepository getJpaRepository() {
         return this.taskRepository;
@@ -337,7 +334,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         // delete tasks and its subTasks
         List<Task> targetTasks = this.taskRepository.findAllById(HierarchyProcessor.getSubItems(relations, taskId));
         targetTasks.forEach(t -> {
-            if (t.getId() != task.getId()) {
+            if (!t.getId().equals(task.getId())) {
                 this.completedTaskRepository.save(new CompletedTask(t));
             }
         });
@@ -425,8 +422,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
-        completedTasks.stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()));
-        return completedTasks;
+        return completedTasks
+                .stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
