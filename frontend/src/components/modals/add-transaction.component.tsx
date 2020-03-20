@@ -213,7 +213,7 @@ const AddTransaction: React.FC<RouteComponentProps &
                     {zones.map((zone: string, index: number) => (
                       <Option key={zone} value={zone}>
                         <Tooltip title={zone} placement='right'>
-                          {zone}
+                          {<span>{zone}</span>}
                         </Tooltip>
                       </Option>
                     ))}
