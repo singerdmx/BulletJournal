@@ -131,6 +131,10 @@ public class UpdateTaskParams {
         this.recurrenceRule = recurrenceRule;
     }
 
+    public boolean hasRecurrenceRule() {
+        return this.recurrenceRule != null;
+    }
+
     public String getOrDefaultDate(String defaultDate) {
         return this.hasDueDate() ? this.getDueDate() : defaultDate;
     }

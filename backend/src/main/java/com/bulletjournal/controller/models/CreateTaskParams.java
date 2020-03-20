@@ -9,8 +9,6 @@ public class CreateTaskParams {
     @Size(min = 1, max = 100)
     private String name;
 
-    @NotBlank
-    @Size(min = 10, max = 10)
     private String dueDate; // "yyyy-MM-dd"
 
     private String dueTime; // "HH-mm"
@@ -28,7 +26,7 @@ public class CreateTaskParams {
     }
 
     public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
-                            @NotBlank @Size(min = 10, max = 10) String dueDate,
+                            String dueDate,
                             String dueTime,
                             Integer duration,
                             ReminderSetting reminderSetting,

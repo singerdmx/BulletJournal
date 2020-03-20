@@ -17,8 +17,6 @@ public class Task extends ProjectItem {
     @Size(min = 1, max = 100)
     private String assignedTo;
 
-    @NotBlank
-    @Size(min = 10, max = 10)
     private String dueDate;
 
     private String dueTime;
@@ -42,7 +40,7 @@ public class Task extends ProjectItem {
 
     public Task(Long id,
                 @NotBlank @Size(min = 1, max = 100) String assignedTo,
-                @Size(min = 10, max = 10) String dueDate,
+                String dueDate,
                 String dueTime,
                 @NotBlank String timezone,
                 @NotNull String name,

@@ -16,7 +16,6 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.bulletjournal.repository.utils.ValidationUtil;
 import com.google.gson.Gson;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
@@ -55,9 +54,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ValidationUtil validationUtil;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -129,8 +125,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
-        validationUtil.validateUser(assignee); // Validate assignee
-
         Timestamp currentTime = Timestamp.from(now.toInstant());
         return this.taskRepository
                 .findRemindingTasks(assignee, currentTime)
@@ -146,8 +140,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
-
-        validationUtil.validateUser(assignee); // Validate assignee
 
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
                 assignee, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
@@ -203,8 +195,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
 
-        validationUtil.validateUser(owner); // Validate owner
-
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -251,8 +241,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
 
-        validationUtil.validateUser(requester); // Validate requester
-
         Task task = this.taskRepository
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
@@ -277,6 +265,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
 
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasTimezone(), updateTaskParams.getTimezone(), task::setTimezone);
+
+        DaoHelper.updateIfPresent(
+                updateTaskParams.hasRecurrenceRule(), updateTaskParams.getRecurrenceRule(), task::setRecurrenceRule);
 
         String date = updateTaskParams.getOrDefaultDate(task.getDueDate());
         String time = updateTaskParams.getOrDefaultTime(task.getDueTime());
@@ -325,8 +316,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public CompletedTask complete(String requester, Long taskId) {
-
-        validationUtil.validateUser(requester); // Validate requester
 
         Task task = this.taskRepository
                 .findById(taskId)
@@ -383,8 +372,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteTask(String requester, Long taskId) {
-
-        validationUtil.validateUser(requester); // Validate requester
 
         Task task = this.taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
