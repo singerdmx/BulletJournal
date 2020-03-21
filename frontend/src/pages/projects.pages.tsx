@@ -55,7 +55,7 @@ export const getGroupByProject = (
     let result: Group | null = null;
     for (let groupWithOwner of groups) {
         for (let group of groupWithOwner.groups) {
-            if (group.id === project.group.id) {
+            if (group.id && group.id === project.group.id) {
                 result = group;
                 break;
             }
