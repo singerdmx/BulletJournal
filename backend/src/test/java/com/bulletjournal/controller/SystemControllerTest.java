@@ -273,7 +273,7 @@ public class SystemControllerTest {
      *
      */
     private ZonedDateTime getReminderDateTime(ZonedDateTime startTime, Integer before) {
-        Instant reminderInstant = null;
+        Instant reminderInstant;
         switch (before) {
             case 0:
                 reminderInstant = startTime.toInstant();

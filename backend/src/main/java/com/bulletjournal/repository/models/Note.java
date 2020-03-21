@@ -17,7 +17,7 @@ public class Note extends ProjectItemModel {
     @SequenceGenerator(
             name = "note_generator",
             sequenceName = "note_sequence",
-            initialValue = 100
+            initialValue = 200
     )
     private Long id;
 

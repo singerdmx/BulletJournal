@@ -1,17 +1,11 @@
 package com.bulletjournal.controller.models;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.util.Objects;
 
 public class ReminderSetting {
 
-    @NotBlank
-    @Size(min = 10, max = 10)
     private String date; // "yyyy-MM-dd"
 
-    @NotBlank
-    @Size(min = 5, max = 5)
     private String time; // "HH-mm"
 
     private Integer before;
@@ -20,8 +14,8 @@ public class ReminderSetting {
     }
 
     public ReminderSetting(
-            @Size(min = 10, max = 10) String date,
-            @Size(min = 5, max = 5) String time,
+            String date,
+            String time,
             Integer before) {
         this.date = date;
         this.time = time;

@@ -209,15 +209,17 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
         task.setAssignedTo(createTaskParams.getAssignedTo());
+        task.setReminderSetting(createTaskParams.getReminderSetting());
+        task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
 
         String date = createTaskParams.getDueDate();
         String time = createTaskParams.getDueTime();
         String timezone = createTaskParams.getTimezone();
 
-        task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-        task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
-        task.setReminderSetting(createTaskParams.getReminderSetting());
-        task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
+        if (date != null) {
+            task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+            task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+        }
 
         task = this.taskRepository.save(task);
 

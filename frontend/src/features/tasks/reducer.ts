@@ -13,10 +13,10 @@ export type CreateTask = {
   projectId: number;
   name: string;
   assignedTo: string;
+  reminderSetting: ReminderSetting;
   dueDate?: string;
   dueTime?: string;
   duration?: number;
-  reminderSetting?: ReminderSetting;
   recurrenceRule?: string;
 };
 
