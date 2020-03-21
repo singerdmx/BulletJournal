@@ -46,15 +46,19 @@ const AddProjectItem : React.FC<GroupProps & ProjectItemProps> = props => {
 
     const getProjectSelections = () => {
         if (projects && projects[0]) {
-            return (<Tooltip title='Choose Project' placement='topLeft'>
-                <Select placeholder="Choose Project" style={{width: "100%"}} defaultValue={projects[0].id}>
+            return (<Tooltip title='Choose BuJo' placement='topLeft'>
+                <Select placeholder="Choose BuJo" style={{width: "100%"}} defaultValue={projects[0].id}>
                     {projects.map(project => {
                         return (
                             <Option value={project.id} key={project.id}>
-                                <Avatar size="small" src={project.ownerAvatar}/>
-                                &nbsp; {iconMapper[project.projectType]}
-                                &nbsp; <strong>{project.name}</strong>
-                                &nbsp; (Group <strong>{project.group.name}</strong>)
+                                <Tooltip title={project.owner} placement='right'>
+                                    <span>
+                                    <Avatar size="small" src={project.ownerAvatar}/>
+                                            &nbsp; {iconMapper[project.projectType]}
+                                            &nbsp; <strong>{project.name}</strong>
+                                            &nbsp; (Group <strong>{project.group.name}</strong>)
+                                    </span>
+                                </Tooltip>
                             </Option>
                         );
                     })}
