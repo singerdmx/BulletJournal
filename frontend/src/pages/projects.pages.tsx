@@ -53,15 +53,17 @@ export const getGroupUsersNumberByProject = (
     project: Project
 ): number => {
     let result = 0;
-    groups.forEach(groupWithOwner => {
-        if (groupWithOwner.owner === project.owner) {
-            groupWithOwner.groups.forEach(group => {
-                if (group.id === project.group.id) {
-                  result = group.users.length;
-                }
-            });
+    for (let groupWithOwner of groups) {
+        for (let group of groupWithOwner.groups) {
+            if (group.id === project.group.id) {
+              result = group.users.length;
+              break;
+            }
         }
-    });
+        if (result) {
+            break;
+        }
+    }
     return result;
 };
 
