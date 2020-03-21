@@ -138,7 +138,7 @@ const AddTask: React.FC<RouteComponentProps &
               )}
             </Form.Item>
             {/* due type */}
-            <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Due Methods : </span>
+            <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Due&nbsp;&nbsp;</span>
             <Radio.Group
               defaultValue={'dueByTime'}
               onChange={e => setDueType(e.target.value)}
@@ -157,13 +157,7 @@ const AddTask: React.FC<RouteComponentProps &
                       style={{ width: '100%' }}
                       placeholder="Select Date"
                       disabled={dueType !== 'dueByTime'}
-                      onChange={value => {
-                        if (value === null) {
-                          setDueTimeVisible(false);
-                        } else {
-                          setDueTimeVisible(true);
-                        }
-                      }}
+                      onChange={value => setDueTimeVisible(value !== null)}
                     />
                   </Form.Item>
                 </Tooltip>
@@ -192,7 +186,7 @@ const AddTask: React.FC<RouteComponentProps &
                 </Popover>
               </Form.Item>
             </div>
-            <Form.Item label="Timezone & Duration" style={{marginBottom : 0}}>
+            <Form.Item label="Time Zone and Duration" style={{marginBottom : 0}}>
               <Tooltip title="Time Zone">
                 <Form.Item
                   name="timezone"
@@ -228,7 +222,7 @@ const AddTask: React.FC<RouteComponentProps &
             </Form.Item>
 
             {/* reminder */}
-            <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Reminder By : </span>
+            <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Reminder&nbsp;&nbsp;</span>
             <Radio.Group
               defaultValue={'remindBefore'}
               onChange={e => setReminderType(e.target.value)}
@@ -236,7 +230,7 @@ const AddTask: React.FC<RouteComponentProps &
               style={{ marginBottom: 18 }}
             >
               <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
-              <Radio.Button value={'reminderDate'}>Date</Radio.Button>
+              <Radio.Button value={'reminderDate'}>Date (Time)</Radio.Button>
             </Radio.Group>
             <div style={{ display: 'flex' }}>
               <Form.Item name="remindBefore">
