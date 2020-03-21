@@ -65,7 +65,7 @@ public class SystemControllerTest {
         SystemUpdates systemUpdates = getRemindingTasks(p1);
         List<Task> remindingTasks = systemUpdates.getReminders();
 
-        assertEquals(4, systemUpdates.getReminders().size());
+        assertEquals(4, remindingTasks.size());
 
         // Check if t1, t2, t3, t4 in the reminding tasks
         assertIfContains(remindingTasks, t1, t2, t3, t4);

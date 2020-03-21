@@ -53,15 +53,17 @@ export const getGroupUsersNumberByProject = (
     project: Project
 ): number => {
     let result = 0;
-    groups.forEach(groupWithOwner => {
-        if (groupWithOwner.owner === project.owner) {
-            groupWithOwner.groups.forEach(group => {
-                if (group.id === project.group.id) {
-                  result = group.users.length;
-                }
-            });
+    for (let groupWithOwner of groups) {
+        for (let group of groupWithOwner.groups) {
+            if (group.id === project.group.id) {
+              result = group.users.length;
+              break;
+            }
         }
-    });
+        if (result) {
+            break;
+        }
+    }
     return result;
 };
 
@@ -73,6 +75,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         updateProjects();
     }, []);
 
+    const handleClick = (projectId: number) => {
+        props.history.push(`/projects/${projectId}`);
+    };
+
     const getOwnedBuJo = (ownedProjects: Project[]) => {
         const projects = flattenOwnedProject(ownedProjects, []);
         if (projects && projects[0]) {
@@ -80,13 +86,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
             <List itemLayout="horizontal" size="small">
               {projects.map(project => {
                 return (
-                  <Tooltip
-                    key={project.id}
-                    title={`Group: ${project.group.name}`}
-                    placement="topLeft"
-                  >
                   <List.Item
                     key={project.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={e => handleClick(project.id)}
                     actions={[
                       <span>
                         <TeamOutlined style={{ marginRight: 5 }} />
@@ -105,7 +108,6 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                     description={project.description}
                   />
                   </List.Item>
-                  </Tooltip>
                 );
               })}
             </List>
@@ -121,13 +123,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
             <List itemLayout="horizontal" size="small">
               {projects.map(project => {
                 return (
-                  <Tooltip
-                    key={project.id}
-                    title={`Group: ${project.group.name}`}
-                    placement="topLeft"
-                  >
                   <List.Item
                     key={project.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={e => handleClick(project.id)}
                     actions={[
                       <span>
                         <TeamOutlined style={{ marginRight: 5 }} />
@@ -146,7 +145,6 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                     description={project.description}
                   />
                   </List.Item>
-                  </Tooltip>
                 );
               })}
             </List>

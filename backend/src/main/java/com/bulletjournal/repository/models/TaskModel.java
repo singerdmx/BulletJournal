@@ -171,6 +171,14 @@ public abstract class TaskModel extends ProjectItemModel {
             return;
         }
 
+        if (reminderSetting.hasBefore()) {
+            this.setReminderBeforeTask(reminderSetting.getBefore());
+            if (this.getStartTime() != null) {
+                this.setReminderDateTime(getReminderDateTime(this.getStartTime(), reminderSetting.getBefore()));
+            }
+            return;
+        }
+
         if (reminderSetting.hasDate()) {
             this.setReminderDate(reminderSetting.getDate());
         }
@@ -183,14 +191,6 @@ public abstract class TaskModel extends ProjectItemModel {
             ZonedDateTime reminderZonedDateTime =
                     ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
             this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
-            return;
-        }
-
-        if (reminderSetting.hasBefore()) {
-            this.setReminderBeforeTask(reminderSetting.getBefore());
-            if (this.getStartTime() != null) {
-                this.setReminderDateTime(getReminderDateTime(this.getStartTime(), reminderSetting.getBefore()));
-            }
         }
     }
 
