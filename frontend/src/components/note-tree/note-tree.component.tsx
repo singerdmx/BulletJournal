@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Tree} from 'antd';
-import {TreeTitle} from '.';
+import TreeItem  from '../project-item/note-item.component';
 import {deleteNote, putNote, updateNotes} from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
 import {IState} from '../../store';
@@ -30,7 +30,7 @@ const getTree = (
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        node.title = <TreeTitle title={item.name}/>;
+        node.title = <TreeItem name={item.name}/>;
         node.key = item.id.toString();
         res.push(node);
     });

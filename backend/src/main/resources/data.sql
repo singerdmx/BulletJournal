@@ -247,4 +247,23 @@ VALUES (7, '2020-02-10 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment7
 INSERT INTO public.transactions (id, created_at, updated_at, name, owner, amount, date, end_time, payer, start_time, time, timezone, transaction_type, project_id, labels)
 VALUES (8, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Payment8', 'BulletJournal', 150000, '2020-03-10', '2020-03-10 00:00:00.000000', 'BulletJournal', '2020-03-10 00:00:00.000000', null, 'America/Los_Angeles', 1, 13, '{2}');
 INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
-VALUES (1, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Note1', 'BulletJournal', 12, '{1,2}');
+VALUES (100, '2020-02-15 07:11:22.535000', '2020-02-15 07:11:22.535000', 'Note1', 'BulletJournal', 12, '{1,2}');
+INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
+VALUES (101, '2020-02-16 07:11:22.535000', '2020-02-17 08:11:22.535000', 'Note12', 'BulletJournal', 12, '{1,2}');
+INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
+VALUES (102, '2020-02-17 07:11:22.535000', '2020-02-18 08:11:22.535000', 'Note13', 'BulletJournal', 12, '{1,2}');
+INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
+VALUES (103, '2020-02-18 07:11:22.535000', '2020-02-19 08:11:22.535000', 'Note14', 'BulletJournal', 12, '{1,2}');
+INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
+VALUES (104, '2020-02-19 07:11:22.535000', '2020-02-20 08:11:22.535000', 'Note15', 'BulletJournal', 12, '{1,2}');
+INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
+VALUES (105, '2020-02-20 07:11:22.535000', '2020-02-21 08:11:22.535000', 'Note16', 'BulletJournal', 12, '{1,2}');
+--update relation
+INSERT INTO public.user_project_notes (project_id, created_at, updated_at, notes)
+VALUES (12, '2020-02-18 07:11:22.535000', '2020-02-19 07:11:22.535000', '[{"id":100,"s":[{"id":101,"s":[{"id":102,"s":[]}]},{"id":103,"s":[]}]},{"id":104,"s":[{"id":105,"s":[]}]}]');
+
+
+
+
+
+

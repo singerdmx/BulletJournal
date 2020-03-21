@@ -1,7 +1,8 @@
 import React from 'react';
-import {Collapse, Timeline, Empty} from 'antd';
+import {Collapse, Timeline, Empty, List } from 'antd';
 import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
 import {ProjectItems} from '../../features/myBuJo/interface';
+import NoteItem from './note-item.component';
 
 const {Panel} = Collapse;
 
@@ -44,7 +45,15 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
     header={items.dayOfWeek}
     key={`notes${index}`}
     extra={<FileTextOutlined/>}
-    />
+    >
+        <List>
+        {items.notes.map(item=>{
+            return (<List.Item key={item.id}>
+                        <NoteItem name={item.name}/>
+                    </List.Item>);
+        })}
+        </List>
+    </Panel>
     );
 };
 

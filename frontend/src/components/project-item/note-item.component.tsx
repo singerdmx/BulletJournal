@@ -9,7 +9,7 @@ import {
 import { Popover } from 'antd';
 
 type NoteProps = {
-    title: string
+    name: string
 };
 
 const text = <span>Title</span>;
@@ -24,12 +24,12 @@ const alginConfig = {
     offset: [10, -5],  
 }
 
-const NoteTitle: React.FC<NoteProps> = props => {
-    const { title } = props;
+const NoteItem: React.FC<NoteProps> = props => {
+    const { name } = props;
 
     return (<div style={{width: '100%', height: '2rem', position: 'relative', lineHeight: '2rem'}}>
         <FormOutlined/>
-        <span style={{padding: '0 5px', height: '100%'}}>{title}</span>
+        <span style={{padding: '0 5px', height: '100%'}}>{name}</span>
         <div style={{ width: '30%', height: '100%', position: 'absolute', top: 0, right: 0, display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
             <InfoCircleOutlined />
             <MessageOutlined />
@@ -40,4 +40,4 @@ const NoteTitle: React.FC<NoteProps> = props => {
     </div>);
 }
 
-export default NoteTitle;
+export default NoteItem;
