@@ -212,7 +212,6 @@ const AddTask: React.FC<RouteComponentProps &
               >
                 <AutoComplete
                   placeholder="Duration"
-                  style={{ display: 'inline' }}
                   options={options}
                 >
                   <Input suffix="Minutes"/>
