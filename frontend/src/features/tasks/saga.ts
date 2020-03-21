@@ -80,16 +80,15 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       projectId,
       name,
       assignedTo,
+      reminderSetting,
       dueDate,
       dueTime,
       duration,
-      reminderSetting,
       recurrenceRule
     );
-    const task = yield data.json();
-    yield put(updateTasks(action.payload.projectId));
+    yield put(updateTasks(projectId));
   } catch (error) {
-    yield call(message.error, `Task Error Received: ${error}`);
+    yield call(message.error, `taskCreate Error Received: ${error}`);
   }
 }
 
