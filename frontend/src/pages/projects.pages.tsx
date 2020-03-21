@@ -86,11 +86,6 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
             <List itemLayout="horizontal" size="small">
               {projects.map(project => {
                 return (
-                  <Tooltip
-                    key={project.id}
-                    title={`Group: ${project.group.name}`}
-                    placement="topLeft"
-                  >
                   <List.Item
                     key={project.id}
                     style={{ cursor: 'pointer' }}
@@ -113,7 +108,6 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                     description={project.description}
                   />
                   </List.Item>
-                  </Tooltip>
                 );
               })}
             </List>
@@ -129,11 +123,6 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
             <List itemLayout="horizontal" size="small">
               {projects.map(project => {
                 return (
-                  <Tooltip
-                    key={project.id}
-                    title={`Group: ${project.group.name}`}
-                    placement="topLeft"
-                  >
                   <List.Item
                     key={project.id}
                     style={{ cursor: 'pointer' }}
@@ -156,7 +145,6 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                     description={project.description}
                   />
                   </List.Item>
-                  </Tooltip>
                 );
               })}
             </List>
