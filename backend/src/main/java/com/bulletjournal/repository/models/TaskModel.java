@@ -31,7 +31,7 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "assigned_to", length = 100)
     private String assignedTo;
 
-    @Column(name = "due_date", length = 15, nullable = false)
+    @Column(name = "due_date", length = 15)
     private String dueDate; // "yyyy-MM-dd"
 
     @Column(name = "due_time", length = 10)
@@ -171,12 +171,6 @@ public abstract class TaskModel extends ProjectItemModel {
             return;
         }
 
-        if (reminderSetting.hasBefore()) {
-            this.setReminderBeforeTask(reminderSetting.getBefore());
-            this.setReminderDateTime(getReminderDateTime(this.getStartTime(), reminderSetting.getBefore()));
-            return;
-        }
-
         if (reminderSetting.hasDate()) {
             this.setReminderDate(reminderSetting.getDate());
         }
@@ -185,10 +179,18 @@ public abstract class TaskModel extends ProjectItemModel {
             this.setReminderTime(reminderSetting.getTime());
         }
 
-        if (reminderSetting.hasDate() || reminderSetting.hasTime()) {
+        if (reminderSetting.hasDate()) {
             ZonedDateTime reminderZonedDateTime =
                     ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
             this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
+            return;
+        }
+
+        if (reminderSetting.hasBefore()) {
+            this.setReminderBeforeTask(reminderSetting.getBefore());
+            if (this.getStartTime() != null) {
+                this.setReminderDateTime(getReminderDateTime(this.getStartTime(), reminderSetting.getBefore()));
+            }
         }
     }
 
@@ -201,7 +203,7 @@ public abstract class TaskModel extends ProjectItemModel {
     }
 
     private Timestamp getReminderDateTime(Timestamp startTime, Integer before) {
-        Instant reminderInstant = null;
+        Instant reminderInstant;
         switch (before) {
             case 0:
                 reminderInstant = startTime.toInstant();
@@ -237,15 +239,13 @@ public abstract class TaskModel extends ProjectItemModel {
             List<com.bulletjournal.controller.models.Label> labels) {
 
         ReminderSetting reminderSetting = new ReminderSetting();
-        if (this.hasReminderBeforeTask()) {
-            reminderSetting.setBefore(this.getReminderBeforeTask());
-        } else {
-            if (this.hasReminderDate()) {
-                reminderSetting.setDate(this.getReminderDate());
-            }
+        if (this.hasReminderDate()) {
+            reminderSetting.setDate(this.getReminderDate());
             if (this.hasReminderTime()) {
                 reminderSetting.setTime(this.getReminderTime());
             }
+        } else if (this.hasReminderBeforeTask()) {
+            reminderSetting.setBefore(this.getReminderBeforeTask());
         }
 
         return new com.bulletjournal.controller.models.Task(

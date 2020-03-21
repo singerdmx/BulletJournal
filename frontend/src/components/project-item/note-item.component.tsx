@@ -20,7 +20,7 @@ const content = (
   </div>
 );
 
-const alginConfig = {
+const alignConfig = {
     offset: [10, -5],  
 }
 
@@ -33,7 +33,7 @@ const NoteItem: React.FC<NoteProps> = props => {
         <div style={{ width: '30%', height: '100%', position: 'absolute', top: 0, right: 0, display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
             <InfoCircleOutlined />
             <MessageOutlined />
-            <Popover align={alginConfig} placement="bottomRight" style={{top: -10}} title={text} content={content} trigger="click">
+            <Popover align={alignConfig} placement="bottomRight" style={{top: -10}} title={text} content={content} trigger="click">
                 <MoreOutlined style={{transform: 'rotate(90deg)', fontSize: '20px'}}/>
             </Popover>
         </div>
