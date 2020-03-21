@@ -20,9 +20,6 @@ abstract class ProjectItemDaoJpa {
     @Autowired
     private LabelDaoJpa labelDaoJpa;
 
-    @Autowired
-    private ProjectRepository projectRepository;
-
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
