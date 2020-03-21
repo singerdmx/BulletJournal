@@ -12,10 +12,7 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.NoteRelationsProcessor;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.models.Note;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.ProjectNotes;
-import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
@@ -79,9 +77,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
         note.setOwner(owner);
         note.setName(createNoteParams.getName());
         note = this.noteRepository.save(note);
-        Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
-        final ProjectNotes projectNotes = projectNotesOptional.isPresent() ?
-                projectNotesOptional.get() : new ProjectNotes();
+        final ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId).orElseGet(ProjectNotes::new);
         String newRelations = HierarchyProcessor.addItem(projectNotes.getNotes(), note.getId());
         projectNotes.setNotes(newRelations);
         projectNotes.setProjectId(projectId);
@@ -127,25 +123,42 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
         Note note = this.noteRepository.findById(noteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
 
+        Project project = deleteNoteAndAdjustRelations(requester, note,
+                (targetNotes) -> this.noteRepository.deleteAll(targetNotes),
+                (target) -> {
+                });
+
+        return generateEvents(note, requester, project);
+    }
+
+    private Project deleteNoteAndAdjustRelations(
+            String requester, Note note,
+            Consumer<List<Note>> targetNotesOperator,
+            Consumer<HierarchyItem> targetOperator) {
         Project project = note.getProject();
         Long projectId = project.getId();
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.DELETE, projectId, project.getOwner());
 
         ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("ProjectNotes by " + projectId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ProjectTasks by " + projectId + " not found"));
+
         String relations = projectNotes.getNotes();
 
         // delete notes and its subNotes
-        List<Note> targetNotes = this.noteRepository.findAllById(HierarchyProcessor.getSubItems(relations, noteId));
-        this.noteRepository.deleteAll(targetNotes);
+        List<Note> targetNotes = this.noteRepository.findAllById(
+                HierarchyProcessor.getSubItems(relations, note.getId()));
+        targetNotesOperator.accept(targetNotes);
 
         // Update note relations
-        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, noteId);
+        HierarchyItem[] target = new HierarchyItem[1];
+        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, note.getId(), target);
+        targetOperator.accept(target[0]);
+
         projectNotes.setNotes(GSON.toJson(hierarchy));
         this.projectNotesRepository.save(projectNotes);
 
-        return generateEvents(note, requester, project);
+        return project;
     }
 
     private List<Event> generateEvents(Note note, String requester, Project project) {
@@ -164,4 +177,34 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
         return events;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void move(String requester, Long noteId, Long targetProject) {
+        final Project project = this.projectRepository.findById(targetProject)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + targetProject + " not found"));
+
+        Note note = this.noteRepository.findById(noteId)
+                .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
+
+        if (!Objects.equals(note.getProject().getType(), project.getType())) {
+            throw new BadRequestException("Cannot move to Project Type " + project.getType());
+        }
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
+                Operation.UPDATE, project.getId(), project.getOwner());
+
+        deleteNoteAndAdjustRelations(
+                requester, note,
+                (targetTasks) -> targetTasks.forEach((t) -> {
+                    t.setProject(project);
+                    this.noteRepository.save(t);
+                }),
+                (target) -> {
+                    final ProjectNotes projectNotes = this.projectNotesRepository.findById(targetProject)
+                            .orElseGet(ProjectNotes::new);
+                    String newRelations = HierarchyProcessor.addItem(projectNotes.getNotes(), target);
+                    projectNotes.setNotes(newRelations);
+                    projectNotes.setProjectId(targetProject);
+                    this.projectNotesRepository.save(projectNotes);
+                });
+    }
 }

@@ -126,7 +126,8 @@ public class TaskController {
     @PostMapping(MOVE_TASK_ROUTE)
     public void moveTask(@NotNull @PathVariable Long taskId,
                          @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
-        this.taskDaoJpa.move(taskId, moveProjectItemParams.getTargetProject());
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.move(username, taskId, moveProjectItemParams.getTargetProject());
     }
 
     @PostMapping(SHARE_TASK_ROUTE)

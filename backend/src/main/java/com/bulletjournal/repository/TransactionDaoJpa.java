@@ -218,4 +218,19 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
         }
         return events;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void move(String requester, Long projectItemId, Long targetProject) {
+        Project project = this.projectRepository.findById(targetProject)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + targetProject + " not found"));
+
+        ProjectItemModel projectItem = getProjectItem(projectItemId);
+        if (!Objects.equals(projectItem.getProject().getType(), project.getType())) {
+            throw new BadRequestException("Cannot move to Project Type " + project.getType());
+        }
+        this.authorizationService.checkAuthorizedToOperateOnContent(projectItem.getOwner(), requester,
+                ContentType.TRANSACTION, Operation.UPDATE, targetProject, project.getOwner());
+        projectItem.setProject(project);
+        this.getJpaRepository().save(projectItem);
+    }
 }

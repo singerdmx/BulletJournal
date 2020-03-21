@@ -14,15 +14,20 @@ public class HierarchyProcessor {
 
     private static final Gson GSON = new Gson();
 
+    public static List<HierarchyItem> removeTargetItem(String relations, Long targetId) {
+        HierarchyItem[] target = new HierarchyItem[1];
+        return removeTargetItem(relations, targetId, target);
+    }
+
     /**
      * Delete target item and all its descendants
      *
      * @return hierarchyItems
      */
-    public static List<HierarchyItem> removeTargetItem(String relations, Long targetId) {
+    public static List<HierarchyItem> removeTargetItem(String relations, Long targetId, HierarchyItem[] target) {
         List<HierarchyItem> hierarchyItems = getItemsFromJson(relations);
         HierarchyItem[] parent = new HierarchyItem[1];
-        HierarchyItem target = findTarget(hierarchyItems, targetId, parent);
+        target[0] = findTarget(hierarchyItems, targetId, parent);
 
         HierarchyItem targetParent = parent[0];
         if (targetParent == null) {
@@ -95,12 +100,16 @@ public class HierarchyProcessor {
     }
 
     public static String addItem(String jsonString, Long id) {
+        return addItem(jsonString, new HierarchyItem(id));
+    }
+
+    public static String addItem(String jsonString, HierarchyItem hierarchyItem) {
         if (StringUtils.isBlank(jsonString)) {
             jsonString = "[]";
         }
 
         List<HierarchyItem> list = new ArrayList<>(getItemsFromJson(jsonString));
-        list.add(new HierarchyItem(id));
+        list.add(hierarchyItem);
         return GSON.toJson(list);
     }
 }

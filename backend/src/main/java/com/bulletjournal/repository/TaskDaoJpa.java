@@ -14,8 +14,8 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
-import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
@@ -224,8 +225,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
 
         task = this.taskRepository.save(task);
 
-        Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
-        final ProjectTasks projectTasks = projectTasksOptional.orElseGet(ProjectTasks::new);
+        final ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId).orElseGet(ProjectTasks::new);
 
         String newRelations = HierarchyProcessor.addItem(projectTasks.getTasks(), task.getId());
         projectTasks.setProjectId(projectId);
@@ -322,33 +322,21 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
-                taskId, task.getProject().getOwner());
+        deleteTaskAndAdjustRelations(
+                requester, task,
+                (targetTasks) -> {
+                    targetTasks.forEach(t -> {
+                        if (!t.getId().equals(task.getId())) {
+                            this.completedTaskRepository.save(new CompletedTask(t));
+                        }
+                    });
+                    this.taskRepository.deleteAll(targetTasks);
+                },
+                (target) -> {
+                });
 
         CompletedTask completedTask = new CompletedTask(task);
         this.completedTaskRepository.save(completedTask);
-
-        Long projectId = task.getProject().getId();
-        ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("ProjectTasks by " + projectId + " not found"));
-
-        String relations = projectTasks.getTasks();
-
-        // delete tasks and its subTasks
-        List<Task> targetTasks = this.taskRepository.findAllById(HierarchyProcessor.getSubItems(relations, taskId));
-        targetTasks.forEach(t -> {
-            if (!t.getId().equals(task.getId())) {
-                this.completedTaskRepository.save(new CompletedTask(t));
-            }
-        });
-        this.taskRepository.deleteAll(targetTasks);
-
-        // Update task relations
-        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, taskId);
-        projectTasks.setTasks(GSON.toJson(hierarchy));
-        this.projectTasksRepository.save(projectTasks);
-
         return completedTask;
     }
 
@@ -373,13 +361,24 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteTask(String requester, Long taskId) {
-
         Task task = this.taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Project project = deleteTaskAndAdjustRelations(
+                requester, task,
+                (targetTasks) -> this.taskRepository.deleteAll(targetTasks),
+                (target) -> {
+                });
 
+        return generateEvents(task, requester, project);
+    }
+
+    private Project deleteTaskAndAdjustRelations(
+            String requester, Task task,
+            Consumer<List<Task>> targetTasksOperator,
+            Consumer<HierarchyItem> targetOperator) {
         Project project = task.getProject();
         Long projectId = project.getId();
-        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.PROJECT,
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.DELETE, projectId, project.getOwner());
 
         ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId)
@@ -388,15 +387,19 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
         String relations = projectTasks.getTasks();
 
         // delete tasks and its subTasks
-        List<Task> targetTasks = this.taskRepository.findAllById(HierarchyProcessor.getSubItems(relations, taskId));
-        this.taskRepository.deleteAll(targetTasks);
+        List<Task> targetTasks = this.taskRepository.findAllById(
+                HierarchyProcessor.getSubItems(relations, task.getId()));
+        targetTasksOperator.accept(targetTasks);
 
         // Update task relations
-        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, taskId);
+        HierarchyItem[] target = new HierarchyItem[1];
+        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, task.getId(), target);
+        targetOperator.accept(target[0]);
+
         projectTasks.setTasks(GSON.toJson(hierarchy));
         this.projectTasksRepository.save(projectTasks);
 
-        return generateEvents(task, requester, project);
+        return project;
     }
 
     /*
@@ -433,5 +436,36 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void uncomplete(String username, Long taskId) {
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void move(String requester, Long taskId, Long targetProject) {
+        final Project project = this.projectRepository.findById(targetProject)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + targetProject + " not found"));
+
+        Task task = this.taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+
+        if (!Objects.equals(task.getProject().getType(), project.getType())) {
+            throw new BadRequestException("Cannot move to Project Type " + project.getType());
+        }
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
+                Operation.UPDATE, project.getId(), project.getOwner());
+
+        deleteTaskAndAdjustRelations(
+                requester, task,
+                (targetTasks) -> targetTasks.forEach((t) -> {
+                    t.setProject(project);
+                    this.taskRepository.save(t);
+                }),
+                (target) -> {
+                    final ProjectTasks projectTasks = this.projectTasksRepository.findById(targetProject)
+                            .orElseGet(ProjectTasks::new);
+                    String newRelations = HierarchyProcessor.addItem(projectTasks.getTasks(), target);
+                    projectTasks.setTasks(newRelations);
+                    projectTasks.setProjectId(targetProject);
+                    this.projectTasksRepository.save(projectTasks);
+                });
     }
 }

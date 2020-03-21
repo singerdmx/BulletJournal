@@ -80,7 +80,8 @@ public class NoteController {
     @PostMapping(MOVE_NOTE_ROUTE)
     public void moveNote(@NotNull @PathVariable Long noteId,
                          @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
-        this.noteDaoJpa.move(noteId, moveProjectItemParams.getTargetProject());
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.move(username, noteId, moveProjectItemParams.getTargetProject());
     }
 
     @PostMapping(SHARE_NOTE_ROUTE)

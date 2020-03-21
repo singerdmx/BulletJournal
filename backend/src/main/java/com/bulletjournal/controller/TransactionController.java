@@ -115,7 +115,8 @@ public class TransactionController {
     @PostMapping(MOVE_TRANSACTION_ROUTE)
     public void moveTransaction(@NotNull @PathVariable Long transactionId,
                          @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
-        this.transactionDaoJpa.move(transactionId, moveProjectItemParams.getTargetProject());
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
     }
 
     @PostMapping(SHARE_TRANSACTION_ROUTE)
