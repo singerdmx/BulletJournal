@@ -38,7 +38,7 @@ public class ZonedDateTimeHelper {
      * Return ZoneDateTime type for start time.
      */
     public static ZonedDateTime getStartTime(FrequencyType frequencyType, String timezone) {
-        ZonedDateTime now = getNow(timezone);
+//        ZonedDateTime now = getNow(timezone);
 
         return null;
     }
