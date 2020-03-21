@@ -8,7 +8,10 @@ import {
   TimePicker,
   Select,
   Avatar,
-  AutoComplete
+  AutoComplete,
+  Radio,
+  Popover,
+  Button
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -20,6 +23,8 @@ import './modals.styles.less';
 import { zones } from '../settings/constants';
 import { Group } from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
+import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
+import { ReminderBeforeTaskText } from '../settings/reducer';
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -28,9 +33,9 @@ zones.sort((a, b) => {
     return -1;
   }
   if (
-      currentCountry &&
-      a.includes(currentCountry) &&
-      !b.includes(currentCountry)
+    currentCountry &&
+    a.includes(currentCountry) &&
+    !b.includes(currentCountry)
   ) {
     return -1;
   }
@@ -56,6 +61,7 @@ interface TaskCreateFormProps {
   updateExpandedMyself: (updateSettings: boolean) => void;
   timezone: string;
   myself: string;
+  before: string;
 }
 
 const AddTask: React.FC<RouteComponentProps &
@@ -63,6 +69,10 @@ const AddTask: React.FC<RouteComponentProps &
   TaskCreateFormProps> = props => {
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
+  const [dueType, setDueType] = useState(false);
+  const [reminderType, setReminderType] = useState(false);
+  const [dueTimeVisible, setDueTimeVisible] = useState(false);
+  const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
   const addTask = (values: any) => {
     // props.createTask(props.projectId, values.taskName);
     setVisible(false);
@@ -138,25 +148,60 @@ const AddTask: React.FC<RouteComponentProps &
               )}
             </Form.Item>
 
-            <div style={{ display: 'flex' }}>
-              <Tooltip title='Select Due Date'>
-                <Form.Item
-                  name='date'
-                  rules={[{ required: true, message: 'Missing Date!' }]}
-                >
-                  <DatePicker placeholder='Select Date' />
-                </Form.Item>
-              </Tooltip>
-              <Tooltip title='Select Due Time'>
-                <Form.Item name='time' style={{ width: '100px' }}>
-                  <TimePicker
-                    allowClear
-                    format='HH:mm'
-                    placeholder='Select Time'
-                  />
-                </Form.Item>
-              </Tooltip>
+            <Radio.Group defaultValue={0}>
+              <Radio value={0} onChange={() => setDueType(false)}>
+                <div style={{ display: 'flex' }}>
+                  <Tooltip title='Select Due Date'>
+                    <Form.Item name='DueDate'>
+                      <DatePicker
+                        allowClear={true}
+                        placeholder='Select Date'
+                        disabled={dueType}
+                        onChange={value => {
+                          if (value === null) {
+                            setDueTimeVisible(false);
+                          } else {
+                            setDueTimeVisible(true);
+                          }
+                        }}
+                      />
+                    </Form.Item>
+                  </Tooltip>
 
+                  <div
+                    style={{
+                      display: dueTimeVisible ? 'flex' : 'none'
+                    }}
+                  >
+                    <Tooltip title='Select Due Time'>
+                      <Form.Item name='DueTime' style={{ width: '100px' }}>
+                        <TimePicker
+                          allowClear={true}
+                          format='HH:mm'
+                          placeholder='Select Time'
+                          disabled={dueType}
+                        />
+                      </Form.Item>
+                    </Tooltip>
+                  </div>
+                </div>
+              </Radio>
+              <Radio value={1} onChange={() => setDueType(true)}>
+                <Form.Item>
+                  <Popover
+                    content={<ReactRRuleGenerator />}
+                    title='Recurrence'
+                    trigger='click'
+                  >
+                    <Button type='default' disabled={!dueType}>
+                      Recurrence
+                    </Button>
+                  </Popover>
+                </Form.Item>
+              </Radio>
+            </Radio.Group>
+
+            <div style={{ display: 'flex' }}>
               <Tooltip title='Time Zone'>
                 <Form.Item name='timezone'>
                   <Select
@@ -174,9 +219,6 @@ const AddTask: React.FC<RouteComponentProps &
                   </Select>
                 </Form.Item>
               </Tooltip>
-            </div>
-
-            <div style={{ display: 'flex' }}>
               <Form.Item
                 name='duration'
                 wrapperCol={{ span: 20 }}
@@ -188,6 +230,64 @@ const AddTask: React.FC<RouteComponentProps &
               </Form.Item>
               <span style={{ marginTop: '5px' }}>&nbsp;&nbsp;Minutes</span>
             </div>
+
+            <span>Reminder</span>
+            <Radio.Group defaultValue={0}>
+              <Radio value={0} onChange={() => setReminderType(false)}>
+                <Form.Item name='remindBefore'>
+                  <Select
+                    defaultValue={ReminderBeforeTaskText[0]}
+                    disabled={reminderType}
+                    style={{ width: '180px' }}
+                    placeholder='Reminder Before Task'
+                  >
+                    {ReminderBeforeTaskText.map(
+                      (before: string, index: number) => (
+                        <Option key={index} value={before}>
+                          {before}
+                        </Option>
+                      )
+                    )}
+                  </Select>
+                </Form.Item>
+              </Radio>
+              <Radio value={1} onChange={() => setReminderType(true)}>
+                <div style={{ display: 'flex' }}>
+                  <Tooltip title='Reminder Date'>
+                    <Form.Item name='reminderDate'>
+                      <DatePicker
+                        placeholder='Date'
+                        disabled={!reminderType}
+                        allowClear={true}
+                        onChange={value => {
+                          if (value === null) {
+                            setReminderTimeVisible(false);
+                          } else {
+                            setReminderTimeVisible(true);
+                          }
+                        }}
+                      />
+                    </Form.Item>
+                  </Tooltip>
+                  <div
+                    style={{
+                      display: reminderTimeVisible ? 'flex' : 'none'
+                    }}
+                  >
+                    <Tooltip title='Reminder Time'>
+                      <Form.Item name='reminderTime' style={{ width: '100px' }}>
+                        <TimePicker
+                          allowClear={true}
+                          format='HH:mm'
+                          placeholder='Time'
+                          disabled={!reminderType}
+                        />
+                      </Form.Item>
+                    </Tooltip>
+                  </div>
+                </div>
+              </Radio>
+            </Radio.Group>
           </Form>
         </Modal>
       </div>
@@ -199,7 +299,8 @@ const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
   timezone: state.settings.timezone,
   group: state.group.group,
-  myself: state.myself.username
+  myself: state.myself.username,
+  before: state.settings.before
 });
 
 export default connect(mapStateToProps, { createTask, updateExpandedMyself })(
