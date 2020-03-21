@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Collapse, Empty, List, Tooltip, Avatar } from 'antd';
-import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps } from 'react-router';
+import React, {useEffect} from 'react';
+import {Avatar, Collapse, Empty, List, Popover, Tooltip} from 'antd';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
 import {IState} from "../store";
 import {Group, GroupsWithOwner} from "../features/group/interface";
 import {updateGroups} from "../features/group/actions";
 import {Project, ProjectsWithOwner} from "../features/project/interface";
 import {updateProjects} from "../features/project/actions";
 import {iconMapper} from "../components/side-menu/side-menu.component";
-import { TeamOutlined } from "@ant-design/icons";
+import {TeamOutlined} from "@ant-design/icons";
 
-const { Panel } = Collapse;
+const {Panel} = Collapse;
 
 // props of projects
 type ProjectsProps = {
@@ -56,8 +56,8 @@ export const getGroupByProject = (
     for (let groupWithOwner of groups) {
         for (let group of groupWithOwner.groups) {
             if (group.id === project.group.id) {
-              result = group;
-              break;
+                result = group;
+                break;
             }
         }
         if (result) {
@@ -68,7 +68,7 @@ export const getGroupByProject = (
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
-    const { groups, ownedProjects, sharedProjects, updateGroups, updateProjects } = props;
+    const {groups, ownedProjects, sharedProjects, updateGroups, updateProjects} = props;
 
     useEffect(() => {
         updateGroups();
@@ -81,24 +81,34 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
 
     const getProject = (project: Project) => {
         const group = getGroupByProject(groups, project);
+        let popContent = null;
+        if (group) {
+            popContent = <div>
+                {group.users.map(u => <p><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
+            </div>;
+        }
         return (
             <List.Item
                 key={project.id}
-                style={{ cursor: 'pointer' }}
+                style={{cursor: 'pointer'}}
                 onClick={e => handleClick(project.id)}
                 actions={[
-                    <Tooltip title={`Group ${project.group.name}`} placement='right'>
+                    <Popover
+                        title={project.group.name}
+                        placement='right'
+                        content={popContent}
+                    >
                           <span>
-                            <TeamOutlined style={{ marginRight: 5 }} />
+                            <TeamOutlined style={{marginRight: 5}}/>
                               {group && group.users.length}
                           </span>
-                    </Tooltip>
+                    </Popover>
                 ]}
             >
                 <List.Item.Meta
                     avatar={
                         <Tooltip title={project.owner} placement='left'>
-                            <Avatar size="small" src={project.ownerAvatar} />
+                            <Avatar size="small" src={project.ownerAvatar}/>
                         </Tooltip>
                     }
                     title={
@@ -116,25 +126,25 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
     const getOwnedBuJo = (ownedProjects: Project[]) => {
         const projects = flattenOwnedProject(ownedProjects, []);
         if (projects && projects[0]) {
-          return (
-            <List itemLayout="horizontal" size="small">
-              {projects.map(project => getProject(project))}
-            </List>
-          );
+            return (
+                <List itemLayout="horizontal" size="small">
+                    {projects.map(project => getProject(project))}
+                </List>
+            );
         }
-        return <Empty />;
+        return <Empty/>;
     };
 
     const getSharedBuJo = (sharedProjects: ProjectsWithOwner[]) => {
         const projects = flattenSharedProject(sharedProjects, []);
         if (projects && projects[0]) {
-          return (
-            <List itemLayout="horizontal" size="small">
-              {projects.map(project => getProject(project))}
-            </List>
-          );
+            return (
+                <List itemLayout="horizontal" size="small">
+                    {projects.map(project => getProject(project))}
+                </List>
+            );
         }
-        return <Empty />;
+        return <Empty/>;
     };
 
     return (
@@ -157,4 +167,4 @@ const mapStateToProps = (state: IState) => ({
     sharedProjects: state.project.shared
 });
 
-export default connect(mapStateToProps, { updateGroups, updateProjects })(withRouter(ProjectsPage));
+export default connect(mapStateToProps, {updateGroups, updateProjects})(withRouter(ProjectsPage));

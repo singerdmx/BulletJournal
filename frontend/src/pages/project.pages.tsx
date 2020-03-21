@@ -4,7 +4,7 @@ import { Project } from '../features/project/interface';
 import { IState } from '../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../features/group/interface';
-import { Avatar, Divider, Popconfirm, Tooltip } from 'antd';
+import {Avatar, Divider, Popconfirm, Popover, Tooltip} from 'antd';
 import { deleteProject, getProject } from '../features/project/actions';
 import { iconMapper } from '../components/side-menu/side-menu.component';
 import { DeleteOutlined, TeamOutlined } from '@ant-design/icons';
@@ -15,6 +15,7 @@ import AddTransaction from '../components/modals/add-transaction.component';
 import { ProjectType } from '../features/project/constants';
 import { NoteTree } from '../components/note-tree';
 import { History } from 'history';
+import {getGroupByProject} from "./projects.pages";
 
 type ProjectPathParams = {
   projectId: string;
@@ -132,6 +133,14 @@ class ProjectPage extends React.Component<
       );
     }
 
+    const group = getGroupByProject(this.props.groups, project);
+    let popContent = null;
+    if (group) {
+      popContent = <div>
+        {group.users.map(u => <p><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
+      </div>;
+    }
+
     return (
       <div className="project">
         <Tooltip
@@ -156,16 +165,16 @@ class ProjectPage extends React.Component<
             </Tooltip>
           </h2>
           <div className="project-control">
-            <Tooltip
-                placement="top"
-                title={project.group && `Group: ${project.group.name}`}
+            <Popover
+                title={group && group.name}
+                placement='bottom'
+                content={popContent}
             >
-              <span style={{ cursor: 'pointer' }} onClick={e => this.onClickGroup(project.group.id)}>
-
-                  <TeamOutlined />
-                  {project.group && project.group.users.length}
-              </span>
-            </Tooltip>
+                          <span style={{ cursor: 'pointer' }} onClick={e => this.onClickGroup(group.id)}>
+                            <TeamOutlined/>
+                            {group && group.users.length}
+                          </span>
+            </Popover>
             {createContent}
             {editContent}
             {deleteContent}
