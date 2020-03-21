@@ -83,11 +83,9 @@ const AddTask: React.FC<RouteComponentProps &
     props.updateExpandedMyself(true);
   }, []);
   const result = ['15', '30', '45', '60'];
-  const children = result.map((option: string, index: number) => (
-    <Option key={index} value={option}>
-      {`${option} Min`}
-    </Option>
-  ));
+  const options = result.map((time: string) => {
+    return {value : time}
+  });
 
   return (
     <Tooltip placement="top" title="Create New Task">
@@ -221,8 +219,9 @@ const AddTask: React.FC<RouteComponentProps &
                 <AutoComplete
                   placeholder="Duration"
                   style={{ display: 'inline' }}
+                  options={options}
                 >
-                  {children}
+                  <Input suffix="Minutes"/>
                 </AutoComplete>
               </Form.Item>
             </Form.Item>
