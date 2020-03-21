@@ -75,6 +75,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         updateProjects();
     }, []);
 
+    const handleClick = (projectId: number) => {
+        props.history.push(`/projects/${projectId}`);
+    };
+
     const getOwnedBuJo = (ownedProjects: Project[]) => {
         const projects = flattenOwnedProject(ownedProjects, []);
         if (projects && projects[0]) {
@@ -89,6 +93,8 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                   >
                   <List.Item
                     key={project.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={e => handleClick(project.id)}
                     actions={[
                       <span>
                         <TeamOutlined style={{ marginRight: 5 }} />
@@ -130,6 +136,8 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                   >
                   <List.Item
                     key={project.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={e => handleClick(project.id)}
                     actions={[
                       <span>
                         <TeamOutlined style={{ marginRight: 5 }} />
