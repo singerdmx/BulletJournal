@@ -61,7 +61,7 @@ interface TaskCreateFormProps {
   updateExpandedMyself: (updateSettings: boolean) => void;
   timezone: string;
   myself: string;
-  before: string;
+  before: number;
 }
 
 const AddTask: React.FC<RouteComponentProps &
