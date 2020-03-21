@@ -3,10 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.RemoveTaskEvent;
-import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import org.slf4j.MDC;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,7 +117,8 @@ public class TaskController {
     @PutMapping(TASK_SET_LABELS_ROUTE)
     public Task setLabels(@NotNull @PathVariable Long taskId,
                           @NotNull @RequestBody List<Long> labels) {
-        this.taskDaoJpa.setLabels(taskId, labels);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.notificationService.inform(this.taskDaoJpa.setLabels(username, taskId, labels));
         return getTask(taskId);
     }
 

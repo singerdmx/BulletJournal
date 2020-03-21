@@ -1,13 +1,19 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.SetLabelEvent;
 import com.bulletjournal.repository.models.ProjectItemModel;
+import com.bulletjournal.repository.models.UserGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 abstract class ProjectItemDaoJpa {
 
@@ -32,9 +38,19 @@ abstract class ProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void setLabels(Long projectItemId, List<Long> labels) {
+    public SetLabelEvent setLabels(String requester, Long projectItemId, List<Long> labels) {
         ProjectItemModel projectItem = getProjectItem(projectItemId);
         projectItem.setLabels(labels);
+        String contentType = projectItem.getClass().getSimpleName();
+        Set<UserGroup> targetUsers = projectItem.getProject().getGroup().getUsers();
+        List<Event> events = new ArrayList<>();
+        for (UserGroup user : targetUsers) {
+            if (!Objects.equals(user.getUser().getName(), requester)) {
+                events.add(new Event(user.getUser().getName(), projectItemId, projectItem.getName()));
+            }
+        }
+
         this.getJpaRepository().save(projectItem);
+        return new SetLabelEvent(events, requester, contentType);
     }
 }

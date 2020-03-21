@@ -108,7 +108,8 @@ public class TransactionController {
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
     public Transaction setLabels(@NotNull @PathVariable Long transactionId,
                           @NotNull @RequestBody List<Long> labels) {
-        this.transactionDaoJpa.setLabels(transactionId, labels);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.notificationService.inform(this.transactionDaoJpa.setLabels(username, transactionId, labels));
         return getTransaction(transactionId);
     }
 

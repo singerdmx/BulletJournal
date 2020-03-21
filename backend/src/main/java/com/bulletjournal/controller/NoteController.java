@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.notifications.SetLabelEvent;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -73,7 +75,8 @@ public class NoteController {
     @PutMapping(NOTE_SET_LABELS_ROUTE)
     public Note setLabels(@NotNull @PathVariable Long noteId,
                           @NotNull @RequestBody List<Long> labels) {
-        this.noteDaoJpa.setLabels(noteId, labels);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.notificationService.inform(this.noteDaoJpa.setLabels(username, noteId, labels));
         return getNote(noteId);
     }
 
