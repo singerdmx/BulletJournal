@@ -3,7 +3,7 @@ import { Collapse, Empty, List, Tooltip, Avatar } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import {IState} from "../store";
-import {GroupsWithOwner} from "../features/group/interface";
+import {Group, GroupsWithOwner} from "../features/group/interface";
 import {updateGroups} from "../features/group/actions";
 import {Project, ProjectsWithOwner} from "../features/project/interface";
 import {updateProjects} from "../features/project/actions";
@@ -48,15 +48,15 @@ export const flattenSharedProject = (
     return flattenedProjects;
 };
 
-export const getGroupUsersNumberByProject = (
+export const getGroupByProject = (
     groups: GroupsWithOwner[],
     project: Project
-): number => {
-    let result = 0;
+): Group => {
+    let result: Group | null = null;
     for (let groupWithOwner of groups) {
         for (let group of groupWithOwner.groups) {
             if (group.id === project.group.id) {
-              result = group.users.length;
+              result = group;
               break;
             }
         }
@@ -64,7 +64,7 @@ export const getGroupUsersNumberByProject = (
             break;
         }
     }
-    return result;
+    return result!;
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
@@ -79,37 +79,46 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         props.history.push(`/projects/${projectId}`);
     };
 
+    const getProject = (project: Project) => {
+        const group = getGroupByProject(groups, project);
+        return (
+            <List.Item
+                key={project.id}
+                style={{ cursor: 'pointer' }}
+                onClick={e => handleClick(project.id)}
+                actions={[
+                    <Tooltip title={`Group ${project.group.name}`} placement='right'>
+                          <span>
+                            <TeamOutlined style={{ marginRight: 5 }} />
+                              {group && group.users.length}
+                          </span>
+                    </Tooltip>
+                ]}
+            >
+                <List.Item.Meta
+                    avatar={
+                        <Tooltip title={project.owner} placement='left'>
+                            <Avatar size="small" src={project.ownerAvatar} />
+                        </Tooltip>
+                    }
+                    title={
+                        <span>
+                        {iconMapper[project.projectType]}
+                            &nbsp;{project.name}
+                      </span>
+                    }
+                    description={project.description}
+                />
+            </List.Item>
+        );
+    };
+
     const getOwnedBuJo = (ownedProjects: Project[]) => {
         const projects = flattenOwnedProject(ownedProjects, []);
         if (projects && projects[0]) {
           return (
             <List itemLayout="horizontal" size="small">
-              {projects.map(project => {
-                return (
-                  <List.Item
-                    key={project.id}
-                    style={{ cursor: 'pointer' }}
-                    onClick={e => handleClick(project.id)}
-                    actions={[
-                      <span>
-                        <TeamOutlined style={{ marginRight: 5 }} />
-                        {getGroupUsersNumberByProject(groups, project)}
-                      </span>
-                    ]}
-                  >
-                  <List.Item.Meta
-                    avatar={<Avatar size="small" src={project.ownerAvatar} />}
-                    title={
-                      <span>
-                        {iconMapper[project.projectType]}
-                        &nbsp;{project.name}
-                      </span>
-                    }
-                    description={project.description}
-                  />
-                  </List.Item>
-                );
-              })}
+              {projects.map(project => getProject(project))}
             </List>
           );
         }
@@ -121,32 +130,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         if (projects && projects[0]) {
           return (
             <List itemLayout="horizontal" size="small">
-              {projects.map(project => {
-                return (
-                  <List.Item
-                    key={project.id}
-                    style={{ cursor: 'pointer' }}
-                    onClick={e => handleClick(project.id)}
-                    actions={[
-                      <span>
-                        <TeamOutlined style={{ marginRight: 5 }} />
-                        {getGroupUsersNumberByProject(groups, project)}
-                      </span>
-                    ]}
-                  >
-                  <List.Item.Meta
-                    avatar={<Avatar size="small" src={project.ownerAvatar} />}
-                    title={
-                      <span>
-                        {iconMapper[project.projectType]}
-                        &nbsp;{project.name}
-                      </span>
-                    }
-                    description={project.description}
-                  />
-                  </List.Item>
-                );
-              })}
+              {projects.map(project => getProject(project))}
             </List>
           );
         }
