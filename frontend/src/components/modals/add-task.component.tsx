@@ -70,7 +70,7 @@ const AddTask: React.FC<RouteComponentProps &
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [dueType, setDueType] = useState('dueByTime');
-  const [reminderType, setReminderType] = useState(false);
+  const [reminderType, setReminderType] = useState('remindBefore');
   const [dueTimeVisible, setDueTimeVisible] = useState(false);
   const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
   const addTask = (values: any) => {
@@ -83,9 +83,9 @@ const AddTask: React.FC<RouteComponentProps &
     props.updateExpandedMyself(true);
   }, []);
   const result = ['15', '30', '45', '60'];
-  const children = result.map((option: string) => (
-    <Option key={option} value={option}>
-      {option}
+  const children = result.map((option: string, index: number) => (
+    <Option key={index} value={option}>
+      {`${option} Min`}
     </Option>
   ));
 
@@ -192,7 +192,7 @@ const AddTask: React.FC<RouteComponentProps &
                 </Popover>
               </Form.Item>
             </div>
-            <Form.Item label="Timezone & Duration">
+            <Form.Item label="Timezone & Duration" style={{marginBottom : 0}}>
               <Tooltip title="Time Zone">
                 <Form.Item
                   name="timezone"
@@ -224,67 +224,68 @@ const AddTask: React.FC<RouteComponentProps &
                 >
                   {children}
                 </AutoComplete>
-                <span>Min</span>
               </Form.Item>
             </Form.Item>
 
-            <span>Reminder</span>
-            <Radio.Group defaultValue={0}>
-              <Radio value={0} onChange={() => setReminderType(false)}>
-                <Form.Item name="remindBefore">
-                  <Select
-                    defaultValue={ReminderBeforeTaskText[0]}
-                    disabled={reminderType}
-                    style={{ width: '180px' }}
-                    placeholder="Reminder Before Task"
-                  >
-                    {ReminderBeforeTaskText.map(
-                      (before: string, index: number) => (
-                        <Option key={index} value={before}>
-                          {before}
-                        </Option>
-                      )
-                    )}
-                  </Select>
-                </Form.Item>
-              </Radio>
-              <Radio value={1} onChange={() => setReminderType(true)}>
-                <div style={{ display: 'flex' }}>
-                  <Tooltip title="Reminder Date">
-                    <Form.Item name="reminderDate">
-                      <DatePicker
-                        placeholder="Date"
-                        disabled={!reminderType}
+            {/* reminder */}
+            <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Reminder By : </span>
+            <Radio.Group
+              defaultValue={'remindBefore'}
+              onChange={e => setReminderType(e.target.value)}
+              buttonStyle="solid"
+              style={{ marginBottom: 18 }}
+            >
+              <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
+              <Radio.Button value={'reminderDate'}>Date</Radio.Button>
+            </Radio.Group>
+            <div style={{ display: 'flex' }}>
+              <Form.Item name="remindBefore">
+                <Select
+                  defaultValue={ReminderBeforeTaskText[0]}
+                  disabled={reminderType !== 'remindBefore'}
+                  style={{ width: '180px' }}
+                  placeholder="Reminder Before Task"
+                >
+                  {ReminderBeforeTaskText.map(
+                    (before: string, index: number) => (
+                      <Option key={index} value={before}>
+                        {before}
+                      </Option>
+                    )
+                  )}
+                </Select>
+              </Form.Item>
+              <div style={{ display: 'flex' }}>
+                <Tooltip title="Reminder Date">
+                  <Form.Item name="reminderDate">
+                    <DatePicker
+                      placeholder="Date"
+                      disabled={reminderType !== 'reminderDate'}
+                      allowClear={true}
+                      onChange={value => {
+                        if (value === null) {
+                          setReminderTimeVisible(false);
+                        } else {
+                          setReminderTimeVisible(true);
+                        }
+                      }}
+                    />
+                  </Form.Item>
+                </Tooltip>
+                {reminderTimeVisible && (
+                  <Tooltip title="Reminder Time">
+                    <Form.Item name="reminderTime" style={{ width: '100px' }}>
+                      <TimePicker
                         allowClear={true}
-                        onChange={value => {
-                          if (value === null) {
-                            setReminderTimeVisible(false);
-                          } else {
-                            setReminderTimeVisible(true);
-                          }
-                        }}
+                        format="HH:mm"
+                        placeholder="Time"
+                        disabled={!reminderType}
                       />
                     </Form.Item>
                   </Tooltip>
-                  <div
-                    style={{
-                      display: reminderTimeVisible ? 'flex' : 'none'
-                    }}
-                  >
-                    <Tooltip title="Reminder Time">
-                      <Form.Item name="reminderTime" style={{ width: '100px' }}>
-                        <TimePicker
-                          allowClear={true}
-                          format="HH:mm"
-                          placeholder="Time"
-                          disabled={!reminderType}
-                        />
-                      </Form.Item>
-                    </Tooltip>
-                  </div>
-                </div>
-              </Radio>
-            </Radio.Group>
+                )}
+              </div>
+            </div>
           </Form>
         </Modal>
       </div>
