@@ -42,11 +42,11 @@ public class TransactionController {
     @GetMapping(TRANSACTIONS_ROUTE)
     public ResponseEntity<LedgerSummary> getTransactions(
             @NotNull @PathVariable Long projectId,
-            @RequestParam(required = false) FrequencyType frequencyType,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
+            @NotNull @RequestParam FrequencyType frequencyType,
             @NotBlank @RequestParam String timezone,
-            @NotNull @RequestParam LedgerSummaryType ledgerSummaryType) {
+            @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
 
         Pair<ZonedDateTime, ZonedDateTime> startEndTime = getStartEndTime(frequencyType, timezone, startDate, endDate);
         ZonedDateTime startTime = startEndTime.getLeft();

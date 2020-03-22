@@ -2,13 +2,16 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,8 +34,15 @@ public class NoteController {
     private NotificationService notificationService;
 
     @GetMapping(NOTES_ROUTE)
-    public List<Note> getNotes(@NotNull @PathVariable Long projectId) {
-        return this.noteDaoJpa.getNotes(projectId);
+    public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
+        List<Note> notes = this.noteDaoJpa.getNotes(projectId);
+        String notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE, notes);
+
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setETag(notesEtag);
+
+        return ResponseEntity.ok().headers(responseHeader).body(notes);
     }
 
     @PostMapping(NOTES_ROUTE)
@@ -65,7 +75,7 @@ public class NoteController {
     }
 
     @PutMapping(NOTES_ROUTE)
-    public List<Note> updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
+    public ResponseEntity<List<Note>> updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
         this.noteDaoJpa.updateUserNotes(projectId, notes);
         return getNotes(projectId);
     }
