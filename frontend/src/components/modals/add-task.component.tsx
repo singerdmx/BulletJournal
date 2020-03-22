@@ -13,7 +13,7 @@ import {
   Popover,
   Button
 } from 'antd';
-import { PlusOutlined, CheckOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { ReminderSetting } from '../../features/tasks/interface';
@@ -220,7 +220,8 @@ const AddTask: React.FC<RouteComponentProps &
                     trigger="click"
                     placement="top"
                   >
-                    <Button type="default" disabled={dueType !== 'dueByRec'}>
+                    <Button type="default" disabled={dueType !== 'dueByRec'}
+                            style={{overflow: 'hidden', maxWidth: '220px', whiteSpace: 'nowrap'}}>
                       {rRuleText}
                     </Button>
                   </Popover>
