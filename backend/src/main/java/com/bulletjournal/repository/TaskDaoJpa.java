@@ -322,6 +322,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
                 .findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
 
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
+                requester, ContentType.TASK,
+                Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
+
+
         deleteTaskAndAdjustRelations(
                 requester, task,
                 (targetTasks) -> {
@@ -435,7 +440,20 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void uncomplete(String username, Long taskId) {
+    public Long uncomplete(String requester, Long taskId) {
+        CompletedTask task = this.completedTaskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Long projectId = task.getProject().getId();
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
+                requester, ContentType.TASK,
+                Operation.UPDATE, projectId, task.getProject().getOwner());
+        this.completedTaskRepository.delete(task);
+        return create(projectId, task.getOwner(), getCreateTaskParams(task)).getId();
+    }
+
+    private CreateTaskParams getCreateTaskParams(CompletedTask task) {
+        return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate()
+                , task.getDueTime(), task.getDuration(), null, task.getTimezone(), task.getRecurrenceRule());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

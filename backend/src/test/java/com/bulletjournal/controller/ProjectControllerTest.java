@@ -527,6 +527,24 @@ public class ProjectControllerTest {
         assertEquals(1, completedTasks.size());
         assertEquals(completedTask, completedTasks.get(0));
 
+        // uncomplete task
+        ResponseEntity<Task> uncompleteTaskResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.UNCOMPLETE_TASK_ROUTE,
+                HttpMethod.POST,
+                null,
+                Task.class,
+                t1.getId());
+
+        assertEquals(HttpStatus.OK, uncompleteTaskResponse.getStatusCode());
+        assertNotNull(uncompleteTaskResponse.getBody());
+        Task uncompletedTask = uncompleteTaskResponse.getBody();
+        assertEquals(t1.getName(), uncompletedTask.getName());
+        assertEquals(t1.getTimezone(), uncompletedTask.getTimezone());
+        assertEquals(t1.getAssignedTo(), uncompletedTask.getAssignedTo());
+        assertEquals(t1.getDueDate(), uncompletedTask.getDueDate());
+        assertEquals(t1.getDueTime(), uncompletedTask.getDueTime());
+
+
         tasksResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.GET,

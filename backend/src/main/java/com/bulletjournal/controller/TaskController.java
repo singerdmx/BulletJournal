@@ -94,8 +94,8 @@ public class TaskController {
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
     public Task uncompleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.uncomplete(username, taskId);
-        return getTask(taskId);
+        Long newId = this.taskDaoJpa.uncomplete(username, taskId);
+        return getTask(newId);
     }
 
     @GetMapping(COMPLETED_TASKS_ROUTE)
