@@ -147,7 +147,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
               })}
             </Select>
             <Select
-              style={{ width: '100px', paddingLeft: '20px' }}
+              style={{ width: '100px', margin: '0 20px' }}
               disabled={this.props.yearlyOn}
               onChange={this.onChangeOnTheDay}
               value={this.props.repeatYearlyOnThe.day}
