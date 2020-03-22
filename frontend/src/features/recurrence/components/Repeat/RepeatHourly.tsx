@@ -13,6 +13,7 @@ type RepeatHourlyProps = {
 class RepeatHourly extends React.Component<RepeatHourlyProps> {
   onChange = (event: any) => {
     let updateInterval = parseInt(event.target.value ? event.target.value : 0);
+    if (isNaN(updateInterval)) updateInterval = 0;
     let update = { interval: updateInterval } as Hourly;
     this.props.updateRepeatHourly(update);
   };
@@ -20,15 +21,15 @@ class RepeatHourly extends React.Component<RepeatHourlyProps> {
   render() {
     return (
       <Input
-        prefix="Every "
-        style={{ width: '20%' }}
+        prefix='Every '
+        style={{ width: '70%' }}
         value={
           this.props.repeatHourly.interval
             ? this.props.repeatHourly.interval
             : 0
         }
         onChange={this.onChange}
-        suffix="Hour(s)"
+        suffix='Hour(s)'
       />
     );
   }

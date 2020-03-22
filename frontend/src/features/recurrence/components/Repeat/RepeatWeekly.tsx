@@ -19,9 +19,9 @@ type SelectState = {};
 
 class RepeatWeekly extends React.Component<RepeatWeeklyProps, SelectState> {
   onChangeCount = (e: any) => {
-    this.props.updateRepeatWeeklyCount(
-      parseInt(e.target.value ? e.target.value : 0)
-    );
+    let update = parseInt(e.target.value ? e.target.value : 0);
+    if (isNaN(update)) update = 0;
+    this.props.updateRepeatWeeklyCount(update);
   };
 
   onClick = (e: any) => {
@@ -51,11 +51,11 @@ class RepeatWeekly extends React.Component<RepeatWeeklyProps, SelectState> {
       <div style={{}}>
         <div style={{ marginBottom: 24 }}>
           <Input
-            prefix="Every"
+            prefix='Every'
             style={{ width: '33%' }}
             value={this.props.repeatWeeklyCount}
             onChange={this.onChangeCount}
-            suffix="Week(s)"
+            suffix='Week(s)'
           />
         </div>
 

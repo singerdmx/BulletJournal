@@ -13,6 +13,7 @@ type RepeatDailyProps = {
 class RepeatDaily extends React.Component<RepeatDailyProps> {
   onChange = (event: any) => {
     let updateInterval = parseInt(event.target.value ? event.target.value : 0);
+    if (isNaN(updateInterval)) updateInterval = 0;
     let update = { interval: updateInterval } as Daily;
     this.props.updateRepeatDaily(update);
   };
@@ -20,13 +21,13 @@ class RepeatDaily extends React.Component<RepeatDailyProps> {
   render() {
     return (
       <Input
-        prefix="Every"
-        style={{ width: '20%' }}
+        prefix='Every'
+        style={{ width: '70%' }}
         value={
           this.props.repeatDaily.interval ? this.props.repeatDaily.interval : 0
         }
         onChange={this.onChange}
-        suffix="Day(s)"
+        suffix='Day(s)'
       />
     );
   }
