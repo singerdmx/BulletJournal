@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 import { updateStartString } from './actions';
 import RRule from 'rrule';
 
+import './rrules.styles.less';
+
 type RRuleGeneratorProps = {
   start: any;
   repeat: any;
@@ -18,20 +20,24 @@ type RRuleGeneratorProps = {
 
 class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
   render() {
-    let test = new RRule({
+    let ruleString = new RRule({
       ...this.props.start,
       ...this.props.repeat,
       ...this.props.end
     });
 
     return (
-      <div>
-        <Start />
-        <Repeat />
-        <End />
-        <div>{this.props.rRuleString}</div>
-        <br />
-        <div>{test.toText()}</div>
+      <div className="rrules">
+        <div className="rrule-start">
+          <Start />
+        </div>
+        <div className="rrule-repeate">
+          <Repeat />
+        </div>
+        <div className="rrule-end">
+          <End />
+        </div>
+        <span>{ruleString.toText()}</span>
       </div>
     );
   }

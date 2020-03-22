@@ -60,18 +60,18 @@ class End extends React.Component<EndProps, SelectState> {
   render() {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <label>
-          <strong>End</strong>
+        <label style={{ marginRight: '1em' }}>
+          <strong>End :</strong>
         </label>
         <Select
-          placeholder='Choose a type'
+          placeholder="Choose a type"
           style={{ width: '30%' }}
           value={this.state.value}
           onChange={e => this.onChangeValue(e)}
         >
-          <Option value='Never'>Never</Option>
-          <Option value='After'>After</Option>
-          <Option value='On date'>On Date</Option>
+          <Option value="Never">Never</Option>
+          <Option value="After">After</Option>
+          <Option value="On date">On Date</Option>
         </Select>
         {this.state.value === 'On date' ? (
           <DatePicker

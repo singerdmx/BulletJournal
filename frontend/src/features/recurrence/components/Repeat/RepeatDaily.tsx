@@ -19,19 +19,15 @@ class RepeatDaily extends React.Component<RepeatDailyProps> {
 
   render() {
     return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span>every</span>
-        <Input
-          style={{ width: '20%' }}
-          value={
-            this.props.repeatDaily.interval
-              ? this.props.repeatDaily.interval
-              : 0
-          }
-          onChange={this.onChange}
-        />
-        <span>day(s)</span>
-      </div>
+      <Input
+        prefix="Every"
+        style={{ width: '20%' }}
+        value={
+          this.props.repeatDaily.interval ? this.props.repeatDaily.interval : 0
+        }
+        onChange={this.onChange}
+        suffix="Day(s)"
+      />
     );
   }
 }

@@ -92,21 +92,23 @@ class Repeat extends React.Component<RepeatProps, SelectState> {
   render() {
     return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <label>
-            <strong>Repeat</strong>
+        <div
+          style={{ display: 'flex', alignItems: 'center', paddingBottom: 24 }}
+        >
+          <label style={{marginRight : '1em'}}>
+            <strong>Repeat : </strong>
           </label>
           <Select
-            placeholder='Choose a type'
+            placeholder="Choose a type"
             style={{ width: '30%' }}
             value={this.state.value}
             onChange={e => this.onChangeValue(e)}
           >
-            <Option value='Yearly'>Yearly</Option>
-            <Option value='Monthly'>Monthly</Option>
-            <Option value='Weekly'>Weekly</Option>
-            <Option value='Daily'>Daily</Option>
-            <Option value='Hourly'>Hourly</Option>
+            <Option value="Yearly">Yearly</Option>
+            <Option value="Monthly">Monthly</Option>
+            <Option value="Weekly">Weekly</Option>
+            <Option value="Daily">Daily</Option>
+            <Option value="Hourly">Hourly</Option>
           </Select>
         </div>
         {this.state.value === 'Yearly' && <RepeatYearly />}

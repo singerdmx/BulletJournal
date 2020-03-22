@@ -31,8 +31,8 @@ class Start extends React.Component<StartProps> {
   render() {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <label>
-          <strong>Start</strong>
+        <label style={{ marginRight: '1em' }}>
+          <strong>Start :</strong>
         </label>
         <DatePicker
           value={this.props.startDate ? moment(this.props.startDate) : null}

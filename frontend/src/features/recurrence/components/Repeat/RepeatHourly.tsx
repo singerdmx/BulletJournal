@@ -19,19 +19,17 @@ class RepeatHourly extends React.Component<RepeatHourlyProps> {
 
   render() {
     return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span>every</span>
-        <Input
-          style={{ width: '20%' }}
-          value={
-            this.props.repeatHourly.interval
-              ? this.props.repeatHourly.interval
-              : 0
-          }
-          onChange={this.onChange}
-        />
-        <span>hour(s)</span>
-      </div>
+      <Input
+        prefix="Every "
+        style={{ width: '20%' }}
+        value={
+          this.props.repeatHourly.interval
+            ? this.props.repeatHourly.interval
+            : 0
+        }
+        onChange={this.onChange}
+        suffix="Hour(s)"
+      />
     );
   }
 }

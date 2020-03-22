@@ -100,7 +100,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
           onChange={this.onChange}
           value={this.props.yearlyOn ? 'on' : 'onThe'}
         >
-          <Radio value='on'>
+          <Radio value='on' style={{marginBottom : 24}}>
             <span>On</span>
             <Select
               style={{ width: '100px', paddingLeft: '20px' }}

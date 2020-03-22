@@ -78,22 +78,24 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
 
   render() {
     return (
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span>every</span>
+      <div style={{ display: 'flex' }}>
+        <div
+          style={{ marginBottom: 24 }}
+        >
           <Input
-            style={{ width: '100px', paddingLeft: '20px' }}
+            prefix="Every"
+            style={{ width: '90%' }}
             onChange={this.onChangeCount}
             value={this.props.repeatMonthlyCount}
+            suffix="Month(s)"
           />
-          <span>month(s)</span>
         </div>
 
         <Radio.Group
           onChange={this.onChange}
           value={this.props.monthlyOn ? 'on' : 'onThe'}
         >
-          <Radio value='on'>
+          <Radio value="on" style={{ marginBottom: 24 }}>
             <span>On day</span>
             <Select
               style={{ width: '100px', paddingLeft: '20px' }}
@@ -109,7 +111,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
             </Select>
           </Radio>
           <br />
-          <Radio value='onThe'>
+          <Radio value="onThe">
             <span>On the</span>
             <Select
               style={{ width: '100px', paddingLeft: '20px' }}
