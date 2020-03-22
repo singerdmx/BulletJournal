@@ -18,9 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,15 +33,7 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test")
 public class ProjectControllerTest {
     private static final String ROOT_URL = "http://localhost:";
-    private static String TIMEZONE;
-    static {
-        try {
-            TIMEZONE = URLEncoder.encode("America/Los_Angeles", StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    private static String TIMEZONE = "America/Los_Angeles";
     private final String expectedOwner = "BulletJournal";
 
     private final String[] sampleUsers = {
@@ -333,7 +322,7 @@ public class ProjectControllerTest {
     private Transaction createTransaction(Project project, String name, String date) {
         CreateTransactionParams transaction =
                 new CreateTransactionParams(name, "BulletJournal", 1000.0,
-                        date, null, "America/Los_Angeles", 1);
+                        date, null, TIMEZONE, 1);
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
                 HttpMethod.POST,
@@ -643,7 +632,7 @@ public class ProjectControllerTest {
 
     private Task createTask(Project project, String taskName) {
         CreateTaskParams task = new CreateTaskParams(taskName, expectedOwner, "2020-02-27",
-                null, null, null, "America/Los_Angeles", null);
+                null, null, null, TIMEZONE, null);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
@@ -662,7 +651,7 @@ public class ProjectControllerTest {
                             String dueTime, String name, ReminderSetting reminderSetting, String expectedName) {
         //update task parameter
         UpdateTaskParams updateTaskParams = new UpdateTaskParams(
-                assignedTo, dueDate, dueTime, name, null, reminderSetting, "America/Los_Angeles", null);
+                assignedTo, dueDate, dueTime, name, null, reminderSetting, TIMEZONE, null);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,
