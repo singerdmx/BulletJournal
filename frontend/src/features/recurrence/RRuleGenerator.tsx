@@ -7,8 +7,8 @@ import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateStartString } from './actions';
 import RRule from 'rrule';
-
 import './rrules.styles.less';
+import { TimePicker } from 'antd';
 
 type RRuleGeneratorProps = {
   start: any;
@@ -27,17 +27,17 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
     });
 
     return (
-      <div className="rrules">
-        <div className="rrule-start">
+      <div className='rrules'>
+        <div className='rrule-start'>
           <Start />
+          <TimePicker placeholder='Time' format='HH:mm' />
         </div>
-        <div className="rrule-repeate">
+        <div className='rrule-repeate'>
           <Repeat />
         </div>
-        <div className="rrule-end">
+        <div className='rrule-end'>
           <End />
         </div>
-        <span>{ruleString.toText()}</span>
       </div>
     );
   }

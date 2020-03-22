@@ -77,6 +77,7 @@ const AddTask: React.FC<RouteComponentProps &
   const [reminderType, setReminderType] = useState('remindBefore');
   const [dueTimeVisible, setDueTimeVisible] = useState(false);
   const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
+  const [recurrenceVisible, setRecurrenceVisible] = useState(false);
   const addTask = (values: any) => {
     // props.createTask(props.projectId, values.taskName);
     setVisible(false);
@@ -90,11 +91,16 @@ const AddTask: React.FC<RouteComponentProps &
   const options = result.map((time: string) => {
     return { value: time };
   });
-  let ruleString = new RRule({
+  const ruleString = new RRule({
     ...props.start,
     ...props.repeat,
     ...props.end
   });
+  const rRuleString = ruleString.toText();
+  const rRuleText =
+    rRuleString === 'every year'
+      ? 'Recurrence'
+      : rRuleString.charAt(0).toUpperCase() + rRuleString.slice(1);
 
   return (
     <Tooltip placement='top' title='Create New Task'>
@@ -184,16 +190,29 @@ const AddTask: React.FC<RouteComponentProps &
                 )}
               </div>
               <Form.Item style={{ flex: 1 }}>
-                <Popover
-                  content={<ReactRRuleGenerator />}
-                  title={ruleString.toText()}
-                  trigger='click'
-                  placement='top'
-                >
-                  <Button type='default' disabled={dueType !== 'dueByRec'}>
-                    Recurrence
-                  </Button>
-                </Popover>
+                <Tooltip title={rRuleText}>
+                  <Popover
+                    content={
+                      <div>
+                        <ReactRRuleGenerator />
+                        <Button onClick={() => setRecurrenceVisible(false)}>
+                          OK
+                        </Button>
+                      </div>
+                    }
+                    title={rRuleText}
+                    visible={recurrenceVisible}
+                    onVisibleChange={visible => {
+                      setRecurrenceVisible(visible);
+                    }}
+                    trigger='click'
+                    placement='top'
+                  >
+                    <Button type='default' disabled={dueType !== 'dueByRec'}>
+                      {rRuleText}
+                    </Button>
+                  </Popover>
+                </Tooltip>
               </Form.Item>
             </div>
             <Form.Item
