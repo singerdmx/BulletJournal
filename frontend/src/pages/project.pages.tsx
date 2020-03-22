@@ -136,9 +136,10 @@ class ProjectPage extends React.Component<
     const group = getGroupByProject(this.props.groups, project);
     let popContent = null;
     if (group) {
-      popContent = <div>
-        {group.users.map(u => <p key={u.id}><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
-      </div>;
+      popContent =
+          <div>
+            {group.users.map((u, index) => <p key={index}><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
+          </div>;
     }
 
     return (

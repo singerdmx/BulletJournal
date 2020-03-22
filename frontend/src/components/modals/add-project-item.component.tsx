@@ -8,6 +8,7 @@ import {updateGroups} from '../../features/group/actions';
 import {IState} from '../../store';
 import {Project, ProjectsWithOwner} from '../../features/project/interface';
 import {iconMapper} from "../side-menu/side-menu.component";
+import { History } from 'history';
 
 import './modals.styles.less';
 import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects.pages";
@@ -15,6 +16,7 @@ import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects.pa
 const {Option} = Select;
 
 type ProjectItemProps = {
+    history: History<History.PoorMansUnknown>;
     mode: string;
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
@@ -44,26 +46,48 @@ const AddProjectItem : React.FC<GroupProps & ProjectItemProps> = props => {
         setProjects(flattenSharedProject(props.sharedProjects, projects));
     }, []);
 
+    const addBuJoItem = (values: any) => {
+        let project: string = values.project;
+        if (!project) {
+            project = getProjectValue(projects[0]);
+        }
+
+        props.history.push(`/projects/${project.split('#')[1]}`);
+        setVisible(false);
+    };
+
+    const getProjectValue = (project: Project) => {
+        return project.projectType + '#' + project.id;
+    };
+
     const getProjectSelections = () => {
         if (projects && projects[0]) {
-            return (<Tooltip title='Choose BuJo' placement='topLeft'>
-                <Select placeholder="Choose BuJo" style={{width: "100%"}} defaultValue={projects[0].id}>
-                    {projects.map(project => {
-                        return (
-                            <Option value={project.id} key={project.id}>
-                                <Tooltip title={project.owner} placement='right'>
-                                    <span>
-                                    <Avatar size="small" src={project.ownerAvatar}/>
+            return (
+                <Form form={form} labelAlign='left'>
+                    <Tooltip title='Choose BuJo' placement='topLeft'>
+                        <Form.Item
+                            name='project'
+                        >
+                            <Select placeholder="Choose BuJo" style={{width: "100%"}}
+                                    defaultValue={getProjectValue(projects[0])}>
+                                {projects.map(project => {
+                                    return (
+                                        <Option value={getProjectValue(project)} key={project.id}>
+                                            <Tooltip title={project.owner} placement='right'>
+                                        <span>
+                                        <Avatar size="small" src={project.ownerAvatar}/>
                                             &nbsp; {iconMapper[project.projectType]}
                                             &nbsp; <strong>{project.name}</strong>
                                             &nbsp; (Group <strong>{project.group.name}</strong>)
-                                    </span>
-                                </Tooltip>
-                            </Option>
-                        );
-                    })}
-                </Select>
-            </Tooltip>);
+                                        </span>
+                                            </Tooltip>
+                                        </Option>
+                                    );
+                                })}
+                            </Select>
+                        </Form.Item>
+                    </Tooltip>
+                </Form>);
         }
 
         return <div></div>;
@@ -82,8 +106,8 @@ const AddProjectItem : React.FC<GroupProps & ProjectItemProps> = props => {
                     form
                         .validateFields()
                         .then(values => {
-                            console.log(values);
                             form.resetFields();
+                            addBuJoItem(values);
                         })
                         .catch(info => console.log(info));
                 }}
