@@ -533,7 +533,7 @@ public class ProjectControllerTest {
                 HttpMethod.POST,
                 null,
                 Task.class,
-                t1.getId());
+                completedTasks.get(0).getId());
 
         assertEquals(HttpStatus.OK, uncompleteTaskResponse.getStatusCode());
         assertNotNull(uncompleteTaskResponse.getBody());

@@ -3,6 +3,7 @@ package com.bulletjournal.repository.models;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.utils.LongArrayType;
+import com.google.common.base.Preconditions;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
@@ -167,9 +168,8 @@ public abstract class TaskModel extends ProjectItemModel {
     }
 
     public void setReminderSetting(ReminderSetting reminderSetting) {
-        if (reminderSetting == null) {
-            return;
-        }
+        Preconditions.checkNotNull(reminderSetting, "ReminderSetting cannot be null");
+        Preconditions.checkNotNull(this.getTimezone(), "Timezone cannot be null");
 
         if (reminderSetting.hasBefore()) {
             this.setReminderBeforeTask(reminderSetting.getBefore());
@@ -179,19 +179,16 @@ public abstract class TaskModel extends ProjectItemModel {
             return;
         }
 
-        if (reminderSetting.hasDate()) {
-            this.setReminderDate(reminderSetting.getDate());
-        }
+        Preconditions.checkNotNull(reminderSetting.getDate(), "ReminderSetting must have Date");
+        this.setReminderDate(reminderSetting.getDate());
 
         if (reminderSetting.hasTime()) {
             this.setReminderTime(reminderSetting.getTime());
         }
 
-        if (reminderSetting.hasDate()) {
-            ZonedDateTime reminderZonedDateTime =
-                    ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
-            this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
-        }
+        ZonedDateTime reminderZonedDateTime =
+                ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
+        this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
     }
 
     public String getRecurrenceRule() {

@@ -5,6 +5,7 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.UpdateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
@@ -52,6 +53,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
 
     @Autowired
     private CompletedTaskRepository completedTaskRepository;
+
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -221,7 +225,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
             task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
         }
 
-        task.setReminderSetting(createTaskParams.getReminderSetting());
+        ReminderSetting reminderSetting = createTaskParams.getReminderSetting();
+
+        if (reminderSetting == null) {
+            reminderSetting = new ReminderSetting(null, null,
+                    this.userDaoJpa.getByName(owner).getReminderBeforeTask().getValue());
+        }
+        task.setReminderSetting(reminderSetting);
 
         task = this.taskRepository.save(task);
 
@@ -452,8 +462,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     }
 
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
-        return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate()
-                , task.getDueTime(), task.getDuration(), null, task.getTimezone(), task.getRecurrenceRule());
+        return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
+                task.getDueTime(), task.getDuration(), null, task.getTimezone(), task.getRecurrenceRule());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

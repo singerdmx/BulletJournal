@@ -48,7 +48,7 @@ public class ProjectItemsGrouperTest {
     public void testGroupTasksByDate() {
         List<Task> tasks = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
-        ReminderSetting reminderSetting = new ReminderSetting();
+        ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
         Task t1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
         Task t2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
         Task t3 = getTask(1L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
@@ -84,7 +84,7 @@ public class ProjectItemsGrouperTest {
         Map<ZonedDateTime, List<Transaction>> transactionMap = new HashMap<>();
 
         ProjectStub projectStub = new ProjectStub();
-        ReminderSetting reminderSetting = new ReminderSetting();
+        ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
         Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
         Transaction transaction2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
@@ -142,7 +142,7 @@ public class ProjectItemsGrouperTest {
     @Test
     public void getProjectItems() {
         ProjectStub projectStub = new ProjectStub();
-        ReminderSetting reminderSetting = new ReminderSetting();
+        ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
         Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
         Transaction transaction2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);

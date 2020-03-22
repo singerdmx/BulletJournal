@@ -273,7 +273,7 @@ public class ProjectItemControllerTest {
     private Task createTask(Project project, String name, String date) {
         CreateTaskParams task =
                 new CreateTaskParams(name, "Michael_Zhou", date, null, 10,
-                        new ReminderSetting(), "America/Los_Angeles", null);
+                        null, "America/Los_Angeles", null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
