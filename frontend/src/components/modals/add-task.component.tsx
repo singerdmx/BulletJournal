@@ -164,7 +164,7 @@ const AddTask: React.FC<RouteComponentProps &
                     <DatePicker
                       allowClear={true}
                       style={{ width: '100%' }}
-                      placeholder='Select Date'
+                      placeholder='Due Date'
                       disabled={dueType !== 'dueByTime'}
                       onChange={value => setDueTimeVisible(value !== null)}
                     />
@@ -176,7 +176,7 @@ const AddTask: React.FC<RouteComponentProps &
                       <TimePicker
                         allowClear={true}
                         format='HH:mm'
-                        placeholder='Select Time'
+                        placeholder='Due Time'
                         disabled={dueType !== 'dueByTime'}
                       />
                     </Form.Item>
