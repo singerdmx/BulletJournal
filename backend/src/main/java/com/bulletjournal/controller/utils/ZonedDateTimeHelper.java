@@ -35,17 +35,40 @@ public class ZonedDateTimeHelper {
     }
 
     /*
-     * Return ZoneDateTime type for start time.
+     * Return ZonedDateTime type for start time.
      */
     public static ZonedDateTime getStartTime(FrequencyType frequencyType, String timezone) {
-//        ZonedDateTime now = getNow(timezone);
-
-        return null;
+        ZonedDateTime now = getNow(timezone);
+        return createStartTime(frequencyType, now);
     }
 
-    public static int getFrequencyTypeGap(FrequencyType frequencyType) {
-        int gap = 0;
-        return gap;
+    /*
+     * Return a copy of ZonedDateTime type start date based on the frequency type
+     */
+    private static ZonedDateTime createStartTime(FrequencyType frequencyType, ZonedDateTime now) {
+        ZonedDateTime cloned;
+        switch (frequencyType) {
+            case MONTHLY:
+                int firstDayOfMonth = (int) now.range(ChronoField.DAY_OF_MONTH).getMinimum();
+                cloned = now.withDayOfMonth(firstDayOfMonth);
+                break;
+            case WEEKLY:
+                int firstDayOfWeek = (int) now.range(ChronoField.DAY_OF_WEEK).getMinimum();
+                cloned = now.minusDays(now.getDayOfWeek().getValue() - firstDayOfWeek);
+                break;
+            case YEARLY:
+                int firstDayOfYear = (int) now.range(ChronoField.DAY_OF_YEAR).getMaximum();
+                cloned = now.withDayOfYear(firstDayOfYear);
+                break;
+            default:
+                throw new IllegalArgumentException("");
+        }
+        int hour = Integer.parseInt(MIN_TIME.split(":")[0]);
+        int minute = Integer.parseInt(MIN_TIME.split(":")[1]);
+        cloned = cloned.withHour(hour);
+        cloned = cloned.withMinute(minute);
+
+        return cloned;
     }
 
     /*
@@ -60,7 +83,37 @@ public class ZonedDateTimeHelper {
      * Return ZoneDateTime type for end time.
      */
     public static ZonedDateTime getEndTime(FrequencyType frequencyType, String timezone) {
-        return null;
+        ZonedDateTime now = getNow(timezone);
+        return createEndTime(frequencyType, now);
+    }
+
+    /*
+     * Return a copy of ZonedDateTime type end date based on the frequency type
+     */
+    private static ZonedDateTime createEndTime(FrequencyType frequencyType, ZonedDateTime now) {
+        ZonedDateTime cloned;
+        switch (frequencyType) {
+            case MONTHLY:
+                int lastDayOfMonth = (int) now.range(ChronoField.DAY_OF_MONTH).getMaximum();
+                cloned = now.withDayOfMonth(lastDayOfMonth);
+                break;
+            case WEEKLY:
+                int lastDayOfWeek = (int) now.range(ChronoField.DAY_OF_WEEK).getMaximum();
+                cloned = now.plusDays(lastDayOfWeek - now.getDayOfWeek().getValue());
+                break;
+            case YEARLY:
+                int lastDayOfYear = (int) now.range(ChronoField.DAY_OF_YEAR).getMaximum();
+                cloned = now.withDayOfYear(lastDayOfYear);
+                break;
+            default:
+                throw new IllegalArgumentException("");
+        }
+        int hour = Integer.parseInt(MAX_TIME.split(":")[0]);
+        int minute = Integer.parseInt(MAX_TIME.split(":")[1]);
+        cloned = cloned.withHour(hour);
+        cloned = cloned.withMinute(minute);
+
+        return cloned;
     }
 
     /*
