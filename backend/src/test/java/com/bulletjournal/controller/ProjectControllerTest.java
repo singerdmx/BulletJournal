@@ -201,20 +201,21 @@ public class ProjectControllerTest {
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
                 .buildAndExpand(p.getId()).toUriString();
-        ResponseEntity<Transaction[]> transactionsResponse = this.restTemplate.exchange(
+        ResponseEntity<LedgerSummary> transactionsResponse = this.restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class);
+                LedgerSummary.class);
         String etag1 = transactionsResponse.getHeaders().getETag();
-        List<Transaction> transactions = Arrays.asList(transactionsResponse.getBody());
+        List<Transaction> transactions = transactionsResponse.getBody().getTransactions();
 
         transactionsResponse = this.restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class);
+                LedgerSummary.class);
         String etag2 = transactionsResponse.getHeaders().getETag();
         assertEquals(etag1, etag2);
 
@@ -223,9 +224,9 @@ public class ProjectControllerTest {
                 url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class);
+                LedgerSummary.class);
         String etag3 = transactionsResponse.getHeaders().getETag();
-        transactions = Arrays.asList(transactionsResponse.getBody());
+        transactions = transactionsResponse.getBody().getTransactions();
         assertNotEquals(etag1, etag3);
         assertEquals(2, transactions.size());
 
@@ -262,22 +263,23 @@ public class ProjectControllerTest {
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
                 .buildAndExpand(project.getId()).toUriString();
-        ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
+        ResponseEntity<LedgerSummary> getResponse = this.restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class);
-        Transaction[] t = getResponse.getBody();
-        int size = t.length;
+                LedgerSummary.class);
+        List<Transaction> t = getResponse.getBody().getTransactions();
+        int size = t.size();
 
         for (Transaction transaction : transactions) {
             t = deleteTransaction(transaction);
-            assertEquals(--size, t.length);
+            assertEquals(--size, t.size());
         }
     }
 
-    private Transaction[] deleteTransaction(Transaction t) {
+    private List<Transaction> deleteTransaction(Transaction t) {
 
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTION_ROUTE,
@@ -291,13 +293,14 @@ public class ProjectControllerTest {
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
                 .buildAndExpand(t.getProjectId()).toUriString();
-        ResponseEntity<Transaction[]> getResponse = this.restTemplate.exchange(
+        ResponseEntity<LedgerSummary> getResponse = this.restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                Transaction[].class);
-        Transaction[] transactions = getResponse.getBody();
+                LedgerSummary.class);
+        List<Transaction> transactions = getResponse.getBody().getTransactions();
         assertNotNull(transactions);
         return transactions;
     }

@@ -11,6 +11,7 @@ import com.bulletjournal.notifications.RemoveTransactionEvent;
 import com.bulletjournal.notifications.UpdateTransactionPayerEvent;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +32,6 @@ public class TransactionController {
     protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
     protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
     protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
-    protected static final String GET_LEDGER_SUMMARY_ROUTE = "/api/projects/{projectId}/ledger";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -40,36 +40,42 @@ public class TransactionController {
     private NotificationService notificationService;
 
     @GetMapping(TRANSACTIONS_ROUTE)
-    public ResponseEntity<List<Transaction>> getTransactions(
+    public ResponseEntity<LedgerSummary> getTransactions(
             @NotNull @PathVariable Long projectId,
             @RequestParam(required = false) FrequencyType frequencyType,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
-            @NotBlank @RequestParam String timezone) {
+            @NotBlank @RequestParam String timezone,
+            @NotNull @RequestParam LedgerSummaryType ledgerSummaryType) {
 
-        // Set start time and end time
-        ZonedDateTime startTime;
-        ZonedDateTime endTime;
-        if (StringUtils.isBlank(startDate) || StringUtils.isBlank(endDate)) {
-            if (frequencyType == null) {
-                throw new BadRequestException("Missing FrequencyType");
-            }
-            startTime = ZonedDateTimeHelper.getStartTime(frequencyType, timezone);
-            endTime = ZonedDateTimeHelper.getEndTime(frequencyType, timezone);
-        } else {
-            startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
-            endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
-        }
+        Pair<ZonedDateTime, ZonedDateTime> startEndTime = getStartEndTime(frequencyType, timezone, startDate, endDate);
+        ZonedDateTime startTime = startEndTime.getLeft();
+        ZonedDateTime endTime = startEndTime.getRight();
 
         List<Transaction> transactions = this.transactionDaoJpa.getTransactions(
                 projectId, startTime, endTime);
+
         String transactionsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, transactions);
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(transactionsEtag);
 
-        return ResponseEntity.ok().headers(responseHeader).body(transactions);
+        LedgerSummary ledgerSummary = new LedgerSummary(transactions);
+        switch (ledgerSummaryType) {
+            case DEFAULT:
+                break;
+            case LABEL:
+                break;
+            case PAYER:
+                break;
+            case TIMELINE:
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid LedgerSummaryType " + ledgerSummaryType);
+        }
+
+        return ResponseEntity.ok().headers(responseHeader).body(ledgerSummary);
     }
 
     @PostMapping(TRANSACTIONS_ROUTE)
@@ -127,14 +133,24 @@ public class TransactionController {
         return null; // may be generated link
     }
 
-    @GetMapping(GET_LEDGER_SUMMARY_ROUTE)
-    public LedgerSummary getLedgerSummary(
-            @NotNull @PathVariable Long projectId,
-            @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
-            @NotNull @RequestParam FrequencyType frequencyType,
-            @NotBlank @RequestParam String timezone,
-            @RequestParam(required = false) String start,
-            @RequestParam(required = false) String end) {
-        return null;
+    private Pair<ZonedDateTime, ZonedDateTime> getStartEndTime(
+            FrequencyType frequencyType,
+            String timezone,
+            String startDate,
+            String endDate
+    ) {
+        ZonedDateTime startTime;
+        ZonedDateTime endTime;
+        if (StringUtils.isBlank(startDate) || StringUtils.isBlank(endDate)) {
+            if (frequencyType == null) {
+                throw new BadRequestException("Missing FrequencyType");
+            }
+            startTime = ZonedDateTimeHelper.getStartTime(frequencyType, timezone);
+            endTime = ZonedDateTimeHelper.getEndTime(frequencyType, timezone);
+        } else {
+            startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+            endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+        }
+        return Pair.of(startTime, endTime);
     }
 }
