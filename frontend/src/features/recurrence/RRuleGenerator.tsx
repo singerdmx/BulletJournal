@@ -20,12 +20,6 @@ type RRuleGeneratorProps = {
 
 class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
   render() {
-    let ruleString = new RRule({
-      ...this.props.start,
-      ...this.props.repeat,
-      ...this.props.end
-    });
-
     return (
       <div className='rrules'>
         <div className='rrule-start'>
