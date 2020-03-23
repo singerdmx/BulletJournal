@@ -18,7 +18,7 @@ export const getNoteById = (noteId: number) => {
 };
 
 export const deleteNoteById = (noteId: number) => {
-  return doDelete(`/api/notes/${noteId}`)
+  return doDelete(`/api/notes/${noteId}`).then(res => res.json())
     .catch(err => {
       throw Error(err.message);
     });
