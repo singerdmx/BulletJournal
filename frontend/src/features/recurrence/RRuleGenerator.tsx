@@ -6,7 +6,6 @@ import End from './components/End/End';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateStartString } from './actions';
-import RRule from 'rrule';
 import './rrules.styles.less';
 import { TimePicker } from 'antd';
 
@@ -15,7 +14,6 @@ type RRuleGeneratorProps = {
   repeat: any;
   end: any;
   rRuleString: string;
-  updateStartString: (startDate: string) => void;
 };
 
 class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
@@ -24,7 +22,6 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
       <div className='rrules'>
         <div className='rrule-start'>
           <Start />
-          <TimePicker placeholder='Time' format='HH:mm' />
         </div>
         <div className='rrule-repeate'>
           <Repeat />
@@ -32,6 +29,7 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
         <div className='rrule-end'>
           <End />
         </div>
+        <div>{this.props.rRuleString}</div>
       </div>
     );
   }

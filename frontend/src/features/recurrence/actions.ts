@@ -9,9 +9,10 @@ import {
   Weekly
 } from './interface';
 
-export const updateStartString = (startDate: string) =>
+export const updateStartString = (startDate: string, startTime: string) =>
   actions.updateStart({
-    startDate: startDate
+    startDate: startDate,
+    startTime: startTime
   });
 
 export const updateEndString = (

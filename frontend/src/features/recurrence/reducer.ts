@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import moment from 'moment';
 import RRule from 'rrule';
 import {
   Hourly,
@@ -11,6 +10,7 @@ import {
   Weekly
 } from './interface';
 import { MONTHS } from './constants';
+import moment from 'moment';
 
 export type End = {
   count?: any;
@@ -19,6 +19,7 @@ export type End = {
 
 export type StartDateAction = {
   startDate: string;
+  startTime: string;
 };
 
 export type EndDateAction = {
@@ -75,6 +76,7 @@ let initialState = {
   startDate: moment(new Date().toLocaleString('fr-CA'), 'YYYY-MM-DD').format(
     'YYYY-MM-DD'
   ),
+  startTime: '00:00',
   endDate: moment(new Date().toLocaleString('fr-CA'), 'YYYY-MM-DD').format(
     'YYYY-MM-DD'
   ),
@@ -118,10 +120,17 @@ const slice = createSlice({
   initialState,
   reducers: {
     updateStart: (state, action: PayloadAction<StartDateAction>) => {
-      const { startDate } = action.payload;
+      const { startDate, startTime } = action.payload;
       state.startDate = startDate;
+      state.startTime = startTime;
       //update rrule start string
-      const start = { dtstart: moment(startDate).toDate() };
+      const start = {
+        dtstart: moment(
+          new Date(startDate + 'T' + startTime + ':00+00:00')
+        ).toDate()
+      };
+      console.log('start');
+      console.log(start);
       state.start = start;
       state.rRuleString = new RRule({
         ...start,
@@ -129,6 +138,7 @@ const slice = createSlice({
         ...state.end
       }).toString();
     },
+
     updateMonthlyOn: (state, action: PayloadAction<MonthlyOnAction>) => {
       const { monthlyOn } = action.payload;
       state.monthlyOn = monthlyOn;

@@ -33,6 +33,7 @@ const { Option } = Select;
 
 type RepeatProps = {
   startDate: string;
+  startTime: string;
   repeatHourly: any;
   repeatDaily: any;
   repeatWeekly: any;
@@ -42,7 +43,7 @@ type RepeatProps = {
   repeatYearlyOn: any;
   monthlyOn: boolean;
   yearlyOn: boolean;
-  updateStartString: (startDate: any) => void;
+  updateStartString: (startDate: string, startTime: string) => void;
   updateRepeatYearlyOn: (repeatYearlyOn: YearlyOn) => void;
   updateRepeatYearlyOnThe: (repeatYearlyOnThe: YearlyOnThe) => void;
   updateRepeatMonthlyOn: (repeatMonthlyOn: MonthlyOn) => void;
@@ -62,7 +63,7 @@ class Repeat extends React.Component<RepeatProps, SelectState> {
   };
 
   componentDidMount = () => {
-    this.props.updateStartString(this.props.startDate);
+    this.props.updateStartString(this.props.startDate, this.props.startTime);
     this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
   };
 
@@ -95,20 +96,20 @@ class Repeat extends React.Component<RepeatProps, SelectState> {
         <div
           style={{ display: 'flex', alignItems: 'center', paddingBottom: 24 }}
         >
-          <label style={{marginRight : '1em'}}>
+          <label style={{ marginRight: '1em' }}>
             <strong>Repeat : </strong>
           </label>
           <Select
-            placeholder="Choose a type"
+            placeholder='Choose a type'
             style={{ width: '30%' }}
             value={this.state.value}
             onChange={e => this.onChangeValue(e)}
           >
-            <Option value="Yearly">Yearly</Option>
-            <Option value="Monthly">Monthly</Option>
-            <Option value="Weekly">Weekly</Option>
-            <Option value="Daily">Daily</Option>
-            <Option value="Hourly">Hourly</Option>
+            <Option value='Yearly'>Yearly</Option>
+            <Option value='Monthly'>Monthly</Option>
+            <Option value='Weekly'>Weekly</Option>
+            <Option value='Daily'>Daily</Option>
+            <Option value='Hourly'>Hourly</Option>
           </Select>
         </div>
         {this.state.value === 'Yearly' && <RepeatYearly />}
@@ -122,6 +123,7 @@ class Repeat extends React.Component<RepeatProps, SelectState> {
 }
 
 const mapStateToProps = (state: IState) => ({
+  startTime: state.rRule.startTime,
   startDate: state.rRule.startDate,
   monthlyOn: state.rRule.monthlyOn,
   yearlyOn: state.rRule.yearlyOn,
