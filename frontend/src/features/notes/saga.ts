@@ -8,12 +8,13 @@ import {
   PutNote,
   GetNote,
   PatchNote,
-  SetNoteLabels
+  SetNoteLabels,
+  DeleteNote
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchNotes, createNote, putNotes, getNoteById, updateNote,
-  setNoteLabels
+  setNoteLabels, deleteNoteById
 } from '../../apis/noteApis';
 import { updateNotes } from './actions';
 
@@ -23,8 +24,7 @@ function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
 
 function* notesUpdate(action: PayloadAction<UpdateNotes>) {
   try {
-    const data = yield call(fetchNotes, action.payload.projectId);
-    const notes = yield data.json();
+    const notes = yield call(fetchNotes, action.payload.projectId);
 
     yield put(
         notesActions.notesReceived({
@@ -80,6 +80,20 @@ function* noteSetLabels(action: PayloadAction<SetNoteLabels>) {
   }
 }
 
+function* noteDelete(action: PayloadAction<DeleteNote>){
+  try{
+    const { noteId }  = action.payload;
+    const data = yield call(deleteNoteById, noteId)
+    yield put(
+      notesActions.notesReceived({
+      notes: data
+    })
+  );
+  } catch(error) {
+    yield call(message.error, `Delete Note Error Received: ${error}`);
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -109,6 +123,10 @@ export default function* noteSagas() {
     yield takeLatest(
       notesActions.NoteSetLabels.type,
       noteSetLabels
+    ),
+    yield takeLatest(
+      notesActions.NoteDelete.type,
+      noteDelete,
     )
   ]);
 }

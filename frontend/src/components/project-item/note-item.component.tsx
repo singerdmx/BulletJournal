@@ -3,29 +3,35 @@ import {
     FormOutlined,
     InfoCircleOutlined,
     MessageOutlined,
-    MoreOutlined
+    MoreOutlined,
+    DeleteTwoTone,
+    EditTwoTone
   } from '@ant-design/icons';
 
 import { Popover } from 'antd';
 
 type NoteProps = {
-    name: string
+    name: string,
+    id: number,
+    onDelete: (noteId: number) => void,
+    onEdit: (noteId: number) => void
 };
 
-const text = <span>Title</span>;
-const content = (
-  <div>
-    <p>Content</p>
-    <p>Content</p>
-  </div>
-);
+
+const Content:  React.FC<NoteProps> = props => {
+    const { name, id, onDelete, onEdit } = props;
+    return (<div style={{display: 'flex', flexDirection: 'column'}}>
+        <div>Delete<DeleteTwoTone onClick={()=>onDelete(id)}/></div>
+        <div>Edit  <EditTwoTone onClick={()=>onEdit(id)}/></div>
+    </div>);
+}
 
 const alignConfig = {
     offset: [10, -5],  
 }
 
 const NoteItem: React.FC<NoteProps> = props => {
-    const { name } = props;
+    const { name, id, onDelete, onEdit } = props;
 
     return (<div style={{width: '100%', height: '2rem', position: 'relative', lineHeight: '2rem'}}>
         <FormOutlined/>
@@ -33,7 +39,7 @@ const NoteItem: React.FC<NoteProps> = props => {
         <div style={{ width: '30%', height: '100%', position: 'absolute', top: 0, right: 0, display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
             <InfoCircleOutlined />
             <MessageOutlined />
-            <Popover align={alignConfig} placement="bottomRight" style={{top: -10}} title={text} content={content} trigger="click">
+            <Popover align={alignConfig} placement="bottomRight" style={{top: -10}} title={null} content={<Content name={''} id={id} onDelete={onDelete} onEdit={onEdit}/>} trigger="click">
                 <MoreOutlined style={{transform: 'rotate(90deg)', fontSize: '20px'}}/>
             </Popover>
         </div>

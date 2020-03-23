@@ -20,17 +20,18 @@ type NotesProps = {
 const getTree = (
     data: Note[],
     name: string,
-    index: number
+    index: number,
+    deleteNode: (id: number) => any
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Note) => {
         const node = {} as TreeNodeNormal;
         if (item.subNotes && item.subNotes.length) {
-            node.children = getTree(item.subNotes, item.name, index);
+            node.children = getTree(item.subNotes, item.name, index, deleteNode);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        node.title = <TreeItem name={item.name}/>;
+        node.title = <TreeItem name={item.name} id={item.id} onDelete={deleteNode} onEdit={()=>{}}/>;
         node.key = item.id.toString();
         res.push(node);
     });
@@ -113,13 +114,13 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: a
 };
 
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
-    const {projectId, notes, putNote, updateNotes} = props;
+    const {projectId, notes, putNote, updateNotes, deleteNote } = props;
     useEffect(() => {
         if (projectId) {
             updateNotes(projectId);
         }
     }, [projectId]);
-    let treeNote = getTree(notes, `project${projectId}`, projectId);
+    let treeNote = getTree(notes, `project${projectId}`, projectId, deleteNote);
 
     return (<Tree
         className="ant-tree"
