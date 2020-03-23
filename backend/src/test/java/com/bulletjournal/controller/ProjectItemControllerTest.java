@@ -1,7 +1,7 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.TestHelpers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +9,9 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -146,7 +148,7 @@ public class ProjectItemControllerTest {
         ResponseEntity<ProjectItems[]> response = this.restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
-                actAsOtherUser(null, sampleUsers[1]),
+                TestHelpers.actAsOtherUser(null, sampleUsers[1]),
                 ProjectItems[].class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -259,7 +261,7 @@ public class ProjectItemControllerTest {
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
                 HttpMethod.POST,
-                actAsOtherUser(transaction, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(transaction, sampleUsers[0]),
                 Transaction.class,
                 project.getId());
         Transaction created = response.getBody();
@@ -278,7 +280,7 @@ public class ProjectItemControllerTest {
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
-                actAsOtherUser(task, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(task, sampleUsers[0]),
                 Task.class,
                 project.getId());
 
@@ -302,7 +304,7 @@ public class ProjectItemControllerTest {
         ResponseEntity<ProjectItems[]> response = this.restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
-                actAsOtherUser(null, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(null, sampleUsers[0]),
                 ProjectItems[].class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -317,7 +319,7 @@ public class ProjectItemControllerTest {
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
-                actAsOtherUser(project, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(project, sampleUsers[0]),
                 Project.class);
         Project created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -337,7 +339,7 @@ public class ProjectItemControllerTest {
         ResponseEntity<Group> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
                 HttpMethod.POST,
-                actAsOtherUser(group, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(group, sampleUsers[0]),
                 Group.class);
         Group created = response.getBody();
 
@@ -353,13 +355,4 @@ public class ProjectItemControllerTest {
         return new ArrayList<>(Arrays.asList(types));
     }
 
-    private <T> HttpEntity actAsOtherUser(T body, String username) {
-        final HttpHeaders headers = new HttpHeaders();
-        headers.set(UserClient.USER_NAME_KEY, username);
-
-        if (body == null)
-            return new HttpEntity<>(headers);
-
-        return new HttpEntity<>(body, headers);
-    }
 }

@@ -1,7 +1,7 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.TestHelpers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +9,9 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -95,7 +97,7 @@ public class SystemControllerTest {
         ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE, // this is TASK bc one task?
                 HttpMethod.DELETE,
-                actAsOtherUser(null, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(null, sampleUsers[0]),
                 Task[].class,
                 task.getId());
 
@@ -110,7 +112,7 @@ public class SystemControllerTest {
         ResponseEntity<SystemUpdates> response = this.restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
-                actAsOtherUser(null, sampleUsers[0], eTag),
+                TestHelpers.actAsOtherUser(null, sampleUsers[0], eTag),
                 SystemUpdates.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -127,7 +129,7 @@ public class SystemControllerTest {
         ResponseEntity<SystemUpdates> response = this.restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
-                actAsOtherUser(null, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(null, sampleUsers[0]),
                 SystemUpdates.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -173,7 +175,7 @@ public class SystemControllerTest {
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
-                actAsOtherUser(task, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(task, sampleUsers[0]),
                 Task.class,
                 project.getId());
 
@@ -191,7 +193,7 @@ public class SystemControllerTest {
         ResponseEntity<Group> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
                 HttpMethod.POST,
-                actAsOtherUser(group, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(group, sampleUsers[0]),
                 Group.class);
         Group created = response.getBody();
 
@@ -210,7 +212,7 @@ public class SystemControllerTest {
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
-                actAsOtherUser(project, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(project, sampleUsers[0]),
                 Project.class);
         Project created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -222,19 +224,6 @@ public class SystemControllerTest {
         assertEquals("Michael_Zhou", created.getGroup().getOwner());
         assertEquals("d15", created.getDescription());
         return created;
-    }
-
-    private <T> HttpEntity actAsOtherUser(T body, String username, String... eTags) {
-        final HttpHeaders headers = new HttpHeaders();
-        headers.set(UserClient.USER_NAME_KEY, username);
-
-        if (eTags.length > 0)
-            headers.setIfNoneMatch(eTags[0]);
-
-        if (body == null)
-            return new HttpEntity<>(headers);
-
-        return new HttpEntity<>(body, headers);
     }
 
     private ZonedDateTime getDueDateTime(ZonedDateTime startTime, Integer after, int amount, ChronoUnit unit) {

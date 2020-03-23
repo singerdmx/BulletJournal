@@ -1,7 +1,7 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.hierarchy.HierarchyProcessorProcessorTest;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.JoinGroupEvent;
@@ -12,7 +12,10 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -429,13 +432,6 @@ public class ProjectControllerTest {
                 note.getProjectId());
         Note[] notes = getResponse.getBody();
         assertEquals(0, notes.length);
-    }
-
-    private HttpEntity actAsOtherUser(String username) {
-        final HttpHeaders headers = new HttpHeaders();
-        headers.set(UserClient.USER_NAME_KEY, username);
-
-        return new HttpEntity<>(headers);
     }
 
     private void createTasks(Project project, Project projectToMoveTo, List<Label> labels) {
@@ -965,7 +961,7 @@ public class ProjectControllerTest {
         notificationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
                 HttpMethod.GET,
-                actAsOtherUser(sampleUsers[0]),
+                TestHelpers.actAsOtherUser(null, sampleUsers[0]),
                 Notification[].class);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
         notifications = Arrays.asList(notificationsResponse.getBody());
