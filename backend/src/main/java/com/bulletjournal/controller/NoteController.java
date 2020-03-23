@@ -66,12 +66,14 @@ public class NoteController {
     }
 
     @DeleteMapping(NOTE_ROUTE)
-    public void deleteNote(@NotNull @PathVariable Long noteId) {
+    public ResponseEntity<List<Note>> deleteNote(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        Note note = getNote(noteId);
         List<Event> events = this.noteDaoJpa.deleteNote(username, noteId);
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveNoteEvent(events, username));
         }
+        return getNotes(note.getProjectId());
     }
 
     @PutMapping(NOTES_ROUTE)

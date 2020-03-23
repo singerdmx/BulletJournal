@@ -413,11 +413,11 @@ public class ProjectControllerTest {
 
     private void deleteNote(Note note) {
 
-        ResponseEntity<Note> response = this.restTemplate.exchange(
+        ResponseEntity<Note[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
                 HttpMethod.DELETE,
                 null,
-                Note.class,
+                Note[].class,
                 note.getId());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
