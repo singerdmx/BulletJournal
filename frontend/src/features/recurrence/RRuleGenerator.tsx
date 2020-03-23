@@ -29,7 +29,6 @@ class ReactRRuleGenerator extends React.Component<RRuleGeneratorProps> {
         <div className='rrule-end'>
           <End />
         </div>
-        <div>{this.props.rRuleString}</div>
       </div>
     );
   }
