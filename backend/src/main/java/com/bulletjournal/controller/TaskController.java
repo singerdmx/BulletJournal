@@ -105,12 +105,14 @@ public class TaskController {
     }
 
     @DeleteMapping(TASK_ROUTE)
-    public void deleteTask(@NotNull @PathVariable Long taskId) {
+    public ResponseEntity<List<Task>> deleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        Task task = getTask(taskId);
         List<Event> events = this.taskDaoJpa.deleteTask(username, taskId);
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
+        return getTasks(task.getProjectId());
     }
 
     @PutMapping(TASK_SET_LABELS_ROUTE)

@@ -7,7 +7,6 @@ import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { updateStartString } from './actions';
 import './rrules.styles.less';
-import { TimePicker } from 'antd';
 
 type RRuleGeneratorProps = {
   start: any;

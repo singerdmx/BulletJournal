@@ -92,11 +92,11 @@ public class SystemControllerTest {
     }
 
     private void deleteTask(Task task) {
-        ResponseEntity<Task> response = this.restTemplate.exchange(
+        ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE, // this is TASK bc one task?
                 HttpMethod.DELETE,
                 actAsOtherUser(null, sampleUsers[0]),
-                Task.class,
+                Task[].class,
                 task.getId());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
