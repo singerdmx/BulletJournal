@@ -165,7 +165,7 @@ const AddTask: React.FC<RouteComponentProps &
             </Radio.Group>
             <div style={{ display: 'flex' }}>
               <div style={{ display: 'flex', flex: 1 }}>
-                <Tooltip title="Select Due Date">
+                <Tooltip title="Select Due Date" placement='bottom'>
                   <Form.Item name="DueDate" style={{ width: '100%' }}>
                     <DatePicker
                       allowClear={true}
@@ -177,7 +177,7 @@ const AddTask: React.FC<RouteComponentProps &
                   </Form.Item>
                 </Tooltip>
                 {dueTimeVisible && (
-                  <Tooltip title="Select Due Time">
+                  <Tooltip title="Select Due Time" placement='bottom'>
                     <Form.Item name="DueTime" style={{ width: '210px' }}>
                       <TimePicker
                         allowClear={true}
@@ -190,7 +190,7 @@ const AddTask: React.FC<RouteComponentProps &
                 )}
               </div>
               <Form.Item style={{ flex: 1 }}>
-                <Tooltip title={rRuleText}>
+                <Tooltip title={rRuleText}  placement='bottom'>
                   <Popover
                     content={<ReactRRuleGenerator />}
                     title={
@@ -232,7 +232,7 @@ const AddTask: React.FC<RouteComponentProps &
               label="Time Zone and Duration"
               style={{ marginBottom: 0 }}
             >
-              <Tooltip title="Time Zone">
+              <Tooltip title="Time Zone" placement='bottom'>
                 <Form.Item
                   name="timezone"
                   style={{ display: 'inline-block', width: '70%' }}
@@ -294,7 +294,7 @@ const AddTask: React.FC<RouteComponentProps &
                 </Select>
               </Form.Item>
               <div style={{ display: 'flex' }}>
-                <Tooltip title="Reminder Date">
+                <Tooltip title="Reminder Date" placement='bottom'>
                   <Form.Item name="reminderDate">
                     <DatePicker
                       placeholder="Date"
@@ -311,7 +311,7 @@ const AddTask: React.FC<RouteComponentProps &
                   </Form.Item>
                 </Tooltip>
                 {reminderTimeVisible && (
-                  <Tooltip title="Reminder Time">
+                  <Tooltip title="Reminder Time" placement='bottom'>
                     <Form.Item name="reminderTime" style={{ width: '100px' }}>
                       <TimePicker
                         allowClear={true}
