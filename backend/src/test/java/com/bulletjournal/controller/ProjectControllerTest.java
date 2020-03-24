@@ -385,14 +385,13 @@ public class ProjectControllerTest {
                 n1.getId());
         Note[] nList = response.getBody();
         Note changedNote = new Note();
-        for(int i = 0; i < nList.length; i++){
-            if(nList[i].getName().equals(noteName)){
+        for (int i = 0; i < nList.length; i++) {
+            if (nList[i].getName().equals(noteName)) {
                 changedNote = nList[i];
             }
         }
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(noteName, changedNote.getName());
-        return;
     }
 
     private void updateNoteRelations(Project project, Note note1, Note note2, Note note3) {
