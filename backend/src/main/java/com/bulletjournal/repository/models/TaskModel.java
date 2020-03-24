@@ -1,11 +1,14 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.utils.LongArrayType;
 import com.google.common.base.Preconditions;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -26,7 +29,7 @@ import java.util.List;
 })
 @MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskModel.class);
     @NotBlank
     @Size(min = 2, max = 100)
     @Column(name = "assigned_to", length = 100)
@@ -171,6 +174,10 @@ public abstract class TaskModel extends ProjectItemModel {
         Preconditions.checkNotNull(reminderSetting, "ReminderSetting cannot be null");
         Preconditions.checkNotNull(this.getTimezone(), "Timezone cannot be null");
 
+        if (!reminderSetting.hasBefore() && !reminderSetting.hasDate()) {
+            LOGGER.info("User did not specify Reminder Date, Set to no reminder");
+            reminderSetting.setBefore(Before.NONE.getValue());
+        }
         if (reminderSetting.hasBefore()) {
             this.setReminderBeforeTask(reminderSetting.getBefore());
             if (this.getStartTime() != null) {
