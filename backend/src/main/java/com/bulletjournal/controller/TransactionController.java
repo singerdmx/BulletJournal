@@ -52,8 +52,7 @@ public class TransactionController {
         ZonedDateTime startTime = startEndTime.getLeft();
         ZonedDateTime endTime = startEndTime.getRight();
 
-        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(
-                projectId, startTime, endTime);
+        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId, startTime, endTime);
 
         String transactionsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, transactions);
@@ -113,7 +112,7 @@ public class TransactionController {
 
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
     public Transaction setLabels(@NotNull @PathVariable Long transactionId,
-                          @NotNull @RequestBody List<Long> labels) {
+                                 @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.notificationService.inform(this.transactionDaoJpa.setLabels(username, transactionId, labels));
         return getTransaction(transactionId);
@@ -121,7 +120,7 @@ public class TransactionController {
 
     @PostMapping(MOVE_TRANSACTION_ROUTE)
     public void moveTransaction(@NotNull @PathVariable Long transactionId,
-                         @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+                                @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
     }
