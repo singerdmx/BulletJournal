@@ -3,8 +3,8 @@ import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Tree} from 'antd';
-import TreeItem  from '../project-item/note-item.component';
-import {deleteNote, putNote, updateNotes} from '../../features/notes/actions';
+import TreeItem from '../project-item/note-item.component';
+import {deleteNote, putNote, updateNotes, moveNote} from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
 import {IState} from '../../store';
 import './note-tree.component.styles.less';
@@ -12,7 +12,8 @@ import './note-tree.component.styles.less';
 type NotesProps = {
     notes: Note[];
     projectId: number,
-    deleteNote: (NoteId: number) => void;
+    deleteNote: (noteId: number) => void;
+    moveNote: (noteId: number, targetProject: number) => void;
     updateNotes: (projectId: number) => void;
     putNote: (projectId: number, notes: Note[]) => void;
 };
@@ -21,17 +22,21 @@ const getTree = (
     data: Note[],
     name: string,
     index: number,
-    deleteNode: (id: number) => any
+    deleteNode: (id: number) => any,
+    moveNote: (id: number, targetProject: number) => any
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Note) => {
         const node = {} as TreeNodeNormal;
         if (item.subNotes && item.subNotes.length) {
-            node.children = getTree(item.subNotes, item.name, index, deleteNode);
+            node.children = getTree(item.subNotes, item.name, index, deleteNode, moveNote);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
-        node.title = <TreeItem name={item.name} id={item.id} onDelete={deleteNode} onEdit={()=>{}}/>;
+        node.title = <TreeItem name={item.name} id={item.id}
+                               onDelete={deleteNode}
+                               onEdit={() => {}}
+                               onMove={moveNote}/>;
         node.key = item.id.toString();
         res.push(node);
     });
@@ -114,13 +119,13 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (info: a
 };
 
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
-    const {projectId, notes, putNote, updateNotes, deleteNote } = props;
+    const {projectId, notes, putNote, updateNotes, deleteNote, moveNote} = props;
     useEffect(() => {
         if (projectId) {
             updateNotes(projectId);
         }
     }, [projectId]);
-    let treeNote = getTree(notes, `project${projectId}`, projectId, deleteNote);
+    let treeNote = getTree(notes, `project${projectId}`, projectId, deleteNote, moveNote);
 
     return (<Tree
         className="ant-tree"
@@ -139,5 +144,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
     deleteNote,
     updateNotes,
-    putNote
+    putNote,
+    moveNote
 })(withRouter(NoteTree));

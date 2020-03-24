@@ -41,6 +41,11 @@ export type SetNoteLabels = {
   labels: number[]
 }
 
+export type MoveNote = {
+  noteId: number,
+  targetProject: number
+}
+
 let initialState = {
   notes: [] as Array<Note>
 };
@@ -67,6 +72,7 @@ const slice = createSlice({
     NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
     NotePatch: (state, action: PayloadAction<PatchNote>) => state,
     NoteSetLabels: (state, action: PayloadAction<SetNoteLabels>) => state,
+    NoteMove: (state, action: PayloadAction<MoveNote>) => state,
   }
 });
 

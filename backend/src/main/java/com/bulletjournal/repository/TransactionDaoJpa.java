@@ -11,7 +11,10 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.ProjectItemModel;
+import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,12 +43,15 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
     public JpaRepository getJpaRepository() {
         return transactionRepository;
     }
+
     /**
-     * Get transactions list from project
+     * Retrieve transactions list from project within the range
      * <p>
      * Parameter:
      *
-     * @projectId Long - Project identifier to retrieve project from project repository
+     * @param projectId - Project identifier to retrieve project from project repository
+     * @param startTime - Range start time
+     * @param endTime - Range end time
      * @retVal List<Transaction> - List of transaction
      */
     public List<com.bulletjournal.controller.models.Transaction> getTransactions(
@@ -54,7 +60,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
-        return this.transactionRepository.findTransactionsByProject(project)
+        return this.transactionRepository
+                .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
                 .stream()
                 .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
                 .map(transaction -> {
@@ -70,8 +77,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
      * <p>
      * Parameter:
      *
-     * @id Long - Transaction identifier to retrieve transaction from ledger repository
-     * @retVal Transaction - Transaction object
+     * @param id - Transaction identifier to retrieve transaction from ledger repository
+     * @retVal a Transaction object
      */
     public com.bulletjournal.controller.models.Transaction getTransaction(Long id) {
         Transaction transaction = (Transaction) this.getProjectItem(id);
@@ -84,10 +91,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
      * <p>
      * Parameter:
      *
-     * @projectId Long - Transaction identifier to retrieve transaction from ledger repository
-     * @startTime ZoneDateTime - Start Time to retrieve transaction from ledger repository
-     * @endTime ZoneDateTime - End Time to retrieve transaction from ledger repository
-     * @retVal Transaction - Transaction object
+     * @param payer - Payer identifier to retrieve transaction from ledger repository
+     * @param startTime - Start Time to retrieve transaction from ledger repository
+     * @param endTime - End Time to retrieve transaction from ledger repository
+     * @retVal List of Transaction
      */
     public List<Transaction> getTransactionsBetween(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
         return this.transactionRepository.findTransactionsOfPayerBetween(payer,

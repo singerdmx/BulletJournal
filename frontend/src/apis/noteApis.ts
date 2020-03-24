@@ -42,7 +42,7 @@ export const putNotes = (projectId: number, notes: Note[]) => {
     .catch(err => {
       throw Error(err.message);
     });
-}
+};
 
 export const updateNote = (
   noteId: number,
@@ -65,4 +65,15 @@ export const setNoteLabels = (noteId: number, labels: number[]) => {
     .catch(err => {
       throw Error(err.message);
     });
-}
+};
+
+export const moveToTargetProject = (noteId: number, targetProject: number) => {
+    const postBody = JSON.stringify({
+        targetProject: targetProject
+    });
+    return doPost(`/api/notes/${noteId}/move`, postBody)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err);
+        });
+};
