@@ -207,6 +207,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskUncomplete.type, uncompleteTask),
     yield takeLatest(tasksActions.TaskDelete.type, deleteTask),
     yield takeLatest(tasksActions.TaskSetLabels.type, taskSetLabels),
+    yield takeLatest(tasksActions.TaskMove.type, moveTask),
     yield takeLatest(
       tasksActions.CompletedTasksUpdate.type,
       completedTasksUpdate
