@@ -8,6 +8,8 @@ import {
   MonthlyOnThe,
   Weekly
 } from './interface';
+import { End } from './reducer';
+import RRule from 'rrule';
 
 export const updateStartString = (startDate: string, startTime: string) =>
   actions.updateStart({
@@ -76,3 +78,15 @@ export const updateMonthlyOn = (monthlyOn: boolean) =>
 
 export const updateYearlyOn = (yearlyOn: boolean) =>
   actions.updateYearlyOn({ yearlyOn: yearlyOn });
+
+export const convertToTextWithTime = (start: any, repeat: any, end: End) => {
+  let resultString = '';
+  const rRuleFirstPart = new RRule({
+    ...start,
+    ...repeat,
+    ...end
+  });
+  resultString = rRuleFirstPart.toText();
+
+  return resultString.charAt(0).toUpperCase() + resultString.slice(1);
+};

@@ -73,7 +73,8 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       dueTime,
       duration,
       reminderSetting,
-      recurrenceRule
+      recurrenceRule,
+      timezone
     } = action.payload;
     const data = yield call(
       createTask,
@@ -81,6 +82,7 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       name,
       assignedTo,
       reminderSetting,
+      timezone,
       dueDate,
       dueTime,
       duration,

@@ -18,6 +18,7 @@ export type CreateTask = {
   dueTime?: string;
   duration?: number;
   recurrenceRule?: string;
+  timezone: string;
 };
 
 export type GetTask = {

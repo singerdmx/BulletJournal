@@ -72,14 +72,16 @@ const AddTransaction: React.FC<RouteComponentProps &
     //convert time object to format string
     const date_value = values.date.format('YYYY-MM-DD');
     const time_value = values.time ? values.time.format('HH:mm') : undefined;
+    const payerName = values.payerName ? values.payerName : props.myself;
+    const timezone = values.timezone ? values.timezone : props.timezone;
     props.createTransaction(
       props.project.id,
       values.amount,
       values.transactionName,
-      values.payerName ? values.payerName : props.myself,
+      payerName,
       date_value,
       values.transactionType,
-      values.timezone ? values.timezone : props.timezone,
+      timezone,
       time_value
     );
     setVisible(false);
