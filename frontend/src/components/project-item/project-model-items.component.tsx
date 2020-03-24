@@ -49,7 +49,7 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
         <List>
         {items.notes.map(item=>{
             return (<List.Item key={item.id}>
-                        <NoteItem name={item.name} id={item.id} onDelete={()=>{}} onEdit={()=>{}}/>
+                        <NoteItem name={item.name} id={item.id} onDelete={()=>{}} onEdit={()=>{}} onMove={()=>{}}/>
                     </List.Item>);
         })}
         </List>
