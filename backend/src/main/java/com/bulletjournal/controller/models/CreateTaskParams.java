@@ -22,6 +22,8 @@ public class CreateTaskParams {
 
     private ReminderSetting reminderSetting;
 
+    @NotBlank
+    @Size(min = 1, max = 100)
     private String timezone;
 
     private String recurrenceRule;
@@ -35,7 +37,7 @@ public class CreateTaskParams {
                             String dueTime,
                             Integer duration,
                             ReminderSetting reminderSetting,
-                            String timezone,
+                            @NotBlank @Size(min = 1, max = 100) String timezone,
                             String recurrenceRule) {
         this.name = name;
         this.assignedTo = assignedTo;
