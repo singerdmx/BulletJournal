@@ -60,7 +60,7 @@ public class TransactionController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(transactionsEtag);
 
-        LedgerSummary ledgerSummary = new LedgerSummary(transactions);
+        LedgerSummary ledgerSummary = new LedgerSummary(transactions, null, null);
         switch (ledgerSummaryType) {
             case DEFAULT:
                 break;

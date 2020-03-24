@@ -14,15 +14,17 @@ public class LedgerSummary {
 
     private List<TransactionsSummary> transactionsSummaries;
 
-    private String startDate;
+    private String startDate; // "yyyy-MM-dd"
 
-    private String endDate;
+    private String endDate; // "yyyy-MM-dd"
 
     public LedgerSummary() {
     }
 
-    public LedgerSummary(List<Transaction> transactions) {
+    public LedgerSummary(List<Transaction> transactions, String startDate, String endDate) {
         this.transactions = transactions;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public String getStartDate() {
