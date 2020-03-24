@@ -266,5 +266,4 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getRecurrenceRule());
     }
 
-    public abstract Long getId();
 }

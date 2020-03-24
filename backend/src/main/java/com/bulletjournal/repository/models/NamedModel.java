@@ -20,4 +20,7 @@ public abstract class NamedModel extends AuditModel {
     public void setName(String name) {
         this.name = name;
     }
+
+    public abstract Long getId();
+
 }
