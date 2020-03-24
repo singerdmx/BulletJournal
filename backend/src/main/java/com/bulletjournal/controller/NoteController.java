@@ -59,10 +59,11 @@ public class NoteController {
     }
 
     @PatchMapping(NOTE_ROUTE)
-    public Note updateNote(@NotNull @PathVariable Long noteId,
+    public ResponseEntity<List<Note>> updateNote(@NotNull @PathVariable Long noteId,
                            @Valid @RequestBody UpdateNoteParams updateNoteParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
+        Note note = this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
+        return getNotes(note.getProjectId());
     }
 
     @DeleteMapping(NOTE_ROUTE)

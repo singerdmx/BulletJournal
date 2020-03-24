@@ -372,21 +372,27 @@ public class ProjectControllerTest {
         return outputNote;
     }
 
-    private Note updateNote(Note n1) {
+    private void updateNote(Note n1) {
         // update project name from "P0" to "P1"
         String noteName = "test111";
         UpdateNoteParams updateNoteParams = new UpdateNoteParams();
         updateNoteParams.setName(noteName);
-        ResponseEntity<Note> response = this.restTemplate.exchange(
+        ResponseEntity<Note[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NoteController.NOTE_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateNoteParams),
-                Note.class,
+                Note[].class,
                 n1.getId());
-        n1 = response.getBody();
+        Note[] nList = response.getBody();
+        Note changedNote = new Note();
+        for(int i = 0; i < nList.length; i++){
+            if(nList[i].getName().equals(noteName)){
+                changedNote = nList[i];
+            }
+        }
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(noteName, n1.getName());
-        return n1;
+        assertEquals(noteName, changedNote.getName());
+        return;
     }
 
     private void updateNoteRelations(Project project, Note note1, Note note2, Note note3) {
