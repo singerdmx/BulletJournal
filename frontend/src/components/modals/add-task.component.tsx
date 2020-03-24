@@ -85,17 +85,27 @@ const AddTask: React.FC<RouteComponentProps &
   const [remindButton, setRemindButton] = useState('remindBefore');
   const addTask = (values: any) => {
     //convert time object to string
-    const dueDate = values.dueDate.format('YYYY-MM-DD');
+    const dueDate = values.dueDate
+      ? values.dueDate.format('YYYY-MM-DD')
+      : undefined;
     const dueTime = values.dueTime ? values.dueTime.format('HH:mm') : undefined;
     const assignee = values.assignee ? values.assignee : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;
-    const reminderSetting = {
-      date: '',
-      time: '',
-      before: props.before
+    let reminderSetting = {
+      date: values.reminderDate
+        ? values.reminderDate.format('YYYY-MM-DD')
+        : undefined,
+      time: values.reminderTime
+        ? values.reminderTime.format('HH:mm')
+        : undefined,
+      before: props.before ? props.before : 0
     } as ReminderSetting;
-    if (values.reminderDate) reminderSetting.date = values.reminderDate;
-    if (values.reminderTime) reminderSetting.time = values.reminderTime;
+    if (reminderType === 'remindBefore') {
+      reminderSetting.date = undefined;
+      reminderSetting.time = undefined;
+    } else {
+      reminderSetting.before = undefined;
+    }
     props.createTask(
       props.projectId,
       values.taskName,
@@ -238,7 +248,7 @@ const AddTask: React.FC<RouteComponentProps &
                           padding: '0.5em'
                         }}
                       >
-                        <div className="recurrence-title">
+                        <div className='recurrence-title'>
                           <div>{rRuleTextList && rRuleTextList[0]}</div>
                           {rRuleTextList &&
                             rRuleTextList.length > 1 &&
