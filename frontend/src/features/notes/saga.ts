@@ -24,8 +24,8 @@ function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
 
 function* notesUpdate(action: PayloadAction<UpdateNotes>) {
   try {
-    const notes = yield call(fetchNotes, action.payload.projectId);
-
+    const data = yield call(fetchNotes, action.payload.projectId);
+    const notes = yield data.json();
     yield put(
         notesActions.notesReceived({
         notes: notes
@@ -83,10 +83,11 @@ function* noteSetLabels(action: PayloadAction<SetNoteLabels>) {
 function* noteDelete(action: PayloadAction<DeleteNote>){
   try{
     const { noteId }  = action.payload;
-    const data = yield call(deleteNoteById, noteId)
+    const data = yield call(deleteNoteById, noteId);
+    const notes = yield data.json();
     yield put(
       notesActions.notesReceived({
-      notes: data
+      notes: notes
     })
   );
   } catch(error) {
