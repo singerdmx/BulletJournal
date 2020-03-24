@@ -12,7 +12,8 @@ export const createTask = (
   dueTime: string,
   duration: number,
   reminderSetting: ReminderSetting,
-  recurrenceRule: string
+  recurrenceRule: string,
+  timezone: string
 ) =>
   actions.TasksCreate({
     projectId: projectId,
@@ -22,7 +23,8 @@ export const createTask = (
     dueTime: dueTime,
     duration: duration,
     reminderSetting: reminderSetting,
-    recurrenceRule: recurrenceRule
+    recurrenceRule: recurrenceRule,
+    timezone: timezone
   });
 export const putTask = (projectId: number, tasks: Task[]) =>
   actions.TaskPut({ projectId: projectId, tasks: tasks });

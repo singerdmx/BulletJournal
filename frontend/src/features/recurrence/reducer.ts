@@ -111,7 +111,7 @@ let initialState = {
   } as Weekly,
   start: {},
   repeat: {},
-  end: {},
+  end: {} as End,
   rRuleString: ''
 };
 
@@ -129,8 +129,7 @@ const slice = createSlice({
           new Date(startDate + 'T' + startTime + ':00+00:00')
         ).toDate()
       };
-      console.log('start');
-      console.log(start);
+
       state.start = start;
       state.rRuleString = new RRule({
         ...start,
