@@ -85,17 +85,27 @@ const AddTask: React.FC<RouteComponentProps &
   const [remindButton, setRemindButton] = useState('remindBefore');
   const addTask = (values: any) => {
     //convert time object to string
-    const dueDate = values.dueDate.format('YYYY-MM-DD');
+    const dueDate = values.dueDate
+      ? values.dueDate.format('YYYY-MM-DD')
+      : undefined;
     const dueTime = values.dueTime ? values.dueTime.format('HH:mm') : undefined;
     const assignee = values.assignee ? values.assignee : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;
-    const reminderSetting = {
-      date: '',
-      time: '',
-      before: props.before
+    let reminderSetting = {
+      date: values.reminderDate
+        ? values.reminderDate.format('YYYY-MM-DD')
+        : undefined,
+      time: values.reminderTime
+        ? values.reminderTime.format('HH:mm')
+        : undefined,
+      before: props.before ? props.before : 0
     } as ReminderSetting;
-    if (values.reminderDate) reminderSetting.date = values.reminderDate;
-    if (values.reminderTime) reminderSetting.time = values.reminderTime;
+    if (reminderType === 'remindBefore') {
+      reminderSetting.date = undefined;
+      reminderSetting.time = undefined;
+    } else {
+      reminderSetting.before = undefined;
+    }
     props.createTask(
       props.projectId,
       values.taskName,
@@ -123,7 +133,8 @@ const AddTask: React.FC<RouteComponentProps &
   rRuleText =
     rRuleText === 'Every year'
       ? 'Recurrence'
-      : (rRuleText += ' starting at ' + props.startDate + ' ' + props.startTime);
+      : (rRuleText +=
+          ' starting at ' + props.startDate + ' ' + props.startTime);
   // split string by n words including marks like space , - : n is setting by {0, n} which is {0, 5} right now
   const rRuleTextList = rRuleText.match(
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
@@ -237,9 +248,10 @@ const AddTask: React.FC<RouteComponentProps &
                           padding: '0.5em'
                         }}
                       >
-                        <div className="recurrence-title">
+                        <div className='recurrence-title'>
                           <div>{rRuleTextList && rRuleTextList[0]}</div>
-                          {rRuleTextList && rRuleTextList.length > 1 &&
+                          {rRuleTextList &&
+                            rRuleTextList.length > 1 &&
                             rRuleTextList
                               .slice(1)
                               .map(text => <div>{text}</div>)}
