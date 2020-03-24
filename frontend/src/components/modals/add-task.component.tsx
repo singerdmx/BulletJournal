@@ -216,7 +216,7 @@ const AddTask: React.FC<RouteComponentProps &
                       >
                         <div
                           style={{
-                            width: 100,
+                            maxWidth: 400,
                             overflow: 'hidden',
                             whiteSpace: 'nowrap',
                             textOverflow: 'ellipsis'
