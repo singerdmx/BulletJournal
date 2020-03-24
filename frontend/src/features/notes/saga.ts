@@ -17,7 +17,8 @@ import {
   createNote,
   deleteNoteById,
   fetchNotes,
-  getNoteById, moveToTargetProject,
+  getNoteById,
+  moveToTargetProject,
   putNotes,
   setNoteLabels,
   updateNote
@@ -44,8 +45,9 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
 
 function* noteCreate(action: PayloadAction<CreateNote>) {
   try {
-    yield call(createNote, action.payload.projectId, action.payload.name);
-    yield put(updateNotes(action.payload.projectId));
+    const {projectId, name} = action.payload;
+    yield call(createNote, projectId, name);
+    yield put(updateNotes(projectId));
   } catch (error) {
     yield call(message.error, `Note Error Received: ${error}`);
   }
