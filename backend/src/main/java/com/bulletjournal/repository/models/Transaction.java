@@ -16,7 +16,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "transactions",
-        indexes = {@Index(name = "transaction_payer_interval_index", columnList = "payer, start_time, end_time")})
+        indexes = {
+                @Index(name = "transaction_payer_interval_index", columnList = "payer, start_time, end_time"),
+                @Index(name = "transaction_project_interval_index", columnList = "project_id, start_time, end_time")})
 public class Transaction extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "transaction_generator")
