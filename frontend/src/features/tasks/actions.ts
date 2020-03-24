@@ -54,3 +54,5 @@ export const uncompleteTask = (taskId: number) =>
   actions.TaskUncomplete({ taskId: taskId });
 export const setTaskLabels = (taskId: number, labels: number[]) =>
   actions.TaskSetLabels({ taskId: taskId, labels: labels });
+export const moveTask = (taskId: number, targetProject: number) =>
+  actions.TaskMove({ taskId: taskId, targetProject: targetProject });

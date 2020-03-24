@@ -38,6 +38,11 @@ export type DeleteTask = {
   taskId: number;
 };
 
+export type MoveTask = {
+  taskId: number;
+  targetProject: number;
+};
+
 export type PatchTask = {
   taskId: number;
   name?: string;
@@ -93,7 +98,8 @@ const slice = createSlice({
     TaskPatch: (state, action: PayloadAction<PatchTask>) => state,
     TaskComplete: (state, action: PayloadAction<CompleteTask>) => state,
     TaskUncomplete: (state, action: PayloadAction<UncompleteTask>) => state,
-    TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state
+    TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state,
+    TaskMove: (state, action: PayloadAction<MoveTask>) => state
   }
 });
 

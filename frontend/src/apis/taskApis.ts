@@ -114,3 +114,14 @@ export const setTaskLabels = (taskId: number, labels: number[]) => {
       throw Error(err.message);
     });
 };
+
+export const moveToTargetProject = (taskId: number, targetProject: number) => {
+  const postBody = JSON.stringify({
+    targetProject: targetProject
+  });
+  return doPost(`/api/tasks/${taskId}/move`, postBody)
+    .then(res => res)
+    .catch(err => {
+      throw Error(err);
+    });
+};

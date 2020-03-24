@@ -8,6 +8,7 @@ import {
   PutTask,
   GetTask,
   PatchTask,
+  MoveTask,
   CompleteTask,
   UncompleteTask,
   SetTaskLabels
@@ -23,7 +24,8 @@ import {
   completeTaskById,
   deleteTaskById,
   uncompleteTaskById,
-  setTaskLabels
+  setTaskLabels,
+  moveToTargetProject
 } from '../../apis/taskApis';
 import { updateTasks } from './actions';
 
@@ -177,6 +179,16 @@ function* deleteTask(action: PayloadAction<CompleteTask>) {
     yield call(deleteTaskById, taskId);
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
+  }
+}
+
+function* moveTask(action: PayloadAction<MoveTask>) {
+  try {
+    const { taskId, targetProject } = action.payload;
+    yield call(moveToTargetProject, taskId, targetProject);
+    yield call(message.success, "Task moved successfully");
+  } catch (error) {
+    yield call(message.error, `moveTask Error Received: ${error}`);
   }
 }
 
