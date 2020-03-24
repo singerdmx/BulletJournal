@@ -105,7 +105,10 @@ const AddTask: React.FC<RouteComponentProps &
     rRuleString === 'every year'
       ? 'Recurrence'
       : rRuleString.charAt(0).toUpperCase() + rRuleString.slice(1);
-
+  // split string by n words including marks like space , - : n is setting by {0, n} which is {0, 5} right now
+  const rRuleTextList = rRuleText.match(
+    /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
+  );
   return (
     <Tooltip placement="top" title="Create New Task">
       <div className="add-task">
@@ -209,14 +212,18 @@ const AddTask: React.FC<RouteComponentProps &
                     title={
                       <div
                         style={{
-                          display : 'flex',
-                          justifyContent : 'space-between',
+                          display: 'flex',
+                          justifyContent: 'space-between',
                           alignItems: 'center',
                           padding: '0.5em'
                         }}
                       >
                         <div className="recurrence-title">
-                          {rRuleText}
+                          <div>{rRuleTextList && rRuleTextList[0]}</div>
+                          {rRuleTextList &&
+                            rRuleTextList
+                              .slice(1)
+                              .map(text => <div>{text}</div>)}
                         </div>
                         <Button
                           onClick={() => setRecurrenceVisible(false)}
