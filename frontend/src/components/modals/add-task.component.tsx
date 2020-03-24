@@ -26,6 +26,9 @@ import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
 import RRule from 'rrule';
+
+import './modals.styles.less';
+
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -209,19 +212,10 @@ const AddTask: React.FC<RouteComponentProps &
                           display : 'flex',
                           justifyContent : 'space-between',
                           alignItems: 'center',
-                          padding: '0.5em',
-                          fontWeight: 500,
-                          fontSize: 18
+                          padding: '0.5em'
                         }}
                       >
-                        <div
-                          style={{
-                            width: 100,
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis'
-                          }}
-                        >
+                        <div className="recurrence-title">
                           {rRuleText}
                         </div>
                         <Button
