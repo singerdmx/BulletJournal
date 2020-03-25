@@ -28,7 +28,8 @@ public class ZonedDateTimeHelper {
     }
 
     private static String aggregateDate(int year, int month, int day) {
-        return year + "-" + month + "-" + day;
+        return year + "-" + convertSingleDigitToTwoDigits(month) + "-"
+                + convertSingleDigitToTwoDigits(day);
     }
     /*
      * Return ZoneDateTime type for start time. If time is null, will replace time with 00:00.
