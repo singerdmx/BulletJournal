@@ -8,30 +8,32 @@ import {
   MessageOutlined,
   MoreOutlined
 } from '@ant-design/icons';
+import { deleteNote, moveNote } from '../../features/notes/actions';
+import {Note} from "../../features/notes/interface";
+import {connect} from "react-redux";
 
 import { Popover } from 'antd';
 
 type NoteProps = {
-  name: string;
-  id: number;
-  onDelete: (noteId: number) => void;
-  onEdit: (noteId: number) => void;
-  onMove: (noteId: number, targetProject: number) => void;
+  note: Note;
+  deleteNote: (noteId: number) => void;
+  // onEdit: (noteId: number) => void;
+  moveNote: (noteId: number, targetProject: number) => void;
 };
 
 const Content: React.FC<NoteProps> = props => {
-  const { name, id, onDelete, onEdit, onMove } = props;
+  const { note, deleteNote, moveNote } = props;
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div>
         Delete
-        <DeleteTwoTone twoToneColor="#f5222d" onClick={() => onDelete(id)} />
+        <DeleteTwoTone twoToneColor="#f5222d" onClick={() => deleteNote(note.id)} />
       </div>
       <div>
-        Edit <EditTwoTone onClick={() => onEdit(id)} />
+        Edit <EditTwoTone onClick={() => {}} />
       </div>
       <div>
-        Move <DragOutlined onClick={() => onMove(id, 14)} />
+        Move <DragOutlined onClick={() => moveNote(note.id, 14)} />
       </div>
     </div>
   );
@@ -42,7 +44,7 @@ const alignConfig = {
 };
 
 const NoteItem: React.FC<NoteProps> = props => {
-  const { name, id, onDelete, onEdit, onMove } = props;
+  const { note, deleteNote, moveNote } = props;
 
   return (
     <div
@@ -54,7 +56,7 @@ const NoteItem: React.FC<NoteProps> = props => {
       }}
     >
       <FormOutlined />
-      <span style={{ padding: '0 5px', height: '100%' }}>{name}</span>
+      <span style={{ padding: '0 5px', height: '100%' }}>{note.name}</span>
       <div
         style={{
           width: '300px',
@@ -76,11 +78,9 @@ const NoteItem: React.FC<NoteProps> = props => {
           title={null}
           content={
             <Content
-              name={''}
-              id={id}
-              onDelete={onDelete}
-              onEdit={onEdit}
-              onMove={onMove}
+              note={note}
+              deleteNote={deleteNote}
+              moveNote={moveNote}
             />
           }
           trigger="click"
@@ -94,4 +94,6 @@ const NoteItem: React.FC<NoteProps> = props => {
   );
 };
 
-export default NoteItem;
+export default connect(null, {deleteNote, moveNote})(
+  NoteItem
+);
