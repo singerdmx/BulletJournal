@@ -46,11 +46,11 @@ const NoteItem: React.FC<NoteProps> = props => {
             top: 0,
             right: 0,
             display: 'flex',
-            justifyContent: 'space-evenly',
+            justifyContent: 'flex-end',
             alignItems: 'center'
         }}>
-            <InfoCircleOutlined/>
-            <MessageOutlined/>
+            <InfoCircleOutlined style={{marginRight : '1em'}}/>
+            <MessageOutlined style={{marginRight : '1em'}}/>
             <Popover align={alignConfig} placement="bottomRight" style={{top: -10}} title={null} content={
                 <Content name={''} id={id} onDelete={onDelete} onEdit={onEdit} onMove={onMove}/>}
                      trigger="click">
