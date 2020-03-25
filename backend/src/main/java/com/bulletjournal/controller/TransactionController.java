@@ -35,7 +35,8 @@ public class TransactionController {
     protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
     protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/transactions/{transactionId}/addContent";
-    protected static final String GET_CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
+    protected static final String CONTENT_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}";
+    protected static final String CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -165,10 +166,25 @@ public class TransactionController {
                 new TransactionContent(createContentParams.getText())).toPresentationModel();
     }
 
-    @GetMapping(GET_CONTENTS_ROUTE)
+    @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.transactionDaoJpa.getContents(transactionId, username).stream()
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList());
+    }
+
+    @DeleteMapping(CONTENT_ROUTE)
+    public void deleteContent(@NotNull @PathVariable Long transactionId,
+                              @NotNull @PathVariable Long contentId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
+    }
+
+    @PostMapping(CONTENT_ROUTE)
+    public void updateContent(@NotNull @PathVariable Long transactionId,
+                              @NotNull @PathVariable Long contentId,
+                              @NotNull @RequestBody UpdateContentParams updateContentParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.transactionDaoJpa.updateContent(contentId, transactionId, username, updateContentParams);
     }
 }

@@ -1,11 +1,13 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SetLabelEvent;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
+import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,6 +37,35 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         content.setOwner(owner);
         this.getContentJpaRepository().save(content);
         return content;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public K getContent(Long contentId) {
+        return this.getContentJpaRepository().findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Content " + contentId + " not found"));
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> K updateContent(
+            Long contentId, Long projectItemId, String requester, UpdateContentParams updateContentParams) {
+        T projectItem = getProjectItem(projectItemId);
+        K content = getContent(contentId);
+        Preconditions.checkState(
+                Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
+                "ProjectItem ID mismatch");
+        content.setText(updateContentParams.getText());
+        this.getContentJpaRepository().save(content);
+        return content;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void deleteContent(Long contentId, Long projectItemId, String requester) {
+        T projectItem = getProjectItem(projectItemId);
+        K content = getContent(contentId);
+        Preconditions.checkState(
+                Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
+                "ProjectItem ID mismatch");
+        this.getContentJpaRepository().delete(content);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

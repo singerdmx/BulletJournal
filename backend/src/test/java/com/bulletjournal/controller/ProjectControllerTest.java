@@ -666,12 +666,26 @@ public class ProjectControllerTest {
         assertEquals(taskName, created.getName());
         assertEquals(project.getId(), created.getProjectId());
 
-        createTaskContent(created);
+        Content content = createTaskContent(created);
+        deleteTaskContent(created, content);
         return created;
     }
 
+    private void deleteTaskContent(Task task, Content content) {
+        ResponseEntity<?> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Void.class,
+                task.getId(),
+                content.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        getTaskContents(task, ImmutableList.of(), null);
+    }
+
     private Content createTaskContent(Task task) {
-        CreateContentParams createContentParams = new CreateContentParams("TEXT1");
+        String text = "TEXT1";
+        CreateContentParams createContentParams = new CreateContentParams(text);
         ResponseEntity<Content> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.ADD_CONTENT_ROUTE,
                 HttpMethod.POST,
@@ -682,15 +696,32 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
         assertEquals(expectedOwner, content.getOwner());
-        assertEquals("TEXT1", content.getText());
+        assertEquals(text, content.getText());
         assertNotNull(content.getId());
-        getTaskContents(task);
+        getTaskContents(task, ImmutableList.of(content), text);
+
+        text = "TEXT2";
+        UpdateContentParams updateContentParams = new UpdateContentParams(text);
+        ResponseEntity<Content> updateResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(updateContentParams),
+                Content.class,
+                task.getId(),
+                content.getId());
+        assertEquals(HttpStatus.OK, updateResponse.getStatusCode());
+        content = updateResponse.getBody();
+        assertEquals(expectedOwner, content.getOwner());
+        assertEquals(text, content.getText());
+        assertNotNull(content.getId());
+        getTaskContents(task, ImmutableList.of(content), text);
+
         return content;
     }
 
-    private void getTaskContents(Task task) {
+    private void getTaskContents(Task task, List<Content> expectedContents, String text) {
         ResponseEntity<Content[]> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TaskController.GET_CONTENTS_ROUTE,
+                ROOT_URL + randomServerPort + TaskController.CONTENTS_ROUTE,
                 HttpMethod.GET,
                 null,
                 Content[].class,
@@ -698,10 +729,12 @@ public class ProjectControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content[] contents = response.getBody();
-        assertEquals(1, contents.length);
-        assertEquals(expectedOwner, contents[0].getOwner());
-        assertEquals("TEXT1", contents[0].getText());
-        assertNotNull(contents[0].getId());
+        assertEquals(expectedContents.size(), contents.length);
+        for (int i = 0; i < contents.length; i++) {
+            assertEquals(expectedOwner, contents[i].getOwner());
+            assertEquals(text, contents[i].getText());
+            assertNotNull(contents[i].getId());
+        }
     }
 
     private Task updateTask(Task task, String assignedTo, String dueDate,

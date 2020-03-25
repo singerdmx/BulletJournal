@@ -35,7 +35,8 @@ public class TaskController {
     protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
-    protected static final String GET_CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
+    protected static final String CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}";
+    protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -151,10 +152,25 @@ public class TaskController {
                 .toPresentationModel();
     }
 
-    @GetMapping(GET_CONTENTS_ROUTE)
+    @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getContents(taskId, username).stream()
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList());
+    }
+
+    @DeleteMapping(CONTENT_ROUTE)
+    public void deleteContent(@NotNull @PathVariable Long taskId,
+                              @NotNull @PathVariable Long contentId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.deleteContent(contentId, taskId, username);
+    }
+
+    @PostMapping(CONTENT_ROUTE)
+    public Content updateContent(@NotNull @PathVariable Long taskId,
+                              @NotNull @PathVariable Long contentId,
+                              @NotNull @RequestBody UpdateContentParams updateContentParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams).toPresentationModel();
     }
 }

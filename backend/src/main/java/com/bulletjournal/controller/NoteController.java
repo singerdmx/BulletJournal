@@ -29,7 +29,8 @@ public class NoteController {
     protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/notes/{noteId}/addContent";
-    protected static final String GET_CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
+    protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
+    protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -117,10 +118,25 @@ public class NoteController {
                 .toPresentationModel();
     }
 
-    @GetMapping(GET_CONTENTS_ROUTE)
+    @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.noteDaoJpa.getContents(noteId, username).stream()
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList());
+    }
+
+    @DeleteMapping(CONTENT_ROUTE)
+    public void deleteContent(@NotNull @PathVariable Long noteId,
+                              @NotNull @PathVariable Long contentId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.deleteContent(contentId, noteId, username);
+    }
+
+    @PostMapping(CONTENT_ROUTE)
+    public void updateContent(@NotNull @PathVariable Long noteId,
+                              @NotNull @PathVariable Long contentId,
+                              @NotNull @RequestBody UpdateContentParams updateContentParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams);
     }
 }
