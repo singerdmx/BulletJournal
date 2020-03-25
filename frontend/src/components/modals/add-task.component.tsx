@@ -70,6 +70,7 @@ interface TaskCreateFormProps {
   end: any;
   startTime: string;
   startDate: string;
+  rRuleString: any;
 }
 
 const AddTask: React.FC<RouteComponentProps &
@@ -106,6 +107,7 @@ const AddTask: React.FC<RouteComponentProps &
     } else {
       reminderSetting.before = undefined;
     }
+    const recurrence = dueType === 'dueByRec' ? props.rRuleString : undefined;
     props.createTask(
       props.projectId,
       values.taskName,
@@ -114,7 +116,7 @@ const AddTask: React.FC<RouteComponentProps &
       dueTime,
       values.duration,
       reminderSetting,
-      values.recurrenceRule,
+      recurrence,
       timezone
     );
     setVisible(false);
@@ -399,7 +401,8 @@ const mapStateToProps = (state: IState) => ({
   before: state.settings.before,
   start: state.rRule.start,
   repeat: state.rRule.repeat,
-  end: state.rRule.end
+  end: state.rRule.end,
+  rRuleString: state.rRule.rRuleString
 });
 
 export default connect(mapStateToProps, {

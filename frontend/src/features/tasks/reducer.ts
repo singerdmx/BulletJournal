@@ -14,11 +14,11 @@ export type CreateTask = {
   name: string;
   assignedTo: string;
   reminderSetting: ReminderSetting;
+  timezone: string;
   dueDate?: string;
   dueTime?: string;
   duration?: number;
   recurrenceRule?: string;
-  timezone: string;
 };
 
 export type GetTask = {
