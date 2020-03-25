@@ -8,7 +8,7 @@ import {
 import { Label } from '../../features/label/interface';
 import LabelsWithRedux from './create-label.pages';
 import LabelsSearching from './search-label.component';
-import '../pages.style.less';
+import './labels.styles.less';
 
 type LabelsPageProps = {
   labels: Label[];

@@ -2,13 +2,15 @@ import React, {useEffect} from 'react';
 import {Avatar, Collapse, Empty, List, Popover, Tooltip} from 'antd';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
-import {IState} from "../store";
-import {Group, GroupsWithOwner} from "../features/group/interface";
-import {updateGroups} from "../features/group/actions";
-import {Project, ProjectsWithOwner} from "../features/project/interface";
-import {updateProjects} from "../features/project/actions";
-import {iconMapper} from "../components/side-menu/side-menu.component";
+import {IState} from "../../store";
+import {Group, GroupsWithOwner} from "../../features/group/interface";
+import {updateGroups} from "../../features/group/actions";
+import {Project, ProjectsWithOwner} from "../../features/project/interface";
+import {updateProjects} from "../../features/project/actions";
+import {iconMapper} from "../../components/side-menu/side-menu.component";
 import {TeamOutlined} from "@ant-design/icons";
+
+import './projects.styles.less';
 
 const {Panel} = Collapse;
 
@@ -148,7 +150,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
     };
 
     return (
-        <div className='project' style={{paddingTop: '30px'}}>
+        <div className='projects' style={{paddingTop: '30px'}}>
             <Collapse defaultActiveKey={['OwnedBuJo', 'SharedBuJo']}>
                 <Panel header="Owned BuJo" key="OwnedBuJo">
                     {getOwnedBuJo(ownedProjects)}

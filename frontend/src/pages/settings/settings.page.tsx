@@ -1,8 +1,8 @@
 import React from 'react';
 import { Tabs } from 'antd';
-import Account from '../components/settings/account';
+import Account from '../../components/settings/account';
 
-import './pages.style.less';
+import './setting.style.less';
 
 const { TabPane } = Tabs;
 

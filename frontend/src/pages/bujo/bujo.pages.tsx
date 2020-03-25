@@ -1,20 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import ProjectItemList from '../components/project-item-list/project-item-list.component';
-import BujoCalendar from '../components/bujo-calendar/bujo-calendar.component';
+import ProjectItemList from '../../components/project-item-list/project-item-list.component';
+import BujoCalendar from '../../components/bujo-calendar/bujo-calendar.component';
 import { AccountBookOutlined, CarryOutOutlined } from '@ant-design/icons';
-import { IState } from '../store/index';
-import { Project } from '../features/project/interface';
-import AddProject from '../components/modals/add-project.component';
-import AddProjectItem from '../components/modals/add-project-item.component';
+import { IState } from '../../store/index';
+import { Project } from '../../features/project/interface';
+import AddProject from '../../components/modals/add-project.component';
+import AddProjectItem from '../../components/modals/add-project-item.component';
 import '@ant-design/compatible/assets/index.css';
 import { Checkbox, Tooltip } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import {
   getProjectItemsAfterUpdateSelect,
   getProjectItems
-} from '../features/myBuJo/actions';
+} from '../../features/myBuJo/actions';
+
+import './bujo.styles.less';
 
 type BujoProps = {
   todoSelected: boolean;

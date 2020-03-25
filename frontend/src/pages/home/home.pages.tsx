@@ -1,6 +1,6 @@
 import React from 'react';
-import RRuleGenerator from '../features/recurrence/RRuleGenerator';
-import translations from '../features/recurrence/translations';
+import RRuleGenerator from '../../features/recurrence/RRuleGenerator';
+import translations from '../../features/recurrence/translations';
 
 const HomePage = () => {
   return (

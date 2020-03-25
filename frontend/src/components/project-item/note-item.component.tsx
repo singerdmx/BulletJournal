@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DeleteTwoTone,
   DragOutlined,
@@ -9,8 +9,9 @@ import {
   MoreOutlined
 } from '@ant-design/icons';
 import { deleteNote, moveNote } from '../../features/notes/actions';
-import {Note} from "../../features/notes/interface";
-import {connect} from "react-redux";
+import { Note } from '../../features/notes/interface';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { Popover } from 'antd';
 
@@ -27,7 +28,10 @@ const Content: React.FC<NoteProps> = props => {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div>
         Delete
-        <DeleteTwoTone twoToneColor="#f5222d" onClick={() => deleteNote(note.id)} />
+        <DeleteTwoTone
+          twoToneColor="#f5222d"
+          onClick={() => deleteNote(note.id)}
+        />
       </div>
       <div>
         Edit <EditTwoTone onClick={() => {}} />
@@ -55,8 +59,11 @@ const NoteItem: React.FC<NoteProps> = props => {
         lineHeight: '2rem'
       }}
     >
-      <FormOutlined />
-      <span style={{ padding: '0 5px', height: '100%' }}>{note.name}</span>
+      
+      <Link to={`/note/${note.id}`}>
+        <FormOutlined />
+        <span style={{ padding: '0 5px', height: '100%' }}>{note.name}</span>
+      </Link>
       <div
         style={{
           width: '300px',
@@ -77,11 +84,7 @@ const NoteItem: React.FC<NoteProps> = props => {
           style={{ top: -10 }}
           title={null}
           content={
-            <Content
-              note={note}
-              deleteNote={deleteNote}
-              moveNote={moveNote}
-            />
+            <Content note={note} deleteNote={deleteNote} moveNote={moveNote} />
           }
           trigger="click"
         >
@@ -94,6 +97,4 @@ const NoteItem: React.FC<NoteProps> = props => {
   );
 };
 
-export default connect(null, {deleteNote, moveNote})(
-  NoteItem
-);
+export default connect(null, { deleteNote, moveNote })(NoteItem);

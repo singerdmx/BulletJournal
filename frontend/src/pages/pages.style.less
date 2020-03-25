@@ -1,4 +1,4 @@
-.pages-property {
+.pages-property() {
   background: #fff;
   margin: 5vh 15vw;
   padding: 1vh 2vw;
@@ -8,96 +8,13 @@
     0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
 }
 
-.setting {
-  .pages-property();
-}
-
 div.ant-popover-message {
   max-width: 180px;
 }
 // projects page
-.project {
-  position: relative;
-  .pages-property();
-
-  .project-avatar {
-    width: 50px;
-    height: 50px;
-    position: absolute;
-    box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
-    -moz-box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
-    -webkit-box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
-    background-color: white;
-    left: -25px;
-    top: -25px;
-    border-radius: 50%;
-    .ant-avatar {
-      width: 100%;
-      height: 100%;
-    }
-  }
-  .project-header {
-    margin-left: 0.5em;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    border-bottom: 1px solid #e0e6ed;
-
-    .project-control {
-      display: flex;
-      align-items: baseline;
-      font-size: 18px;
-      justify-content: flex-end;
-    }
-  }
-  .project-content {
-    display: flex;
-  }
-  .project-description {
-    width: 100%;
-
-    & p {
-      margin-left: 7px;
-      margin-bottom: 3px;
-      word-wrap: break-word;
-      margin-top: 3px;
-      font-size: 16px;
-    }
-  }
-}
-
-.todo {
-  .pages-property();
-
-  .todo-header {
-    border-bottom: 1px solid #e0e6ed;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .todo-panel {
-    margin: 1rem 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
 
 .add-group-page {
   .pages-property();
-}
-
-.groups-page {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-}
-
-.group-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .group-page-card {
@@ -136,88 +53,5 @@ div.ant-popover-message {
   }
   &:hover {
     transform: scale(1.05);
-  }
-}
-
-.labels-page {
-  .pages-property();
-
-  .labels-search-container {
-    margin: 1em 1em;
-
-    .label-search-input {
-      width: 60%;
-      margin-left: 20%;
-
-      .ant-select-selection-search-input {
-        width: 100%;
-        border: 0;
-        border-bottom: 1px solid grey;
-        font-size: 18px;
-        transition: ease 0.5s;
-
-        &::placeholder {
-          color: grey;
-        }
-
-        &:focus {
-          outline: none !important;
-          border-bottom: 3px solid @primary-color;
-        }
-      }
-    }
-
-    .selected-labels {
-      width: 60%;
-      margin-left: 20%;
-      display: flex;
-      flex-wrap: wrap;
-    }
-  }
-  .labels-create {
-    width: 60%;
-    margin-left: 20%;
-    margin-top: 10%;
-    border-bottom: 1px solid @primary-color;
-
-    .ant-input {
-      width: 100%;
-      border: none;
-      &:focus {
-        outline: 0;
-      }
-    }
-  }
-
-  .labels-container {
-    margin-top: 1em;
-    display: flex;
-    flex-direction: column;
-    width: 60%;
-    margin-left: 20%;
-
-    .labels-control {
-      display: flex;
-      justify-content: flex-end;
-      .edit-button {
-        margin-left: 1em;
-      }
-    }
-    .labels-list {
-      margin-top: 1em;
-      .labels {
-        display: inline-block;
-        font-size: 16px;
-        font-weight: 500;
-        padding: 5px 10px;
-        margin: 0.5em 0.5em;
-        border-radius: 10px;
-
-        .labels-edit {
-          width: 78px;
-          background-color: transparent;
-        }
-      }
-    }
   }
 }

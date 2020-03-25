@@ -1,10 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateGroups } from '../features/group/actions';
-import { IState } from '../store';
-import { GroupsWithOwner } from '../features/group/interface';
-import GroupCard from '../components/group-card/group-card.component';
+import { updateGroups } from '../../features/group/actions';
+import { IState } from '../../store';
+import { GroupsWithOwner } from '../../features/group/interface';
+import GroupCard from '../../components/group-card/group-card.component';
 import { BackTop } from 'antd';
+
+import './groups.styles.less';
 
 type GroupsProps = {
   groups: GroupsWithOwner[];

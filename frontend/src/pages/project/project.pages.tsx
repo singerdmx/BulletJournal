@@ -1,21 +1,23 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Project } from '../features/project/interface';
-import { IState } from '../store';
+import { Project } from '../../features/project/interface';
+import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../features/group/interface';
+import { GroupsWithOwner } from '../../features/group/interface';
 import {Avatar, Divider, Popconfirm, Popover, Tooltip} from 'antd';
-import { deleteProject, getProject } from '../features/project/actions';
-import { iconMapper } from '../components/side-menu/side-menu.component';
+import { deleteProject, getProject } from '../../features/project/actions';
+import { iconMapper } from '../../components/side-menu/side-menu.component';
 import { DeleteOutlined, TeamOutlined } from '@ant-design/icons';
-import EditProject from '../components/modals/edit-project.component';
-import AddNote from '../components/modals/add-note.component';
-import AddTask from '../components/modals/add-task.component';
-import AddTransaction from '../components/modals/add-transaction.component';
-import { ProjectType } from '../features/project/constants';
-import { NoteTree } from '../components/note-tree';
+import EditProject from '../../components/modals/edit-project.component';
+import AddNote from '../../components/modals/add-note.component';
+import AddTask from '../../components/modals/add-task.component';
+import AddTransaction from '../../components/modals/add-transaction.component';
+import { ProjectType } from '../../features/project/constants';
+import { NoteTree } from '../../components/note-tree';
 import { History } from 'history';
-import {getGroupByProject} from "./projects.pages";
+import {getGroupByProject} from "../projects/projects.pages";
+
+import './project.styles.less';
 
 type ProjectPathParams = {
   projectId: string;

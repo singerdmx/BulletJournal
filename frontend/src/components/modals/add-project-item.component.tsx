@@ -12,12 +12,11 @@ import { History } from 'history';
 import { updateTaskVisible } from '../../features/tasks/actions';
 import { updateNoteVisible } from '../../features/notes/actions';
 import { updateTransactionVisible } from '../../features/transactions/actions';
-
 import './modals.styles.less';
 import {
   flattenOwnedProject,
   flattenSharedProject
-} from '../../pages/projects.pages';
+} from '../../pages/projects/projects.pages';
 
 const { Option } = Select;
 
