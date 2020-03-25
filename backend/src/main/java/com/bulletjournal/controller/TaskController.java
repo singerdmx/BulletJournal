@@ -6,6 +6,7 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
+import com.bulletjournal.repository.models.TaskContent;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +31,7 @@ public class TaskController {
     protected static final String TASK_SET_LABELS_ROUTE = "/api/tasks/{taskId}/setLabels";
     protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
+    protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -135,5 +137,11 @@ public class TaskController {
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         return null; // may be generated link
+    }
+
+    @PostMapping(ADD_CONTENT_ROUTE)
+    public Content addContent(@NotNull @PathVariable Long taskId,
+                              @NotNull @RequestBody CreateContentParams createContentParams) {
+        return this.taskDaoJpa.addContent(taskId, new TaskContent(createContentParams.getText())).toPresentationModel();
     }
 }

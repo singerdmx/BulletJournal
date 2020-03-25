@@ -7,6 +7,7 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
+import com.bulletjournal.repository.models.TaskContent;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +27,7 @@ public class NoteController {
     protected static final String NOTE_SET_LABELS_ROUTE = "/api/notes/{noteId}/setLabels";
     protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
+    protected static final String ADD_CONTENT_ROUTE = "/api/notes/{noteId}/addContent";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -103,5 +105,11 @@ public class NoteController {
             @NotNull @PathVariable Long noteId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         return null; // may be generated link
+    }
+
+    @PostMapping(ADD_CONTENT_ROUTE)
+    public Content addContent(@NotNull @PathVariable Long taskId,
+                              @NotNull @RequestBody CreateContentParams createContentParams) {
+        return this.noteDaoJpa.addContent(taskId, new TaskContent(createContentParams.getText())).toPresentationModel();
     }
 }

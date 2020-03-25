@@ -22,6 +22,13 @@ public class TransactionContent extends ContentModel<Transaction> {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Transaction transaction;
 
+    public TransactionContent() {
+    }
+
+    public TransactionContent(String text) {
+        this.setText(text);
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -30,6 +37,11 @@ public class TransactionContent extends ContentModel<Transaction> {
     @Override
     public Transaction getProjectItem() {
         return getTransaction();
+    }
+
+    @Override
+    public void setProjectItem(Transaction projectItem) {
+        this.setTransaction(projectItem);
     }
 
     public void setId(Long id) {

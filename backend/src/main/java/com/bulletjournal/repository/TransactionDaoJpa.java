@@ -38,6 +38,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
     private ProjectRepository projectRepository;
     @Autowired
     private AuthorizationService authorizationService;
+    @Autowired
+    private TransactionContentRepository transactionContentRepository;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -81,7 +83,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
      * @retVal a Transaction object
      */
     public com.bulletjournal.controller.models.Transaction getTransaction(Long id) {
-        Transaction transaction = (Transaction) this.getProjectItem(id);
+        Transaction transaction = this.getProjectItem(id);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(transaction);
         return transaction.toPresentationModel(labels);
     }
@@ -239,5 +241,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
                 ContentType.TRANSACTION, Operation.UPDATE, targetProject, project.getOwner());
         projectItem.setProject(project);
         this.getJpaRepository().save(projectItem);
+    }
+
+    @Override
+    public JpaRepository getContentJpaRepository() {
+        return this.transactionContentRepository;
     }
 }

@@ -37,6 +37,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
     private AuthorizationService authorizationService;
     @Autowired
     private ProjectNotesRepository projectNotesRepository;
+    @Autowired
+    private NoteContentRepository noteContentRepository;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -102,7 +104,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Note getNote(Long id) {
-        Note note = (Note) this.getProjectItem(id);
+        Note note = this.getProjectItem(id);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(note);
         return note.toPresentationModel(labels);
     }
@@ -206,5 +208,10 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
                     projectNotes.setProjectId(targetProject);
                     this.projectNotesRepository.save(projectNotes);
                 });
+    }
+
+    @Override
+    public JpaRepository getContentJpaRepository() {
+        return this.noteContentRepository;
     }
 }

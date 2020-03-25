@@ -22,6 +22,13 @@ public class NoteContent extends ContentModel<Note> {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Note note;
 
+    public NoteContent() {
+    }
+
+    public NoteContent(String text) {
+        this.setText(text);
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -30,6 +37,11 @@ public class NoteContent extends ContentModel<Note> {
     @Override
     public Note getProjectItem() {
         return getNote();
+    }
+
+    @Override
+    public void setProjectItem(Note projectItem) {
+        this.setNote(projectItem);
     }
 
     public void setId(Long id) {

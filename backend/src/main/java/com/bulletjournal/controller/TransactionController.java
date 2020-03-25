@@ -10,6 +10,7 @@ import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveTransactionEvent;
 import com.bulletjournal.notifications.UpdateTransactionPayerEvent;
 import com.bulletjournal.repository.TransactionDaoJpa;
+import com.bulletjournal.repository.models.TaskContent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -32,6 +33,7 @@ public class TransactionController {
     protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
     protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
     protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
+    protected static final String ADD_CONTENT_ROUTE = "/api/transactions/{transactionId}/addContent";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -151,5 +153,12 @@ public class TransactionController {
             endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
         }
         return Pair.of(startTime, endTime);
+    }
+
+    @PostMapping(ADD_CONTENT_ROUTE)
+    public Content addContent(@NotNull @PathVariable Long taskId,
+                              @NotNull @RequestBody CreateContentParams createContentParams) {
+        return this.transactionDaoJpa.addContent(taskId,
+                new TaskContent(createContentParams.getText())).toPresentationModel();
     }
 }

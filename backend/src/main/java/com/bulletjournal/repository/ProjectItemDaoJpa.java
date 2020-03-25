@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SetLabelEvent;
+import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,22 @@ abstract class ProjectItemDaoJpa {
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
+    abstract <K extends ContentModel> JpaRepository<K, Long> getContentJpaRepository();
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public ProjectItemModel getProjectItem(Long projectItemId) {
+    public <T extends ProjectItemModel> ContentModel addContent(
+            Long projectItemId, ContentModel content) {
+        T projectItem = getProjectItem(projectItemId);
+        content.setProjectItem(projectItem);
+        this.getContentJpaRepository().save(content);
+        return content;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> T getProjectItem(Long projectItemId) {
         ProjectItemModel projectItem = this.getJpaRepository().findById(projectItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("projectItem " + projectItemId + " not found"));
-        return projectItem;
+        return (T) projectItem;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

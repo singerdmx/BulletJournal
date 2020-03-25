@@ -22,6 +22,13 @@ public class TaskContent extends ContentModel<Task> {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Task task;
 
+    public TaskContent() {
+    }
+
+    public TaskContent(String text) {
+        this.setText(text);
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -30,6 +37,11 @@ public class TaskContent extends ContentModel<Task> {
     @Override
     public Task getProjectItem() {
         return getTask();
+    }
+
+    @Override
+    public void setProjectItem(Task projectItem) {
+        this.setTask(projectItem);
     }
 
     public void setId(Long id) {

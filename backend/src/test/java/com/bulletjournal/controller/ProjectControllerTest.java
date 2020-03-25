@@ -665,9 +665,24 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(taskName, created.getName());
         assertEquals(project.getId(), created.getProjectId());
+
+        createTaskContent(created);
         return created;
     }
 
+    private Content createTaskContent(Task task) {
+        CreateContentParams createContentParams = new CreateContentParams("TEXT1");
+        ResponseEntity<Content> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.ADD_CONTENT_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(createContentParams),
+                Content.class,
+                task.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Content content = response.getBody();
+        return content;
+    }
 
     private Task updateTask(Task task, String assignedTo, String dueDate,
                             String dueTime, String name, ReminderSetting reminderSetting, String expectedName) {

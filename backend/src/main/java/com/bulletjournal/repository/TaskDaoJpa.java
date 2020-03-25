@@ -57,6 +57,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
+    @Autowired
+    private TaskContentRepository taskContentRepository;
+
     @Override
     public JpaRepository getJpaRepository() {
         return this.taskRepository;
@@ -99,7 +102,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getTask(Long id) {
-        Task task = (Task) this.getProjectItem(id);
+        Task task = this.getProjectItem(id);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
         return task.toPresentationModel(labels);
     }
@@ -495,5 +498,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
                     projectTasks.setProjectId(targetProject);
                     this.projectTasksRepository.save(projectTasks);
                 });
+    }
+
+    @Override
+    public JpaRepository getContentJpaRepository() {
+        return this.taskContentRepository;
     }
 }
