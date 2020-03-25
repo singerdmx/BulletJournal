@@ -71,13 +71,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal List<com.bulletjournal.controller.models.Task> - a list of controller model tasks with labels
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId) {
+    public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
         if (!projectTasksOptional.isPresent()) {
             return Collections.emptyList();
         }
         ProjectTasks projectTasks = projectTasksOptional.get();
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
         Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
                 .stream().collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks())
@@ -100,8 +100,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal com.bulletjournal.controller.models.Task - controller model task with label
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public com.bulletjournal.controller.models.Task getTask(Long id) {
-        Task task = this.getProjectItem(id);
+    public com.bulletjournal.controller.models.Task getTask(String requester, Long id) {
+        Task task = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
         return task.toPresentationModel(labels);
     }
@@ -199,7 +199,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
 
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
@@ -252,7 +252,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
 
-        Task task = this.getProjectItem(taskId);
+        Task task = this.getProjectItem(taskId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
@@ -326,7 +326,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public CompletedTask complete(String requester, Long taskId) {
 
-        Task task = this.getProjectItem(taskId);
+        Task task = this.getProjectItem(taskId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
                 requester, ContentType.TASK,
@@ -372,7 +372,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteTask(String requester, Long taskId) {
-        Task task = this.getProjectItem(taskId);
+        Task task = this.getProjectItem(taskId, requester);
         Project project = deleteTaskAndAdjustRelations(
                 requester, task,
                 (targetTasks) -> this.taskRepository.deleteAll(targetTasks),
@@ -434,8 +434,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<CompletedTask> getCompletedTasks(Long projectId) {
-        Project project = this.projectDaoJpa.getProject(projectId);
+    public List<CompletedTask> getCompletedTasks(Long projectId, String requester) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
         return completedTasks
                 .stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
@@ -461,9 +461,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long taskId, Long targetProject) {
-        final Project project = this.projectDaoJpa.getProject(targetProject);
+        final Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
-        Task task = this.getProjectItem(taskId);
+        Task task = this.getProjectItem(taskId, requester);
 
         if (!Objects.equals(task.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
@@ -496,7 +496,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<TaskContent> getContents(Long projectItemId, String requester) {
-        Task task = this.getProjectItem(projectItemId);
+        Task task = this.getProjectItem(projectItemId, requester);
         List<TaskContent> contents = this.taskContentRepository.findTaskContentByTask(task)
                 .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
                 .collect(Collectors.toList());

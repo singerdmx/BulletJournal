@@ -1,5 +1,8 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.authz.Operation;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
@@ -23,6 +26,9 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Autowired
     private LabelDaoJpa labelDaoJpa;
 
+    @Autowired
+    private AuthorizationService authorizationService;
+
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
     abstract JpaRepository<K, Long> getContentJpaRepository();
@@ -32,7 +38,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> ContentModel addContent(
             Long projectItemId, String owner, K content) {
-        T projectItem = getProjectItem(projectItemId);
+        T projectItem = getProjectItem(projectItemId, owner);
         content.setProjectItem(projectItem);
         content.setOwner(owner);
         this.getContentJpaRepository().save(content);
@@ -40,19 +46,24 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public K getContent(Long contentId) {
-        return this.getContentJpaRepository().findById(contentId)
+    public K getContent(Long contentId, String requester) {
+        K content = this.getContentJpaRepository().findById(contentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Content " + contentId + " not found"));
+        this.authorizationService.validateRequesterInProjectGroup(requester, content.getProjectItem());
+        return content;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> K updateContent(
             Long contentId, Long projectItemId, String requester, UpdateContentParams updateContentParams) {
-        T projectItem = getProjectItem(projectItemId);
-        K content = getContent(contentId);
+        T projectItem = getProjectItem(projectItemId, requester);
+        K content = getContent(contentId, requester);
         Preconditions.checkState(
                 Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
                 "ProjectItem ID mismatch");
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                content.getOwner(), requester, ContentType.CONTENT, Operation.UPDATE, content.getId(),
+                projectItem.getOwner(), projectItem.getProject().getOwner());
         content.setText(updateContentParams.getText());
         this.getContentJpaRepository().save(content);
         return content;
@@ -60,18 +71,22 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> void deleteContent(Long contentId, Long projectItemId, String requester) {
-        T projectItem = getProjectItem(projectItemId);
-        K content = getContent(contentId);
+        T projectItem = getProjectItem(projectItemId, requester);
+        K content = getContent(contentId, requester);
         Preconditions.checkState(
                 Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
                 "ProjectItem ID mismatch");
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                content.getOwner(), requester, ContentType.CONTENT, Operation.DELETE, content.getId(),
+                projectItem.getOwner(), projectItem.getProject().getOwner());
         this.getContentJpaRepository().delete(content);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> T getProjectItem(Long projectItemId) {
+    public <T extends ProjectItemModel> T getProjectItem(Long projectItemId, String requester) {
         ProjectItemModel projectItem = this.getJpaRepository().findById(projectItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("projectItem " + projectItemId + " not found"));
+        this.authorizationService.validateRequesterInProjectGroup(requester, projectItem);
         return (T) projectItem;
     }
 
@@ -82,7 +97,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SetLabelEvent setLabels(String requester, Long projectItemId, List<Long> labels) {
-        ProjectItemModel projectItem = getProjectItem(projectItemId);
+        ProjectItemModel projectItem = getProjectItem(projectItemId, requester);
         projectItem.setLabels(labels);
         String contentType = projectItem.getClass().getSimpleName();
         Set<UserGroup> targetUsers = projectItem.getProject().getGroup().getUsers();

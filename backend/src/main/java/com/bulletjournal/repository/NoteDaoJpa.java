@@ -46,13 +46,13 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId) {
+    public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId, String requester) {
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
         if (!projectNotesOptional.isPresent()) {
             return Collections.emptyList();
         }
         ProjectNotes projectNotes = projectNotesOptional.get();
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
         Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project)
                 .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
         return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes())
@@ -68,7 +68,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Note create(Long projectId, String owner, CreateNoteParams createNoteParams) {
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.NOTE.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be NOTE while request is " + project.getType());
         }
@@ -87,7 +87,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Note partialUpdate(String requester, Long noteId, UpdateNoteParams updateNoteParams) {
-        Note note = this.getProjectItem(noteId);
+        Note note = this.getProjectItem(noteId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 note.getOwner(), requester, ContentType.NOTE, Operation.UPDATE, noteId,
@@ -100,8 +100,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public com.bulletjournal.controller.models.Note getNote(Long id) {
-        Note note = this.getProjectItem(id);
+    public com.bulletjournal.controller.models.Note getNote(String requester, Long id) {
+        Note note = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(note);
         return note.toPresentationModel(labels);
     }
@@ -119,7 +119,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteNote(String requester, Long noteId) {
-        Note note = this.getProjectItem(noteId);
+        Note note = this.getProjectItem(noteId, requester);
 
         Project project = deleteNoteAndAdjustRelations(requester, note,
                 (targetNotes) -> this.noteRepository.deleteAll(targetNotes),
@@ -177,9 +177,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long noteId, Long targetProject) {
-        final Project project = this.projectDaoJpa.getProject(targetProject);
+        final Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
-        Note note = this.getProjectItem(noteId);
+        Note note = this.getProjectItem(noteId, requester);
 
         if (!Objects.equals(note.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
@@ -212,7 +212,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<NoteContent> getContents(Long projectItemId, String requester) {
-        Note note = this.getProjectItem(projectItemId);
+        Note note = this.getProjectItem(projectItemId, requester);
         List<NoteContent> contents = this.noteContentRepository.findNoteContentByNote(note)
                 .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
                 .collect(Collectors.toList());

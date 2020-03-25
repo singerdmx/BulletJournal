@@ -57,8 +57,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      * @retVal List<Transaction> - List of transaction
      */
     public List<com.bulletjournal.controller.models.Transaction> getTransactions(
-            Long projectId, ZonedDateTime startTime, ZonedDateTime endTime) {
-        Project project = this.projectDaoJpa.getProject(projectId);
+            Long projectId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
 
         return this.transactionRepository
                 .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
@@ -80,8 +80,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      * @param id - Transaction identifier to retrieve transaction from ledger repository
      * @retVal a Transaction object
      */
-    public com.bulletjournal.controller.models.Transaction getTransaction(Long id) {
-        Transaction transaction = this.getProjectItem(id);
+    public com.bulletjournal.controller.models.Transaction getTransaction(String requester, Long id) {
+        Transaction transaction = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(transaction);
         return transaction.toPresentationModel(labels);
     }
@@ -103,7 +103,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Transaction create(Long projectId, String owner, CreateTransactionParams createTransaction) {
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.LEDGER.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be LEDGER while request is " + project.getType());
         }
@@ -130,7 +130,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
-        Transaction transaction = this.getProjectItem(transactionId);
+        Transaction transaction = this.getProjectItem(transactionId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 transaction.getOwner(), requester, ContentType.TRANSACTION, Operation.UPDATE,
@@ -195,7 +195,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> delete(String requester, Long transactionId) {
-        Transaction transaction = this.getProjectItem(transactionId);
+        Transaction transaction = this.getProjectItem(transactionId, requester);
         Project project = transaction.getProject();
         Long projectId = project.getId();
 
@@ -223,9 +223,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long projectItemId, Long targetProject) {
-        Project project = this.projectDaoJpa.getProject(targetProject);
+        Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
-        Transaction projectItem = this.getProjectItem(projectItemId);
+        Transaction projectItem = this.getProjectItem(projectItemId, requester);
         if (!Objects.equals(projectItem.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
@@ -243,7 +243,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<TransactionContent> getContents(Long projectItemId, String requester) {
-        Transaction transaction = this.getProjectItem(projectItemId);
+        Transaction transaction = this.getProjectItem(projectItemId, requester);
         List<TransactionContent> contents = this.transactionContentRepository
                 .findTransactionContentByTransaction(transaction)
                 .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))

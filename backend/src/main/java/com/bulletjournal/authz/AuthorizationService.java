@@ -2,12 +2,29 @@ package com.bulletjournal.authz;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class AuthorizationService {
+
+    public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, T projectItem) {
+        validateRequesterInProjectGroup(requester, projectItem.getProject());
+    }
+
+    public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, Project project) {
+        List<String> projectGroupUsers = project.getGroup()
+                .getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toList());
+        if (!projectGroupUsers.stream().anyMatch(u -> Objects.equals(requester, u))) {
+            throw new UnAuthorizedException("User " + requester + " not in Project "
+                    + project.getName());
+        }
+    }
 
     public void checkAuthorizedToOperateOnContent(
             String owner, String requester, ContentType contentType,
@@ -24,6 +41,9 @@ public class AuthorizationService {
             case NOTE:
             case TRANSACTION:
                 checkAuthorizedToOperateOnProjectItem(owner, requester, operation, contentId, other);
+                break;
+            case CONTENT:
+                checkAuthorizedToOperateOnProjectItemContent(owner, requester, operation, contentId, other);
                 break;
             case LABEL:
                 checkAuthorizedToOperateOnLabel(owner, requester, operation, contentId);
@@ -83,6 +103,24 @@ public class AuthorizationService {
                 if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
                     throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
                             owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
+                }
+                break;
+        }
+    }
+
+    private void checkAuthorizedToOperateOnProjectItemContent(
+            String owner, String requester, Operation operation, Long contentId, Object[] other) {
+        String projectItemOwner = (String) other[0];
+        String projectOwner = (String) other[1];
+        switch (operation) {
+            case DELETE:
+            case UPDATE:
+                if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)
+                        && !Objects.equals(projectItemOwner, requester)) {
+                    throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
+                            owner + " and Project is owned by " + projectOwner +
+                            " and Project Item is owned by " + projectItemOwner +
+                            " while request is from " + requester);
                 }
                 break;
         }

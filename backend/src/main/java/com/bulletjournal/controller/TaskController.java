@@ -46,7 +46,8 @@ public class TaskController {
 
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId) {
-        List<Task> tasks = this.taskDaoJpa.getTasks(projectId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Task> tasks = this.taskDaoJpa.getTasks(projectId, username);
         String tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, tasks);
 
@@ -58,7 +59,8 @@ public class TaskController {
 
     @GetMapping(TASK_ROUTE)
     public Task getTask(@NotNull @PathVariable Long taskId) {
-        return this.taskDaoJpa.getTask(taskId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getTask(username, taskId);
     }
 
     @GetMapping(COMPLETED_TASK_ROUTE)
@@ -107,7 +109,8 @@ public class TaskController {
 
     @GetMapping(COMPLETED_TASKS_ROUTE)
     public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId) {
-        return this.taskDaoJpa.getCompletedTasks(projectId)
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getCompletedTasks(projectId, username)
                 .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 

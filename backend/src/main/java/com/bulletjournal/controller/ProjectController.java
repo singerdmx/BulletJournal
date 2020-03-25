@@ -62,7 +62,8 @@ public class ProjectController {
 
     @GetMapping(PROJECT_ROUTE)
     public Project getProject(@NotNull @PathVariable Long projectId) {
-        Project project = this.projectDaoJpa.getProject(projectId).toVerbosePresentationModel();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        Project project = this.projectDaoJpa.getProject(projectId, username).toVerbosePresentationModel();
         return addOwnerAvatar(project);
     }
 
