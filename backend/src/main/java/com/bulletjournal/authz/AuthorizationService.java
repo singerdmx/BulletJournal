@@ -2,12 +2,29 @@ package com.bulletjournal.authz;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class AuthorizationService {
+
+    public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, T projectItem) {
+        validateRequesterInProjectGroup(requester, projectItem.getProject());
+    }
+
+    public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, Project project) {
+        List<String> projectGroupUsers = project.getGroup()
+                .getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toList());
+        if (!projectGroupUsers.stream().anyMatch(u -> Objects.equals(requester, u))) {
+            throw new UnAuthorizedException("User " + requester + " not in Project "
+                    + project.getName());
+        }
+    }
 
     public void checkAuthorizedToOperateOnContent(
             String owner, String requester, ContentType contentType,

@@ -46,13 +46,13 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId) {
+    public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId, String requester) {
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
         if (!projectNotesOptional.isPresent()) {
             return Collections.emptyList();
         }
         ProjectNotes projectNotes = projectNotesOptional.get();
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
         Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project)
                 .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
         return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes())
@@ -68,7 +68,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Note create(Long projectId, String owner, CreateNoteParams createNoteParams) {
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.NOTE.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be NOTE while request is " + project.getType());
         }
@@ -177,7 +177,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long noteId, Long targetProject) {
-        final Project project = this.projectDaoJpa.getProject(targetProject);
+        final Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
         Note note = this.getProjectItem(noteId, requester);
 

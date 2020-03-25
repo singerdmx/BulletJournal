@@ -40,7 +40,8 @@ public class NoteController {
 
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
-        List<Note> notes = this.noteDaoJpa.getNotes(projectId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Note> notes = this.noteDaoJpa.getNotes(projectId, username);
         String notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, notes);
 

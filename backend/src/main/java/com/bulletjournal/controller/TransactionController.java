@@ -57,7 +57,8 @@ public class TransactionController {
         ZonedDateTime startTime = startEndTime.getLeft();
         ZonedDateTime endTime = startEndTime.getRight();
 
-        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId, startTime, endTime);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId, startTime, endTime, username);
 
         String transactionsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, transactions);

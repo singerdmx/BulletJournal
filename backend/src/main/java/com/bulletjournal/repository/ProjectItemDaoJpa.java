@@ -5,7 +5,6 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SetLabelEvent;
 import com.bulletjournal.repository.models.ContentModel;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
@@ -47,20 +45,11 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         return content;
     }
 
-    private <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, T projectItem) {
-        List<String> projectGroupUsers = projectItem.getProject().getGroup()
-                .getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toList());
-        if (!projectGroupUsers.stream().anyMatch(u -> Objects.equals(requester, u))) {
-            throw new UnAuthorizedException("User " + requester + " not in Project "
-                    + projectItem.getProject().getName());
-        }
-    }
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public K getContent(Long contentId, String requester) {
         K content = this.getContentJpaRepository().findById(contentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Content " + contentId + " not found"));
-        validateRequesterInProjectGroup(requester, content.getProjectItem());
+        this.authorizationService.validateRequesterInProjectGroup(requester, content.getProjectItem());
         return content;
     }
 
@@ -97,7 +86,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     public <T extends ProjectItemModel> T getProjectItem(Long projectItemId, String requester) {
         ProjectItemModel projectItem = this.getJpaRepository().findById(projectItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("projectItem " + projectItemId + " not found"));
-        validateRequesterInProjectGroup(requester, projectItem);
+        this.authorizationService.validateRequesterInProjectGroup(requester, projectItem);
         return (T) projectItem;
     }
 

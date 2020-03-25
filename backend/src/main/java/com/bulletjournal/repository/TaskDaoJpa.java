@@ -71,13 +71,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal List<com.bulletjournal.controller.models.Task> - a list of controller model tasks with labels
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId) {
+    public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
         if (!projectTasksOptional.isPresent()) {
             return Collections.emptyList();
         }
         ProjectTasks projectTasks = projectTasksOptional.get();
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
         Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
                 .stream().collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks())
@@ -199,7 +199,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
 
-        Project project = this.projectDaoJpa.getProject(projectId);
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
@@ -434,8 +434,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<CompletedTask> getCompletedTasks(Long projectId) {
-        Project project = this.projectDaoJpa.getProject(projectId);
+    public List<CompletedTask> getCompletedTasks(Long projectId, String requester) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
         return completedTasks
                 .stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
@@ -461,7 +461,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long taskId, Long targetProject) {
-        final Project project = this.projectDaoJpa.getProject(targetProject);
+        final Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
         Task task = this.getProjectItem(taskId, requester);
 
