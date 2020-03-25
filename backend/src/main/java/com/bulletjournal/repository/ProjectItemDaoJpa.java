@@ -16,20 +16,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-abstract class ProjectItemDaoJpa {
+abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Autowired
     private LabelDaoJpa labelDaoJpa;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
-    abstract <K extends ContentModel> JpaRepository<K, Long> getContentJpaRepository();
+    abstract JpaRepository<K, Long> getContentJpaRepository();
+
+    abstract List<K> getContents(Long projectItemId, String requester);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> ContentModel addContent(
-            Long projectItemId, ContentModel content) {
+            Long projectItemId, String owner, K content) {
         T projectItem = getProjectItem(projectItemId);
         content.setProjectItem(projectItem);
+        content.setOwner(owner);
         this.getContentJpaRepository().save(content);
         return content;
     }

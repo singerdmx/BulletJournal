@@ -681,7 +681,27 @@ public class ProjectControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
+        assertEquals(expectedOwner, content.getOwner());
+        assertEquals("TEXT1", content.getText());
+        assertNotNull(content.getId());
+        getTaskContents(task);
         return content;
+    }
+
+    private void getTaskContents(Task task) {
+        ResponseEntity<Content[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.GET_CONTENTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Content[].class,
+                task.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Content[] contents = response.getBody();
+        assertEquals(1, contents.length);
+        assertEquals(expectedOwner, contents[0].getOwner());
+        assertEquals("TEXT1", contents[0].getText());
+        assertNotNull(contents[0].getId());
     }
 
     private Task updateTask(Task task, String assignedTo, String dueDate,

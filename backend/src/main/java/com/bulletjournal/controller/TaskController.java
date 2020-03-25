@@ -3,7 +3,10 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveTaskEvent;
+import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.TaskContent;
@@ -32,6 +35,7 @@ public class TaskController {
     protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
+    protected static final String GET_CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -142,6 +146,15 @@ public class TaskController {
     @PostMapping(ADD_CONTENT_ROUTE)
     public Content addContent(@NotNull @PathVariable Long taskId,
                               @NotNull @RequestBody CreateContentParams createContentParams) {
-        return this.taskDaoJpa.addContent(taskId, new TaskContent(createContentParams.getText())).toPresentationModel();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.addContent(taskId, username, new TaskContent(createContentParams.getText()))
+                .toPresentationModel();
+    }
+
+    @GetMapping(GET_CONTENTS_ROUTE)
+    public List<Content> getContents(@NotNull @PathVariable Long taskId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getContents(taskId, username).stream()
+                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 }

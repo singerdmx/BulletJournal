@@ -7,7 +7,7 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
-import com.bulletjournal.repository.models.TaskContent;
+import com.bulletjournal.repository.models.NoteContent;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class NoteController {
@@ -28,6 +29,7 @@ public class NoteController {
     protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/notes/{noteId}/addContent";
+    protected static final String GET_CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -62,7 +64,7 @@ public class NoteController {
 
     @PatchMapping(NOTE_ROUTE)
     public ResponseEntity<List<Note>> updateNote(@NotNull @PathVariable Long noteId,
-                           @Valid @RequestBody UpdateNoteParams updateNoteParams) {
+                                                 @Valid @RequestBody UpdateNoteParams updateNoteParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note note = this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
         return getNotes(note.getProjectId());
@@ -108,8 +110,17 @@ public class NoteController {
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)
-    public Content addContent(@NotNull @PathVariable Long taskId,
+    public Content addContent(@NotNull @PathVariable Long noteId,
                               @NotNull @RequestBody CreateContentParams createContentParams) {
-        return this.noteDaoJpa.addContent(taskId, new TaskContent(createContentParams.getText())).toPresentationModel();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.noteDaoJpa.addContent(noteId, username, new NoteContent(createContentParams.getText()))
+                .toPresentationModel();
+    }
+
+    @GetMapping(GET_CONTENTS_ROUTE)
+    public List<Content> getContents(@NotNull @PathVariable Long noteId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.noteDaoJpa.getContents(noteId, username).stream()
+                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 }

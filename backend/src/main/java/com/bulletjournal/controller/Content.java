@@ -9,13 +9,17 @@ public class Content {
     private Long id;
 
     @NotBlank
+    private String owner;
+
+    @NotBlank
     private String text;
 
     public Content() {
     }
 
-    public Content(@NotNull Long id, @NotBlank String text) {
+    public Content(@NotNull Long id, @NotBlank String owner, @NotBlank String text) {
         this.id = id;
+        this.owner = owner;
         this.text = text;
     }
 
@@ -25,6 +29,14 @@ public class Content {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public String getText() {

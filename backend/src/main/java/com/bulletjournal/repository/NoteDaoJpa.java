@@ -26,13 +26,13 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
-public class NoteDaoJpa extends ProjectItemDaoJpa {
+public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     private static final Gson GSON = new Gson();
     @Autowired
     private NoteRepository noteRepository;
     @Autowired
-    private ProjectRepository projectRepository;
+    private ProjectDaoJpa projectDaoJpa;
     @Autowired
     private AuthorizationService authorizationService;
     @Autowired
@@ -52,8 +52,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
             return Collections.emptyList();
         }
         ProjectNotes projectNotes = projectNotesOptional.get();
-        Project project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        Project project = this.projectDaoJpa.getProject(projectId);
         Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project)
                 .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
         return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes())
@@ -69,8 +68,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Note create(Long projectId, String owner, CreateNoteParams createNoteParams) {
-        Project project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        Project project = this.projectDaoJpa.getProject(projectId);
         if (!ProjectType.NOTE.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be NOTE while request is " + project.getType());
         }
@@ -89,8 +87,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Note partialUpdate(String requester, Long noteId, UpdateNoteParams updateNoteParams) {
-        Note note = this.noteRepository.findById(noteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
+        Note note = this.getProjectItem(noteId);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 note.getOwner(), requester, ContentType.NOTE, Operation.UPDATE, noteId,
@@ -122,8 +119,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteNote(String requester, Long noteId) {
-        Note note = this.noteRepository.findById(noteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
+        Note note = this.getProjectItem(noteId);
 
         Project project = deleteNoteAndAdjustRelations(requester, note,
                 (targetNotes) -> this.noteRepository.deleteAll(targetNotes),
@@ -181,11 +177,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long noteId, Long targetProject) {
-        final Project project = this.projectRepository.findById(targetProject)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + targetProject + " not found"));
+        final Project project = this.projectDaoJpa.getProject(targetProject);
 
-        Note note = this.noteRepository.findById(noteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Note " + noteId + " not found"));
+        Note note = this.getProjectItem(noteId);
 
         if (!Objects.equals(note.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
@@ -213,5 +207,13 @@ public class NoteDaoJpa extends ProjectItemDaoJpa {
     @Override
     public JpaRepository getContentJpaRepository() {
         return this.noteContentRepository;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<NoteContent> getContents(Long projectItemId, String requester) {
+        Note note = this.getProjectItem(projectItemId);
+        List<NoteContent> contents = this.noteContentRepository.findNoteContentByNote(note);
+        return contents;
     }
 }

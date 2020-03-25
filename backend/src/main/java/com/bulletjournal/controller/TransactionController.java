@@ -10,7 +10,7 @@ import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveTransactionEvent;
 import com.bulletjournal.notifications.UpdateTransactionPayerEvent;
 import com.bulletjournal.repository.TransactionDaoJpa;
-import com.bulletjournal.repository.models.TaskContent;
+import com.bulletjournal.repository.models.TransactionContent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -25,6 +25,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class TransactionController {
@@ -34,6 +35,7 @@ public class TransactionController {
     protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
     protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/transactions/{transactionId}/addContent";
+    protected static final String GET_CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -156,9 +158,17 @@ public class TransactionController {
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)
-    public Content addContent(@NotNull @PathVariable Long taskId,
+    public Content addContent(@NotNull @PathVariable Long transactionId,
                               @NotNull @RequestBody CreateContentParams createContentParams) {
-        return this.transactionDaoJpa.addContent(taskId,
-                new TaskContent(createContentParams.getText())).toPresentationModel();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.transactionDaoJpa.addContent(transactionId, username,
+                new TransactionContent(createContentParams.getText())).toPresentationModel();
+    }
+
+    @GetMapping(GET_CONTENTS_ROUTE)
+    public List<Content> getContents(@NotNull @PathVariable Long transactionId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.transactionDaoJpa.getContents(transactionId, username).stream()
+                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 }

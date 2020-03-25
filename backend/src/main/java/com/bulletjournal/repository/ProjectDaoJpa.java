@@ -71,7 +71,7 @@ public class ProjectDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project getProject(Long projectId) {
         Project project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group " + projectId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         return project;
     }
 

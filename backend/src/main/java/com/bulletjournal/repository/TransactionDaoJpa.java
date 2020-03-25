@@ -8,12 +8,11 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
-import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.repository.models.TransactionContent;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +29,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Repository
-public class TransactionDaoJpa extends ProjectItemDaoJpa {
+public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
-    private ProjectRepository projectRepository;
+    private ProjectDaoJpa projectDaoJpa;
     @Autowired
     private AuthorizationService authorizationService;
     @Autowired
@@ -53,14 +52,12 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
      *
      * @param projectId - Project identifier to retrieve project from project repository
      * @param startTime - Range start time
-     * @param endTime - Range end time
+     * @param endTime   - Range end time
      * @retVal List<Transaction> - List of transaction
      */
     public List<com.bulletjournal.controller.models.Transaction> getTransactions(
             Long projectId, ZonedDateTime startTime, ZonedDateTime endTime) {
-        Project project = this.projectRepository
-                .findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        Project project = this.projectDaoJpa.getProject(projectId);
 
         return this.transactionRepository
                 .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
@@ -93,9 +90,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
      * <p>
      * Parameter:
      *
-     * @param payer - Payer identifier to retrieve transaction from ledger repository
+     * @param payer     - Payer identifier to retrieve transaction from ledger repository
      * @param startTime - Start Time to retrieve transaction from ledger repository
-     * @param endTime - End Time to retrieve transaction from ledger repository
+     * @param endTime   - End Time to retrieve transaction from ledger repository
      * @retVal List of Transaction
      */
     public List<Transaction> getTransactionsBetween(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
@@ -105,9 +102,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Transaction create(Long projectId, String owner, CreateTransactionParams createTransaction) {
-        Project project = this.projectRepository
-                .findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        Project project = this.projectDaoJpa.getProject(projectId);
         if (!ProjectType.LEDGER.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be LEDGER while request is " + project.getType());
         }
@@ -134,9 +129,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
-        Transaction transaction = this.transactionRepository
-                .findById(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction " + transactionId + " not found"));
+        Transaction transaction = this.getProjectItem(transactionId);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 transaction.getOwner(), requester, ContentType.TRANSACTION, Operation.UPDATE,
@@ -201,8 +194,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> delete(String requester, Long transactionId) {
-        Transaction transaction = this.transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction " + transactionId + " not found"));
+        Transaction transaction = this.getProjectItem(transactionId);
         Project project = transaction.getProject();
         Long projectId = project.getId();
 
@@ -230,10 +222,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long projectItemId, Long targetProject) {
-        Project project = this.projectRepository.findById(targetProject)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + targetProject + " not found"));
+        Project project = this.projectDaoJpa.getProject(targetProject);
 
-        ProjectItemModel projectItem = getProjectItem(projectItemId);
+        Transaction projectItem = this.getProjectItem(projectItemId);
         if (!Objects.equals(projectItem.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
@@ -246,5 +237,14 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa {
     @Override
     public JpaRepository getContentJpaRepository() {
         return this.transactionContentRepository;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<TransactionContent> getContents(Long projectItemId, String requester) {
+        Transaction transaction = this.getProjectItem(projectItemId);
+        List<TransactionContent> contents = this.transactionContentRepository
+                .findTransactionContentByTransaction(transaction);
+        return contents;
     }
 }

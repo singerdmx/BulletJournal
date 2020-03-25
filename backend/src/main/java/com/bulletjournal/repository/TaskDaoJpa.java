@@ -35,7 +35,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
-public class TaskDaoJpa extends ProjectItemDaoJpa {
+public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     private static final Gson GSON = new Gson();
 
@@ -43,7 +43,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     private TaskRepository taskRepository;
 
     @Autowired
-    private ProjectRepository projectRepository;
+    private ProjectDaoJpa projectDaoJpa;
 
     @Autowired
     private ProjectTasksRepository projectTasksRepository;
@@ -77,8 +77,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
             return Collections.emptyList();
         }
         ProjectTasks projectTasks = projectTasksOptional.get();
-        Project project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        Project project = this.projectDaoJpa.getProject(projectId);
         Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
                 .stream().collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks())
@@ -200,9 +199,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
 
-        Project project = this.projectRepository
-                .findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        Project project = this.projectDaoJpa.getProject(projectId);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
@@ -255,9 +252,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
 
-        Task task = this.taskRepository
-                .findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Task task = this.getProjectItem(taskId);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
@@ -331,9 +326,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public CompletedTask complete(String requester, Long taskId) {
 
-        Task task = this.taskRepository
-                .findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Task task = this.getProjectItem(taskId);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
                 requester, ContentType.TASK,
@@ -379,8 +372,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteTask(String requester, Long taskId) {
-        Task task = this.taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Task task = this.getProjectItem(taskId);
         Project project = deleteTaskAndAdjustRelations(
                 requester, task,
                 (targetTasks) -> this.taskRepository.deleteAll(targetTasks),
@@ -443,9 +435,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> getCompletedTasks(Long projectId) {
-        Project project = this.projectRepository
-                .findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+        Project project = this.projectDaoJpa.getProject(projectId);
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
         return completedTasks
                 .stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
@@ -471,11 +461,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long taskId, Long targetProject) {
-        final Project project = this.projectRepository.findById(targetProject)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + targetProject + " not found"));
+        final Project project = this.projectDaoJpa.getProject(targetProject);
 
-        Task task = this.taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Task task = this.getProjectItem(taskId);
 
         if (!Objects.equals(task.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
@@ -503,5 +491,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa {
     @Override
     public JpaRepository getContentJpaRepository() {
         return this.taskContentRepository;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<TaskContent> getContents(Long projectItemId, String requester) {
+        Task task = this.getProjectItem(projectItemId);
+        List<TaskContent> contents = this.taskContentRepository.findTaskContentByTask(task);
+        return contents;
     }
 }
