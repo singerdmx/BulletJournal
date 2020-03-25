@@ -4,6 +4,8 @@ export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });
 export const createNote = (projectId: number, name: string) =>
   actions.NotesCreate({ projectId: projectId, name: name });
+export const getNote = (noteId: number) =>
+    actions.NoteGet({ noteId: noteId });
 export const putNote = (projectId: number, notes: Note[]) =>
   actions.NotePut({ projectId: projectId, notes: notes });
 export const deleteNote = (noteId: number) =>
