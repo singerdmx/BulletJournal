@@ -40,7 +40,7 @@ const NoteItem: React.FC<NoteProps> = props => {
         <FormOutlined/>
         <span style={{padding: '0 5px', height: '100%'}}>{name}</span>
         <div style={{
-            width: '30%',
+            width: '300px',
             height: '100%',
             position: 'absolute',
             top: 0,
