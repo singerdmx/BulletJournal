@@ -26,6 +26,10 @@ export type NotesAction = {
   notes: Array<Note>;
 };
 
+export type NoteAction = {
+  note: Note;
+};
+
 export type PutNote = {
   projectId: number;
   notes: Note[];
@@ -51,6 +55,7 @@ export type MoveNote = {
 };
 
 let initialState = {
+  note: {} as Note,
   notes: [] as Array<Note>,
   addNoteVisible: false
 };
@@ -62,6 +67,10 @@ const slice = createSlice({
     notesReceived: (state, action: PayloadAction<NotesAction>) => {
       const { notes } = action.payload;
       state.notes = notes;
+    },
+    noteReceived: (state, action: PayloadAction<NoteAction>) => {
+      const { note } = action.payload;
+      state.note = note;
     },
     updateAddNoteVisible: (
       state,
