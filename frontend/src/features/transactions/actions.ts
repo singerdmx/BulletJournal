@@ -33,6 +33,8 @@ export const createTransaction = (
     timezone: timezone,
     time: time
   });
+export const getTransaction = (transactionId: number) =>
+    actions.TransactionGet({ transactionId: transactionId });
 export const deleteTransaction = (transactionId: number) =>
   actions.TransactionDelete({ transactionId: transactionId });
 export const patchTransaction = (

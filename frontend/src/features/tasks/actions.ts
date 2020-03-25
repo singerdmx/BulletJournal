@@ -26,6 +26,8 @@ export const createTask = (
     recurrenceRule: recurrenceRule,
     timezone: timezone
   });
+export const getTask = (taskId: number) =>
+    actions.TaskGet({ taskId: taskId });
 export const putTask = (projectId: number, tasks: Task[]) =>
   actions.TaskPut({ projectId: projectId, tasks: tasks });
 export const deleteTask = (taskId: number) =>
