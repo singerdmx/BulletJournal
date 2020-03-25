@@ -61,3 +61,9 @@ export const setTransactionLabels = (transactionId: number, labels: number[]) =>
 
 export const updateTransactionVisible = (visible: boolean) =>
   actions.updateAddTransactionVisible({ visible: visible });
+
+export const moveTransaction = (transactionId: number, targetProject: number) =>
+actions.TransactionMove({
+  transactionId: transactionId,
+  targetProject: targetProject
+});

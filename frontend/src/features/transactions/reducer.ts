@@ -51,6 +51,11 @@ export type PatchTransaction = {
   timezone?: string;
 };
 
+export type MoveTransaction = {
+  transactionId: number;
+  targetProject: number;
+};
+
 export type SetTransactionLabels = {
   transactionId: number;
   labels: number[];
@@ -91,6 +96,7 @@ const slice = createSlice({
     TransactionDelete: (state, action: PayloadAction<DeleteTransaction>) =>
       state,
     TransactionPatch: (state, action: PayloadAction<PatchTransaction>) => state,
+    TransactionMove: (state, action: PayloadAction<MoveTransaction>) => state,
     TransactionSetLabels: (
       state,
       action: PayloadAction<SetTransactionLabels>

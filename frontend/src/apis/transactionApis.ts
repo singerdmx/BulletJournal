@@ -87,4 +87,18 @@ export const setTransactionLabels = (transactionId: number, labels: number[]) =>
     .catch(err => {
       throw Error(err.message);
     });
-}
+};
+
+export const moveToTargetProject = (
+  transactionId: number,
+  targetProject: number
+) => {
+  const postBody = JSON.stringify({
+    targetProject: targetProject
+  });
+  return doPost(`/api/transactions/${transactionId}/move`, postBody)
+    .then(res => res)
+    .catch(err => {
+      throw Error(err);
+    });
+};

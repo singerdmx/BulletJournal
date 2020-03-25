@@ -7,6 +7,7 @@ import {
   CreateTransaction,
   GetTransaction,
   PatchTransaction,
+  MoveTransaction,
   SetTransactionLabels
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
@@ -15,6 +16,7 @@ import {
   createTransaction,
   getTransactionById,
   updateTransaction,
+  moveToTargetProject,
   setTransactionLabels
 } from '../../apis/transactionApis';
 import { updateTransactions } from './actions';
@@ -59,6 +61,16 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
     yield put(updateTransactions(projectId, timezone, undefined, undefined, 'MONTHLY'));
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
+  }
+}
+
+function* transactionMove(action: PayloadAction<MoveTransaction>) {
+  try {
+    const { transactionId, targetProject } = action.payload;
+    yield call(moveToTargetProject, transactionId, targetProject);
+    yield call(message.success, "Transaction moved successfully");
+  } catch (error) {
+    yield call(message.error, `transactionMove Error Received: ${error}`);
   }
 }
 
@@ -117,6 +129,7 @@ export default function* transactionSagas() {
       transactionsActions.TransactionPatch.type,
       patchTransaction
     ),
+    yield takeLatest(transactionsActions.TransactionMove.type, transactionMove),
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,
       transactionSetLabels
