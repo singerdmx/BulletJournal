@@ -67,8 +67,8 @@ public class TransactionController {
 
 
         LedgerSummary ledgerSummary = new LedgerSummary(transactions,
-                ZonedDateTimeHelper.getTime(startTime),
-                ZonedDateTimeHelper.getTime(endTime));
+                ZonedDateTimeHelper.getDateString(startTime),
+                ZonedDateTimeHelper.getDateString(endTime));
 
         switch (ledgerSummaryType) {
             case DEFAULT:

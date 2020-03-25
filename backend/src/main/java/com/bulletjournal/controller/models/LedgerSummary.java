@@ -1,6 +1,5 @@
 package com.bulletjournal.controller.models;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class LedgerSummary {
@@ -18,10 +17,6 @@ public class LedgerSummary {
     private String startDate; // "yyyy-MM-dd"
 
     private String endDate; // "yyyy-MM-dd"
-
-    private ZonedDateTime startDateTime;
-
-    private ZonedDateTime endDateTime;
 
     public LedgerSummary() {
     }
