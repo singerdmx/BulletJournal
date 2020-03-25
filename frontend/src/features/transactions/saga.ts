@@ -77,6 +77,7 @@ function* transactionMove(action: PayloadAction<MoveTransaction>) {
 function* getTransaction(action: PayloadAction<GetTransaction>) {
   try {
     const data = yield call(getTransactionById, action.payload.transactionId);
+    yield put(transactionsActions.transactionReceived({transaction: data}));
   } catch (error) {
     yield call(message.error, `Get Transaction Error Received: ${error}`);
   }

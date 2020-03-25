@@ -29,6 +29,10 @@ export type TasksAction = {
   tasks: Array<Task>;
 };
 
+export type TaskAction = {
+  task: Task;
+};
+
 export type PutTask = {
   projectId: number;
   tasks: Task[];
@@ -76,6 +80,7 @@ export type GetCompletedTasks = {
 
 let initialState = {
   addTaskVisible: false,
+  task: {} as Task,
   tasks: [] as Array<Task>,
   completedTasks: [] as Array<Task>
 };
@@ -87,6 +92,10 @@ const slice = createSlice({
     tasksReceived: (state, action: PayloadAction<TasksAction>) => {
       const { tasks } = action.payload;
       state.tasks = tasks;
+    },
+    taskReceived: (state, action: PayloadAction<TaskAction>) => {
+      const { task } = action.payload;
+      state.task = task;
     },
     updateAddTaskVisible: (
       state,

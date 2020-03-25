@@ -36,6 +36,10 @@ export type TransactionsAction = {
   transactions: Array<Transaction>;
 };
 
+export type TransactionAction = {
+  transaction: Transaction;
+};
+
 export type DeleteTransaction = {
   transactionId: number;
 };
@@ -62,6 +66,7 @@ export type SetTransactionLabels = {
 };
 
 let initialState = {
+  transaction: {} as Transaction,
   transactions: [] as Array<Transaction>,
   addTransactionVisible: false
 };
@@ -76,6 +81,13 @@ const slice = createSlice({
     ) => {
       const { transactions } = action.payload;
       state.transactions = transactions;
+    },
+    transactionReceived: (
+        state,
+        action: PayloadAction<TransactionAction>
+    ) => {
+      const { transaction } = action.payload;
+      state.transaction = transaction;
     },
     updateAddTransactionVisible: (
       state,
