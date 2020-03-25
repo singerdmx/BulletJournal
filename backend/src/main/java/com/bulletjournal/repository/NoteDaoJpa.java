@@ -213,7 +213,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<NoteContent> getContents(Long projectItemId, String requester) {
         Note note = this.getProjectItem(projectItemId);
-        List<NoteContent> contents = this.noteContentRepository.findNoteContentByNote(note);
+        List<NoteContent> contents = this.noteContentRepository.findNoteContentByNote(note)
+                .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
+                .collect(Collectors.toList());
         return contents;
     }
 }

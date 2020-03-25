@@ -41,6 +41,8 @@ public abstract class ContentModel<T extends ProjectItemModel> extends AuditMode
     }
 
     public Content toPresentationModel() {
-        return new Content(this.getId(), this.getOwner(), this.getText());
+        return new Content(
+                this.getId(), this.getOwner(), this.getText(),
+                this.getCreatedAt().getTime(), this.getUpdatedAt().getTime());
     }
 }

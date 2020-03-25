@@ -497,7 +497,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<TaskContent> getContents(Long projectItemId, String requester) {
         Task task = this.getProjectItem(projectItemId);
-        List<TaskContent> contents = this.taskContentRepository.findTaskContentByTask(task);
+        List<TaskContent> contents = this.taskContentRepository.findTaskContentByTask(task)
+                .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
+                .collect(Collectors.toList());
         return contents;
     }
 }

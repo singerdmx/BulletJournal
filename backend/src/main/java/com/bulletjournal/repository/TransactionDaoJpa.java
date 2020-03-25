@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -244,7 +245,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public List<TransactionContent> getContents(Long projectItemId, String requester) {
         Transaction transaction = this.getProjectItem(projectItemId);
         List<TransactionContent> contents = this.transactionContentRepository
-                .findTransactionContentByTransaction(transaction);
+                .findTransactionContentByTransaction(transaction)
+                .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
+                .collect(Collectors.toList());
         return contents;
     }
 }
