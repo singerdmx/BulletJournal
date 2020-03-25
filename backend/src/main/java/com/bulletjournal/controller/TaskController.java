@@ -58,7 +58,8 @@ public class TaskController {
 
     @GetMapping(TASK_ROUTE)
     public Task getTask(@NotNull @PathVariable Long taskId) {
-        return this.taskDaoJpa.getTask(taskId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getTask(username, taskId);
     }
 
     @GetMapping(COMPLETED_TASK_ROUTE)

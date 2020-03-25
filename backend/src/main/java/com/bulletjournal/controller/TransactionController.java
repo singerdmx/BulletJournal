@@ -96,7 +96,8 @@ public class TransactionController {
 
     @GetMapping(TRANSACTION_ROUTE)
     public Transaction getTransaction(@NotNull @PathVariable Long transactionId) {
-        return this.transactionDaoJpa.getTransaction(transactionId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.transactionDaoJpa.getTransaction(username, transactionId);
     }
 
     @PatchMapping(TRANSACTION_ROUTE)

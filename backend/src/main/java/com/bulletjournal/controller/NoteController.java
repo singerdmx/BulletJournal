@@ -60,7 +60,8 @@ public class NoteController {
 
     @GetMapping(NOTE_ROUTE)
     public Note getNote(@NotNull @PathVariable Long noteId) {
-        return this.noteDaoJpa.getNote(noteId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.noteDaoJpa.getNote(username, noteId);
     }
 
     @PatchMapping(NOTE_ROUTE)
