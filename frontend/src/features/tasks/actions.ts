@@ -59,7 +59,3 @@ export const moveTask = (taskId: number, targetProject: number) =>
 
 export const updateTaskVisible = (visible: boolean) =>
   actions.updateAddTaskVisible({ visible: visible });
-export const updateNoteVisible = (visible: boolean) =>
-  actions.updateAddNoteVisible({ visible: visible });
-export const updateTransactionVisible = (visible: boolean) =>
-  actions.updateAddTransactionVisible({ visible: visible });

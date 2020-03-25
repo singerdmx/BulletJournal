@@ -21,7 +21,7 @@ import { Group } from '../../features/group/interface';
 import './modals.styles.less';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { zones } from '../settings/constants';
-import { updateTransactionVisible } from '../../features/tasks/actions';
+import { updateTransactionVisible } from '../../features/transactions/actions';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -238,7 +238,7 @@ const mapStateToProps = (state: IState) => ({
   currency: state.settings.currency,
   timezone: state.settings.timezone,
   myself: state.myself.username,
-  addTransactionVisible: state.task.addTransactionVisible
+  addTransactionVisible: state.transaction.addTransactionVisible
 });
 
 export default connect(mapStateToProps, {

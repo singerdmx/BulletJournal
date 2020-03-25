@@ -1,8 +1,18 @@
 import { actions } from './reducer';
-export const updateTransactions = (projectId: number, timezone: string,
-  startDate?: string, endDate?: string, frequencyType?: string) =>
-  actions.TransactionsUpdate({ projectId: projectId, timezone: timezone,
-    startDate: startDate, endDate: endDate, frequencyType: frequencyType });
+export const updateTransactions = (
+  projectId: number,
+  timezone: string,
+  startDate?: string,
+  endDate?: string,
+  frequencyType?: string
+) =>
+  actions.TransactionsUpdate({
+    projectId: projectId,
+    timezone: timezone,
+    startDate: startDate,
+    endDate: endDate,
+    frequencyType: frequencyType
+  });
 export const createTransaction = (
   projectId: number,
   amount: number,
@@ -11,7 +21,7 @@ export const createTransaction = (
   date: string,
   transactionType: number,
   timezone: string,
-  time?: string,
+  time?: string
 ) =>
   actions.TransactionsCreate({
     projectId: projectId,
@@ -21,7 +31,7 @@ export const createTransaction = (
     date: date,
     transactionType: transactionType,
     timezone: timezone,
-    time: time,
+    time: time
   });
 export const deleteTransaction = (transactionId: number) =>
   actions.TransactionDelete({ transactionId: transactionId });
@@ -48,3 +58,6 @@ export const setTransactionLabels = (transactionId: number, labels: number[]) =>
     transactionId: transactionId,
     labels: labels
   });
+
+export const updateTransactionVisible = (visible: boolean) =>
+  actions.updateAddTransactionVisible({ visible: visible });

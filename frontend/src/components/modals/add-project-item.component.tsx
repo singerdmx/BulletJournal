@@ -9,11 +9,9 @@ import { IState } from '../../store';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { iconMapper } from '../side-menu/side-menu.component';
 import { History } from 'history';
-import {
-  updateTaskVisible,
-  updateNoteVisible,
-  updateTransactionVisible
-} from '../../features/tasks/actions';
+import { updateTaskVisible } from '../../features/tasks/actions';
+import { updateNoteVisible } from '../../features/notes/actions';
+import { updateTransactionVisible } from '../../features/transactions/actions';
 
 import './modals.styles.less';
 import {

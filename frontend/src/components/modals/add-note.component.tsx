@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { createNote } from '../../features/notes/actions';
 import { IState } from '../../store';
-import { updateNoteVisible } from '../../features/tasks/actions';
+import { updateNoteVisible } from '../../features/notes/actions';
 import './modals.styles.less';
 
 type NoteProps = {
@@ -68,7 +68,7 @@ const AddNote: React.FC<RouteComponentProps &
 
 const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
-  addNoteVisible: state.task.addNoteVisible
+  addNoteVisible: state.note.addNoteVisible
 });
 
 export default connect(mapStateToProps, { createNote, updateNoteVisible })(

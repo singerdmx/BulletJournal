@@ -13,6 +13,10 @@ export type UpdateTransactions = {
   frequencyType?: string;
 };
 
+export type updateVisibleAction = {
+  visible: boolean;
+};
+
 export type CreateTransaction = {
   projectId: number;
   amount: number;
@@ -53,7 +57,8 @@ export type SetTransactionLabels = {
 };
 
 let initialState = {
-  transactions: [] as Array<Transaction>
+  transactions: [] as Array<Transaction>,
+  addTransactionVisible: false
 };
 
 const slice = createSlice({
@@ -66,6 +71,13 @@ const slice = createSlice({
     ) => {
       const { transactions } = action.payload;
       state.transactions = transactions;
+    },
+    updateAddTransactionVisible: (
+      state,
+      action: PayloadAction<updateVisibleAction>
+    ) => {
+      const { visible } = action.payload;
+      state.addTransactionVisible = visible;
     },
     transactionApiErrorReceived: (
       state,
