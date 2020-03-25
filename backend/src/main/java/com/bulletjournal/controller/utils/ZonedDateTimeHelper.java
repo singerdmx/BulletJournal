@@ -19,6 +19,18 @@ public class ZonedDateTimeHelper {
     private static final String MIN_TIME = "00:00";
     private static final String MAX_TIME = "23:59";
 
+    public static String getTime(ZonedDateTime date) {
+        return aggregateDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth())
+                + aggregateTime(date.getHour(), date.getMinute());
+    }
+
+    private  static String aggregateTime(int hour, int min) {
+        return hour + ":" + min;
+    }
+
+    private static String aggregateDate(int year, int month, int day) {
+        return year + "-" + month + "-" + day;
+    }
     /*
      * Return ZoneDateTime type for start time. If time is null, will replace time with 00:00.
      */

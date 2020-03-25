@@ -65,7 +65,11 @@ public class TransactionController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(transactionsEtag);
 
-        LedgerSummary ledgerSummary = new LedgerSummary(transactions, null, null);
+
+        LedgerSummary ledgerSummary = new LedgerSummary(transactions,
+                ZonedDateTimeHelper.getTime(startTime),
+                ZonedDateTimeHelper.getTime(endTime));
+
         switch (ledgerSummaryType) {
             case DEFAULT:
                 break;
