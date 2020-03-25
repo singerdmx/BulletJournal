@@ -21,6 +21,7 @@ import { Group } from '../../features/group/interface';
 import './modals.styles.less';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { zones } from '../settings/constants';
+import { updateTransactionVisible } from '../../features/tasks/actions';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -61,13 +62,14 @@ interface TransactionCreateFormProps {
   currency: string;
   timezone: string;
   myself: string;
+  updateTransactionVisible: (visible: boolean) => void;
+  addTransactionVisible: boolean;
 }
 
 const AddTransaction: React.FC<RouteComponentProps &
   TransactionProps &
   TransactionCreateFormProps> = props => {
   const [form] = Form.useForm();
-  const [visible, setVisible] = useState(false);
   const addTransaction = (values: any) => {
     //convert time object to format string
     const date_value = values.date.format('YYYY-MM-DD');
@@ -84,11 +86,11 @@ const AddTransaction: React.FC<RouteComponentProps &
       timezone,
       time_value
     );
-    setVisible(false);
+    props.updateTransactionVisible(false);
   };
-  const onCancel = () => setVisible(false);
+  const onCancel = () => props.updateTransactionVisible(false);
   const openModal = () => {
-    setVisible(true);
+    props.updateTransactionVisible(true);
   };
 
   useEffect(() => {
@@ -107,7 +109,7 @@ const AddTransaction: React.FC<RouteComponentProps &
           destroyOnClose
           centered
           title='Create New Transaction'
-          visible={visible}
+          visible={props.addTransactionVisible}
           okText='Create'
           onCancel={onCancel}
           onOk={() => {
@@ -235,10 +237,12 @@ const mapStateToProps = (state: IState) => ({
   group: state.group.group,
   currency: state.settings.currency,
   timezone: state.settings.timezone,
-  myself: state.myself.username
+  myself: state.myself.username,
+  addTransactionVisible: state.task.addTransactionVisible
 });
 
 export default connect(mapStateToProps, {
   createTransaction,
-  updateExpandedMyself
+  updateExpandedMyself,
+  updateTransactionVisible
 })(withRouter(AddTransaction));

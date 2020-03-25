@@ -66,11 +66,18 @@ export type SetTaskLabels = {
   labels: number[];
 };
 
+export type updateVisibleAction = {
+  visible: boolean;
+};
+
 export type GetCompletedTasks = {
   projectId: number;
 };
 
 let initialState = {
+  addTaskVisible: false,
+  addNoteVisible: false,
+  addTransactionVisible: false,
   tasks: [] as Array<Task>,
   completedTasks: [] as Array<Task>
 };
@@ -82,6 +89,27 @@ const slice = createSlice({
     tasksReceived: (state, action: PayloadAction<TasksAction>) => {
       const { tasks } = action.payload;
       state.tasks = tasks;
+    },
+    updateAddTaskVisible: (
+      state,
+      action: PayloadAction<updateVisibleAction>
+    ) => {
+      const { visible } = action.payload;
+      state.addTaskVisible = visible;
+    },
+    updateAddNoteVisible: (
+      state,
+      action: PayloadAction<updateVisibleAction>
+    ) => {
+      const { visible } = action.payload;
+      state.addNoteVisible = visible;
+    },
+    updateAddTransactionVisible: (
+      state,
+      action: PayloadAction<updateVisibleAction>
+    ) => {
+      const { visible } = action.payload;
+      state.addTransactionVisible = visible;
     },
     completedTasksReceived: (state, action: PayloadAction<TasksAction>) => {
       const { tasks } = action.payload;

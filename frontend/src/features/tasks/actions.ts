@@ -56,3 +56,10 @@ export const setTaskLabels = (taskId: number, labels: number[]) =>
   actions.TaskSetLabels({ taskId: taskId, labels: labels });
 export const moveTask = (taskId: number, targetProject: number) =>
   actions.TaskMove({ taskId: taskId, targetProject: targetProject });
+
+export const updateTaskVisible = (visible: boolean) =>
+  actions.updateAddTaskVisible({ visible: visible });
+export const updateNoteVisible = (visible: boolean) =>
+  actions.updateAddNoteVisible({ visible: visible });
+export const updateTransactionVisible = (visible: boolean) =>
+  actions.updateAddTransactionVisible({ visible: visible });
