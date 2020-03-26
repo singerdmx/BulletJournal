@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Transaction, LedgerSummary, TransactionsSummary } from './interface';
+import { History } from 'history';
 
 export type TransactionApiErrorAction = {
   error: string;

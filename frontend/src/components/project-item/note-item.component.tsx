@@ -34,7 +34,7 @@ const Content: React.FC<NoteProps> = props => {
                 className="group-setting"
                 placement="bottom"
             >
-                <div>
+                <div style={{ cursor: 'pointer' }}>
                     Delete
                     <DeleteTwoTone twoToneColor="#f5222d"/>
                 </div>
