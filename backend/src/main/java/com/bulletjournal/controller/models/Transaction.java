@@ -13,6 +13,8 @@ public class Transaction extends ProjectItem {
     @Size(min = 2, max = 100)
     private String payer;
 
+    private String payerAvatar;
+
     @NotNull
     private Double amount;
 
@@ -57,6 +59,14 @@ public class Transaction extends ProjectItem {
 
     public void setPayer(String payer) {
         this.payer = payer;
+    }
+
+    public String getPayerAvatar() {
+        return payerAvatar;
+    }
+
+    public void setPayerAvatar(String payerAvatar) {
+        this.payerAvatar = payerAvatar;
     }
 
     public Double getAmount() {

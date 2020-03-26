@@ -103,6 +103,7 @@ public class TransactionController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Transaction transaction = this.transactionDaoJpa.getTransaction(username, transactionId);
         transaction.setOwnerAvatar(this.userClient.getUser(transaction.getOwner()).getAvatar());
+        transaction.setPayerAvatar(this.userClient.getUser(transaction.getPayer()).getAvatar());
         return transaction;
     }
 

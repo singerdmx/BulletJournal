@@ -65,6 +65,7 @@ public class TaskController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Task task = this.taskDaoJpa.getTask(username, taskId);
         task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
+        task.setAssignedToAvatar(this.userClient.getUser(task.getAssignedTo()).getAvatar());
         return task;
     }
 

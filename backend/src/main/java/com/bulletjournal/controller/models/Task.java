@@ -17,6 +17,8 @@ public class Task extends ProjectItem {
     @Size(min = 1, max = 100)
     private String assignedTo;
 
+    private String assignedToAvatar;
+
     private String dueDate;
 
     private String dueTime;
@@ -68,6 +70,14 @@ public class Task extends ProjectItem {
 
     public void setAssignedTo(String assignedTo) {
         this.assignedTo = assignedTo;
+    }
+
+    public String getAssignedToAvatar() {
+        return assignedToAvatar;
+    }
+
+    public void setAssignedToAvatar(String assignedToAvatar) {
+        this.assignedToAvatar = assignedToAvatar;
     }
 
     public String getDueDate() {
