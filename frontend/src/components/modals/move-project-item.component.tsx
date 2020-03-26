@@ -1,21 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import {Avatar, Button, Form, Modal, Select, Tooltip} from 'antd';
-import {RightCircleOutlined} from '@ant-design/icons';
-import {connect} from 'react-redux';
-import {GroupsWithOwner} from '../../features/group/interface';
-import {createProjectByName} from '../../features/project/actions';
-import {updateGroups} from '../../features/group/actions';
-import {IState} from '../../store';
-import {Project, ProjectsWithOwner} from '../../features/project/interface';
-import {iconMapper} from '../side-menu/side-menu.component';
-import {History} from 'history';
-import {moveTask} from '../../features/tasks/actions';
-import {moveNote} from '../../features/notes/actions';
-import {moveTransaction} from '../../features/transactions/actions';
+import React, { useEffect, useState } from 'react';
+import { Avatar, Button, Form, Modal, Select, Tooltip } from 'antd';
+import { RightCircleOutlined } from '@ant-design/icons';
+import { connect } from 'react-redux';
+import { GroupsWithOwner } from '../../features/group/interface';
+import { createProjectByName } from '../../features/project/actions';
+import { updateGroups } from '../../features/group/actions';
+import { IState } from '../../store';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
+import { iconMapper } from '../side-menu/side-menu.component';
+import { History } from 'history';
+import { moveTask } from '../../features/tasks/actions';
+import { moveNote } from '../../features/notes/actions';
+import { moveTransaction } from '../../features/transactions/actions';
 import './modals.styles.less';
-import {flattenOwnedProject, flattenSharedProject} from '../../pages/projects/projects.pages';
+import {
+  flattenOwnedProject,
+  flattenSharedProject
+} from '../../pages/projects/projects.pages';
 
-const {Option} = Select;
+const { Option } = Select;
 
 type ProjectItemProps = {
   type: string;
@@ -40,6 +43,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const [visible, setVisible] = useState(false);
 
   const onCancel = () => {
+    console.log('cancel clicking');
     setVisible(false);
   };
   const openModal = () => {
@@ -51,7 +55,11 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     setProjects([]);
     setProjects(flattenOwnedProject(props.ownedProjects, projects));
     setProjects(flattenSharedProject(props.sharedProjects, projects));
-    setProjects(projects.filter(p => p.projectType === props.type && p.id !== props.project.id));
+    setProjects(
+      projects.filter(
+        p => p.projectType === props.type && p.id !== props.project.id
+      )
+    );
   }, []);
 
   const moveProjectItem = (values: any) => {
@@ -59,7 +67,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     if (!projectId) {
       projectId = projects[0].id;
     }
-    console.log(props.projectItemId + "#" + projectId);
+    console.log(props.projectItemId + '#' + projectId);
     switch (props.type) {
       case 'NOTE':
         moveNote(props.projectItemId, projectId);
@@ -68,7 +76,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         moveTask(props.projectItemId, projectId);
         break;
       case 'TRANSACTION':
-        moveTask(props.projectItemId, projectId)
+        moveTask(props.projectItemId, projectId);
         break;
     }
     setVisible(false);
@@ -77,59 +85,59 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const getProjectSelections = () => {
     if (projects && projects[0]) {
       return (
-          <Form form={form} labelAlign='left'>
-            <Tooltip title='Choose BuJo' placement='topLeft'>
-              <Form.Item name='project'>
-                <Select
-                    placeholder='Choose BuJo'
-                    style={{width: '100%'}}
-                    defaultValue={projects[0].id}
-                >
-                  {projects.map(project => {
-                    return (
-                        <Option value={project.id} key={project.id}>
-                          <Tooltip title={project.owner} placement='right'>
+        <Form form={form} labelAlign="left">
+          <Tooltip title="Choose BuJo" placement="topLeft">
+            <Form.Item name="project">
+              <Select
+                placeholder="Choose BuJo"
+                style={{ width: '100%' }}
+                defaultValue={projects[0].id}
+              >
+                {projects.map(project => {
+                  return (
+                    <Option value={project.id} key={project.id}>
+                      <Tooltip title={project.owner} placement="right">
                         <span>
-                          <Avatar size='small' src={project.ownerAvatar}/>
+                          <Avatar size="small" src={project.ownerAvatar} />
                           &nbsp; {iconMapper[project.projectType]}
                           &nbsp; <strong>{project.name}</strong>
                           &nbsp; (Group <strong>{project.group.name}</strong>)
                         </span>
-                          </Tooltip>
-                        </Option>
-                    );
-                  })}
-                </Select>
-              </Form.Item>
-            </Tooltip>
-          </Form>
+                      </Tooltip>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Tooltip>
+        </Form>
       );
     }
 
-    return <div/>;
+    return <React.Fragment />;
   };
 
   const getModal = () => {
     return (
-        <Modal
-            title='Move'
-            destroyOnClose
-            centered
-            okText='Confirm'
-            visible={visible}
-            onCancel={onCancel}
-            onOk={() => {
-              form
-                  .validateFields()
-                  .then(values => {
-                    form.resetFields();
-                    moveProjectItem(values);
-                  })
-                  .catch(info => console.log(info));
-            }}
-        >
-          <div>{getProjectSelections()}</div>
-        </Modal>
+      <Modal
+        title="Move"
+        destroyOnClose
+        centered
+        okText="Confirm"
+        visible={visible}
+        onCancel={onCancel}
+        onOk={() => {
+          form
+            .validateFields()
+            .then(values => {
+              form.resetFields();
+              moveProjectItem(values);
+            })
+            .catch(info => console.log(info));
+        }}
+      >
+        <div>{getProjectSelections()}</div>
+      </Modal>
     );
   };
 
@@ -138,11 +146,11 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
       return null;
     }
     return (
-        <div onClick={openModal} style={{cursor: 'pointer'}}>
-          <span>Move</span>
-          <RightCircleOutlined />
-          {getModal()}
-        </div>
+      <div onClick={openModal} style={{ cursor: 'pointer' }}>
+        <span>Move</span>
+        <RightCircleOutlined />
+        {getModal()}
+      </div>
     );
   };
 
