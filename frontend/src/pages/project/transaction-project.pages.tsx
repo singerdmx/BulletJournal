@@ -7,6 +7,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
 import { zones } from '../../components/settings/constants';
 import { updateTransactions } from '../../features/transactions/actions';
+import { updateExpandedMyself } from '../../features/myself/actions';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -33,6 +34,7 @@ type TransactionProps = {
   startDate: string;
   endDate: string;
   ledgerSummaryType: string;
+  updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
     projectId: number,
     timezone: string,
@@ -55,6 +57,20 @@ const TransactionProject: React.FC<TransactionProps> = props => {
     );
   };
 
+  useEffect(() => {
+    props.updateExpandedMyself(true);
+    props.updateTransactions(
+      props.projectId,
+      props.timezone
+        ? props.timezone
+        : Intl.DateTimeFormat().resolvedOptions().timeZone,
+      props.frequencyType,
+      props.ledgerSummaryType,
+      props.startDate,
+      props.endDate
+    );
+  }, []);
+
   return (
     <div>
       <Radio.Group value={props.frequencyType} onChange={onChangeFrequency}>
@@ -76,7 +92,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
           style={{ width: '200px' }}
           showSearch={true}
           placeholder='Select Time Zone'
-          defaultValue={props.timezone ? props.timezone : ''}
+          value={props.transactionTimezone ? props.transactionTimezone : ''}
         >
           {zones.map((zone: string, index: number) => (
             <Option key={zone} value={zone}>
@@ -101,6 +117,7 @@ const mapStateToProps = (state: IState) => ({
   ledgerSummaryType: state.transaction.ledgerSummaryType
 });
 
-export default connect(mapStateToProps, { updateTransactions })(
-  TransactionProject
-);
+export default connect(mapStateToProps, {
+  updateTransactions,
+  updateExpandedMyself
+})(TransactionProject);

@@ -124,8 +124,6 @@ const AddTask: React.FC<RouteComponentProps &
   };
   const onCancel = () => props.updateTaskVisible(false);
   const openModal = () => {
-    console.log('============');
-    console.log(props.addTaskVisible);
     props.updateTaskVisible(true);
   };
   useEffect(() => {
