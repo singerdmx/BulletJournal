@@ -42,7 +42,8 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
 
-  const onCancel = () => {
+  const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.stopPropagation();
     console.log('cancel clicking');
     setVisible(false);
   };
@@ -125,7 +126,8 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         centered
         okText="Confirm"
         visible={visible}
-        onCancel={onCancel}
+        zIndex={2000}
+        onCancel={e => handleCancel(e)}
         onOk={() => {
           form
             .validateFields()
