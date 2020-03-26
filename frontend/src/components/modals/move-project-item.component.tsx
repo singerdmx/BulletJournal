@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Form, Modal, Select, Tooltip} from 'antd';
-import {PlusOutlined} from '@ant-design/icons';
+import {Avatar, Button, Form, Modal, Select, Tooltip} from 'antd';
+import {RightCircleOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {GroupsWithOwner} from '../../features/group/interface';
 import {createProjectByName} from '../../features/project/actions';
@@ -9,17 +9,18 @@ import {IState} from '../../store';
 import {Project, ProjectsWithOwner} from '../../features/project/interface';
 import {iconMapper} from '../side-menu/side-menu.component';
 import {History} from 'history';
-import {updateTaskVisible} from '../../features/tasks/actions';
-import {updateNoteVisible} from '../../features/notes/actions';
-import {updateTransactionVisible} from '../../features/transactions/actions';
+import {moveTask} from '../../features/tasks/actions';
+import {moveNote} from '../../features/notes/actions';
+import {moveTransaction} from '../../features/transactions/actions';
 import './modals.styles.less';
 import {flattenOwnedProject, flattenSharedProject} from '../../pages/projects/projects.pages';
 
 const {Option} = Select;
 
 type ProjectItemProps = {
-  history: History<History.PoorMansUnknown>;
-  mode: string;
+  type: string;
+  projectItemId: number;
+  project: Project;
   ownedProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
 };
@@ -28,17 +29,19 @@ type ProjectItemProps = {
 type GroupProps = {
   groups: GroupsWithOwner[];
   updateGroups: () => void;
-  updateTaskVisible: (addTaskVisible: boolean) => void;
-  updateNoteVisible: (addNoteVisible: boolean) => void;
-  updateTransactionVisible: (addTransactionVisible: boolean) => void;
+  moveNote: (noteId: number, targetProject: number) => void;
+  moveTask: (taskId: number, targetProject: number) => void;
+  moveTransaction: (trasactionId: number, targetProject: number) => void;
 };
 
-const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
+const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
 
-  const onCancel = () => setVisible(false);
+  const onCancel = () => {
+    setVisible(false);
+  };
   const openModal = () => {
     setVisible(true);
   };
@@ -48,28 +51,27 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     setProjects([]);
     setProjects(flattenOwnedProject(props.ownedProjects, projects));
     setProjects(flattenSharedProject(props.sharedProjects, projects));
+    setProjects(projects.filter(p => p.projectType === props.type && p.id !== props.project.id));
   }, []);
 
-  const addBuJoItem = (values: any) => {
-    let project: string = values.project;
-    if (!project) {
-      project = getProjectValue(projects[0]);
+  const moveProjectItem = (values: any) => {
+    let projectId: number | undefined = values.project;
+    if (!projectId) {
+      projectId = projects[0].id;
     }
-
-    props.history.push(`/projects/${project.split('#')[1]}`);
-    const type = project.split('#')[0];
-    if (type === 'TODO') {
-      props.updateTaskVisible(true);
-    } else if (type === 'NOTE') {
-      props.updateNoteVisible(true);
-    } else if (type === 'LEDGER') {
-      props.updateTransactionVisible(true);
+    console.log(props.projectItemId + "#" + projectId);
+    switch (props.type) {
+      case 'NOTE':
+        moveNote(props.projectItemId, projectId);
+        break;
+      case 'TASK':
+        moveTask(props.projectItemId, projectId);
+        break;
+      case 'TRANSACTION':
+        moveTask(props.projectItemId, projectId)
+        break;
     }
     setVisible(false);
-  };
-
-  const getProjectValue = (project: Project) => {
-    return project.projectType + '#' + project.id;
   };
 
   const getProjectSelections = () => {
@@ -81,11 +83,11 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                 <Select
                     placeholder='Choose BuJo'
                     style={{width: '100%'}}
-                    defaultValue={getProjectValue(projects[0])}
+                    defaultValue={projects[0].id}
                 >
                   {projects.map(project => {
                     return (
-                        <Option value={getProjectValue(project)} key={project.id}>
+                        <Option value={project.id} key={project.id}>
                           <Tooltip title={project.owner} placement='right'>
                         <span>
                           <Avatar size='small' src={project.ownerAvatar}/>
@@ -110,10 +112,10 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const getModal = () => {
     return (
         <Modal
-            title='Create New BuJo Item'
+            title='Move'
             destroyOnClose
             centered
-            okText='Create'
+            okText='Confirm'
             visible={visible}
             onCancel={onCancel}
             onOk={() => {
@@ -121,7 +123,7 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                   .validateFields()
                   .then(values => {
                     form.resetFields();
-                    addBuJoItem(values);
+                    moveProjectItem(values);
                   })
                   .catch(info => console.log(info));
             }}
@@ -132,23 +134,13 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   };
 
   const getDiv = () => {
-    if (props.mode === 'MyBuJo') {
-      return (
-          <div>
-            <Tooltip placement='bottom' title='Create New BuJo Item'>
-              <h2 className='add-todo-button' onClick={openModal}>
-                <PlusOutlined/>
-              </h2>
-            </Tooltip>
-            {getModal()}
-          </div>
-      );
+    if (projects.length === 0) {
+      return null;
     }
     return (
-        <div>
-          <Tooltip placement='bottom' title='Create New BuJo Item'>
-            <PlusOutlined className='rotateIcon' onClick={openModal}/>
-          </Tooltip>
+        <div onClick={openModal} style={{cursor: 'pointer'}}>
+          <span>Move</span>
+          <RightCircleOutlined />
           {getModal()}
         </div>
     );
@@ -167,7 +159,7 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   updateGroups,
   createProjectByName,
-  updateTaskVisible,
-  updateNoteVisible,
-  updateTransactionVisible
-})(AddProjectItem);
+  moveNote,
+  moveTask,
+  moveTransaction
+})(MoveProjectItem);

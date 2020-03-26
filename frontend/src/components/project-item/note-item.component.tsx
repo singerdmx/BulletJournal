@@ -6,24 +6,23 @@ import {
     InfoCircleOutlined,
     MessageOutlined,
     MoreOutlined,
-    RightCircleOutlined
 } from '@ant-design/icons';
-import {deleteNote, moveNote} from '../../features/notes/actions';
+import {deleteNote} from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import EditNote from '../modals/edit-note.component';
 
 import {Popconfirm, Popover} from 'antd';
+import EditProjectItem from "../modals/move-project-item.component";
 
 type NoteProps = {
     note: Note;
     deleteNote: (noteId: number) => void;
-    moveNote: (noteId: number, targetProject: number) => void;
 };
 
 const Content: React.FC<NoteProps> = props => {
-    const {note, deleteNote, moveNote} = props;
+    const {note, deleteNote} = props;
     const [visible, setVisible] = useState(false);
     return (
         <div style={{display: 'flex', flexDirection: 'column'}}>
@@ -46,7 +45,7 @@ const Content: React.FC<NoteProps> = props => {
                 <EditNote visible={visible} note={note} setVisible={setVisible}/>
             </div>
             <div>
-                Move <RightCircleOutlined onClick={() => moveNote(note.id, 14)}/>
+                <EditProjectItem type='NOTE' projectItemId={note.id}/>
             </div>
         </div>
     );
@@ -57,7 +56,7 @@ const alignConfig = {
 };
 
 const NoteItem: React.FC<NoteProps> = props => {
-    const {note, deleteNote, moveNote} = props;
+    const {note, deleteNote} = props;
 
     return (
         <div
@@ -92,7 +91,7 @@ const NoteItem: React.FC<NoteProps> = props => {
                     placement="bottomRight"
                     style={{top: -10}}
                     content={
-                        <Content note={note} deleteNote={deleteNote} moveNote={moveNote}/>
+                        <Content note={note} deleteNote={deleteNote}/>
                     }
                     trigger="click"
                 >
@@ -105,4 +104,4 @@ const NoteItem: React.FC<NoteProps> = props => {
     );
 };
 
-export default connect(null, {deleteNote, moveNote})(NoteItem);
+export default connect(null, {deleteNote})(NoteItem);

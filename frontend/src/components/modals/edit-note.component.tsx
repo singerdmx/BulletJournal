@@ -24,7 +24,7 @@ const EditNote: React.FC<NoteProps> = props => {
 
     return (<div>
         <Modal
-            title="Title"
+            title="Edit"
             visible={props.visible}
             onOk={onOk}
             okText="Confirm"
