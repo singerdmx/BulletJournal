@@ -27,7 +27,7 @@ public class TaskController {
 
     protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
-    protected static final String COMPLETED_TASK_ROUTE = "/api/completeTasks/{taskId}";
+    protected static final String COMPLETED_TASK_ROUTE = "/api/completedTasks/{taskId}";
     protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
     protected static final String UNCOMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/uncomplete";
     protected static final String COMPLETED_TASKS_ROUTE = "/api/projects/{projectId}/completedTasks";
