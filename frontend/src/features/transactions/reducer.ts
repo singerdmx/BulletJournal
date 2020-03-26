@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Transaction } from './interface';
+import { Transaction, LedgerSummary, TransactionsSummary } from './interface';
 
 export type TransactionApiErrorAction = {
   error: string;
@@ -8,9 +8,10 @@ export type TransactionApiErrorAction = {
 export type UpdateTransactions = {
   projectId: number;
   timezone: string;
+  frequencyType: string;
+  ledgerSummaryType: string;
   startDate?: string;
   endDate?: string;
-  frequencyType?: string;
 };
 
 export type updateVisibleAction = {
@@ -33,7 +34,10 @@ export type GetTransaction = {
 };
 
 export type TransactionsAction = {
-  transactions: Array<Transaction>;
+  ledgerSummary: LedgerSummary;
+  timezone: string;
+  frequencyType: string;
+  ledgerSummaryType: string;
 };
 
 export type TransactionAction = {
@@ -42,6 +46,10 @@ export type TransactionAction = {
 
 export type DeleteTransaction = {
   transactionId: number;
+};
+
+export type updateFrequencyAction = {
+  frequencyType: string;
 };
 
 export type PatchTransaction = {
@@ -66,9 +74,18 @@ export type SetTransactionLabels = {
 };
 
 let initialState = {
+  balance: 0,
+  expense: 0,
+  income: 0,
+  startDate: '',
+  endDate: '',
+  frequencyType: 'MONTHLY',
+  ledgerSummaryType: 'DEFAULT',
   transaction: {} as Transaction,
   transactions: [] as Array<Transaction>,
-  addTransactionVisible: false
+  transactionsSummaries: [] as Array<TransactionsSummary>,
+  addTransactionVisible: false,
+  timezone: ''
 };
 
 const slice = createSlice({
@@ -79,13 +96,24 @@ const slice = createSlice({
       state,
       action: PayloadAction<TransactionsAction>
     ) => {
-      const { transactions } = action.payload;
-      state.transactions = transactions;
+      const {
+        ledgerSummary,
+        frequencyType,
+        ledgerSummaryType,
+        timezone
+      } = action.payload;
+      state.transactions = ledgerSummary.transactions;
+      state.startDate = ledgerSummary.startDate;
+      state.endDate = ledgerSummary.endDate;
+      state.expense = ledgerSummary.expense;
+      state.income = ledgerSummary.income;
+      state.balance = ledgerSummary.balance;
+      state.transactionsSummaries = ledgerSummary.transactionsSummaries;
+      state.frequencyType = frequencyType;
+      state.ledgerSummaryType = ledgerSummaryType;
+      state.timezone = timezone;
     },
-    transactionReceived: (
-        state,
-        action: PayloadAction<TransactionAction>
-    ) => {
+    transactionReceived: (state, action: PayloadAction<TransactionAction>) => {
       const { transaction } = action.payload;
       state.transaction = transaction;
     },

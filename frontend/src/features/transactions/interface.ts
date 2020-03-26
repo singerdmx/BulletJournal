@@ -9,6 +9,26 @@ export interface Transaction extends ProjectItem {
   transactionType: number;
 }
 
+export interface TransactionsSummary {
+  balance: number;
+  expense: number;
+  expensePercentage: number;
+  income: number;
+  incomePercentage: number;
+  name: string;
+  metadata?: string;
+}
+
+export interface LedgerSummary {
+  balance: number;
+  expense: number;
+  income: number;
+  startDate: string;
+  endDate: string;
+  transactions: Transaction[];
+  transactionsSummaries: TransactionsSummary[];
+}
+
 export enum FrequencyType {
   WEEKLY = 'WEEKLY',
   MONTHLY = 'MONTHLY',

@@ -16,6 +16,7 @@ import { ProjectType } from '../../features/project/constants';
 import { NoteTree } from '../../components/note-tree';
 import { History } from 'history';
 import {getGroupByProject} from "../projects/projects.pages";
+import TransactionProject from './transaction-project.pages';
 
 import './project.styles.less';
 
@@ -99,6 +100,7 @@ class ProjectPage extends React.Component<
         break;
       case ProjectType.LEDGER:
         createContent = <AddTransaction />;
+        projectContent = <TransactionProject />;
     }
 
     let editContent = null;

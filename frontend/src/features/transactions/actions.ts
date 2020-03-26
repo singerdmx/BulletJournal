@@ -2,16 +2,18 @@ import { actions } from './reducer';
 export const updateTransactions = (
   projectId: number,
   timezone: string,
+  frequencyType: string,
+  ledgerSummaryType: string,
   startDate?: string,
-  endDate?: string,
-  frequencyType?: string
+  endDate?: string
 ) =>
   actions.TransactionsUpdate({
     projectId: projectId,
     timezone: timezone,
+    frequencyType: frequencyType,
+    ledgerSummaryType: ledgerSummaryType,
     startDate: startDate,
-    endDate: endDate,
-    frequencyType: frequencyType
+    endDate: endDate
   });
 export const createTransaction = (
   projectId: number,
@@ -34,7 +36,7 @@ export const createTransaction = (
     time: time
   });
 export const getTransaction = (transactionId: number) =>
-    actions.TransactionGet({ transactionId: transactionId });
+  actions.TransactionGet({ transactionId: transactionId });
 export const deleteTransaction = (transactionId: number) =>
   actions.TransactionDelete({ transactionId: transactionId });
 export const patchTransaction = (
@@ -65,7 +67,7 @@ export const updateTransactionVisible = (visible: boolean) =>
   actions.updateAddTransactionVisible({ visible: visible });
 
 export const moveTransaction = (transactionId: number, targetProject: number) =>
-actions.TransactionMove({
-  transactionId: transactionId,
-  targetProject: targetProject
-});
+  actions.TransactionMove({
+    transactionId: transactionId,
+    targetProject: targetProject
+  });

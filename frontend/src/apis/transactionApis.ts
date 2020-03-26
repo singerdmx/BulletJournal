@@ -3,15 +3,16 @@ import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
 export const fetchTransactions = (
   projectId: number,
   timezone: string,
+  frequencyType: string,
+  ledgerSummaryType: string,
   startDate?: string,
-  endDate?: string,
-  frequencyType?: string
-  ) => {
+  endDate?: string
+) => {
   // e.g. /api/projects/105/transactions?frequencyType=MONTHLY&timezone=America%2FLos_Angeles
-  let url = `/api/projects/${projectId}/transactions?timezone=` + encodeURIComponent(timezone);
-  if (frequencyType) {
-    url += `&frequencyType=${frequencyType}`;
-  } else {
+  let url = `/api/projects/${projectId}/transactions?timezone=${encodeURIComponent(
+    timezone
+  )}&frequencyType=${frequencyType}&ledgerSummaryType=${ledgerSummaryType}`;
+  if (startDate && endDate) {
     url += `&startDate=${startDate}&endDate=${endDate}`;
   }
   return doFetch(url)
@@ -30,14 +31,21 @@ export const getTransactionById = (transactionId: number) => {
 };
 
 export const deleteTransactionById = (transactionId: number) => {
-  return doDelete(`/api/transactions/${transactionId}`)
-    .catch(err => {
-      throw Error(err.message);
-    });
+  return doDelete(`/api/transactions/${transactionId}`).catch(err => {
+    throw Error(err.message);
+  });
 };
 
-export const createTransaction = (projectId: number, amount: number, name: string, payer: string,
-  transactionType: number, date: string, timezone: string, time?: string) => {
+export const createTransaction = (
+  projectId: number,
+  amount: number,
+  name: string,
+  payer: string,
+  transactionType: number,
+  date: string,
+  timezone: string,
+  time?: string
+) => {
   const postBody = JSON.stringify({
     amount: amount,
     name: name,
@@ -80,7 +88,10 @@ export const updateTransaction = (
     });
 };
 
-export const setTransactionLabels = (transactionId: number, labels: number[]) => {
+export const setTransactionLabels = (
+  transactionId: number,
+  labels: number[]
+) => {
   const putBody = JSON.stringify(labels);
   return doPut(`/api/transactions/{transactionId}/setLabels`, putBody)
     .then(res => res.json())

@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as transactionsActions,
@@ -10,6 +10,7 @@ import {
   MoveTransaction,
   SetTransactionLabels
 } from './reducer';
+import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchTransactions,
@@ -20,6 +21,7 @@ import {
   setTransactionLabels
 } from '../../apis/transactionApis';
 import { updateTransactions } from './actions';
+import { LedgerSummary } from './interface';
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -29,13 +31,32 @@ function* transactionApiErrorReceived(
 
 function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
   try {
-    const { projectId, timezone, startDate, endDate, frequencyType } = action.payload;
-    const data = yield call(fetchTransactions, projectId, timezone, startDate, endDate, frequencyType);
-    const transactions = yield data.json();
+    const {
+      projectId,
+      timezone,
+      startDate,
+      endDate,
+      frequencyType,
+      ledgerSummaryType
+    } = action.payload;
+
+    const data = yield call(
+      fetchTransactions,
+      projectId,
+      timezone,
+      frequencyType,
+      ledgerSummaryType,
+      startDate,
+      endDate
+    );
+    const ledgerSummary: LedgerSummary = yield data.json();
 
     yield put(
       transactionsActions.transactionsReceived({
-        transactions: transactions
+        ledgerSummary: ledgerSummary,
+        timezone: timezone,
+        frequencyType: frequencyType,
+        ledgerSummaryType: ledgerSummaryType
       })
     );
   } catch (error) {
@@ -45,8 +66,16 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
 
 function* transactionCreate(action: PayloadAction<CreateTransaction>) {
   try {
-    const { projectId, amount, name, payer, transactionType, date,
-    timezone, time } = action.payload;
+    const {
+      projectId,
+      amount,
+      name,
+      payer,
+      transactionType,
+      date,
+      timezone,
+      time
+    } = action.payload;
     const data = yield call(
       createTransaction,
       projectId,
@@ -56,9 +85,20 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       transactionType,
       date,
       timezone,
-      time,
+      time
     );
-    yield put(updateTransactions(projectId, timezone, undefined, undefined, 'MONTHLY'));
+    const state: IState = yield select();
+    const transaction = state.transaction;
+    yield put(
+      updateTransactions(
+        projectId,
+        timezone,
+        transaction.frequencyType,
+        transaction.ledgerSummaryType,
+        transaction.startDate,
+        transaction.endDate
+      )
+    );
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
   }
@@ -68,7 +108,7 @@ function* transactionMove(action: PayloadAction<MoveTransaction>) {
   try {
     const { transactionId, targetProject } = action.payload;
     yield call(moveToTargetProject, transactionId, targetProject);
-    yield call(message.success, "Transaction moved successfully");
+    yield call(message.success, 'Transaction moved successfully');
   } catch (error) {
     yield call(message.error, `transactionMove Error Received: ${error}`);
   }
@@ -77,7 +117,7 @@ function* transactionMove(action: PayloadAction<MoveTransaction>) {
 function* getTransaction(action: PayloadAction<GetTransaction>) {
   try {
     const data = yield call(getTransactionById, action.payload.transactionId);
-    yield put(transactionsActions.transactionReceived({transaction: data}));
+    yield put(transactionsActions.transactionReceived({ transaction: data }));
   } catch (error) {
     yield call(message.error, `Get Transaction Error Received: ${error}`);
   }
