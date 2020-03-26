@@ -131,6 +131,11 @@ public class TaskController {
         return getTasks(task.getProjectId());
     }
 
+    @DeleteMapping(COMPLETED_TASK_ROUTE)
+    public void deleteCompletedTask(@NotNull @PathVariable Long taskId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+    }
+
     @PutMapping(TASK_SET_LABELS_ROUTE)
     public Task setLabels(@NotNull @PathVariable Long taskId,
                           @NotNull @RequestBody List<Long> labels) {
