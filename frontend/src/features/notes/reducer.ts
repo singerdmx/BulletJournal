@@ -44,6 +44,10 @@ export type PatchNote = {
   name: string;
 };
 
+export type OpenEditNote = {
+  patchLoading: boolean;
+};
+
 export type SetNoteLabels = {
   noteId: number;
   labels: number[];
@@ -57,7 +61,8 @@ export type MoveNote = {
 let initialState = {
   note: {} as Note,
   notes: [] as Array<Note>,
-  addNoteVisible: false
+  addNoteVisible: false,
+  patchLoading: false
 };
 
 const slice = createSlice({
@@ -67,6 +72,7 @@ const slice = createSlice({
     notesReceived: (state, action: PayloadAction<NotesAction>) => {
       const { notes } = action.payload;
       state.notes = notes;
+      state.patchLoading = false;
     },
     noteReceived: (state, action: PayloadAction<NoteAction>) => {
       const { note } = action.payload;
@@ -86,7 +92,11 @@ const slice = createSlice({
     NotePut: (state, action: PayloadAction<PutNote>) => state,
     NoteGet: (state, action: PayloadAction<GetNote>) => state,
     NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
-    NotePatch: (state, action: PayloadAction<PatchNote>) => state,
+    NotePatch: (state, action: PayloadAction<PatchNote>) => {
+      state.patchLoading = true },
+    OpenEditNote: (state, action: PayloadAction<OpenEditNote>) => {
+      state.patchLoading = !action.payload.patchLoading
+    },
     NoteSetLabels: (state, action: PayloadAction<SetNoteLabels>) => state,
     NoteMove: (state, action: PayloadAction<MoveNote>) => state
   }

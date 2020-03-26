@@ -12,6 +12,7 @@ import { deleteNote, moveNote } from '../../features/notes/actions';
 import { Note } from '../../features/notes/interface';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import EditNote from '../modals/edit-note.component';
 
 import { Popover } from 'antd';
 
@@ -24,6 +25,7 @@ type NoteProps = {
 
 const Content: React.FC<NoteProps> = props => {
   const { note, deleteNote, moveNote } = props;
+  const [visible, setVisible] = useState(false);
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div>
@@ -34,7 +36,9 @@ const Content: React.FC<NoteProps> = props => {
         />
       </div>
       <div>
-        Edit <EditTwoTone onClick={() => {}} />
+        <span>Edit</span>
+        <EditTwoTone onClick={()=>setVisible(!visible)} />
+        <EditNote visible={visible} note={note} setVisible={setVisible}/>
       </div>
       <div>
         Move <DragOutlined onClick={() => moveNote(note.id, 14)} />
