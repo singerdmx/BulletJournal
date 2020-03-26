@@ -70,13 +70,13 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     console.log(props.projectItemId + '#' + projectId);
     switch (props.type) {
       case 'NOTE':
-        moveNote(props.projectItemId, projectId);
+        props.moveNote(props.projectItemId, projectId);
         break;
       case 'TASK':
-        moveTask(props.projectItemId, projectId);
+        props.moveTask(props.projectItemId, projectId);
         break;
       case 'TRANSACTION':
-        moveTask(props.projectItemId, projectId);
+        props.moveTask(props.projectItemId, projectId);
         break;
     }
     setVisible(false);
