@@ -4,7 +4,7 @@ import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interface';
-import {Avatar, Divider, Popconfirm, Popover, Tooltip} from 'antd';
+import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
 import { DeleteOutlined, TeamOutlined } from '@ant-design/icons';
@@ -15,7 +15,7 @@ import AddTransaction from '../../components/modals/add-transaction.component';
 import { ProjectType } from '../../features/project/constants';
 import { NoteTree } from '../../components/note-tree';
 import { History } from 'history';
-import {getGroupByProject} from "../projects/projects.pages";
+import { getGroupByProject } from '../projects/projects.pages';
 import TransactionProject from './transaction-project.pages';
 
 import './project.styles.less';
@@ -106,7 +106,7 @@ class ProjectPage extends React.Component<
     let editContent = null;
     let deleteContent = null;
     if (myself === project.owner) {
-      editContent = <EditProject project={project}/>;
+      editContent = <EditProject project={project} />;
       deleteContent = (
         <Popconfirm
           title="Deleting BuJo also deletes its child BuJo. Are you sure?"
@@ -140,10 +140,16 @@ class ProjectPage extends React.Component<
     const group = getGroupByProject(this.props.groups, project);
     let popContent = null;
     if (group) {
-      popContent =
-          <div>
-            {group.users.map((u, index) => <p key={index}><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
-          </div>;
+      popContent = (
+        <div>
+          {group.users.map((u, index) => (
+            <p key={index}>
+              <Avatar size="small" src={u.avatar} />
+              &nbsp;{u.name}
+            </p>
+          ))}
+        </div>
+      );
     }
 
     return (
@@ -171,21 +177,26 @@ class ProjectPage extends React.Component<
           </h2>
           <div className="project-control">
             <Popover
-                title={group && group.name}
-                placement='bottom'
-                content={popContent}
+              title={group && group.name}
+              placement="bottom"
+              content={popContent}
             >
-                          <span style={{ cursor: 'pointer' }} onClick={e => this.onClickGroup(group.id)}>
-                            <TeamOutlined/>
-                            {group && group.users.length}
-                          </span>
+              <span
+                style={{ cursor: 'pointer' }}
+                onClick={e => this.onClickGroup(group.id)}
+              >
+                <TeamOutlined />
+                {group && group.users.length}
+              </span>
             </Popover>
             {createContent}
             {editContent}
             {deleteContent}
           </div>
         </div>
-        <div>{description}</div>
+        {description && (
+          <div className="project-description">{description}</div>
+        )}
         <div className="project-content">{projectContent}</div>
       </div>
     );

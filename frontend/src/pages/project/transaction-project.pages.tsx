@@ -8,6 +8,9 @@ import './project.styles.less';
 import { zones } from '../../components/settings/constants';
 import { updateTransactions } from '../../features/transactions/actions';
 import { updateExpandedMyself } from '../../features/myself/actions';
+
+import './transaction.styles.less';
+
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -72,37 +75,47 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   }, []);
 
   return (
-    <div>
-      <Radio.Group value={props.frequencyType} onChange={onChangeFrequency}>
-        <Radio value='WEEKLY'>WEEKLY</Radio>
-        <Radio value='MONTHLY'>MONTHLY</Radio>
-        <Radio value='YEARLY'>YEARLY</Radio>
-      </Radio.Group>
-
-      <div className='todo-panel'>
-        <RangePicker
-          allowClear={false}
-          value={[
-            props.startDate ? moment(props.startDate, dateFormat) : null,
-            props.endDate ? moment(props.endDate, dateFormat) : null
-          ]}
-          format={dateFormat}
-        />
-        <Select
-          style={{ width: '200px' }}
-          showSearch={true}
-          placeholder='Select Time Zone'
-          value={props.transactionTimezone ? props.transactionTimezone : ''}
-        >
-          {zones.map((zone: string, index: number) => (
-            <Option key={zone} value={zone}>
-              <Tooltip title={zone} placement='right'>
-                {<span>{zone}</span>}
-              </Tooltip>
-            </Option>
-          ))}
-        </Select>
+    <div className="transaction-page">
+      <div className="transaction-display">
+        <Carousel autoplay dotPosition="bottom">
+          <div className="trasaction-number">1400</div>
+          <div className="transaction-static">graph</div>
+          {/* maybe others? */}
+        </Carousel>
       </div>
+      <div className="transaction-control">
+        <Radio.Group value={props.frequencyType} onChange={onChangeFrequency}>
+          <Radio value="WEEKLY">WEEKLY</Radio>
+          <Radio value="MONTHLY">MONTHLY</Radio>
+          <Radio value="YEARLY">YEARLY</Radio>
+        </Radio.Group>
+
+        <div className="time-range">
+          <RangePicker
+            allowClear={false}
+            value={[
+              props.startDate ? moment(props.startDate, dateFormat) : null,
+              props.endDate ? moment(props.endDate, dateFormat) : null
+            ]}
+            format={dateFormat}
+          />
+          <Select
+            style={{ width: '200px' }}
+            showSearch={true}
+            placeholder="Select Time Zone"
+            value={props.transactionTimezone ? props.transactionTimezone : ''}
+          >
+            {zones.map((zone: string, index: number) => (
+              <Option key={zone} value={zone}>
+                <Tooltip title={zone} placement="right">
+                  {<span>{zone}</span>}
+                </Tooltip>
+              </Option>
+            ))}
+          </Select>
+        </div>
+      </div>
+      <div className="trasaction-ist"></div>
     </div>
   );
 };
