@@ -73,7 +73,12 @@ function* getNote(action: PayloadAction<GetNote>) {
 
 function* patchNote(action: PayloadAction<PatchNote>) {
   try {
-    yield call(updateNote, action.payload.noteId, action.payload.name);
+    const data = yield call(updateNote, action.payload.noteId, action.payload.name);
+    yield put(
+      notesActions.notesReceived({
+        notes: data
+      })
+  );
   } catch (error) {
     yield call(message.error, `Patch Note Error Received: ${error}`);
   }

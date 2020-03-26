@@ -30,8 +30,8 @@ const EditNote: React.FC<NoteProps> = props => {
           visible={props.visible}
           onOk={onOk}
           confirmLoading={props.patchLoading}
-          okText="确认"
-          cancelText="取消"
+          okText="Confirm"
+          cancelText="Cancel"
           onCancel={()=>setVisible(!visible)}
         >
           <div><Input placeholder='text' onChange={e=>setValue(e.target.value)}/></div>
