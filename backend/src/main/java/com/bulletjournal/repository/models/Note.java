@@ -37,6 +37,7 @@ public class Note extends ProjectItemModel {
             List<Label> labels) {
         return new com.bulletjournal.controller.models.Note(
                 this.getId(),
+                this.getOwner(),
                 this.getName(),
                 this.getProject(),
                 labels);

@@ -44,6 +44,9 @@ public class TransactionController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private UserClient userClient;
+
     @GetMapping(TRANSACTIONS_ROUTE)
     public ResponseEntity<LedgerSummary> getTransactions(
             @NotNull @PathVariable Long projectId,
@@ -98,7 +101,9 @@ public class TransactionController {
     @GetMapping(TRANSACTION_ROUTE)
     public Transaction getTransaction(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.transactionDaoJpa.getTransaction(username, transactionId);
+        Transaction transaction = this.transactionDaoJpa.getTransaction(username, transactionId);
+        transaction.setOwnerAvatar(this.userClient.getUser(transaction.getOwner()).getAvatar());
+        return transaction;
     }
 
     @PatchMapping(TRANSACTION_ROUTE)

@@ -44,6 +44,9 @@ public class TaskController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private UserClient userClient;
+
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -60,7 +63,9 @@ public class TaskController {
     @GetMapping(TASK_ROUTE)
     public Task getTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.getTask(username, taskId);
+        Task task = this.taskDaoJpa.getTask(username, taskId);
+        task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
+        return task;
     }
 
     @GetMapping(COMPLETED_TASK_ROUTE)

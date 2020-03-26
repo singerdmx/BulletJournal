@@ -32,16 +32,17 @@ public class Transaction extends ProjectItem {
     }
 
     public Transaction(Long id,
-                       @NotNull String name,
+                       @NotBlank String owner,
+                       @NotBlank String name,
                        @NotNull Project project,
-                       @NotNull String payer,
+                       @NotBlank String payer,
                        @NotNull Double amount,
                        @NotNull String date,
                        String time,
                        @NotNull String timezone,
                        @NotNull Integer transactionType,
                        List<Label> labels) {
-        super(id, name, project, labels);
+        super(id, name, owner, project, labels);
         this.payer = payer;
         this.amount = amount;
         this.date = date;

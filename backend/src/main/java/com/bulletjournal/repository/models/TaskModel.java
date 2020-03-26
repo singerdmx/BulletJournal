@@ -254,6 +254,7 @@ public abstract class TaskModel extends ProjectItemModel {
 
         return new com.bulletjournal.controller.models.Task(
                 this.getId(),
+                this.getOwner(),
                 this.getAssignedTo(),
                 this.getDueDate(),
                 this.getDueTime(),

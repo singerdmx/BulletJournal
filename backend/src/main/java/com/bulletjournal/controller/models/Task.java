@@ -39,6 +39,7 @@ public class Task extends ProjectItem {
     }
 
     public Task(Long id,
+                @NotBlank String owner,
                 @NotBlank @Size(min = 1, max = 100) String assignedTo,
                 String dueDate,
                 String dueTime,
@@ -49,7 +50,7 @@ public class Task extends ProjectItem {
                 List<Label> labels,
                 ReminderSetting reminderSetting,
                 String recurrenceRule) {
-        super(id, name, project, labels);
+        super(id, name, owner, project, labels);
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;

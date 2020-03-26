@@ -3,6 +3,7 @@ package com.bulletjournal.controller.models;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -13,20 +14,27 @@ public class ProjectItem {
     @Expose
     protected Long id;
 
+    @NotBlank
     @Size(min = 1, max = 100)
     protected String name;
 
     @NotNull
     protected Long projectId;
 
+    protected String owner;
+
+    private String ownerAvatar;
+
     protected List<Label> labels;
 
     public ProjectItem() {
     }
 
-    public ProjectItem(Long id, @Size(min = 1, max = 100) String name, @NotNull Project project, List<Label> labels) {
+    public ProjectItem(Long id, @NotBlank @Size(min = 1, max = 100) String name, String owner,
+                       @NotNull Project project, List<Label> labels) {
         this.id = id;
         this.name = name;
+        this.owner = owner;
         this.projectId = project.getId();
         this.labels = labels;
     }
@@ -63,6 +71,22 @@ public class ProjectItem {
         this.labels = labels;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getOwnerAvatar() {
+        return ownerAvatar;
+    }
+
+    public void setOwnerAvatar(String ownerAvatar) {
+        this.ownerAvatar = ownerAvatar;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,12 +95,13 @@ public class ProjectItem {
         return Objects.equals(getId(), that.getId()) &&
                 Objects.equals(getName(), that.getName()) &&
                 Objects.equals(getProjectId(), that.getProjectId()) &&
+                Objects.equals(getOwner(), that.getOwner()) &&
                 Objects.equals(getLabels(), that.getLabels());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getProjectId(), getLabels());
+        return Objects.hash(getId(), getName(), getProjectId(), getOwner(), getLabels());
     }
 
     public void clone(ProjectItem projectItem) {
@@ -84,5 +109,7 @@ public class ProjectItem {
         this.setName(projectItem.getName());
         this.setProjectId(projectItem.getProjectId());
         this.setLabels(projectItem.getLabels());
+        this.setOwner(projectItem.getOwner());
+        this.setOwnerAvatar(projectItem.getOwnerAvatar());
     }
 }

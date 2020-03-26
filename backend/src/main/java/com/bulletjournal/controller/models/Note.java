@@ -4,6 +4,7 @@ import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +20,11 @@ public class Note extends ProjectItem {
     }
 
     public Note(Long id,
-                @NotNull String name,
+                @NotBlank String owner,
+                @NotBlank String name,
                 @NotNull Project project,
                 List<Label> labels) {
-        super(id, name, project, labels);
+        super(id, name, owner, project, labels);
     }
 
 

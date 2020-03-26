@@ -38,6 +38,9 @@ public class NoteController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private UserClient userClient;
+
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -62,7 +65,9 @@ public class NoteController {
     @GetMapping(NOTE_ROUTE)
     public Note getNote(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.noteDaoJpa.getNote(username, noteId);
+        Note note = this.noteDaoJpa.getNote(username, noteId);
+        note.setOwnerAvatar(this.userClient.getUser(note.getOwner()).getAvatar());
+        return note;
     }
 
     @PatchMapping(NOTE_ROUTE)

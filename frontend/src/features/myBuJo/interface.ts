@@ -14,6 +14,8 @@ export interface ProjectItems {
 export interface ProjectItem {
     id: number,
     name: string,
+    owner?: string,
+    ownerAvatar?: string,
     projectId: number,
     labels: Label[]
 }

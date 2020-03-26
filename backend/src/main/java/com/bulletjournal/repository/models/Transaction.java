@@ -141,6 +141,7 @@ public class Transaction extends ProjectItemModel {
             List<Label> labels) {
         return new com.bulletjournal.controller.models.Transaction(
                 this.getId(),
+                this.getOwner(),
                 this.getName(),
                 this.getProject(),
                 this.getPayer(),
