@@ -59,7 +59,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     if (!projectId) {
       projectId = projects[0].id;
     }
-    console.log(props.projectItemId + "#" + projectId);
+    
     switch (props.type) {
       case 'NOTE':
         props.moveNote(props.projectItemId, projectId);
@@ -68,7 +68,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         props.moveTask(props.projectItemId, projectId);
         break;
       case 'TRANSACTION':
-        props.moveTask(props.projectItemId, projectId);
+        props.moveTransaction(props.projectItemId, projectId);
         break;
     }
     setVisible(false);
