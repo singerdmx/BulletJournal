@@ -126,7 +126,6 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         centered
         okText="Confirm"
         visible={visible}
-        zIndex={2000}
         onCancel={e => handleCancel(e)}
         onOk={() => {
           form
