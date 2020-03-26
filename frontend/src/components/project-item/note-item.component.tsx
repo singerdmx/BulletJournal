@@ -19,7 +19,6 @@ import {Popconfirm, Popover} from 'antd';
 type NoteProps = {
     note: Note;
     deleteNote: (noteId: number) => void;
-    // onEdit: (noteId: number) => void;
     moveNote: (noteId: number, targetProject: number) => void;
 };
 
