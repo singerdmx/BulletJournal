@@ -185,9 +185,10 @@ function* deleteTask(action: PayloadAction<CompleteTask>) {
 
 function* moveTask(action: PayloadAction<MoveTask>) {
   try {
-    const { taskId, targetProject } = action.payload;
+    const { taskId, targetProject, history } = action.payload;
     yield call(moveToTargetProject, taskId, targetProject);
     yield call(message.success, "Task moved successfully");
+    history.push(`/projects/${targetProject}`);
   } catch (error) {
     yield call(message.error, `moveTask Error Received: ${error}`);
   }

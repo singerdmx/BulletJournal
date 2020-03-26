@@ -44,9 +44,7 @@ const Content: React.FC<NoteProps> = props => {
                 <EditTwoTone onClick={() => setVisible(!visible)}/>
                 <EditNote visible={visible} note={note} setVisible={setVisible}/>
             </div>
-            <div>
-                <EditProjectItem type='NOTE' projectItemId={note.id}/>
-            </div>
+            <EditProjectItem type='NOTE' projectItemId={note.id}/>
         </div>
     );
 };

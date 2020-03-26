@@ -66,6 +66,7 @@ export type PatchTransaction = {
 export type MoveTransaction = {
   transactionId: number;
   targetProject: number;
+  history: History;
 };
 
 export type SetTransactionLabels = {

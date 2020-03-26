@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Task, ReminderSetting } from './interface';
+import { History } from 'history';
 
 export type TaskApiErrorAction = {
   error: string;
@@ -45,6 +46,7 @@ export type DeleteTask = {
 export type MoveTask = {
   taskId: number;
   targetProject: number;
+  history: History;
 };
 
 export type PatchTask = {

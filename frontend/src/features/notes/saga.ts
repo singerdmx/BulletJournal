@@ -111,9 +111,10 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
 
 function* noteMove(action: PayloadAction<MoveNote>) {
   try {
-    const {noteId, targetProject} = action.payload;
+    const {noteId, targetProject, history} = action.payload;
     yield call(moveToTargetProject, noteId, targetProject);
     yield call(message.success, 'Note moved successfully');
+    history.push(`/projects/${targetProject}`);
   } catch (error) {
     yield call(message.error, `noteMove Error Received: ${error}`);
   }

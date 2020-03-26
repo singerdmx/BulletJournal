@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Note } from './interface';
+import { History } from 'history';
 
 export type NoteApiErrorAction = {
   error: string;
@@ -52,6 +53,7 @@ export type SetNoteLabels = {
 export type MoveNote = {
   noteId: number;
   targetProject: number;
+  history: History;
 };
 
 let initialState = {

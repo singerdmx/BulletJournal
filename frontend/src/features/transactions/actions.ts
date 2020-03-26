@@ -1,4 +1,6 @@
 import { actions } from './reducer';
+import { History } from 'history';
+
 export const updateTransactions = (
   projectId: number,
   timezone: string,
@@ -66,8 +68,9 @@ export const setTransactionLabels = (transactionId: number, labels: number[]) =>
 export const updateTransactionVisible = (visible: boolean) =>
   actions.updateAddTransactionVisible({ visible: visible });
 
-export const moveTransaction = (transactionId: number, targetProject: number) =>
+export const moveTransaction = (transactionId: number, targetProject: number, history: History) =>
   actions.TransactionMove({
     transactionId: transactionId,
-    targetProject: targetProject
+    targetProject: targetProject,
+    history: history
   });

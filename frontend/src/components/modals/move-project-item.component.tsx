@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
+import { useHistory } from 'react-router-dom';
 import { RightCircleOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interface';
@@ -8,10 +9,10 @@ import { updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { iconMapper } from '../side-menu/side-menu.component';
-import { History } from 'history';
 import { moveTask } from '../../features/tasks/actions';
 import { moveNote } from '../../features/notes/actions';
 import { moveTransaction } from '../../features/transactions/actions';
+import { History } from 'history';
 import './modals.styles.less';
 import {
   flattenOwnedProject,
@@ -32,21 +33,22 @@ type ProjectItemProps = {
 type GroupProps = {
   groups: GroupsWithOwner[];
   updateGroups: () => void;
-  moveNote: (noteId: number, targetProject: number) => void;
-  moveTask: (taskId: number, targetProject: number) => void;
-  moveTransaction: (transactionId: number, targetProject: number) => void;
+  moveNote: (noteId: number, targetProject: number, history: History) => void;
+  moveTask: (taskId: number, targetProject: number, history: History) => void;
+  moveTransaction: (transactionId: number, targetProject: number, history: History) => void;
 };
 
 const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
+  const history = useHistory();
 
   const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
-    console.log('cancel clicking');
     setVisible(false);
   };
+
   const openModal = () => {
     setVisible(true);
   };
@@ -71,13 +73,13 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
 
     switch (props.type) {
       case 'NOTE':
-        props.moveNote(props.projectItemId, projectId);
+        props.moveNote(props.projectItemId, projectId, history);
         break;
       case 'TASK':
-        props.moveTask(props.projectItemId, projectId);
+        props.moveTask(props.projectItemId, projectId, history);
         break;
       case 'TRANSACTION':
-        props.moveTransaction(props.projectItemId, projectId);
+        props.moveTransaction(props.projectItemId, projectId, history);
         break;
     }
     setVisible(false);
@@ -121,7 +123,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const getModal = () => {
     return (
       <Modal
-        title="Move"
+        title={`MOVE ${props.type}`}
         destroyOnClose
         centered
         okText="Confirm"

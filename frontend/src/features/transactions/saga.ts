@@ -22,6 +22,7 @@ import {
 } from '../../apis/transactionApis';
 import { updateTransactions } from './actions';
 import { LedgerSummary } from './interface';
+import { History } from 'history';
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -106,9 +107,10 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
 
 function* transactionMove(action: PayloadAction<MoveTransaction>) {
   try {
-    const { transactionId, targetProject } = action.payload;
+    const { transactionId, targetProject, history } = action.payload;
     yield call(moveToTargetProject, transactionId, targetProject);
     yield call(message.success, 'Transaction moved successfully');
+    history.push(`/projects/${targetProject}`);
   } catch (error) {
     yield call(message.error, `transactionMove Error Received: ${error}`);
   }
