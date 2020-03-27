@@ -110,6 +110,20 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Group getDefaultGroup(String owner) {
+        List<Group> groupList = this.groupRepository.findDefaultGroup(owner);
+        if (groupList.isEmpty()) {
+            throw new ResourceNotFoundException("Default Group for user " + owner + " does not exist");
+        }
+
+        if (groupList.size() > 1) {
+            throw new IllegalStateException("More than one Default Group for user " + owner + " exist");
+        }
+
+        return groupList.get(0);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Group> getGroups(String owner) {
         User user = this.userDaoJpa.getByName(owner);
         return user.getGroups()

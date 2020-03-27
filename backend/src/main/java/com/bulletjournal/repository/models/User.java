@@ -133,13 +133,16 @@ public class User extends NamedModel {
         this.theme = theme;
     }
 
-
     public Long getSharedTasksProject() {
         return sharedTasksProject;
     }
 
     public void setSharedTasksProject(Long sharedTasksProject) {
         this.sharedTasksProject = sharedTasksProject;
+    }
+
+    public boolean hasSharedTasksProject() {
+        return this.sharedTasksProject != null;
     }
 
     public Long getSharedNotesProject() {
@@ -150,12 +153,20 @@ public class User extends NamedModel {
         this.sharedNotesProject = sharedNotesProject;
     }
 
+    public boolean hasSharedNotesProject() {
+        return this.sharedNotesProject != null;
+    }
+
     public Long getSharedTransactionsProject() {
         return sharedTransactionsProject;
     }
 
     public void setSharedTransactionsProject(Long sharedTransactionsProject) {
         this.sharedTransactionsProject = sharedTransactionsProject;
+    }
+
+    public boolean hasSharedTransactionsProject() {
+        return this.sharedTransactionsProject != null;
     }
 
     @Override
