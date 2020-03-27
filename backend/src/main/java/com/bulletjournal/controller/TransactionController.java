@@ -37,6 +37,7 @@ public class TransactionController {
     protected static final String ADD_CONTENT_ROUTE = "/api/transactions/{transactionId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
+    protected static final String CONTENT_REVISIONS_ROUTE = "/api/contents/{contentId}/revisions";
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -198,5 +199,10 @@ public class TransactionController {
                               @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.updateContent(contentId, transactionId, username, updateContentParams);
+    }
+
+    @GetMapping(CONTENT_REVISIONS_ROUTE)
+    public List<Revision> getContentRevisions(@NotNull @PathVariable Long contentId) {
+        return null;
     }
 }

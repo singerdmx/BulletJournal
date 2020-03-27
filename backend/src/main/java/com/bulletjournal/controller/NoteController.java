@@ -31,6 +31,7 @@ public class NoteController {
     protected static final String ADD_CONTENT_ROUTE = "/api/notes/{noteId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
+    protected static final String CONTENT_REVISIONS_ROUTE = "/api/contents/{contentId}/revisions";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -145,5 +146,10 @@ public class NoteController {
                               @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams);
+    }
+
+    @GetMapping(CONTENT_REVISIONS_ROUTE)
+    public List<Revision> getContentRevisions(@NotNull @PathVariable Long contentId) {
+        return null;
     }
 }
