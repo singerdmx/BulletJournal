@@ -192,7 +192,7 @@ public class TransactionController {
         this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
     }
 
-    @PostMapping(CONTENT_ROUTE)
+    @PatchMapping(CONTENT_ROUTE)
     public void updateContent(@NotNull @PathVariable Long transactionId,
                               @NotNull @PathVariable Long contentId,
                               @NotNull @RequestBody UpdateContentParams updateContentParams) {

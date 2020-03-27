@@ -139,7 +139,7 @@ public class NoteController {
         this.noteDaoJpa.deleteContent(contentId, noteId, username);
     }
 
-    @PostMapping(CONTENT_ROUTE)
+    @PatchMapping(CONTENT_ROUTE)
     public void updateContent(@NotNull @PathVariable Long noteId,
                               @NotNull @PathVariable Long contentId,
                               @NotNull @RequestBody UpdateContentParams updateContentParams) {

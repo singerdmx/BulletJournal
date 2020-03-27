@@ -180,7 +180,7 @@ public class TaskController {
         this.taskDaoJpa.deleteContent(contentId, taskId, username);
     }
 
-    @PostMapping(CONTENT_ROUTE)
+    @PatchMapping(CONTENT_ROUTE)
     public Content updateContent(@NotNull @PathVariable Long taskId,
                               @NotNull @PathVariable Long contentId,
                               @NotNull @RequestBody UpdateContentParams updateContentParams) {
