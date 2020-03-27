@@ -37,7 +37,7 @@ public class TaskController {
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
-    protected static final String CONTENT_REVISIONS_ROUTE = "/api/contents/{contentId}/revisions";
+    protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -190,7 +190,9 @@ public class TaskController {
     }
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
-    public List<Revision> getContentRevisions(@NotNull @PathVariable Long contentId) {
+    public List<Revision> getContentRevisions(
+            @NotNull @PathVariable Long taskId,
+            @NotNull @PathVariable Long contentId) {
         return null;
     }
 }
