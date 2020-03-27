@@ -48,14 +48,17 @@ public class User extends NamedModel {
     @Column
     private String theme;
 
-    @Column(name = "shared_tasks_project")
-    private Long sharedTasksProject;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "shared_tasks_project", referencedColumnName = "id")
+    private Project sharedTasksProject;
 
-    @Column(name = "shared_notes_project")
-    private Long sharedNotesProject;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "shared_notes_project", referencedColumnName = "id")
+    private Project sharedNotesProject;
 
-    @Column(name = "shared_transactions_project")
-    private Long sharedTransactionsProject;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "shared_transactions_project", referencedColumnName = "id")
+    private Project sharedTransactionsProject;
 
     public Long getId() {
         return id;
@@ -133,40 +136,40 @@ public class User extends NamedModel {
         this.theme = theme;
     }
 
-    public Long getSharedTasksProject() {
-        return sharedTasksProject;
-    }
-
-    public void setSharedTasksProject(Long sharedTasksProject) {
-        this.sharedTasksProject = sharedTasksProject;
-    }
-
     public boolean hasSharedTasksProject() {
         return this.sharedTasksProject != null;
-    }
-
-    public Long getSharedNotesProject() {
-        return sharedNotesProject;
-    }
-
-    public void setSharedNotesProject(Long sharedNotesProject) {
-        this.sharedNotesProject = sharedNotesProject;
     }
 
     public boolean hasSharedNotesProject() {
         return this.sharedNotesProject != null;
     }
 
-    public Long getSharedTransactionsProject() {
+    public boolean hasSharedTransactionsProject() {
+        return this.sharedTransactionsProject != null;
+    }
+
+    public Project getSharedTasksProject() {
+        return sharedTasksProject;
+    }
+
+    public void setSharedTasksProject(Project sharedTasksProject) {
+        this.sharedTasksProject = sharedTasksProject;
+    }
+
+    public Project getSharedNotesProject() {
+        return sharedNotesProject;
+    }
+
+    public void setSharedNotesProject(Project sharedNotesProject) {
+        this.sharedNotesProject = sharedNotesProject;
+    }
+
+    public Project getSharedTransactionsProject() {
         return sharedTransactionsProject;
     }
 
-    public void setSharedTransactionsProject(Long sharedTransactionsProject) {
+    public void setSharedTransactionsProject(Project sharedTransactionsProject) {
         this.sharedTransactionsProject = sharedTransactionsProject;
-    }
-
-    public boolean hasSharedTransactionsProject() {
-        return this.sharedTransactionsProject != null;
     }
 
     @Override

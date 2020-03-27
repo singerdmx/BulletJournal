@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Repository
 public class SharedProjectItemDaoJpa {
@@ -18,6 +19,9 @@ public class SharedProjectItemDaoJpa {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -31,33 +35,52 @@ public class SharedProjectItemDaoJpa {
         for (String user : new HashSet<>(users)) {
             User targetUser = this.userDaoJpa.getByName(user);
             SharedProjectItem sharedProjectItem = new SharedProjectItem(user);
-            boolean sharedProjectExists;
             switch (projectType) {
                 case NOTE:
-                    sharedProjectExists = targetUser.hasSharedNotesProject();
+                    checkSharedProjectExistence(
+                            targetUser.hasSharedNotesProject(),
+                            projectType,
+                            targetUser,
+                            (p) -> targetUser.setSharedNotesProject(p));
                     sharedProjectItem.setNote((Note) projectItem);
                     break;
                 case TODO:
-                    sharedProjectExists = targetUser.hasSharedTasksProject();
+                    checkSharedProjectExistence(
+                            targetUser.hasSharedTasksProject(),
+                            projectType,
+                            targetUser,
+                            (p) -> targetUser.setSharedTasksProject(p));
                     sharedProjectItem.setTask((Task) projectItem);
                     break;
                 case LEDGER:
-                    sharedProjectExists = targetUser.hasSharedTransactionsProject();
+                    checkSharedProjectExistence(
+                            targetUser.hasSharedTransactionsProject(),
+                            projectType,
+                            targetUser,
+                            (p) -> targetUser.setSharedTransactionsProject(p));
                     sharedProjectItem.setTransaction((Transaction) projectItem);
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
-            if (!sharedProjectExists) {
-                Project project = new Project(
-                        "Shared " + projectType.name(),
-                        projectType.getValue(),
-                        this.groupDaoJpa.getDefaultGroup(user),
-                        true);
-                this.projectRepository.save(project);
-            }
             this.sharedProjectItemsRepository.save(sharedProjectItem);
         }
     }
 
+    private void checkSharedProjectExistence(
+            boolean sharedProjectExists, ProjectType projectType, User user, Consumer<Project> userConsumer) {
+        if (sharedProjectExists) {
+            return;
+        }
+
+        Project project = new Project(
+                "Shared " + projectType.name(),
+                projectType.getValue(),
+                this.groupDaoJpa.getDefaultGroup(user.getName()),
+                true);
+        this.projectRepository.save(project);
+
+        userConsumer.accept(project);
+        this.userRepository.save(user);
+    }
 }
