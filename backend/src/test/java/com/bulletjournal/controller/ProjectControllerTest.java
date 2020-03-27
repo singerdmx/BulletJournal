@@ -704,7 +704,7 @@ public class ProjectControllerTest {
         UpdateContentParams updateContentParams = new UpdateContentParams(text);
         ResponseEntity<Content> updateResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
-                HttpMethod.POST,
+                HttpMethod.PATCH,
                 new HttpEntity<>(updateContentParams),
                 Content.class,
                 task.getId(),

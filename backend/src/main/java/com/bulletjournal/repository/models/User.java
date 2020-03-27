@@ -48,13 +48,13 @@ public class User extends NamedModel {
     @Column
     private String theme;
 
-    @Column(name="shared_tasks_project")
+    @Column(name = "shared_tasks_project")
     private Long sharedTasksProject;
 
-    @Column(name="shared_notes_project")
+    @Column(name = "shared_notes_project")
     private Long sharedNotesProject;
 
-    @Column(name="shared_transactions_project")
+    @Column(name = "shared_transactions_project")
     private Long sharedTransactionsProject;
 
     public Long getId() {
