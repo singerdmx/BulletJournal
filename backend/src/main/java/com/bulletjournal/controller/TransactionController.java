@@ -147,6 +147,8 @@ public class TransactionController {
     public String shareTransaction(
             @NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.transactionDaoJpa.shareProjectItem(transactionId, shareProjectItemParams, username);
         return null; // may be generated link
     }
 

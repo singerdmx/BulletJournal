@@ -3,14 +3,15 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.ShareProjectItemParams;
 import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SetLabelEvent;
-import com.bulletjournal.repository.models.ContentModel;
-import com.bulletjournal.repository.models.ProjectItemModel;
-import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.repository.models.*;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,11 +30,41 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Autowired
     private AuthorizationService authorizationService;
 
+    @Autowired
+    private GroupDaoJpa groupDaoJpa;
+
+    @Autowired
+    private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
+
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
     abstract JpaRepository<K, Long> getContentJpaRepository();
 
     abstract List<K> getContents(Long projectItemId, String requester);
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void shareProjectItem(
+            Long projectItemId, ShareProjectItemParams shareProjectItemParams, String requester) {
+        T projectItem = getProjectItem(projectItemId, requester);
+        List<String> users = new ArrayList<>();
+        if (StringUtils.isNotBlank(shareProjectItemParams.getTargetUser())) {
+            users.add(shareProjectItemParams.getTargetUser());
+        }
+
+        if (shareProjectItemParams.getTargetGroup() != null) {
+            Group group = this.groupDaoJpa.getGroup(shareProjectItemParams.getTargetGroup());
+            for (UserGroup userGroup : group.getUsers()) {
+                if (!userGroup.isAccepted()) {
+                    continue;
+                }
+
+                users.add(userGroup.getUser().getName());
+            }
+        }
+
+        ProjectType projectType = ProjectType.getType(projectItem.getProject().getType());
+        this.sharedProjectItemDaoJpa.save(projectType, projectItem, users);
+    }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> ContentModel addContent(

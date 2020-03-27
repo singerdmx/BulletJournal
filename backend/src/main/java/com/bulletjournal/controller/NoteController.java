@@ -115,6 +115,8 @@ public class NoteController {
     public String shareNote(
             @NotNull @PathVariable Long noteId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.shareProjectItem(noteId, shareProjectItemParams, username);
         return null; // may be generated link
     }
 

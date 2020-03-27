@@ -156,6 +156,8 @@ public class TaskController {
     public String shareTask(
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.shareProjectItem(taskId, shareProjectItemParams, username);
         return null; // may be generated link
     }
 

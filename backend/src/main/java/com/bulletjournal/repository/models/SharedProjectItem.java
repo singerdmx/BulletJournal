@@ -1,29 +1,32 @@
 package com.bulletjournal.repository.models;
 
-import com.bulletjournal.controller.models.ProjectType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "shared_project_items"
-//        indexes = {@Index(name = "shared_project_items_task_id_index", columnList = "task")}
-        )
-public class SharedProjectItems extends AuditModel {
+@Table(name = "shared_project_items")
+public class SharedProjectItem extends AuditModel {
 
     @Id
-    @GeneratedValue(generator = "shared_project_items_generator")
+    @GeneratedValue(generator = "shared_project_item_generator")
     @SequenceGenerator(
-            name = "shared_project_items_generator",
-            sequenceName = "shared_project_items_sequence",
+            name = "shared_project_item_generator",
+            sequenceName = "shared_project_item_sequence",
             initialValue = 100
     )
     private Long id;
 
     @Column
     private String username;
+
+    public SharedProjectItem() {
+    }
+
+    public SharedProjectItem(String username) {
+        this.username = username;
+    }
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "task_id", nullable = true)
