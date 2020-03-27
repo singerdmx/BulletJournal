@@ -48,6 +48,15 @@ public class User extends NamedModel {
     @Column
     private String theme;
 
+    @Column(name="shared_tasks_project")
+    private Long sharedTasksProject;
+
+    @Column(name="shared_notes_project")
+    private Long sharedNotesProject;
+
+    @Column(name="shared_transactions_project")
+    private Long sharedTransactionsProject;
+
     public Long getId() {
         return id;
     }
@@ -122,6 +131,31 @@ public class User extends NamedModel {
 
     public void setTheme(String theme) {
         this.theme = theme;
+    }
+
+
+    public Long getSharedTasksProject() {
+        return sharedTasksProject;
+    }
+
+    public void setSharedTasksProject(Long sharedTasksProject) {
+        this.sharedTasksProject = sharedTasksProject;
+    }
+
+    public Long getSharedNotesProject() {
+        return sharedNotesProject;
+    }
+
+    public void setSharedNotesProject(Long sharedNotesProject) {
+        this.sharedNotesProject = sharedNotesProject;
+    }
+
+    public Long getSharedTransactionsProject() {
+        return sharedTransactionsProject;
+    }
+
+    public void setSharedTransactionsProject(Long sharedTransactionsProject) {
+        this.sharedTransactionsProject = sharedTransactionsProject;
     }
 
     @Override

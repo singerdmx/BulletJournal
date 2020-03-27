@@ -1,6 +1,7 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.ProjectType;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -36,6 +37,9 @@ public class Project extends OwnedModel {
     @Column
     private String description;
 
+    @Column
+    private Boolean shared;
+
     public Long getId() {
         return id;
     }
@@ -69,6 +73,14 @@ public class Project extends OwnedModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getShared() {
+        return shared;
+    }
+
+    public void setShared(Boolean shared) {
+        this.shared = shared;
     }
 
     public com.bulletjournal.controller.models.Project toPresentationModel() {
