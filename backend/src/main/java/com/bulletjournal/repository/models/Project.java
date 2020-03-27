@@ -39,6 +39,16 @@ public class Project extends OwnedModel {
     @Column(nullable = false, columnDefinition = "Boolean default 'false'")
     private boolean shared;
 
+    public Project() {
+    }
+
+    public Project(String name, Integer type, Group group, boolean shared) {
+        this.type = type;
+        this.group = group;
+        this.shared = shared;
+        this.setName(name);
+    }
+
     public Long getId() {
         return id;
     }

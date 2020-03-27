@@ -1,6 +1,5 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.controller.models.CreateProjectParams;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.repository.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Repository
@@ -21,7 +20,7 @@ public class SharedProjectItemDaoJpa {
     private UserDaoJpa userDaoJpa;
 
     @Autowired
-    private ProjectDaoJpa projectDaoJpa;
+    private ProjectRepository projectRepository;
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
@@ -29,10 +28,10 @@ public class SharedProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> void save(
             ProjectType projectType, T projectItem, List<String> users) {
-        for (String user : users) {
+        for (String user : new HashSet<>(users)) {
             User targetUser = this.userDaoJpa.getByName(user);
             SharedProjectItem sharedProjectItem = new SharedProjectItem(user);
-            boolean sharedProjectExists = false;
+            boolean sharedProjectExists;
             switch (projectType) {
                 case NOTE:
                     sharedProjectExists = targetUser.hasSharedNotesProject();
@@ -50,12 +49,12 @@ public class SharedProjectItemDaoJpa {
                     throw new IllegalArgumentException();
             }
             if (!sharedProjectExists) {
-                CreateProjectParams createProjectParams = new CreateProjectParams(
+                Project project = new Project(
                         "Shared " + projectType.name(),
-                        projectType,
-                        null,
-                        this.groupDaoJpa.getDefaultGroup(user).getId());
-                this.projectDaoJpa.create(createProjectParams, user, new ArrayList<>());
+                        projectType.getValue(),
+                        this.groupDaoJpa.getDefaultGroup(user),
+                        true);
+                this.projectRepository.save(project);
             }
             this.sharedProjectItemsRepository.save(sharedProjectItem);
         }
