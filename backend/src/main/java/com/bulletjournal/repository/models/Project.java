@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "projects",
@@ -106,5 +107,22 @@ public class Project extends OwnedModel {
                 ProjectType.getType(this.getType()),
                 this.getGroup().toVerbosePresentationModel(),
                 this.getDescription());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Project)) return false;
+        Project project = (Project) o;
+        return isShared() == project.isShared() &&
+                Objects.equals(getId(), project.getId()) &&
+                Objects.equals(getType(), project.getType()) &&
+                Objects.equals(getGroup(), project.getGroup()) &&
+                Objects.equals(getDescription(), project.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getType(), getGroup(), getDescription(), isShared());
     }
 }

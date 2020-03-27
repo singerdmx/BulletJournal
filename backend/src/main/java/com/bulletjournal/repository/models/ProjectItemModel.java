@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Parent class for items under a project.
@@ -50,4 +51,19 @@ public abstract class ProjectItemModel extends OwnedModel {
         this.project = project;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProjectItemModel)) return false;
+        ProjectItemModel that = (ProjectItemModel) o;
+        return Objects.equals(getProject(), that.getProject()) &&
+                Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getOwner(), that.getOwner());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getProject(), getId(), getName(), getOwner());
+    }
 }
