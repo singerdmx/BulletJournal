@@ -40,9 +40,6 @@ public class GroupDaoJpa {
     @Autowired
     private AuthorizationService authorizationService;
 
-    @Autowired
-    private NotificationService notificationService;
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Group create(String name, String owner) {
         User user = this.userDaoJpa.getByName(owner);
@@ -152,7 +149,7 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void addUserGroups(
+    public JoinGroupEvent addUserGroups(
             String owner,
             List<AddUserGroupParams> addUserGroupsParams) {
 
@@ -169,7 +166,7 @@ public class GroupDaoJpa {
             this.userGroupRepository.save(new UserGroup(user, group, false));
         }
 
-        this.notificationService.inform(new JoinGroupEvent(events, owner));
+        return new JoinGroupEvent(events, owner);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

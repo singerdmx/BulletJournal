@@ -174,7 +174,7 @@ public class GroupController {
     public ResponseEntity<List<GroupsWithOwner>> addUserGroups(
             @Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups());
+        this.notificationService.inform(this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups()));
         return getGroups();
     }
 

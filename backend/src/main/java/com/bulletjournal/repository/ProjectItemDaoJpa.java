@@ -94,7 +94,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 "ProjectItem ID mismatch");
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 content.getOwner(), requester, ContentType.CONTENT, Operation.UPDATE, content.getId(),
-                projectItem.getOwner(), projectItem.getProject().getOwner());
+                projectItem.getOwner(), projectItem.getProject().getOwner(), projectItem);
         content.setText(updateContentParams.getText());
         this.getContentJpaRepository().save(content);
         return content;
@@ -109,7 +109,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 "ProjectItem ID mismatch");
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 content.getOwner(), requester, ContentType.CONTENT, Operation.DELETE, content.getId(),
-                projectItem.getOwner(), projectItem.getProject().getOwner());
+                projectItem.getOwner(), projectItem.getProject().getOwner(), projectItem);
         this.getContentJpaRepository().delete(content);
     }
 

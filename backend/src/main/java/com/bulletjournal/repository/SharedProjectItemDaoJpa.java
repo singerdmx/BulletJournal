@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
@@ -28,6 +29,13 @@ public class SharedProjectItemDaoJpa {
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> List<T> getSharedProjectItems(String user) {
+        List<T> result = new ArrayList<>();
+        // TODO: implement
+        return result;
+    }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> void save(

@@ -2,8 +2,11 @@ package com.bulletjournal.authz;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.repository.SharedProjectItemDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.ProjectItemModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +16,14 @@ import java.util.stream.Collectors;
 @Component
 public class AuthorizationService {
 
+    @Autowired
+    @Lazy
+    private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
+
     public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, T projectItem) {
+        if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).contains(projectItem)) {
+            return;
+        }
         validateRequesterInProjectGroup(requester, projectItem.getProject());
     }
 
@@ -112,9 +122,13 @@ public class AuthorizationService {
             String owner, String requester, Operation operation, Long contentId, Object[] other) {
         String projectItemOwner = (String) other[0];
         String projectOwner = (String) other[1];
+        ProjectItemModel projectItem = (ProjectItemModel) other[2];
         switch (operation) {
             case DELETE:
             case UPDATE:
+                if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).contains(projectItem)) {
+                    return;
+                }
                 if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)
                         && !Objects.equals(projectItemOwner, requester)) {
                     throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
