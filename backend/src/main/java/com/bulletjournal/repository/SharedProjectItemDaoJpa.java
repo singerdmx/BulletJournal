@@ -86,6 +86,7 @@ public class SharedProjectItemDaoJpa {
                 projectType.getValue(),
                 this.groupDaoJpa.getDefaultGroup(user.getName()),
                 true);
+        project.setOwner(user.getName());
         this.projectRepository.save(project);
 
         userConsumer.accept(project);

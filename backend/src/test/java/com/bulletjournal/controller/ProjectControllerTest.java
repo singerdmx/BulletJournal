@@ -661,14 +661,27 @@ public class ProjectControllerTest {
                 new HttpEntity<>(task),
                 Task.class,
                 project.getId());
-        Task created = response.getBody();
+        Task createdTask = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(taskName, created.getName());
-        assertEquals(project.getId(), created.getProjectId());
+        assertEquals(taskName, createdTask.getName());
+        assertEquals(project.getId(), createdTask.getProjectId());
 
-        Content content = createTaskContent(created);
-        deleteTaskContent(created, content);
-        return created;
+        Content content = createTaskContent(createdTask);
+        deleteTaskContent(createdTask, content);
+        shareTask(createdTask);
+        return createdTask;
+    }
+
+    private void shareTask(Task task) {
+        ShareProjectItemParams shareProjectItemParams = new ShareProjectItemParams();
+        shareProjectItemParams.setTargetUser(sampleUsers[5]);
+        ResponseEntity<String> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(shareProjectItemParams),
+                String.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     private void deleteTaskContent(Task task, Content content) {
