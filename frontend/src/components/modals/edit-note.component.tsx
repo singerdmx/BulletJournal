@@ -19,7 +19,7 @@ const EditNote: React.FC<NoteProps> = props => {
     const { note, patchNote} = props;
     const [visible, setVisible] = useState(false);
 
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState(note.name);
     const onOk = () => {
         patchNote(note.id, value);
         setVisible(!visible)
@@ -30,13 +30,15 @@ const EditNote: React.FC<NoteProps> = props => {
                 <EditTwoTone />
                 <Modal
                     title='Edit'
-                    visible={visible}
-                    onOk={onOk}
                     okText="Confirm"
                     cancelText="Cancel"
+                    onOk={onOk}
+                    visible={visible}
                     onCancel={() => setVisible(!visible)}
                 >
-                    <div><Input placeholder={note.name} onChange={e => setValue(e.target.value)}/></div>
+                    <Input onClick={e=>e.stopPropagation()}  value={value} placeholder={note.name} onChange={e => {
+                        e.stopPropagation();
+                        setValue(e.target.value);}}/>
                 </Modal>
             </div>);
 };
