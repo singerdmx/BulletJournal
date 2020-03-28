@@ -19,3 +19,11 @@ export interface ProjectItem {
     projectId: number,
     labels: Label[]
 }
+
+export interface Content {
+    id: number,
+    owner: string,
+    text: string,
+    createdAt: number,
+    updatedAt: number
+}

@@ -126,3 +126,42 @@ export const shareTransactionWithOther = (transactionId: number, targetUser: str
         throw Error(err);
       });
 };
+
+export const getContents = (transactionId: number) => {
+  return doFetch(`/api/transactions/${transactionId}/contents`)
+      .then(res => res.json())
+      .catch(err => {
+        throw Error(err.message);
+      });
+};
+
+export const addContent = (transactionId: number, text: string) => {
+  const postBody = JSON.stringify({
+    text: text,
+  });
+
+  return doPost(`/api/transactions/${transactionId}/addContent`, postBody)
+      .then(res => res.json())
+      .catch(err => {
+        throw Error(err);
+      });
+};
+
+export const deleteContent = (transactionId: number, contentId: number) => {
+  return doDelete(`/api/transactions/${transactionId}/contents/${contentId}`)
+      .then(res => res)
+      .catch(err => {
+        throw Error(err.message);
+      });
+};
+
+export const updateContent = (transactionId: number, contentId: number, text: string) => {
+  const patchBody = JSON.stringify({
+    text: text
+  });
+  return doPatch(`/api/transactions/${transactionId}/contents/${contentId}`, patchBody)
+      .then(res => res)
+      .catch(err => {
+        throw Error(err);
+      });
+};

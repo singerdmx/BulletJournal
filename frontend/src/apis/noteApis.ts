@@ -90,3 +90,42 @@ export const shareNoteWithOther = (noteId: number, targetUser: string, targetGro
             throw Error(err);
         });
 };
+
+export const getContents = (noteId: number) => {
+    return doFetch(`/api/notes/${noteId}/contents`)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+};
+
+export const addContent = (noteId: number, text: string) => {
+    const postBody = JSON.stringify({
+        text: text,
+    });
+
+    return doPost(`/api/notes/${noteId}/addContent`, postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err);
+        });
+};
+
+export const deleteContent = (noteId: number, contentId: number) => {
+    return doDelete(`/api/notes/${noteId}/contents/${contentId}`)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err.message);
+        });
+};
+
+export const updateContent = (noteId: number, contentId: number, text: string) => {
+    const patchBody = JSON.stringify({
+        text: text
+    });
+    return doPatch(`/api/notes/${noteId}/contents/${contentId}`, patchBody)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err);
+        });
+};

@@ -138,3 +138,42 @@ export const shareTaskWithOther = (taskId: number, targetUser: string, targetGro
         throw Error(err);
       });
 };
+
+export const getContents = (taskId: number) => {
+  return doFetch(`/api/tasks/${taskId}/contents`)
+      .then(res => res.json())
+      .catch(err => {
+        throw Error(err.message);
+      });
+};
+
+export const addContent = (taskId: number, text: string) => {
+  const postBody = JSON.stringify({
+    text: text,
+  });
+
+  return doPost(`/api/tasks/${taskId}/addContent`, postBody)
+      .then(res => res.json())
+      .catch(err => {
+        throw Error(err);
+      });
+};
+
+export const deleteContent = (taskId: number, contentId: number) => {
+  return doDelete(`/api/tasks/${taskId}/contents/${contentId}`)
+      .then(res => res)
+      .catch(err => {
+        throw Error(err.message);
+      });
+};
+
+export const updateContent = (taskId: number, contentId: number, text: string) => {
+  const patchBody = JSON.stringify({
+    text: text
+  });
+  return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody)
+      .then(res => res)
+      .catch(err => {
+        throw Error(err);
+      });
+};
