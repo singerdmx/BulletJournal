@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import {Input, Modal} from 'antd';
+import {
+    EditTwoTone,
+} from '@ant-design/icons';
 import './modals.styles.less';
 import {patchNote} from '../../features/notes/actions';
 import {connect} from 'react-redux';
@@ -10,12 +13,12 @@ import {Note} from '../../features/notes/interface';
 type NoteProps = {
     note: Note;
     patchNote: (noteId: number, content: string) => void;
-    visible: boolean;
-    setVisible: (visible: boolean) => void;
 };
 
 const EditNote: React.FC<NoteProps> = props => {
-    const {visible, setVisible, note, patchNote} = props;
+    const { note, patchNote} = props;
+    const [visible, setVisible] = useState(false);
+
     const [value, setValue] = useState('');
     const onOk = () => {
         patchNote(note.id, value);
@@ -23,17 +26,19 @@ const EditNote: React.FC<NoteProps> = props => {
     };
 
     return (<div>
-        <Modal
-            title="Edit"
-            visible={props.visible}
-            onOk={onOk}
-            okText="Confirm"
-            cancelText="Cancel"
-            onCancel={() => setVisible(!visible)}
-        >
-            <div><Input placeholder='text' onChange={e => setValue(e.target.value)}/></div>
-        </Modal>
-    </div>);
+                <span>Edit</span>
+                <EditTwoTone onClick={()=>setVisible(!visible)}/>
+                <Modal
+                    title='Edit Note title'
+                    visible={visible}
+                    onOk={onOk}
+                    okText="Confirm"
+                    cancelText="Cancel"
+                    onCancel={() => setVisible(!visible)}
+                >
+                    <div><Input placeholder={note.name} onChange={e => setValue(e.target.value)}/></div>
+                </Modal>
+            </div>);
 };
 
 const mapStateToProps = (state: IState) => ({

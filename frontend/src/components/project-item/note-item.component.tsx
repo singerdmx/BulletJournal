@@ -21,9 +21,9 @@ type NoteProps = {
     deleteNote: (noteId: number) => void;
 };
 
-const Content: React.FC<NoteProps> = props => {
+const ManageNote: React.FC<NoteProps> = props => {
     const {note, deleteNote} = props;
-    const [visible, setVisible] = useState(false);
+
     return (
         <div style={{display: 'flex', flexDirection: 'column'}}>
             <Popconfirm
@@ -39,11 +39,7 @@ const Content: React.FC<NoteProps> = props => {
                     <DeleteTwoTone twoToneColor="#f5222d"/>
                 </div>
             </Popconfirm>
-            <div>
-                <span>Edit</span>
-                <EditTwoTone onClick={() => setVisible(!visible)}/>
-                <EditNote visible={visible} note={note} setVisible={setVisible}/>
-            </div>
+            <EditNote note={note}/>
             <EditProjectItem type='NOTE' projectItemId={note.id}/>
         </div>
     );
@@ -55,7 +51,6 @@ const alignConfig = {
 
 const NoteItem: React.FC<NoteProps> = props => {
     const {note, deleteNote} = props;
-
     return (
         <div
             style={{
@@ -89,7 +84,7 @@ const NoteItem: React.FC<NoteProps> = props => {
                     placement="bottomRight"
                     style={{top: -10}}
                     content={
-                        <Content note={note} deleteNote={deleteNote}/>
+                        <ManageNote note={note} deleteNote={deleteNote} />
                     }
                     trigger="click"
                 >
