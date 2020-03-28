@@ -6,6 +6,8 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 @RestController
 public class GroupController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
 
     protected static final String GROUPS_ROUTE = "/api/groups";
     protected static final String GROUP_ROUTE = "/api/groups/{groupId}";

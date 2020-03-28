@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveTransactionEvent;
@@ -24,7 +25,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,6 +42,31 @@ public class TransactionController {
     protected static final String CONTENT_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}/revisions";
+
+    private static class Transactions {
+        double income = 0.0;
+        double expense = 0.0;
+
+        public Transactions() {
+        }
+
+        void addIncome(double amount) {
+            this.income += amount;
+        }
+
+        void addExpense(double amount) {
+            this.expense += amount;
+        }
+
+        public double getIncome() {
+            return income;
+        }
+
+        public double getExpense() {
+            return expense;
+        }
+    }
+
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -75,18 +104,59 @@ public class TransactionController {
                 ZonedDateTimeHelper.getDateString(startTime),
                 ZonedDateTimeHelper.getDateString(endTime));
 
+        double totalIncome = 0.0;
+        double totalExpense = 0.0;
+        Map<String, Transactions> m = new HashMap<>();
         switch (ledgerSummaryType) {
             case DEFAULT:
                 break;
             case LABEL:
                 break;
             case PAYER:
+                // by payer : different user in projects
+                for (Transaction t : transactions) {
+                    TransactionType transactionType = TransactionType.getType(t.getTransactionType());
+
+                    double amount = t.getAmount();
+                    Transactions tran = m.computeIfAbsent(t.getPayer(), k -> new Transactions());
+                    switch (transactionType) {
+                        case INCOME:
+                            totalIncome += amount;
+                            tran.addIncome(amount);
+                            break;
+                        case EXPENSE:
+                            totalExpense += amount;
+                            tran.addExpense(amount);
+                            break;
+                    }
+                }
                 break;
             case TIMELINE:
                 break;
             default:
                 throw new IllegalArgumentException("Invalid LedgerSummaryType " + ledgerSummaryType);
         }
+
+        ledgerSummary.setIncome(totalIncome);
+        ledgerSummary.setExpense(totalExpense);
+        ledgerSummary.setBalance(totalIncome - totalExpense);
+        List<TransactionsSummary> transactionsSummaries = new ArrayList<>();
+        double finalTotalIncome = totalIncome;
+        double finalTotalExpense = totalExpense;
+        m.forEach((k, v) -> {
+            double balance = v.getIncome() - v.getExpense();
+            transactionsSummaries.add(new TransactionsSummary(
+                    k,
+                    null,
+                    v.getIncome(),
+                    Math.round((v.getIncome() * 100 / finalTotalIncome) * 100.0) / 100.0,
+                    v.getExpense(),
+                    Math.round(v.getExpense() * 100 / finalTotalExpense * 100.0) / 100.0,
+                    balance,
+                    balance * 100 / ledgerSummary.getBalance()
+            ));
+        });
+        ledgerSummary.setTransactionsSummaries(transactionsSummaries);
 
         return ResponseEntity.ok().headers(responseHeader).body(ledgerSummary);
     }

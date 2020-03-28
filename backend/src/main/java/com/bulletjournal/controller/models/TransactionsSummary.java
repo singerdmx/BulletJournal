@@ -16,6 +16,24 @@ public class TransactionsSummary {
 
     private Double balance;
 
+    private Double balancePercentage;
+
+    public TransactionsSummary() {
+    }
+
+    public TransactionsSummary(String name, String metadata, Double income, Double incomePercentage,
+                               Double expense, Double expensePercentage, Double balance, Double balancePercentage) {
+        this.name = name;
+        this.metadata = metadata;
+        this.income = income;
+        this.incomePercentage = incomePercentage;
+        this.expense = expense;
+        this.expensePercentage = expensePercentage;
+        this.balance = balance;
+        this.balancePercentage = balancePercentage;
+    }
+
+
     public String getName() {
         return name;
     }
