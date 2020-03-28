@@ -78,7 +78,7 @@ const AddUser: React.FC<ModalProps> = props => {
           <Form.Item name="username" rules={[{ min: 1, required : true }]}>
             <Input.Search
               allowClear
-              prefix={<UserOutlined className="site-form-item-icon" />}
+              prefix={<UserOutlined />}
               onSearch={() =>
                 form
                   .validateFields()

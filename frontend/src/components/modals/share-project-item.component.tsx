@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Form, Modal, Select, Tabs} from 'antd';
-import {ShareAltOutlined} from '@ant-design/icons';
+import {Avatar, Form, Modal, Select, Tabs, Result, Input, Empty} from 'antd';
+import {ShareAltOutlined, LinkOutlined, SolutionOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {GroupsWithOwner} from '../../features/group/interface';
 import {updateGroups} from '../../features/group/actions';
@@ -9,6 +9,11 @@ import {shareTask} from '../../features/tasks/actions';
 import {shareNote} from '../../features/notes/actions';
 import {shareTransaction} from '../../features/transactions/actions';
 import './modals.styles.less';
+import {
+  updateUser,
+  clearUser,
+} from '../../features/user/actions';
+import {UserWithAvatar} from "../../features/user/reducer";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -16,6 +21,7 @@ const {Option} = Select;
 type ProjectItemProps = {
   type: string;
   projectItemId: number;
+  user: UserWithAvatar;
   shareTask: (taskId: number, targetUser: string, targetGroup: number, generateLink: boolean) => void;
   shareNote: (noteId: number, targetUser: string, targetGroup: number, generateLink: boolean) => void;
   shareTransaction: (transactionId: number, targetUser: string, targetGroup: number, generateLink: boolean) => void;
@@ -25,11 +31,18 @@ type ProjectItemProps = {
 type GroupProps = {
   groups: GroupsWithOwner[];
   updateGroups: () => void;
+  updateUser: (username: string) => void;
+  clearUser: () => void;
 };
 
 const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
+
+  const searchUser = (value: string) => {
+    props.updateUser(value);
+    props.clearUser();
+  };
 
   const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
@@ -93,6 +106,7 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   };
 
   const getModal = () => {
+    const { user } = props;
     return (
         <Modal
             title={`SHARE ${props.type}`}
@@ -116,10 +130,44 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
               <Tabs defaultActiveKey="Group" tabPosition={"left"}>
                 <TabPane tab='Group' key='Group'>
                   {shareWithGroup()}
+                  <Result
+                      icon={<TeamOutlined />}
+                      title= {`Share this ${props.type} with GROUP`}
+                  />
                 </TabPane>
                 <TabPane tab='User' key='User'>
+                  <Form.Item name="username">
+                    <Input.Search
+                        allowClear
+                        prefix={<UserOutlined className="site-form-item-icon" />}
+                        onSearch={() =>
+                            form
+                                .validateFields()
+                                .then(values => {
+                                  form.resetFields();
+                                  searchUser(values.username);
+                                })
+                                .catch(info => console.log(info))
+                        }
+                        className="input-search-box"
+                        placeholder="Enter Username"
+                    />
+                  </Form.Item>
+                  <div className="search-result">
+                    {user.name ? (
+                        <Avatar size="large" src={user.avatar} />
+                    ) : null}
+                  </div>
+                  <Result
+                      icon={<SolutionOutlined />}
+                      title= {`Share this ${props.type} with USER`}
+                  />
                 </TabPane>
                 <TabPane tab='Link' key='Link'>
+                  <Result
+                      icon={<LinkOutlined />}
+                      title= {`Generate shareable LINK for this ${props.type}`}
+                  />
                 </TabPane>
               </Tabs>
             </Form>
@@ -143,11 +191,14 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
 
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
+  user: state.user
 });
 
 export default connect(mapStateToProps, {
   updateGroups,
   shareTask,
   shareNote,
-  shareTransaction
+  shareTransaction,
+  updateUser,
+  clearUser,
 })(ShareProjectItem);
