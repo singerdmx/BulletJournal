@@ -25,11 +25,11 @@ const EditNote: React.FC<NoteProps> = props => {
         setVisible(!visible)
     };
 
-    return (<div>
+    return (<div onClick={()=>setVisible(!visible)} style={{ cursor: 'pointer' }}>
                 <span>Edit</span>
-                <EditTwoTone onClick={()=>setVisible(!visible)}/>
+                <EditTwoTone />
                 <Modal
-                    title='Edit Note title'
+                    title='Edit'
                     visible={visible}
                     onOk={onOk}
                     okText="Confirm"
