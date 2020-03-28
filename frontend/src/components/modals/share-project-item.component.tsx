@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Form, Modal, Select, Tabs, Result, Input, Empty} from 'antd';
+import {Avatar, Form, Modal, Select, Tabs, Result, Input} from 'antd';
 import {ShareAltOutlined, LinkOutlined, SolutionOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {GroupsWithOwner} from '../../features/group/interface';

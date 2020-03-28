@@ -105,8 +105,13 @@ function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
 function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
   try {
     const { groupId, groupName, history } = action.payload;
+    const resp = yield call(deleteGroup, groupId);
+    if (!resp.ok) {
+      const data = yield resp.json();
+      yield call(message.error, data.message);
+      return;
+    }
     history.goBack();
-    yield call(deleteGroup, groupId);
     yield put(groupsActions.groupsUpdate({}));
     yield call(message.success, `Group "${groupName}" deleted`);
     history.push('/groups');

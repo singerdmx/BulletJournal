@@ -30,7 +30,7 @@ export function doPost(endpoint: string, body?: string) {
   });
 }
 
-export function doDelete(endpoint: string) {
+export function doDelete(endpoint: string, returnError = false) {
   if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }
@@ -38,7 +38,7 @@ export function doDelete(endpoint: string) {
     headers: { 'request-id': uuidv4() },
     method: 'DELETE'
   }).then(res => {
-    if (!res.ok) {
+    if (!res.ok && !returnError) {
       throw Error(res.status.toString());
     }
     return res;

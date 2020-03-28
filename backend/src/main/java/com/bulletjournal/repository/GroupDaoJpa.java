@@ -69,6 +69,13 @@ public class GroupDaoJpa {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 group.getOwner(), requester, ContentType.GROUP, Operation.DELETE, groupId, group.getName());
 
+        if (!group.getProjects().isEmpty()) {
+            throw new BadRequestException(
+                    "Group [" + group.getName() + "] is associated with Projects " +
+                            group.getProjects().stream().map(p -> p.getName()).collect(Collectors.toList()) +
+                            " and it cannot be deleted");
+        }
+
         List<Event> events = new ArrayList<>();
         for (UserGroup userGroup : group.getUsers()) {
             this.userGroupRepository.delete(userGroup);

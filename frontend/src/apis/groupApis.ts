@@ -50,9 +50,7 @@ export const removeUserGroup = (groupId: number, username: string) => {
 };
 
 export const deleteGroup = (groupId: number) => {
-  return doDelete(`/api/groups/${groupId}`).catch(err => {
-    throw Error(err.message);
-  });
+  return doDelete(`/api/groups/${groupId}`, true);
 };
 
 export const updateGroup = (groupId: number, name: string) => {
