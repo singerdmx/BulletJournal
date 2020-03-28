@@ -833,7 +833,6 @@ public class ProjectControllerTest {
                     Void.class,
                     notification.getId());
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(JoinGroupEvent.class.getSimpleName(), notification.getType());
         }
         return etag;
     }
