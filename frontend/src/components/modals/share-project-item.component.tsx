@@ -1,48 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
-import { useHistory } from 'react-router-dom';
-import { ShareAltOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
-import { createProjectByName } from '../../features/project/actions';
-import { updateGroups } from '../../features/group/actions';
-import { IState } from '../../store';
-import { Project, ProjectsWithOwner } from '../../features/project/interface';
-import { iconMapper } from '../side-menu/side-menu.component';
-import { moveTask } from '../../features/tasks/actions';
-import { moveNote } from '../../features/notes/actions';
-import { moveTransaction } from '../../features/transactions/actions';
-import { History } from 'history';
+import React, {useEffect, useState} from 'react';
+import {Avatar, Form, Modal, Select, Tabs} from 'antd';
+import {ShareAltOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {GroupsWithOwner} from '../../features/group/interface';
+import {updateGroups} from '../../features/group/actions';
+import {IState} from '../../store';
+import {shareTask} from '../../features/tasks/actions';
+import {shareNote} from '../../features/notes/actions';
+import {shareTransaction} from '../../features/transactions/actions';
 import './modals.styles.less';
-import {
-  flattenOwnedProject,
-  flattenSharedProject
-} from '../../pages/projects/projects.pages';
 
-const { Option } = Select;
+const {TabPane} = Tabs;
+const {Option} = Select;
 
 type ProjectItemProps = {
   type: string;
   projectItemId: number;
-  project: Project;
-  ownedProjects: Project[];
-  sharedProjects: ProjectsWithOwner[];
+  shareTask: (taskId: number, targetUser: string, targetGroup: number, generateLink: boolean) => void;
+  shareNote: (noteId: number, targetUser: string, targetGroup: number, generateLink: boolean) => void;
+  shareTransaction: (transactionId: number, targetUser: string, targetGroup: number, generateLink: boolean) => void;
 };
 
 //props of groups
 type GroupProps = {
   groups: GroupsWithOwner[];
   updateGroups: () => void;
-  moveNote: (noteId: number, targetProject: number, history: History) => void;
-  moveTask: (taskId: number, targetProject: number, history: History) => void;
-  moveTransaction: (transactionId: number, targetProject: number, history: History) => void;
 };
 
 const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
-  const [projects, setProjects] = useState<Project[]>([]);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
-  const history = useHistory();
 
   const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
@@ -55,105 +42,99 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
 
   useEffect(() => {
     props.updateGroups();
-    setProjects([]);
-    setProjects(flattenOwnedProject(props.ownedProjects, projects));
-    setProjects(flattenSharedProject(props.sharedProjects, projects));
-    setProjects(
-      projects.filter(
-        p => p.projectType === props.type && p.id !== props.project.id
-      )
-    );
   }, []);
 
-  const moveProjectItem = (values: any) => {
-    let projectId: number | undefined = values.project;
-    if (!projectId) {
-      projectId = projects[0].id;
-    }
-
+  const shareProjectItem = (values: any) => {
     switch (props.type) {
       case 'NOTE':
-        props.moveNote(props.projectItemId, projectId, history);
+        // props.moveNote(props.projectItemId, projectId, history);
         break;
       case 'TASK':
-        props.moveTask(props.projectItemId, projectId, history);
+        // props.moveTask(props.projectItemId, projectId, history);
         break;
       case 'TRANSACTION':
-        props.moveTransaction(props.projectItemId, projectId, history);
+        // props.moveTransaction(props.projectItemId, projectId, history);
         break;
     }
     setVisible(false);
   };
 
-  const getProjectSelections = () => {
-    if (projects && projects[0]) {
-      return (
-        <Form form={form} labelAlign="left">
-          <Tooltip title="Choose BuJo" placement="topLeft">
-            <Form.Item name="project">
-              <Select
-                placeholder="Choose BuJo"
-                style={{ width: '100%' }}
-                defaultValue={projects[0].id}
-              >
-                {projects.map(project => {
-                  return (
-                    <Option value={project.id} key={project.id}>
-                      <Tooltip title={project.owner} placement="right">
-                        <span>
-                          <Avatar size="small" src={project.ownerAvatar} />
-                          &nbsp; {iconMapper[project.projectType]}
-                          &nbsp; <strong>{project.name}</strong>
-                          &nbsp; (Group <strong>{project.group.name}</strong>)
-                        </span>
-                      </Tooltip>
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Tooltip>
-        </Form>
-      );
+  const shareWithGroup = () => {
+    const {groups: groupsWithOwner} = props;
+    if (groupsWithOwner.length === 0) {
+      return null;
     }
 
-    return <React.Fragment />;
+    return <div>
+      <Form.Item name="group">
+        <Select
+            placeholder="Choose Group"
+            style={{width: '100%'}}
+            defaultValue={groupsWithOwner[0].groups[0].id}
+        >
+          {groupsWithOwner.map(
+              (groupsOwner: GroupsWithOwner, index: number) => {
+                return groupsOwner.groups.map(group => (
+                    <Option
+                        key={`group${group.id}`}
+                        value={group.id}
+                        title={`Group "${group.name}" (owner "${group.owner}")`}
+                    >
+                      <Avatar size="small" src={group.ownerAvatar}/>
+                      &nbsp;&nbsp;
+                      <strong> {group.name} </strong> (owner <strong>{group.owner}</strong>)
+                    </Option>
+                ));
+              }
+          )}
+        </Select>
+      </Form.Item>
+    </div>;
   };
 
   const getModal = () => {
     return (
-      <Modal
-        title={`SHARE ${props.type}`}
-        destroyOnClose
-        centered
-        okText="Confirm"
-        visible={visible}
-        onCancel={e => handleCancel(e)}
-        onOk={() => {
-          form
-            .validateFields()
-            .then(values => {
-              form.resetFields();
-              moveProjectItem(values);
-            })
-            .catch(info => console.log(info));
-        }}
-      >
-        <div>{getProjectSelections()}</div>
-      </Modal>
+        <Modal
+            title={`SHARE ${props.type}`}
+            destroyOnClose
+            centered
+            okText="Confirm"
+            visible={visible}
+            onCancel={e => handleCancel(e)}
+            onOk={() => {
+              form
+                  .validateFields()
+                  .then(values => {
+                    form.resetFields();
+                    shareProjectItem(values);
+                  })
+                  .catch(info => console.log(info));
+            }}
+        >
+          <div>
+            <Form form={form} labelAlign="left">
+              <Tabs defaultActiveKey="Group" tabPosition={"left"}>
+                <TabPane tab='Group' key='Group'>
+                  {shareWithGroup()}
+                </TabPane>
+                <TabPane tab='User' key='User'>
+                </TabPane>
+                <TabPane tab='Link' key='Link'>
+                </TabPane>
+              </Tabs>
+            </Form>
+          </div>
+        </Modal>
     );
   };
 
   const getDiv = () => {
-    if (projects.length === 0) {
-      return null;
-    }
     return (
-      <div onClick={openModal} style={{ cursor: 'pointer' }}>
-        <span>Share</span>
-        <ShareAltOutlined />
-        {getModal()}
-      </div>
+        <div onClick={openModal} style={{cursor: 'pointer'}}>
+          <span>Share</span>
+          <ShareAltOutlined/>
+          {getModal()}
+        </div>
     );
   };
 
@@ -162,15 +143,11 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
 
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
-  project: state.project.project,
-  ownedProjects: state.project.owned,
-  sharedProjects: state.project.shared
 });
 
 export default connect(mapStateToProps, {
   updateGroups,
-  createProjectByName,
-  moveNote,
-  moveTask,
-  moveTransaction
+  shareTask,
+  shareNote,
+  shareTransaction
 })(ShareProjectItem);
