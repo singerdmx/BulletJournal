@@ -67,8 +67,16 @@ public class SharedProjectItem extends AuditModel {
         this.task = task;
     }
 
+    public boolean hasTask() {
+        return this.task != null;
+    }
+
     public Note getNote() {
         return note;
+    }
+
+    public boolean hasNote() {
+        return this.note != null;
     }
 
     public void setNote(Note note) {
@@ -81,5 +89,9 @@ public class SharedProjectItem extends AuditModel {
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
+    }
+
+    public boolean hasTransaction() {
+        return this.transaction != null;
     }
 }

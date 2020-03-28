@@ -96,6 +96,7 @@ public class ProjectDaoJpa {
             }
         }
 
+        ProjectsWithOwner sharedItems = getSharedItems(user);
         String sharedProjectRelations = userProjects.getSharedProjects();
         List<String> owners = new ArrayList<>();
         if (sharedProjectRelations != null) {
@@ -104,16 +105,46 @@ public class ProjectDaoJpa {
 
         List<String> newOwners = new ArrayList<>();
         List<ProjectsWithOwner> result = new ArrayList<>();
-        for (String o : owners) {
-            Set<Long> projectsByOwner = projectIds.remove(o);
-            addProjectsByOwner(newOwners, o, projectsByOwner, result);
+        for (String projectOwner : owners) {
+            Set<Long> projectsByOwner = projectIds.remove(projectOwner);
+            if (Objects.equals(owner, projectOwner)) {
+                result.add(sharedItems);
+            } else {
+                addProjectsByOwner(newOwners, projectOwner, projectsByOwner, result);
+            }
         }
 
         for (Map.Entry<String, Set<Long>> entry : projectIds.entrySet()) {
-            addProjectsByOwner(newOwners, entry.getKey(), entry.getValue(), result);
+            String projectOwner = entry.getKey();
+            if (Objects.equals(owner, projectOwner)) {
+                result.add(sharedItems);
+            } else {
+                addProjectsByOwner(newOwners, projectOwner, entry.getValue(), result);
+            }
         }
 
         return result;
+    }
+
+    private ProjectsWithOwner getSharedItems(User user) {
+        List<Project> projects = new ArrayList<>();
+        if (user.hasSharedNotesProject()) {
+            projects.add(user.getSharedNotesProject());
+        }
+        if (user.hasSharedTasksProject()) {
+            projects.add(user.getSharedTasksProject());
+        }
+        if (user.hasSharedTransactionsProject()) {
+            projects.add(user.getSharedTransactionsProject());
+        }
+
+        if (projects.isEmpty()) {
+            return null;
+        }
+
+        ProjectsWithOwner projectsWithOwner = new ProjectsWithOwner(user.getName(),
+                projects.stream().map(p -> p.toPresentationModel()).collect(Collectors.toList()));
+        return projectsWithOwner;
     }
 
     private void addProjectsByOwner(

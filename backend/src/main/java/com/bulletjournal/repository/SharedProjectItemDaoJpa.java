@@ -31,9 +31,21 @@ public class SharedProjectItemDaoJpa {
     private GroupDaoJpa groupDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> List<T> getSharedProjectItems(String user) {
-        List<T> result = new ArrayList<>();
+    public List<ProjectItemModel> getSharedProjectItems(String user) {
+        List<ProjectItemModel> result = new ArrayList<>();
         // TODO: implement
+        List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(user);
+        items.forEach(item -> {
+            if (item.hasNote()) {
+                result.add(item.getNote());
+            } else if (item.hasTask()) {
+                result.add(item.getTask());
+            } else if (item.hasTransaction()) {
+                result.add(item.getTransaction());
+            } else {
+                throw new IllegalStateException();
+            }
+        });
         return result;
     }
 
