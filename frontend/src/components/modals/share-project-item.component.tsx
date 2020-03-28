@@ -132,14 +132,14 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                   {shareWithGroup()}
                   <Result
                       icon={<TeamOutlined />}
-                      title= {`Share this ${props.type} with GROUP`}
+                      title= {`Share ${props.type} with GROUP`}
                   />
                 </TabPane>
                 <TabPane tab='User' key='User'>
                   <Form.Item name="username">
                     <Input.Search
                         allowClear
-                        prefix={<UserOutlined className="site-form-item-icon" />}
+                        prefix={<UserOutlined />}
                         onSearch={() =>
                             form
                                 .validateFields()
@@ -160,13 +160,13 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                   </div>
                   <Result
                       icon={<SolutionOutlined />}
-                      title= {`Share this ${props.type} with USER`}
+                      title= {`Share ${props.type} with USER`}
                   />
                 </TabPane>
                 <TabPane tab='Link' key='Link'>
                   <Result
                       icon={<LinkOutlined />}
-                      title= {`Generate shareable LINK for this ${props.type}`}
+                      title= {`Generate Shareable LINK`}
                   />
                 </TabPane>
               </Tabs>
