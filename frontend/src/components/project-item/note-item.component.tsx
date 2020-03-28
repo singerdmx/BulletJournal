@@ -14,6 +14,7 @@ import EditNote from '../modals/edit-note.component';
 
 import {Popconfirm, Popover} from 'antd';
 import EditProjectItem from "../modals/move-project-item.component";
+import ShareProjectItem from "../modals/share-project-item.component";
 
 type NoteProps = {
     note: Note;
@@ -40,6 +41,7 @@ const ManageNote: React.FC<NoteProps> = props => {
             </Popconfirm>
             <EditNote note={note}/>
             <EditProjectItem type='NOTE' projectItemId={note.id}/>
+            <ShareProjectItem type='NOTE' projectItemId={note.id}/>
         </div>
     );
 };
