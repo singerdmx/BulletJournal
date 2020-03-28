@@ -107,7 +107,7 @@ public class ProjectDaoJpa {
         List<ProjectsWithOwner> result = new ArrayList<>();
         for (String projectOwner : owners) {
             Set<Long> projectsByOwner = projectIds.remove(projectOwner);
-            if (Objects.equals(owner, projectOwner)) {
+            if (Objects.equals(owner, projectOwner) && sharedItems != null) {
                 result.add(sharedItems);
             } else {
                 addProjectsByOwner(newOwners, projectOwner, projectsByOwner, result);
@@ -116,13 +116,12 @@ public class ProjectDaoJpa {
 
         for (Map.Entry<String, Set<Long>> entry : projectIds.entrySet()) {
             String projectOwner = entry.getKey();
-            if (Objects.equals(owner, projectOwner)) {
-                result.add(sharedItems);
-            } else {
-                addProjectsByOwner(newOwners, projectOwner, entry.getValue(), result);
-            }
+            addProjectsByOwner(newOwners, projectOwner, entry.getValue(), result);
         }
 
+        if (sharedItems != null && !result.contains(sharedItems)) {
+            result.add(0, sharedItems);
+        }
         return result;
     }
 
