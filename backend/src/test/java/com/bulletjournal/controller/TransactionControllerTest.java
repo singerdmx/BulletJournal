@@ -18,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.constraints.AssertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

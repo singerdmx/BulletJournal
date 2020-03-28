@@ -47,9 +47,6 @@ public class TransactionController {
         double income = 0.0;
         double expense = 0.0;
 
-        public Transactions() {
-        }
-
         void addIncome(double amount) {
             this.income += amount;
         }
