@@ -77,3 +77,16 @@ export const moveToTargetProject = (noteId: number, targetProject: number) => {
             throw Error(err);
         });
 };
+
+export const shareNoteWithOther = (noteId: number, targetUser: string, targetGroup: number, generateLink: boolean) => {
+    const postBody = JSON.stringify({
+        targetUser: targetUser,
+        targetGroup: targetGroup,
+        generateLink: generateLink
+    });
+    return doPost(`/api/notes/${noteId}/share`, postBody)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err);
+        });
+};

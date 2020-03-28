@@ -11,7 +11,7 @@ import {
   MoveTask,
   CompleteTask,
   UncompleteTask,
-  SetTaskLabels
+  SetTaskLabels, ShareTask
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -25,7 +25,7 @@ import {
   deleteTaskById,
   uncompleteTaskById,
   setTaskLabels,
-  moveToTargetProject
+  moveToTargetProject, shareTaskWithOther
 } from '../../apis/taskApis';
 import { updateTasks } from './actions';
 
@@ -194,6 +194,16 @@ function* moveTask(action: PayloadAction<MoveTask>) {
   }
 }
 
+function* shareTask(action: PayloadAction<ShareTask>) {
+  try {
+    const {taskId, targetUser, targetGroup, generateLink} = action.payload;
+    yield call(shareTaskWithOther, taskId, targetUser, targetGroup, generateLink);
+    yield call(message.success, 'Task shared successfully');
+  } catch (error) {
+    yield call(message.error, `shareTask Error Received: ${error}`);
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -210,6 +220,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskDelete.type, deleteTask),
     yield takeLatest(tasksActions.TaskSetLabels.type, taskSetLabels),
     yield takeLatest(tasksActions.TaskMove.type, moveTask),
+    yield takeLatest(tasksActions.TaskShare.type, shareTask),
     yield takeLatest(
       tasksActions.CompletedTasksUpdate.type,
       completedTasksUpdate

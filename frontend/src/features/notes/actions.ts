@@ -19,4 +19,6 @@ export const setNoteLabels = (noteId: number, labels: number[]) =>
 export const moveNote = (noteId: number, targetProject: number, history: History) =>
   actions.NoteMove({ noteId: noteId, targetProject: targetProject, history: history });
 export const updateNoteVisible = (visible: boolean) =>
-  actions.updateAddNoteVisible({ visible: visible });
+  actions.UpdateAddNoteVisible({ visible: visible });
+export const shareNote = (noteId: number, targetUser: string, targetGroup: number, generateLink: boolean) =>
+  actions.NoteShare({noteId: noteId, targetUser: targetUser, targetGroup: targetGroup, generateLink: generateLink});

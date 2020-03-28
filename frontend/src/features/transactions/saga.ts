@@ -8,7 +8,7 @@ import {
   GetTransaction,
   PatchTransaction,
   MoveTransaction,
-  SetTransactionLabels
+  SetTransactionLabels, ShareTransaction
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -18,11 +18,10 @@ import {
   getTransactionById,
   updateTransaction,
   moveToTargetProject,
-  setTransactionLabels
+  setTransactionLabels, shareTransactionWithOther
 } from '../../apis/transactionApis';
 import { updateTransactions } from './actions';
 import { LedgerSummary } from './interface';
-import { History } from 'history';
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -116,6 +115,16 @@ function* transactionMove(action: PayloadAction<MoveTransaction>) {
   }
 }
 
+function* shareTransaction(action: PayloadAction<ShareTransaction>) {
+  try {
+    const { transactionId, targetUser, targetGroup, generateLink} = action.payload;
+    yield call(shareTransactionWithOther, transactionId, targetUser, targetGroup, generateLink);
+    yield call(message.success, 'Transaction shared successfully');
+  } catch (error) {
+    yield call(message.error, `shareTransaction Error Received: ${error}`);
+  }
+}
+
 function* getTransaction(action: PayloadAction<GetTransaction>) {
   try {
     const data = yield call(getTransactionById, action.payload.transactionId);
@@ -173,6 +182,7 @@ export default function* transactionSagas() {
       patchTransaction
     ),
     yield takeLatest(transactionsActions.TransactionMove.type, transactionMove),
+    yield takeLatest(transactionsActions.TransactionShare.type, shareTransaction),
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,
       transactionSetLabels

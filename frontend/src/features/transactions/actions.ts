@@ -66,7 +66,15 @@ export const setTransactionLabels = (transactionId: number, labels: number[]) =>
   });
 
 export const updateTransactionVisible = (visible: boolean) =>
-  actions.updateAddTransactionVisible({ visible: visible });
+  actions.UpdateAddTransactionVisible({ visible: visible });
+
+export const shareTransaction = (transactionId: number, targetUser: string, targetGroup: number, generateLink: boolean) =>
+    actions.TransactionShare({
+        transactionId: transactionId,
+        targetUser: targetUser,
+        targetGroup: targetGroup,
+        generateLink: generateLink
+    });
 
 export const moveTransaction = (transactionId: number, targetProject: number, history: History) =>
   actions.TransactionMove({

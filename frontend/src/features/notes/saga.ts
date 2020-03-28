@@ -9,7 +9,7 @@ import {
   NoteApiErrorAction,
   PatchNote,
   PutNote,
-  SetNoteLabels,
+  SetNoteLabels, ShareNote,
   UpdateNotes
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
@@ -20,7 +20,7 @@ import {
   getNoteById,
   moveToTargetProject,
   putNotes,
-  setNoteLabels,
+  setNoteLabels, shareNoteWithOther,
   updateNote
 } from '../../apis/noteApis';
 import {updateNotes} from './actions';
@@ -120,6 +120,16 @@ function* noteMove(action: PayloadAction<MoveNote>) {
   }
 }
 
+function* shareNote(action: PayloadAction<ShareNote>) {
+  try {
+    const {noteId, targetUser, targetGroup, generateLink} = action.payload;
+    yield call(shareNoteWithOther, noteId, targetUser, targetGroup, generateLink);
+    yield call(message.success, 'Note shared successfully');
+  } catch (error) {
+    yield call(message.error, `noteShare Error Received: ${error}`);
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -157,6 +167,10 @@ export default function* noteSagas() {
     yield takeLatest(
         notesActions.NoteMove.type,
         noteMove,
+    ),
+    yield takeLatest(
+        notesActions.NoteShare.type,
+        shareNote,
     )
   ]);
 }

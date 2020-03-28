@@ -70,6 +70,13 @@ export type MoveTransaction = {
   history: History;
 };
 
+export type ShareTransaction = {
+  targetUser: string;
+  transactionId: number;
+  targetGroup: number;
+  generateLink: boolean;
+};
+
 export type SetTransactionLabels = {
   transactionId: number;
   labels: number[];
@@ -119,7 +126,7 @@ const slice = createSlice({
       const { transaction } = action.payload;
       state.transaction = transaction;
     },
-    updateAddTransactionVisible: (
+    UpdateAddTransactionVisible: (
       state,
       action: PayloadAction<updateVisibleAction>
     ) => {
@@ -139,6 +146,7 @@ const slice = createSlice({
       state,
     TransactionPatch: (state, action: PayloadAction<PatchTransaction>) => state,
     TransactionMove: (state, action: PayloadAction<MoveTransaction>) => state,
+    TransactionShare: (state, action: PayloadAction<ShareTransaction>) => state,
     TransactionSetLabels: (
       state,
       action: PayloadAction<SetTransactionLabels>

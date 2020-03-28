@@ -56,6 +56,13 @@ export type MoveNote = {
   history: History;
 };
 
+export type ShareNote = {
+  targetUser: string;
+  noteId: number;
+  targetGroup: number;
+  generateLink: boolean;
+};
+
 let initialState = {
   note: {} as Note,
   notes: [] as Array<Note>,
@@ -76,7 +83,7 @@ const slice = createSlice({
       const { note } = action.payload;
       state.note = note;
     },
-    updateAddNoteVisible: (
+    UpdateAddNoteVisible: (
       state,
       action: PayloadAction<updateVisibleAction>
     ) => {
@@ -93,7 +100,8 @@ const slice = createSlice({
     NotePatch: (state, action: PayloadAction<PatchNote>) => {
       state.patchLoading = false },
     NoteSetLabels: (state, action: PayloadAction<SetNoteLabels>) => state,
-    NoteMove: (state, action: PayloadAction<MoveNote>) => state
+    NoteMove: (state, action: PayloadAction<MoveNote>) => state,
+    NoteShare: (state, action: PayloadAction<ShareNote>) => state,
   }
 });
 

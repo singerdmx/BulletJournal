@@ -49,6 +49,13 @@ export type MoveTask = {
   history: History;
 };
 
+export type ShareTask = {
+  targetUser: string;
+  taskId: number;
+  targetGroup: number;
+  generateLink: boolean;
+};
+
 export type PatchTask = {
   taskId: number;
   name?: string;
@@ -99,7 +106,7 @@ const slice = createSlice({
       const { task } = action.payload;
       state.task = task;
     },
-    updateAddTaskVisible: (
+    UpdateAddTaskVisible: (
       state,
       action: PayloadAction<updateVisibleAction>
     ) => {
@@ -122,7 +129,8 @@ const slice = createSlice({
     TaskComplete: (state, action: PayloadAction<CompleteTask>) => state,
     TaskUncomplete: (state, action: PayloadAction<UncompleteTask>) => state,
     TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state,
-    TaskMove: (state, action: PayloadAction<MoveTask>) => state
+    TaskMove: (state, action: PayloadAction<MoveTask>) => state,
+    TaskShare: (state, action: PayloadAction<ShareTask>) => state
   }
 });
 

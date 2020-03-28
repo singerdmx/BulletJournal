@@ -60,6 +60,7 @@ export const setTaskLabels = (taskId: number, labels: number[]) =>
   actions.TaskSetLabels({ taskId: taskId, labels: labels });
 export const moveTask = (taskId: number, targetProject: number, history: History) =>
   actions.TaskMove({ taskId: taskId, targetProject: targetProject, history: history });
-
 export const updateTaskVisible = (visible: boolean) =>
-  actions.updateAddTaskVisible({ visible: visible });
+  actions.UpdateAddTaskVisible({ visible: visible });
+export const shareTask = (taskId: number, targetUser: string, targetGroup: number, generateLink: boolean) =>
+    actions.TaskShare({taskId: taskId, targetUser: targetUser, targetGroup: targetGroup, generateLink: generateLink});
