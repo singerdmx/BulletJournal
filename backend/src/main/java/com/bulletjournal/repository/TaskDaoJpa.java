@@ -426,12 +426,24 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return project;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Event> deleteCompletedTask(String requester, Long taskId) {
+        CompletedTask task = this.completedTaskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Project project = task.getProject();
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
+                requester, ContentType.TASK,
+                Operation.DELETE, project.getId(), task.getProject().getOwner());
+        this.completedTaskRepository.delete(task);
+        return generateEvents(task, requester, project);
+    }
+
     /*
      * Generate events for notification
      *
      * @retVal List<Event> - a list of events for notifications
      */
-    private List<Event> generateEvents(Task task, String requester, Project project) {
+    private List<Event> generateEvents(TaskModel task, String requester, Project project) {
         List<Event> events = new ArrayList<>();
         for (UserGroup userGroup : project.getGroup().getUsers()) {
             if (!userGroup.isAccepted()) {

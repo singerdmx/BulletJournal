@@ -133,8 +133,14 @@ public class TaskController {
     }
 
     @DeleteMapping(COMPLETED_TASK_ROUTE)
-    public void deleteCompletedTask(@NotNull @PathVariable Long taskId) {
+    public List<Task> deleteCompletedTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        Task task = getCompletedTask(taskId);
+        List<Event> events = this.taskDaoJpa.deleteCompletedTask(username, taskId);
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new RemoveTaskEvent(events, username));
+        }
+        return getCompletedTasks(task.getProjectId());
     }
 
     @PutMapping(TASK_SET_LABELS_ROUTE)
