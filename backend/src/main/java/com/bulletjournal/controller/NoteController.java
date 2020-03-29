@@ -60,9 +60,8 @@ public class NoteController {
     public Note createNote(@NotNull @PathVariable Long projectId,
                            @Valid @RequestBody CreateNoteParams note) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Note returnedNote = noteDaoJpa.create(projectId, username, note).toPresentationModel();
-//        noteDaoJpa.saveToES(returnedNote, username);
-        return returnedNote;
+        Note createdNote = noteDaoJpa.create(projectId, username, note).toPresentationModel();
+        return createdNote;
     }
 
     @GetMapping(NOTE_ROUTE)

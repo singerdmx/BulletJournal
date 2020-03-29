@@ -12,13 +12,9 @@ import com.bulletjournal.notifications.SetLabelEvent;
 import com.bulletjournal.repository.models.*;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.support.WriteRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +23,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.io.IOException;
 import java.util.*;
 
 abstract class ProjectItemDaoJpa<K extends ContentModel> {
@@ -47,9 +38,6 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Autowired
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
-
-    @Autowired
-    RestHighLevelClient highLevelClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
 
@@ -158,23 +146,5 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         this.getJpaRepository().save(projectItem);
         return new SetLabelEvent(events, requester, contentType);
-    }
-
-    // search
-    // TODO user -> project id -> group -> all users
-    public void saveToES(ProjectItem projectItem, String username) {
-        Map<String, Object> json = new HashMap<>();
-        json.put("name", projectItem.getName());
-        json.put("user", username);
-
-        String index = projectItem.getClass().getSimpleName() + "@" + projectItem.getId();
-        IndexRequest request = new IndexRequest("projectitem", "default", index)
-                .source(json)
-                .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-        try {
-            highLevelClient.index(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            LOGGER.error("saveToES fail", e);
-        }
     }
 }
