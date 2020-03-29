@@ -1,5 +1,8 @@
 package com.bulletjournal.controller.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionsSummary {
 
     private String name;
@@ -88,5 +91,13 @@ public class TransactionsSummary {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public Double getBalancePercentage() {
+        return balancePercentage;
+    }
+
+    public void setBalancePercentage(Double balancePercentage) {
+        this.balancePercentage = balancePercentage;
     }
 }

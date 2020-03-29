@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RestController
@@ -64,6 +65,10 @@ public class TransactionController {
         }
     }
 
+    private static class Total {
+        double totalIncome = 0.0;
+        double totalExpense = 0.0;
+    }
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -97,25 +102,21 @@ public class TransactionController {
         responseHeader.setETag(transactionsEtag);
 
 
-        LedgerSummary ledgerSummary = new LedgerSummary(transactions,
+        final LedgerSummary ledgerSummary = new LedgerSummary(transactions,
                 ZonedDateTimeHelper.getDateString(startTime),
                 ZonedDateTimeHelper.getDateString(endTime));
 
-        double totalIncome = 0.0;
-        double totalExpense = 0.0;
+        final Total total = new Total();
         Map<String, Transactions> m = new HashMap<>();
         switch (ledgerSummaryType) {
             case DEFAULT:
                 break;
             case LABEL:
-                for (Transaction t : transactions) {
-                    TransactionType transactionType = TransactionType.getType(t.getTransactionType());
-
+                processTransaction(transactions, total, (t -> {
                     double amount = t.getAmount();
-
                     for (Label l : t.getLabels()) {
                         Transactions tran = m.computeIfAbsent(l.getValue(), k -> new Transactions());
-                        switch (transactionType) {
+                        switch (TransactionType.getType(t.getTransactionType())) {
                             case INCOME:
                                 tran.addIncome(amount);
                                 break;
@@ -124,33 +125,21 @@ public class TransactionController {
                                 break;
                         }
                     }
-                    switch (transactionType) {
-                        case INCOME:
-                            totalIncome += amount;
-                            break;
-                        case EXPENSE:
-                            totalExpense += amount;
-                            break;
-                    }
-                }
+                }));
                 break;
             case PAYER:
-                for (Transaction t : transactions) {
-                    TransactionType transactionType = TransactionType.getType(t.getTransactionType());
-
-                    double amount = t.getAmount();
+                processTransaction(transactions, total, (t -> {
                     Transactions tran = m.computeIfAbsent(t.getPayer(), k -> new Transactions());
-                    switch (transactionType) {
+                    double amount = t.getAmount();
+                    switch (TransactionType.getType(t.getTransactionType())) {
                         case INCOME:
-                            totalIncome += amount;
                             tran.addIncome(amount);
                             break;
                         case EXPENSE:
-                            totalExpense += amount;
                             tran.addExpense(amount);
                             break;
                     }
-                }
+                }));
                 break;
             case TIMELINE:
                 break;
@@ -158,21 +147,19 @@ public class TransactionController {
                 throw new IllegalArgumentException("Invalid LedgerSummaryType " + ledgerSummaryType);
         }
 
-        ledgerSummary.setIncome(totalIncome);
-        ledgerSummary.setExpense(totalExpense);
-        ledgerSummary.setBalance(totalIncome - totalExpense);
-        List<TransactionsSummary> transactionsSummaries = new ArrayList<>();
-        double finalTotalIncome = totalIncome;
-        double finalTotalExpense = totalExpense;
+        ledgerSummary.setIncome(total.totalIncome);
+        ledgerSummary.setExpense(total.totalExpense);
+        ledgerSummary.setBalance(total.totalIncome - total.totalExpense);
+        final List<TransactionsSummary> transactionsSummaries = new ArrayList<>();
         m.forEach((k, v) -> {
             double balance = v.getIncome() - v.getExpense();
             transactionsSummaries.add(new TransactionsSummary(
                     k,
                     null,
                     v.getIncome(),
-                    Math.round((v.getIncome() * 100 / finalTotalIncome) * 100.0) / 100.0,
+                    Math.round((v.getIncome() * 100 / total.totalIncome) * 100.0) / 100.0,
                     v.getExpense(),
-                    Math.round(v.getExpense() * 100 / finalTotalExpense * 100.0) / 100.0,
+                    Math.round(v.getExpense() * 100 / total.totalExpense * 100.0) / 100.0,
                     balance,
                     balance * 100 / ledgerSummary.getBalance()
             ));
@@ -180,6 +167,24 @@ public class TransactionController {
         ledgerSummary.setTransactionsSummaries(transactionsSummaries);
 
         return ResponseEntity.ok().headers(responseHeader).body(ledgerSummary);
+    }
+
+    private void processTransaction(List<Transaction> transactions, Total total,
+                                    Consumer<Transaction> transactionHandler) {
+        for (Transaction t : transactions) {
+            transactionHandler.accept(t);
+            TransactionType transactionType = TransactionType.getType(t.getTransactionType());
+            double amount = t.getAmount();
+
+            switch (transactionType) {
+                case INCOME:
+                    total.totalIncome += amount;
+                    break;
+                case EXPENSE:
+                    total.totalExpense += amount;
+                    break;
+            }
+        }
     }
 
     @PostMapping(TRANSACTIONS_ROUTE)
