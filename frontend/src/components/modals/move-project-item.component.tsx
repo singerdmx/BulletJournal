@@ -60,7 +60,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     setProjects(flattenSharedProject(props.sharedProjects, projects));
     setProjects(
       projects.filter(
-        p => p.projectType === props.type && p.id !== props.project.id
+        p => p.projectType === props.type && p.id !== props.project.id && !p.shared
       )
     );
   }, []);
