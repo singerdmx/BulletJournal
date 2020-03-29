@@ -18,7 +18,7 @@ type LabelsPageProps = {
 const LablesPage: React.FC<LabelsPageProps> = props => {
   const { createOrSearch } = useParams();
   const history = useHistory();
-  const [path, setPath] = useState('create');
+  const [path, setPath] = useState(createOrSearch);
   const startSearching = () => {
     setPath('search');
   };
@@ -37,7 +37,7 @@ const LablesPage: React.FC<LabelsPageProps> = props => {
 
   return (
     <div className="labels-page">
-      {createOrSearch === 'search' ? (
+      {path === 'search' ? (
         <LabelsSearching
           defaultLabels={props.defaultLabels}
           labelOptions={props.labelOptions}

@@ -24,8 +24,8 @@ class ContentLayout extends React.Component {
           <Route exact path="/projects/:projectId" component={ProjectPage} />
           <Route exact path="/groups" component={GroupsPage} />
           <Route exact path="/groups/:groupId" component={GroupPage} />
+          <Route exact path="/labels/:createOrSearch" component={LabelsPage} />
           <Route path="/labels" component={LabelsPage} />
-          <Route path="/labels/:createOrSearch" component={LabelsPage} />
           <Route exact path="/note/:noteId" component={NotePage} />
         </Switch>
       </Content>
