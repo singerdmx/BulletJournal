@@ -54,9 +54,7 @@ public class UserController {
     @PatchMapping(MYSELF_ROUTE)
     public Myself updateMyself(@NotNull @Valid @RequestBody UpdateMyselfParams updateMyselfParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        com.bulletjournal.repository.models.User user =
-                this.userDaoJpa.updateMyself(username, updateMyselfParams);
-        User self = userClient.getUser(username);
+        this.userDaoJpa.updateMyself(username, updateMyselfParams);
         return getMyself(TRUE);
     }
 

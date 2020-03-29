@@ -40,6 +40,7 @@ public class Note extends ProjectItemModel {
                 this.getOwner(),
                 this.getName(),
                 this.getProject(),
-                labels);
+                labels,
+                this.getUpdatedAt().getTime());
     }
 }
