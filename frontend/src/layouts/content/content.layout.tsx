@@ -1,5 +1,5 @@
 import React from 'react';
-import {Switch, Route} from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import HomePage from '../../pages/home/home.pages';
 import SettingPage from '../../pages/settings/settings.page';
 import BujoPage from '../../pages/bujo/bujo.pages';
@@ -24,7 +24,7 @@ class ContentLayout extends React.Component {
           <Route exact path="/projects/:projectId" component={ProjectPage} />
           <Route exact path="/groups" component={GroupsPage} />
           <Route exact path="/groups/:groupId" component={GroupPage} />
-          <Route exact path="/labels" component={LabelsPage} />
+          <Route exact path="/labels/:createOrSearch" component={LabelsPage} />
           <Route exact path="/note/:noteId" component={NotePage} />
         </Switch>
       </Content>

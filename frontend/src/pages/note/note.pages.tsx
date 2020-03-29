@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar, Typography, Divider } from 'antd';
+import { Tooltip, Tag, Avatar, Typography, Divider, Button } from 'antd';
 import { stringToRGB } from '../../features/label/interface';
+import { addSelectedLabel } from '../../features/label/actions';
 import { icons } from '../../assets/icons/index';
 import {
   TagOutlined,
@@ -22,12 +23,18 @@ type NoteProps = {
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
+  addSelectedLabel: () => void;
 }
 
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { note } = props;
   const { noteId } = useParams();
   const [showEditor] = useState(false);
+  const history = useHistory();
+
+  const toLabelSearching = () => {
+    history.push('/labels/search');
+  };
 
   const getIcon = (icon: string) => {
     let res = icons.filter(item => item.name === icon);
@@ -61,10 +68,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
                       color={stringToRGB(label.value)}
                       style={{ cursor: 'pointer' }}
                     >
-                      <Link to="/labels">
+                      <Button type="link" onClick={toLabelSearching}>
                         {getIcon(label.icon)} &nbsp;
                         {label.value}
-                      </Link>
+                      </Button>
                     </Tag>
                   </Tooltip>
                 );
@@ -95,4 +102,6 @@ const mapStateToProps = (state: IState) => ({
   note: state.note.note
 });
 
-export default connect(mapStateToProps, { getNote })(NotePage);
+export default connect(mapStateToProps, { getNote, addSelectedLabel })(
+  NotePage
+);

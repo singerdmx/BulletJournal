@@ -1,12 +1,12 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {Button, Divider, Form, PageHeader, Select, Tooltip} from 'antd';
-import {Label} from '../../features/label/interface';
-import {getItemsByLabels} from '../../features/label/actions';
-import {IState} from '../../store';
-import {SearchOutlined} from '@ant-design/icons';
-import {ProjectItems} from '../../features/myBuJo/interface';
-import ProjectModelItems from "../../components/project-item/project-model-items.component";
+import { connect } from 'react-redux';
+import { Button, Divider, Form, PageHeader, Select, Tooltip } from 'antd';
+import { Label } from '../../features/label/interface';
+import { getItemsByLabels } from '../../features/label/actions';
+import { IState } from '../../store';
+import { SearchOutlined } from '@ant-design/icons';
+import { ProjectItems } from '../../features/myBuJo/interface';
+import ProjectModelItems from '../../components/project-item/project-model-items.component';
 
 type LabelSearchProps = {
   labelOptions: Label[];
@@ -28,49 +28,48 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
   };
 
   return (
-      <div className="labels-search-container">
-        <PageHeader
-            title="Search By Label(s)"
-            subTitle="Click to choose label(s)"
-            onBack={props.endSearching}
-        />
-        <div className="label-search-input">
-          <Form form={form} layout="inline" onFinish={handleSearch}>
-            <Form.Item
-                name="selectLabels"
-                rules={[{required: true, message: 'Missing Label(s)'}]}
-                style={{flex: 5}}
-            >
-              <Select mode="multiple">
-                {props.labelOptions &&
+    <div className="labels-search-container">
+      <PageHeader
+        title="Search By Label(s)"
+        subTitle="Click to choose label(s)"
+        onBack={props.endSearching}
+      />
+      <div className="label-search-input">
+        <Form form={form} layout="inline" onFinish={handleSearch}>
+          <Form.Item
+            name="selectLabels"
+            rules={[{ required: true, message: 'Missing Label(s)' }]}
+            style={{ flex: 5 }}
+          >
+            <Select mode="multiple">
+              {props.labelOptions &&
                 props.labelOptions.map(option => {
                   return (
-                      <Select.Option key={option.id} value={option.id}>
-                        {option.value}
-                      </Select.Option>
+                    <Select.Option key={option.id} value={option.id}>
+                      {option.value}
+                    </Select.Option>
                   );
                 })}
-              </Select>
-            </Form.Item>
-            <Form.Item style={{flex: 1}}>
-              <Tooltip placement="top" title="Search">
-                <Button shape="circle" type="primary" htmlType="submit">
-                  <SearchOutlined/>
-                </Button>
-              </Tooltip>
-            </Form.Item>
-          </Form>
-        </div>
-        <Divider/>
-        <div>
-          <ProjectModelItems projectItems={props.items}/>
-        </div>
+            </Select>
+          </Form.Item>
+          <Form.Item style={{ flex: 1 }}>
+            <Tooltip placement="top" title="Search">
+              <Button shape="circle" type="primary" htmlType="submit">
+                <SearchOutlined />
+              </Button>
+            </Tooltip>
+          </Form.Item>
+        </Form>
       </div>
+      <Divider />
+      <div>
+        <ProjectModelItems projectItems={props.items} />
+      </div>
+    </div>
   );
 };
 
 const mapStateToProps = (state: IState) => ({
-  labelsSelected: state.label.labelsSelected,
   items: state.label.items
 });
 

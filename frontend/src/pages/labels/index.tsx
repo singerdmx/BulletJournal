@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { IState } from '../../store/index';
-import {
-  addSelectedLabel,
-  removeSelectedLabel
-} from '../../features/label/actions';
 import { Label } from '../../features/label/interface';
 import LabelsWithRedux from './create-label.pages';
 import LabelsSearching from './search-label.component';
@@ -13,19 +10,18 @@ import './labels.styles.less';
 type LabelsPageProps = {
   labels: Label[];
   labelOptions: Label[];
-  addSelectedLabel: (val: string) => void;
-  removeSelectedLabel: (val: string) => void;
 };
 
 const LablesPage: React.FC<LabelsPageProps> = props => {
-  const [isSearching, setSearching] = useState(false);
+  const { createOrSearch } = useParams();
+  const [isSearching, setSearching] = useState(createOrSearch === 'search');
   const startSearching = () => {
     setSearching(true);
   };
 
   const endSearching = () => {
-      setSearching(false);
-  }
+    setSearching(false);
+  };
   return (
     <div className="labels-page">
       {isSearching ? (
@@ -49,7 +45,4 @@ const mapStateToProps = (state: IState) => ({
   labelOptions: state.label.labelOptions
 });
 
-export default connect(mapStateToProps, {
-  addSelectedLabel,
-  removeSelectedLabel
-})(LablesPage);
+export default connect(mapStateToProps)(LablesPage);
