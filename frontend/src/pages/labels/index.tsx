@@ -13,8 +13,8 @@ import './labels.styles.less';
 type LabelsPageProps = {
   labels: Label[];
   labelOptions: Label[];
-  addSelectedLabel: (val: string) => void;
-  removeSelectedLabel: (val: string) => void;
+  addSelectedLabel: (label: Label) => void;
+  removeSelectedLabel: (label: Label) => void;
 };
 
 const LablesPage: React.FC<LabelsPageProps> = props => {
