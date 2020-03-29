@@ -9,8 +9,11 @@ import {
   NoteApiErrorAction,
   PatchNote,
   PutNote,
-  SetNoteLabels, ShareNote,
-  UpdateNotes
+  SetNoteLabels,
+  ShareNote,
+  UpdateNoteContents,
+  UpdateNotes,
+  CreateContent, DeleteContent, PatchContent
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -20,10 +23,15 @@ import {
   getNoteById,
   moveToTargetProject,
   putNotes,
-  setNoteLabels, shareNoteWithOther,
-  updateNote
+  setNoteLabels,
+  shareNoteWithOther,
+  updateNote,
+  getContents,
+  addContent,
+  deleteContent,
+  updateContent
 } from '../../apis/noteApis';
-import {updateNotes} from './actions';
+import {updateNoteContents, updateNotes} from './actions';
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -43,6 +51,20 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
   }
 }
 
+function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
+  try {
+    const data = yield call(getContents, action.payload.noteId);
+    const contents = yield data.json();
+    yield put(
+        notesActions.noteContentsReceived({
+          contents: contents
+        })
+    );
+  } catch (error) {
+    yield call(message.error, `noteContentsUpdate Error Received: ${error}`);
+  }
+}
+
 function* noteCreate(action: PayloadAction<CreateNote>) {
   try {
     const {projectId, name} = action.payload;
@@ -50,6 +72,16 @@ function* noteCreate(action: PayloadAction<CreateNote>) {
     yield put(updateNotes(projectId));
   } catch (error) {
     yield call(message.error, `Note Error Received: ${error}`);
+  }
+}
+
+function* createNoteContent(action: PayloadAction<CreateContent>) {
+  try {
+    const {noteId, text} = action.payload;
+    yield call(addContent, noteId, text);
+    yield put(updateNoteContents(noteId));
+  } catch (error) {
+    yield call(message.error, `createNoteContent Error Received: ${error}`);
   }
 }
 
@@ -73,14 +105,29 @@ function* getNote(action: PayloadAction<GetNote>) {
 
 function* patchNote(action: PayloadAction<PatchNote>) {
   try {
-    const data = yield call(updateNote, action.payload.noteId, action.payload.name);
+    const { noteId, name } = action.payload;
+    const data = yield call(updateNote, noteId, name);
     yield put(
-      notesActions.notesReceived({
-        notes: data
-      })
-  );
+        notesActions.notesReceived({
+          notes: data
+        })
+    );
   } catch (error) {
     yield call(message.error, `Patch Note Error Received: ${error}`);
+  }
+}
+
+function* patchContent(action: PayloadAction<PatchContent>) {
+  try {
+    const { noteId, contentId, text } = action.payload;
+    const contents = yield call(updateContent, noteId, contentId, text);
+    yield put(
+        notesActions.noteContentsReceived({
+          contents: contents
+        })
+    );
+  } catch (error) {
+    yield call(message.error, `Patch Content Error Received: ${error}`);
   }
 }
 
@@ -106,6 +153,21 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
     );
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
+  }
+}
+
+function* deleteNoteContent(action: PayloadAction<DeleteContent>) {
+  try {
+    const {noteId, contentId} = action.payload;
+    const data = yield call(deleteContent, noteId, contentId);
+    const contents = yield data.json();
+    yield put(
+        notesActions.noteContentsReceived({
+          contents: contents
+        })
+    );
+  } catch (error) {
+    yield call(message.error, `noteContentDelete Note Error Received: ${error}`);
   }
 }
 
@@ -141,8 +203,16 @@ export default function* noteSagas() {
         notesUpdate
     ),
     yield takeLatest(
+        notesActions.NoteContentsUpdate.type,
+        noteContentsUpdate
+    ),
+    yield takeLatest(
         notesActions.NotesCreate.type,
         noteCreate
+    ),
+    yield takeLatest(
+        notesActions.NoteContentCreate.type,
+        createNoteContent
     ),
     yield takeLatest(
         notesActions.NotePut.type,
@@ -157,12 +227,20 @@ export default function* noteSagas() {
         patchNote
     ),
     yield takeLatest(
+        notesActions.NoteContentPatch.type,
+        patchContent
+    ),
+    yield takeLatest(
         notesActions.NoteSetLabels.type,
         noteSetLabels
     ),
     yield takeLatest(
         notesActions.NoteDelete.type,
         noteDelete,
+    ),
+    yield takeLatest(
+        notesActions.NoteContentDelete.type,
+        deleteNoteContent,
     ),
     yield takeLatest(
         notesActions.NoteMove.type,

@@ -5,7 +5,7 @@ import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
 import { Tooltip, Tag, Avatar, Typography, Divider, Button } from 'antd';
-import { stringToRGB } from '../../features/label/interface';
+import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { icons } from '../../assets/icons/index';
 import {
@@ -23,7 +23,7 @@ type NoteProps = {
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
-  addSelectedLabel: () => void;
+  addSelectedLabel: (label: Label) => void;
 }
 
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {

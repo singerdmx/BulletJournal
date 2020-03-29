@@ -34,7 +34,7 @@ export type PatchLabelAction = {
 export type UpdateLabels = {};
 
 export type SelectedLabelAction = {
-  val: string;
+  label: Label;
 }
 
 export type ItemsByLabelsAction = {
@@ -64,16 +64,16 @@ const slice = createSlice({
       state.labelsSelected = [];
     },
     addSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
-      const { val } = action.payload;
-      const label = state.labelOptions.filter(l => l.value === val)[0];
-      state.labelsSelected.unshift(label);
-      state.labelOptions = state.labelOptions.filter(l => l.value !== val);
+      const { label } = action.payload;
+      const selectedLabel = state.labelOptions.filter(l => l.value === label.value)[0];
+      state.labelsSelected.unshift(selectedLabel);
+      state.labelOptions = state.labelOptions.filter(l => l.value !== label.value);
     },
     removeSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
-      const { val } = action.payload;
-      const label = state.labelsSelected.filter(l => l.value === val)[0];
-      state.labelOptions.unshift(label);
-      state.labelsSelected = state.labelsSelected.filter(l => l.value !== val);
+      const { label } = action.payload;
+      const selectedLabel = state.labelsSelected.filter(l => l.value === label.value)[0];
+      state.labelOptions.unshift(selectedLabel);
+      state.labelsSelected = state.labelsSelected.filter(l => l.value !== label.value);
     },
     labelsUpdate: (state, action: PayloadAction<UpdateLabels>) => state,
     labelsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
