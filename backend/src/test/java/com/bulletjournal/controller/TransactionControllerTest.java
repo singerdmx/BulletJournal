@@ -104,6 +104,49 @@ public class TransactionControllerTest {
         assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71.43) < 1e-4);
         assertEquals(Double.valueOf("-500.0"), transactionsSummaries.get(1).getBalance());
 
+        shareTransaction(t1);
+    }
+
+    private void shareTransaction(Transaction t1) {
+        String targetUser = "999999";
+        ShareProjectItemParams shareProjectItemParams = new ShareProjectItemParams();
+        shareProjectItemParams.setTargetUser(targetUser);
+        ResponseEntity<String> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.SHARE_TRANSACTION_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(shareProjectItemParams),
+                String.class,
+                t1.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // share again
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.SHARE_TRANSACTION_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(shareProjectItemParams),
+                String.class,
+                t1.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        ResponseEntity<Projects> getProjectsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, targetUser),
+                Projects.class);
+        assertEquals(HttpStatus.OK, getProjectsResponse.getStatusCode());
+        List<ProjectsWithOwner> sharedProjects = getProjectsResponse.getBody().getShared();
+        assertEquals(1, sharedProjects.size());
+        ProjectsWithOwner sharedProject = sharedProjects.get(0);
+        assertEquals(targetUser, sharedProject.getOwner());
+        assertEquals("https://1o24bbs.com/user_avatar/1o24bbs.com/999999/75/1678_2.png",
+                sharedProject.getOwnerAvatar());
+        assertEquals(1, sharedProject.getProjects().size());
+        Project p = sharedProject.getProjects().get(0);
+        Group g = p.getGroup();
+        assertEquals("Shared LEDGER", p.getName());
+        assertEquals("Default", g.getName());
+        assertEquals(ProjectType.LEDGER, p.getProjectType());
+        assertEquals(targetUser, g.getOwner());
     }
 
     private Group createGroup() {
