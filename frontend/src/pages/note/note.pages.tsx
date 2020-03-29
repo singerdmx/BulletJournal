@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar, Typography } from 'antd';
+import { Tooltip, Tag, Avatar, Typography, Divider } from 'antd';
 import { stringToRGB } from '../../features/label/interface';
 import { icons } from '../../assets/icons/index';
 import {
@@ -85,7 +85,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </div>
       </div>
       <div className="content-or-editor">
-        {!showEditor ? <Typography></Typography>}
+        {!showEditor ? <div></div> : <div></div>}
       </div>
     </div>
   );
