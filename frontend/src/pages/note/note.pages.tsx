@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar, Divider } from 'antd';
+import { Tooltip, Tag, Avatar, Divider, Drawer, Button } from 'antd';
 import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { icons } from '../../assets/icons/index';
@@ -31,7 +31,7 @@ interface NotePageHandler {
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { note } = props;
   const { noteId } = useParams();
-  const [showEditor] = useState(true); //setting true for debugging
+  const [showEditor, setEditorShow] = useState(false);
   const history = useHistory();
 
   const toLabelSearching = (label: Label) => {
@@ -96,14 +96,18 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </div>
       </div>
       <Divider />
-      <div className="content-or-editor">
-        {!showEditor ? (
-          <div></div>
-        ) : (
-          <div className="editor-wrapper">
-            <NoteEditor />
-          </div>
-        )}
+      <div className="content">
+        <Button onClick={() => setEditorShow(true)}>Edit</Button>
+      </div>
+      <div className="note-drawer">
+        <Drawer
+          onClose={() => setEditorShow(false)}
+          visible={showEditor}
+          placement="bottom"
+          height="400"
+        >
+          <NoteEditor />
+        </Drawer>
       </div>
     </div>
   );

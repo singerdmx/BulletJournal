@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  DeleteTwoTone,
-  FormOutlined,
-  TagOutlined,
-  MoreOutlined
-} from '@ant-design/icons';
+import { DeleteTwoTone, TagOutlined, MoreOutlined } from '@ant-design/icons';
 import { deleteNote } from '../../features/notes/actions';
 import { Note } from '../../features/notes/interface';
 import { connect } from 'react-redux';
