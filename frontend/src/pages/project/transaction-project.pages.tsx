@@ -78,7 +78,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
     <div className="transaction-page">
       <div className="transaction-display">
         <Carousel autoplay dotPosition="bottom">
-          <div className="trasaction-number">1400</div>
+          <div className="transaction-number">1400</div>
           <div className="transaction-static">graph</div>
           {/* maybe others? */}
         </Carousel>
