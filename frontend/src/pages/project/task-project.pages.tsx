@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { List, Divider } from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TaskItem from '../../components/project-item/task-item.component'
+import { updateTasks, updateCompletedTasks } from '../../features/tasks/actions';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 
