@@ -23,9 +23,11 @@ public class ProjectItem {
 
     protected String owner;
 
-    private String ownerAvatar;
+    protected String ownerAvatar;
 
     protected List<Label> labels;
+
+    protected Long updatedAt;
 
     public ProjectItem() {
     }
@@ -87,6 +89,14 @@ public class ProjectItem {
         this.ownerAvatar = ownerAvatar;
     }
 
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -111,5 +121,6 @@ public class ProjectItem {
         this.setLabels(projectItem.getLabels());
         this.setOwner(projectItem.getOwner());
         this.setOwnerAvatar(projectItem.getOwnerAvatar());
+        this.setUpdatedAt(projectItem.getUpdatedAt());
     }
 }

@@ -85,17 +85,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             return Collections.emptyList();
         }
         ProjectTasks projectTasks = projectTasksOptional.get();
-        Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
+        final Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
                 .stream().collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks())
                 .stream()
-                .map(task -> {
-                    List<com.bulletjournal.controller.models.Label> labels =
-                            TaskDaoJpa.this.getLabelsToProjectItem(tasksMap.get(task.getId()));
-                    task.setLabels(labels);
-                    return task;
-                })
+                .map(task -> addLabels(task, tasksMap))
                 .collect(Collectors.toList());
+    }
+
+    private com.bulletjournal.controller.models.Task addLabels(
+            com.bulletjournal.controller.models.Task task, Map<Long, Task> tasksMap) {
+        List<com.bulletjournal.controller.models.Label> labels =
+                getLabelsToProjectItem(tasksMap.get(task.getId()));
+        task.setLabels(labels);
+        for (com.bulletjournal.controller.models.Task subTask: task.getSubTasks()) {
+            addLabels(subTask, tasksMap);
+        }
+        return task;
     }
 
     private List<com.bulletjournal.controller.models.Task> projectSharedTasks(String requester) {

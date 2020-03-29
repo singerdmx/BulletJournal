@@ -4,6 +4,7 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTransactionParams;
+import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -64,11 +65,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
                 .stream()
                 .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
-                .map(transaction -> {
-                    List<com.bulletjournal.controller.models.Label> labels =
-                            TransactionDaoJpa.this.getLabelsToProjectItem(transaction);
-                    return transaction.toPresentationModel(labels);
-                })
+                .map(transaction -> addLabels(transaction))
                 .collect(Collectors.toList());
     }
 
@@ -82,7 +79,11 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      */
     public com.bulletjournal.controller.models.Transaction getTransaction(String requester, Long id) {
         Transaction transaction = this.getProjectItem(id, requester);
-        List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(transaction);
+        return addLabels(transaction);
+    }
+
+    private com.bulletjournal.controller.models.Transaction addLabels(Transaction transaction) {
+        List<Label> labels = this.getLabelsToProjectItem(transaction);
         return transaction.toPresentationModel(labels);
     }
 

@@ -23,8 +23,10 @@ public class Note extends ProjectItem {
                 @NotBlank String owner,
                 @NotBlank String name,
                 @NotNull Project project,
-                List<Label> labels) {
+                List<Label> labels,
+                Long updatedAt) {
         super(id, name, owner, project, labels);
+        this.updatedAt = updatedAt;
     }
 
 
