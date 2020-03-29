@@ -11,7 +11,7 @@ export const fetchTasks = (projectId: number) => {
 
 export const fetchCompletedTasks = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/completedTasks`)
-    .then(res => res.json())
+    .then(res => res)
     .catch(err => {
       throw Error(err.message);
     });
@@ -133,18 +133,18 @@ export const shareTaskWithOther = (taskId: number, targetUser: string, targetGro
     generateLink: generateLink
   });
   return doPost(`/api/tasks/${taskId}/share`, postBody)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err);
-      });
+    .then(res => res)
+    .catch(err => {
+      throw Error(err);
+    });
 };
 
 export const getContents = (taskId: number) => {
   return doFetch(`/api/tasks/${taskId}/contents`)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err.message);
-      });
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const addContent = (taskId: number, text: string) => {
@@ -153,18 +153,18 @@ export const addContent = (taskId: number, text: string) => {
   });
 
   return doPost(`/api/tasks/${taskId}/addContent`, postBody)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err);
-      });
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err);
+    });
 };
 
 export const deleteContent = (taskId: number, contentId: number) => {
   return doDelete(`/api/tasks/${taskId}/contents/${contentId}`)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err.message);
-      });
+    .then(res => res)
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const updateContent = (taskId: number, contentId: number, text: string) => {
@@ -172,8 +172,8 @@ export const updateContent = (taskId: number, contentId: number, text: string) =
     text: text
   });
   return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err);
-      });
+    .then(res => res)
+    .catch(err => {
+      throw Error(err);
+    });
 };

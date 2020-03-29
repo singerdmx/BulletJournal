@@ -124,7 +124,7 @@ function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
 function* getTask(action: PayloadAction<GetTask>) {
   try {
     const data = yield call(getTaskById, action.payload.taskId);
-    yield put(tasksActions.taskReceived({task: data}));
+    yield put(tasksActions.taskReceived({ task: data }));
   } catch (error) {
     yield call(message.error, `Get Task Error Received: ${error}`);
   }
@@ -196,7 +196,7 @@ function* moveTask(action: PayloadAction<MoveTask>) {
 
 function* shareTask(action: PayloadAction<ShareTask>) {
   try {
-    const {taskId, targetUser, targetGroup, generateLink} = action.payload;
+    const { taskId, targetUser, targetGroup, generateLink } = action.payload;
     yield call(shareTaskWithOther, taskId, targetUser, targetGroup, generateLink);
     yield call(message.success, 'Task shared successfully');
   } catch (error) {
