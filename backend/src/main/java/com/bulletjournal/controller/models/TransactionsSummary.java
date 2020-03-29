@@ -89,4 +89,12 @@ public class TransactionsSummary {
     public void setBalance(Double balance) {
         this.balance = balance;
     }
+
+    public Double getBalancePercentage() {
+        return balancePercentage;
+    }
+
+    public void setBalancePercentage(Double balancePercentage) {
+        this.balancePercentage = balancePercentage;
+    }
 }
