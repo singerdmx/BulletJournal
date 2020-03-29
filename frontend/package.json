@@ -15,6 +15,7 @@
     "@types/redux-logger": "^3.0.7",
     "@types/uuid": "^7.0.0",
     "antd": "^4.0.4",
+    "braft-editor": "^2.3.9",
     "country-code": "0.0.3",
     "electron-is-dev": "^1.1.0",
     "flag-icon-css": "^3.4.6",

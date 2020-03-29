@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar } from 'antd';
+import { Tooltip, Tag, Avatar, Typography } from 'antd';
 import { stringToRGB } from '../../features/label/interface';
 import { icons } from '../../assets/icons/index';
-import { TagOutlined } from '@ant-design/icons';
+import {
+  TagOutlined,
+  ShareAltOutlined,
+  DeleteOutlined
+} from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
 import './note-page.styles.less';
@@ -23,6 +27,7 @@ interface NotePageHandler {
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { note } = props;
   const { noteId } = useParams();
+  const [showEditor] = useState(false);
 
   const getIcon = (icon: string) => {
     let res = icons.filter(item => item.name === icon);
@@ -40,30 +45,47 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </span>
       </Tooltip>
       <div className="note-title">
-        {note.name}
-        <div className="note-labels">
-          {note.labels &&
-            note.labels.map(label => {
-              return (
-                <Tooltip
-                  placement="top"
-                  title="Click to Check or Edit"
-                  key={label.id}
-                >
-                  <Tag
-                    className="labels"
-                    color={stringToRGB(label.value)}
-                    style={{ cursor: 'pointer' }}
+        <div className="label-and-name">
+          {note.name}
+          <div className="note-labels">
+            {note.labels &&
+              note.labels.map(label => {
+                return (
+                  <Tooltip
+                    placement="top"
+                    title="Click to Check or Edit"
+                    key={label.id}
                   >
-                    <Link to="/labels">
-                      {getIcon(label.icon)} &nbsp;
-                      {label.value}
-                    </Link>
-                  </Tag>
-                </Tooltip>
-              );
-            })}
+                    <Tag
+                      className="labels"
+                      color={stringToRGB(label.value)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <Link to="/labels">
+                        {getIcon(label.icon)} &nbsp;
+                        {label.value}
+                      </Link>
+                    </Tag>
+                  </Tooltip>
+                );
+              })}
+          </div>
         </div>
+
+        <div className="note-operation">
+          <Tooltip title="Add Tag">
+            <TagOutlined />
+          </Tooltip>
+          <Tooltip title="Share Note">
+            <ShareAltOutlined />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <DeleteOutlined style={{ color: 'red' }} />
+          </Tooltip>
+        </div>
+      </div>
+      <div className="content-or-editor">
+        {!showEditor ? <Typography></Typography>}
       </div>
     </div>
   );
