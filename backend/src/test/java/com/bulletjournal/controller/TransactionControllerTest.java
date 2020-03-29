@@ -18,9 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -38,6 +37,14 @@ public class TransactionControllerTest {
     private static final String ROOT_URL = "http://localhost:";
 
     private static String TIMEZONE = "America/Los_Angeles";
+
+    private static class CustomComparator implements Comparator<TransactionsSummary> {
+
+        @Override
+        public int compare(TransactionsSummary t1, TransactionsSummary t2) {
+            return t1.getName().compareTo(t2.getName());
+        }
+    }
 
 
     @LocalServerPort
@@ -78,7 +85,7 @@ public class TransactionControllerTest {
         Transaction t4 = createTransaction(p1, "T4", "2019-12-22", "Joker", 200.0, 1);
         Transaction t5 = createTransaction(p1, "T5", "2019-12-28", "ccc", 100.0, 0);
 
-        // Get transactions
+        // Get transactions by payer
         String url = UriComponentsBuilder.fromHttpUrl(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
@@ -93,6 +100,7 @@ public class TransactionControllerTest {
                 TestHelpers.actAsOtherUser(null, USER),
                 LedgerSummary.class);
 
+        // transactions was passed into getTransaction reverse date order
         List<Transaction> transactions = transactionsResponse.getBody().getTransactions();
         LedgerSummary summary = transactionsResponse.getBody();
         List<TransactionsSummary> transactionsSummaries = summary.getTransactionsSummaries();
@@ -104,49 +112,42 @@ public class TransactionControllerTest {
         assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71.43) < 1e-4);
         assertEquals(Double.valueOf("-500.0"), transactionsSummaries.get(1).getBalance());
 
-        shareTransaction(t1);
-    }
 
-    private void shareTransaction(Transaction t1) {
-        String targetUser = "999999";
-        ShareProjectItemParams shareProjectItemParams = new ShareProjectItemParams();
-        shareProjectItemParams.setTargetUser(targetUser);
-        ResponseEntity<String> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TransactionController.SHARE_TRANSACTION_ROUTE,
-                HttpMethod.POST,
-                new HttpEntity<>(shareProjectItemParams),
-                String.class,
-                t1.getId());
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<Label> label = createLabels();
+        // labels set is in reverse order ?
+        t1 = setLabelsforTransaction(t1, label);
+        t2 = setLabelsforTransaction(t2, label);
+        t5 = setLabelsforTransaction(t5, label);
 
-        // share again
-        response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TransactionController.SHARE_TRANSACTION_ROUTE,
-                HttpMethod.POST,
-                new HttpEntity<>(shareProjectItemParams),
-                String.class,
-                t1.getId());
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        ResponseEntity<Projects> getProjectsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+        // Get transactions by label
+        url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.MONTHLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.LABEL.name())
+                .queryParam("startDate", "2019-12-01")
+                .queryParam("endDate", "2019-12-31")
+                .buildAndExpand(p1.getId()).toUriString();
+        transactionsResponse = this.restTemplate.exchange(
+                url,
                 HttpMethod.GET,
-                TestHelpers.actAsOtherUser(null, targetUser),
-                Projects.class);
-        assertEquals(HttpStatus.OK, getProjectsResponse.getStatusCode());
-        List<ProjectsWithOwner> sharedProjects = getProjectsResponse.getBody().getShared();
-        assertEquals(1, sharedProjects.size());
-        ProjectsWithOwner sharedProject = sharedProjects.get(0);
-        assertEquals(targetUser, sharedProject.getOwner());
-        assertEquals("https://1o24bbs.com/user_avatar/1o24bbs.com/999999/75/1678_2.png",
-                sharedProject.getOwnerAvatar());
-        assertEquals(1, sharedProject.getProjects().size());
-        Project p = sharedProject.getProjects().get(0);
-        Group g = p.getGroup();
-        assertEquals("Shared LEDGER", p.getName());
-        assertEquals("Default", g.getName());
-        assertEquals(ProjectType.LEDGER, p.getProjectType());
-        assertEquals(targetUser, g.getOwner());
+                TestHelpers.actAsOtherUser(null, USER),
+                LedgerSummary.class);
+
+        transactions = transactionsResponse.getBody().getTransactions();
+        summary = transactionsResponse.getBody();
+        transactionsSummaries = summary.getTransactionsSummaries();
+        List<TransactionsSummary> summaryInOrder = new ArrayList<>(transactionsSummaries);
+        Collections.sort(summaryInOrder, new CustomComparator());
+//        assertTrue(Math.abs(summary.getBalance() - 700.0) < 1e-4);
+//        assertTrue(Math.abs(summary.getIncome() - 1400.0) < 1e-4);
+        assertEquals(5, summary.getTransactions().size());
+        assertEquals("Label0", summaryInOrder.get(0).getName());
+        assertEquals("Label2", summaryInOrder.get(2).getName());
+        assertEquals((Double) 600.0, summaryInOrder.get(1).getBalance());
+        assertTrue(Math.abs(summaryInOrder.get(0).getIncomePercentage() - 78.57) < 1e-4);
+        assertTrue(Math.abs(summaryInOrder.get(0).getExpensePercentage() - 71.43) < 1e-4);
+
     }
 
     private Group createGroup() {
@@ -236,6 +237,45 @@ public class TransactionControllerTest {
         assertEquals(name, created.getName());
         assertEquals(project.getId(), created.getProjectId());
         return created;
+    }
+
+    private Transaction setLabelsforTransaction(Transaction t, List<Label> labels) {
+        // Attach Labels to transactions
+        ResponseEntity<Transaction> setLabelResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTION_SET_LABELS_ROUTE,
+                HttpMethod.PUT,
+                TestHelpers.actAsOtherUser(labels.stream().map(l -> l.getId()).collect(Collectors.toList()), USER),
+                Transaction.class,
+                t.getId());
+        assertEquals(HttpStatus.OK, setLabelResponse.getStatusCode());
+        t = setLabelResponse.getBody();
+        assertEquals(labels.size(), t.getLabels().size());
+
+        return t;
+    }
+
+    private List<Label> createLabels() {
+        List<Label> labels = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            CreateLabelParams createLabelParams = new CreateLabelParams("Label" + i, "Icon" + i);
+            ResponseEntity<Label> response = this.restTemplate.exchange(
+                    ROOT_URL + randomServerPort + LabelController.LABELS_ROUTE,
+                    HttpMethod.POST,
+                    TestHelpers.actAsOtherUser(createLabelParams, USER),
+                    Label.class);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            labels.add(response.getBody());
+        }
+
+        ResponseEntity<Label[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + LabelController.LABELS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                Label[].class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Label[] labelsCreated = response.getBody();
+        assertEquals(5, labelsCreated.length);
+        return labels;
     }
 
 
