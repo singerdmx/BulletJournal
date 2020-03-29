@@ -3,7 +3,7 @@ import { Task, ReminderSetting } from '../features/tasks/interface';
 
 export const fetchTasks = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/tasks`)
-    .then(res => res)
+    .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
     });
@@ -11,7 +11,7 @@ export const fetchTasks = (projectId: number) => {
 
 export const fetchCompletedTasks = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/completedTasks`)
-    .then(res => res)
+    .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
     });

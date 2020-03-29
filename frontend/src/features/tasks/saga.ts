@@ -36,8 +36,7 @@ function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
 function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
     const { projectId } = action.payload;
-    const data = yield call(fetchTasks, projectId);
-    const tasks = yield data.json();
+    const tasks = yield call(fetchTasks, projectId);
 
     yield put(
       tasksActions.tasksReceived({
@@ -52,8 +51,7 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
 function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
     const { projectId } = action.payload;
-    const data = yield call(fetchCompletedTasks, projectId);
-    const tasks = yield data.json();
+    const tasks = yield call(fetchCompletedTasks, projectId);
 
     yield put(
       tasksActions.completedTasksReceived({
@@ -159,7 +157,19 @@ function* patchTask(action: PayloadAction<PatchTask>) {
 function* completeTask(action: PayloadAction<CompleteTask>) {
   try {
     const { taskId } = action.payload;
-    yield call(completeTaskById, taskId);
+    const task = yield call(completeTaskById, taskId);
+    const tasks = yield call(fetchTasks, task.projectId);
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: tasks
+      })
+    );
+    const completedTasks = yield call(fetchCompletedTasks, task.projectId);
+    yield put(
+      tasksActions.completedTasksReceived({
+        tasks: completedTasks
+      })
+    );
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
   }
@@ -168,7 +178,19 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
 function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
   try {
     const { taskId } = action.payload;
-    yield call(uncompleteTaskById, taskId);
+    const task = yield call(uncompleteTaskById, taskId);
+    const tasks = yield call(fetchTasks, task.projectId);
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: tasks
+      })
+    );
+    const completedTasks = yield call(fetchCompletedTasks, task.projectId);
+    yield put(
+      tasksActions.completedTasksReceived({
+        tasks: completedTasks
+      })
+    );
   } catch (error) {
     yield call(message.error, `Uncomplete Task Error Received: ${error}`);
   }
