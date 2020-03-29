@@ -48,6 +48,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   React.useEffect(() => {
     noteId && props.getNote(parseInt(noteId));
   }, []);
+
   return (
     <div className="note-page">
       <Tooltip placement="top" title={note.owner} className="note-avatar">
@@ -104,7 +105,21 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           onClose={() => setEditorShow(false)}
           visible={showEditor}
           placement="bottom"
-          height="400"
+          height="600"
+          destroyOnClose
+          closable={false}
+          title={
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <h3>Edit</h3>
+              <Button type="primary">Update</Button>
+            </div>
+          }
         >
           <NoteEditor />
         </Drawer>
