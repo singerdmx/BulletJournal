@@ -1,7 +1,10 @@
 package com.bulletjournal.controller.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LedgerSummary {
 
     private Double balance;
