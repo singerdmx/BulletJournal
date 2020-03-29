@@ -68,7 +68,7 @@ const NoteItem: React.FC<NoteProps> = props => {
       <div className="note-item-content">
         <Link to={`/note/${note.id}`}>
           <h3 className="note-item-name">
-            {note.labels ? getIcon(note.labels[0].icon) : <SnippetsOutlined />}{' '}
+            {note.labels && note.labels[0] ? getIcon(note.labels[0].icon) : <SnippetsOutlined />}{' '}
             {note.name}
           </h3>
         </Link>

@@ -84,7 +84,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </div>
 
         <div className="note-operation">
-          <Tooltip title="Add Tag">
+          <Tooltip title="Add Label">
             <TagOutlined />
           </Tooltip>
           <Tooltip title="Share Note">
