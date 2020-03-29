@@ -98,7 +98,8 @@ public class Project extends OwnedModel {
                 this.getId(), this.getName(), this.getOwner(),
                 ProjectType.getType(this.getType()),
                 this.getGroup().toPresentationModel(),
-                this.getDescription());
+                this.getDescription(),
+                this.isShared());
     }
 
     public com.bulletjournal.controller.models.Project toVerbosePresentationModel() {
@@ -106,7 +107,8 @@ public class Project extends OwnedModel {
                 this.getId(), this.getName(), this.getOwner(),
                 ProjectType.getType(this.getType()),
                 this.getGroup().toVerbosePresentationModel(),
-                this.getDescription());
+                this.getDescription(),
+                this.isShared());
     }
 
     @Override
