@@ -60,6 +60,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Autowired
     private TaskContentRepository taskContentRepository;
 
+    @Autowired
+    private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
+
     @Override
     public JpaRepository getJpaRepository() {
         return this.taskRepository;
@@ -72,12 +75,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        if (project.isShared()) {
+            return projectSharedTasks(requester);
+        }
+
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
         if (!projectTasksOptional.isPresent()) {
             return Collections.emptyList();
         }
         ProjectTasks projectTasks = projectTasksOptional.get();
-        Project project = this.projectDaoJpa.getProject(projectId, requester);
         Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
                 .stream().collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks())
@@ -89,6 +96,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                     return task;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<com.bulletjournal.controller.models.Task> projectSharedTasks(String requester) {
+        return this.sharedProjectItemDaoJpa.getSharedProjectItems(requester)
+                .stream().filter(item -> ProjectType.TODO.getValue() == item.getProject().getType().intValue())
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                .map(item -> ((Task) item).toPresentationModel()).collect(Collectors.toList());
     }
 
     /*
@@ -412,12 +426,24 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return project;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Event> deleteCompletedTask(String requester, Long taskId) {
+        CompletedTask task = this.completedTaskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
+        Project project = task.getProject();
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
+                requester, ContentType.TASK,
+                Operation.DELETE, project.getId(), task.getProject().getOwner());
+        this.completedTaskRepository.delete(task);
+        return generateEvents(task, requester, project);
+    }
+
     /*
      * Generate events for notification
      *
      * @retVal List<Event> - a list of events for notifications
      */
-    private List<Event> generateEvents(Task task, String requester, Project project) {
+    private List<Event> generateEvents(TaskModel task, String requester, Project project) {
         List<Event> events = new ArrayList<>();
         for (UserGroup userGroup : project.getGroup().getUsers()) {
             if (!userGroup.isAccepted()) {

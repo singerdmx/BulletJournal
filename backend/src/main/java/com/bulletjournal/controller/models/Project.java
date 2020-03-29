@@ -24,6 +24,8 @@ public class Project {
 
     private String ownerAvatar;
 
+    private boolean shared;
+
     @NotNull
     private ProjectType projectType;
 
@@ -44,13 +46,15 @@ public class Project {
         this.id = id;
     }
 
-    public Project(Long id, String name, String owner, ProjectType projectType, Group group, String description) {
+    public Project(Long id, String name, String owner, ProjectType projectType,
+                   Group group, String description, boolean shared) {
         this.id = id;
         this.name = name;
         this.owner = owner;
         this.projectType = projectType;
         this.group = group;
         this.description = description;
+        this.shared = shared;
     }
 
     public Long getId() {
@@ -121,6 +125,14 @@ public class Project {
         this.ownerAvatar = ownerAvatar;
     }
 
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(boolean shared) {
+        this.shared = shared;
+    }
+
     public void clone(Project other) {
         this.setGroup(other.getGroup());
         this.setName(other.getName());
@@ -128,22 +140,24 @@ public class Project {
         this.setOwner(other.getOwner());
         this.setProjectType(other.getProjectType());
         this.setDescription(other.getDescription());
+        this.setShared(other.isShared());
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Project)) return false;
         Project project = (Project) o;
-        return Objects.equals(id, project.id) &&
-                Objects.equals(name, project.name) &&
-                Objects.equals(owner, project.owner) &&
-                projectType == project.projectType;
+        return isShared() == project.isShared() &&
+                Objects.equals(getId(), project.getId()) &&
+                Objects.equals(getName(), project.getName()) &&
+                Objects.equals(getOwner(), project.getOwner()) &&
+                getProjectType() == project.getProjectType();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, owner, projectType, description, subProjects);
+        return Objects.hash(getId(), getName(), getOwner(), isShared(), getProjectType());
     }
 
     @Override

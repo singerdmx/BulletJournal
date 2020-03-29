@@ -1,8 +1,9 @@
 import React from 'react';
-import {Collapse, Timeline, Empty, List } from 'antd';
+import {Collapse, Empty, List, Timeline} from 'antd';
 import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
 import {ProjectItems} from '../../features/myBuJo/interface';
 import NoteItem from './note-item.component';
+import TaskItem from "./task-item.component";
 
 const {Panel} = Collapse;
 
@@ -16,10 +17,18 @@ const getTasksPanel = (items: ProjectItems, index: number) => {
     }
     return (
         <Panel
-    header={items.dayOfWeek}
-    key={`tasks${index}`}
-    extra={<CarryOutOutlined/>}
-    />
+            header={items.dayOfWeek}
+            key={`tasks${index}`}
+            extra={<CarryOutOutlined/>}
+        >
+            <List>
+                {items.tasks.map(item => {
+                    return (<List.Item key={item.id}>
+                        <TaskItem task={item} isComplete={false}/>
+                    </List.Item>);
+                })}
+            </List>
+        </Panel>
     );
 };
 
@@ -29,10 +38,11 @@ const getTransactionsPanel = (items: ProjectItems, index: number) => {
     }
     return (
         <Panel
-    header={items.dayOfWeek}
-    key={`transactions${index}`}
-    extra={<AccountBookOutlined/>}
-    />
+            header={items.dayOfWeek}
+            key={`transactions${index}`}
+            extra={<AccountBookOutlined/>}
+        >
+        </Panel>
     );
 };
 

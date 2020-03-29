@@ -3,7 +3,7 @@ import { Task, ReminderSetting } from '../features/tasks/interface';
 
 export const fetchTasks = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/tasks`)
-    .then(res => res)
+    .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
     });
@@ -26,9 +26,11 @@ export const getTaskById = (taskId: number) => {
 };
 
 export const deleteTaskById = (taskId: number) => {
-  return doDelete(`/api/task/${taskId}`).catch(err => {
-    throw Error(err.message);
-  });
+  return doDelete(`/api/tasks/${taskId}`)
+    .then(res => res)
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const createTask = (
@@ -133,18 +135,18 @@ export const shareTaskWithOther = (taskId: number, targetUser: string, targetGro
     generateLink: generateLink
   });
   return doPost(`/api/tasks/${taskId}/share`, postBody)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err);
-      });
+    .then(res => res)
+    .catch(err => {
+      throw Error(err);
+    });
 };
 
 export const getContents = (taskId: number) => {
   return doFetch(`/api/tasks/${taskId}/contents`)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err.message);
-      });
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const addContent = (taskId: number, text: string) => {
@@ -153,18 +155,18 @@ export const addContent = (taskId: number, text: string) => {
   });
 
   return doPost(`/api/tasks/${taskId}/addContent`, postBody)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err);
-      });
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err);
+    });
 };
 
 export const deleteContent = (taskId: number, contentId: number) => {
   return doDelete(`/api/tasks/${taskId}/contents/${contentId}`)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err.message);
-      });
+    .then(res => res)
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const updateContent = (taskId: number, contentId: number, text: string) => {
@@ -172,8 +174,8 @@ export const updateContent = (taskId: number, contentId: number, text: string) =
     text: text
   });
   return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err);
-      });
+    .then(res => res)
+    .catch(err => {
+      throw Error(err);
+    });
 };

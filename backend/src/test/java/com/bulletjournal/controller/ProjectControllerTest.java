@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.hierarchy.HierarchyProcessorProcessorTest;
 import com.bulletjournal.notifications.Action;
 import com.google.common.collect.ImmutableList;
@@ -667,7 +668,8 @@ public class ProjectControllerTest {
 
     private void shareTask(Task task) {
         ShareProjectItemParams shareProjectItemParams = new ShareProjectItemParams();
-        shareProjectItemParams.setTargetUser(sampleUsers[5]);
+        String targetUser = sampleUsers[5];
+        shareProjectItemParams.setTargetUser(targetUser);
         ResponseEntity<String> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
                 HttpMethod.POST,
@@ -675,6 +677,38 @@ public class ProjectControllerTest {
                 String.class,
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        ResponseEntity<Projects> getProjectsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, targetUser),
+                Projects.class);
+        assertEquals(HttpStatus.OK, getProjectsResponse.getStatusCode());
+        List<ProjectsWithOwner> sharedProjects = getProjectsResponse.getBody().getShared();
+        assertEquals(2, sharedProjects.size());
+        ProjectsWithOwner sharedProject = sharedProjects.get(0);
+        assertEquals(targetUser, sharedProject.getOwner());
+        assertEquals("https://1o24bbs.com/user_avatar/1o24bbs.com/mqm/75/1671_2.png",
+                sharedProject.getOwnerAvatar());
+        assertEquals(1, sharedProject.getProjects().size());
+        Project p = sharedProject.getProjects().get(0);
+        Group g = p.getGroup();
+        assertEquals("Shared TODO", p.getName());
+        assertEquals("Default", g.getName());
+        assertEquals(ProjectType.TODO, p.getProjectType());
+        assertEquals(targetUser, g.getOwner());
+
+        // Get Tasks
+        ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, targetUser),
+                Task[].class,
+                p.getId());
+        assertEquals(HttpStatus.OK, tasksResponse.getStatusCode());
+        List<Task> tasks = Arrays.asList(tasksResponse.getBody());
+        Task sharedTask = tasks.get(0);
+        assertEquals(task, sharedTask);
     }
 
     private void deleteTaskContent(Task task, Content content) {

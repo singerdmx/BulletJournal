@@ -39,6 +39,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private ProjectNotesRepository projectNotesRepository;
     @Autowired
     private NoteContentRepository noteContentRepository;
+    @Autowired
+    private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -47,12 +49,16 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId, String requester) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        if (project.isShared()) {
+            return projectSharedNotes(requester);
+        }
+
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
         if (!projectNotesOptional.isPresent()) {
             return Collections.emptyList();
         }
         ProjectNotes projectNotes = projectNotesOptional.get();
-        Project project = this.projectDaoJpa.getProject(projectId, requester);
         Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project)
                 .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
         return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes())
@@ -64,6 +70,13 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                     return note;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<com.bulletjournal.controller.models.Note> projectSharedNotes(String requester) {
+        return this.sharedProjectItemDaoJpa.getSharedProjectItems(requester)
+                .stream().filter(item -> ProjectType.NOTE.getValue() == item.getProject().getType().intValue())
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                .map(item -> ((Note) item).toPresentationModel()).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

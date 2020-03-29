@@ -36,8 +36,7 @@ function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
 function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
     const { projectId } = action.payload;
-    const data = yield call(fetchTasks, projectId);
-    const tasks = yield data.json();
+    const tasks = yield call(fetchTasks, projectId);
 
     yield put(
       tasksActions.tasksReceived({
@@ -52,8 +51,7 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
 function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
     const { projectId } = action.payload;
-    const data = yield call(fetchCompletedTasks, projectId);
-    const tasks = yield data.json();
+    const tasks = yield call(fetchCompletedTasks, projectId);
 
     yield put(
       tasksActions.completedTasksReceived({
@@ -124,7 +122,7 @@ function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
 function* getTask(action: PayloadAction<GetTask>) {
   try {
     const data = yield call(getTaskById, action.payload.taskId);
-    yield put(tasksActions.taskReceived({task: data}));
+    yield put(tasksActions.taskReceived({ task: data }));
   } catch (error) {
     yield call(message.error, `Get Task Error Received: ${error}`);
   }
@@ -159,7 +157,19 @@ function* patchTask(action: PayloadAction<PatchTask>) {
 function* completeTask(action: PayloadAction<CompleteTask>) {
   try {
     const { taskId } = action.payload;
-    yield call(completeTaskById, taskId);
+    const task = yield call(completeTaskById, taskId);
+    const tasks = yield call(fetchTasks, task.projectId);
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: tasks
+      })
+    );
+    const completedTasks = yield call(fetchCompletedTasks, task.projectId);
+    yield put(
+      tasksActions.completedTasksReceived({
+        tasks: completedTasks
+      })
+    );
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
   }
@@ -168,7 +178,19 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
 function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
   try {
     const { taskId } = action.payload;
-    yield call(uncompleteTaskById, taskId);
+    const task = yield call(uncompleteTaskById, taskId);
+    const tasks = yield call(fetchTasks, task.projectId);
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: tasks
+      })
+    );
+    const completedTasks = yield call(fetchCompletedTasks, task.projectId);
+    yield put(
+      tasksActions.completedTasksReceived({
+        tasks: completedTasks
+      })
+    );
   } catch (error) {
     yield call(message.error, `Uncomplete Task Error Received: ${error}`);
   }
@@ -177,7 +199,13 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
 function* deleteTask(action: PayloadAction<CompleteTask>) {
   try {
     const { taskId } = action.payload;
-    yield call(deleteTaskById, taskId);
+    const data = yield call(deleteTaskById, taskId);
+    const updatedTasks = yield data.json();
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: updatedTasks
+      })
+    );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
@@ -196,7 +224,7 @@ function* moveTask(action: PayloadAction<MoveTask>) {
 
 function* shareTask(action: PayloadAction<ShareTask>) {
   try {
-    const {taskId, targetUser, targetGroup, generateLink} = action.payload;
+    const { taskId, targetUser, targetGroup, generateLink } = action.payload;
     yield call(shareTaskWithOther, taskId, targetUser, targetGroup, generateLink);
     yield call(message.success, 'Task shared successfully');
   } catch (error) {
