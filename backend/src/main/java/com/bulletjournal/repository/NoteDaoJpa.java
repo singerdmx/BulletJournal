@@ -59,17 +59,23 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             return Collections.emptyList();
         }
         ProjectNotes projectNotes = projectNotesOptional.get();
-        Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project)
+        final Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project)
                 .stream().collect(Collectors.toMap(n -> n.getId(), n -> n));
         return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes())
                 .stream()
-                .map(note -> {
-                    List<com.bulletjournal.controller.models.Label> labels =
-                            NoteDaoJpa.this.getLabelsToProjectItem(notesMap.get(note.getId()));
-                    note.setLabels(labels);
-                    return note;
-                })
+                .map(note -> addLabels(note, notesMap))
                 .collect(Collectors.toList());
+    }
+
+    private com.bulletjournal.controller.models.Note addLabels(
+            com.bulletjournal.controller.models.Note note, Map<Long, Note> notesMap) {
+        List<com.bulletjournal.controller.models.Label> labels =
+               getLabelsToProjectItem(notesMap.get(note.getId()));
+        note.setLabels(labels);
+        for (com.bulletjournal.controller.models.Note subNote: note.getSubNotes()) {
+            addLabels(subNote, notesMap);
+        }
+        return note;
     }
 
     private List<com.bulletjournal.controller.models.Note> projectSharedNotes(String requester) {

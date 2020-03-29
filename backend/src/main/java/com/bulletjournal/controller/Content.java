@@ -1,5 +1,7 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.controller.models.Revision;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -19,6 +21,8 @@ public class Content {
 
     @NotNull
     private Long updatedAt;
+
+    private Revision[] revisions;
 
     public Content() {
     }
