@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import EditNote from '../modals/edit-note.component';
 
 import { Popconfirm, Popover, Tag, Tooltip, Avatar } from 'antd';
-import EditProjectItem from '../modals/move-project-item.component';
+import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
 
 import './note-item.styles.less';
@@ -37,7 +37,7 @@ const ManageNote: React.FC<NoteManageProps> = props => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <EditNote note={note} />
-      <EditProjectItem type="NOTE" projectItemId={note.id} />
+      <MoveProjectItem type="NOTE" projectItemId={note.id} />
       <ShareProjectItem type="NOTE" projectItemId={note.id} />
       <Popconfirm
         title="Deleting Note also deletes its child notes. Are you sure?"

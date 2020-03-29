@@ -12,7 +12,8 @@ import { icons } from '../../assets/icons/index';
 import {
   TagOutlined,
   ShareAltOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  RightCircleOutlined
 } from '@ant-design/icons';
 
 import './note-page.styles.less';
@@ -87,6 +88,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         <div className="note-operation">
           <Tooltip title="Add Label">
             <TagOutlined />
+          </Tooltip>
+          <Tooltip title="Move Note">
+            <RightCircleOutlined />
           </Tooltip>
           <Tooltip title="Share Note">
             <ShareAltOutlined />

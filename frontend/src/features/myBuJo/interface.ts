@@ -25,5 +25,9 @@ export interface Content {
     owner: string,
     text: string,
     createdAt: number,
-    updatedAt: number
+    updatedAt: number,
+    revisions: Revision[]
+}
+
+export interface Revision {
 }
