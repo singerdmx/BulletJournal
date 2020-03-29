@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Button, Divider, Form, PageHeader, Select, Tooltip } from 'antd';
 import { Label } from '../../features/label/interface';
@@ -31,6 +31,10 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
   const initialValues = {
     selectLabels: defaultLabels.map(label => label.id)
   };
+
+  useEffect(() => {
+    handleSearch();
+  }, []);
 
   return (
     <div className="labels-search-container">
