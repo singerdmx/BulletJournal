@@ -17,7 +17,7 @@ type LabelsPageProps = {
   removeSelectedLabel: (label: Label) => void;
 };
 
-const LablesPage: React.FC<LabelsPageProps> = props => {
+const LabelsPage: React.FC<LabelsPageProps> = props => {
   const [isSearching, setSearching] = useState(false);
   const startSearching = () => {
     setSearching(true);
@@ -25,7 +25,7 @@ const LablesPage: React.FC<LabelsPageProps> = props => {
 
   const endSearching = () => {
       setSearching(false);
-  }
+  };
   return (
     <div className="labels-page">
       {isSearching ? (
@@ -52,4 +52,4 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   addSelectedLabel,
   removeSelectedLabel
-})(LablesPage);
+})(LabelsPage);
