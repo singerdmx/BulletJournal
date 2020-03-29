@@ -2,6 +2,8 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.repository.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,6 +16,8 @@ import java.util.function.Consumer;
 
 @Repository
 public class SharedProjectItemDaoJpa {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SharedProjectItemDaoJpa.class);
 
     @Autowired
     private SharedProjectItemRepository sharedProjectItemsRepository;
@@ -33,7 +37,6 @@ public class SharedProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItemModel> getSharedProjectItems(String user) {
         List<ProjectItemModel> result = new ArrayList<>();
-        // TODO: implement
         List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(user);
         items.forEach(item -> {
             if (item.hasNote()) {
@@ -53,6 +56,14 @@ public class SharedProjectItemDaoJpa {
     public <T extends ProjectItemModel> void save(
             ProjectType projectType, T projectItem, List<String> users) {
         for (String user : new HashSet<>(users)) {
+            List<ProjectItemModel> existingItems = this.getSharedProjectItems(user);
+            if (existingItems.contains(projectItem)) {
+                LOGGER.error(projectItem.getClass().getSimpleName() + " " + projectItem.getName() +
+                        " (ID " + projectItem.getId() +
+                        ") is already shared with User " + user);
+                continue;
+            }
+
             User targetUser = this.userDaoJpa.getByName(user);
             SharedProjectItem sharedProjectItem = new SharedProjectItem(user);
             switch (projectType) {
