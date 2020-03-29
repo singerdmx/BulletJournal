@@ -108,9 +108,33 @@ public class TransactionController {
             case DEFAULT:
                 break;
             case LABEL:
+                for (Transaction t : transactions) {
+                    TransactionType transactionType = TransactionType.getType(t.getTransactionType());
+
+                    double amount = t.getAmount();
+
+                    for (Label l : t.getLabels()) {
+                        Transactions tran = m.computeIfAbsent(l.getValue(), k -> new Transactions());
+                        switch (transactionType) {
+                            case INCOME:
+                                tran.addIncome(amount);
+                                break;
+                            case EXPENSE:
+                                tran.addExpense(amount);
+                                break;
+                        }
+                    }
+                    switch (transactionType) {
+                        case INCOME:
+                            totalIncome += amount;
+                            break;
+                        case EXPENSE:
+                            totalExpense += amount;
+                            break;
+                    }
+                }
                 break;
             case PAYER:
-                // by payer : different user in projects
                 for (Transaction t : transactions) {
                     TransactionType transactionType = TransactionType.getType(t.getTransactionType());
 
