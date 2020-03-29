@@ -1,5 +1,10 @@
 import React from 'react';
-import { DeleteTwoTone, TagOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  DeleteTwoTone,
+  TagOutlined,
+  MoreOutlined,
+  SnippetsOutlined
+} from '@ant-design/icons';
 import { deleteNote } from '../../features/notes/actions';
 import { Note } from '../../features/notes/interface';
 import { connect } from 'react-redux';
@@ -63,9 +68,7 @@ const NoteItem: React.FC<NoteProps> = props => {
       <div className="note-item-content">
         <Link to={`/note/${note.id}`}>
           <h3 className="note-item-name">
-            <Tooltip title={note.owner}>
-              <Avatar src={note.ownerAvatar} size="small" shape="square" />
-            </Tooltip>{' '}
+            {note.labels ? getIcon(note.labels[0].icon) : <SnippetsOutlined />}{' '}
             {note.name}
           </h3>
         </Link>
@@ -87,6 +90,11 @@ const NoteItem: React.FC<NoteProps> = props => {
       </div>
 
       <div className="note-control">
+        <div className="note-item-owner">
+          <Tooltip title={note.owner}>
+            <Avatar src={note.ownerAvatar} size="small" />
+          </Tooltip>
+        </div>
         <Popover
           arrowPointAtCenter
           placement="rightTop"
