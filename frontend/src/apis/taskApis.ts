@@ -26,9 +26,11 @@ export const getTaskById = (taskId: number) => {
 };
 
 export const deleteTaskById = (taskId: number) => {
-  return doDelete(`/api/task/${taskId}`).catch(err => {
-    throw Error(err.message);
-  });
+  return doDelete(`/api/tasks/${taskId}`)
+    .then(res => res)
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const createTask = (

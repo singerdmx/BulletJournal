@@ -177,7 +177,13 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
 function* deleteTask(action: PayloadAction<CompleteTask>) {
   try {
     const { taskId } = action.payload;
-    yield call(deleteTaskById, taskId);
+    const data = yield call(deleteTaskById, taskId);
+    const updatedTasks = yield data.json();
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: updatedTasks
+      })
+    );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
