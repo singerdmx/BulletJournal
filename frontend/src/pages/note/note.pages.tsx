@@ -4,11 +4,12 @@ import { connect } from 'react-redux';
 import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar, Typography, Divider } from 'antd';
+import { Tooltip, Tag, Avatar, Typography, Divider, Form, Button } from 'antd';
 import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { icons } from '../../assets/icons/index';
 import BraftEditor from 'braft-editor';
+import { BuiltInControlType } from 'braft-editor/index';
 
 import {
   TagOutlined,
@@ -31,8 +32,19 @@ interface NotePageHandler {
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { note } = props;
   const { noteId } = useParams();
-  const [showEditor] = useState(false);
+  const [showEditor] = useState(true); //setting true for debugging
+  const [form] = Form.useForm();
   const history = useHistory();
+  const noteControls = [
+    'bold',
+    'italic',
+    'underline',
+    'text-color',
+    'separator',
+    'link',
+    'separator',
+    'media'
+  ] as BuiltInControlType[];
 
   const toLabelSearching = (label: Label) => {
     console.log(label);
@@ -95,12 +107,26 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           </Tooltip>
         </div>
       </div>
+      <Divider />
       <div className="content-or-editor">
         {!showEditor ? (
           <div></div>
         ) : (
           <div className="editor-wrapper">
-            <BraftEditor language="en" />
+            <Form form={form}>
+              <Form.Item name="noteContent">
+                <BraftEditor
+                  controls={noteControls}
+                  language="en"
+                  className="note-editor"
+                />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Save
+                </Button>
+              </Form.Item>
+            </Form>
           </div>
         )}
       </div>
