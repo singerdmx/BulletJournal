@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar, Typography, Divider } from 'antd';
+import { Tooltip, Tag, Avatar } from 'antd';
 import { stringToRGB } from '../../features/label/interface';
 import { icons } from '../../assets/icons/index';
 import {

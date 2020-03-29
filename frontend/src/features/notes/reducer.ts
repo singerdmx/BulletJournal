@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Note } from './interface';
 import { History } from 'history';
+import {Content} from "../myBuJo/interface";
 
 export type NoteApiErrorAction = {
   error: string;
@@ -10,6 +11,10 @@ export type UpdateNotes = {
   projectId: number;
 };
 
+export type UpdateNoteContents = {
+  noteId: number;
+};
+
 export type updateVisibleAction = {
   visible: boolean;
 };
@@ -17,6 +22,11 @@ export type updateVisibleAction = {
 export type CreateNote = {
   projectId: number;
   name: string;
+};
+
+export type CreateContent = {
+  noteId: number;
+  text: string;
 };
 
 export type GetNote = {
@@ -40,10 +50,21 @@ export type DeleteNote = {
   noteId: number;
 };
 
+export type DeleteContent = {
+  noteId: number;
+  contentId: number;
+};
+
 export type PatchNote = {
   noteId: number;
   name: string;
 };
+
+export type PatchContent = {
+  noteId: number;
+  contentId: number;
+  text: string;
+}
 
 export type SetNoteLabels = {
   noteId: number;
@@ -63,8 +84,13 @@ export type ShareNote = {
   generateLink: boolean;
 };
 
+export type ContentsAction = {
+  contents: Content[];
+}
+
 let initialState = {
   note: {} as Note,
+  contents: [] as Array<Content>,
   notes: [] as Array<Note>,
   addNoteVisible: false,
   patchLoading: true
@@ -83,6 +109,10 @@ const slice = createSlice({
       const { note } = action.payload;
       state.note = note;
     },
+    noteContentsReceived: (state, action: PayloadAction<ContentsAction>) => {
+      const { contents } = action.payload;
+      state.contents = contents;
+    },
     UpdateAddNoteVisible: (
       state,
       action: PayloadAction<updateVisibleAction>
@@ -93,12 +123,16 @@ const slice = createSlice({
     noteApiErrorReceived: (state, action: PayloadAction<NoteApiErrorAction>) =>
       state,
     NotesUpdate: (state, action: PayloadAction<UpdateNotes>) => state,
+    NoteContentsUpdate: (state, action: PayloadAction<UpdateNoteContents>) => state,
     NotesCreate: (state, action: PayloadAction<CreateNote>) => state,
+    NoteContentCreate: (state, action: PayloadAction<CreateContent>) => state,
     NotePut: (state, action: PayloadAction<PutNote>) => state,
     NoteGet: (state, action: PayloadAction<GetNote>) => state,
     NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
+    NoteContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
     NotePatch: (state, action: PayloadAction<PatchNote>) => {
       state.patchLoading = false },
+    NoteContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     NoteSetLabels: (state, action: PayloadAction<SetNoteLabels>) => state,
     NoteMove: (state, action: PayloadAction<MoveNote>) => state,
     NoteShare: (state, action: PayloadAction<ShareNote>) => state,
