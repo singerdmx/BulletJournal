@@ -93,7 +93,8 @@ public class TransactionController {
         ZonedDateTime endTime = startEndTime.getRight();
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId, startTime, endTime, username);
+        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId, startTime, endTime, username)
+                .stream().map(t -> addAvatar(t)).collect(Collectors.toList());
 
         String transactionsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, transactions);
@@ -167,6 +168,12 @@ public class TransactionController {
         ledgerSummary.setTransactionsSummaries(transactionsSummaries);
 
         return ResponseEntity.ok().headers(responseHeader).body(ledgerSummary);
+    }
+
+    private Transaction addAvatar(Transaction transaction) {
+        transaction.setOwnerAvatar(this.userClient.getUser(transaction.getOwner()).getAvatar());
+        transaction.setPayerAvatar(this.userClient.getUser(transaction.getPayer()).getAvatar());
+        return transaction;
     }
 
     private void processTransaction(List<Transaction> transactions, Total total,

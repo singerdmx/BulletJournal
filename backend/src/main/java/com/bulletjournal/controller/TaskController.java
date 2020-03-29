@@ -51,7 +51,8 @@ public class TaskController {
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Task> tasks = this.taskDaoJpa.getTasks(projectId, username);
+        List<Task> tasks = this.taskDaoJpa.getTasks(projectId, username)
+                .stream().map(t -> addAvatar(t)).collect(Collectors.toList());
         String tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, tasks);
 
@@ -61,13 +62,21 @@ public class TaskController {
         return ResponseEntity.ok().headers(responseHeader).body(tasks);
     }
 
+    private Task addAvatar(Task task) {
+        task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
+        task.setAssignedToAvatar(this.userClient.getUser(task.getAssignedTo()).getAvatar());
+        if (task.getSubTasks() != null) {
+            for (Task subTask : task.getSubTasks()) {
+                addAvatar(subTask);
+            }
+        }
+        return task;
+    }
+
     @GetMapping(TASK_ROUTE)
     public Task getTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Task task = this.taskDaoJpa.getTask(username, taskId);
-        task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
-        task.setAssignedToAvatar(this.userClient.getUser(task.getAssignedTo()).getAvatar());
-        return task;
+        return addAvatar(this.taskDaoJpa.getTask(username, taskId));
     }
 
     @GetMapping(COMPLETED_TASK_ROUTE)

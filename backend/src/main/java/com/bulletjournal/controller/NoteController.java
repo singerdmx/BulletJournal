@@ -45,7 +45,8 @@ public class NoteController {
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Note> notes = this.noteDaoJpa.getNotes(projectId, username);
+        List<Note> notes = this.noteDaoJpa.getNotes(projectId, username)
+                .stream().map(n -> addAvatar(n)).collect(Collectors.toList());
         String notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, notes);
 
@@ -53,6 +54,16 @@ public class NoteController {
         responseHeader.setETag(notesEtag);
 
         return ResponseEntity.ok().headers(responseHeader).body(notes);
+    }
+
+    private Note addAvatar(Note note) {
+        note.setOwnerAvatar(this.userClient.getUser(note.getOwner()).getAvatar());
+        if (note.getSubNotes() != null) {
+            for (Note subNote : note.getSubNotes()) {
+                addAvatar(subNote);
+            }
+        }
+        return note;
     }
 
     @PostMapping(NOTES_ROUTE)
@@ -67,9 +78,7 @@ public class NoteController {
     @GetMapping(NOTE_ROUTE)
     public Note getNote(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Note note = this.noteDaoJpa.getNote(username, noteId);
-        note.setOwnerAvatar(this.userClient.getUser(note.getOwner()).getAvatar());
-        return note;
+        return addAvatar(this.noteDaoJpa.getNote(username, noteId));
     }
 
     @PatchMapping(NOTE_ROUTE)
