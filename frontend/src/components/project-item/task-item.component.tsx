@@ -1,41 +1,119 @@
 import React from 'react';
-import { DashOutlined } from '@ant-design/icons';
-import { List, Checkbox, Menu, Dropdown } from 'antd';
-
+import { Popconfirm, Popover } from 'antd';
+import {
+  DeleteTwoTone,
+  CheckCircleTwoTone,
+  CloseCircleOutlined,
+  FileDoneOutlined,
+  InfoCircleOutlined,
+  MessageOutlined,
+  MoreOutlined
+} from '@ant-design/icons';
+import { Task } from '../../features/tasks/interface';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { completeTask, uncompleteTask, deleteTask } from '../../features/tasks/actions';
 import './project-item.styles.less';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 
-interface ItemProps {
-  title: string;
-}
 
-const handleCheck = (e: CheckboxChangeEvent) => {
-  console.log(e);
+type TaskProps = {
+  task: Task;
+  isComplete: boolean;
+  completeTask: (taskId: number) => void;
+  uncompleteTask: (taskId: number) => void;
+  deleteTask: (taskId: number) => void;
 };
 
-const todoMenu = (
-  <Menu>
-    <Menu.Item key="edit">Edit</Menu.Item>
-    <Menu.Item key="delete">Delete</Menu.Item>
-  </Menu>
-);
-
-const TodoItem = (props: ItemProps) => {
-  return (
-    <List.Item>
-      <div className="todo-content">
-        <div className="check">
-          <Checkbox onChange={e => handleCheck(e)} />
+const ManageTask: React.FC<TaskProps> = props => {
+  const { task, isComplete, completeTask, uncompleteTask, deleteTask } = props;
+  if (isComplete) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ cursor: 'pointer' }}>
+          Uncomplete
+            <CloseCircleOutlined onClick={() => uncompleteTask(task.id)} twoToneColor="#52c41a" />
         </div>
-        <div className="content">{props.title}</div>
       </div>
-      <div className="selector">
-        <Dropdown overlay={todoMenu} trigger={['click']}>
-          <DashOutlined />
-        </Dropdown>
+    );
+  } else {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Popconfirm
+          title="Deleting Task also deletes its child tasks. Are you sure?"
+          okText="Yes"
+          cancelText="No"
+          onConfirm={() => deleteTask(task.id)}
+          className="group-setting"
+          placement="bottom"
+        >
+          <div style={{ cursor: 'pointer' }}>
+            Delete
+            <DeleteTwoTone twoToneColor="#f5222d" />
+          </div>
+        </Popconfirm>
+        <div style={{ cursor: 'pointer' }}>
+          Complete
+          <CheckCircleTwoTone onClick={() => completeTask(task.id)} twoToneColor="#52c41a" />
+        </div>
       </div>
-    </List.Item>
+    );
+  }
+};
+
+const alignConfig = {
+  offset: [10, -5]
+};
+
+const TaskItem: React.FC<TaskProps> = props => {
+  const { task, isComplete, completeTask, uncompleteTask, deleteTask } = props;
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '2rem',
+        position: 'relative',
+        lineHeight: '2rem'
+      }}
+    >
+      <Link to={`/task/${task.id}`}>
+        <FileDoneOutlined />
+        <span style={{ padding: '0 5px', height: '100%' }}>{task.name}</span>
+      </Link>
+      <div
+        style={{
+          width: '300px',
+          height: '100%',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center'
+        }}
+      >
+        <InfoCircleOutlined style={{ marginRight: '1em' }} />
+        <MessageOutlined style={{ marginRight: '1em' }} />
+        <Popover
+          align={alignConfig}
+          placement="bottomRight"
+          style={{ top: -10 }}
+          content={
+            <ManageTask task={task} isComplete={isComplete} completeTask={completeTask} uncompleteTask={uncompleteTask} deleteTask={deleteTask} />
+          }
+          trigger="click"
+        >
+          <MoreOutlined
+            style={{ transform: 'rotate(90deg)', fontSize: '20px' }}
+          />
+        </Popover>
+      </div>
+    </div>
   );
 };
 
-export default TodoItem;
+export default connect(null, {
+  completeTask,
+  uncompleteTask,
+  deleteTask
+})(TaskItem);
+
