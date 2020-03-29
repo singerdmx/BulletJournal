@@ -35,11 +35,11 @@ export type UpdateLabels = {};
 
 export type SelectedLabelAction = {
   label: Label;
-}
+};
 
 export type ItemsByLabelsAction = {
   items: ProjectItems[];
-}
+};
 
 let initialState = {
   labels: [] as Label[],
@@ -47,7 +47,7 @@ let initialState = {
   labelOptions: [] as Label[],
   etag: '',
   label: {} as Label,
-  items: [] as ProjectItems[],
+  items: [] as ProjectItems[]
 };
 
 const slice = createSlice({
@@ -65,15 +65,21 @@ const slice = createSlice({
     },
     addSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
       const { label } = action.payload;
-      const selectedLabel = state.labelOptions.filter(l => l.value === label.value)[0];
-      state.labelsSelected.unshift(selectedLabel);
-      state.labelOptions = state.labelOptions.filter(l => l.value !== label.value);
+      state.labelsSelected.unshift(label);
+      // state.labelOptions = state.labelOptions.filter(l => l.value !== label.value);
     },
-    removeSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
+    removeSelectedLabel: (
+      state,
+      action: PayloadAction<SelectedLabelAction>
+    ) => {
       const { label } = action.payload;
-      const selectedLabel = state.labelsSelected.filter(l => l.value === label.value)[0];
+      const selectedLabel = state.labelsSelected.filter(
+        l => l.value === label.value
+      )[0];
       state.labelOptions.unshift(selectedLabel);
-      state.labelsSelected = state.labelsSelected.filter(l => l.value !== label.value);
+      state.labelsSelected = state.labelsSelected.filter(
+        l => l.value !== label.value
+      );
     },
     labelsUpdate: (state, action: PayloadAction<UpdateLabels>) => state,
     labelsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
@@ -81,8 +87,12 @@ const slice = createSlice({
     createLabel: (state, action: PayloadAction<LabelCreateAction>) => state,
     deleteLabel: (state, action: PayloadAction<DeleteLabelAction>) => state,
     patchLabel: (state, action: PayloadAction<PatchLabelAction>) => state,
-    getItemsByLabels: (state, action: PayloadAction<GetItemsByLabelsAction>) => state,
-    itemsByLabelsReceived: (state, action: PayloadAction<ItemsByLabelsAction>) => {
+    getItemsByLabels: (state, action: PayloadAction<GetItemsByLabelsAction>) =>
+      state,
+    itemsByLabelsReceived: (
+      state,
+      action: PayloadAction<ItemsByLabelsAction>
+    ) => {
       const { items } = action.payload;
       state.items = items;
     }

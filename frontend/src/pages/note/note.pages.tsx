@@ -32,7 +32,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const [showEditor] = useState(false);
   const history = useHistory();
 
-  const toLabelSearching = () => {
+  const toLabelSearching = (label: Label) => {
+    console.log(label);
+    props.addSelectedLabel(label);
     history.push('/labels/search');
   };
 
@@ -68,10 +70,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
                       color={stringToRGB(label.value)}
                       style={{ cursor: 'pointer' }}
                     >
-                      <Button type="link" onClick={toLabelSearching}>
+                      <span onClick={() => toLabelSearching(label)}>
                         {getIcon(label.icon)} &nbsp;
                         {label.value}
-                      </Button>
+                      </span>
                     </Tag>
                   </Tooltip>
                 );

@@ -10,6 +10,7 @@ import ProjectModelItems from '../../components/project-item/project-model-items
 
 type LabelSearchProps = {
   labelOptions: Label[];
+  defaultLabels: Label[];
   items: ProjectItems[];
   getItemsByLabels: (labels: []) => void;
   endSearching: () => void;
@@ -17,7 +18,7 @@ type LabelSearchProps = {
 
 const LabelsSearching: React.FC<LabelSearchProps> = props => {
   const [form] = Form.useForm();
-
+  const { defaultLabels } = props;
   const handleSearch = () => {
     form.validateFields().then(values => {
       if (!values) {
@@ -25,6 +26,10 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
       }
       props.getItemsByLabels(values.selectLabels);
     });
+  };
+
+  const initialValues = {
+    selectLabels: defaultLabels.map(label => label.id)
   };
 
   return (
@@ -35,7 +40,12 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
         onBack={props.endSearching}
       />
       <div className="label-search-input">
-        <Form form={form} layout="inline" onFinish={handleSearch}>
+        <Form
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          initialValues={initialValues}
+        >
           <Form.Item
             name="selectLabels"
             rules={[{ required: true, message: 'Missing Label(s)' }]}

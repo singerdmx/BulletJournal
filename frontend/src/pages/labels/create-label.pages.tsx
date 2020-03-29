@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Label, stringToRGB } from '../../features/label/interface';
 import {
@@ -27,7 +27,6 @@ import {
 
 type LabelsProps = {
   labels: Label[];
-  labelsUpdate: () => void;
   deleteLabel: (labelId: number, name: string) => void;
   createLabel: (name: string, icon: string) => void;
   patchLabel: (labelId: number, value: string, icon: string) => void;
@@ -43,15 +42,23 @@ type titleProps = {
 const EditorTitle: React.FC<titleProps> = props => {
   const { labelId, labelName, deleteHelper } = props;
   return (
-    <span style={{display : "flex", justifyContent : "space-between", paddingRight : 20}}>
+    <span
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        paddingRight: 20
+      }}
+    >
       <span>Edit</span>
       <Tooltip title="Delete Label">
         <Button
           type="link"
           danger
           onClick={() => deleteHelper(labelId, labelName)}
-          style={{ padding: 0, fontWeight: 500, marginTop: '-4px'}}
-          shape="circle" icon={<DeleteOutlined />} />
+          style={{ padding: 0, fontWeight: 500, marginTop: '-4px' }}
+          shape="circle"
+          icon={<DeleteOutlined />}
+        />
       </Tooltip>
     </span>
   );
@@ -64,10 +71,6 @@ const Labels: React.FC<LabelsProps> = props => {
   const [editable, setEditable] = useState(false);
   const [currentLabel, setCurrentLabel] = useState(initialLabel);
   const [inputFocus, setFocus] = useState(false);
-
-  useEffect(() => {
-    props.labelsUpdate();
-  }, []);
 
   const handleCreate = () => {
     createForm
@@ -119,7 +122,11 @@ const Labels: React.FC<LabelsProps> = props => {
             name="labelIcon"
             rules={[{ required: true, message: 'Missing Icon' }]}
           >
-            <Select bordered={false} onSelect={() => setFocus(true)} style={{width: '58px'}}>
+            <Select
+              bordered={false}
+              onSelect={() => setFocus(true)}
+              style={{ width: '58px' }}
+            >
               {iconOptions}
             </Select>
           </Form.Item>
@@ -159,7 +166,11 @@ const Labels: React.FC<LabelsProps> = props => {
         <div className="labels-list">
           {props.labels.map(label => {
             return (
-              <Tooltip placement="top" title="Click to edit or delete label" key={label.id}>
+              <Tooltip
+                placement="top"
+                title="Click to edit or delete label"
+                key={label.id}
+              >
                 <Tag
                   className="labels"
                   color={stringToRGB(label.value)}
