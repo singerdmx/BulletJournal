@@ -1,6 +1,6 @@
 package com.bulletjournal.repository.models;
 
-import com.bulletjournal.controller.Content;
+import com.bulletjournal.controller.models.Content;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
