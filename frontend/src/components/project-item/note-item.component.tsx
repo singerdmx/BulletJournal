@@ -2,9 +2,8 @@ import React from 'react';
 import {
   DeleteTwoTone,
   FormOutlined,
-  InfoCircleOutlined,
-  MessageOutlined,
-  MoreOutlined
+  TagOutlined,
+  EllipsisOutlined
 } from '@ant-design/icons';
 import { deleteNote } from '../../features/notes/actions';
 import { Note } from '../../features/notes/interface';
@@ -12,18 +11,27 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import EditNote from '../modals/edit-note.component';
 
-import { Popconfirm, Popover } from 'antd';
+import { Popconfirm, Popover, Tooltip, Tag } from 'antd';
 import EditProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
 
 import './note-item.styles.less';
+import { stringToRGB, Label } from '../../features/label/interface';
+import { icons } from '../../assets/icons';
+import { addSelectedLabel } from '../../features/label/actions';
 
 type NoteProps = {
   note: Note;
   deleteNote: (noteId: number) => void;
+  addSelectedLabel: (label: Label) => void;
 };
 
-const ManageNote: React.FC<NoteProps> = props => {
+type NoteManageProps = {
+  note: Note;
+  deleteNote: (noteId: number) => void;
+};
+
+const ManageNote: React.FC<NoteManageProps> = props => {
   const { note, deleteNote } = props;
 
   return (
@@ -50,15 +58,42 @@ const ManageNote: React.FC<NoteProps> = props => {
 
 const NoteItem: React.FC<NoteProps> = props => {
   const { note, deleteNote } = props;
+  const getIcon = (icon: string) => {
+    let res = icons.filter(item => item.name === icon);
+    return res.length > 0 ? res[0].icon : <TagOutlined />;
+  };
+
   return (
     <div className="note-item">
-      <Link to={`/note/${note.id}`}>
-        <FormOutlined />
-        <span style={{ padding: '0 5px', height: '100%' }}>{note.name}</span>
-      </Link>
+      <div className="note-item-content">
+        <Link to={`/note/${note.id}`}>
+          <FormOutlined />
+          <span className="note-item-name">{note.name}</span>
+        </Link>
+        {note.labels &&
+          note.labels.map(label => {
+            return (
+              <Tooltip
+                placement="top"
+                title="Click to Check or Edit"
+                key={label.id}
+              >
+                <Tag
+                  className="labels"
+                  color={stringToRGB(label.value)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <span>
+                    {getIcon(label.icon)} &nbsp;
+                    {label.value}
+                  </span>
+                </Tag>
+              </Tooltip>
+            );
+          })}
+      </div>
+
       <div className="note-control">
-        <InfoCircleOutlined />
-        <MessageOutlined />
         <Popover
           arrowPointAtCenter
           placement="rightTop"
@@ -66,11 +101,11 @@ const NoteItem: React.FC<NoteProps> = props => {
           content={<ManageNote note={note} deleteNote={deleteNote} />}
           trigger="click"
         >
-          <MoreOutlined />
+          <EllipsisOutlined />
         </Popover>
       </div>
     </div>
   );
 };
 
-export default connect(null, { deleteNote })(NoteItem);
+export default connect(null, { deleteNote, addSelectedLabel })(NoteItem);
