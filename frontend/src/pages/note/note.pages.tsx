@@ -4,18 +4,20 @@ import { connect } from 'react-redux';
 import { getNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar, Typography, Divider, Button } from 'antd';
+import { Tooltip, Tag, Avatar, Typography, Divider } from 'antd';
 import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { icons } from '../../assets/icons/index';
+import BraftEditor from 'braft-editor';
+
 import {
   TagOutlined,
   ShareAltOutlined,
   DeleteOutlined
 } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
 
 import './note-page.styles.less';
+import 'braft-editor/dist/index.css';
 
 type NoteProps = {
   note: Note;
@@ -94,7 +96,13 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </div>
       </div>
       <div className="content-or-editor">
-        {!showEditor ? <div></div> : <div></div>}
+        {!showEditor ? (
+          <div></div>
+        ) : (
+          <div className="editor-wrapper">
+            <BraftEditor language="en" />
+          </div>
+        )}
       </div>
     </div>
   );

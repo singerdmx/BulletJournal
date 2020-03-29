@@ -35,7 +35,11 @@ type GroupProps = {
   updateGroups: () => void;
   moveNote: (noteId: number, targetProject: number, history: History) => void;
   moveTask: (taskId: number, targetProject: number, history: History) => void;
-  moveTransaction: (transactionId: number, targetProject: number, history: History) => void;
+  moveTransaction: (
+    transactionId: number,
+    targetProject: number,
+    history: History
+  ) => void;
 };
 
 const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
@@ -149,7 +153,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
       return null;
     }
     return (
-      <div onClick={openModal} style={{ cursor: 'pointer' }}>
+      <div onClick={openModal} className="popover-control-item">
         <span>Move</span>
         <RightCircleOutlined />
         {getModal()}
