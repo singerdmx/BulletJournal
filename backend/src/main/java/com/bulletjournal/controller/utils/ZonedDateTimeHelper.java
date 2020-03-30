@@ -1,6 +1,6 @@
 package com.bulletjournal.controller.utils;
 
-import com.bulletjournal.controller.models.FrequencyType;
+import com.bulletjournal.ledger.FrequencyType;
 import org.dmfs.rfc5545.DateTime;
 
 import java.time.LocalDateTime;

@@ -1,5 +1,7 @@
-package com.bulletjournal.controller.models;
+package com.bulletjournal.ledger;
 
+import com.bulletjournal.controller.models.Transaction;
+import com.bulletjournal.controller.models.TransactionsSummary;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;

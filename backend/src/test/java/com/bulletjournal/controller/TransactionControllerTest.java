@@ -2,6 +2,9 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.ledger.FrequencyType;
+import com.bulletjournal.ledger.LedgerSummary;
+import com.bulletjournal.ledger.LedgerSummaryType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
