@@ -1,7 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Carousel, Radio, DatePicker, Tooltip, Select } from 'antd';
+import {
+  Carousel,
+  Radio,
+  DatePicker,
+  Tooltip,
+  Select,
+  Button,
+  Form
+} from 'antd';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
@@ -49,19 +57,11 @@ type TransactionProps = {
 };
 
 const TransactionProject: React.FC<TransactionProps> = props => {
-  const onChangeFrequency = (e: any) => {
-    props.updateTransactions(
-      props.projectId,
-      props.transactionTimezone,
-      e.target.value,
-      props.ledgerSummaryType,
-      props.startDate,
-      props.endDate
-    );
-  };
+  const [form] = Form.useForm();
 
-  useEffect(() => {
-    props.updateExpandedMyself(true);
+  const updateTransactions = (values: any) => {
+    console.log('hellpo');
+    console.log(values);
     props.updateTransactions(
       props.projectId,
       props.timezone
@@ -72,62 +72,95 @@ const TransactionProject: React.FC<TransactionProps> = props => {
       props.startDate,
       props.endDate
     );
+  };
+
+  useEffect(() => {
+    props.updateExpandedMyself(true);
+    props.updateTransactions(
+      props.projectId,
+      currentZone,
+      'MONTHLY',
+      'DEFAULT',
+      '',
+      ''
+    );
   }, []);
 
   return (
-    <div className="transaction-page">
-      <div className="transaction-display">
-        <Carousel autoplay dotPosition="bottom">
-          <div className="transaction-number">1400</div>
-          <div className="transaction-static">graph</div>
+    <div className='transaction-page'>
+      <div className='transaction-display'>
+        <Carousel autoplay dotPosition='bottom'>
+          <div className='transaction-number'>1111</div>
+          <div className='transaction-static'>2222</div>
+          <div className='transaction-static'>33333</div>
+          <div className='transaction-static'>4444</div>
           {/* maybe others? */}
         </Carousel>
       </div>
-      <div className="transaction-control">
-        <Radio.Group value={props.frequencyType} onChange={onChangeFrequency}>
-          <Radio value="WEEKLY">WEEKLY</Radio>
-          <Radio value="MONTHLY">MONTHLY</Radio>
-          <Radio value="YEARLY">YEARLY</Radio>
-        </Radio.Group>
+      <div className='transaction-control'>
+        <Form
+          form={form}
+          initialValues={{
+            frequencyType: 'MONTHLY',
+            timezone: props.timezone ? props.timezone : currentZone
+          }}
+        >
+          <Form.Item name='frequencyType'>
+            <Radio.Group value='YEARLY'>
+              <Radio value='WEEKLY'>WEEKLY</Radio>
+              <Radio value='MONTHLY'>MONTHLY</Radio>
+              <Radio value='YEARLY'>YEARLY</Radio>
+            </Radio.Group>
+          </Form.Item>
 
-        <div className="time-range">
-          <RangePicker
-            allowClear={false}
-            value={[
-              props.startDate ? moment(props.startDate, dateFormat) : null,
-              props.endDate ? moment(props.endDate, dateFormat) : null
-            ]}
-            format={dateFormat}
-          />
-          <Select
-            style={{ width: '200px' }}
-            showSearch={true}
-            placeholder="Select Time Zone"
-            value={props.transactionTimezone ? props.transactionTimezone : ''}
+          <Form.Item name='date'>
+            <RangePicker
+              allowClear={true}
+              format={dateFormat}
+              placeholder={['Start Date', 'End Date']}
+            />
+          </Form.Item>
+
+          <Form.Item name='timezone'>
+            <Select
+              style={{ width: '200px' }}
+              showSearch={true}
+              placeholder='Select Time Zone'
+            >
+              {zones.map((zone: string, index: number) => (
+                <Option key={zone} value={zone}>
+                  <Tooltip title={zone} placement='right'>
+                    {<span>{zone}</span>}
+                  </Tooltip>
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Button
+            onClick={() => {
+              form
+                .validateFields()
+                .then(values => {
+                  console.log(values);
+                  form.resetFields();
+                  updateTransactions(values);
+                })
+                .catch(info => console.log(info));
+            }}
           >
-            {zones.map((zone: string, index: number) => (
-              <Option key={zone} value={zone}>
-                <Tooltip title={zone} placement="right">
-                  {<span>{zone}</span>}
-                </Tooltip>
-              </Option>
-            ))}
-          </Select>
-        </div>
+            Search
+          </Button>
+        </Form>
       </div>
-      <div className="trasaction-ist"></div>
+      <div className='transaction-list'></div>
     </div>
   );
 };
 
 const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
-  frequencyType: state.transaction.frequencyType,
-  timezone: state.settings.timezone,
-  transactionTimezone: state.transaction.timezone,
-  startDate: state.transaction.startDate,
-  endDate: state.transaction.endDate,
-  ledgerSummaryType: state.transaction.ledgerSummaryType
+  timezone: state.settings.timezone
 });
 
 export default connect(mapStateToProps, {

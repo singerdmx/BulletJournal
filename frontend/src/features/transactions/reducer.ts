@@ -83,18 +83,8 @@ export type SetTransactionLabels = {
 };
 
 let initialState = {
-  balance: 0,
-  expense: 0,
-  income: 0,
-  startDate: '',
-  endDate: '',
-  frequencyType: 'MONTHLY',
-  ledgerSummaryType: 'DEFAULT',
-  transaction: {} as Transaction,
-  transactions: [] as Array<Transaction>,
-  transactionsSummaries: [] as Array<TransactionsSummary>,
-  addTransactionVisible: false,
-  timezone: ''
+  ledgerSummary: {} as LedgerSummary,
+  addTransactionVisible: false
 };
 
 const slice = createSlice({
