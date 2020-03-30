@@ -130,7 +130,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
             </div>
           }
         >
-          <NoteEditor />
+          <NoteEditor note={note} />
         </Drawer>
       </div>
     </div>
