@@ -11,6 +11,7 @@ import {
 } from './interface';
 import { MONTHS } from './constants';
 import moment from 'moment';
+import {dateFormat} from "../myBuJo/constants";
 
 export type End = {
   count?: any;
@@ -73,12 +74,12 @@ export type YearlyOnAction = {
 };
 
 let initialState = {
-  startDate: moment(new Date().toLocaleString('fr-CA'), 'YYYY-MM-DD').format(
-    'YYYY-MM-DD'
+  startDate: moment(new Date().toLocaleString('fr-CA'), dateFormat).format(
+    dateFormat
   ),
   startTime: '00:00',
-  endDate: moment(new Date().toLocaleString('fr-CA'), 'YYYY-MM-DD').format(
-    'YYYY-MM-DD'
+  endDate: moment(new Date().toLocaleString('fr-CA'), dateFormat).format(
+    dateFormat
   ),
   endCount: 1,
   repeatHourly: { interval: 1 } as Hourly,

@@ -22,6 +22,7 @@ import './modals.styles.less';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { zones } from '../settings/constants';
 import { updateTransactionVisible } from '../../features/transactions/actions';
+import {dateFormat} from "../../features/myBuJo/constants";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -72,7 +73,7 @@ const AddTransaction: React.FC<RouteComponentProps &
   const [form] = Form.useForm();
   const addTransaction = (values: any) => {
     //convert time object to format string
-    const date_value = values.date.format('YYYY-MM-DD');
+    const date_value = values.date.format(dateFormat);
     const time_value = values.time ? values.time.format('HH:mm') : undefined;
     const payerName = values.payerName ? values.payerName : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;

@@ -5,6 +5,7 @@ import { IState } from '../../../../store';
 import { connect } from 'react-redux';
 import { updateStartString } from '../../actions';
 import moment from 'moment';
+import {dateFormat} from "../../../myBuJo/constants";
 
 type StartProps = {
   timezone: string;
@@ -20,8 +21,8 @@ class Start extends React.Component<StartProps> {
         'fr-CA',
         this.props.timezone ? { timeZone: this.props.timezone } : {}
       ),
-      'YYYY-MM-DD'
-    ).format('YYYY-MM-DD');
+      dateFormat
+    ).format(dateFormat);
     this.props.updateStartString(initStartDate, '00:00');
   };
 

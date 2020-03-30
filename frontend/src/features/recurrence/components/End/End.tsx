@@ -5,6 +5,7 @@ import moment from 'moment';
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
 import { updateEndString } from '../../actions';
+import {dateFormat} from "../../../myBuJo/constants";
 const { Option } = Select;
 
 type EndProps = {
@@ -29,8 +30,8 @@ class End extends React.Component<EndProps, SelectState> {
         'fr-CA',
         this.props.timezone ? { timeZone: this.props.timezone } : {}
       ),
-      'YYYY-MM-DD'
-    ).format('YYYY-MM-DD');
+      dateFormat
+    ).format(dateFormat);
     this.props.updateEndString('', initEndDate, this.props.endCount);
   };
 
