@@ -10,7 +10,6 @@ import {
   Button,
   Form
 } from 'antd';
-import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
 import { zones } from '../../components/settings/constants';
@@ -56,8 +55,8 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
 
   const updateTransactions = (values: any) => {
-    const startDate = values.date ? values.date[0].format('YYYY-MM-DD') : null;
-    const endDate = values.date ? values.date[1].format('YYYY-MM-DD') : null;
+    const startDate = values.date ? values.date[0].format(dateFormat) : null;
+    const endDate = values.date ? values.date[1].format(dateFormat) : null;
 
     props.updateTransactions(
       props.projectId,

@@ -26,6 +26,7 @@ import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
 import { convertToTextWithTime } from '../../features/recurrence/actions';
 import { ReminderSetting } from '../../features/tasks/interface';
+import {dateFormat} from "../../features/myBuJo/constants";
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -88,14 +89,14 @@ const AddTask: React.FC<RouteComponentProps &
   const addTask = (values: any) => {
     //convert time object to string
     const dueDate = values.dueDate
-      ? values.dueDate.format('YYYY-MM-DD')
+      ? values.dueDate.format(dateFormat)
       : undefined;
     const dueTime = values.dueTime ? values.dueTime.format('HH:mm') : undefined;
     const assignee = values.assignee ? values.assignee : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;
     let reminderSetting = {
       date: values.reminderDate
-        ? values.reminderDate.format('YYYY-MM-DD')
+        ? values.reminderDate.format(dateFormat)
         : undefined,
       time: values.reminderTime
         ? values.reminderTime.format('HH:mm')
