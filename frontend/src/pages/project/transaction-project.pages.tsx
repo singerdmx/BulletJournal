@@ -55,8 +55,8 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
 
   const updateTransactions = (values: any) => {
-    const startDate = values.date ? values.date[0].format(dateFormat) : null;
-    const endDate = values.date ? values.date[1].format(dateFormat) : null;
+    const startDate = values.date ? values.date[0].format(dateFormat) : undefined;
+    const endDate = values.date ? values.date[1].format(dateFormat) : undefined;
 
     props.updateTransactions(
       props.projectId,
