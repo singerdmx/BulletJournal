@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.repository.models.*;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Repository
 public class SharedProjectItemDaoJpa {
@@ -35,28 +37,43 @@ public class SharedProjectItemDaoJpa {
     private GroupDaoJpa groupDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<ProjectItemModel> getSharedProjectItems(String user) {
-        List<ProjectItemModel> result = new ArrayList<>();
+    public <T extends ProjectItem> List<T> getSharedProjectItems(
+            String user, final ProjectType projectType) {
+        List<T> result = new ArrayList<>();
         List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(user);
         items.forEach(item -> {
+            ProjectItemModel projectItem;
             if (item.hasNote()) {
-                result.add(item.getNote());
+                projectItem = item.getNote();
             } else if (item.hasTask()) {
-                result.add(item.getTask());
+                projectItem = item.getTask();
             } else if (item.hasTransaction()) {
-                result.add(item.getTransaction());
+                projectItem = item.getTransaction();
             } else {
                 throw new IllegalStateException();
             }
+
+            if (projectType == null || projectType.getValue() == projectItem.getProject().getType().intValue()) {
+                T target = projectItem.toPresentationModel();
+                result.add(target);
+            }
         });
-        return result;
+
+        return result.stream()
+                .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> void save(
+    public <T extends ProjectItem> List<T> getSharedProjectItems(String user) {
+        return getSharedProjectItems(user, null);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel, K extends ProjectItem> void save(
             ProjectType projectType, T projectItem, List<String> users) {
         for (String user : new HashSet<>(users)) {
-            List<ProjectItemModel> existingItems = this.getSharedProjectItems(user);
+            List<K> existingItems = this.getSharedProjectItems(user);
             if (existingItems.contains(projectItem)) {
                 LOGGER.error(projectItem.getClass().getSimpleName() + " " + projectItem.getName() +
                         " (ID " + projectItem.getId() +

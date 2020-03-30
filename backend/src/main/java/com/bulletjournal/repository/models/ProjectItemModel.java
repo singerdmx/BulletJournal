@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.ProjectItem;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -50,6 +51,8 @@ public abstract class ProjectItemModel extends OwnedModel {
     public void setProject(Project project) {
         this.project = project;
     }
+
+    public abstract <T extends ProjectItem> T toPresentationModel();
 
     @Override
     public boolean equals(Object o) {

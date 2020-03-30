@@ -667,9 +667,9 @@ public class ProjectControllerTest {
     }
 
     private void shareTask(Task task) {
-        ShareProjectItemParams shareProjectItemParams = new ShareProjectItemParams();
         String targetUser = sampleUsers[5];
-        shareProjectItemParams.setTargetUser(targetUser);
+
+        ShareProjectItemParams shareProjectItemParams = new ShareProjectItemParams(targetUser);
         ResponseEntity<String> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
                 HttpMethod.POST,

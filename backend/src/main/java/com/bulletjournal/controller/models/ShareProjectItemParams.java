@@ -11,6 +11,10 @@ public class ShareProjectItemParams {
     public ShareProjectItemParams() {
     }
 
+    public ShareProjectItemParams(String targetUser) {
+        this.targetUser = targetUser;
+    }
+
     public Long getTargetGroup() {
         return targetGroup;
     }
