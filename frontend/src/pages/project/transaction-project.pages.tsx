@@ -55,18 +55,15 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   const [form] = Form.useForm();
 
   const updateTransactions = (values: any) => {
-    console.log('hellpo');
     console.log(values);
-    // props.updateTransactions(
-    //   props.projectId,
-    //   props.timezone
-    //     ? props.timezone
-    //     : Intl.DateTimeFormat().resolvedOptions().timeZone,
-    //   props.frequencyType,
-    //   props.ledgerSummaryType,
-    //   props.startDate,
-    //   props.endDate
-    // );
+    props.updateTransactions(
+      props.projectId,
+      values.timezone,
+      values.frequencyType,
+      'DEFAULT',
+      values.startDate,
+      values.endDate
+    );
   };
 
   useEffect(() => {
@@ -84,7 +81,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   return (
     <div className='transaction-page'>
       <div className='transaction-display'>
-        <Carousel autoplay dotPosition='bottom'>
+        <Carousel dotPosition='bottom'>
           <div className='transaction-number'>1111</div>
           <div className='transaction-static'>2222</div>
           <div className='transaction-static'>33333</div>

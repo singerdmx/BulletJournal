@@ -80,8 +80,8 @@ export type SetTransactionLabels = {
 };
 
 let initialState = {
-    transaction: {} as Transaction,
-    ledgerSummary: {} as LedgerSummary,
+  transaction: {} as Transaction,
+  ledgerSummary: {} as LedgerSummary,
   addTransactionVisible: false
 };
 
