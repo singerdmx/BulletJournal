@@ -49,7 +49,7 @@ public class ZonedDateTimeHelperTest {
         String timezone = "America/Los_Angeles";
 
         ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateOnly(date, timezone);
-        String resultDate = ZonedDateTimeHelper.getDateFromZoneDateTime(zonedDateTime);
+        String resultDate = ZonedDateTimeHelper.getDate(zonedDateTime);
 
         assertEquals("2020-02-20", resultDate);
     }

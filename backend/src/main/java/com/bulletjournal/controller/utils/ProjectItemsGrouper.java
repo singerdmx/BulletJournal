@@ -74,7 +74,7 @@ public class ProjectItemsGrouper {
 
         transactionsMap.keySet().forEach(zonedDateTime -> {
             ProjectItems projectItem = mergedMap.getOrDefault(zonedDateTime, new ProjectItems());
-            projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(zonedDateTime));
+            projectItem.setDate(ZonedDateTimeHelper.getDate(zonedDateTime));
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Transaction> transactions = transactionsMap.get(zonedDateTime);
             transactions.sort((t1, t2) -> {
@@ -103,7 +103,7 @@ public class ProjectItemsGrouper {
 
         tasksMap.keySet().forEach(zonedDateTime -> {
             ProjectItems projectItem = mergedMap.getOrDefault(zonedDateTime, new ProjectItems());
-            projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(zonedDateTime));
+            projectItem.setDate(ZonedDateTimeHelper.getDate(zonedDateTime));
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort((t1, t2) -> {
@@ -132,7 +132,7 @@ public class ProjectItemsGrouper {
 
         notesMap.keySet().forEach(zonedDateTime -> {
             ProjectItems projectItem = mergedMap.getOrDefault(zonedDateTime, new ProjectItems());
-            projectItem.setDate(ZonedDateTimeHelper.getDateFromZoneDateTime(zonedDateTime));
+            projectItem.setDate(ZonedDateTimeHelper.getDate(zonedDateTime));
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Note> notes = notesMap.get(zonedDateTime);
 

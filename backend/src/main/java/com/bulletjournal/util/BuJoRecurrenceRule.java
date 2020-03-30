@@ -19,9 +19,9 @@ public class BuJoRecurrenceRule {
 
     private RecurrenceRule rrule;
 
-    public BuJoRecurrenceRule(String recurInput) throws InvalidRecurrenceRuleException {
+    public BuJoRecurrenceRule(String recurInput, String timezone) throws InvalidRecurrenceRuleException {
         this.recurInput = recurInput;
-        if (!parseDTStart())
+        if (!parseDTStart(timezone))
             throw new IllegalStateException("RRule DTStart parsing error");
 
         this.hasEnd = parseDTUntil();
@@ -45,7 +45,7 @@ public class BuJoRecurrenceRule {
         if (this.hasEnd) {
             idxOfRRuleEnd = this.recurInput.indexOf(DATETIME_END_KEY);
         }
-        return this.recurInput.substring(idxOfRRuleStart, idxOfRRuleEnd);
+        return this.recurInput.substring(idxOfRRuleStart + RECURRENCE_RULE_KEY.length(), idxOfRRuleEnd);
     }
 
     private String getRFC5545DateTime(int startIdx, String key) {
@@ -54,13 +54,13 @@ public class BuJoRecurrenceRule {
         return recurInput.substring(idxOfDateTimeStart, idxOfDateTimeEnd);
     }
 
-    private boolean parseDTStart() {
+    private boolean parseDTStart(String timezone) {
         int indexOfDTStart = recurInput.indexOf(DATETIME_START_KEY);
         if (indexOfDTStart == -1) {
             return false;
         }
         String rfc5545DateTime = getRFC5545DateTime(indexOfDTStart, DATETIME_START_KEY);
-        this.start = DateTime.parse(rfc5545DateTime);
+        this.start = timezone == null ? DateTime.parse(rfc5545DateTime) : DateTime.parse(timezone, rfc5545DateTime);
         return true;
     }
 

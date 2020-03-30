@@ -27,27 +27,28 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests {@link ProjectController}
- *
- *          Transaction:
- *               "2020-02-29"
- *               "2020-03-01"
- *               "2020-03-02"
- *               "2020-03-02"
- *               "2020-03-04"
- *          Task:
- *               "2020-02-28"
- *               "2020-02-29"
- *               "2020-03-01"
- *               "2020-03-02"
- *               "2020-03-02"
- *               "2020-03-04"
- *               "2020-03-04"
+ * <p>
+ * Transaction:
+ * "2020-02-29"
+ * "2020-03-01"
+ * "2020-03-02"
+ * "2020-03-02"
+ * "2020-03-04"
+ * Task:
+ * "2020-02-28"
+ * "2020-02-29"
+ * "2020-03-01"
+ * "2020-03-02"
+ * "2020-03-02"
+ * "2020-03-04"
+ * "2020-03-04"
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class ProjectItemControllerTest {
     private static final String ROOT_URL = "http://localhost:";
+    private static String TIMEZONE = "America/Los_Angeles";
     private final String expectedOwner = "BulletJournal";
     private final String[] sampleUsers = {
             "Michael_Zhou",
@@ -130,10 +131,23 @@ public class ProjectItemControllerTest {
 
         List<ProjectItems> projectItemsOtherUser = getProjectItemsOtherUser("2020-02-28",
                 "2020-03-04",
-                "America/Los_Angeles",
+                TIMEZONE,
                 types);
         assertNotNull(projectItemsOtherUser);
         assertEquals(0, projectItemsOtherUser.size());
+
+        // "DTSTART:20200320T080000Z RRULE:FREQ=WEEKLY;INTERVAL=1"
+        Task recurTask = addRecurringTasks(p2);
+        List<ProjectItems> projectItemsRecurring = getProjectItems("2020-04-20",
+                "2020-05-01",
+                TIMEZONE,
+                types);
+        assertNotNull(projectItemsRecurring);
+        assertEquals(2, projectItemsRecurring.size());
+        assertEquals("rt1", projectItemsRecurring.get(0).getTasks().get(0).getName());
+        assertEquals("rt1", projectItemsRecurring.get(1).getTasks().get(0).getName());
+        assertEquals("2020-04-27", projectItemsRecurring.get(0).getTasks().get(0).getDueDate());
+        assertEquals("2020-04-20", projectItemsRecurring.get(1).getTasks().get(0).getDueDate());
     }
 
     private List<ProjectItems> getProjectItemsOtherUser(String startDate, String endDate, String timezone, List<ProjectType> types) {
@@ -253,10 +267,30 @@ public class ProjectItemControllerTest {
         assertEquals(0, p5.size());
     }
 
+    private Task addRecurringTasks(Project project) {
+        String recurrenceRule = "DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1";
+        String taskName = "rt1";
+
+        CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
+                null, null, null, TIMEZONE, recurrenceRule);
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(task, sampleUsers[0]),
+                Task.class,
+                project.getId());
+        Task createdTask = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(taskName, createdTask.getName());
+        assertEquals(project.getId(), createdTask.getProjectId());
+
+        return createdTask;
+    }
+
     private Transaction createTransaction(Project project, String name, String date) {
         CreateTransactionParams transaction =
-                new CreateTransactionParams(name, "Michael_Zhou", 1000.0,
-                        date, null, "America/Los_Angeles", 1);
+                new CreateTransactionParams(name, sampleUsers[0], 1000.0,
+                        date, null, TIMEZONE, 1);
 
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
@@ -274,8 +308,8 @@ public class ProjectItemControllerTest {
 
     private Task createTask(Project project, String name, String date) {
         CreateTaskParams task =
-                new CreateTaskParams(name, "Michael_Zhou", date, null, 10,
-                        null, "America/Los_Angeles", null);
+                new CreateTaskParams(name, sampleUsers[0], date, null, 10,
+                        null, TIMEZONE, null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
@@ -325,10 +359,10 @@ public class ProjectItemControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals(projectName, created.getName());
-        assertEquals("Michael_Zhou", created.getOwner());
+        assertEquals(sampleUsers[0], created.getOwner());
         assertEquals(type, created.getProjectType());
         assertEquals("Group_ProjectItem", created.getGroup().getName());
-        assertEquals("Michael_Zhou", created.getGroup().getOwner());
+        assertEquals(sampleUsers[0], created.getGroup().getOwner());
         assertEquals("d14", created.getDescription());
         return created;
     }
@@ -346,7 +380,7 @@ public class ProjectItemControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals("Group_ProjectItem", created.getName());
-        assertEquals("Michael_Zhou", created.getOwner());
+        assertEquals(sampleUsers[0], created.getOwner());
 
         return created;
     }

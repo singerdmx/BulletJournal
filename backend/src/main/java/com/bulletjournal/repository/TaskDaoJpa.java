@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -98,7 +97,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<com.bulletjournal.controller.models.Label> labels =
                 getLabelsToProjectItem(tasksMap.get(task.getId()));
         task.setLabels(labels);
-        for (com.bulletjournal.controller.models.Task subTask: task.getSubTasks()) {
+        for (com.bulletjournal.controller.models.Task subTask : task.getSubTasks()) {
             addLabels(subTask, tasksMap);
         }
         return task;
@@ -176,29 +175,33 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<Task> getRecurrentTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurrentTasksBetween = new ArrayList<>();
         List<Task> recurrentTasks = this.taskRepository.findTasksByAssignedToAndRecurrenceRuleNotNull(assignee);
-        long startMoment = startTime.getLong(ChronoField.INSTANT_SECONDS);
-        long endMoment = endTime.getLong(ChronoField.INSTANT_SECONDS);
+        DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
+        DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
 
         for (Task t : recurrentTasks) {
             String recurrenceRule = t.getRecurrenceRule();
+            String timezone = t.getTimezone();
             try {
-                BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule);
+                BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
 
                 RecurrenceRuleIterator it = rule.getIterator();
                 while (it.hasNext()) {
-                    DateTime nextInstance = it.nextDateTime();
-                    long currTime = nextInstance.getTimestamp();
-                    if (currTime > endMoment) {
+                    DateTime currDateTime = it.nextDateTime();
+                    if (currDateTime.after(endDateTime)) {
                         break;
                     }
-                    if (currTime < startMoment) {
+                    if (currDateTime.before(startDateTime)) {
                         continue;
                     }
-
-                    recurrentTasksBetween.add(t);
+                    Task cloned = (Task) t.clone();
+                    cloned.setDueDate(ZonedDateTimeHelper.getDate(currDateTime)); // Set due date
+                    cloned.setDueTime(ZonedDateTimeHelper.getTime(currDateTime)); // Set due time
+                    recurrentTasksBetween.add(cloned);
                 }
             } catch (InvalidRecurrenceRuleException e) {
                 throw new IllegalArgumentException("Recurrence rule format invalid");
+            } catch (CloneNotSupportedException e) {
+                throw new IllegalStateException("Clone new Task failed");
             }
         }
         return recurrentTasksBetween;

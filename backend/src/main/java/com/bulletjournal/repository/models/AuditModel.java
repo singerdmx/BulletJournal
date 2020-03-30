@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @MappedSuperclass
-public abstract class AuditModel implements Serializable {
+public abstract class AuditModel implements Serializable, Cloneable {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
