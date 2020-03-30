@@ -77,7 +77,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
-            return this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, ProjectType.TODO);
+            return projectSharedTasks(requester);
         }
 
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
@@ -102,6 +102,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             addLabels(subTask, tasksMap);
         }
         return task;
+    }
+
+    private List<com.bulletjournal.controller.models.Task> projectSharedTasks(String requester) {
+        return this.sharedProjectItemDaoJpa.getSharedProjectItems(requester)
+                .stream().filter(item -> ProjectType.TODO.getValue() == item.getProject().getType().intValue())
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                .map(item -> ((Task) item).toPresentationModel()).collect(Collectors.toList());
     }
 
     /*

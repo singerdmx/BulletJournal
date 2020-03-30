@@ -6,16 +6,9 @@ public class ShareProjectItemParams {
 
     private String targetUser;
 
-    private boolean readOnly;
-
     private boolean generateLink;
 
     public ShareProjectItemParams() {
-    }
-
-    public ShareProjectItemParams(String targetUser, boolean readOnly) {
-        this.targetUser = targetUser;
-        this.readOnly = readOnly;
     }
 
     public Long getTargetGroup() {
@@ -40,13 +33,5 @@ public class ShareProjectItemParams {
 
     public void setGenerateLink(boolean generateLink) {
         this.generateLink = generateLink;
-    }
-
-    public boolean isReadOnly() {
-        return readOnly;
-    }
-
-    public void setReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
     }
 }
