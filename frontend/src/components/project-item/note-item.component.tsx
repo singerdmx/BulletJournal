@@ -77,7 +77,7 @@ const NoteItem: React.FC<NoteProps> = props => {
             {note.labels &&
               note.labels.map(label => {
                 return (
-                  <Tag className="labels" color={stringToRGB(label.value)}>
+                  <Tag key={`label${label.id}`} className="labels" color={stringToRGB(label.value)}>
                     <span>
                       {getIcon(label.icon)} &nbsp;
                       {label.value}
