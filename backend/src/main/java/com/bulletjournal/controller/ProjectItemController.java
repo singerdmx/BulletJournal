@@ -48,6 +48,9 @@ public class ProjectItemController {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
+    @Autowired
+    private UserClient userClient;
+
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
     public List<ProjectItems> getProjectItems(
@@ -70,7 +73,9 @@ public class ProjectItemController {
         Map<ZonedDateTime, ProjectItems> projectItemsMap =
                 getZonedDateTimeProjectItemsMap(types, username, startTime, endTime, labelIds);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
-        return this.labelDaoJpa.getLabelsForProjectItems(projectItems, labelIds);
+        return ProjectItems.addOwnerAvatar(
+                this.labelDaoJpa.getLabelsForProjectItems(projectItems, labelIds),
+                this.userClient);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -85,7 +90,7 @@ public class ProjectItemController {
         // Task query
         if (types.contains(ProjectType.TODO)) {
             List<Task> tasks = taskDaoJpa.getTasksBetween(user.getName(), startTime, endTime);
-            Map<Long, List<Long>> tasklabels = tasks.stream().collect(
+            Map<Long, List<Long>> tasklabels = tasks.stream().distinct().collect(
                     Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
             labelIds.put(ProjectItemType.TASK, tasklabels);
             // Group tasks by date

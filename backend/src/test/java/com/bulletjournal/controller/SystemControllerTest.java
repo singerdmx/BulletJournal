@@ -70,10 +70,10 @@ public class SystemControllerTest {
         assertEquals(4, remindingTasks.size());
 
         // Check if t1, t2, t3, t4 in the reminding tasks
-        assertIfContains(remindingTasks, t1, t2, t3, t4);
+        TestHelpers.assertIfContains(remindingTasks, t1, t2, t3, t4);
 
         // Check if t5 not in the reminding tasks
-        assertIfNotContains(remindingTasks, t5);
+        TestHelpers.assertIfNotContains(remindingTasks, t5);
 
         deleteTask(t1);
 
@@ -83,10 +83,10 @@ public class SystemControllerTest {
         assertEquals(3, systemUpdates.getReminders().size());
 
         // Check if t2, t3, t4 in the reminding tasks
-        assertIfContains(remindingTasks, t2, t3, t4);
+        TestHelpers.assertIfContains(remindingTasks, t2, t3, t4);
 
         // Check if t5 not in the reminding tasks
-        assertIfNotContains(remindingTasks, t5);
+        TestHelpers.assertIfNotContains(remindingTasks, t5);
 
         String remindingTaskEtag = systemUpdates.getRemindingTaskEtag();
         systemUpdates = testRemindingTaskEtagMatch(p1, remindingTaskEtag);
@@ -137,20 +137,6 @@ public class SystemControllerTest {
         assertNotNull(systemUpdates);
 
         return systemUpdates;
-    }
-
-    @SafeVarargs
-    private final <T> void assertIfContains(List<T> container, T... objects) {
-        for (T object : objects) {
-            assertTrue(container.contains(object));
-        }
-    }
-
-    @SafeVarargs
-    private final <T> void assertIfNotContains(List<T> container, T... objects) {
-        for (T object : objects) {
-            assertFalse(container.contains(object));
-        }
     }
 
     private Task createRemindingTask(Project project, String name, Integer before, String date, String time) {

@@ -3,6 +3,7 @@ package com.bulletjournal.controller.utils;
 import com.bulletjournal.ledger.FrequencyType;
 import org.dmfs.rfc5545.DateTime;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -14,28 +15,33 @@ public class ZonedDateTimeHelper {
 
     public static final String DATE_TIME_DELIMITER = " ";
     public static final String DATE_DELIMITER = "-";
+    public static final String TIME_DELIMITER = ":";
     public static final String DEFAULT_TIME = "00:00";
     public static final String PATTERN = "yyyy-MM-dd HH:mm";
     private static final String MIN_TIME = "00:00";
     private static final String MAX_TIME = "23:59";
 
-    public static String getDateString(ZonedDateTime date) {
-        return aggregateDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+    /*
+     * Aggregate hour and time to a single string
+     */
+    private static String aggregateTime(int hour, int min) {
+        return convertSingleDigitToTwoDigits(hour) + TIME_DELIMITER + convertSingleDigitToTwoDigits(min);
     }
 
-    private  static String aggregateTime(int hour, int min) {
-        return hour + ":" + min;
-    }
-
+    /*
+     * Aggregate year, month and day to a single string
+     */
     private static String aggregateDate(int year, int month, int day) {
-        return year + "-" + convertSingleDigitToTwoDigits(month) + "-"
-                + convertSingleDigitToTwoDigits(day);
+        return year + DATE_DELIMITER +
+                convertSingleDigitToTwoDigits(month) + DATE_DELIMITER +
+                convertSingleDigitToTwoDigits(day);
     }
+
     /*
      * Return ZoneDateTime type for start time. If time is null, will replace time with 00:00.
      */
     private static String getDateTime(String date, String time) {
-        return date + ZonedDateTimeHelper.DATE_TIME_DELIMITER + time;
+        return date + DATE_TIME_DELIMITER + time;
     }
 
     /*
@@ -154,10 +160,15 @@ public class ZonedDateTimeHelper {
     /*
      * Convert ZonedDateTime to Date String
      */
-    public static String getDateFromZoneDateTime(ZonedDateTime zonedDateTime) {
-        return zonedDateTime.getYear() + DATE_DELIMITER +
-                convertSingleDigitToTwoDigits(zonedDateTime.getMonthValue()) + DATE_DELIMITER +
-                convertSingleDigitToTwoDigits(zonedDateTime.getDayOfMonth());
+    public static String getDate(ZonedDateTime dateTime) {
+        return aggregateDate(dateTime.getYear(), dateTime.getMonthValue(), dateTime.getDayOfMonth());
+    }
+
+    /*
+     * Convert ZonedDateTime to Date String
+     */
+    public static String getTime(ZonedDateTime dateTime) {
+        return aggregateTime(dateTime.getHour(), dateTime.getMinute());
     }
 
     /*
@@ -169,11 +180,33 @@ public class ZonedDateTimeHelper {
     }
 
     /*
+     * Get ZonedDateTime from rfc5545 Datetime
+     */
+    public static ZonedDateTime getZonedDateTime(DateTime dateTime) {
+        ZoneId zonedId = dateTime.getTimeZone().toZoneId();
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime.getTimestamp()), zonedId);
+    }
+
+    /*
      * Convert ZonedDateTime to DateTime
      */
-    public static DateTime getDateTimeFromZonedDateTime(ZonedDateTime zonedDateTime) {
+    public static DateTime getDateTime(ZonedDateTime zonedDateTime) {
         TimeZone convertedTimezone = TimeZone.getTimeZone(zonedDateTime.getZone());
-        return new DateTime(convertedTimezone, zonedDateTime.getLong(ChronoField.INSTANT_SECONDS));
+        return new DateTime(convertedTimezone, zonedDateTime.getLong(ChronoField.INSTANT_SECONDS) * 1000);
+    }
+
+    /*
+     * Get Date from rfc5455 DateTime with format yyyy-mm-dd
+     */
+    public static String getDate(DateTime dateTime) {
+        return getDate(getZonedDateTime(dateTime));
+    }
+
+    /*
+     * Get Time from rfc5455 DateTime with format hh:mm
+     */
+    public static String getTime(DateTime dateTime) {
+        return getTime(getZonedDateTime(dateTime));
     }
 
     /*

@@ -1,6 +1,8 @@
 package com.bulletjournal.ledger;
 
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.Label;
+import com.bulletjournal.controller.models.Transaction;
+import com.bulletjournal.controller.models.TransactionsSummary;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import org.springframework.stereotype.Component;
 
@@ -14,38 +16,12 @@ import java.util.function.Consumer;
 @Component
 public class LedgerSummaryCalculator {
 
-    private static class Transactions {
-        double income = 0.0;
-        double expense = 0.0;
-
-        void addIncome(double amount) {
-            this.income += amount;
-        }
-
-        void addExpense(double amount) {
-            this.expense += amount;
-        }
-
-        public double getIncome() {
-            return income;
-        }
-
-        public double getExpense() {
-            return expense;
-        }
-    }
-
-    private static class Total {
-        double totalIncome = 0.0;
-        double totalExpense = 0.0;
-    }
-
     public LedgerSummary getLedgerSummary(
             LedgerSummaryType ledgerSummaryType,
             ZonedDateTime startTime, ZonedDateTime endTime, List<Transaction> transactions) {
         final LedgerSummary ledgerSummary = new LedgerSummary(transactions,
-                ZonedDateTimeHelper.getDateString(startTime),
-                ZonedDateTimeHelper.getDateString(endTime));
+                ZonedDateTimeHelper.getDate(startTime),
+                ZonedDateTimeHelper.getDate(endTime));
 
         final Total total = new Total();
         Map<String, Transactions> m = new HashMap<>();
@@ -125,5 +101,31 @@ public class LedgerSummaryCalculator {
                     break;
             }
         }
+    }
+
+    private static class Transactions {
+        double income = 0.0;
+        double expense = 0.0;
+
+        void addIncome(double amount) {
+            this.income += amount;
+        }
+
+        void addExpense(double amount) {
+            this.expense += amount;
+        }
+
+        public double getIncome() {
+            return income;
+        }
+
+        public double getExpense() {
+            return expense;
+        }
+    }
+
+    private static class Total {
+        double totalIncome = 0.0;
+        double totalExpense = 0.0;
     }
 }

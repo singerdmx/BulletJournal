@@ -1,10 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.CreateLabelParams;
-import com.bulletjournal.controller.models.Label;
-import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.controller.models.UpdateLabelParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.repository.LabelDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -33,6 +30,9 @@ public class LabelController {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private UserClient userClient;
 
     @PostMapping(LABELS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -79,6 +79,9 @@ public class LabelController {
     public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         User user = this.userDaoJpa.getByName(username);
-        return this.labelDaoJpa.getItemsByLabels(user.getTimezone(), labels, username);
+        return ProjectItems.addOwnerAvatar(
+                this.labelDaoJpa.getItemsByLabels(user.getTimezone(), labels, username),
+                this.userClient);
     }
+
 }

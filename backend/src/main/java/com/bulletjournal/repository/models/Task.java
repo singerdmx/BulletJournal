@@ -30,4 +30,9 @@ public class Task extends TaskModel {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
