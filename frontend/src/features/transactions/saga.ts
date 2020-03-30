@@ -8,7 +8,8 @@ import {
   GetTransaction,
   PatchTransaction,
   MoveTransaction,
-  SetTransactionLabels, ShareTransaction
+  SetTransactionLabels,
+  ShareTransaction
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -18,7 +19,8 @@ import {
   getTransactionById,
   updateTransaction,
   moveToTargetProject,
-  setTransactionLabels, shareTransactionWithOther
+  setTransactionLabels,
+  shareTransactionWithOther
 } from '../../apis/transactionApis';
 import { updateTransactions } from './actions';
 import { LedgerSummary } from './interface';
@@ -53,10 +55,7 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
 
     yield put(
       transactionsActions.transactionsReceived({
-        ledgerSummary: ledgerSummary,
-        timezone: timezone,
-        frequencyType: frequencyType,
-        ledgerSummaryType: ledgerSummaryType
+        ledgerSummary: ledgerSummary
       })
     );
   } catch (error) {
@@ -107,8 +106,19 @@ function* transactionMove(action: PayloadAction<MoveTransaction>) {
 
 function* shareTransaction(action: PayloadAction<ShareTransaction>) {
   try {
-    const { transactionId, targetUser, targetGroup, generateLink} = action.payload;
-    yield call(shareTransactionWithOther, transactionId, targetUser, targetGroup, generateLink);
+    const {
+      transactionId,
+      targetUser,
+      targetGroup,
+      generateLink
+    } = action.payload;
+    yield call(
+      shareTransactionWithOther,
+      transactionId,
+      targetUser,
+      targetGroup,
+      generateLink
+    );
     yield call(message.success, 'Transaction shared successfully');
   } catch (error) {
     yield call(message.error, `shareTransaction Error Received: ${error}`);
@@ -172,7 +182,10 @@ export default function* transactionSagas() {
       patchTransaction
     ),
     yield takeLatest(transactionsActions.TransactionMove.type, transactionMove),
-    yield takeLatest(transactionsActions.TransactionShare.type, shareTransaction),
+    yield takeLatest(
+      transactionsActions.TransactionShare.type,
+      shareTransaction
+    ),
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,
       transactionSetLabels

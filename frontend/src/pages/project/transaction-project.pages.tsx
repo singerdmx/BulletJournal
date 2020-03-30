@@ -16,7 +16,6 @@ import './project.styles.less';
 import { zones } from '../../components/settings/constants';
 import { updateTransactions } from '../../features/transactions/actions';
 import { updateExpandedMyself } from '../../features/myself/actions';
-
 import './transaction.styles.less';
 
 const { RangePicker } = DatePicker;
@@ -36,6 +35,7 @@ zones.sort((a, b) => {
   }
   return 0;
 });
+const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL', 'TIMELINE'];
 
 type TransactionProps = {
   projectId: number;
@@ -53,14 +53,14 @@ type TransactionProps = {
 
 const TransactionProject: React.FC<TransactionProps> = props => {
   const [form] = Form.useForm();
+  const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
 
   const updateTransactions = (values: any) => {
-    console.log(values);
     props.updateTransactions(
       props.projectId,
       values.timezone,
       values.frequencyType,
-      'DEFAULT',
+      ledgerSummaryType,
       values.startDate,
       values.endDate
     );
@@ -72,7 +72,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
       props.projectId,
       currentZone,
       'MONTHLY',
-      'DEFAULT',
+      ledgerSummaryType,
       '',
       ''
     );
@@ -81,11 +81,17 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   return (
     <div className='transaction-page'>
       <div className='transaction-display'>
-        <Carousel dotPosition='bottom'>
-          <div className='transaction-number'>1111</div>
-          <div className='transaction-static'>2222</div>
-          <div className='transaction-static'>33333</div>
-          <div className='transaction-static'>4444</div>
+        <Carousel
+          dotPosition='bottom'
+          afterChange={(current: number) => {
+            console.log(LedgerSummaryTypeMap[current]);
+            setLedgerSummaryType(LedgerSummaryTypeMap[current]);
+          }}
+        >
+          <div className='transaction-number'>{LedgerSummaryTypeMap[0]}</div>
+          <div className='transaction-static'>{LedgerSummaryTypeMap[1]}</div>
+          <div className='transaction-static'>{LedgerSummaryTypeMap[2]}</div>
+          <div className='transaction-static'>{LedgerSummaryTypeMap[3]}</div>
           {/* maybe others? */}
         </Carousel>
       </div>
@@ -135,7 +141,6 @@ const TransactionProject: React.FC<TransactionProps> = props => {
                 .validateFields()
                 .then(values => {
                   console.log(values);
-                  form.resetFields();
                   updateTransactions(values);
                 })
                 .catch(info => console.log(info));
