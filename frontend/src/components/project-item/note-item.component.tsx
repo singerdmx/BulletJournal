@@ -1,24 +1,30 @@
+// note item component for note tree
+// react import
 import React from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+// antd imports
 import {
   DeleteTwoTone,
   TagOutlined,
   MoreOutlined,
   SnippetsOutlined
 } from '@ant-design/icons';
+import { Popconfirm, Popover, Tag, Tooltip, Avatar } from 'antd';
+// features import
 import { deleteNote } from '../../features/notes/actions';
 import { Note } from '../../features/notes/interface';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { stringToRGB, Label } from '../../features/label/interface';
+import { addSelectedLabel } from '../../features/label/actions';
+// modals import
 import EditNote from '../modals/edit-note.component';
-
-import { Popconfirm, Popover, Tag, Tooltip, Avatar } from 'antd';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
-
-import './note-item.styles.less';
-import { stringToRGB, Label } from '../../features/label/interface';
+//  third party import
+import moment from 'moment';
+// assets import
 import { icons } from '../../assets/icons';
-import { addSelectedLabel } from '../../features/label/actions';
+import './note-item.styles.less';
 
 type NoteProps = {
   note: Note;
@@ -68,7 +74,11 @@ const NoteItem: React.FC<NoteProps> = props => {
       <div className="note-item-content">
         <Link to={`/note/${note.id}`}>
           <h3 className="note-item-name">
-            {note.labels && note.labels[0] ? getIcon(note.labels[0].icon) : <SnippetsOutlined />}{' '}
+            {note.labels && note.labels[0] ? (
+              getIcon(note.labels[0].icon)
+            ) : (
+              <SnippetsOutlined />
+            )}{' '}
             {note.name}
           </h3>
         </Link>
@@ -77,7 +87,11 @@ const NoteItem: React.FC<NoteProps> = props => {
             {note.labels &&
               note.labels.map(label => {
                 return (
-                  <Tag key={`label${label.id}`} className="labels" color={stringToRGB(label.value)}>
+                  <Tag
+                    key={`label${label.id}`}
+                    className="labels"
+                    color={stringToRGB(label.value)}
+                  >
                     <span>
                       {getIcon(label.icon)} &nbsp;
                       {label.value}
@@ -85,6 +99,9 @@ const NoteItem: React.FC<NoteProps> = props => {
                   </Tag>
                 );
               })}
+          </div>
+          <div className="note-item-time">
+            {note.updatedAt && moment(note.updatedAt).fromNow()}
           </div>
         </div>
       </div>

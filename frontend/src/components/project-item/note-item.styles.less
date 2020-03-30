@@ -2,7 +2,7 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   padding: 3px 5px;
 
   .note-item-content {
@@ -11,19 +11,32 @@
       font-weight: 600;
       padding-right: 1em;
     }
+    .note-item-subs {
+      display: flex;
+      align-items: baseline;
+      .note-item-time {
+        font-size: 14px;
+        color: #c0c1c0;
+      }
+    }
   }
 
   .note-control {
-    width: 300px;
+    max-width: 200px;
     height: 100%;
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: baseline;
 
     .note-control-more {
       font-weight: bold;
       margin-left: 1em;
       font-size: 20px;
+    }
+
+    .ant-avatar img {
+      height: auto;
+      width: 20px;
     }
   }
 }
