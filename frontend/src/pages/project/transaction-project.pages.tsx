@@ -56,13 +56,16 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
 
   const updateTransactions = (values: any) => {
+    const startDate = values.date ? values.date[0].format('YYYY-MM-DD') : null;
+    const endDate = values.date ? values.date[1].format('YYYY-MM-DD') : null;
+
     props.updateTransactions(
       props.projectId,
       values.timezone,
       values.frequencyType,
       ledgerSummaryType,
-      values.startDate,
-      values.endDate
+      startDate,
+      endDate
     );
   };
 
