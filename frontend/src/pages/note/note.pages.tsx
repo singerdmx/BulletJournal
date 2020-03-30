@@ -1,3 +1,4 @@
+// page diplay contents of notes
 import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -29,23 +30,27 @@ interface NotePageHandler {
   addSelectedLabel: (label: Label) => void;
 }
 
+// get icons by string name
+const getIcon = (icon: string) => {
+  let res = icons.filter(item => item.name === icon);
+  return res.length > 0 ? res[0].icon : <TagOutlined />;
+};
+
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { note } = props;
+  // get id of note from oruter
   const { noteId } = useParams();
+  // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
+  // hook history in router
   const history = useHistory();
-
+  // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
     console.log(label);
     props.addSelectedLabel(label);
     history.push('/labels/search');
   };
-
-  const getIcon = (icon: string) => {
-    let res = icons.filter(item => item.name === icon);
-    return res.length > 0 ? res[0].icon : <TagOutlined />;
-  };
-
+  // listening on the empty state working as componentDidmount
   React.useEffect(() => {
     noteId && props.getNote(parseInt(noteId));
   }, []);
