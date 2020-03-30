@@ -39,12 +39,7 @@ zones.sort((a, b) => {
 
 type TransactionProps = {
   projectId: number;
-  transactionTimezone: string;
-  frequencyType: string;
   timezone: string;
-  startDate: string;
-  endDate: string;
-  ledgerSummaryType: string;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
     projectId: number,
@@ -62,16 +57,16 @@ const TransactionProject: React.FC<TransactionProps> = props => {
   const updateTransactions = (values: any) => {
     console.log('hellpo');
     console.log(values);
-    props.updateTransactions(
-      props.projectId,
-      props.timezone
-        ? props.timezone
-        : Intl.DateTimeFormat().resolvedOptions().timeZone,
-      props.frequencyType,
-      props.ledgerSummaryType,
-      props.startDate,
-      props.endDate
-    );
+    // props.updateTransactions(
+    //   props.projectId,
+    //   props.timezone
+    //     ? props.timezone
+    //     : Intl.DateTimeFormat().resolvedOptions().timeZone,
+    //   props.frequencyType,
+    //   props.ledgerSummaryType,
+    //   props.startDate,
+    //   props.endDate
+    // );
   };
 
   useEffect(() => {

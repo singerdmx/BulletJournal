@@ -36,9 +36,6 @@ export type GetTransaction = {
 
 export type TransactionsAction = {
   ledgerSummary: LedgerSummary;
-  timezone: string;
-  frequencyType: string;
-  ledgerSummaryType: string;
 };
 
 export type TransactionAction = {
@@ -83,7 +80,8 @@ export type SetTransactionLabels = {
 };
 
 let initialState = {
-  ledgerSummary: {} as LedgerSummary,
+    transaction: {} as Transaction,
+    ledgerSummary: {} as LedgerSummary,
   addTransactionVisible: false
 };
 
@@ -95,22 +93,8 @@ const slice = createSlice({
       state,
       action: PayloadAction<TransactionsAction>
     ) => {
-      const {
-        ledgerSummary,
-        frequencyType,
-        ledgerSummaryType,
-        timezone
-      } = action.payload;
-      state.transactions = ledgerSummary.transactions;
-      state.startDate = ledgerSummary.startDate;
-      state.endDate = ledgerSummary.endDate;
-      state.expense = ledgerSummary.expense;
-      state.income = ledgerSummary.income;
-      state.balance = ledgerSummary.balance;
-      state.transactionsSummaries = ledgerSummary.transactionsSummaries;
-      state.frequencyType = frequencyType;
-      state.ledgerSummaryType = ledgerSummaryType;
-      state.timezone = timezone;
+      const { ledgerSummary } = action.payload;
+      state.ledgerSummary = ledgerSummary;
     },
     transactionReceived: (state, action: PayloadAction<TransactionAction>) => {
       const { transaction } = action.payload;

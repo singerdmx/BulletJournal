@@ -89,16 +89,6 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
     );
     const state: IState = yield select();
     const transaction = state.transaction;
-    yield put(
-      updateTransactions(
-        projectId,
-        timezone,
-        transaction.frequencyType,
-        transaction.ledgerSummaryType,
-        transaction.startDate,
-        transaction.endDate
-      )
-    );
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
   }
