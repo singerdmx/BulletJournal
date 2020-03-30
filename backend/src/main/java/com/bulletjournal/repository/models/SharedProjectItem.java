@@ -21,11 +21,15 @@ public class SharedProjectItem extends AuditModel {
     @Column
     private String username;
 
+    @Column
+    private boolean readOnly;
+
     public SharedProjectItem() {
     }
 
-    public SharedProjectItem(String username) {
+    public SharedProjectItem(String username, boolean readOnly) {
         this.username = username;
+        this.readOnly = readOnly;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -93,5 +97,13 @@ public class SharedProjectItem extends AuditModel {
 
     public boolean hasTransaction() {
         return this.transaction != null;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 }

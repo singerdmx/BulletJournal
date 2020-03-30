@@ -68,7 +68,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         ProjectType projectType = ProjectType.getType(projectItem.getProject().getType());
-        this.sharedProjectItemDaoJpa.save(projectType, projectItem, users);
+        this.sharedProjectItemDaoJpa.save(projectType, projectItem, users, shareProjectItemParams.isReadOnly());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

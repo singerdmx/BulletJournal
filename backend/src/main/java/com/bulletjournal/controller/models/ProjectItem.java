@@ -29,6 +29,8 @@ public class ProjectItem {
 
     protected Long updatedAt;
 
+    protected boolean readOnly;
+
     public ProjectItem() {
     }
 
@@ -95,6 +97,14 @@ public class ProjectItem {
 
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 
     @Override
