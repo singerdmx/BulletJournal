@@ -1,24 +1,22 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import {
-  DeleteTwoTone,
-  TagOutlined,
-  MoreOutlined,
-  SnippetsOutlined
-} from '@ant-design/icons';
-import { Popconfirm, Popover, Tag, Tooltip, Avatar, List } from 'antd';
+import {connect} from 'react-redux';
+import {Avatar} from 'antd';
 
-import { Transaction } from '../../features/transactions/interface';
-import { icons } from '../../assets/icons';
+import {Transaction} from '../../features/transactions/interface';
 
 type TransactionProps = {
   transaction: Transaction;
 };
 
 const TransactionItem: React.FC<TransactionProps> = props => {
-  const { transaction } = props;
+  const {transaction} = props;
 
-  return <div>{transaction.owner}</div>;
+  return <div>
+    <span><Avatar size='small' src={transaction.ownerAvatar}/></span>
+    <div>{transaction.owner}</div>
+    <span><Avatar size='small' src={transaction.payerAvatar}/></span>
+    <div>{transaction.payer}</div>
+  </div>;
 };
 
 export default connect(null, {})(TransactionItem);
