@@ -3,37 +3,36 @@ import React from 'react';
 import { Form, Button } from 'antd';
 import { connect } from 'react-redux';
 import BraftEditor from 'braft-editor';
-import { Note } from '../../features/notes/interface';
-import {
-  updateNoteContents,
-  createContent
-} from '../../features/notes/actions';
+import { createContent } from '../../features/notes/actions';
+import { Content } from '../../features/myBuJo/interface';
 
 type NoteEditorProps = {
-  note: Note;
+  noteId: number;
+  content?: Content;
+  createOrEdit: string;
 };
 
 interface NoteEditorHandler {
-  updateNoteContents: (noteId: number) => void;
   createContent: (noteId: number, text: string) => void;
 }
 
 const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
-  note,
-  updateNoteContents,
-  createContent
+  noteId,
+  content,
+  createContent,
+  createOrEdit
 }) => {
   // get hook of form from ant form
   const [form] = Form.useForm();
 
   const handleFormSubmit = () => {
-    // form.validateFields().then(values => {
-    //   if (note.content) {
-    //     updateNoteContents()
-    //   } else {
-    //     createContent(values.noteContent)
-    //   }
-    // })
+    if (createOrEdit === 'create') {
+      form.validateFields().then(values => {
+        createContent(noteId, values.noteContent.toRAW());
+      });
+    } else {
+      return;
+    }
   };
   return (
     <Form form={form} onFinish={handleFormSubmit}>
@@ -42,11 +41,11 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">
-          Update
+          {createOrEdit.toLocaleUpperCase()}
         </Button>
       </Form.Item>
     </Form>
   );
 };
 
-export default connect(null, { createContent, updateNoteContents })(NoteEditor);
+export default connect(null, { createContent })(NoteEditor);
