@@ -18,7 +18,7 @@ public class LedgerSummaryCalculator {
 
     public LedgerSummary getLedgerSummary(
             LedgerSummaryType ledgerSummaryType,
-            ZonedDateTime startTime, ZonedDateTime endTime, List<Transaction> transactions) {
+            ZonedDateTime startTime, ZonedDateTime endTime, List<Transaction> transactions, FrequencyType frequencyType) {
         final LedgerSummary ledgerSummary = new LedgerSummary(transactions,
                 ZonedDateTimeHelper.getDate(startTime),
                 ZonedDateTimeHelper.getDate(endTime));
@@ -27,6 +27,38 @@ public class LedgerSummaryCalculator {
         Map<String, Transactions> m = new HashMap<>();
         switch (ledgerSummaryType) {
             case DEFAULT:
+
+                switch (frequencyType) {
+                    case MONTHLY:
+                        // transactions, month
+                        Map<Transaction, String> transactionMonthMap = new HashMap<>();
+//                        int startmonth = startTime.getMonthValue();
+//                        int endmonth = endTime.getMonthValue();
+                        for (Transaction t : transactions) {
+                            String month = t.getDate().substring(5, 7);
+                            transactionMonthMap.put(t, month);
+                        }
+
+                        processTransaction(transactions, total, (t -> {
+                            double amount = t.getAmount();
+                            Transactions tran = m.computeIfAbsent(transactionMonthMap.get(t), k -> new Transactions());
+                            switch (TransactionType.getType(t.getTransactionType())) {
+                                case INCOME:
+                                    tran.addIncome(amount);
+                                    break;
+                                case EXPENSE:
+                                    tran.addExpense(amount);
+                                    break;
+                            }
+                        }));
+                        break;
+                    case YEARLY:
+                        break;
+                    case WEEKLY:
+                        break;
+                }
+
+
                 break;
             case LABEL:
                 processTransaction(transactions, total, (t -> {
@@ -78,7 +110,7 @@ public class LedgerSummaryCalculator {
                     v.getExpense(),
                     Math.round(v.getExpense() * 100 / total.totalExpense * 100.0) / 100.0,
                     balance,
-                    balance * 100 / ledgerSummary.getBalance()
+                    Math.round(balance * 100 / ledgerSummary.getBalance() * 100.0) / 100.0
             ));
         });
         ledgerSummary.setTransactionsSummaries(transactionsSummaries);

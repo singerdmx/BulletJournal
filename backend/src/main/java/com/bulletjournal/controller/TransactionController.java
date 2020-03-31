@@ -79,7 +79,7 @@ public class TransactionController {
         responseHeader.setETag(transactionsEtag);
 
         final LedgerSummary ledgerSummary = this.ledgerSummaryCalculator.getLedgerSummary(
-                ledgerSummaryType, startTime, endTime, transactions);
+                ledgerSummaryType, startTime, endTime, transactions, frequencyType);
 
         return ResponseEntity.ok().headers(responseHeader).body(ledgerSummary);
     }

@@ -151,6 +151,42 @@ public class TransactionControllerTest {
         assertTrue(Math.abs(summaryInOrder.get(0).getIncomePercentage() - 78.57) < 1e-4);
         assertTrue(Math.abs(summaryInOrder.get(0).getExpensePercentage() - 71.43) < 1e-4);
 
+        // get transactions default (MONTHLY)
+        // wat bout different year same month?
+        Transaction t6 = createTransaction(p1, "T6", "2019-11-28", "BulletJournal", 250.0, 1);
+        Transaction t7 = createTransaction(p1, "T7", "2019-10-28", "999999", 700.0, 0);
+        Transaction t8 = createTransaction(p1, "T8", "2019-09-28", "mqm", 300.0, 1);
+        Transaction t9 = createTransaction(p1, "T9", "2019-09-18", "mqm", 100.0, 1);
+//        Transaction t10 = createTransaction(p1, "T10", "2018-09-28", "BulletJournal", 200.0, 0);
+
+        url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.MONTHLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
+                .queryParam("startDate", "2019-09-01")
+                .queryParam("endDate", "2019-12-14")
+                .buildAndExpand(p1.getId()).toUriString();
+        transactionsResponse = this.restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                LedgerSummary.class);
+
+        transactions = transactionsResponse.getBody().getTransactions();
+        summary = transactionsResponse.getBody();
+        transactionsSummaries = summary.getTransactionsSummaries();
+        summaryInOrder = new ArrayList<>(transactionsSummaries);
+        Collections.sort(summaryInOrder, new CustomComparator());
+        assertTrue(Math.abs(summary.getBalance() - 550.0) < 1e-4);
+        assertTrue(Math.abs(summary.getIncome() - 1700.0) < 1e-4);
+        assertEquals(6, summary.getTransactions().size());
+        assertEquals(Double.valueOf("-400.0"), summaryInOrder.get(0).getBalance());
+        assertTrue(Math.abs(summaryInOrder.get(1).getIncomePercentage() - 41.18) < 1e-4);
+        assertTrue(Math.abs(summaryInOrder.get(0).getExpensePercentage() - 34.78) < 1e-4);
+        assertEquals((Double) 0.0, summaryInOrder.get(0).getIncomePercentage());
+
+
     }
 
     private Group createGroup() {
