@@ -59,7 +59,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   };
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
-    props.getNote(parseInt(noteId));
+    noteId && props.getNote(parseInt(noteId));
   }, [noteId]);
 
   const createHandler = () => {
