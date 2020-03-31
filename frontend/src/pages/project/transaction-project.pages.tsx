@@ -8,13 +8,16 @@ import {
   Tooltip,
   Select,
   Button,
-  Form
+  Form,
+  List
 } from 'antd';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
 import { zones } from '../../components/settings/constants';
 import { updateTransactions } from '../../features/transactions/actions';
 import { updateExpandedMyself } from '../../features/myself/actions';
+import { LedgerSummary, Transaction } from '../../features/transactions/interface';
+import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 
 const { RangePicker } = DatePicker;
@@ -39,6 +42,7 @@ const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL', 'TIMELINE'];
 type TransactionProps = {
   projectId: number;
   timezone: string;
+  ledgerSummary: LedgerSummary;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
     projectId: number,
@@ -79,6 +83,8 @@ const TransactionProject: React.FC<TransactionProps> = props => {
       ''
     );
   }, []);
+
+  const { transactions = [] } = props.ledgerSummary;
 
   return (
     <div className='transaction-page'>
@@ -152,14 +158,17 @@ const TransactionProject: React.FC<TransactionProps> = props => {
           </Button>
         </Form>
       </div>
-      <div className='transaction-list'></div>
+      <List className='transaction-list'>
+        {transactions.map(item=><TransactionItem transaction={item}/>)}
+      </List>
     </div>
   );
 };
 
 const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
-  timezone: state.settings.timezone
+  timezone: state.settings.timezone,
+  ledgerSummary: state.transaction.ledgerSummary
 });
 
 export default connect(mapStateToProps, {
