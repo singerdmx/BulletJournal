@@ -25,7 +25,7 @@ const NoteContentList: React.FC<NoteContentListProps> = ({
     <List>
       {contents &&
         contents.map(content => (
-          <NoteContentItem key={content.id} content={content} />
+          <NoteContentItem noteId={noteId} key={content.id} content={content} />
         ))}
     </List>
   );

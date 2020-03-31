@@ -25,7 +25,9 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
   // get hook of form from ant form
   const [form] = Form.useForm();
   const isEdit = !!content;
-
+  const defaultEditorState = BraftEditor.createEditorState(
+    content ? content.text : null
+  );
   const handleFormSubmit = () => {
     if (!isEdit) {
       form.validateFields().then(async values => {
@@ -37,7 +39,11 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
     }
   };
   return (
-    <Form form={form} onFinish={handleFormSubmit}>
+    <Form
+      form={form}
+      onFinish={handleFormSubmit}
+      initialValues={{ noteContent: defaultEditorState }}
+    >
       <Form.Item name="noteContent">
         <BraftEditor language="en" className="note-editor" />
       </Form.Item>

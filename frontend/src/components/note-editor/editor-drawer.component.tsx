@@ -26,7 +26,7 @@ const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
     <Drawer
       onClose={() => setVisible(false)}
       visible={visible}
-      width="500"
+      width="700"
       destroyOnClose
       closable={false}
     >
