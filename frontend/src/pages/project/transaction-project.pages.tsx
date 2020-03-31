@@ -47,11 +47,7 @@ type TransactionProps = {
   projectId: number;
   timezone: string;
   ledgerSummary: LedgerSummary;
-  balance: number;
-  income: number;
-  expense: number;
-  startDate: string;
-  endDate: string;
+
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
     projectId: number,
@@ -66,7 +62,7 @@ type TransactionProps = {
 const TransactionProject: React.FC<TransactionProps> = props => {
   const [form] = Form.useForm();
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
-  const { balance, income, expense, startDate, endDate } = props;
+  const { balance, income, expense, startDate, endDate } = props.ledgerSummary;
 
   const updateTransactions = (
     values: any,
@@ -118,43 +114,43 @@ const TransactionProject: React.FC<TransactionProps> = props => {
         >
           <div className='transaction-number'>
             <LedgerSummaries
+              title={''}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[0]}
           </div>
           <div className='transaction-static'>
             <LedgerSummaries
+              title={'By Payer'}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[1]}
           </div>
           <div className='transaction-static'>
             <LedgerSummaries
+              title={'By Label'}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[2]}
           </div>
           <div className='transaction-static'>
             <LedgerSummaries
+              title={'By Timeline'}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[3]}
           </div>
           {/* maybe others? */}
         </Carousel>
@@ -228,12 +224,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
 const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
   timezone: state.settings.timezone,
-  ledgerSummary: state.transaction.ledgerSummary,
-  balance: state.transaction.ledgerSummary.balance,
-  income: state.transaction.ledgerSummary.income,
-  expense: state.transaction.ledgerSummary.expense,
-  startDate: state.transaction.ledgerSummary.startDate,
-  endDate: state.transaction.ledgerSummary.endDate
+  ledgerSummary: state.transaction.ledgerSummary
 });
 
 export default connect(mapStateToProps, {
