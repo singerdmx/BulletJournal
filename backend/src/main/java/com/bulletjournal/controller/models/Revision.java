@@ -11,27 +11,31 @@ public class Revision {
     @NotNull
     private Integer id;
 
-    @NotNull
     private String diff;
 
     @NotNull
     private Long createdAt;
 
+    @NotNull
+    private String user;
+
     public Revision() {
+
     }
 
-    public Revision(@NotNull Integer id, @NotNull String diff, @NotNull Long createdAt) {
+    public Revision(@NotNull Integer id, String diff, @NotNull Long createdAt, @NotNull String username) {
         this.id = id;
         this.diff = diff;
         this.createdAt = createdAt;
+        this.user = username;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getDiff() {
@@ -48,5 +52,13 @@ public class Revision {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

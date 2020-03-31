@@ -9,12 +9,14 @@ import { Tooltip, Tag, Avatar, Divider, Drawer, Button } from 'antd';
 import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { icons } from '../../assets/icons/index';
+import { updateNoteContents } from '../../features/notes/actions';
 
 import {
   TagOutlined,
   ShareAltOutlined,
   DeleteOutlined,
-  RightCircleOutlined
+  RightCircleOutlined,
+  PlusCircleTwoTone
 } from '@ant-design/icons';
 
 import './note-page.styles.less';
@@ -28,6 +30,7 @@ type NoteProps = {
 interface NotePageHandler {
   getNote: (noteId: number) => void;
   addSelectedLabel: (label: Label) => void;
+  updateNoteContents: (noteId: number) => void;
 }
 
 // get icons by string name
@@ -42,6 +45,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { noteId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
+  // eidt or update
+  const [createOrEdit, setCOE] = useState('create');
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -53,7 +58,13 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
     noteId && props.getNote(parseInt(noteId));
+    noteId && props.updateNoteContents(parseInt(noteId));
   }, []);
+
+  const createHandler = () => {
+    createOrEdit === 'update' && setCOE('create');
+    setEditorShow(true);
+  };
 
   return (
     <div className="note-page">
@@ -107,7 +118,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
       </div>
       <Divider />
       <div className="content">
-        <Button onClick={() => setEditorShow(true)}>Edit</Button>
+        <Button onClick={createHandler}>
+          <PlusCircleTwoTone />
+          New Note
+        </Button>
       </div>
       <div className="note-drawer">
         <Drawer
@@ -117,20 +131,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           height="600"
           destroyOnClose
           closable={false}
-          title={
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <h3>Edit</h3>
-              <Button type="primary">Update</Button>
-            </div>
-          }
         >
-          <NoteEditor note={note} />
+          <NoteEditor createOrEdit={createOrEdit} noteId={note.id} />
         </Drawer>
       </div>
     </div>
@@ -141,6 +143,8 @@ const mapStateToProps = (state: IState) => ({
   note: state.note.note
 });
 
-export default connect(mapStateToProps, { getNote, addSelectedLabel })(
-  NotePage
-);
+export default connect(mapStateToProps, {
+  getNote,
+  addSelectedLabel,
+  updateNoteContents
+})(NotePage);
