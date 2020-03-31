@@ -1,16 +1,19 @@
 // page diplay contents of notes
+// react imports
 import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
+// features
 import { getNote } from '../../features/notes/actions';
-import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
-import { Tooltip, Tag, Avatar, Divider, Drawer, Button } from 'antd';
 import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
-import { icons } from '../../assets/icons/index';
-import { updateNoteContents } from '../../features/notes/actions';
-
+import { IState } from '../../store';
+// compoennts
+import NoteEditor from '../../components/note-editor/note-editor.component';
+import NoteContentList from '../../components/note-content/content-list.component';
+// antd imports
+import { Tooltip, Tag, Avatar, Divider, Drawer, Button } from 'antd';
 import {
   TagOutlined,
   ShareAltOutlined,
@@ -19,9 +22,9 @@ import {
   PlusCircleTwoTone
 } from '@ant-design/icons';
 
+import { icons } from '../../assets/icons/index';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
-import NoteEditor from '../../components/note-editor/note-editor.component';
 
 type NoteProps = {
   note: Note;
@@ -30,7 +33,6 @@ type NoteProps = {
 interface NotePageHandler {
   getNote: (noteId: number) => void;
   addSelectedLabel: (label: Label) => void;
-  updateNoteContents: (noteId: number) => void;
 }
 
 // get icons by string name
@@ -57,9 +59,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   };
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
-    noteId && props.getNote(parseInt(noteId));
-    noteId && props.updateNoteContents(parseInt(noteId));
-  }, []);
+    props.getNote(parseInt(noteId));
+  }, [noteId]);
 
   const createHandler = () => {
     createOrEdit === 'update' && setCOE('create');
@@ -118,9 +119,12 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
       </div>
       <Divider />
       <div className="content">
+        <div className="content-list">
+          <NoteContentList noteId={note.id} />
+        </div>
         <Button onClick={createHandler}>
           <PlusCircleTwoTone />
-          New Note
+          New
         </Button>
       </div>
       <div className="note-drawer">
@@ -145,6 +149,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   getNote,
-  addSelectedLabel,
-  updateNoteContents
+  addSelectedLabel
 })(NotePage);
