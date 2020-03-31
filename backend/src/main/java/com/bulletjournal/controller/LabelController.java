@@ -37,25 +37,26 @@ public class LabelController {
     @Autowired
     private UserClient userClient;
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(LABELS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Label createLabel(@Valid @RequestBody CreateLabelParams label) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return labelDaoJpa.create(label.getValue(), username, label.getIcon()).toPresentationModel();
     }
-
-    @PatchMapping(LABEL_ROUTE)
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PatchMapping(LABELS_ROUTE)
     public Label updateLabel(@NotNull @PathVariable Long labelId,
                              @Valid @RequestBody UpdateLabelParams updateLabelParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return labelDaoJpa.partialUpdate(username, labelId, updateLabelParams).toPresentationModel();
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(LABEL_ROUTE)
     public Label getLabel(@NotNull @PathVariable Long labelId) {
         return this.labelDaoJpa.getLabel(labelId).toPresentationModel();
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(LABELS_ROUTE)
     public ResponseEntity<List<Label>> getLabels() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -70,14 +71,14 @@ public class LabelController {
         responseHeader.setETag(labelsEtag);
         return ResponseEntity.ok().headers(responseHeader).body(labels);
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping(LABEL_ROUTE)
     public ResponseEntity<?> deleteLabel(@PathVariable Long labelId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.labelDaoJpa.delete(username, labelId);
         return ResponseEntity.ok().build();
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(ITEMS_ROUTE)
     public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

@@ -12,7 +12,7 @@ export const fetchProjectItems = (
 
   // e.g. "/api/projectItems?types=TODO&types=LEDGER&timezone=America%2FLos_Angeles"
   return doFetch(
-    '/api/projectItems?' +
+    'http://localhost:8081/api/projectItems?' +
       projectTypes.map(p => `types=${p}`).join('&') +
       '&timezone=' +
       encodeURIComponent(timezone) +

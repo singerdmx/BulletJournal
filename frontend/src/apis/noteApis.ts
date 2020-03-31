@@ -2,7 +2,7 @@ import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
 import { Note } from '../features/notes/interface';
 
 export const fetchNotes = (projectId: number) => {
-  return doFetch(`/api/projects/${projectId}/notes`)
+  return doFetch(`http://localhost:8081/api/projects/${projectId}/notes`)
     .then(res => res)
     .catch(err => {
       throw Error(err.message);
@@ -10,7 +10,7 @@ export const fetchNotes = (projectId: number) => {
 };
 
 export const getNoteById = (noteId: number) => {
-  return doFetch(`/api/notes/${noteId}`)
+  return doFetch(`http://localhost:8081/api/notes/${noteId}`)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -18,7 +18,7 @@ export const getNoteById = (noteId: number) => {
 };
 
 export const deleteNoteById = (noteId: number) => {
-    return doDelete(`/api/notes/${noteId}`)
+    return doDelete(`http://localhost:8081/api/notes/${noteId}`)
         .then(res => res)
         .catch(err => {
             throw Error(err.message);
@@ -29,7 +29,7 @@ export const createNote = (projectId: number, name: string) => {
   const postBody = JSON.stringify({
     name: name,
   });
-  return doPost(`/api/projects/${projectId}/notes`, postBody)
+  return doPost(`http://localhost:8081/api/projects/${projectId}/notes`, postBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -38,7 +38,7 @@ export const createNote = (projectId: number, name: string) => {
 
 export const putNotes = (projectId: number, notes: Note[]) => {
   const putBody = JSON.stringify(notes);
-  return doPut(`/api/projects/${projectId}/notes`, putBody)
+  return doPut(`http://localhost:8081/api/projects/${projectId}/notes`, putBody)
     .catch(err => {
       throw Error(err.message);
     });
@@ -51,7 +51,7 @@ export const updateNote = (
   const patchBody = JSON.stringify({
     name: name
   });
-  return doPatch(`/api/notes/${noteId}`, patchBody)
+  return doPatch(`http://localhost:8081/api/notes/${noteId}`, patchBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err);
@@ -60,7 +60,7 @@ export const updateNote = (
 
 export const setNoteLabels = (noteId: number, labels: number[]) => {
   const putBody = JSON.stringify(labels);
-  return doPut(`/api/notes/{noteId}/setLabels`, putBody)
+  return doPut(`http://localhost:8081/api/notes/{noteId}/setLabels`, putBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);

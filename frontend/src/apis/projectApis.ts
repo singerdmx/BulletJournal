@@ -2,7 +2,7 @@ import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
 import { Project } from '../features/project/interface';
 
 export const fetchProjects = () => {
-  return doFetch('/api/projects')
+  return doFetch("http://localhost:8081/api/projects")
     .then(res => res)
     .catch(err => {
       throw Error(err.message);
@@ -10,7 +10,7 @@ export const fetchProjects = () => {
 };
 
 export const getProject = (projectId: number) => {
-  return doFetch(`/api/projects/${projectId}`)
+  return doFetch(`http://localhost:8081/api/projects/${projectId}`)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -29,7 +29,7 @@ export const createProject = (
     projectType: projectType,
     groupId: groupId
   });
-  return doPost('/api/projects', postBody)
+  return doPost('http://localhost:8081/api/projects', postBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -42,14 +42,14 @@ export const updateSharedProjectsOrder = (projectOwners: string[]) => {
   });
   console.log(postBody);
 
-  return doPost('/api/updateSharedProjectsOrder', postBody)
+  return doPost('http://localhost:8081/api/updateSharedProjectsOrder', postBody)
     .catch(err => {
       throw Error(err.message);
     });
 };
 
 export const deleteProject = (projectId: number) => {
-  return doDelete(`/api/projects/${projectId}`).catch(err => {
+  return doDelete(`http://localhost:8081/api/projects/${projectId}`).catch(err => {
     throw Error(err);
   });
 };
@@ -65,7 +65,7 @@ export const updateProject = (
     groupId: groupId,
     name: name
   });
-  return doPatch(`/api/projects/${projectId}`, patchBody)
+  return doPatch(`http://localhost:8081/api/projects/${projectId}`, patchBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -74,8 +74,11 @@ export const updateProject = (
 
 export const updateProjectRelations = (projects: Project[]) => {
   const putBody = JSON.stringify(projects);
-  return doPut('/api/projects', putBody)
-    .then(res => res)
+  return doPut('http://localhost:8081/api/projects', putBody)
+    .then(res => {
+      return res;
+      console.log("updateProjectRelations -> res", res)
+    })
     .catch(err => {
       throw Error(err.message);
     });

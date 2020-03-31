@@ -48,7 +48,7 @@ public class NotificationController {
 
     @Autowired
     private GroupRepository groupRepository;
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(NOTIFICATIONS_ROUTE)
     public ResponseEntity<List<Notification>> getNotification() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -63,7 +63,7 @@ public class NotificationController {
 
         return ResponseEntity.ok().headers(responseHeader).body(notificationList);
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(ANSWER_NOTIFICATION_ROUTE)
     public ResponseEntity<?> answerNotification(
             @NotNull @PathVariable Long notificationId,

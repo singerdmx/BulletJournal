@@ -10,6 +10,7 @@ import { Popconfirm, Popover, Tag, Tooltip, Avatar, List } from 'antd';
 
 import { Transaction } from '../../features/transactions/interface';
 import { icons } from '../../assets/icons';
+import Item from 'antd/lib/list/Item';
 
 type TransactionProps = {
     transaction: Transaction;
@@ -19,7 +20,12 @@ const TransactionItem: React.FC<TransactionProps> = props => {
   const { transaction } = props;
 
   return (
-      <div>{transaction.owner}</div>
+    <List.Item style={{ display: 'flex', width: '100%' }}>
+        <span><Avatar size='small' src={transaction.ownerAvatar}/></span>
+        <div>{transaction.owner}</div>
+        <span><Avatar size='small' src={transaction.payerAvatar}/></span>
+        <div>{transaction.payer}</div>
+    </List.Item>
   );
 };
 

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -51,6 +52,7 @@ public class ProjectItemController {
     @Autowired
     private UserClient userClient;
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
     public List<ProjectItems> getProjectItems(
