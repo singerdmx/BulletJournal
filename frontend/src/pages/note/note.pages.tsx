@@ -10,10 +10,10 @@ import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 // compoennts
-import NoteEditor from '../../components/note-editor/note-editor.component';
+import NoteEditorDrawer from '../../components/note-editor/editor-drawer.component';
 import NoteContentList from '../../components/note-content/content-list.component';
 // antd imports
-import { Tooltip, Tag, Avatar, Divider, Drawer, Button } from 'antd';
+import { Tooltip, Tag, Avatar, Divider, Button } from 'antd';
 import {
   TagOutlined,
   ShareAltOutlined,
@@ -47,8 +47,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { noteId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
-  // eidt or update
-  const [createOrEdit, setCOE] = useState('create');
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -61,9 +59,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   React.useEffect(() => {
     noteId && props.getNote(parseInt(noteId));
   }, [noteId]);
-
+  // show drawer
   const createHandler = () => {
-    createOrEdit === 'update' && setCOE('create');
     setEditorShow(true);
   };
 
@@ -128,16 +125,11 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </Button>
       </div>
       <div className="note-drawer">
-        <Drawer
-          onClose={() => setEditorShow(false)}
+        <NoteEditorDrawer
+          noteId={note.id}
           visible={showEditor}
-          placement="bottom"
-          height="600"
-          destroyOnClose
-          closable={false}
-        >
-          <NoteEditor createOrEdit={createOrEdit} noteId={note.id} />
-        </Drawer>
+          setVisible={setEditorShow}
+        />
       </div>
     </div>
   );

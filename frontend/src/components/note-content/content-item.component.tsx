@@ -1,5 +1,5 @@
 import React from 'react';
-import { List } from 'antd';
+import { List, Button } from 'antd';
 import { Content } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
 
@@ -15,6 +15,7 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content }) => {
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
         : contentText}
+      <Button type="link">More</Button>
     </List.Item>
   );
 };

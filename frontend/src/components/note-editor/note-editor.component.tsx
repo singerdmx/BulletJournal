@@ -9,26 +9,28 @@ import { Content } from '../../features/myBuJo/interface';
 type NoteEditorProps = {
   noteId: number;
   content?: Content;
-  createOrEdit: string;
 };
 
 interface NoteEditorHandler {
   createContent: (noteId: number, text: string) => void;
+  afterFinish: () => void;
 }
 
 const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
   noteId,
   content,
   createContent,
-  createOrEdit
+  afterFinish
 }) => {
   // get hook of form from ant form
   const [form] = Form.useForm();
+  const isEdit = !!content;
 
   const handleFormSubmit = () => {
-    if (createOrEdit === 'create') {
-      form.validateFields().then(values => {
-        createContent(noteId, values.noteContent.toRAW());
+    if (!isEdit) {
+      form.validateFields().then(async values => {
+        await createContent(noteId, values.noteContent.toRAW());
+        afterFinish();
       });
     } else {
       return;
@@ -41,7 +43,7 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">
-          {createOrEdit.toLocaleUpperCase()}
+          {isEdit ? 'Update' : 'Create'}
         </Button>
       </Form.Item>
     </Form>
