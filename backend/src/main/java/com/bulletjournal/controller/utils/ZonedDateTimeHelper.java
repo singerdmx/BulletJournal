@@ -3,6 +3,7 @@ package com.bulletjournal.controller.utils;
 import com.bulletjournal.ledger.FrequencyType;
 import org.dmfs.rfc5545.DateTime;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -42,6 +43,13 @@ public class ZonedDateTimeHelper {
      */
     private static String getDateTime(String date, String time) {
         return date + DATE_TIME_DELIMITER + time;
+    }
+
+    /*
+     * Return Timestamp type from ZonedDateTime
+     */
+    public static Timestamp getTimestamp(ZonedDateTime dateTime) {
+        return Timestamp.from(dateTime.toInstant());
     }
 
     /*

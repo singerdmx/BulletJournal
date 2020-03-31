@@ -170,6 +170,10 @@ public abstract class TaskModel extends ProjectItemModel {
         this.reminderDateTime = reminderDateTime;
     }
 
+    public ReminderSetting getReminderSetting() {
+        return new ReminderSetting(this.getReminderDate(), this.getReminderTime(), this.getReminderBeforeTask());
+    }
+
     public void setReminderSetting(ReminderSetting reminderSetting) {
         Preconditions.checkNotNull(reminderSetting, "ReminderSetting cannot be null");
         Preconditions.checkNotNull(this.getTimezone(), "Timezone cannot be null");
