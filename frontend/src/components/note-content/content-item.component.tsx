@@ -23,9 +23,11 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
         : contentText}
+
       <Button type="link" onClick={handleDisplay}>
-        {'More'}
+        {contentText.length > 300 ? 'More' : 'Open'}
       </Button>
+
       <NoteEditorDrawer
         content={content}
         visible={displayMore}
