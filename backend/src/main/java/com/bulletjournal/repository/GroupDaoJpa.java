@@ -1,8 +1,8 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
-import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.AddUserGroupParams;
 import com.bulletjournal.controller.models.RemoveUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
@@ -10,7 +10,8 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.JoinGroupEvent;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
@@ -21,7 +22,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 

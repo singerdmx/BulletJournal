@@ -5,8 +5,6 @@ import com.bulletjournal.es.SearchService;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
-
-import com.bulletjournal.config.SpringESConfig;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -32,7 +30,7 @@ public class QueryController {
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
 
     @Qualifier("client")
-    @Autowired(required=false)
+    @Autowired(required = false)
     private RestHighLevelClient highLevelClient;
 
     @CrossOrigin(origins = "http://localhost:3000")

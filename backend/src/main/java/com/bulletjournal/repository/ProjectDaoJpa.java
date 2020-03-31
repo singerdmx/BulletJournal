@@ -1,20 +1,20 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
-import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
-import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,25 +28,19 @@ import java.util.stream.Collectors;
 @Repository
 public class ProjectDaoJpa {
 
+    private static final Gson GSON = new Gson();
     @Autowired
     private ProjectRepository projectRepository;
-
     @Autowired
     private GroupRepository groupRepository;
-
     @Autowired
     private UserProjectsRepository userProjectsRepository;
-
     @Autowired
     private UserDaoJpa userDaoJpa;
-
     @Autowired
     private AuthorizationService authorizationService;
-
     @Autowired
     private UserGroupRepository userGroupRepository;
-
-    private static final Gson GSON = new Gson();
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Projects getProjects(String owner) {

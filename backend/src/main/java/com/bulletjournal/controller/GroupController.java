@@ -23,15 +23,13 @@ import java.util.stream.Collectors;
 @RestController
 public class GroupController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
-
     protected static final String GROUPS_ROUTE = "/api/groups";
     protected static final String GROUP_ROUTE = "/api/groups/{groupId}";
     protected static final String ADD_USER_GROUPS_ROUTE = "/api/addUserGroups";
     protected static final String ADD_USER_GROUP_ROUTE = "/api/addUserGroup";
     protected static final String REMOVE_USER_GROUP_ROUTE = "/api/removeUserGroup";
     protected static final String REMOVE_USER_GROUPS_ROUTE = "/api/removeUserGroups";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
     @Autowired
     private GroupDaoJpa groupDaoJpa;
 

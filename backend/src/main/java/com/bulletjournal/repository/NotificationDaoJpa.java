@@ -18,13 +18,11 @@ import java.util.stream.Collectors;
 @Repository
 public class NotificationDaoJpa {
 
+    private static final Gson GSON = new Gson();
     @Autowired
     private NotificationRepository notificationRepository;
-
     @Autowired
     private UserClient userClient;
-
-    private static final Gson GSON = new Gson();
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
         List<Notification> notifications = this.notificationRepository.findByTargetUser(username);

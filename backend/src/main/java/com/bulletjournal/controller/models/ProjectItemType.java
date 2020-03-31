@@ -11,10 +11,6 @@ public enum ProjectItemType {
         this.value = value;
     }
 
-    public int getValue() {
-        return this.value;
-    }
-
     public static ProjectItemType getType(int type) {
         switch (type) {
             case 0:
@@ -26,5 +22,9 @@ public enum ProjectItemType {
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }

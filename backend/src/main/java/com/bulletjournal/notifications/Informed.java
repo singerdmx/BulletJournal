@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 public abstract class Informed {
     private static final Logger LOGGER = LoggerFactory.getLogger(Informed.class);
+    private static final Gson GSON = new Gson();
     private List<Event> events;
     private String originator;
-    private static final Gson GSON = new Gson();
 
     public Informed(Event event, String originator) {
         this.events = ImmutableList.of(event);

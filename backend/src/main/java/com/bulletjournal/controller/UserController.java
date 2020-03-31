@@ -16,9 +16,9 @@ import java.util.Objects;
 
 @RestController
 public class UserController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     public static final String MYSELF_ROUTE = "/api/myself";
     public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
 
     @Autowired

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
 
@@ -16,7 +15,7 @@ class ESConfig {
 
     @Bean
     @ConditionalOnProperty(
-            value="spring.elasticsearch.rest.enable",
+            value = "spring.elasticsearch.rest.enable",
             havingValue = "true",
             matchIfMissing = false)
     RestHighLevelClient client() {

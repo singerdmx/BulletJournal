@@ -152,7 +152,7 @@ public class NoteController {
 
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long noteId,
-                              @NotNull @PathVariable Long contentId) {
+                                       @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.deleteContent(contentId, noteId, username);
         return getContents(noteId);
@@ -160,8 +160,8 @@ public class NoteController {
 
     @PatchMapping(CONTENT_ROUTE)
     public List<Content> updateContent(@NotNull @PathVariable Long noteId,
-                              @NotNull @PathVariable Long contentId,
-                              @NotNull @RequestBody UpdateContentParams updateContentParams) {
+                                       @NotNull @PathVariable Long contentId,
+                                       @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams);
         return getContents(noteId);

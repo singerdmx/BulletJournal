@@ -101,12 +101,12 @@ public class Project {
         return subProjects;
     }
 
-    public void addSubProject(Project subProject) {
-        this.subProjects.add(subProject);
-    }
-
     public void setSubProjects(List<Project> subProjects) {
         this.subProjects = subProjects;
+    }
+
+    public void addSubProject(Project subProject) {
+        this.subProjects.add(subProject);
     }
 
     public String getDescription() {

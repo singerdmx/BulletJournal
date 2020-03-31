@@ -1,10 +1,7 @@
 package com.bulletjournal.clients;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.LinkedHashMap;
-import java.util.Optional;
-
+import com.bulletjournal.config.SSOConfig;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.RedisUserRepository;
@@ -19,13 +16,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.bulletjournal.config.SSOConfig;
-import com.bulletjournal.controller.models.User;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+import java.util.Optional;
 
 @Component
 public class UserClient {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserClient.class);
     public static final String USER_NAME_KEY = "discourse-user-name";
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserClient.class);
     private static final String AVATAR_SIZE = "75";
     private static final String THUMBNAIL_SIZE = "37";
     private static final String SIZE_HOLDER = "{size}";

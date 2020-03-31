@@ -22,11 +22,10 @@ import java.util.List;
 
 @RestController
 public class ProjectController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
     protected static final String PROJECTS_ROUTE = "/api/projects";
     protected static final String PROJECT_ROUTE = "/api/projects/{projectId}";
     protected static final String UPDATE_SHARED_PROJECTS_ORDER_ROUTE = "/api/updateSharedProjectsOrder";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
 

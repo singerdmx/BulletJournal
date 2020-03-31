@@ -34,6 +34,10 @@ public class TaskContent extends ContentModel<Task> {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public Task getProjectItem() {
         return getTask();
@@ -42,10 +46,6 @@ public class TaskContent extends ContentModel<Task> {
     @Override
     public void setProjectItem(Task projectItem) {
         this.setTask(projectItem);
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Task getTask() {

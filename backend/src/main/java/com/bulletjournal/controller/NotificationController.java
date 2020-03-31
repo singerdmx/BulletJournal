@@ -28,10 +28,9 @@ import java.util.List;
 
 @RestController
 public class NotificationController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationController.class);
     protected static final String NOTIFICATIONS_ROUTE = "/api/notifications";
     protected static final String ANSWER_NOTIFICATION_ROUTE = "/api/notifications/{notificationId}/answer";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationController.class);
     @Autowired
     private NotificationDaoJpa notificationDaoJpa;
 

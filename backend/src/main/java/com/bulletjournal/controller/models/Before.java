@@ -22,14 +22,6 @@ public enum Before {
         this.text = text;
     }
 
-    public int getValue() {
-        return this.value;
-    }
-
-    public String getText() {
-        return this.text;
-    }
-
     public static Before getType(int type) {
         switch (type) {
             case 0:
@@ -49,5 +41,13 @@ public enum Before {
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    public int getValue() {
+        return this.value;
+    }
+
+    public String getText() {
+        return this.text;
     }
 }

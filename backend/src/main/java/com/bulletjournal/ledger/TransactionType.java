@@ -12,14 +12,6 @@ public enum TransactionType {
         this.text = text;
     }
 
-    public int getValue() {
-        return this.value;
-    }
-
-    public String getText() {
-        return this.text;
-    }
-
     public static TransactionType getType(int type) {
         switch (type) {
             case 0:
@@ -29,5 +21,13 @@ public enum TransactionType {
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    public int getValue() {
+        return this.value;
+    }
+
+    public String getText() {
+        return this.text;
     }
 }

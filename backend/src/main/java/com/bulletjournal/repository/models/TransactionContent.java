@@ -34,6 +34,10 @@ public class TransactionContent extends ContentModel<Transaction> {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public Transaction getProjectItem() {
         return getTransaction();
@@ -42,10 +46,6 @@ public class TransactionContent extends ContentModel<Transaction> {
     @Override
     public void setProjectItem(Transaction projectItem) {
         this.setTransaction(projectItem);
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Transaction getTransaction() {

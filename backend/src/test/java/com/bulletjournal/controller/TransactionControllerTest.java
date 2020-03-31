@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
@@ -40,16 +39,6 @@ public class TransactionControllerTest {
     private static final String ROOT_URL = "http://localhost:";
 
     private static String TIMEZONE = "America/Los_Angeles";
-
-    private static class CustomComparator implements Comparator<TransactionsSummary> {
-
-        @Override
-        public int compare(TransactionsSummary t1, TransactionsSummary t2) {
-            return t1.getName().compareTo(t2.getName());
-        }
-    }
-
-
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
@@ -315,6 +304,14 @@ public class TransactionControllerTest {
         Label[] labelsCreated = response.getBody();
         assertEquals(5, labelsCreated.length);
         return labels;
+    }
+
+    private static class CustomComparator implements Comparator<TransactionsSummary> {
+
+        @Override
+        public int compare(TransactionsSummary t1, TransactionsSummary t2) {
+            return t1.getName().compareTo(t2.getName());
+        }
     }
 
 

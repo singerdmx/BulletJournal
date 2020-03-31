@@ -70,9 +70,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private com.bulletjournal.controller.models.Note addLabels(
             com.bulletjournal.controller.models.Note note, Map<Long, Note> notesMap) {
         List<com.bulletjournal.controller.models.Label> labels =
-               getLabelsToProjectItem(notesMap.get(note.getId()));
+                getLabelsToProjectItem(notesMap.get(note.getId()));
         note.setLabels(labels);
-        for (com.bulletjournal.controller.models.Note subNote: note.getSubNotes()) {
+        for (com.bulletjournal.controller.models.Note subNote : note.getSubNotes()) {
             addLabels(subNote, notesMap);
         }
         return note;

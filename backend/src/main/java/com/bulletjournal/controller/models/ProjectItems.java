@@ -30,6 +30,20 @@ public class ProjectItems {
     @NotNull
     private DayOfWeek dayOfWeek;
 
+    public static List<ProjectItems> addOwnerAvatar(
+            List<ProjectItems> projectItems, final UserClient userClient) {
+        projectItems.forEach(items -> {
+            items.getNotes().forEach(item -> addOwnerAvatar(item, userClient));
+            items.getTransactions().forEach(item -> addOwnerAvatar(item, userClient));
+            items.getTasks().forEach(item -> addOwnerAvatar(item, userClient));
+        });
+        return projectItems;
+    }
+
+    private static void addOwnerAvatar(ProjectItem projectItem, UserClient userClient) {
+        projectItem.setOwnerAvatar(userClient.getUser(projectItem.getOwner()).getAvatar());
+    }
+
     public List<Task> getTasks() {
         return tasks;
     }
@@ -68,19 +82,5 @@ public class ProjectItems {
 
     public void setDayOfWeek(DayOfWeek dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
-    }
-
-    public static List<ProjectItems> addOwnerAvatar(
-            List<ProjectItems> projectItems, final UserClient userClient) {
-        projectItems.forEach(items -> {
-            items.getNotes().forEach(item -> addOwnerAvatar(item, userClient));
-            items.getTransactions().forEach(item -> addOwnerAvatar(item, userClient));
-            items.getTasks().forEach(item -> addOwnerAvatar(item, userClient));
-        });
-        return projectItems;
-    }
-
-    private static void addOwnerAvatar(ProjectItem projectItem, UserClient userClient) {
-        projectItem.setOwnerAvatar(userClient.getUser(projectItem.getOwner()).getAvatar());
     }
 }

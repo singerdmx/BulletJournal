@@ -34,6 +34,10 @@ public class NoteContent extends ContentModel<Note> {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public Note getProjectItem() {
         return getNote();
@@ -42,10 +46,6 @@ public class NoteContent extends ContentModel<Note> {
     @Override
     public void setProjectItem(Note projectItem) {
         this.setNote(projectItem);
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Note getNote() {

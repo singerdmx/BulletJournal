@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 public class Group extends OwnedModel {
 
     public static final String DEFAULT_NAME = "Default";
-
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    Set<UserGroup> users = new HashSet<>();
     @Id
     @GeneratedValue(generator = "group_generator")
     @SequenceGenerator(
@@ -22,13 +23,8 @@ public class Group extends OwnedModel {
             initialValue = 100
     )
     private Long id;
-
     @Column(name = "default_group", nullable = false, updatable = false)
     private boolean defaultGroup = false;
-
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
-    Set<UserGroup> users = new HashSet<>();
-
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Project> projects = new ArrayList<>();
 

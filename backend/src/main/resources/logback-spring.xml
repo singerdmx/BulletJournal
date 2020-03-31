@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="LOGS" value="/var/log/bulletjournal" />
+    <property name="LOGS" value="/var/log/bulletjournal"/>
 
     <appender name="Console"
               class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %black(%d{ISO8601}) %blue%X{request-id} [%X{discourse-user-name}] %magenta([%t]) %highlight(%-5level) %yellow(%C{1.}): %msg%n%throwable
+                %black(%d{ISO8601}) %blue%X{request-id} [%X{discourse-user-name}] %magenta([%t]) %highlight(%-5level)
+                %yellow(%C{1.}): %msg%n%throwable
             </Pattern>
         </layout>
     </appender>
@@ -34,14 +35,14 @@
 
     <!-- LOG everything at INFO level -->
     <root level="info">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
+        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="Console"/>
     </root>
 
     <!-- LOG "com.baeldung*" at TRACE level -->
     <logger name="com.bulletjournal" level="trace" additivity="false">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
+        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="Console"/>
     </logger>
 
 </configuration>

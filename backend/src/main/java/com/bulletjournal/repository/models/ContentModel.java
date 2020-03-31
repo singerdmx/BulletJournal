@@ -10,19 +10,18 @@ import javax.validation.constraints.Size;
 @MappedSuperclass
 public abstract class ContentModel<T extends ProjectItemModel> extends AuditModel {
 
+    @NotBlank
+    @Size(min = 2, max = 100)
+    @Column(length = 100, nullable = false, updatable = false)
+    private String owner;
+    @Column(columnDefinition = "TEXT")
+    private String text;
+
     public abstract Long getId();
 
     public abstract T getProjectItem();
 
     public abstract void setProjectItem(T projectItem);
-
-    @NotBlank
-    @Size(min = 2, max = 100)
-    @Column(length = 100, nullable = false, updatable = false)
-    private String owner;
-
-    @Column(columnDefinition = "TEXT")
-    private String text;
 
     public String getText() {
         return text;

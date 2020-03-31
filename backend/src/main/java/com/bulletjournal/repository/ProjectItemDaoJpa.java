@@ -9,37 +9,35 @@ import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SetLabelEvent;
-import com.bulletjournal.repository.models.*;
-import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.StringUtils;
+import com.bulletjournal.repository.models.ContentModel;
+import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
-
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     @Autowired
     private LabelDaoJpa labelDaoJpa;
-
     @Autowired
     private AuthorizationService authorizationService;
-
     @Autowired
     private GroupDaoJpa groupDaoJpa;
-
     @Autowired
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 

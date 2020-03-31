@@ -20,6 +20,18 @@ public class SharedProjectItem extends AuditModel {
 
     @Column
     private String username;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "task_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Task task;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "note_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Note note;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "transaction_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Transaction transaction;
 
     public SharedProjectItem() {
     }
@@ -27,21 +39,6 @@ public class SharedProjectItem extends AuditModel {
     public SharedProjectItem(String username) {
         this.username = username;
     }
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "task_id", nullable = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Task task;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "note_id", nullable = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Note note;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "transaction_id", nullable = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Transaction transaction;
 
     public Long getId() {
         return id;
@@ -75,12 +72,12 @@ public class SharedProjectItem extends AuditModel {
         return note;
     }
 
-    public boolean hasNote() {
-        return this.note != null;
-    }
-
     public void setNote(Note note) {
         this.note = note;
+    }
+
+    public boolean hasNote() {
+        return this.note != null;
     }
 
     public Transaction getTransaction() {

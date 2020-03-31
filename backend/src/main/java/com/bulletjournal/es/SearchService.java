@@ -24,7 +24,7 @@ public class SearchService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchService.class);
 
     @Qualifier("client")
-    @Autowired(required=false)
+    @Autowired(required = false)
     private RestHighLevelClient highLevelClient;
 
     @Autowired

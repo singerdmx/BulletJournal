@@ -1,16 +1,16 @@
 package com.bulletjournal.clients;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import com.bulletjournal.config.SSOConfig;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.redis.RedisUserRepository;
-import java.util.Optional;
-
 import com.bulletjournal.repository.UserDaoJpa;
 import org.junit.Assert;
 import org.junit.Test;
-import com.bulletjournal.config.SSOConfig;
-import com.bulletjournal.controller.models.User;
+
+import java.util.Optional;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests {@link UserClient}

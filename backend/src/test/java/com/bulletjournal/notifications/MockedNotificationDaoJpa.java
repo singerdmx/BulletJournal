@@ -1,7 +1,7 @@
 package com.bulletjournal.notifications;
 
-import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.repository.NotificationDaoJpa;
+import com.bulletjournal.repository.models.Notification;
 
 import java.util.ArrayList;
 import java.util.Collections;

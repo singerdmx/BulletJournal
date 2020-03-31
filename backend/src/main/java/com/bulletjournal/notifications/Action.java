@@ -15,14 +15,6 @@ public enum Action {
         this.pastTenseDescription = pastTenseDescription;
     }
 
-    public String getDescription() {
-        return this.description;
-    }
-
-    public String getPastTenseDescription() {
-        return this.pastTenseDescription;
-    }
-
     public static Action getAction(String description) {
         switch (description) {
             case "Accept":
@@ -32,5 +24,13 @@ public enum Action {
             default:
                 throw new BadRequestException("Invalid Action for description: " + description);
         }
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public String getPastTenseDescription() {
+        return this.pastTenseDescription;
     }
 }

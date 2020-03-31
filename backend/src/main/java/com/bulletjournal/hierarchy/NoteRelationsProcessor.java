@@ -4,7 +4,9 @@ import com.bulletjournal.controller.models.Note;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class NoteRelationsProcessor {
 

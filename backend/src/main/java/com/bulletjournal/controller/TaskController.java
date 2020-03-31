@@ -200,8 +200,8 @@ public class TaskController {
 
     @PatchMapping(CONTENT_ROUTE)
     public Content updateContent(@NotNull @PathVariable Long taskId,
-                              @NotNull @PathVariable Long contentId,
-                              @NotNull @RequestBody UpdateContentParams updateContentParams) {
+                                 @NotNull @PathVariable Long contentId,
+                                 @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams).toPresentationModel();
     }
