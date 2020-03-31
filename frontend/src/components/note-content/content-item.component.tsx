@@ -20,6 +20,7 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
 
   return (
     <List.Item key={content.id}>
+      <List.Item.Meta avatar={content.ownerAvatar} />
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
         : contentText}
