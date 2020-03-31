@@ -26,8 +26,12 @@ export interface Content {
     text: string,
     createdAt: number,
     updatedAt: number,
-    revisions: Revision[]
+    revisions: Revision[],
+    ownerAvatar: string
 }
 
 export interface Revision {
+    id: number,
+    createdAt: number,
+    user: string
 }

@@ -184,7 +184,11 @@ public class TransactionController {
     public List<Content> getContents(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.transactionDaoJpa.getContents(transactionId, username).stream()
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
+                .map(t -> {
+                    Content content = t.toPresentationModel();
+                    content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
+                    return content;
+                }).collect(Collectors.toList());
     }
 
     @DeleteMapping(CONTENT_ROUTE)

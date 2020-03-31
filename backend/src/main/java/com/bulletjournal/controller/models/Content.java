@@ -11,6 +11,8 @@ public class Content {
     @NotBlank
     private String owner;
 
+    private String ownerAvatar;
+
     @NotBlank
     private String text;
 
@@ -80,5 +82,13 @@ public class Content {
 
     public void setRevisions(Revision[] revisions) {
         this.revisions = revisions;
+    }
+
+    public String getOwnerAvatar() {
+        return ownerAvatar;
+    }
+
+    public void setOwnerAvatar(String ownerAvatar) {
+        this.ownerAvatar = ownerAvatar;
     }
 }

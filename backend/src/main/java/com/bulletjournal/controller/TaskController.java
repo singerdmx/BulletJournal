@@ -188,7 +188,12 @@ public class TaskController {
     public List<Content> getContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getContents(taskId, username).stream()
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
+                .map(t -> {
+                    Content content = t.toPresentationModel();
+                    content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
+                    return content;
+                })
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping(CONTENT_ROUTE)
