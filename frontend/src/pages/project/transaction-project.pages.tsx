@@ -16,9 +16,13 @@ import './project.styles.less';
 import { zones } from '../../components/settings/constants';
 import { updateTransactions } from '../../features/transactions/actions';
 import { updateExpandedMyself } from '../../features/myself/actions';
-import { LedgerSummary, Transaction } from '../../features/transactions/interface';
+import {
+  LedgerSummary,
+  Transaction
+} from '../../features/transactions/interface';
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
+import LedgerSummaries from './ledger-summary';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -43,6 +47,11 @@ type TransactionProps = {
   projectId: number;
   timezone: string;
   ledgerSummary: LedgerSummary;
+  balance: number;
+  income: number;
+  expense: number;
+  startDate: string;
+  endDate: string;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
     projectId: number,
@@ -57,16 +66,22 @@ type TransactionProps = {
 const TransactionProject: React.FC<TransactionProps> = props => {
   const [form] = Form.useForm();
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
+  const { balance, income, expense, startDate, endDate } = props;
 
-  const updateTransactions = (values: any) => {
-    const startDate = values.date ? values.date[0].format(dateFormat) : undefined;
+  const updateTransactions = (
+    values: any,
+    currentLedgerSummaryType: string
+  ) => {
+    const startDate = values.date
+      ? values.date[0].format(dateFormat)
+      : undefined;
     const endDate = values.date ? values.date[1].format(dateFormat) : undefined;
 
     props.updateTransactions(
       props.projectId,
       values.timezone,
       values.frequencyType,
-      ledgerSummaryType,
+      currentLedgerSummaryType,
       startDate,
       endDate
     );
@@ -92,14 +107,55 @@ const TransactionProject: React.FC<TransactionProps> = props => {
         <Carousel
           dotPosition='bottom'
           afterChange={(current: number) => {
-            console.log(LedgerSummaryTypeMap[current]);
             setLedgerSummaryType(LedgerSummaryTypeMap[current]);
+            form
+              .validateFields()
+              .then(values => {
+                updateTransactions(values, LedgerSummaryTypeMap[current]);
+              })
+              .catch(info => console.log(info));
           }}
         >
-          <div className='transaction-number'>{LedgerSummaryTypeMap[0]}</div>
-          <div className='transaction-static'>{LedgerSummaryTypeMap[1]}</div>
-          <div className='transaction-static'>{LedgerSummaryTypeMap[2]}</div>
-          <div className='transaction-static'>{LedgerSummaryTypeMap[3]}</div>
+          <div className='transaction-number'>
+            <LedgerSummaries
+              balance={balance}
+              income={income}
+              expense={expense}
+              startDate={startDate}
+              endDate={endDate}
+            />
+            {LedgerSummaryTypeMap[0]}
+          </div>
+          <div className='transaction-static'>
+            <LedgerSummaries
+              balance={balance}
+              income={income}
+              expense={expense}
+              startDate={startDate}
+              endDate={endDate}
+            />
+            {LedgerSummaryTypeMap[1]}
+          </div>
+          <div className='transaction-static'>
+            <LedgerSummaries
+              balance={balance}
+              income={income}
+              expense={expense}
+              startDate={startDate}
+              endDate={endDate}
+            />
+            {LedgerSummaryTypeMap[2]}
+          </div>
+          <div className='transaction-static'>
+            <LedgerSummaries
+              balance={balance}
+              income={income}
+              expense={expense}
+              startDate={startDate}
+              endDate={endDate}
+            />
+            {LedgerSummaryTypeMap[3]}
+          </div>
           {/* maybe others? */}
         </Carousel>
       </div>
@@ -149,7 +205,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
                 .validateFields()
                 .then(values => {
                   console.log(values);
-                  updateTransactions(values);
+                  updateTransactions(values, ledgerSummaryType);
                 })
                 .catch(info => console.log(info));
             }}
@@ -159,7 +215,11 @@ const TransactionProject: React.FC<TransactionProps> = props => {
         </Form>
       </div>
       <List className='transaction-list'>
-        {transactions.map(item=><TransactionItem transaction={item}/>)}
+        {transactions.map(item => (
+          <List.Item>
+            <TransactionItem transaction={item} />
+          </List.Item>
+        ))}
       </List>
     </div>
   );
@@ -168,7 +228,12 @@ const TransactionProject: React.FC<TransactionProps> = props => {
 const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
   timezone: state.settings.timezone,
-  ledgerSummary: state.transaction.ledgerSummary
+  ledgerSummary: state.transaction.ledgerSummary,
+  balance: state.transaction.ledgerSummary.balance,
+  income: state.transaction.ledgerSummary.income,
+  expense: state.transaction.ledgerSummary.expense,
+  startDate: state.transaction.ledgerSummary.startDate,
+  endDate: state.transaction.ledgerSummary.endDate
 });
 
 export default connect(mapStateToProps, {

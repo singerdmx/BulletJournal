@@ -12,15 +12,13 @@ import { Transaction } from '../../features/transactions/interface';
 import { icons } from '../../assets/icons';
 
 type TransactionProps = {
-    transaction: Transaction;
+  transaction: Transaction;
 };
 
 const TransactionItem: React.FC<TransactionProps> = props => {
   const { transaction } = props;
 
-  return (
-      <div>{transaction.owner}</div>
-  );
+  return <div>{transaction.owner}</div>;
 };
 
-export default connect(null, { })(TransactionItem);
+export default connect(null, {})(TransactionItem);
