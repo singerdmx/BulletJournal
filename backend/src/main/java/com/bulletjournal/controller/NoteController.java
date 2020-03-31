@@ -46,7 +46,6 @@ public class NoteController {
     @Autowired
     private SearchService searchService;
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -71,7 +70,6 @@ public class NoteController {
         return note;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(NOTES_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Note createNote(@NotNull @PathVariable Long projectId,
@@ -81,13 +79,13 @@ public class NoteController {
         searchService.saveToES(createdNote, username);
         return createdNote;
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(NOTE_ROUTE)
     public Note getNote(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return addAvatar(this.noteDaoJpa.getNote(username, noteId));
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PatchMapping(NOTE_ROUTE)
     public ResponseEntity<List<Note>> updateNote(@NotNull @PathVariable Long noteId,
                                                  @Valid @RequestBody UpdateNoteParams updateNoteParams) {
@@ -95,7 +93,7 @@ public class NoteController {
         Note note = this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
         return getNotes(note.getProjectId());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @DeleteMapping(NOTE_ROUTE)
     public ResponseEntity<List<Note>> deleteNote(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -106,13 +104,13 @@ public class NoteController {
         }
         return getNotes(note.getProjectId());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PutMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
         this.noteDaoJpa.updateUserNotes(projectId, notes);
         return getNotes(projectId);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PutMapping(NOTE_SET_LABELS_ROUTE)
     public Note setLabels(@NotNull @PathVariable Long noteId,
                           @NotNull @RequestBody List<Long> labels) {
@@ -120,14 +118,14 @@ public class NoteController {
         this.notificationService.inform(this.noteDaoJpa.setLabels(username, noteId, labels));
         return getNote(noteId);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(MOVE_NOTE_ROUTE)
     public void moveNote(@NotNull @PathVariable Long noteId,
                          @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.move(username, noteId, moveProjectItemParams.getTargetProject());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(SHARE_NOTE_ROUTE)
     public String shareNote(
             @NotNull @PathVariable Long noteId,

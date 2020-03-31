@@ -9,7 +9,7 @@ export const fetchTransactions = (
   endDate?: string
 ) => {
   // e.g. /api/projects/105/transactions?frequencyType=MONTHLY&timezone=America%2FLos_Angeles
-  let url = `http://localhost:8081/api/projects/${projectId}/transactions?timezone=${encodeURIComponent(
+  let url = `/api/projects/${projectId}/transactions?timezone=${encodeURIComponent(
     timezone
   )}&frequencyType=${frequencyType}&ledgerSummaryType=${ledgerSummaryType}`;
   if (startDate && endDate) {
@@ -23,7 +23,7 @@ export const fetchTransactions = (
 };
 
 export const getTransactionById = (transactionId: number) => {
-  return doFetch(`http://localhost:8081/api/transactions/${transactionId}`)
+  return doFetch(`/api/transactions/${transactionId}`)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -31,7 +31,7 @@ export const getTransactionById = (transactionId: number) => {
 };
 
 export const deleteTransactionById = (transactionId: number) => {
-  return doDelete(`http://localhost:8081/api/transactions/${transactionId}`).catch(err => {
+  return doDelete(`/api/transactions/${transactionId}`).catch(err => {
     throw Error(err.message);
   });
 };
@@ -55,7 +55,7 @@ export const createTransaction = (
     time: time,
     timezone: timezone
   });
-  return doPost(`http://localhost:8081/api/projects/${projectId}/transactions`, postBody)
+  return doPost(`/api/projects/${projectId}/transactions`, postBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -81,7 +81,7 @@ export const updateTransaction = (
     time: time,
     timezone: timezone
   });
-  return doPatch(`http://localhost:8081/api/transactions/${transactionId}`, patchBody)
+  return doPatch(`/api/transactions/${transactionId}`, patchBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err);

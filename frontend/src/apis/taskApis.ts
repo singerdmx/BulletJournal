@@ -2,8 +2,11 @@ import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
 import { Task, ReminderSetting } from '../features/tasks/interface';
 
 export const fetchTasks = (projectId: number) => {
-  return doFetch(`http://localhost:8081/api/projects/${projectId}/tasks`)
-    .then(res => res.json());
+  return doFetch(`/api/projects/${projectId}/tasks`)
+    .then(res => res.json())
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const fetchCompletedTasks = (projectId: number) => {
@@ -15,7 +18,7 @@ export const fetchCompletedTasks = (projectId: number) => {
 };
 
 export const getTaskById = (taskId: number) => {
-  return doFetch(`http://localhost:8081/api/tasks/${taskId}`)
+  return doFetch(`/api/tasks/${taskId}`)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -23,8 +26,11 @@ export const getTaskById = (taskId: number) => {
 };
 
 export const deleteTaskById = (taskId: number) => {
-  return doDelete(`http://localhost:8081/api/tasks/${taskId}`)
-    .then(res => res);
+  return doDelete(`/api/tasks/${taskId}`)
+    .then(res => res)
+    .catch(err => {
+      throw Error(err.message);
+    });
 };
 
 export const createTask = (
@@ -48,7 +54,7 @@ export const createTask = (
     recurrenceRule: recurrenceRule,
     timezone: timezone
   });
-  return doPost(`http://localhost:8081/api/projects/${projectId}/tasks`, postBody)
+  return doPost(`/api/projects/${projectId}/tasks`, postBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
@@ -57,11 +63,10 @@ export const createTask = (
 
 export const putTasks = (projectId: number, tasks: Task[]) => {
   const putBody = JSON.stringify(tasks);
-  return doPut(`http://localhost:8081/api/projects/${projectId}/tasks`, putBody)
-    .catch(err => {
-      throw Error(err.message);
-    });
-}
+  return doPut(`/api/projects/${projectId}/tasks`, putBody).catch(err => {
+    throw Error(err.message);
+  });
+};
 
 export const updateTask = (
   taskId: number,
@@ -80,7 +85,7 @@ export const updateTask = (
     duration: duration,
     reminderSetting: reminderSetting
   });
-  return doPatch(`http://localhost:8081/api/tasks/${taskId}`, patchBody)
+  return doPatch(`/api/tasks/${taskId}`, patchBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err);

@@ -54,7 +54,7 @@ public class TransactionController {
 
     @Autowired
     private UserClient userClient;
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(TRANSACTIONS_ROUTE)
     public ResponseEntity<LedgerSummary> getTransactions(
             @NotNull @PathVariable Long projectId,
@@ -89,7 +89,7 @@ public class TransactionController {
         transaction.setPayerAvatar(this.userClient.getUser(transaction.getPayer()).getAvatar());
         return transaction;
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(TRANSACTIONS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Transaction createTransaction(@NotNull @PathVariable Long projectId,
@@ -97,7 +97,7 @@ public class TransactionController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return transactionDaoJpa.create(projectId, username, createTransactionParams).toPresentationModel();
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(TRANSACTION_ROUTE)
     public Transaction getTransaction(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -106,7 +106,7 @@ public class TransactionController {
         transaction.setPayerAvatar(this.userClient.getUser(transaction.getPayer()).getAvatar());
         return transaction;
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PatchMapping(TRANSACTION_ROUTE)
     public Transaction updateTransaction(@NotNull @PathVariable Long transactionId,
                                          @Valid @RequestBody UpdateTransactionParams updateTransactionParams) {
@@ -117,7 +117,7 @@ public class TransactionController {
         }
         return getTransaction(transactionId);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @DeleteMapping(TRANSACTION_ROUTE)
     public void deleteTransaction(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -126,7 +126,7 @@ public class TransactionController {
             this.notificationService.inform(new RemoveTransactionEvent(events, username));
         }
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
     public Transaction setLabels(@NotNull @PathVariable Long transactionId,
                                  @NotNull @RequestBody List<Long> labels) {
@@ -134,14 +134,14 @@ public class TransactionController {
         this.notificationService.inform(this.transactionDaoJpa.setLabels(username, transactionId, labels));
         return getTransaction(transactionId);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(MOVE_TRANSACTION_ROUTE)
     public void moveTransaction(@NotNull @PathVariable Long transactionId,
                                 @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(SHARE_TRANSACTION_ROUTE)
     public String shareTransaction(
             @NotNull @PathVariable Long transactionId,
@@ -171,7 +171,7 @@ public class TransactionController {
         }
         return Pair.of(startTime, endTime);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(ADD_CONTENT_ROUTE)
     public Content addContent(@NotNull @PathVariable Long transactionId,
                               @NotNull @RequestBody CreateContentParams createContentParams) {
@@ -179,21 +179,21 @@ public class TransactionController {
         return this.transactionDaoJpa.addContent(transactionId, username,
                 new TransactionContent(createContentParams.getText())).toPresentationModel();
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.transactionDaoJpa.getContents(transactionId, username).stream()
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @DeleteMapping(CONTENT_ROUTE)
     public void deleteContent(@NotNull @PathVariable Long transactionId,
                               @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PatchMapping(CONTENT_ROUTE)
     public void updateContent(@NotNull @PathVariable Long transactionId,
                               @NotNull @PathVariable Long contentId,
@@ -201,7 +201,7 @@ public class TransactionController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.updateContent(contentId, transactionId, username, updateContentParams);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(CONTENT_REVISIONS_ROUTE)
     public List<Revision> getContentRevisions(
             @NotNull @PathVariable Long transactionId,

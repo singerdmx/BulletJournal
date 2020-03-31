@@ -35,7 +35,6 @@ public class ProjectController {
     @Autowired
     private UserClient userClient;
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -60,7 +59,6 @@ public class ProjectController {
         return ResponseEntity.ok().headers(responseHeader).body(projects);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(PROJECT_ROUTE)
     public Project getProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -76,7 +74,6 @@ public class ProjectController {
         return project;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(PROJECTS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody CreateProjectParams project) {
@@ -89,7 +86,6 @@ public class ProjectController {
         return createdProject;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
                                  @Valid @RequestBody UpdateProjectParams updateProjectParams) {
@@ -109,7 +105,6 @@ public class ProjectController {
     /**
      * Delete project deletes its child projects as well
      */
-    @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping(PROJECT_ROUTE)
     public void deleteProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -119,7 +114,6 @@ public class ProjectController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(UPDATE_SHARED_PROJECTS_ORDER_ROUTE)
     public void updateSharedProjectsOrder(
             @Valid @RequestBody UpdateSharedProjectsOrderParams updateSharedProjectsOrderParams) {
@@ -129,7 +123,6 @@ public class ProjectController {
         this.projectDaoJpa.updateSharedProjectsOrder(username, updateSharedProjectsOrderParams);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> updateProjectRelations(@Valid @RequestBody List<Project> projects) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

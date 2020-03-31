@@ -38,14 +38,14 @@ public class GroupController {
 
     @Autowired
     private NotificationService notificationService;
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(GROUPS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Group createGroup(@Valid @RequestBody CreateGroupParams group) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return addOwnerAvatar(groupDaoJpa.create(group.getName(), username).toPresentationModel());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @DeleteMapping(GROUP_ROUTE)
     public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -55,7 +55,7 @@ public class GroupController {
                         username));
         return ResponseEntity.ok().build();
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PatchMapping(GROUP_ROUTE)
     public Group updateGroup(@NotNull @PathVariable Long groupId,
                              @Valid @RequestBody UpdateGroupParams updateGroupParams) {
@@ -63,7 +63,7 @@ public class GroupController {
         this.groupDaoJpa.partialUpdate(username, groupId, updateGroupParams);
         return getGroup(groupId);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(GROUP_ROUTE)
     public Group getGroup(@NotNull @PathVariable Long groupId) {
         com.bulletjournal.repository.models.Group g = this.groupDaoJpa.getGroup(groupId);
@@ -78,7 +78,7 @@ public class GroupController {
         group.setOwnerAvatar(this.userClient.getUser(group.getOwner()).getAvatar());
         return group;
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(GROUPS_ROUTE)
     public ResponseEntity<List<GroupsWithOwner>> getGroups() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -171,7 +171,7 @@ public class GroupController {
         g.setUsers(users);
         return g;
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(ADD_USER_GROUPS_ROUTE)
     public ResponseEntity<List<GroupsWithOwner>> addUserGroups(
             @Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
@@ -179,7 +179,7 @@ public class GroupController {
         this.notificationService.inform(this.groupDaoJpa.addUserGroups(username, addUserGroupsParams.getUserGroups()));
         return getGroups();
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(ADD_USER_GROUP_ROUTE)
     public Group addUserGroup(@Valid @RequestBody AddUserGroupParams addUserGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -189,7 +189,7 @@ public class GroupController {
         }
         return getGroup(addUserGroupParams.getGroupId());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(REMOVE_USER_GROUPS_ROUTE)
     public void removeUserGroups(@Valid @RequestBody RemoveUserGroupsParams removeUserGroupsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -198,7 +198,7 @@ public class GroupController {
             this.notificationService.inform(new RemoveUserFromGroupEvent(events, username));
         }
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(REMOVE_USER_GROUP_ROUTE)
     public void removeUserGroup(@Valid @RequestBody RemoveUserGroupParams removeUserGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

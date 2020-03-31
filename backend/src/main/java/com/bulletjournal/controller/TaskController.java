@@ -48,7 +48,6 @@ public class TaskController {
     @Autowired
     private UserClient userClient;
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -74,20 +73,17 @@ public class TaskController {
         return task;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(TASK_ROUTE)
     public Task getTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return addAvatar(this.taskDaoJpa.getTask(username, taskId));
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(COMPLETED_TASK_ROUTE)
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
         return this.taskDaoJpa.getCompletedTask(taskId);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(TASKS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Task createTask(@NotNull @PathVariable Long projectId,
@@ -95,7 +91,7 @@ public class TaskController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return taskDaoJpa.create(projectId, username, task).toPresentationModel();
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PatchMapping(TASK_ROUTE)
     public Task updateTask(@NotNull @PathVariable Long taskId,
                            @Valid @RequestBody UpdateTaskParams updateTaskParams) {
@@ -107,20 +103,19 @@ public class TaskController {
         return getTask(taskId);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> updateTaskRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Task> tasks) {
         this.taskDaoJpa.updateUserTasks(projectId, tasks);
         return getTasks(projectId);
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(COMPLETE_TASK_ROUTE)
     public Task completeTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         CompletedTask task = this.taskDaoJpa.complete(username, taskId);
         return getCompletedTask(task.getId());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
     public Task uncompleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -128,14 +123,13 @@ public class TaskController {
         return getTask(newId);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(COMPLETED_TASKS_ROUTE)
     public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getCompletedTasks(projectId, username)
                 .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @DeleteMapping(TASK_ROUTE)
     public ResponseEntity<List<Task>> deleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

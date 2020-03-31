@@ -1,7 +1,7 @@
 import { doFetch, doPost, doPatch } from './api-helper';
 
 export const fetchMyself = (expand = false) => {
-  let endpoint = 'http://localhost:8081/api/myself';
+  let endpoint = '/api/myself';
   if (expand) endpoint += '?expand=true';
 
   return doFetch(endpoint)
@@ -13,7 +13,7 @@ export const fetchMyself = (expand = false) => {
 
 export const logoutUser = () => {
   const postBody = JSON.stringify({});
-  return doPost('http://localhost:8081/api/myself/logout', postBody);
+  return doPost('/api/myself/logout', postBody);
 };
 
 export const patchMyself = (
@@ -29,7 +29,7 @@ export const patchMyself = (
     theme: theme
   });
 
-  return doPatch('http://localhost:8081/api/myself', patchBody)
+  return doPatch('/api/myself', patchBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
