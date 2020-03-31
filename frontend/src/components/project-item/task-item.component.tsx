@@ -12,7 +12,7 @@ import {
 import { Task } from '../../features/tasks/interface';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { completeTask, uncompleteTask, deleteTask } from '../../features/tasks/actions';
+import { completeTask, uncompleteTask, deleteTask, deleteCompletedTask } from '../../features/tasks/actions';
 import './project-item.styles.less';
 
 
@@ -22,13 +22,27 @@ type TaskProps = {
   completeTask: (taskId: number) => void;
   uncompleteTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
+  deleteCompletedTask: (taskId: number) => void;
 };
 
 const ManageTask: React.FC<TaskProps> = props => {
-  const { task, isComplete, completeTask, uncompleteTask, deleteTask } = props;
+  const { task, isComplete, completeTask, uncompleteTask, deleteTask, deleteCompletedTask } = props;
   if (isComplete) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Popconfirm
+          title="Deleting Task also deletes its child tasks. Are you sure?"
+          okText="Yes"
+          cancelText="No"
+          onConfirm={() => deleteCompletedTask(task.id)}
+          className="group-setting"
+          placement="bottom"
+        >
+          <div style={{ cursor: 'pointer' }}>
+            Delete
+            <DeleteTwoTone twoToneColor="#f5222d" />
+          </div>
+        </Popconfirm>
         <div style={{ cursor: 'pointer' }}>
           Uncomplete
             <CloseCircleOutlined onClick={() => uncompleteTask(task.id)} twoToneColor="#52c41a" />
@@ -65,7 +79,7 @@ const alignConfig = {
 };
 
 const TaskItem: React.FC<TaskProps> = props => {
-  const { task, isComplete, completeTask, uncompleteTask, deleteTask } = props;
+  const { task, isComplete, completeTask, uncompleteTask, deleteTask, deleteCompletedTask } = props;
   return (
     <div
       style={{
@@ -98,7 +112,7 @@ const TaskItem: React.FC<TaskProps> = props => {
           placement="bottomRight"
           style={{ top: -10 }}
           content={
-            <ManageTask task={task} isComplete={isComplete} completeTask={completeTask} uncompleteTask={uncompleteTask} deleteTask={deleteTask} />
+            <ManageTask task={task} isComplete={isComplete} completeTask={completeTask} uncompleteTask={uncompleteTask} deleteTask={deleteTask} deleteCompletedTask={deleteCompletedTask} />
           }
           trigger="click"
         >
@@ -114,6 +128,7 @@ const TaskItem: React.FC<TaskProps> = props => {
 export default connect(null, {
   completeTask,
   uncompleteTask,
-  deleteTask
+  deleteTask,
+  deleteCompletedTask
 })(TaskItem);
 

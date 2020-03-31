@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { List, Divider } from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TaskItem from '../../components/project-item/task-item.component'
@@ -15,13 +15,7 @@ type TasksProps = {
 };
 
 const TaskProject: React.FC<TasksProps> = props => {
-  const {
-    projectId,
-    tasks,
-    completedTasks,
-    updateTasks,
-    updateCompletedTasks
-  } = props;
+  const { projectId, tasks, completedTasks, updateTasks, updateCompletedTasks } = props;
 
   useEffect(() => {
     updateTasks(projectId);
