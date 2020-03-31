@@ -75,7 +75,7 @@ public class ZonedDateTimeHelper {
                 cloned = now.minusDays(now.getDayOfWeek().getValue() - firstDayOfWeek);
                 break;
             case YEARLY:
-                int firstDayOfYear = (int) now.range(ChronoField.DAY_OF_YEAR).getMaximum();
+                int firstDayOfYear = (int) now.range(ChronoField.DAY_OF_YEAR).getMinimum();
                 cloned = now.withDayOfYear(firstDayOfYear);
                 break;
             default:

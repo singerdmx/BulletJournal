@@ -17,7 +17,8 @@ public class Revision {
     @NotNull
     private Long createdAt;
 
-    public Revision() {}
+    public Revision() {
+    }
 
     public Revision(@NotNull Integer id, @NotNull String diff, @NotNull Long createdAt) {
         this.id = id;
@@ -29,12 +30,12 @@ public class Revision {
         return id;
     }
 
-    public String getDiff() {
-        return diff;
-    }
-
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getDiff() {
+        return diff;
     }
 
     public void setDiff(String diff) {
