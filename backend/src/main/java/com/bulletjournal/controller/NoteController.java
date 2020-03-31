@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.es.SearchService;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
@@ -42,6 +43,9 @@ public class NoteController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private SearchService searchService;
+
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -72,6 +76,7 @@ public class NoteController {
                            @Valid @RequestBody CreateNoteParams note) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note createdNote = noteDaoJpa.create(projectId, username, note).toPresentationModel();
+        searchService.saveToES(createdNote, username);
         return createdNote;
     }
 

@@ -1,5 +1,6 @@
 package com.bulletjournal.es;
 
+import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.controller.models.ProjectItem;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.support.WriteRequest;
@@ -8,6 +9,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,11 +23,19 @@ public class SearchService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchService.class);
 
-    @Autowired
+    @Qualifier("client")
+    @Autowired(required=false)
     private RestHighLevelClient highLevelClient;
+
+    @Autowired
+    private SpringESConfig springESConfig;
 
     // TODO user -> project id -> group -> all users
     public void saveToES(ProjectItem projectItem, String username) {
+        if (highLevelClient == null) {
+            return;
+        }
+
         Map<String, Object> json = new HashMap<>();
         json.put("name", projectItem.getName());
         json.put("user", username);

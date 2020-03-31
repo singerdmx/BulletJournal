@@ -5,6 +5,8 @@ import com.bulletjournal.es.SearchService;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
+
+import com.bulletjournal.config.SpringESConfig;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,13 +31,19 @@ public class QueryController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
 
-    @Autowired
-    RestHighLevelClient highLevelClient;
+    @Qualifier("client")
+    @Autowired(required=false)
+    private RestHighLevelClient highLevelClient;
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(SEARCH_ROUTE)
     @ResponseStatus(HttpStatus.OK)
     public SearchResponse searchItems(@Valid @RequestParam @NotBlank String term) throws IOException {
+
+        if (highLevelClient == null) {
+            LOGGER.info("ES is not enabled.");
+            return null;
+        }
         // return List<ProjectItems>
         // search by title and comment
         // const project_item in service
