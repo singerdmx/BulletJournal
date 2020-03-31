@@ -73,4 +73,12 @@ public class Content {
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public Revision[] getRevisions() {
+        return revisions;
+    }
+
+    public void setRevisions(Revision[] revisions) {
+        this.revisions = revisions;
+    }
 }
