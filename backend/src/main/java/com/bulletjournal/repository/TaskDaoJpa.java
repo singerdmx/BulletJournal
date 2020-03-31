@@ -3,10 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.CreateTaskParams;
-import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -14,6 +11,9 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
@@ -68,8 +68,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /*
-     * Get tasks by project identifier
+     * Get all tasks from project
      *
+     * @param projectId
+     * @param requester
      * @retVal List<com.bulletjournal.controller.models.Task> - a list of controller model tasks with labels
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -92,6 +94,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .collect(Collectors.toList());
     }
 
+    /*
+     * Apply labels to tasks
+     *
+     * @param task
+     * @param taskMap - Mapping relationship between TaskId and Task Instance
+     * @retVal com.bulletjournal.controller.models.Task - Task instance with labels
+     */
     private com.bulletjournal.controller.models.Task addLabels(
             com.bulletjournal.controller.models.Task task, Map<Long, Task> tasksMap) {
         List<com.bulletjournal.controller.models.Label> labels =
@@ -109,6 +118,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * 1. Get task from database
      * 2. Look up task labels and add to task
      *
+     * @param requester
+     * @param id
      * @retVal com.bulletjournal.controller.models.Task - controller model task with label
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -121,6 +132,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /*
      * Get completed tasks from database
      *
+     * @param id
      * @retVal List<com.bulletjournal.controller.models.Task> - A list of completed tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -131,27 +143,41 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /*
-     * Get reminding tasks from database.
+     * Get assignee's reminding tasks and recurring reminding tasks from database.
      *
      * Reminding tasks qualifications:
      * 1. Reminding Time is before current time.
      * 2. Starting time is after the current time.
      *
+     * @param assignee
+     * @param now
      * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks to be reminded
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
         Timestamp currentTime = Timestamp.from(now.toInstant());
-        return this.taskRepository
+
+        // Fetch regular reminding tasks
+        List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
                 .findRemindingTasks(assignee, currentTime)
                 .stream()
                 .map(TaskModel::toPresentationModel)
                 .collect(Collectors.toList());
+
+        // Fetch recurring reminding tasks
+        List<com.bulletjournal.controller.models.Task> recurringTask = getRecurringTaskNeedReminding(assignee, now);
+
+        // Append recurring reminding tasks to regular reminding tasks
+        regularTasks.addAll(recurringTask);
+        return regularTasks;
     }
 
     /*
      * Get user's tasks between the request start time and request end time.
      *
+     * @param assignee
+     * @param startTime
+     * @param endTime
      * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -160,20 +186,50 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
                 assignee, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
 
-        List<Task> recurrentTasks = this.getRecurrentTasks(assignee, startTime, endTime);
+        List<Task> recurrentTasks = this.getRecurringTasks(assignee, startTime, endTime);
 
         tasks.addAll(recurrentTasks);
         return tasks;
     }
 
     /*
-     * Get all recurrent tasks of an assignee
+     * Get recurring reminding tasks from database.
      *
+     * Reminding tasks qualifications:
+     * 1. Reminding Time is before current time.
+     * 2. Starting time is after the current time.
+     *
+     * @param assignee
+     * @param now
+     * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(String assignee, ZonedDateTime now) {
+        ZonedDateTime minimumRemindingTime = now.minusHours(Before.TWO_HR_BEFORE.getValue());
+        return this.getRecurringTasks(assignee, minimumRemindingTime, now)
+                .stream()
+                .filter(t -> t.getReminderDateTime().after(ZonedDateTimeHelper.getTimestamp(now))
+                        && t.getStartTime().before(ZonedDateTimeHelper.getTimestamp(now)))
+                .map(TaskModel::toPresentationModel)
+                .collect(Collectors.toList());
+    }
+
+    /*
+     * Get all recurrent tasks of an assignee within requested start time and end time
+     *
+     * Procedure:
+     * 1. Fetch all tasks with recurrence rule
+     * 2. Obtain new DateTime instance by using RecurrenceRule iterator
+     * 3. Clone the original recurring task and set its start/end time and reminding setting
+     *
+     * @param assignee
+     * @param startTime
+     * @param endTime
      * @retVal List<Task> - A list of recurrent tasks within the time range
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getRecurrentTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<Task> recurrentTasksBetween = new ArrayList<>();
+    public List<Task> getRecurringTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Task> recurringTasksBetween = new ArrayList<>();
         List<Task> recurrentTasks = this.taskRepository.findTasksByAssignedToAndRecurrenceRuleNotNull(assignee);
         DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
         DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
@@ -194,9 +250,19 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                         continue;
                     }
                     Task cloned = (Task) t.clone();
-                    cloned.setDueDate(ZonedDateTimeHelper.getDate(currDateTime)); // Set due date
-                    cloned.setDueTime(ZonedDateTimeHelper.getTime(currDateTime)); // Set due time
-                    recurrentTasksBetween.add(cloned);
+
+                    String date = ZonedDateTimeHelper.getDate(currDateTime);
+                    String time = ZonedDateTimeHelper.getTime(currDateTime);
+
+                    cloned.setDueDate(date); // Set due date
+                    cloned.setDueTime(time); // Set due time
+
+                    // Set start time and end time
+                    cloned.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+                    cloned.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+
+                    cloned.setReminderSetting(t.getReminderSetting()); // Set reminding setting to cloned
+                    recurringTasksBetween.add(cloned);
                 }
             } catch (InvalidRecurrenceRuleException e) {
                 throw new IllegalArgumentException("Recurrence rule format invalid");
@@ -204,12 +270,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 throw new IllegalStateException("Clone new Task failed");
             }
         }
-        return recurrentTasksBetween;
+        return recurringTasksBetween;
     }
 
     /*
      * Create task based on CreateTaskParams
      *
+     * @param projectId
+     * @param owner
+     * @param createTaskParams
      * @retVal Task - A repository task model
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -263,7 +332,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /*
      * Partially update task based on UpdateTaskParams
      *
-     * @retVal List<Event> - a list of events that is used to notify users
+     * @param requester
+     * @param taskId
+     * @param updateTaskParams
+     * @retVal List<Event> - a list of events for users notification
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
@@ -313,6 +385,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     /*
      * Add assignee change event to notification
+     *
+     * @param requester
+     * @param taskId
+     * @param updateTaskParams
+     * @param task
+     * @retVal List<Event> - a list of events for users notification
      */
     private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams, Task task) {
         List<Event> events = new ArrayList<>();
@@ -337,6 +415,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * 2. Delete task and its sub tasks from task table
      * 3. Add task and its sub tasks to complete task table
      *
+     * @param requester
+     * @param taskId
      * @retVal CompleteTask - a repository model complete task object
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -369,6 +449,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     /*
      * Update sub tasks relation
+     *
+     * @param projectId
+     * @param tasks - a list of tasks
+     * @retVal void
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateUserTasks(Long projectId, List<com.bulletjournal.controller.models.Task> tasks) {
@@ -384,6 +468,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /*
      * Delete requester's task by task identifier
      *
+     * @param requester
+     * @param taskId
      * @retVal List<Event> - a list of notification events
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -398,6 +484,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return generateEvents(task, requester, project);
     }
 
+    /*
+     * Delete task and adjust project relations after task completion
+     *
+     *
+     * @param requester
+     * @param task
+     * @param targetTasksOperator - Consumer class or Lambda function operate upon target tasks list
+     * @param targetOperator - Consumer class or Lambda function operates upon target HierarchyItem
+     * @retVal Project
+     */
     private Project deleteTaskAndAdjustRelations(
             String requester, Task task,
             Consumer<List<Task>> targetTasksOperator,
@@ -428,6 +524,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return project;
     }
 
+    /*
+     * Delete completed tasks from database
+     *
+     * 1. Check if the requester is authorized for the operation
+     * 2. Remove task from complete tasks table
+     *
+     * @param requester
+     * @param taskId
+     * @retVal - A list of notification events
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteCompletedTask(String requester, Long taskId) {
         CompletedTask task = this.completedTaskRepository.findById(taskId)
@@ -443,7 +549,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /*
      * Generate events for notification
      *
-     * @retVal List<Event> - a list of events for notifications
+     * @param task
+     * @param requester
+     * @param project
+     * @retVal List<Event> - a list of notification events
      */
     private List<Event> generateEvents(TaskModel task, String requester, Project project) {
         List<Event> events = new ArrayList<>();
@@ -461,6 +570,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return events;
     }
 
+    /*
+     * Get completed tasks by project from database
+     *
+     * @param projectId
+     * @param requester
+     * @retVal - A list of tasks
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> getCompletedTasks(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
@@ -470,6 +586,17 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .collect(Collectors.toList());
     }
 
+    /*
+     * Uncomplete completed task.
+     *
+     * 1. Check if requester is allowed to operate with this action
+     * 2. Remove task from Completed Task table
+     * 3. Create a new task and add it to regular Task table
+     *
+     * @param requester
+     * @param taskId
+     * @retVal Long?
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Long uncomplete(String requester, Long taskId) {
         CompletedTask task = this.completedTaskRepository.findById(taskId)
@@ -482,11 +609,25 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return create(projectId, task.getOwner(), getCreateTaskParams(task)).getId();
     }
 
+    /*
+     * Remove reminder setting from CreateTaskParams
+     *
+     * @param task
+     * @retVal CreateTaskParams
+     */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
         return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
                 task.getDueTime(), task.getDuration(), null, task.getTimezone(), task.getRecurrenceRule());
     }
 
+    /*
+     * Move task from one project to another
+     *
+     * @requester
+     * @taskId
+     * @targetProject
+     * @retVal void
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long taskId, Long targetProject) {
         final Project project = this.projectDaoJpa.getProject(targetProject, requester);
@@ -516,11 +657,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 });
     }
 
+    /*
+     * Get Content Jpa Repository
+     *
+     * @retVal JpaRepository
+     */
     @Override
     public JpaRepository getContentJpaRepository() {
         return this.taskContentRepository;
     }
 
+    /*
+     * Get Contents for project
+     *
+     * @param projectItemId
+     * @param requester
+     * @retVal List<TaskContent>
+     */
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<TaskContent> getContents(Long projectItemId, String requester) {

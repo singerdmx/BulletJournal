@@ -268,7 +268,7 @@ public class ProjectItemControllerTest {
     }
 
     private Task addRecurringTasks(Project project) {
-        String recurrenceRule = "DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1";
+        String recurrenceRule = "DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20200520T070000Z";
         String taskName = "rt1";
 
         CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,

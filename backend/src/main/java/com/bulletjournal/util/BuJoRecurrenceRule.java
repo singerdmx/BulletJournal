@@ -25,10 +25,13 @@ public class BuJoRecurrenceRule {
             throw new IllegalStateException("RRule DTStart parsing error");
 
         this.hasEnd = parseDTUntil();
-        rrule = new RecurrenceRule(parseRRuel());
+        this.rrule = new RecurrenceRule(parseRRuel());
 
-        if (hasEnd)
-            rrule.setUntil(util);
+        if (this.hasEnd) this.rrule.setUntil(this.util);
+    }
+
+    public static BuJoRecurrenceRule create(String recurInput) throws InvalidRecurrenceRuleException {
+        return new BuJoRecurrenceRule(recurInput, null);
     }
 
     public RecurrenceRuleIterator getIterator() {
@@ -69,7 +72,7 @@ public class BuJoRecurrenceRule {
         if (indexOfDTUntil == -1)
             return false;
 
-        String rfc5545DateTime = getRFC5545DateTime(indexOfDTUntil, DATETIME_END_KEY);
+        String rfc5545DateTime = getRFC5545DateTime(indexOfDTUntil + DATETIME_END_KEY.length(), DATETIME_END_KEY);
         this.util = DateTime.parse(rfc5545DateTime);
         return true;
     }

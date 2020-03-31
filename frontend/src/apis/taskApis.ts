@@ -33,6 +33,14 @@ export const deleteTaskById = (taskId: number) => {
     });
 };
 
+export const deleteCompletedTaskById = (taskId: number) => {
+  return doDelete(`/api/completedTasks/${taskId}`)
+    .then(res => res)
+    .catch(err => {
+      throw Error(err.message);
+    });
+};
+
 export const createTask = (
   projectId: number,
   name: string,

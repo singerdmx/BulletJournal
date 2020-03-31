@@ -2,6 +2,7 @@ import React from 'react';
 import { Statistic } from 'antd';
 
 type LedgerSummaryProps = {
+  title: string;
   balance: number;
   income: number;
   expense: number;
@@ -10,16 +11,22 @@ type LedgerSummaryProps = {
 };
 
 const LedgerSummary: React.FC<LedgerSummaryProps> = props => {
-  const { balance, income, expense, startDate, endDate } = props;
+  const { title, balance, income, expense, startDate, endDate } = props;
 
   return (
-    <span style={{ display: 'flex' }}>
+    <span>
       <span>
+        <b>{title}&nbsp;&nbsp;</b>
         {startDate} - {endDate}
       </span>
-      <Statistic title='Balance' value={balance} />
-      <Statistic title='Income' value={income} />
-      <Statistic title='Expense' value={expense} />
+      <br />
+      <span style={{ display: 'flex' }}>
+        <Statistic title='Balance' value={balance} />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <Statistic title='Income' value={income} />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <Statistic title='Expense' value={expense} />
+      </span>
     </span>
   );
 };

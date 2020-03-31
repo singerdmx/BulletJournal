@@ -23,6 +23,7 @@ import {
   updateTask,
   completeTaskById,
   deleteTaskById,
+  deleteCompletedTaskById,
   uncompleteTaskById,
   setTaskLabels,
   moveToTargetProject, shareTaskWithOther
@@ -196,7 +197,7 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
   }
 }
 
-function* deleteTask(action: PayloadAction<CompleteTask>) {
+function* deleteTask(action: PayloadAction<UncompleteTask>) {
   try {
     const { taskId } = action.payload;
     const data = yield call(deleteTaskById, taskId);
@@ -208,6 +209,21 @@ function* deleteTask(action: PayloadAction<CompleteTask>) {
     );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
+  }
+}
+
+function* deleteCompletedTask(action: PayloadAction<CompleteTask>) {
+  try {
+    const { taskId } = action.payload;
+    const data = yield call(deleteCompletedTaskById, taskId);
+    const updatedCompletedTasks = yield data.json();
+    yield put(
+      tasksActions.completedTasksReceived({
+        tasks: updatedCompletedTasks
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Delete Completed Task Error Received: ${error}`);
   }
 }
 
@@ -246,6 +262,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskComplete.type, completeTask),
     yield takeLatest(tasksActions.TaskUncomplete.type, uncompleteTask),
     yield takeLatest(tasksActions.TaskDelete.type, deleteTask),
+    yield takeLatest(tasksActions.CompletedTaskDelete.type, deleteCompletedTask),
     yield takeLatest(tasksActions.TaskSetLabels.type, taskSetLabels),
     yield takeLatest(tasksActions.TaskMove.type, moveTask),
     yield takeLatest(tasksActions.TaskShare.type, shareTask),

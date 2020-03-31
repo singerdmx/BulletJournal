@@ -23,6 +23,7 @@ import {
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from './ledger-summary';
+import { TransactionsSummary } from '../../features/transactions/interface';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -47,11 +48,7 @@ type TransactionProps = {
   projectId: number;
   timezone: string;
   ledgerSummary: LedgerSummary;
-  balance: number;
-  income: number;
-  expense: number;
-  startDate: string;
-  endDate: string;
+
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
     projectId: number,
@@ -66,7 +63,14 @@ type TransactionProps = {
 const TransactionProject: React.FC<TransactionProps> = props => {
   const [form] = Form.useForm();
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
-  const { balance, income, expense, startDate, endDate } = props;
+  const {
+    balance,
+    income,
+    expense,
+    startDate,
+    endDate,
+    transactionsSummaries
+  } = props.ledgerSummary;
 
   const updateTransactions = (
     values: any,
@@ -105,7 +109,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
     <div className='transaction-page'>
       <div className='transaction-display'>
         <Carousel
-          dotPosition='bottom'
+          dotPosition='top'
           afterChange={(current: number) => {
             setLedgerSummaryType(LedgerSummaryTypeMap[current]);
             form
@@ -116,45 +120,125 @@ const TransactionProject: React.FC<TransactionProps> = props => {
               .catch(info => console.log(info));
           }}
         >
-          <div className='transaction-number'>
+          <div className='transaction-summary'>
             <LedgerSummaries
+              title={''}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[0]}
+            {transactionsSummaries
+              ? transactionsSummaries.map(
+                  (transactionsSummary: TransactionsSummary, index: number) => (
+                    <div>
+                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                      <span>balance: {transactionsSummary.balance}</span>
+                      &nbsp;&nbsp;
+                      <span>
+                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                        {transactionsSummary.expensePercentage}%,
+                      </span>
+                      &nbsp;&nbsp;
+                      <span>income: {transactionsSummary.income}</span>
+                      &nbsp;&nbsp;
+                      {transactionsSummary.incomePercentage}%
+                      <span>&nbsp;&nbsp;</span>
+                    </div>
+                  )
+                )
+              : 'Loading...'}
           </div>
           <div className='transaction-static'>
             <LedgerSummaries
+              title={'By Payer'}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[1]}
+            {transactionsSummaries
+              ? transactionsSummaries.map(
+                  (transactionsSummary: TransactionsSummary, index: number) => (
+                    <div>
+                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                      <span>balance: {transactionsSummary.balance}</span>
+                      &nbsp;&nbsp;
+                      <span>
+                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                        {transactionsSummary.expensePercentage}%,
+                      </span>
+                      &nbsp;&nbsp;
+                      <span>income: {transactionsSummary.income}</span>
+                      &nbsp;&nbsp;
+                      {transactionsSummary.incomePercentage}%
+                      <span>&nbsp;&nbsp;</span>
+                    </div>
+                  )
+                )
+              : 'Loading...'}
           </div>
           <div className='transaction-static'>
             <LedgerSummaries
+              title={'By Label'}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[2]}
+            {transactionsSummaries
+              ? transactionsSummaries.map(
+                  (transactionsSummary: TransactionsSummary, index: number) => (
+                    <div>
+                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                      <span>balance: {transactionsSummary.balance}</span>
+                      &nbsp;&nbsp;
+                      <span>
+                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                        {transactionsSummary.expensePercentage}%,
+                      </span>
+                      &nbsp;&nbsp;
+                      <span>income: {transactionsSummary.income}</span>
+                      &nbsp;&nbsp;
+                      {transactionsSummary.incomePercentage}%
+                      <span>&nbsp;&nbsp;</span>
+                    </div>
+                  )
+                )
+              : 'Loading...'}
           </div>
           <div className='transaction-static'>
             <LedgerSummaries
+              title={'Timeline'}
               balance={balance}
               income={income}
               expense={expense}
               startDate={startDate}
               endDate={endDate}
             />
-            {LedgerSummaryTypeMap[3]}
+            {transactionsSummaries
+              ? transactionsSummaries.map(
+                  (transactionsSummary: TransactionsSummary, index: number) => (
+                    <div>
+                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                      <span>balance: {transactionsSummary.balance}</span>
+                      &nbsp;&nbsp;
+                      <span>
+                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                        {transactionsSummary.expensePercentage}%,
+                      </span>
+                      &nbsp;&nbsp;
+                      <span>income: {transactionsSummary.income}</span>
+                      &nbsp;&nbsp;
+                      {transactionsSummary.incomePercentage}%
+                      <span>&nbsp;&nbsp;</span>
+                    </div>
+                  )
+                )
+              : 'Loading...'}
           </div>
           {/* maybe others? */}
         </Carousel>
@@ -228,12 +312,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
 const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
   timezone: state.settings.timezone,
-  ledgerSummary: state.transaction.ledgerSummary,
-  balance: state.transaction.ledgerSummary.balance,
-  income: state.transaction.ledgerSummary.income,
-  expense: state.transaction.ledgerSummary.expense,
-  startDate: state.transaction.ledgerSummary.startDate,
-  endDate: state.transaction.ledgerSummary.endDate
+  ledgerSummary: state.transaction.ledgerSummary
 });
 
 export default connect(mapStateToProps, {
