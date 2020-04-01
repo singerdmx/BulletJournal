@@ -13,14 +13,18 @@ import { IState } from '../../store';
 import NoteEditorDrawer from '../../components/note-editor/editor-drawer.component';
 import NoteContentList from '../../components/note-content/content-list.component';
 // antd imports
-import { Tooltip, Tag, Avatar, Divider, Button } from 'antd';
+import { Tooltip, Tag, Avatar, Divider, Button, Popconfirm } from 'antd';
 import {
   TagOutlined,
-  ShareAltOutlined,
-  DeleteOutlined,
-  RightCircleOutlined,
+  DeleteTwoTone,
   PlusCircleTwoTone
 } from '@ant-design/icons';
+// modals import
+import EditNote from '../../components/modals/edit-note.component';
+import MoveProjectItem from '../../components/modals/move-project-item.component';
+import ShareProjectItem from '../../components/modals/share-project-item.component';
+//actions
+import { deleteNote } from '../../features/notes/actions';
 
 import { icons } from '../../assets/icons/index';
 import './note-page.styles.less';
@@ -28,6 +32,7 @@ import 'braft-editor/dist/index.css';
 
 type NoteProps = {
   note: Note;
+  deleteNote: (noteId: number) => void;
 };
 
 interface NotePageHandler {
@@ -42,7 +47,7 @@ const getIcon = (icon: string) => {
 };
 
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
-  const { note } = props;
+  const { note, deleteNote } = props;
   // get id of note from oruter
   const { noteId } = useParams();
   // state control drawer displaying
@@ -65,26 +70,26 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   };
 
   return (
-    <div className="note-page">
-      <Tooltip placement="top" title={note.owner} className="note-avatar">
+    <div className='note-page'>
+      <Tooltip placement='top' title={note.owner} className='note-avatar'>
         <span>
-          <Avatar size="large" src={note.ownerAvatar} />
+          <Avatar size='large' src={note.ownerAvatar} />
         </span>
       </Tooltip>
-      <div className="note-title">
-        <div className="label-and-name">
+      <div className='note-title'>
+        <div className='label-and-name'>
           {note.name}
-          <div className="note-labels">
+          <div className='note-labels'>
             {note.labels &&
               note.labels.map(label => {
                 return (
                   <Tooltip
-                    placement="top"
-                    title="Click to Check or Edit"
+                    placement='top'
+                    title='Click to Check or Edit'
                     key={label.id}
                   >
                     <Tag
-                      className="labels"
+                      className='labels'
                       color={stringToRGB(label.value)}
                       style={{ cursor: 'pointer' }}
                     >
@@ -99,24 +104,39 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           </div>
         </div>
 
-        <div className="note-operation">
-          <Tooltip title="Add Label">
+        <div className='note-operation'>
+          <Tooltip title='Add Label'>
             <TagOutlined />
           </Tooltip>
-          <Tooltip title="Move Note">
-            <RightCircleOutlined />
+          <Tooltip title='Edit Label'>
+            <EditNote note={note} mode='icon' />
           </Tooltip>
-          <Tooltip title="Share Note">
-            <ShareAltOutlined />
+          <Tooltip title='Move Note'>
+            <MoveProjectItem type='NOTE' projectItemId={note.id} mode='icon' />
           </Tooltip>
-          <Tooltip title="Delete">
-            <DeleteOutlined style={{ color: 'red' }} />
+          <Tooltip title='Share Note'>
+            <ShareProjectItem type='NOTE' projectItemId={note.id} mode='icon' />
+          </Tooltip>
+          <Tooltip title='Delete'>
+            <Popconfirm
+              title='Deleting Note also deletes its child notes. Are you sure?'
+              okText='Yes'
+              cancelText='No'
+              onConfirm={() => {
+                deleteNote(note.id);
+                history.goBack();
+              }}
+              className='group-setting'
+              placement='bottom'
+            >
+              <DeleteTwoTone twoToneColor='#f5222d' />
+            </Popconfirm>
           </Tooltip>
         </div>
       </div>
       <Divider />
-      <div className="content">
-        <div className="content-list">
+      <div className='content'>
+        <div className='content-list'>
           <NoteContentList noteId={note.id} />
         </div>
         <Button onClick={createHandler}>
@@ -124,7 +144,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           New
         </Button>
       </div>
-      <div className="note-drawer">
+      <div className='note-drawer'>
         <NoteEditorDrawer
           noteId={note.id}
           visible={showEditor}
@@ -140,6 +160,7 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
+  deleteNote,
   getNote,
   addSelectedLabel
 })(NotePage);

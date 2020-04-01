@@ -8,12 +8,13 @@ import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
 
 type NoteProps = {
+  mode: string;
   note: Note;
   patchNote: (noteId: number, content: string) => void;
 };
 
 const EditNote: React.FC<NoteProps> = props => {
-  const { note, patchNote } = props;
+  const { note, patchNote, mode } = props;
   const [visible, setVisible] = useState(false);
 
   const [value, setValue] = useState(note.name);
@@ -22,14 +23,12 @@ const EditNote: React.FC<NoteProps> = props => {
     setVisible(!visible);
   };
 
-  return (
-    <div onClick={() => setVisible(!visible)} className="popover-control-item">
-      <span>Edit</span>
-      <EditTwoTone />
+  const getModal = () => {
+    return (
       <Modal
-        title="Edit"
-        okText="Confirm"
-        cancelText="Cancel"
+        title='Edit'
+        okText='Confirm'
+        cancelText='Cancel'
         onOk={onOk}
         visible={visible}
         onCancel={() => setVisible(!visible)}
@@ -44,8 +43,28 @@ const EditNote: React.FC<NoteProps> = props => {
           }}
         />
       </Modal>
-    </div>
-  );
+    );
+  };
+
+  if (mode === 'div') {
+    return (
+      <div
+        onClick={() => setVisible(!visible)}
+        className='popover-control-item'
+      >
+        <span>Edit</span>
+        <EditTwoTone />
+        {getModal()}
+      </div>
+    );
+  } else {
+    return (
+      <>
+        <EditTwoTone onClick={() => setVisible(!visible)} />
+        {getModal()}
+      </>
+    );
+  }
 };
 
 const mapStateToProps = (state: IState) => ({});

@@ -22,6 +22,7 @@ const { TabPane } = Tabs;
 const { Option } = Select;
 
 type ProjectItemProps = {
+  mode: string;
   type: string;
   projectItemId: number;
   user: UserWithAvatar;
@@ -56,6 +57,7 @@ type GroupProps = {
 const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
+  const { mode } = props;
 
   const searchUser = (value: string) => {
     props.updateUser(value);
@@ -98,9 +100,9 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
 
     return (
       <div>
-        <Form.Item name="group">
+        <Form.Item name='group'>
           <Select
-            placeholder="Choose Group"
+            placeholder='Choose Group'
             style={{ width: '100%' }}
             defaultValue={groupsWithOwner[0].groups[0].id}
           >
@@ -112,7 +114,7 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                     value={group.id}
                     title={`Group "${group.name}" (owner "${group.owner}")`}
                   >
-                    <Avatar size="small" src={group.ownerAvatar} />
+                    <Avatar size='small' src={group.ownerAvatar} />
                     &nbsp;&nbsp;
                     <strong> {group.name} </strong> (owner{' '}
                     <strong>{group.owner}</strong>)
@@ -133,7 +135,7 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         title={`SHARE ${props.type}`}
         destroyOnClose
         centered
-        okText="Confirm"
+        okText='Confirm'
         visible={visible}
         onCancel={e => handleCancel(e)}
         onOk={() => {
@@ -147,17 +149,17 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         }}
       >
         <div>
-          <Form form={form} labelAlign="left">
-            <Tabs defaultActiveKey="Group" tabPosition={'left'}>
-              <TabPane tab="Group" key="Group">
+          <Form form={form} labelAlign='left'>
+            <Tabs defaultActiveKey='Group' tabPosition={'left'}>
+              <TabPane tab='Group' key='Group'>
                 {shareWithGroup()}
                 <Result
                   icon={<TeamOutlined />}
                   title={`Share ${props.type} with GROUP`}
                 />
               </TabPane>
-              <TabPane tab="User" key="User">
-                <Form.Item name="username">
+              <TabPane tab='User' key='User'>
+                <Form.Item name='username'>
                   <Input.Search
                     allowClear
                     prefix={<UserOutlined />}
@@ -170,19 +172,19 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                         })
                         .catch(info => console.log(info))
                     }
-                    className="input-search-box"
-                    placeholder="Enter Username"
+                    className='input-search-box'
+                    placeholder='Enter Username'
                   />
                 </Form.Item>
-                <div className="search-result">
-                  {user.name ? <Avatar size="large" src={user.avatar} /> : null}
+                <div className='search-result'>
+                  {user.name ? <Avatar size='large' src={user.avatar} /> : null}
                 </div>
                 <Result
                   icon={<SolutionOutlined />}
                   title={`Share ${props.type} with USER`}
                 />
               </TabPane>
-              <TabPane tab="Link" key="Link">
+              <TabPane tab='Link' key='Link'>
                 <Result
                   icon={<LinkOutlined />}
                   title={`Generate Shareable LINK`}
@@ -196,13 +198,22 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   };
 
   const getDiv = () => {
-    return (
-      <div onClick={openModal} className="popover-control-item">
-        <span>Share</span>
-        <ShareAltOutlined />
-        {getModal()}
-      </div>
-    );
+    if (mode === 'div') {
+      return (
+        <div onClick={openModal} className='popover-control-item'>
+          <span>Share</span>
+          <ShareAltOutlined />
+          {getModal()}
+        </div>
+      );
+    } else {
+      return (
+        <span onClick={openModal}>
+          <ShareAltOutlined />
+          {getModal()}
+        </span>
+      );
+    }
   };
 
   return getDiv();

@@ -42,20 +42,20 @@ const ManageNote: React.FC<NoteManageProps> = props => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditNote note={note} />
-      <MoveProjectItem type="NOTE" projectItemId={note.id} />
-      <ShareProjectItem type="NOTE" projectItemId={note.id} />
+      <EditNote note={note} mode='div' />
+      <MoveProjectItem type='NOTE' projectItemId={note.id} mode='div' />
+      <ShareProjectItem type='NOTE' projectItemId={note.id} mode='div' />
       <Popconfirm
-        title="Deleting Note also deletes its child notes. Are you sure?"
-        okText="Yes"
-        cancelText="No"
+        title='Deleting Note also deletes its child notes. Are you sure?'
+        okText='Yes'
+        cancelText='No'
         onConfirm={() => deleteNote(note.id)}
-        className="group-setting"
-        placement="bottom"
+        className='group-setting'
+        placement='bottom'
       >
-        <div className="popover-control-item">
+        <div className='popover-control-item'>
           <span>Delete</span>
-          <DeleteTwoTone twoToneColor="#f5222d" />
+          <DeleteTwoTone twoToneColor='#f5222d' />
         </div>
       </Popconfirm>
     </div>
@@ -70,10 +70,10 @@ const NoteItem: React.FC<NoteProps> = props => {
   };
 
   return (
-    <div className="note-item">
-      <div className="note-item-content">
+    <div className='note-item'>
+      <div className='note-item-content'>
         <Link to={`/note/${note.id}`}>
-          <h3 className="note-item-name">
+          <h3 className='note-item-name'>
             {note.labels && note.labels[0] ? (
               getIcon(note.labels[0].icon)
             ) : (
@@ -82,14 +82,14 @@ const NoteItem: React.FC<NoteProps> = props => {
             {note.name}
           </h3>
         </Link>
-        <div className="note-item-subs">
-          <div className="note-item-labels">
+        <div className='note-item-subs'>
+          <div className='note-item-labels'>
             {note.labels &&
               note.labels.map(label => {
                 return (
                   <Tag
                     key={`label${label.id}`}
-                    className="labels"
+                    className='labels'
                     color={stringToRGB(label.value)}
                   >
                     <span>
@@ -100,26 +100,26 @@ const NoteItem: React.FC<NoteProps> = props => {
                 );
               })}
           </div>
-          <div className="note-item-time">
+          <div className='note-item-time'>
             {note.updatedAt && moment(note.updatedAt).fromNow()}
           </div>
         </div>
       </div>
 
-      <div className="note-control">
-        <div className="note-item-owner">
+      <div className='note-control'>
+        <div className='note-item-owner'>
           <Tooltip title={note.owner}>
-            <Avatar src={note.ownerAvatar} size="small" />
+            <Avatar src={note.ownerAvatar} size='small' />
           </Tooltip>
         </div>
         <Popover
           arrowPointAtCenter
-          placement="rightTop"
+          placement='rightTop'
           overlayStyle={{ width: '150px' }}
           content={<ManageNote note={note} deleteNote={deleteNote} />}
-          trigger="click"
+          trigger='click'
         >
-          <span className="note-control-more">
+          <span className='note-control-more'>
             <MoreOutlined />
           </span>
         </Popover>

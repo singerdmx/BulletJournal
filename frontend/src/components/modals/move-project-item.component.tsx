@@ -22,6 +22,7 @@ import {
 const { Option } = Select;
 
 type ProjectItemProps = {
+  mode: string;
   type: string;
   projectItemId: number;
   project: Project;
@@ -43,6 +44,7 @@ type GroupProps = {
 };
 
 const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
+  const { mode } = props;
   const [projects, setProjects] = useState<Project[]>([]);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
@@ -64,7 +66,8 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     setProjects(flattenSharedProject(props.sharedProjects, projects));
     setProjects(
       projects.filter(
-        p => p.projectType === props.type && p.id !== props.project.id && !p.shared
+        p =>
+          p.projectType === props.type && p.id !== props.project.id && !p.shared
       )
     );
   }, []);
@@ -92,20 +95,20 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const getProjectSelections = () => {
     if (projects && projects[0]) {
       return (
-        <Form form={form} labelAlign="left">
-          <Tooltip title="Choose BuJo" placement="topLeft">
-            <Form.Item name="project">
+        <Form form={form} labelAlign='left'>
+          <Tooltip title='Choose BuJo' placement='topLeft'>
+            <Form.Item name='project'>
               <Select
-                placeholder="Choose BuJo"
+                placeholder='Choose BuJo'
                 style={{ width: '100%' }}
                 defaultValue={projects[0].id}
               >
                 {projects.map(project => {
                   return (
                     <Option value={project.id} key={project.id}>
-                      <Tooltip title={project.owner} placement="right">
+                      <Tooltip title={project.owner} placement='right'>
                         <span>
-                          <Avatar size="small" src={project.ownerAvatar} />
+                          <Avatar size='small' src={project.ownerAvatar} />
                           &nbsp; {iconMapper[project.projectType]}
                           &nbsp; <strong>{project.name}</strong>
                           &nbsp; (Group <strong>{project.group.name}</strong>)
@@ -130,7 +133,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         title={`MOVE ${props.type}`}
         destroyOnClose
         centered
-        okText="Confirm"
+        okText='Confirm'
         visible={visible}
         onCancel={e => handleCancel(e)}
         onOk={() => {
@@ -152,13 +155,22 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     if (projects.length === 0) {
       return null;
     }
-    return (
-      <div onClick={openModal} className="popover-control-item">
-        <span>Move</span>
-        <RightCircleOutlined />
-        {getModal()}
-      </div>
-    );
+    if (mode === 'div') {
+      return (
+        <div onClick={openModal} className='popover-control-item'>
+          <span>Move</span>
+          <RightCircleOutlined />
+          {getModal()}
+        </div>
+      );
+    } else {
+      return (
+        <span onClick={openModal}>
+          <RightCircleOutlined />
+          {getModal()}
+        </span>
+      );
+    }
   };
 
   return getDiv();
