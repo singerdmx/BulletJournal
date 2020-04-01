@@ -81,9 +81,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           {note.name}
           <div className="note-labels">
             {note.labels &&
-              note.labels.map(label => {
+              note.labels.map((label, index) => {
                 return (
                   <Tag
+                    key={index}
                     className="labels"
                     color={stringToRGB(label.value)}
                     style={{ cursor: 'pointer', display: 'inline-block' }}
