@@ -6,11 +6,9 @@ import com.bulletjournal.controller.models.TransactionsSummary;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import org.springframework.stereotype.Component;
 
+import java.time.Month;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Component
@@ -25,23 +23,31 @@ public class LedgerSummaryCalculator {
 
         final Total total = new Total();
         Map<String, Transactions> m = new HashMap<>();
+        boolean sortByMeta = false;
         switch (ledgerSummaryType) {
             case DEFAULT:
 
                 switch (frequencyType) {
                     case MONTHLY:
-                        // transactions, month
-                        Map<Transaction, String> transactionMonthMap = new HashMap<>();
+
+                        sortByMeta = true;
+                        // transactions, yearMonth
+                        Map<Transaction, Map.Entry<String, String>> transactionMonthMap = new HashMap<>();
 //                        int startmonth = startTime.getMonthValue();
 //                        int endmonth = endTime.getMonthValue();
                         for (Transaction t : transactions) {
-                            String month = t.getDate().substring(5, 7);
-                            transactionMonthMap.put(t, month);
+                            String tm = t.getDate().substring(5, 7);
+                            String ty = t.getDate().substring(0, 4);
+                            String month = Month.of(Integer.parseInt(tm)).name();
+                            String yearMonth = ty + " " + month;
+                            ty += "-" + tm; // year-month
+                            transactionMonthMap.put(t, new AbstractMap.SimpleEntry<>(yearMonth, ty));
                         }
 
                         processTransaction(transactions, total, (t -> {
                             double amount = t.getAmount();
-                            Transactions tran = m.computeIfAbsent(transactionMonthMap.get(t), k -> new Transactions());
+                            Transactions tran = m.computeIfAbsent(transactionMonthMap.get(t).getKey(), k -> new Transactions());
+                            tran.setMeta(transactionMonthMap.get(t).getValue());
                             switch (TransactionType.getType(t.getTransactionType())) {
                                 case INCOME:
                                     tran.addIncome(amount);
@@ -104,7 +110,7 @@ public class LedgerSummaryCalculator {
             double balance = v.getIncome() - v.getExpense();
             transactionsSummaries.add(new TransactionsSummary(
                     k,
-                    null,
+                    v.getMeta(),
                     v.getIncome(),
                     Math.round((v.getIncome() * 100 / total.totalIncome) * 100.0) / 100.0,
                     v.getExpense(),
@@ -113,6 +119,13 @@ public class LedgerSummaryCalculator {
                     Math.round(balance * 100 / ledgerSummary.getBalance() * 100.0) / 100.0
             ));
         });
+        if (sortByMeta) {
+            transactionsSummaries.sort(Comparator.comparing(TransactionsSummary::getMetadata));
+        } else {
+            transactionsSummaries.sort(Comparator.comparing(TransactionsSummary::getName));
+        }
+
+
         ledgerSummary.setTransactionsSummaries(transactionsSummaries);
         return ledgerSummary;
     }
@@ -138,6 +151,7 @@ public class LedgerSummaryCalculator {
     private static class Transactions {
         double income = 0.0;
         double expense = 0.0;
+        String meta = null;
 
         void addIncome(double amount) {
             this.income += amount;
@@ -153,6 +167,14 @@ public class LedgerSummaryCalculator {
 
         public double getExpense() {
             return expense;
+        }
+
+        public String getMeta() {
+            return meta;
+        }
+
+        public void setMeta(String meta) {
+            this.meta = meta;
         }
     }
 

@@ -39,6 +39,7 @@ public class TransactionControllerTest {
     private static final String ROOT_URL = "http://localhost:";
 
     private static String TIMEZONE = "America/Los_Angeles";
+
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
@@ -77,6 +78,8 @@ public class TransactionControllerTest {
         Transaction t4 = createTransaction(p1, "T4", "2019-12-22", "Joker", 200.0, 1);
         Transaction t5 = createTransaction(p1, "T5", "2019-12-28", "ccc", 100.0, 0);
 
+        // Bu Jo Thin cc
+
         // Get transactions by payer
         String url = UriComponentsBuilder.fromHttpUrl(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
@@ -100,9 +103,9 @@ public class TransactionControllerTest {
         assertTrue(Math.abs(summary.getBalance() - 700.0) < 1e-4);
         assertTrue(Math.abs(summary.getIncome() - 1400.0) < 1e-4);
         assertEquals(5, summary.getTransactions().size());
-        assertEquals((Double) 400.0, transactionsSummaries.get(2).getBalance());
+        assertEquals(Double.valueOf("-500.0"), transactionsSummaries.get(2).getBalance());
         assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71.43) < 1e-4);
-        assertEquals(Double.valueOf("-500.0"), transactionsSummaries.get(1).getBalance());
+        assertEquals(Double.valueOf("-200.0"), transactionsSummaries.get(1).getBalance());
 
 
         List<Label> label = createLabels();
@@ -129,16 +132,12 @@ public class TransactionControllerTest {
         transactions = transactionsResponse.getBody().getTransactions();
         summary = transactionsResponse.getBody();
         transactionsSummaries = summary.getTransactionsSummaries();
-        List<TransactionsSummary> summaryInOrder = new ArrayList<>(transactionsSummaries);
-        Collections.sort(summaryInOrder, new CustomComparator());
-//        assertTrue(Math.abs(summary.getBalance() - 700.0) < 1e-4);
-//        assertTrue(Math.abs(summary.getIncome() - 1400.0) < 1e-4);
         assertEquals(5, summary.getTransactions().size());
-        assertEquals("Label0", summaryInOrder.get(0).getName());
-        assertEquals("Label2", summaryInOrder.get(2).getName());
-        assertEquals((Double) 600.0, summaryInOrder.get(1).getBalance());
-        assertTrue(Math.abs(summaryInOrder.get(0).getIncomePercentage() - 78.57) < 1e-4);
-        assertTrue(Math.abs(summaryInOrder.get(0).getExpensePercentage() - 71.43) < 1e-4);
+        assertEquals("Label0", transactionsSummaries.get(0).getName());
+        assertEquals("Label2", transactionsSummaries.get(2).getName());
+        assertEquals((Double) 600.0, transactionsSummaries.get(1).getBalance());
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 78.57) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(0).getExpensePercentage() - 71.43) < 1e-4);
 
         // get transactions default (MONTHLY)
         // wat bout different year same month?
@@ -146,15 +145,16 @@ public class TransactionControllerTest {
         Transaction t7 = createTransaction(p1, "T7", "2019-10-28", "999999", 700.0, 0);
         Transaction t8 = createTransaction(p1, "T8", "2019-09-28", "mqm", 300.0, 1);
         Transaction t9 = createTransaction(p1, "T9", "2019-09-18", "mqm", 100.0, 1);
-//        Transaction t10 = createTransaction(p1, "T10", "2018-09-28", "BulletJournal", 200.0, 0);
+        Transaction t10 = createTransaction(p1, "T10", "2018-09-28", "BulletJournal", 200.0, 0);
+        Transaction t11 = createTransaction(p1, "T11", "2018-11-17", "ccc", 300.0, 0);
 
         url = UriComponentsBuilder.fromHttpUrl(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
                 .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
-                .queryParam("startDate", "2019-09-01")
-                .queryParam("endDate", "2019-12-14")
+                .queryParam("startDate", "2018-09-01")
+                .queryParam("endDate", "2019-11-30")
                 .buildAndExpand(p1.getId()).toUriString();
         transactionsResponse = this.restTemplate.exchange(
                 url,
@@ -165,15 +165,15 @@ public class TransactionControllerTest {
         transactions = transactionsResponse.getBody().getTransactions();
         summary = transactionsResponse.getBody();
         transactionsSummaries = summary.getTransactionsSummaries();
-        summaryInOrder = new ArrayList<>(transactionsSummaries);
-        Collections.sort(summaryInOrder, new CustomComparator());
         assertTrue(Math.abs(summary.getBalance() - 550.0) < 1e-4);
-        assertTrue(Math.abs(summary.getIncome() - 1700.0) < 1e-4);
+        assertTrue(Math.abs(summary.getIncome() - 1200.0) < 1e-4);
         assertEquals(6, summary.getTransactions().size());
-        assertEquals(Double.valueOf("-400.0"), summaryInOrder.get(0).getBalance());
-        assertTrue(Math.abs(summaryInOrder.get(1).getIncomePercentage() - 41.18) < 1e-4);
-        assertTrue(Math.abs(summaryInOrder.get(0).getExpensePercentage() - 34.78) < 1e-4);
-        assertEquals((Double) 0.0, summaryInOrder.get(0).getIncomePercentage());
+        assertEquals("2018 SEPTEMBER", transactionsSummaries.get(0).getName());
+        assertEquals("2019 SEPTEMBER", transactionsSummaries.get(2).getName());
+        assertEquals(Double.valueOf("-400.0"), transactionsSummaries.get(2).getBalance());
+        assertTrue(Math.abs(transactionsSummaries.get(2).getExpensePercentage() - 61.54) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 16.67) < 1e-4);
+        assertEquals((Double) 0.0, transactionsSummaries.get(0).getExpensePercentage());
 
 
     }
@@ -304,14 +304,6 @@ public class TransactionControllerTest {
         Label[] labelsCreated = response.getBody();
         assertEquals(5, labelsCreated.length);
         return labels;
-    }
-
-    private static class CustomComparator implements Comparator<TransactionsSummary> {
-
-        @Override
-        public int compare(TransactionsSummary t1, TransactionsSummary t2) {
-            return t1.getName().compareTo(t2.getName());
-        }
     }
 
 
