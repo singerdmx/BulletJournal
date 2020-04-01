@@ -19,6 +19,7 @@ import {
   deleteTask,
   deleteCompletedTask
 } from '../../features/tasks/actions';
+import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
 
 type TaskProps = {
@@ -42,6 +43,7 @@ const ManageTask: React.FC<TaskProps> = props => {
   if (isComplete) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <EditTask />
         <Popconfirm
           title='Deleting Task also deletes its child tasks. Are you sure?'
           okText='Yes'
@@ -67,10 +69,7 @@ const ManageTask: React.FC<TaskProps> = props => {
   } else {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div className='popover-control-item'>
-          <span>Edit</span>
-          <EditOutlined />
-        </div>
+        <EditTask />
         <Popconfirm
           title='Deleting Task also deletes its child tasks. Are you sure?'
           okText='Yes'

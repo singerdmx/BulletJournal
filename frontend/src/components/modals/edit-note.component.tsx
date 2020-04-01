@@ -19,7 +19,9 @@ const EditNote: React.FC<NoteProps> = props => {
 
   const [value, setValue] = useState(note.name);
   const onOk = () => {
-    patchNote(note.id, value);
+    if (value) {
+      patchNote(note.id, value);
+    }
     setVisible(!visible);
   };
 
