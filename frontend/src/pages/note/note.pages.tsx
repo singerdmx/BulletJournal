@@ -70,73 +70,67 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   };
 
   return (
-    <div className='note-page'>
-      <Tooltip placement='top' title={note.owner} className='note-avatar'>
+    <div className="note-page">
+      <Tooltip placement="top" title={note.owner} className="note-avatar">
         <span>
-          <Avatar size='large' src={note.ownerAvatar} />
+          <Avatar size="large" src={note.ownerAvatar} />
         </span>
       </Tooltip>
-      <div className='note-title'>
-        <div className='label-and-name'>
+      <div className="note-title">
+        <div className="label-and-name">
           {note.name}
-          <div className='note-labels'>
+          <div className="note-labels">
             {note.labels &&
               note.labels.map(label => {
                 return (
-                  <Tooltip
-                    placement='top'
-                    title='Click to Check or Edit'
-                    key={label.id}
+                  <Tag
+                    className="labels"
+                    color={stringToRGB(label.value)}
+                    style={{ cursor: 'pointer', display: 'inline-block' }}
                   >
-                    <Tag
-                      className='labels'
-                      color={stringToRGB(label.value)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <span onClick={() => toLabelSearching(label)}>
-                        {getIcon(label.icon)} &nbsp;
-                        {label.value}
-                      </span>
-                    </Tag>
-                  </Tooltip>
+                    <span onClick={() => toLabelSearching(label)}>
+                      {getIcon(label.icon)} &nbsp;
+                      {label.value}
+                    </span>
+                  </Tag>
                 );
               })}
           </div>
         </div>
 
-        <div className='note-operation'>
-          <Tooltip title='Add Label'>
+        <div className="note-operation">
+          <Tooltip title="Add Label">
             <TagOutlined />
           </Tooltip>
-          <Tooltip title='Edit Label'>
-            <EditNote note={note} mode='icon' />
+          <Tooltip title="Edit Label">
+            <EditNote note={note} mode="icon" />
           </Tooltip>
-          <Tooltip title='Move Note'>
-            <MoveProjectItem type='NOTE' projectItemId={note.id} mode='icon' />
+          <Tooltip title="Move Note">
+            <MoveProjectItem type="NOTE" projectItemId={note.id} mode="icon" />
           </Tooltip>
-          <Tooltip title='Share Note'>
-            <ShareProjectItem type='NOTE' projectItemId={note.id} mode='icon' />
+          <Tooltip title="Share Note">
+            <ShareProjectItem type="NOTE" projectItemId={note.id} mode="icon" />
           </Tooltip>
-          <Tooltip title='Delete'>
+          <Tooltip title="Delete">
             <Popconfirm
-              title='Deleting Note also deletes its child notes. Are you sure?'
-              okText='Yes'
-              cancelText='No'
+              title="Deleting Note also deletes its child notes. Are you sure?"
+              okText="Yes"
+              cancelText="No"
               onConfirm={() => {
                 deleteNote(note.id);
                 history.goBack();
               }}
-              className='group-setting'
-              placement='bottom'
+              className="group-setting"
+              placement="bottom"
             >
-              <DeleteTwoTone twoToneColor='#f5222d' />
+              <DeleteTwoTone twoToneColor="#f5222d" />
             </Popconfirm>
           </Tooltip>
         </div>
       </div>
       <Divider />
-      <div className='content'>
-        <div className='content-list'>
+      <div className="content">
+        <div className="content-list">
           <NoteContentList noteId={note.id} />
         </div>
         <Button onClick={createHandler}>
@@ -144,7 +138,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           New
         </Button>
       </div>
-      <div className='note-drawer'>
+      <div className="note-drawer">
         <NoteEditorDrawer
           noteId={note.id}
           visible={showEditor}
