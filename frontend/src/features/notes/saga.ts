@@ -114,6 +114,13 @@ function* patchNote(action: PayloadAction<PatchNote>) {
         notes: data
       })
     );
+
+    const note = yield call(getNoteById, action.payload.noteId);
+    yield put(
+      notesActions.noteReceived({
+        note: note
+      })
+    );
   } catch (error) {
     yield call(message.error, `Patch Note Error Received: ${error}`);
   }

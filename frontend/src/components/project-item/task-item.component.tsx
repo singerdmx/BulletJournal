@@ -1,6 +1,7 @@
 import React from 'react';
 import { Popconfirm, Popover } from 'antd';
 import {
+  EditOutlined,
   DeleteTwoTone,
   CheckCircleTwoTone,
   CloseCircleOutlined,
@@ -12,9 +13,13 @@ import {
 import { Task } from '../../features/tasks/interface';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { completeTask, uncompleteTask, deleteTask, deleteCompletedTask } from '../../features/tasks/actions';
+import {
+  completeTask,
+  uncompleteTask,
+  deleteTask,
+  deleteCompletedTask
+} from '../../features/tasks/actions';
 import './project-item.styles.less';
-
 
 type TaskProps = {
   task: Task;
@@ -26,48 +31,65 @@ type TaskProps = {
 };
 
 const ManageTask: React.FC<TaskProps> = props => {
-  const { task, isComplete, completeTask, uncompleteTask, deleteTask, deleteCompletedTask } = props;
+  const {
+    task,
+    isComplete,
+    completeTask,
+    uncompleteTask,
+    deleteTask,
+    deleteCompletedTask
+  } = props;
   if (isComplete) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Popconfirm
-          title="Deleting Task also deletes its child tasks. Are you sure?"
-          okText="Yes"
-          cancelText="No"
+          title='Deleting Task also deletes its child tasks. Are you sure?'
+          okText='Yes'
+          cancelText='No'
           onConfirm={() => deleteCompletedTask(task.id)}
-          className="group-setting"
-          placement="bottom"
+          className='group-setting'
+          placement='bottom'
         >
           <div style={{ cursor: 'pointer' }}>
             Delete
-            <DeleteTwoTone twoToneColor="#f5222d" />
+            <DeleteTwoTone twoToneColor='#f5222d' />
           </div>
         </Popconfirm>
         <div style={{ cursor: 'pointer' }}>
           Uncomplete
-            <CloseCircleOutlined onClick={() => uncompleteTask(task.id)} twoToneColor="#52c41a" />
+          <CloseCircleOutlined
+            onClick={() => uncompleteTask(task.id)}
+            twoToneColor='#52c41a'
+          />
         </div>
       </div>
     );
   } else {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ cursor: 'pointer' }}>
+          Edit
+          <EditOutlined />
+        </div>
         <Popconfirm
-          title="Deleting Task also deletes its child tasks. Are you sure?"
-          okText="Yes"
-          cancelText="No"
+          title='Deleting Task also deletes its child tasks. Are you sure?'
+          okText='Yes'
+          cancelText='No'
           onConfirm={() => deleteTask(task.id)}
-          className="group-setting"
-          placement="bottom"
+          className='group-setting'
+          placement='bottom'
         >
           <div style={{ cursor: 'pointer' }}>
             Delete
-            <DeleteTwoTone twoToneColor="#f5222d" />
+            <DeleteTwoTone twoToneColor='#f5222d' />
           </div>
         </Popconfirm>
         <div style={{ cursor: 'pointer' }}>
           Complete
-          <CheckCircleTwoTone onClick={() => completeTask(task.id)} twoToneColor="#52c41a" />
+          <CheckCircleTwoTone
+            onClick={() => completeTask(task.id)}
+            twoToneColor='#52c41a'
+          />
         </div>
       </div>
     );
@@ -79,7 +101,14 @@ const alignConfig = {
 };
 
 const TaskItem: React.FC<TaskProps> = props => {
-  const { task, isComplete, completeTask, uncompleteTask, deleteTask, deleteCompletedTask } = props;
+  const {
+    task,
+    isComplete,
+    completeTask,
+    uncompleteTask,
+    deleteTask,
+    deleteCompletedTask
+  } = props;
   return (
     <div
       style={{
@@ -109,12 +138,19 @@ const TaskItem: React.FC<TaskProps> = props => {
         <MessageOutlined style={{ marginRight: '1em' }} />
         <Popover
           align={alignConfig}
-          placement="bottomRight"
+          placement='bottomRight'
           style={{ top: -10 }}
           content={
-            <ManageTask task={task} isComplete={isComplete} completeTask={completeTask} uncompleteTask={uncompleteTask} deleteTask={deleteTask} deleteCompletedTask={deleteCompletedTask} />
+            <ManageTask
+              task={task}
+              isComplete={isComplete}
+              completeTask={completeTask}
+              uncompleteTask={uncompleteTask}
+              deleteTask={deleteTask}
+              deleteCompletedTask={deleteCompletedTask}
+            />
           }
-          trigger="click"
+          trigger='click'
         >
           <MoreOutlined
             style={{ transform: 'rotate(90deg)', fontSize: '20px' }}
@@ -131,4 +167,3 @@ export default connect(null, {
   deleteTask,
   deleteCompletedTask
 })(TaskItem);
-
