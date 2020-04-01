@@ -259,6 +259,8 @@ VALUES (104, '2020-02-19 07:11:22.535000', '2020-02-20 08:11:22.535000', 'Note15
 INSERT INTO public.notes (id, created_at, updated_at, name, owner, project_id, labels)
 VALUES (105, '2020-02-20 07:11:22.535000', '2020-02-21 08:11:22.535000', 'Note16', 'BulletJournal', 12, '{1,2}');
 --update relation
+INSERT INTO public.user_project_tasks (project_id, created_at, updated_at, tasks)
+VALUES (11, '2020-03-31 22:31:08.476000', '2020-03-31 22:31:39.473000', '[{"id":13,"s":[]}');
 INSERT INTO public.user_project_notes (project_id, created_at, updated_at, notes)
 VALUES (12, '2020-02-18 07:11:22.535000', '2020-02-19 07:11:22.535000', '[{"id":100,"s":[{"id":101,"s":[{"id":102,"s":[]}]},{"id":103,"s":[]}]},{"id":104,"s":[{"id":105,"s":[]}]}]');
 
