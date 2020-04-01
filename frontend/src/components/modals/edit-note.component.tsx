@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Modal } from 'antd';
 import { EditTwoTone } from '@ant-design/icons';
 import './modals.styles.less';
@@ -22,6 +22,10 @@ const EditNote: React.FC<NoteProps> = props => {
     patchNote(note.id, value);
     setVisible(!visible);
   };
+
+  useEffect(() => {
+    setValue(note.name);
+  }, [note]);
 
   const getModal = () => {
     return (
