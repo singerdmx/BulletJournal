@@ -202,6 +202,8 @@ public class ProjectControllerTest {
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
                 .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
+                .queryParam("startDate", "2020-01-01")
+                .queryParam("endDate", "2020-11-01")
                 .buildAndExpand(p.getId()).toUriString();
         ResponseEntity<LedgerSummary> transactionsResponse = this.restTemplate.exchange(
                 url,
@@ -264,6 +266,8 @@ public class ProjectControllerTest {
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
                 .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
+                .queryParam("startDate", "2020-01-01")
+                .queryParam("endDate", "2020-11-01")
                 .buildAndExpand(project.getId()).toUriString();
         ResponseEntity<LedgerSummary> getResponse = this.restTemplate.exchange(
                 url,
@@ -294,6 +298,8 @@ public class ProjectControllerTest {
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
                 .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
+                .queryParam("startDate", "2020-01-01")
+                .queryParam("endDate", "2020-11-01")
                 .buildAndExpand(t.getProjectId()).toUriString();
         ResponseEntity<LedgerSummary> getResponse = this.restTemplate.exchange(
                 url,
