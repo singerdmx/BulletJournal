@@ -1,34 +1,36 @@
-import { takeLatest, call, all, put } from 'redux-saga/effects';
-import { message } from 'antd';
+import {all, call, put, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
 import {
   actions as tasksActions,
-  TaskApiErrorAction,
-  UpdateTasks,
-  CreateTask,
-  PutTask,
-  GetTask,
-  PatchTask,
-  MoveTask,
   CompleteTask,
+  CreateTask,
+  GetTask,
+  MoveTask,
+  PatchTask,
+  PutTask,
+  SetTaskLabels,
+  ShareTask,
+  TaskApiErrorAction,
   UncompleteTask,
-  SetTaskLabels, ShareTask
+  UpdateTasks
 } from './reducer';
-import { PayloadAction } from 'redux-starter-kit';
+import {PayloadAction} from 'redux-starter-kit';
 import {
-  fetchTasks,
-  fetchCompletedTasks,
-  createTask,
-  putTasks,
-  getTaskById,
-  updateTask,
   completeTaskById,
-  deleteTaskById,
+  createTask,
   deleteCompletedTaskById,
-  uncompleteTaskById,
+  deleteTaskById,
+  fetchCompletedTasks,
+  fetchTasks,
+  getTaskById,
+  moveToTargetProject,
+  putTasks,
   setTaskLabels,
-  moveToTargetProject, shareTaskWithOther
+  shareTaskWithOther,
+  uncompleteTaskById,
+  updateTask
 } from '../../apis/taskApis';
-import { updateTasks } from './actions';
+import {updateTasks} from './actions';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -36,13 +38,13 @@ function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
 
 function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
-    const { projectId } = action.payload;
+    const {projectId} = action.payload;
     const tasks = yield call(fetchTasks, projectId);
 
     yield put(
-      tasksActions.tasksReceived({
-        tasks: tasks
-      })
+        tasksActions.tasksReceived({
+          tasks: tasks
+        })
     );
   } catch (error) {
     yield call(message.error, `tasksUpdate Error Received: ${error}`);
@@ -51,13 +53,13 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
 
 function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
-    const { projectId } = action.payload;
+    const {projectId} = action.payload;
     const tasks = yield call(fetchCompletedTasks, projectId);
 
     yield put(
-      tasksActions.completedTasksReceived({
-        tasks: tasks
-      })
+        tasksActions.completedTasksReceived({
+          tasks: tasks
+        })
     );
   } catch (error) {
     yield call(message.error, `completedTasksUpdate Error Received: ${error}`);
@@ -77,17 +79,17 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       recurrenceRule,
       timezone
     } = action.payload;
-    const data = yield call(
-      createTask,
-      projectId,
-      name,
-      assignedTo,
-      reminderSetting,
-      timezone,
-      dueDate,
-      dueTime,
-      duration,
-      recurrenceRule
+    yield call(
+        createTask,
+        projectId,
+        name,
+        assignedTo,
+        reminderSetting,
+        timezone,
+        dueDate,
+        dueTime,
+        duration,
+        recurrenceRule
     );
     yield put(updateTasks(projectId));
   } catch (error) {
@@ -97,13 +99,13 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
 
 function* taskPut(action: PayloadAction<PutTask>) {
   try {
-    const { projectId, tasks } = action.payload;
+    const {projectId, tasks} = action.payload;
     const data = yield call(putTasks, projectId, tasks);
     const updatedTasks = yield data.json();
     yield put(
-      tasksActions.tasksReceived({
-        tasks: updatedTasks
-      })
+        tasksActions.tasksReceived({
+          tasks: updatedTasks
+        })
     );
   } catch (error) {
     yield call(message.error, `Put Task Error Received: ${error}`);
@@ -112,7 +114,7 @@ function* taskPut(action: PayloadAction<PutTask>) {
 
 function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
   try {
-    const { taskId, labels } = action.payload;
+    const {taskId, labels} = action.payload;
     const data = yield call(setTaskLabels, taskId, labels);
     yield put(updateTasks(data.projectId));
   } catch (error) {
@@ -123,7 +125,7 @@ function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
 function* getTask(action: PayloadAction<GetTask>) {
   try {
     const data = yield call(getTaskById, action.payload.taskId);
-    yield put(tasksActions.taskReceived({ task: data }));
+    yield put(tasksActions.taskReceived({task: data}));
   } catch (error) {
     yield call(message.error, `Get Task Error Received: ${error}`);
   }
@@ -141,14 +143,14 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       reminderSetting
     } = action.payload;
     yield call(
-      updateTask,
-      taskId,
-      name,
-      assignedTo,
-      dueDate,
-      dueTime,
-      duration,
-      reminderSetting
+        updateTask,
+        taskId,
+        name,
+        assignedTo,
+        dueDate,
+        dueTime,
+        duration,
+        reminderSetting
     );
   } catch (error) {
     yield call(message.error, `Patch Task Error Received: ${error}`);
@@ -157,19 +159,19 @@ function* patchTask(action: PayloadAction<PatchTask>) {
 
 function* completeTask(action: PayloadAction<CompleteTask>) {
   try {
-    const { taskId } = action.payload;
+    const {taskId} = action.payload;
     const task = yield call(completeTaskById, taskId);
     const tasks = yield call(fetchTasks, task.projectId);
     yield put(
-      tasksActions.tasksReceived({
-        tasks: tasks
-      })
+        tasksActions.tasksReceived({
+          tasks: tasks
+        })
     );
     const completedTasks = yield call(fetchCompletedTasks, task.projectId);
     yield put(
-      tasksActions.completedTasksReceived({
-        tasks: completedTasks
-      })
+        tasksActions.completedTasksReceived({
+          tasks: completedTasks
+        })
     );
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
@@ -178,19 +180,19 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
 
 function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
   try {
-    const { taskId } = action.payload;
+    const {taskId} = action.payload;
     const task = yield call(uncompleteTaskById, taskId);
     const tasks = yield call(fetchTasks, task.projectId);
     yield put(
-      tasksActions.tasksReceived({
-        tasks: tasks
-      })
+        tasksActions.tasksReceived({
+          tasks: tasks
+        })
     );
     const completedTasks = yield call(fetchCompletedTasks, task.projectId);
     yield put(
-      tasksActions.completedTasksReceived({
-        tasks: completedTasks
-      })
+        tasksActions.completedTasksReceived({
+          tasks: completedTasks
+        })
     );
   } catch (error) {
     yield call(message.error, `Uncomplete Task Error Received: ${error}`);
@@ -199,13 +201,13 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
 
 function* deleteTask(action: PayloadAction<UncompleteTask>) {
   try {
-    const { taskId } = action.payload;
+    const {taskId} = action.payload;
     const data = yield call(deleteTaskById, taskId);
     const updatedTasks = yield data.json();
     yield put(
-      tasksActions.tasksReceived({
-        tasks: updatedTasks
-      })
+        tasksActions.tasksReceived({
+          tasks: updatedTasks
+        })
     );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
@@ -214,13 +216,13 @@ function* deleteTask(action: PayloadAction<UncompleteTask>) {
 
 function* deleteCompletedTask(action: PayloadAction<CompleteTask>) {
   try {
-    const { taskId } = action.payload;
+    const {taskId} = action.payload;
     const data = yield call(deleteCompletedTaskById, taskId);
     const updatedCompletedTasks = yield data.json();
     yield put(
-      tasksActions.completedTasksReceived({
-        tasks: updatedCompletedTasks
-      })
+        tasksActions.completedTasksReceived({
+          tasks: updatedCompletedTasks
+        })
     );
   } catch (error) {
     yield call(message.error, `Delete Completed Task Error Received: ${error}`);
@@ -229,7 +231,7 @@ function* deleteCompletedTask(action: PayloadAction<CompleteTask>) {
 
 function* moveTask(action: PayloadAction<MoveTask>) {
   try {
-    const { taskId, targetProject, history } = action.payload;
+    const {taskId, targetProject, history} = action.payload;
     yield call(moveToTargetProject, taskId, targetProject);
     yield call(message.success, "Task moved successfully");
     history.push(`/projects/${targetProject}`);
@@ -240,7 +242,7 @@ function* moveTask(action: PayloadAction<MoveTask>) {
 
 function* shareTask(action: PayloadAction<ShareTask>) {
   try {
-    const { taskId, targetUser, targetGroup, generateLink } = action.payload;
+    const {taskId, targetUser, targetGroup, generateLink} = action.payload;
     yield call(shareTaskWithOther, taskId, targetUser, targetGroup, generateLink);
     yield call(message.success, 'Task shared successfully');
   } catch (error) {
@@ -251,8 +253,8 @@ function* shareTask(action: PayloadAction<ShareTask>) {
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
-      tasksActions.taskApiErrorReceived.type,
-      taskApiErrorReceived
+        tasksActions.taskApiErrorReceived.type,
+        taskApiErrorReceived
     ),
     yield takeLatest(tasksActions.TasksUpdate.type, tasksUpdate),
     yield takeLatest(tasksActions.TasksCreate.type, taskCreate),
@@ -267,8 +269,8 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskMove.type, moveTask),
     yield takeLatest(tasksActions.TaskShare.type, shareTask),
     yield takeLatest(
-      tasksActions.CompletedTasksUpdate.type,
-      completedTasksUpdate
+        tasksActions.CompletedTasksUpdate.type,
+        completedTasksUpdate
     )
   ]);
 }
