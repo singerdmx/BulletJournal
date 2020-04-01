@@ -4,6 +4,7 @@ import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-desi
 import {ProjectItems} from '../../features/myBuJo/interface';
 import NoteItem from './note-item.component';
 import TaskItem from "./task-item.component";
+import TransactionItem from "./transaction-item.component";
 
 const {Panel} = Collapse;
 
@@ -21,11 +22,11 @@ const getTasksPanel = (items: ProjectItems, index: number) => {
             key={`tasks${index}`}
             extra={<CarryOutOutlined/>}
         >
-                {items.tasks.map(item => {
-                    return (<div key={`task${item.id}`}>
-                        <TaskItem task={item} isComplete={false}/>
-                    </div>);
-                })}
+            {items.tasks.map((item, index) => {
+                return (<div key={`task${item.id}#${index}`}>
+                    <TaskItem task={item} isComplete={false}/>
+                </div>);
+            })}
         </Panel>
     );
 };
@@ -40,6 +41,13 @@ const getTransactionsPanel = (items: ProjectItems, index: number) => {
             key={`transactions${index}`}
             extra={<AccountBookOutlined/>}
         >
+            <List>
+                {items.transactions.map((item, index) => {
+                    return (<div key={`transactions${item.id}#${index}`}>
+                        <TransactionItem transaction={item}/>
+                    </div>);
+                })}
+            </List>
         </Panel>
     );
 };
@@ -50,24 +58,24 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
     }
     return (
         <Panel
-    header={items.dayOfWeek}
-    key={`notes${index}`}
-    extra={<FileTextOutlined/>}
-    >
-        <List>
-        {items.notes.map(item=>{
-            return (<div key={`note${item.id}`}>
+            header={items.dayOfWeek}
+            key={`notes${index}`}
+            extra={<FileTextOutlined/>}
+        >
+            <List>
+                {items.notes.map((item, index) => {
+                    return (<div key={`note${item.id}#${index}`}>
                         <NoteItem note={item}/>
                     </div>);
-        })}
-        </List>
-    </Panel>
+                })}
+            </List>
+        </Panel>
     );
 };
 
 const ProjectModelItems: React.FC<ProjectModelItemsProps> = props => {
     if (!props.projectItems || props.projectItems.length === 0) {
-        return <Empty />;
+        return <Empty/>;
     }
     return (
         <Timeline mode={'left'}>

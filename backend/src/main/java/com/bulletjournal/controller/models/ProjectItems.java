@@ -42,6 +42,13 @@ public class ProjectItems {
 
     private static void addOwnerAvatar(ProjectItem projectItem, UserClient userClient) {
         projectItem.setOwnerAvatar(userClient.getUser(projectItem.getOwner()).getAvatar());
+        if (projectItem instanceof Transaction) {
+            Transaction transaction = ((Transaction) projectItem);
+            transaction.setPayerAvatar(userClient.getUser(transaction.getPayer()).getAvatar());
+        } else if (projectItem instanceof Task) {
+            Task task = ((Task) projectItem);
+            task.setAssignedToAvatar(userClient.getUser(task.getAssignedTo()).getAvatar());
+        }
     }
 
     public List<Task> getTasks() {
