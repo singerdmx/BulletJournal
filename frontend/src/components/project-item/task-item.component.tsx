@@ -50,25 +50,25 @@ const ManageTask: React.FC<TaskProps> = props => {
           className='group-setting'
           placement='bottom'
         >
-          <div style={{ cursor: 'pointer' }}>
-            Delete
+          <div className='popover-control-item'>
+            <span>Delete</span>
             <DeleteTwoTone twoToneColor='#f5222d' />
           </div>
         </Popconfirm>
-        <div style={{ cursor: 'pointer' }}>
-          Uncomplete
-          <CloseCircleOutlined
-            onClick={() => uncompleteTask(task.id)}
-            twoToneColor='#52c41a'
-          />
+        <div
+          onClick={() => uncompleteTask(task.id)}
+          className='popover-control-item'
+        >
+          <span>Uncomplete</span>
+          <CloseCircleOutlined twoToneColor='#52c41a' />
         </div>
       </div>
     );
   } else {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div style={{ cursor: 'pointer' }}>
-          Edit
+        <div className='popover-control-item'>
+          <span>Edit</span>
           <EditOutlined />
         </div>
         <Popconfirm
@@ -79,25 +79,21 @@ const ManageTask: React.FC<TaskProps> = props => {
           className='group-setting'
           placement='bottom'
         >
-          <div style={{ cursor: 'pointer' }}>
-            Delete
+          <div className='popover-control-item'>
+            <span>Delete</span>
             <DeleteTwoTone twoToneColor='#f5222d' />
           </div>
         </Popconfirm>
-        <div style={{ cursor: 'pointer' }}>
-          Complete
-          <CheckCircleTwoTone
-            onClick={() => completeTask(task.id)}
-            twoToneColor='#52c41a'
-          />
+        <div
+          onClick={() => completeTask(task.id)}
+          className='popover-control-item'
+        >
+          <span>Complete</span>
+          <CheckCircleTwoTone twoToneColor='#52c41a' />
         </div>
       </div>
     );
   }
-};
-
-const alignConfig = {
-  offset: [10, -5]
 };
 
 const TaskItem: React.FC<TaskProps> = props => {
@@ -137,9 +133,9 @@ const TaskItem: React.FC<TaskProps> = props => {
         <InfoCircleOutlined style={{ marginRight: '1em' }} />
         <MessageOutlined style={{ marginRight: '1em' }} />
         <Popover
-          align={alignConfig}
-          placement='bottomRight'
-          style={{ top: -10 }}
+          arrowPointAtCenter
+          placement='rightTop'
+          overlayStyle={{ width: '150px' }}
           content={
             <ManageTask
               task={task}
@@ -152,9 +148,9 @@ const TaskItem: React.FC<TaskProps> = props => {
           }
           trigger='click'
         >
-          <MoreOutlined
-            style={{ transform: 'rotate(90deg)', fontSize: '20px' }}
-          />
+          <span className='note-control-more'>
+            <MoreOutlined />
+          </span>
         </Popover>
       </div>
     </div>
