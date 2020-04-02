@@ -3,6 +3,7 @@ package com.bulletjournal.filters;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.config.SSOConfig;
+import com.bulletjournal.controller.SystemController;
 import com.bulletjournal.controller.UserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +54,17 @@ public class AuthFilter implements Filter {
             }
         }
 
-        if (username == null && this.authConfig.isEnableDefaultUser()) {
-            username = this.authConfig.getDefaultUsername();
-            MDC.put(UserClient.USER_NAME_KEY, username);
-        }
-
         if (username == null) {
-            LOGGER.error(request.getRequestURI() + ": user not logged in");
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            if (request.getRequestURI().startsWith(SystemController.PUBLIC_ITEM_ROUTE_PREFIX)) {
+                LOGGER.info("Bypassing AuthFilter");
+            } else if (this.authConfig.isEnableDefaultUser()) {
+                username = this.authConfig.getDefaultUsername();
+                MDC.put(UserClient.USER_NAME_KEY, username);
+            } else {
+                LOGGER.error(request.getRequestURI() + ": user not logged in");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
         }
 
         LOGGER.info(request.getRequestURI());

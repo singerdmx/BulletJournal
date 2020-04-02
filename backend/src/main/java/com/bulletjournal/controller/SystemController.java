@@ -11,11 +11,9 @@ import com.bulletjournal.repository.TaskDaoJpa;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -24,6 +22,8 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 public class SystemController {
 
     public static final String UPDATES_ROUTE = "/api/system/updates";
+    public static final String PUBLIC_ITEM_ROUTE_PREFIX = "/api/public/items/";
+    public static final String PUBLIC_ITEM_ROUTE = PUBLIC_ITEM_ROUTE_PREFIX + "{itemId}";
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
@@ -91,5 +91,10 @@ public class SystemController {
         systemUpdates.setReminders(remindingTasks);
         systemUpdates.setRemindingTaskEtag(remindingTaskEtag);
         return systemUpdates;
+    }
+
+    @GetMapping(PUBLIC_ITEM_ROUTE)
+    public PublicProjectItem getPublicProjectItem(@NotNull @PathVariable String itemId) {
+        return new PublicProjectItem();
     }
 }

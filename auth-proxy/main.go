@@ -156,6 +156,13 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		writeClientError()
 	}
 
+	if (strings.HasPrefix(r.RequestURI, "/api/public/items/") ||
+		strings.HasPrefix(r.RequestURI, "/public/items/")) {
+		logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)
+		handler.ServeHTTP(w, r)
+		return
+	}
+
 	cookie, err := r.Cookie("__discourse_proxy")
 	var username, groups string
 
