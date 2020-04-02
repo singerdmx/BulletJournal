@@ -24,7 +24,7 @@ import ShareProjectItem from '../modals/share-project-item.component';
 import moment from 'moment';
 // assets import
 import { icons } from '../../assets/icons';
-import './note-item.styles.less';
+import './project-item.styles.less';
 
 type NoteProps = {
   note: Note;
@@ -70,10 +70,10 @@ const NoteItem: React.FC<NoteProps> = props => {
   };
 
   return (
-    <div className='note-item'>
-      <div className='note-item-content'>
+    <div className='project-item'>
+      <div className='project-item-content'>
         <Link to={`/note/${note.id}`}>
-          <h3 className='note-item-name'>
+          <h3 className='project-item-name'>
             {note.labels && note.labels[0] ? (
               getIcon(note.labels[0].icon)
             ) : (
@@ -82,8 +82,8 @@ const NoteItem: React.FC<NoteProps> = props => {
             {note.name}
           </h3>
         </Link>
-        <div className='note-item-subs'>
-          <div className='note-item-labels'>
+        <div className='project-item-subs'>
+          <div className='project-item-labels'>
             {note.labels &&
               note.labels.map(label => {
                 return (
@@ -100,14 +100,14 @@ const NoteItem: React.FC<NoteProps> = props => {
                 );
               })}
           </div>
-          <div className='note-item-time'>
+          <div className='project-item-time'>
             {note.updatedAt && moment(note.updatedAt).fromNow()}
           </div>
         </div>
       </div>
 
-      <div className='note-control'>
-        <div className='note-item-owner'>
+      <div className='project-control'>
+        <div className='project-item-owner'>
           <Tooltip title={note.owner}>
             <Avatar src={note.ownerAvatar} size='small' />
           </Tooltip>
@@ -119,7 +119,7 @@ const NoteItem: React.FC<NoteProps> = props => {
           content={<ManageNote note={note} deleteNote={deleteNote} />}
           trigger='click'
         >
-          <span className='note-control-more'>
+          <span className='project-control-more'>
             <MoreOutlined />
           </span>
         </Popover>

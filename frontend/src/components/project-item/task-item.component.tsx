@@ -13,7 +13,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {completeTask, deleteCompletedTask, deleteTask, uncompleteTask} from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
-import './task-item.styles.less';
+import './project-item.styles.less';
 import {icons} from "../../assets/icons";
 import {stringToRGB} from "../../features/label/interface";
 import moment from "moment";
@@ -108,10 +108,10 @@ const TaskItem: React.FC<TaskProps> = props => {
         deleteCompletedTask
     } = props;
     return (
-        <div className='task-item'>
-            <div className='task-item-content'>
+        <div className='project-item'>
+            <div className='project-item-content'>
                 <Link to={`/task/${task.id}`}>
-                    <h3 className='task-item-name'>
+                    <h3 className='project-item-name'>
                         {task.labels && task.labels[0] ? (
                             getIcon(task.labels[0].icon)
                         ) : (
@@ -120,8 +120,8 @@ const TaskItem: React.FC<TaskProps> = props => {
                         {task.name}
                     </h3>
                 </Link>
-                <div className='task-item-subs'>
-                    <div className='task-item-labels'>
+                <div className='project-item-subs'>
+                    <div className='project-item-labels'>
                         {task.labels &&
                         task.labels.map(label => {
                             return (
@@ -138,19 +138,19 @@ const TaskItem: React.FC<TaskProps> = props => {
                             );
                         })}
                     </div>
-                    <div className='task-item-time'>
+                    <div className='project-item-time'>
                         {task.dueDate && moment(task.dueDate, dateFormat).fromNow()}
                     </div>
                 </div>
             </div>
 
-            <div className='task-control'>
-                <div className='task-item-owner'>
+            <div className='project-control'>
+                <div className='project-item-owner'>
                     <Tooltip title={`Owner ${task.owner}`}>
                         <Avatar src={task.ownerAvatar} size='small'/>
                     </Tooltip>
                 </div>
-                <div className='task-item-assignee'>
+                <div className='project-item-assignee'>
                     <Tooltip title={`Assignee ${task.assignedTo}`}>
                         <Avatar src={task.assignedToAvatar} size='small'/>
                     </Tooltip>
@@ -169,7 +169,7 @@ const TaskItem: React.FC<TaskProps> = props => {
                     />}
                     trigger='click'
                 >
-                  <span className='task-control-more'>
+                  <span className='project-control-more'>
                     <MoreOutlined/>
                   </span>
                 </Popover>

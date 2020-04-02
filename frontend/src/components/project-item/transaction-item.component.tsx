@@ -5,6 +5,7 @@ import {
   deleteTransaction
 } from '../../features/transactions/actions';
 import {Transaction} from '../../features/transactions/interface';
+import './project-item.styles.less';
 
 type TransactionProps = {
   transaction: Transaction;
