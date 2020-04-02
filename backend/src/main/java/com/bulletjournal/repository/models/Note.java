@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 
 import javax.persistence.*;
@@ -42,5 +43,10 @@ public class Note extends ProjectItemModel {
                 this.getProject(),
                 labels,
                 this.getUpdatedAt().getTime());
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.NOTE;
     }
 }

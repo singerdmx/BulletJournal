@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.contents.ContentType;
+
 import javax.persistence.*;
 
 /**
@@ -34,5 +36,10 @@ public class Task extends TaskModel {
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.TASK;
     }
 }

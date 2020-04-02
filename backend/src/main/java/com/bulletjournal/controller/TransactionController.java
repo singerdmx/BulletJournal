@@ -9,10 +9,7 @@ import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
 import com.bulletjournal.ledger.LedgerSummaryCalculator;
 import com.bulletjournal.ledger.LedgerSummaryType;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.RemoveTransactionEvent;
-import com.bulletjournal.notifications.UpdateTransactionPayerEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import com.bulletjournal.repository.models.TransactionContent;
 import org.apache.commons.lang3.StringUtils;
@@ -147,7 +144,8 @@ public class TransactionController {
             @NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.transactionDaoJpa.shareProjectItem(transactionId, shareProjectItemParams, username);
+        Informed inform = this.transactionDaoJpa.shareProjectItem(transactionId, shareProjectItemParams, username);
+        this.notificationService.inform(inform);
         return null; // may be generated link
     }
 

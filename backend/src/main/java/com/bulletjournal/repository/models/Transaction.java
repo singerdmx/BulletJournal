@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.ledger.TransactionType;
 
@@ -151,5 +152,10 @@ public class Transaction extends ProjectItemModel {
                 this.getTimezone(),
                 this.getTransactionType().getValue(),
                 labels);
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.NOTE;
     }
 }

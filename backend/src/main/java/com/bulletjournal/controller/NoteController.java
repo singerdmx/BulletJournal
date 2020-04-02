@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.SearchService;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
@@ -131,7 +132,8 @@ public class NoteController {
             @NotNull @PathVariable Long noteId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.shareProjectItem(noteId, shareProjectItemParams, username);
+        Informed inform = this.noteDaoJpa.shareProjectItem(noteId, shareProjectItemParams, username);
+        this.notificationService.inform(inform);
         return null; // may be generated link
     }
 

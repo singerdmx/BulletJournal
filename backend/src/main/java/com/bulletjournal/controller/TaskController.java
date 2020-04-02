@@ -3,10 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.RemoveTaskEvent;
-import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.TaskContent;
@@ -173,7 +170,8 @@ public class TaskController {
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.shareProjectItem(taskId, shareProjectItemParams, username);
+        Informed inform = this.taskDaoJpa.shareProjectItem(taskId, shareProjectItemParams, username);
+        this.notificationService.inform(inform);
         return null; // may be generated link
     }
 

@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.contents.ContentType;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -47,6 +49,11 @@ public class CompletedTask extends TaskModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.TASK;
     }
 
     @Override

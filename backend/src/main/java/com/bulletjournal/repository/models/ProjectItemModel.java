@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectItem;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -53,6 +54,8 @@ public abstract class ProjectItemModel extends OwnedModel {
     }
 
     public abstract <T extends ProjectItem> T toPresentationModel();
+
+    public abstract ContentType getContentType();
 
     @Override
     public boolean equals(Object o) {

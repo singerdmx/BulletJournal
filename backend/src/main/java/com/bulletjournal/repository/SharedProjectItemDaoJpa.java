@@ -2,6 +2,8 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.ShareProjectItemEvent;
 import com.bulletjournal.repository.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +72,9 @@ public class SharedProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel, K extends ProjectItem> void save(
-            ProjectType projectType, T projectItem, List<String> users) {
+    public <T extends ProjectItemModel, K extends ProjectItem> ShareProjectItemEvent save(
+            ProjectType projectType, T projectItem, List<String> users, String requester) {
+        List<Event> events = new ArrayList<>();
         for (String user : new HashSet<>(users)) {
             List<K> existingItems = this.getSharedProjectItems(user);
             if (existingItems.contains(projectItem)) {
@@ -111,8 +114,11 @@ public class SharedProjectItemDaoJpa {
                 default:
                     throw new IllegalArgumentException();
             }
-            this.sharedProjectItemsRepository.save(sharedProjectItem);
+            sharedProjectItem = this.sharedProjectItemsRepository.save(sharedProjectItem);
+            Event event = new Event(user, sharedProjectItem.getId(), projectItem.getName());
+            events.add(event);
         }
+        return new ShareProjectItemEvent(events, requester, projectItem.getContentType());
     }
 
     private void checkSharedProjectExistence(

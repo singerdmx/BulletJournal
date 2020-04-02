@@ -9,6 +9,7 @@ import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SetLabelEvent;
+import com.bulletjournal.notifications.ShareProjectItemEvent;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -46,7 +47,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     abstract List<K> getContents(Long projectItemId, String requester);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> void shareProjectItem(
+    public <T extends ProjectItemModel> ShareProjectItemEvent shareProjectItem(
             Long projectItemId, ShareProjectItemParams shareProjectItemParams, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
         List<String> users = new ArrayList<>();
@@ -66,7 +67,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         ProjectType projectType = ProjectType.getType(projectItem.getProject().getType());
-        this.sharedProjectItemDaoJpa.save(projectType, projectItem, users);
+        return this.sharedProjectItemDaoJpa.save(projectType, projectItem, users, requester);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
