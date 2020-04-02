@@ -134,7 +134,6 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     public SetLabelEvent setLabels(String requester, Long projectItemId, List<Long> labels) {
         ProjectItemModel projectItem = getProjectItem(projectItemId, requester);
         projectItem.setLabels(labels);
-        String contentType = projectItem.getClass().getSimpleName();
         Set<UserGroup> targetUsers = projectItem.getProject().getGroup().getUsers();
         List<Event> events = new ArrayList<>();
         for (UserGroup user : targetUsers) {
@@ -144,6 +143,6 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         this.getJpaRepository().save(projectItem);
-        return new SetLabelEvent(events, requester, contentType);
+        return new SetLabelEvent(events, requester, projectItem.getContentType());
     }
 }

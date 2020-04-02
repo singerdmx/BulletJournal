@@ -6,20 +6,20 @@ import java.util.List;
 
 public class SetLabelEvent extends Informed {
 
-    private final String contentType;
+    private final ContentType contentType;
 
-    public SetLabelEvent(List<Event> event, String originator, String contentType) {
-        super(event, originator);
+    public SetLabelEvent(List<Event> events, String originator, ContentType contentType) {
+        super(events, originator);
         this.contentType = contentType;
     }
 
     @Override
     public ContentType getContentType() {
-        return ContentType.LABEL;
+        return this.contentType;
     }
 
     @Override
     protected String getEventTitle(Event event) {
-        return this.getOriginator() + " updated labels for " + contentType + " " + event.getContentName();
+        return this.getOriginator() + " updated labels for " + this.contentType.name() + " " + event.getContentName();
     }
 }
