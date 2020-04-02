@@ -65,10 +65,11 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     setProjects(flattenOwnedProject(props.ownedProjects, projects));
     setProjects(flattenSharedProject(props.sharedProjects, projects));
     setProjects(
-      projects.filter(
-        p =>
+      projects.filter(p => {
+        return (
           p.projectType === props.type && p.id !== props.project.id && !p.shared
-      )
+        );
+      })
     );
   }, []);
 
@@ -82,10 +83,10 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
       case 'NOTE':
         props.moveNote(props.projectItemId, projectId, history);
         break;
-      case 'TASK':
+      case 'TODO':
         props.moveTask(props.projectItemId, projectId, history);
         break;
-      case 'TRANSACTION':
+      case 'LEDGER':
         props.moveTransaction(props.projectItemId, projectId, history);
         break;
     }

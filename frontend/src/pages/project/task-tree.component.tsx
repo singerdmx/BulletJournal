@@ -134,15 +134,6 @@ const TaskTree: React.FC<TasksProps> = props => {
   let treeTask = getTree(tasks);
   return (
     <div>
-      {/* <List>
-        {tasks.map(task => {
-          return (
-            <List.Item key={task.id}>
-              <TaskItem task={task} isComplete={false} />
-            </List.Item>
-          );
-        })}
-      </List> */}
       <Tree
         className='ant-tree'
         draggable
