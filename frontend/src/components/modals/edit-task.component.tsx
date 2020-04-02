@@ -27,6 +27,7 @@ import { ReminderBeforeTaskText } from '../settings/reducer';
 import { convertToTextWithTime } from '../../features/recurrence/actions';
 import { ReminderSetting } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
+
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -122,10 +123,9 @@ const EditTask: React.FC<RouteComponentProps &
     );
   };
 
-  const onCancel = () => {
-    form.resetFields();
+  const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.stopPropagation();
     setVisible(false);
-    console.log(visible);
   };
 
   const openModal = () => {
@@ -159,7 +159,7 @@ const EditTask: React.FC<RouteComponentProps &
             title='Edit Task'
             visible={visible}
             okText='Confirm'
-            onCancel={onCancel}
+            onCancel={e => handleCancel(e)}
             onOk={() => {
               form
                 .validateFields()
@@ -398,13 +398,11 @@ const EditTask: React.FC<RouteComponentProps &
   };
 
   return (
-    <div className='popover-control-item'>
-      <span onClick={openModal}>
+      <div onClick={openModal} className='popover-control-item'>
         <span>Edit</span>
         <EditOutlined />
-      </span>
-      {getModal()}
-    </div>
+        {getModal()}
+      </div>
   );
 };
 
