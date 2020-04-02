@@ -49,7 +49,7 @@ type TaskProps = {
   group: Group;
 };
 
-interface TaskCreateFormProps {
+interface TaskEditFormProps {
   createTask: (
     projectId: number,
     name: string,
@@ -76,7 +76,7 @@ interface TaskCreateFormProps {
 
 const EditTask: React.FC<RouteComponentProps &
   TaskProps &
-  TaskCreateFormProps> = props => {
+  TaskEditFormProps> = props => {
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [dueType, setDueType] = useState('dueByTime');
@@ -153,12 +153,12 @@ const EditTask: React.FC<RouteComponentProps &
 
   const getModal = () => {
     return (
-      <Tooltip placement='top' title='Create New Task'>
+      <Tooltip placement='top' title='Edit Task'>
         <div className='add-task'>
           <Modal
-            title='Create New Task'
+            title='Edit Task'
             visible={visible}
-            okText='Create'
+            okText='Confirm'
             onCancel={onCancel}
             onOk={() => {
               form
