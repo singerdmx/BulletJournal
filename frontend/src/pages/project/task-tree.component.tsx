@@ -29,7 +29,7 @@ const getTree = (data: Task[]): TreeNodeNormal[] => {
     } else {
       node.children = [] as TreeNodeNormal[];
     }
-    //iscomplete 默认是啥???
+
     node.title = <TreeItem task={item} isComplete={false} />;
     node.key = item.id.toString();
     res.push(node);
@@ -128,9 +128,11 @@ const TaskTree: React.FC<TasksProps> = props => {
   } = props;
 
   useEffect(() => {
-    updateTasks(projectId);
-    updateCompletedTasks(projectId);
-  }, []);
+    if (projectId) {
+      updateTasks(projectId);
+      updateCompletedTasks(projectId);
+    }
+  }, [projectId]);
   let treeTask = getTree(tasks);
   return (
     <div>
