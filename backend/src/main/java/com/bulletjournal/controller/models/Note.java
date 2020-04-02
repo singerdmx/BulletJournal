@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
@@ -17,6 +18,11 @@ public class Note extends ProjectItem {
     private List<Note> subNotes = new ArrayList<>();
 
     public Note() {
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.NOTE;
     }
 
     public Note(Long id,

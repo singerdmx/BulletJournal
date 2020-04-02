@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
 
 import javax.validation.constraints.NotBlank;
@@ -31,6 +32,11 @@ public class Transaction extends ProjectItem {
     private String timezone;
 
     public Transaction() {
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.TRANSACTION;
     }
 
     public Transaction(Long id,

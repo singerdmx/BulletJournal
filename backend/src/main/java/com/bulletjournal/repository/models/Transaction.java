@@ -156,6 +156,6 @@ public class Transaction extends ProjectItemModel {
 
     @Override
     public ContentType getContentType() {
-        return ContentType.NOTE;
+        return ContentType.TRANSACTION;
     }
 }

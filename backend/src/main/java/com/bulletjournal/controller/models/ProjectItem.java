@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
@@ -9,7 +10,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
 
-public class ProjectItem {
+public abstract class ProjectItem {
 
     @Expose
     protected Long id;
@@ -40,6 +41,8 @@ public class ProjectItem {
         this.projectId = project.getId();
         this.labels = labels;
     }
+
+    public abstract ContentType getContentType();
 
     public Long getId() {
         return id;

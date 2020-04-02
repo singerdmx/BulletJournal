@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
@@ -38,6 +39,11 @@ public class Task extends ProjectItem {
     private List<Task> subTasks = new ArrayList<>();
 
     public Task() {
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.TASK;
     }
 
     public Task(Long id,
