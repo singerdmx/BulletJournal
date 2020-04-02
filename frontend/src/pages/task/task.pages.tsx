@@ -1,17 +1,16 @@
-// page display contents of notes
+// page display contents of tasks
 // react imports
 import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
-import { getNote } from '../../features/notes/actions';
-import { Note } from '../../features/notes/interface';
+import { getTask } from '../../features/tasks/actions';
+import { Task } from '../../features/tasks/interface';
 import { stringToRGB, Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 // components
-import NoteEditorDrawer from '../../components/note-editor/editor-drawer.component';
-import NoteContentList from '../../components/note-content/content-list.component';
+
 // antd imports
 import { Tooltip, Tag, Avatar, Divider, Button, Popconfirm } from 'antd';
 import {
@@ -20,23 +19,23 @@ import {
   PlusCircleTwoTone
 } from '@ant-design/icons';
 // modals import
-import EditNote from '../../components/modals/edit-note.component';
+import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
 //actions
-import { deleteNote } from '../../features/notes/actions';
+import { deleteTask } from '../../features/tasks/actions';
 
 import { icons } from '../../assets/icons/index';
-import './note-page.styles.less';
+import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
 
-type NoteProps = {
-  note: Note;
-  deleteNote: (noteId: number) => void;
+type TaskProps = {
+  task: Task;
+  deleteTask: (taskId: number) => void;
 };
 
-interface NotePageHandler {
-  getNote: (noteId: number) => void;
+interface TaskPageHandler {
+  getTask: (taskId: number) => void;
   addSelectedLabel: (label: Label) => void;
 }
 
@@ -46,10 +45,10 @@ const getIcon = (icon: string) => {
   return res.length > 0 ? res[0].icon : <TagOutlined />;
 };
 
-const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
-  const { note, deleteNote } = props;
-  // get id of note from oruter
-  const { noteId } = useParams();
+const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
+  const { task, deleteTask } = props;
+  // get id of task from oruter
+  const { taskId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
   // hook history in router
@@ -62,26 +61,26 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   };
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
-    noteId && props.getNote(parseInt(noteId));
-  }, [noteId]);
+    taskId && props.getTask(parseInt(taskId));
+  }, [taskId]);
   // show drawer
   const createHandler = () => {
     setEditorShow(true);
   };
 
   return (
-    <div className="note-page">
-      <Tooltip placement="top" title={note.owner} className="note-avatar">
+    <div className="task-page">
+      <Tooltip placement="top" title={task.owner} className="task-avatar">
         <span>
-          <Avatar size="large" src={note.ownerAvatar} />
+          <Avatar size="large" src={task.ownerAvatar} />
         </span>
       </Tooltip>
-      <div className="note-title">
+      <div className="task-title">
         <div className="label-and-name">
-          {note.name}
-          <div className="note-labels">
-            {note.labels &&
-              note.labels.map((label, index) => {
+          {task.name}
+          <div className="task-labels">
+            {task.labels &&
+              task.labels.map((label, index) => {
                 return (
                   <Tag
                     key={index}
@@ -99,26 +98,26 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           </div>
         </div>
 
-        <div className="note-operation">
+        <div className="task-operation">
           <Tooltip title="Add Label">
             <TagOutlined />
           </Tooltip>
           <Tooltip title="Edit Label">
-            <EditNote note={note} mode="icon" />
+            <EditTask task={task} mode="icon" />
           </Tooltip>
-          <Tooltip title="Move Note">
-            <MoveProjectItem type="NOTE" projectItemId={note.id} mode="icon" />
+          <Tooltip title="Move Task">
+            <MoveProjectItem type="NOTE" projectItemId={task.id} mode="icon" />
           </Tooltip>
-          <Tooltip title="Share Note">
-            <ShareProjectItem type="NOTE" projectItemId={note.id} mode="icon" />
+          <Tooltip title="Share Task">
+            <ShareProjectItem type="NOTE" projectItemId={task.id} mode="icon" />
           </Tooltip>
           <Tooltip title="Delete">
             <Popconfirm
-              title="Deleting Note also deletes its child notes. Are you sure?"
+              title="Deleting Task also deletes its child tasks. Are you sure?"
               okText="Yes"
               cancelText="No"
               onConfirm={() => {
-                deleteNote(note.id);
+                deleteTask(task.id);
                 history.goBack();
               }}
               className="group-setting"
@@ -132,30 +131,24 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
       <Divider />
       <div className="content">
         <div className="content-list">
-          <NoteContentList noteId={note.id} />
         </div>
         <Button onClick={createHandler}>
           <PlusCircleTwoTone />
           New
         </Button>
       </div>
-      <div className="note-drawer">
-        <NoteEditorDrawer
-          noteId={note.id}
-          visible={showEditor}
-          setVisible={setEditorShow}
-        />
+      <div className="task-drawer">
       </div>
     </div>
   );
 };
 
 const mapStateToProps = (state: IState) => ({
-  note: state.note.note
+  task: state.task.task
 });
 
 export default connect(mapStateToProps, {
-  deleteNote,
-  getNote,
+  deleteTask,
+  getTask,
   addSelectedLabel
-})(NotePage);
+})(TaskPage);

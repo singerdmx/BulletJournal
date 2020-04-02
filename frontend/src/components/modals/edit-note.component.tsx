@@ -63,14 +63,14 @@ const EditNote: React.FC<NoteProps> = props => {
         {getModal()}
       </div>
     );
-  } else {
-    return (
-      <>
-        <EditTwoTone onClick={() => setVisible(!visible)} />
-        {getModal()}
-      </>
-    );
   }
+
+  return (
+    <>
+      <EditTwoTone onClick={() => setVisible(!visible)} />
+      {getModal()}
+    </>
+  );
 };
 
 const mapStateToProps = (state: IState) => ({});

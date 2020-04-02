@@ -73,7 +73,7 @@ const ManageTask: React.FC<TaskProps> = props => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditTask task={task} />
+      <EditTask task={task} mode='div'/>
       <MoveProjectItem type='TODO' projectItemId={task.id} mode='div' />
       <ShareProjectItem type='TODO' projectItemId={task.id} mode='div' />
       <div

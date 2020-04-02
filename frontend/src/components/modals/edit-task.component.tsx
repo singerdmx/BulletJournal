@@ -13,7 +13,7 @@ import {
   TimePicker,
   Tooltip
 } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { EditTwoTone } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { createTask, updateTaskVisible } from '../../features/tasks/actions';
@@ -46,6 +46,7 @@ zones.sort((a, b) => {
 });
 
 type TaskProps = {
+  mode: string;
   task: Task;
   projectId: number;
   group: Group;
@@ -390,13 +391,20 @@ const EditTask: React.FC<RouteComponentProps &
     );
   };
 
-  return (
-    <div onClick={openModal} className='popover-control-item'>
-      <span>Edit</span>
-      <EditOutlined />
-      {getModal()}
-    </div>
-  );
+  if (props.mode === 'div') {
+    return (
+        <div onClick={openModal} className='popover-control-item'>
+          <span>Edit</span>
+          <EditTwoTone/>
+          {getModal()}
+        </div>
+    );
+  }
+
+  return <>
+    <EditTwoTone onClick={() => setVisible(!visible)} />
+    {getModal()}
+  </>
 };
 
 const mapStateToProps = (state: IState) => ({
