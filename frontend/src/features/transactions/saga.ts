@@ -9,7 +9,8 @@ import {
   PatchTransaction,
   MoveTransaction,
   SetTransactionLabels,
-  ShareTransaction
+  ShareTransaction,
+  DeleteTransaction
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -18,12 +19,13 @@ import {
   createTransaction,
   getTransactionById,
   updateTransaction,
+  deleteTransactionById,
   moveToTargetProject,
   setTransactionLabels,
   shareTransactionWithOther
 } from '../../apis/transactionApis';
-import { updateTransactions } from './actions';
 import { LedgerSummary } from './interface';
+import {getProjectItemsAfterUpdateSelect} from "../myBuJo/actions";
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -75,7 +77,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       timezone,
       time
     } = action.payload;
-    const data = yield call(
+    yield call(
       createTransaction,
       projectId,
       amount,
@@ -86,8 +88,6 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       timezone,
       time
     );
-    const state: IState = yield select();
-    const transaction = state.transaction;
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
   }
@@ -134,6 +134,20 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
   }
 }
 
+function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
+  try {
+    const {transactionId} = action.payload;
+    yield call(deleteTransactionById, transactionId);
+
+    const state: IState = yield select();
+
+    yield put(getProjectItemsAfterUpdateSelect(
+        state.myBuJo.todoSelected, state.myBuJo.ledgerSelected, 'today'));
+  } catch (error) {
+    yield call(message.error, `Delete Transaction Error Received: ${error}`);
+  }
+}
+
 function* patchTransaction(action: PayloadAction<PatchTransaction>) {
   try {
     yield call(
@@ -155,8 +169,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
 function* transactionSetLabels(action: PayloadAction<SetTransactionLabels>) {
   try {
     const { transactionId, labels } = action.payload;
-    const data = yield call(setTransactionLabels, transactionId, labels);
-    // yield put(updateTransactions(data.projectId));
+    yield call(setTransactionLabels, transactionId, labels);
   } catch (error) {
     yield call(message.error, `transactionSetLabels Error Received: ${error}`);
   }
@@ -185,6 +198,10 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.TransactionShare.type,
       shareTransaction
+    ),
+    yield takeLatest(
+        transactionsActions.TransactionDelete.type,
+        deleteTransaction
     ),
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,

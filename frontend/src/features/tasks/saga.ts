@@ -1,9 +1,9 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
 import {message} from 'antd';
 import {
   actions as tasksActions,
   CompleteTask,
-  CreateTask,
+  CreateTask, DeleteTask,
   GetTask,
   MoveTask,
   PatchTask,
@@ -31,6 +31,8 @@ import {
   updateTask
 } from '../../apis/taskApis';
 import {updateTasks} from './actions';
+import {getProjectItemsAfterUpdateSelect} from "../myBuJo/actions";
+import {IState} from "../../store";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -173,6 +175,10 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
           tasks: completedTasks
         })
     );
+    const state: IState = yield select();
+
+    yield put(getProjectItemsAfterUpdateSelect(
+        state.myBuJo.todoSelected, state.myBuJo.ledgerSelected, 'today'));
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
   }
@@ -199,7 +205,7 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
   }
 }
 
-function* deleteTask(action: PayloadAction<UncompleteTask>) {
+function* deleteTask(action: PayloadAction<DeleteTask>) {
   try {
     const {taskId} = action.payload;
     const data = yield call(deleteTaskById, taskId);
@@ -209,6 +215,11 @@ function* deleteTask(action: PayloadAction<UncompleteTask>) {
           tasks: updatedTasks
         })
     );
+
+    const state: IState = yield select();
+
+    yield put(getProjectItemsAfterUpdateSelect(
+        state.myBuJo.todoSelected, state.myBuJo.ledgerSelected, 'today'));
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
