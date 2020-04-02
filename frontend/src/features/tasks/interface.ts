@@ -9,6 +9,7 @@ export interface ReminderSetting {
 export interface Task extends ProjectItem {
   subTasks: Task[];
   assignedTo: string;
+  assignedToAvatar?: string;
   dueDate?: string;
   dueTime?: string;
   duration?: number;

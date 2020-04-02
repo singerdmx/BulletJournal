@@ -127,7 +127,8 @@ public class TaskController {
     public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getCompletedTasks(projectId, username)
-                .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+                .stream().map(t -> addAvatar(t.toPresentationModel()))
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping(TASK_ROUTE)

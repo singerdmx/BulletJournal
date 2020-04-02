@@ -5,8 +5,7 @@ export interface Transaction extends ProjectItem {
   owner: string;
   payer: string;
   date: string;
-  payerAvatar: string;
-  ownerAvatar: string;
+  payerAvatar?: string;
   time: string;
   timezone: string;
   transactionType: number;
