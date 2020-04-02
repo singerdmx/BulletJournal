@@ -46,7 +46,7 @@ zones.sort((a, b) => {
 });
 
 type TaskProps = {
-  task?: Task;
+  task: Task;
   projectId: number;
   group: Group;
 };
@@ -153,6 +153,7 @@ const EditTask: React.FC<RouteComponentProps &
   );
 
   const getModal = () => {
+    const { task } = props;
     return (
       <Modal
         title='Edit Task'
@@ -177,7 +178,11 @@ const EditTask: React.FC<RouteComponentProps &
             label='Name'
             rules={[{ required: true, message: 'Missing Task Name!' }]}
           >
-            <Input placeholder='Enter Task Name' allowClear />
+            <Input
+              placeholder='Enter Task Name'
+              allowClear
+              defaultValue={task.name}
+            />
           </Form.Item>
           {/* form for Assignee */}
           <Form.Item name='assignee' label='Assignee'>
