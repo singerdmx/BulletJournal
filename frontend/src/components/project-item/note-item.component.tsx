@@ -78,7 +78,7 @@ const NoteItem: React.FC<NoteProps> = props => {
               getIcon(note.labels[0].icon)
             ) : (
               <SnippetsOutlined />
-            )}{' '}
+            )}
             {note.name}
           </h3>
         </Link>
