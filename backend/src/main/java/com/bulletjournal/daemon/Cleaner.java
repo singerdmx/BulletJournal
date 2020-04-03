@@ -2,6 +2,7 @@ package com.bulletjournal.daemon;
 
 import com.bulletjournal.config.NotificationConfig;
 import com.bulletjournal.repository.NotificationDaoJpa;
+import com.bulletjournal.repository.PublicProjectItemDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +23,17 @@ public class Cleaner {
     private static final Logger LOGGER = LoggerFactory.getLogger(Cleaner.class);
     private final ScheduledExecutorService executorService;
     private final NotificationDaoJpa notificationDaoJpa;
+    private final PublicProjectItemDaoJpa publicProjectItemDaoJpa;
 
     @Autowired
     private NotificationConfig notificationConfig;
 
     @Autowired
-    public Cleaner(NotificationDaoJpa notificationDaoJpa) {
-        this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("notification-cleaner"));
+    public Cleaner(NotificationDaoJpa notificationDaoJpa, PublicProjectItemDaoJpa publicProjectItemDaoJpa) {
+        this.executorService = Executors.newSingleThreadScheduledExecutor(
+                new CustomThreadFactory("cleaner"));
         this.notificationDaoJpa = notificationDaoJpa;
+        this.publicProjectItemDaoJpa = publicProjectItemDaoJpa;
     }
 
     @PostConstruct
@@ -39,16 +43,25 @@ public class Cleaner {
             throw new IllegalArgumentException("Invalid intervalInSeconds: " + intervalInSeconds);
         }
 
-        this.executorService.scheduleWithFixedDelay(this::cleanNotification, 0, intervalInSeconds, TimeUnit.SECONDS);
+        this.executorService.scheduleWithFixedDelay(this::clean, 0, intervalInSeconds, TimeUnit.SECONDS);
     }
 
-    public void cleanNotification() {
+    public void clean() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        cleanNotification();
+        cleanPublicProjectItems();
+    }
+
+    private void cleanNotification() {
         int maxRetentionTimeInDays = notificationConfig.getCleaner().getMaxRetentionTimeInDays();
         long expirationTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(maxRetentionTimeInDays);
 
         notificationDaoJpa.deleteAllExpiredNotifications(new Timestamp(expirationTime));
         LOGGER.info("Notification Cleaning Done");
+    }
+
+    private void cleanPublicProjectItems() {
+        LOGGER.info("PublicProjectItems Cleaning Done");
     }
 
     @Override
