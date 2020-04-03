@@ -6,7 +6,6 @@ import com.bulletjournal.controller.models.TransactionsSummary;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import org.springframework.stereotype.Component;
 
-import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
