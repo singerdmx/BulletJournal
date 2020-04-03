@@ -167,9 +167,10 @@ const EditTask: React.FC<RouteComponentProps &
     const { task } = props;
     return (
       <Modal
-        title='Edit Task'
+        title="Edit Task"
         visible={visible}
-        okText='Confirm'
+        okText="Confirm"
+        destroyOnClose
         onCancel={e => handleCancel(e)}
         onOk={() => {
           form
@@ -182,27 +183,27 @@ const EditTask: React.FC<RouteComponentProps &
             .catch(info => console.log(info));
         }}
       >
-        <Form form={form} layout='vertical'>
+        <Form form={form} layout="vertical">
           {/* form for name */}
           <Form.Item
-            name='taskName'
-            label='Name'
+            name="taskName"
+            label="Name"
             rules={[{ required: true, message: 'Missing Task Name!' }]}
           >
             <Input
-              placeholder='Enter Task Name'
+              placeholder="Enter Task Name"
               allowClear
               defaultValue={task.name}
             />
           </Form.Item>
           {/* form for Assignee */}
-          <Form.Item name='assignee' label='Assignee'>
+          <Form.Item name="assignee" label="Assignee">
             {props.group.users && (
               <Select defaultValue={task.assignedTo} style={{ width: '100%' }}>
                 {props.group.users.map(user => {
                   return (
                     <Option value={user.name} key={user.name}>
-                      <Avatar size='small' src={user.avatar} />
+                      <Avatar size="small" src={user.avatar} />
                       &nbsp;&nbsp; <strong>{user.name}</strong>
                     </Option>
                   );
@@ -214,20 +215,20 @@ const EditTask: React.FC<RouteComponentProps &
           <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Due&nbsp;&nbsp;</span>
           <Radio.Group
             defaultValue={dueType}
-            onChange={e => {
-              setDueType(e.target.value);
-            }}
-            buttonStyle='solid'
+            value={dueType}
+            onChange={e => setDueType(e.target.value)}
+            buttonStyle="solid"
             style={{ marginBottom: 18 }}
           >
             <Radio.Button value={'dueByTime'}>Date (Time)</Radio.Button>
             <Radio.Button
               value={'dueByRec'}
-              onClick={() => {
-                //force remind option to be before
-                setRemindButton('remindBefore');
-                setReminderType('remindBefore');
-              }}
+              // onClick={() => {
+              //   console.log('click');
+              //   //force remind option to be before
+              //   setRemindButton('remindBefore');
+              //   setReminderType('remindBefore');
+              // }}
             >
               Recurrence
             </Radio.Button>
@@ -235,12 +236,12 @@ const EditTask: React.FC<RouteComponentProps &
 
           <div style={{ display: 'flex' }}>
             <div style={{ display: 'flex', flex: 1 }}>
-              <Tooltip title='Select Due Date' placement='bottom'>
-                <Form.Item name='dueDate' style={{ width: '100%' }}>
+              <Tooltip title="Select Due Date" placement="bottom">
+                <Form.Item name="dueDate" style={{ width: '100%' }}>
                   <DatePicker
                     allowClear={true}
                     style={{ width: '100%' }}
-                    placeholder='Due Date'
+                    placeholder="Due Date"
                     disabled={dueType !== 'dueByTime'}
                     onChange={value => setDueTimeVisible(value !== null)}
                     defaultValue={
@@ -252,12 +253,12 @@ const EditTask: React.FC<RouteComponentProps &
                 </Form.Item>
               </Tooltip>
               {dueTimeVisible && (
-                <Tooltip title='Select Due Time' placement='bottom'>
-                  <Form.Item name='dueTime' style={{ width: '210px' }}>
+                <Tooltip title="Select Due Time" placement="bottom">
+                  <Form.Item name="dueTime" style={{ width: '210px' }}>
                     <TimePicker
                       allowClear={true}
-                      format='HH:mm'
-                      placeholder='Due Time'
+                      format="HH:mm"
+                      placeholder="Due Time"
                       disabled={dueType !== 'dueByTime'}
                       defaultValue={
                         task.dueTime ? moment(task.dueTime, 'HH:mm') : undefined
@@ -268,7 +269,7 @@ const EditTask: React.FC<RouteComponentProps &
               )}
             </div>
             <Form.Item style={{ flex: 1 }}>
-              <Tooltip title={rRuleText} placement='bottom'>
+              <Tooltip title={rRuleText} placement="bottom">
                 <Popover
                   content={<ReactRRuleGenerator />}
                   title={
@@ -280,7 +281,7 @@ const EditTask: React.FC<RouteComponentProps &
                         padding: '0.5em'
                       }}
                     >
-                      <div className='recurrence-title'>
+                      <div className="recurrence-title">
                         <div>{rRuleTextList && rRuleTextList[0]}</div>
                         {rRuleTextList &&
                           rRuleTextList.length > 1 &&
@@ -288,40 +289,40 @@ const EditTask: React.FC<RouteComponentProps &
                       </div>
                       <Button
                         onClick={() => setRecurrenceVisible(false)}
-                        type='primary'
+                        type="primary"
                       >
                         Done
                       </Button>
                     </div>
                   }
-                  visible={recurrenceVisible}
+                  visible={recurrenceVisible && dueType === 'dueByRec'}
                   onVisibleChange={visible => {
                     setRecurrenceVisible(visible);
                   }}
-                  trigger='click'
-                  placement='top'
+                  trigger="click"
+                  placement="top"
                 >
-                  <Button type='default' disabled={dueType !== 'dueByRec'}>
-                    <p className='marquee'>{rRuleText}</p>
+                  <Button type="default" disabled={dueType !== 'dueByRec'}>
+                    <p className="marquee">{rRuleText}</p>
                   </Button>
                 </Popover>
               </Tooltip>
             </Form.Item>
           </div>
-          <Form.Item label='Time Zone and Duration' style={{ marginBottom: 0 }}>
-            <Tooltip title='Time Zone' placement='bottom'>
+          <Form.Item label="Time Zone and Duration" style={{ marginBottom: 0 }}>
+            <Tooltip title="Time Zone" placement="bottom">
               <Form.Item
-                name='timezone'
+                name="timezone"
                 style={{ display: 'inline-block', width: '70%' }}
               >
                 <Select
                   showSearch={true}
-                  placeholder='Select Time Zone'
+                  placeholder="Select Time Zone"
                   defaultValue={props.timezone ? props.timezone : ''}
                 >
                   {zones.map((zone: string, index: number) => (
                     <Option key={zone} value={zone}>
-                      <Tooltip title={zone} placement='right'>
+                      <Tooltip title={zone} placement="right">
                         {<span>{zone}</span>}
                       </Tooltip>
                     </Option>
@@ -330,12 +331,12 @@ const EditTask: React.FC<RouteComponentProps &
               </Form.Item>
             </Tooltip>
             <Form.Item
-              name='duration'
+              name="duration"
               rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Duration' }]}
               style={{ display: 'inline-block', width: '30%' }}
             >
-              <AutoComplete placeholder='Duration' options={options}>
-                <Input suffix='Minutes' />
+              <AutoComplete placeholder="Duration" options={options}>
+                <Input suffix="Minutes" />
               </AutoComplete>
             </Form.Item>
           </Form.Item>
@@ -350,7 +351,7 @@ const EditTask: React.FC<RouteComponentProps &
               setRemindButton(e.target.value);
               setReminderType(e.target.value);
             }}
-            buttonStyle='solid'
+            buttonStyle="solid"
             style={{ marginBottom: 18 }}
           >
             <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
@@ -362,12 +363,12 @@ const EditTask: React.FC<RouteComponentProps &
             </Radio.Button>
           </Radio.Group>
           <div style={{ display: 'flex' }}>
-            <Form.Item name='remindBefore'>
+            <Form.Item name="remindBefore">
               <Select
                 defaultValue={ReminderBeforeTaskText[props.before]}
                 disabled={reminderType !== 'remindBefore'}
                 style={{ width: '180px' }}
-                placeholder='Reminder Before Task'
+                placeholder="Reminder Before Task"
               >
                 {ReminderBeforeTaskText.map((before: string, index: number) => (
                   <Option key={index} value={before}>
@@ -377,10 +378,10 @@ const EditTask: React.FC<RouteComponentProps &
               </Select>
             </Form.Item>
             <div style={{ display: 'flex' }}>
-              <Tooltip title='Reminder Date' placement='bottom'>
-                <Form.Item name='reminderDate'>
+              <Tooltip title="Reminder Date" placement="bottom">
+                <Form.Item name="reminderDate">
                   <DatePicker
-                    placeholder='Date'
+                    placeholder="Date"
                     disabled={reminderType !== 'reminderDate'}
                     allowClear={true}
                     onChange={value => {
@@ -394,12 +395,12 @@ const EditTask: React.FC<RouteComponentProps &
                 </Form.Item>
               </Tooltip>
               {reminderTimeVisible && (
-                <Tooltip title='Reminder Time' placement='bottom'>
-                  <Form.Item name='reminderTime' style={{ width: '100px' }}>
+                <Tooltip title="Reminder Time" placement="bottom">
+                  <Form.Item name="reminderTime" style={{ width: '100px' }}>
                     <TimePicker
                       allowClear={true}
-                      format='HH:mm'
-                      placeholder='Time'
+                      format="HH:mm"
+                      placeholder="Time"
                       disabled={reminderType !== 'reminderDate'}
                     />
                   </Form.Item>
@@ -415,7 +416,7 @@ const EditTask: React.FC<RouteComponentProps &
   if (props.mode === 'div') {
     return (
       <>
-        <div onClick={openModal} className='popover-control-item'>
+        <div onClick={openModal} className="popover-control-item">
           <span>Edit</span>
           <EditTwoTone />
         </div>
