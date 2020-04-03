@@ -170,6 +170,11 @@ public class TaskController {
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        if (shareProjectItemParams.isGenerateLink()) {
+            return this.taskDaoJpa.generatePublicItemLink(
+                    taskId, username, shareProjectItemParams.getTtl());
+        }
+
         Informed inform = this.taskDaoJpa.shareProjectItem(taskId, shareProjectItemParams, username);
         this.notificationService.inform(inform);
         return null; // may be generated link

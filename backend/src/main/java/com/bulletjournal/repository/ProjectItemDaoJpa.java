@@ -39,12 +39,21 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private GroupDaoJpa groupDaoJpa;
     @Autowired
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
+    @Autowired
+    private PublicProjectItemDaoJpa publicProjectItemDaoJpa;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
     abstract JpaRepository<K, Long> getContentJpaRepository();
 
     abstract List<K> getContents(Long projectItemId, String requester);
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> String generatePublicItemLink(
+            Long projectItemId, String requester, Integer ttl) {
+        T projectItem = getProjectItem(projectItemId, requester);
+        return this.publicProjectItemDaoJpa.generatePublicItemLink(projectItem, requester, ttl);
+    }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> ShareProjectItemEvent shareProjectItem(

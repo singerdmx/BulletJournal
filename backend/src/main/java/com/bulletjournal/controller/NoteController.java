@@ -132,9 +132,14 @@ public class NoteController {
             @NotNull @PathVariable Long noteId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        if (shareProjectItemParams.isGenerateLink()) {
+            return this.noteDaoJpa.generatePublicItemLink(
+                    noteId, username, shareProjectItemParams.getTtl());
+        }
+
         Informed inform = this.noteDaoJpa.shareProjectItem(noteId, shareProjectItemParams, username);
         this.notificationService.inform(inform);
-        return null; // may be generated link
+        return null;
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)

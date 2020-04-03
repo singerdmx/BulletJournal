@@ -139,6 +139,7 @@ public class TransactionController {
         this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
     }
 
+    @Deprecated
     @PostMapping(SHARE_TRANSACTION_ROUTE)
     public String shareTransaction(
             @NotNull @PathVariable Long transactionId,
