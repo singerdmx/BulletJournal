@@ -10,6 +10,7 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Component
 public class LedgerSummaryCalculator {
@@ -23,31 +24,22 @@ public class LedgerSummaryCalculator {
 
         final Total total = new Total();
         Map<String, Transactions> m = new HashMap<>();
-        boolean sortByMeta = false;
+
+        Function<? super TransactionsSummary, ? extends String> transactionsSummariesComparator =
+                TransactionsSummary::getName;
+
         switch (ledgerSummaryType) {
             case DEFAULT:
 
                 switch (frequencyType) {
                     case MONTHLY:
 
-                        sortByMeta = true;
-                        // transactions, yearMonth
-                        Map<Transaction, Map.Entry<String, String>> transactionMonthMap = new HashMap<>();
-//                        int startmonth = startTime.getMonthValue();
-//                        int endmonth = endTime.getMonthValue();
-                        for (Transaction t : transactions) {
-                            String tm = t.getDate().substring(5, 7);
-                            String ty = t.getDate().substring(0, 4);
-                            String month = Month.of(Integer.parseInt(tm)).name();
-                            String yearMonth = ty + " " + month;
-                            ty += "-" + tm; // year-month
-                            transactionMonthMap.put(t, new AbstractMap.SimpleEntry<>(yearMonth, ty));
-                        }
+                        transactionsSummariesComparator = TransactionsSummary::getMetadata;
 
                         processTransaction(transactions, total, (t -> {
                             double amount = t.getAmount();
-                            Transactions tran = m.computeIfAbsent(transactionMonthMap.get(t).getKey(), k -> new Transactions());
-                            tran.setMeta(transactionMonthMap.get(t).getValue());
+                            Transactions tran = m.computeIfAbsent(t.getReadableYearMonth(), k -> new Transactions());
+                            tran.setMeta(t.getYearMonth());
                             switch (TransactionType.getType(t.getTransactionType())) {
                                 case INCOME:
                                     tran.addIncome(amount);
@@ -119,13 +111,7 @@ public class LedgerSummaryCalculator {
                     Math.round(balance * 100 / ledgerSummary.getBalance() * 100.0) / 100.0
             ));
         });
-        if (sortByMeta) {
-            transactionsSummaries.sort(Comparator.comparing(TransactionsSummary::getMetadata));
-        } else {
-            transactionsSummaries.sort(Comparator.comparing(TransactionsSummary::getName));
-        }
-
-
+        transactionsSummaries.sort(Comparator.comparing(transactionsSummariesComparator));
         ledgerSummary.setTransactionsSummaries(transactionsSummaries);
         return ledgerSummary;
     }

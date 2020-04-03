@@ -6,6 +6,7 @@ import com.bulletjournal.repository.models.Project;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Month;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +31,7 @@ public class Transaction extends ProjectItem {
 
     @NotBlank
     private String timezone;
+
 
     public Transaction() {
     }
@@ -113,6 +115,17 @@ public class Transaction extends ProjectItem {
 
     public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public String getYearMonth() {
+        return this.date.substring(0, 7);
+    }
+
+    public String getReadableYearMonth() {
+        String m = this.date.substring(5, 7);
+        String y = this.date.substring(0, 4);
+        String month = Month.of(Integer.parseInt(m)).name();
+        return y + " " + month;
     }
 
     @Override
