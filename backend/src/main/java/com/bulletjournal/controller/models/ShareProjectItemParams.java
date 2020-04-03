@@ -8,7 +8,7 @@ public class ShareProjectItemParams {
 
     private boolean generateLink;
 
-    private Integer ttl; //in days
+    private Long ttl; //in days
 
     public ShareProjectItemParams() {
     }
@@ -41,11 +41,11 @@ public class ShareProjectItemParams {
         this.generateLink = generateLink;
     }
 
-    public Integer getTtl() {
+    public Long getTtl() {
         return ttl;
     }
 
-    public void setTtl(Integer ttl) {
+    public void setTtl(Long ttl) {
         this.ttl = ttl;
     }
 }

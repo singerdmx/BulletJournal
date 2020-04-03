@@ -26,6 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -718,6 +719,29 @@ public class ProjectControllerTest {
         List<Task> tasks = Arrays.asList(tasksResponse.getBody());
         Task sharedTask = tasks.get(0);
         assertEquals(task, sharedTask);
+
+        shareProjectItemParams = new ShareProjectItemParams();
+        shareProjectItemParams.setGenerateLink(true);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(shareProjectItemParams),
+                String.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        UUID.fromString(response.getBody());
+
+        shareProjectItemParams = new ShareProjectItemParams();
+        shareProjectItemParams.setGenerateLink(true);
+        shareProjectItemParams.setTtl(20L);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(shareProjectItemParams),
+                String.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        UUID.fromString(response.getBody());
     }
 
     private void deleteTaskContent(Task task, Content content) {

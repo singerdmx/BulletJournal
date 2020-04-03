@@ -50,7 +50,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> String generatePublicItemLink(
-            Long projectItemId, String requester, Integer ttl) {
+            Long projectItemId, String requester, Long ttl) {
         T projectItem = getProjectItem(projectItemId, requester);
         return this.publicProjectItemDaoJpa.generatePublicItemLink(projectItem, requester, ttl);
     }
