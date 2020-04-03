@@ -26,7 +26,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -729,7 +728,7 @@ public class ProjectControllerTest {
                 String.class,
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        UUID.fromString(response.getBody());
+        assertEquals(8, response.getBody().length());
 
         shareProjectItemParams = new ShareProjectItemParams();
         shareProjectItemParams.setGenerateLink(true);
@@ -741,7 +740,7 @@ public class ProjectControllerTest {
                 String.class,
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        UUID.fromString(response.getBody());
+        assertEquals(8, response.getBody().length());
     }
 
     private void deleteTaskContent(Task task, Content content) {

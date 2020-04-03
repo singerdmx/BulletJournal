@@ -8,7 +8,7 @@ Run the following command to bring up all containers using online deployment con
 ../start.sh
 ```
 
-## How to release
+## How to Release
 
 1. Update source code on local git repo: Change version number in docker-compose.yml
 2. Push to Github

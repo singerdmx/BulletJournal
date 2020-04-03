@@ -24,13 +24,14 @@ public class PublicProjectItem extends AuditModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Note note;
 
-    @Column(name = "expiration_time", nullable = false)
+    @Column(name = "expiration_time")
     private Timestamp expirationTime;
 
     public PublicProjectItem() {
     }
 
-    public PublicProjectItem(String username) {
+    public PublicProjectItem(String id, String username) {
+        this.id = id;
         this.username = username;
     }
 
