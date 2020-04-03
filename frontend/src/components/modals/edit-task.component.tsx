@@ -27,6 +27,7 @@ import { ReminderBeforeTaskText } from '../settings/reducer';
 import { convertToTextWithTime } from '../../features/recurrence/actions';
 import { ReminderSetting, Task } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
+import moment from 'moment';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -135,7 +136,16 @@ const EditTask: React.FC<RouteComponentProps &
   };
 
   useEffect(() => {
+    const { task } = props;
     props.updateExpandedMyself(true);
+    //initialize due type
+    if (task.dueDate) {
+      setDueType('dueByTime');
+    } else {
+      setDueType('dueByRec');
+    }
+    //set due time
+    if (task.dueTime) setDueTimeVisible(true);
   }, []);
   const result = ['15', '30', '45', '60'];
   const options = result.map((time: string) => {
@@ -188,7 +198,7 @@ const EditTask: React.FC<RouteComponentProps &
           {/* form for Assignee */}
           <Form.Item name='assignee' label='Assignee'>
             {props.group.users && (
-              <Select defaultValue={props.myself} style={{ width: '100%' }}>
+              <Select defaultValue={task.assignedTo} style={{ width: '100%' }}>
                 {props.group.users.map(user => {
                   return (
                     <Option value={user.name} key={user.name}>
@@ -203,8 +213,10 @@ const EditTask: React.FC<RouteComponentProps &
           {/* due type */}
           <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Due&nbsp;&nbsp;</span>
           <Radio.Group
-            defaultValue={'dueByTime'}
-            onChange={e => setDueType(e.target.value)}
+            defaultValue={dueType}
+            onChange={e => {
+              setDueType(e.target.value);
+            }}
             buttonStyle='solid'
             style={{ marginBottom: 18 }}
           >
@@ -220,6 +232,7 @@ const EditTask: React.FC<RouteComponentProps &
               Recurrence
             </Radio.Button>
           </Radio.Group>
+
           <div style={{ display: 'flex' }}>
             <div style={{ display: 'flex', flex: 1 }}>
               <Tooltip title='Select Due Date' placement='bottom'>
@@ -230,6 +243,11 @@ const EditTask: React.FC<RouteComponentProps &
                     placeholder='Due Date'
                     disabled={dueType !== 'dueByTime'}
                     onChange={value => setDueTimeVisible(value !== null)}
+                    defaultValue={
+                      task.dueDate
+                        ? moment(task.dueDate, 'YYYY-MM-DD')
+                        : undefined
+                    }
                   />
                 </Form.Item>
               </Tooltip>
@@ -241,6 +259,9 @@ const EditTask: React.FC<RouteComponentProps &
                       format='HH:mm'
                       placeholder='Due Time'
                       disabled={dueType !== 'dueByTime'}
+                      defaultValue={
+                        task.dueTime ? moment(task.dueTime, 'HH:mm') : undefined
+                      }
                     />
                   </Form.Item>
                 </Tooltip>
@@ -393,18 +414,22 @@ const EditTask: React.FC<RouteComponentProps &
 
   if (props.mode === 'div') {
     return (
+      <>
         <div onClick={openModal} className='popover-control-item'>
           <span>Edit</span>
-          <EditTwoTone/>
-          {getModal()}
+          <EditTwoTone />
         </div>
+        {getModal()}
+      </>
     );
   }
 
-  return <>
-    <EditTwoTone onClick={() => setVisible(!visible)} />
-    {getModal()}
-  </>
+  return (
+    <>
+      <EditTwoTone onClick={() => setVisible(!visible)} />
+      {getModal()}
+    </>
+  );
 };
 
 const mapStateToProps = (state: IState) => ({
