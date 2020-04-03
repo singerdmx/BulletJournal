@@ -31,12 +31,3 @@ Next, you can look into the `docker-compose.yml` for detailed config parameters.
 Open the browser and enter `https://localhost` to see the UI interface.
 Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the API documentation.
 
-## How to release
-
-1. In source code: Change version number in docker-compose; push to git
-2. In server, by running
-```
-cd /root/ws/BulletJournal/deployment
-./start.sh
-```
-3. In server, verify docker ps and UI

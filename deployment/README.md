@@ -8,6 +8,17 @@ Run the following command to bring up all containers using online deployment con
 ../start.sh
 ```
 
+## How to release
+
+1. Update source code on local git repo: Change version number in docker-compose.yml
+2. Push to Github
+2. Run the following command on Production Server
+```
+cd /root/ws/BulletJournal/deployment
+./start.sh
+```
+3. On Production Server, verify using `docker ps` and UI
+
 ## Authentication
 
 <b>BulletJournal</b> uses Discourse as an SSO endpoint for authentication based on [Discourse Auth Proxy](https://github.com/discourse/discourse-auth-proxy). This repo is copied to `../discourse-auth-proxy`.

@@ -177,7 +177,7 @@ public class TaskController {
 
         Informed inform = this.taskDaoJpa.shareProjectItem(taskId, shareProjectItemParams, username);
         this.notificationService.inform(inform);
-        return null; // may be generated link
+        return null;
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)
