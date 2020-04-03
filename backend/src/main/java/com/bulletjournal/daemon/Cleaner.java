@@ -1,4 +1,4 @@
-package com.bulletjournal.notifications;
+package com.bulletjournal.daemon;
 
 import com.bulletjournal.config.NotificationConfig;
 import com.bulletjournal.repository.NotificationDaoJpa;
@@ -17,9 +17,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class NotificationCleaner {
+public class Cleaner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationCleaner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Cleaner.class);
     private final ScheduledExecutorService executorService;
     private final NotificationDaoJpa notificationDaoJpa;
 
@@ -27,7 +27,7 @@ public class NotificationCleaner {
     private NotificationConfig notificationConfig;
 
     @Autowired
-    public NotificationCleaner(NotificationDaoJpa notificationDaoJpa) {
+    public Cleaner(NotificationDaoJpa notificationDaoJpa) {
         this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("notification-cleaner"));
         this.notificationDaoJpa = notificationDaoJpa;
     }
@@ -70,8 +70,8 @@ public class NotificationCleaner {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof NotificationCleaner)) return false;
-        NotificationCleaner that = (NotificationCleaner) o;
+        if (!(o instanceof Cleaner)) return false;
+        Cleaner that = (Cleaner) o;
         return executorService.equals(that.executorService) &&
                 notificationDaoJpa.equals(that.notificationDaoJpa) &&
                 notificationConfig.equals(that.notificationConfig);
