@@ -96,18 +96,12 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </div>
 
         <div className="note-operation">
-          <Tooltip title="Add Label">
+          <Tooltip title="Manage Labels">
             <TagOutlined />
           </Tooltip>
-          <Tooltip title="Edit Label">
-            <EditNote note={note} mode="icon" />
-          </Tooltip>
-          <Tooltip title="Move Note">
-            <MoveProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
-          </Tooltip>
-          <Tooltip title="Share Note">
-            <ShareProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
-          </Tooltip>
+          <EditNote note={note} mode="icon" />
+          <MoveProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
+          <ShareProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
           <Tooltip title="Delete">
             <Popconfirm
               title="Deleting Note also deletes its child notes. Are you sure?"

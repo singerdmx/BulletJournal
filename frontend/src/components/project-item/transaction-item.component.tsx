@@ -81,9 +81,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
   };
 
   const getTransactionInfo = (transaction: Transaction) => {
-    const amount = `${transaction.amount} ${
-      props.currency ? LocaleCurrency.getCurrency(props.currency) : ''
-    }`;
+    const amount = `${transaction.amount} ${props.currency ? LocaleCurrency.getCurrency(props.currency) : ''}`;
     switch (transaction.transactionType) {
       case 0:
         return (

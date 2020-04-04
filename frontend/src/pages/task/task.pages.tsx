@@ -94,18 +94,12 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
         </div>
 
         <div className="task-operation">
-          <Tooltip title="Add Label">
+          <Tooltip title="Manage Labels">
             <TagOutlined />
           </Tooltip>
-          <Tooltip title="Edit Label">
-            <EditTask task={task} mode="icon" />
-          </Tooltip>
-          <Tooltip title="Move Task">
-            <MoveProjectItem type={ProjectType.TODO} projectItemId={task.id} mode="icon" />
-          </Tooltip>
-          <Tooltip title="Share Task">
-            <ShareProjectItem type={ProjectType.TODO} projectItemId={task.id} mode="icon" />
-          </Tooltip>
+          <EditTask task={task} mode="icon" />
+          <MoveProjectItem type={ProjectType.TODO} projectItemId={task.id} mode="icon" />
+          <ShareProjectItem type={ProjectType.TODO} projectItemId={task.id} mode="icon" />
           <Tooltip title="Delete">
             <Popconfirm
               title="Deleting Task also deletes its child tasks. Are you sure?"

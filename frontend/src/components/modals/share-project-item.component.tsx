@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Form, Input, Modal, Result, Select, Tabs} from 'antd';
+import {Avatar, Form, Input, Modal, Result, Select, Tabs, Tooltip} from 'antd';
 import {LinkOutlined, ShareAltOutlined, SolutionOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {GroupsWithOwner} from '../../features/group/interface';
@@ -209,10 +209,12 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
       );
     } else {
       return (
-        <span onClick={openModal}>
-          <ShareAltOutlined />
-          {getModal()}
-        </span>
+          <Tooltip title={`SHARE ${getProjectItemType(props.type)}`}>
+            <span onClick={openModal}>
+              <ShareAltOutlined />
+              {getModal()}
+            </span>
+          </Tooltip>
       );
     }
   };

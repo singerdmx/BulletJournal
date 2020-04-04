@@ -23,6 +23,7 @@ import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
 
 type TransactionProps = {
+  currency: string;
   transaction: Transaction;
   deleteTransaction: (transactionId: number) => void;
 };
@@ -97,7 +98,7 @@ const TransactionPage: React.FC<TransactionPageHandler &
         </div>
 
         <div className='transaction-operation'>
-          <Tooltip title='Add Label'>
+          <Tooltip title='Manage Labels'>
             <TagOutlined />
           </Tooltip>
         </div>
@@ -116,7 +117,8 @@ const TransactionPage: React.FC<TransactionPageHandler &
 };
 
 const mapStateToProps = (state: IState) => ({
-  transaction: state.transaction.transaction
+  transaction: state.transaction.transaction,
+  currency: state.myself.currency,
 });
 
 export default connect(mapStateToProps, {

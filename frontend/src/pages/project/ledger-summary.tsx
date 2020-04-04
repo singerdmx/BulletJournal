@@ -1,7 +1,11 @@
 import React from 'react';
 import { Statistic } from 'antd';
+import {IState} from "../../store";
+import {connect} from "react-redux";
+const LocaleCurrency = require('locale-currency'); //currency code
 
 type LedgerSummaryProps = {
+  currency: string;
   title: string;
   balance: number;
   income: number;
@@ -21,14 +25,18 @@ const LedgerSummary: React.FC<LedgerSummaryProps> = props => {
       </span>
       <br />
       <span style={{ display: 'flex' }}>
-        <Statistic title='Balance' value={balance} />
+        <Statistic title={`Balance (${LocaleCurrency.getCurrency(props.currency)})`} value={balance} />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <Statistic title='Income' value={income} />
+        <Statistic title={`Income (${LocaleCurrency.getCurrency(props.currency)})`} value={income} />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <Statistic title='Expense' value={expense} />
+        <Statistic title={`Expense (${LocaleCurrency.getCurrency(props.currency)})`} value={expense} />
       </span>
     </span>
   );
 };
 
-export default LedgerSummary;
+const mapStateToProps = (state: IState) => ({
+    currency: state.myself.currency,
+});
+
+export default connect(mapStateToProps, {})(LedgerSummary);

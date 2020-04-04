@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Modal } from 'antd';
+import {Input, Modal, Tooltip} from 'antd';
 import { EditTwoTone } from '@ant-design/icons';
 import './modals.styles.less';
 import { patchNote } from '../../features/notes/actions';
@@ -66,10 +66,12 @@ const EditNote: React.FC<NoteProps> = props => {
   }
 
   return (
-    <>
-      <EditTwoTone onClick={() => setVisible(!visible)} />
-      {getModal()}
-    </>
+        <>
+          <Tooltip title={'Edit Note'}>
+            <EditTwoTone onClick={() => setVisible(!visible)} />
+          </Tooltip>
+          {getModal()}
+        </>
   );
 };
 

@@ -294,7 +294,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
                 .catch(info => console.log(info));
             }}
           >
-            Search
+            Refresh
           </Button>
         </Form>
       </div>
