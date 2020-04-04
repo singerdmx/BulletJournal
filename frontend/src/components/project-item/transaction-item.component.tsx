@@ -6,7 +6,7 @@ import {
   DeleteTwoTone,
   TagOutlined,
   MoreOutlined,
-  SnippetsOutlined,
+  AccountBookOutlined,
   MoneyCollectOutlined,
 } from '@ant-design/icons';
 import { deleteTransaction } from '../../features/transactions/actions';
@@ -15,8 +15,8 @@ import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
 import { icons } from '../../assets/icons';
 import moment from 'moment';
-import {dateFormat} from "../../features/myBuJo/constants";
-import {IState} from "../../store";
+import { dateFormat } from '../../features/myBuJo/constants';
+import { IState } from '../../store';
 const LocaleCurrency = require('locale-currency'); //currency code
 
 type TransactionProps = {
@@ -27,7 +27,7 @@ type TransactionProps = {
 
 type NoteManageProps = {};
 
-const ManageNote: React.FC<NoteManageProps> = props => {
+const ManageNote: React.FC<NoteManageProps> = (props) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <Popconfirm
@@ -46,11 +46,20 @@ const ManageNote: React.FC<NoteManageProps> = props => {
   );
 };
 
-const TransactionItem: React.FC<TransactionProps> = props => {
+const TransactionItem: React.FC<TransactionProps> = (props) => {
   const { transaction } = props;
 
+  const getTransactionIcon = (transaction: Transaction) => {
+    if (transaction.labels && transaction.labels[0]) {
+      const icon = transaction.labels[0].icon;
+      return getIcon(icon);
+    }
+
+    return <AccountBookOutlined />;
+  };
+
   const getIcon = (icon: string) => {
-    let res = icons.filter(item => item.name === icon);
+    const res = icons.filter((item) => item.name === icon);
     return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
@@ -60,28 +69,38 @@ const TransactionItem: React.FC<TransactionProps> = props => {
     }
 
     return (
-        <Tooltip title={moment(transaction.date, dateFormat).fromNow()} placement={"bottom"}>
-          <div className='project-item-time'>
-            {transaction.date} {transaction.time}
-          </div>
-        </Tooltip>);
+      <Tooltip
+        title={moment(transaction.date, dateFormat).fromNow()}
+        placement={'bottom'}
+      >
+        <div className='project-item-time'>
+          {transaction.date} {transaction.time}
+        </div>
+      </Tooltip>
+    );
   };
 
   const getTransactionInfo = (transaction: Transaction) => {
-    const amount = `${transaction.amount} ${props.currency ? LocaleCurrency.getCurrency(props.currency) : ''}`;
+    const amount = `${transaction.amount} ${
+      props.currency ? LocaleCurrency.getCurrency(props.currency) : ''
+    }`;
     switch (transaction.transactionType) {
       case 0:
-        return (<Tooltip title={`Income ${amount}`}>
-          <span className='transaction-item-income'>
-            <MoneyCollectOutlined/> {transaction.amount}
-          </span>
-        </Tooltip>);
+        return (
+          <Tooltip title={`Income ${amount}`}>
+            <span className='transaction-item-income'>
+              <MoneyCollectOutlined /> {transaction.amount}
+            </span>
+          </Tooltip>
+        );
       case 1:
-        return (<Tooltip title={`Expense ${amount}`}>
-          <span className='transaction-item-expense'>
-            <MoneyCollectOutlined/> {transaction.amount}
-          </span>
-        </Tooltip>);
+        return (
+          <Tooltip title={`Expense ${amount}`}>
+            <span className='transaction-item-expense'>
+              <MoneyCollectOutlined /> {transaction.amount}
+            </span>
+          </Tooltip>
+        );
     }
 
     return null;
@@ -92,18 +111,14 @@ const TransactionItem: React.FC<TransactionProps> = props => {
       <div className='project-item-content'>
         <Link to={`/transaction/${transaction.id}`}>
           <h3 className='project-item-name'>
-            {transaction.labels && transaction.labels[0] ? (
-              getIcon(transaction.labels[0].icon)
-            ) : (
-              <SnippetsOutlined />
-            )}
+            {getTransactionIcon(transaction)}
             {transaction.name}
           </h3>
         </Link>
         <div className='project-item-subs'>
           <div className='project-item-labels'>
             {transaction.labels &&
-              transaction.labels.map(label => {
+              transaction.labels.map((label) => {
                 return (
                   <Tag
                     key={`label${label.id}`}
@@ -153,9 +168,9 @@ const TransactionItem: React.FC<TransactionProps> = props => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  currency: state.myself.currency
+  currency: state.myself.currency,
 });
 
 export default connect(mapStateToProps, {
-  deleteTransaction
+  deleteTransaction,
 })(TransactionItem);

@@ -1,16 +1,22 @@
 // note item component for note tree
 // react import
 import React from 'react';
-import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 // antd imports
-import {DeleteTwoTone, MoreOutlined, SnippetsOutlined, TagOutlined} from '@ant-design/icons';
-import {Avatar, Popconfirm, Popover, Tag, Tooltip} from 'antd';
+import {
+  DeleteTwoTone,
+  MoreOutlined,
+  FileTextOutlined,
+  TagOutlined,
+  CarryOutOutlined,
+} from '@ant-design/icons';
+import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 // features import
-import {deleteNote} from '../../features/notes/actions';
-import {Note} from '../../features/notes/interface';
-import {Label, stringToRGB} from '../../features/label/interface';
-import {addSelectedLabel} from '../../features/label/actions';
+import { deleteNote } from '../../features/notes/actions';
+import { Note } from '../../features/notes/interface';
+import { Label, stringToRGB } from '../../features/label/interface';
+import { addSelectedLabel } from '../../features/label/actions';
 // modals import
 import EditNote from '../modals/edit-note.component';
 import MoveProjectItem from '../modals/move-project-item.component';
@@ -18,9 +24,9 @@ import ShareProjectItem from '../modals/share-project-item.component';
 //  third party import
 import moment from 'moment';
 // assets import
-import {icons} from '../../assets/icons';
+import { icons } from '../../assets/icons';
 import './project-item.styles.less';
-import {ProjectType} from "../../features/project/constants";
+import { ProjectType } from '../../features/project/constants';
 
 type NoteProps = {
   note: Note;
@@ -33,14 +39,22 @@ type NoteManageProps = {
   deleteNote: (noteId: number) => void;
 };
 
-const ManageNote: React.FC<NoteManageProps> = props => {
+const ManageNote: React.FC<NoteManageProps> = (props) => {
   const { note, deleteNote } = props;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <EditNote note={note} mode='div' />
-      <MoveProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode='div' />
-      <ShareProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode='div' />
+      <MoveProjectItem
+        type={ProjectType.NOTE}
+        projectItemId={note.id}
+        mode='div'
+      />
+      <ShareProjectItem
+        type={ProjectType.NOTE}
+        projectItemId={note.id}
+        mode='div'
+      />
       <Popconfirm
         title='Deleting Note also deletes its child notes. Are you sure?'
         okText='Yes'
@@ -58,10 +72,19 @@ const ManageNote: React.FC<NoteManageProps> = props => {
   );
 };
 
-const NoteItem: React.FC<NoteProps> = props => {
+const NoteItem: React.FC<NoteProps> = (props) => {
   const { note, deleteNote } = props;
+  const getNoteIcon = (note: Note) => {
+    if (note.labels && note.labels[0]) {
+      const icon = note.labels[0].icon;
+      return getIcon(icon);
+    }
+
+    return <FileTextOutlined />;
+  };
+
   const getIcon = (icon: string) => {
-    let res = icons.filter(item => item.name === icon);
+    const res = icons.filter((item) => item.name === icon);
     return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
@@ -70,18 +93,14 @@ const NoteItem: React.FC<NoteProps> = props => {
       <div className='project-item-content'>
         <Link to={`/note/${note.id}`}>
           <h3 className='project-item-name'>
-            {note.labels && note.labels[0] ? (
-              getIcon(note.labels[0].icon)
-            ) : (
-              <SnippetsOutlined />
-            )}
+            {getNoteIcon(note)}
             {note.name}
           </h3>
         </Link>
         <div className='project-item-subs'>
           <div className='project-item-labels'>
             {note.labels &&
-              note.labels.map(label => {
+              note.labels.map((label) => {
                 return (
                   <Tag
                     key={`label${label.id}`}

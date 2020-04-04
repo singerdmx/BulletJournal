@@ -1,26 +1,31 @@
 import React from 'react';
-import {Avatar, Popconfirm, Popover, Tag, Tooltip} from 'antd';
+import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 import {
   CheckCircleTwoTone,
   CloseCircleOutlined,
   DeleteTwoTone,
-  FileDoneOutlined,
   MoreOutlined,
-  TagOutlined
+  TagOutlined,
+  CarryOutOutlined,
 } from '@ant-design/icons';
-import {Task} from '../../features/tasks/interface';
-import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
-import {completeTask, deleteCompletedTask, deleteTask, uncompleteTask} from '../../features/tasks/actions';
+import { Task } from '../../features/tasks/interface';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import {
+  completeTask,
+  deleteCompletedTask,
+  deleteTask,
+  uncompleteTask,
+} from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import {icons} from '../../assets/icons';
-import {stringToRGB} from '../../features/label/interface';
+import { icons } from '../../assets/icons';
+import { stringToRGB } from '../../features/label/interface';
 import moment from 'moment';
-import {dateFormat} from '../../features/myBuJo/constants';
+import { dateFormat } from '../../features/myBuJo/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
-import {ProjectType} from "../../features/project/constants";
+import { ProjectType } from '../../features/project/constants';
 
 type TaskProps = {
   task: Task;
@@ -31,14 +36,14 @@ type TaskProps = {
   deleteCompletedTask: (taskId: number) => void;
 };
 
-const ManageTask: React.FC<TaskProps> = props => {
+const ManageTask: React.FC<TaskProps> = (props) => {
   const {
     task,
     isComplete,
     completeTask,
     uncompleteTask,
     deleteTask,
-    deleteCompletedTask
+    deleteCompletedTask,
   } = props;
   if (isComplete) {
     return (
@@ -69,9 +74,17 @@ const ManageTask: React.FC<TaskProps> = props => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditTask task={task} mode='div'/>
-      <MoveProjectItem type={ProjectType.TODO} projectItemId={task.id} mode='div' />
-      <ShareProjectItem type={ProjectType.TODO} projectItemId={task.id} mode='div' />
+      <EditTask task={task} mode='div' />
+      <MoveProjectItem
+        type={ProjectType.TODO}
+        projectItemId={task.id}
+        mode='div'
+      />
+      <ShareProjectItem
+        type={ProjectType.TODO}
+        projectItemId={task.id}
+        mode='div'
+      />
       <div
         onClick={() => completeTask(task.id)}
         className='popover-control-item'
@@ -96,9 +109,18 @@ const ManageTask: React.FC<TaskProps> = props => {
   );
 };
 
-const TaskItem: React.FC<TaskProps> = props => {
+const TaskItem: React.FC<TaskProps> = (props) => {
+  const getTaskIcon = (task: Task) => {
+    if (task.labels && task.labels[0]) {
+      const icon = task.labels[0].icon;
+      return getIcon(icon);
+    }
+
+    return <CarryOutOutlined />;
+  };
+
   const getIcon = (icon: string) => {
-    let res = icons.filter(item => item.name === icon);
+    const res = icons.filter((item) => item.name === icon);
     return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
@@ -108,7 +130,7 @@ const TaskItem: React.FC<TaskProps> = props => {
     completeTask,
     uncompleteTask,
     deleteTask,
-    deleteCompletedTask
+    deleteCompletedTask,
   } = props;
 
   const getDueDateTime = () => {
@@ -117,11 +139,15 @@ const TaskItem: React.FC<TaskProps> = props => {
     }
 
     return (
-        <Tooltip title={moment(task.dueDate, dateFormat).fromNow()} placement={"bottom"}>
-          <div className='project-item-time'>
-            {task.dueDate} {task.dueTime}
-          </div>
-        </Tooltip>);
+      <Tooltip
+        title={moment(task.dueDate, dateFormat).fromNow()}
+        placement={'bottom'}
+      >
+        <div className='project-item-time'>
+          {task.dueDate} {task.dueTime}
+        </div>
+      </Tooltip>
+    );
   };
 
   return (
@@ -129,18 +155,13 @@ const TaskItem: React.FC<TaskProps> = props => {
       <div className='project-item-content'>
         <Link to={`/task/${task.id}`}>
           <h3 className='project-item-name'>
-            {task.labels && task.labels[0] ? (
-              getIcon(task.labels[0].icon)
-            ) : (
-              <FileDoneOutlined />
-            )}{' '}
-            {task.name}
+            {getTaskIcon(task)} {task.name}
           </h3>
         </Link>
         <div className='project-item-subs'>
           <div className='project-item-labels'>
             {task.labels &&
-              task.labels.map(label => {
+              task.labels.map((label) => {
                 return (
                   <Tag
                     key={`label${label.id}`}
@@ -199,5 +220,5 @@ export default connect(null, {
   completeTask,
   uncompleteTask,
   deleteTask,
-  deleteCompletedTask
+  deleteCompletedTask,
 })(TaskItem);
