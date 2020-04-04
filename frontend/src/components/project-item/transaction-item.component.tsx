@@ -100,12 +100,12 @@ const TransactionItem: React.FC<TransactionProps> = props => {
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip title={transaction.owner}>
+          <Tooltip title={`Created by ${transaction.owner}`}>
             <Avatar src={transaction.ownerAvatar} size='small' />
           </Tooltip>
         </div>
         <div className='project-item-owner'>
-          <Tooltip title={transaction.payer}>
+          <Tooltip title={`Payer ${transaction.payer}`}>
             <Avatar src={transaction.payerAvatar} size='small' />
           </Tooltip>
         </div>

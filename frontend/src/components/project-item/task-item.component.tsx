@@ -161,7 +161,7 @@ const TaskItem: React.FC<TaskProps> = props => {
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip title={`Owner ${task.owner}`}>
+          <Tooltip title={`Created by ${task.owner}`}>
             <Avatar src={task.ownerAvatar} size='small' />
           </Tooltip>
         </div>
