@@ -185,6 +185,12 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                   title={`Generate Shareable LINK`}
                 />
               </TabPane>
+              <TabPane tab='Manage' key='Manage'>
+                <Result
+                    icon={<LinkOutlined />}
+                    title={`Manage Shared ${getProjectItemType(props.type)}`}
+                />
+              </TabPane>
             </Tabs>
           </Form>
         </div>
