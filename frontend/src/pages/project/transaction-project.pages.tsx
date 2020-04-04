@@ -283,19 +283,22 @@ const TransactionProject: React.FC<TransactionProps> = props => {
             </Select>
           </Form.Item>
 
-          <Button
-            onClick={() => {
-              form
-                .validateFields()
-                .then(values => {
-                  console.log(values);
-                  updateTransactions(values, ledgerSummaryType);
-                })
-                .catch(info => console.log(info));
-            }}
-          >
-            Refresh
-          </Button>
+          <Tooltip title={"Click to Refresh Transactions"}>
+            <Button
+              onClick={() => {
+                form
+                  .validateFields()
+                  .then(values => {
+                    console.log(values);
+                    updateTransactions(values, ledgerSummaryType);
+                  })
+                  .catch(info => console.log(info));
+              }}
+            >
+
+                <span>Refresh</span>
+            </Button>
+          </Tooltip>
         </Form>
       </div>
       <List className='transaction-list'>
