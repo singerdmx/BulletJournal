@@ -83,10 +83,11 @@ export const convertToTextWithRRule = (rrule: string) => {
     const rule = RRule.fromString(rrule);
     const resultString = rule.toText();
 
-    return resultString.charAt(0).toUpperCase() + resultString.slice(1) + ' starting at ' +
+    const result = resultString.charAt(0).toUpperCase() + resultString.slice(1) + ' starting at ' +
         rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' +
         rrule.substr(14, 2) + ' ' + rrule.substr(17, 2) + ':' +
         rrule.substr(19, 2);
+    return result;
 };
 
 export const convertToTextWithTime = (start: any, repeat: any, end: End) => {

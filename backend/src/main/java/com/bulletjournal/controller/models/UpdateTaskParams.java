@@ -59,10 +59,6 @@ public class UpdateTaskParams {
         return this.dueDate != null;
     }
 
-    public boolean needsUpdateDateTime() {
-        return this.hasDueDate() || this.hasDueTime() || this.hasTimezone();
-    }
-
     public String getDueTime() {
         return dueTime;
     }
@@ -133,17 +129,5 @@ public class UpdateTaskParams {
 
     public boolean hasRecurrenceRule() {
         return this.recurrenceRule != null;
-    }
-
-    public String getOrDefaultDate(String defaultDate) {
-        return this.hasDueDate() ? this.getDueDate() : defaultDate;
-    }
-
-    public String getOrDefaultTime(String defaultTime) {
-        return this.hasDueTime() ? this.getDueTime() : defaultTime;
-    }
-
-    public String getOrDefaultTimezone(String defaultTimezone) {
-        return this.hasTimezone() ? this.getTimezone() : defaultTimezone;
     }
 }

@@ -37,23 +37,23 @@ export const deleteCompletedTask = (taskId: number) =>
   actions.CompletedTaskDelete({ taskId: taskId });
 export const patchTask = (
   taskId: number,
-  name: string,
-  assignedTo: string,
-  dueDate: string,
-  dueTime: string,
-  duration: number,
   timezone: string,
-  reminderSetting: ReminderSetting,
-  recurrenceRule: string
+  name?: string,
+  assignedTo?: string,
+  dueDate?: string,
+  dueTime?: string,
+  duration?: number,
+  reminderSetting?: ReminderSetting,
+  recurrenceRule?: string
 ) =>
   actions.TaskPatch({
     taskId: taskId,
+    timezone: timezone,
     name: name,
     assignedTo: assignedTo,
     dueDate: dueDate,
     dueTime: dueTime,
     duration: duration,
-    timezone: timezone,
     reminderSetting: reminderSetting,
     recurrenceRule: recurrenceRule,
   });

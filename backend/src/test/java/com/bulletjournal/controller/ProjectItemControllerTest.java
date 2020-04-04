@@ -155,7 +155,7 @@ public class ProjectItemControllerTest {
         ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE, // this is TASK bc one task?
                 HttpMethod.DELETE,
-                null,
+                TestHelpers.actAsOtherUser(null, sampleUsers[0]),
                 Task[].class,
                 task.getId());
 

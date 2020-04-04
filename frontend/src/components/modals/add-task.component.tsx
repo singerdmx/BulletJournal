@@ -269,7 +269,7 @@ const AddTask: React.FC<
                             rRuleTextList.length > 1 &&
                             rRuleTextList
                               .slice(1)
-                              .map((text) => <div>{text}</div>)}
+                              .map((text, index) => <div key={index}>{text}</div>)}
                         </div>
                         <Button
                           onClick={() => setRecurrenceVisible(false)}

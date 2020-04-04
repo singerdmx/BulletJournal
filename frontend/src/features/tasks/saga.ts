@@ -145,6 +145,7 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       duration,
       timezone,
       reminderSetting,
+      recurrenceRule
     } = action.payload;
 
     const data = yield call(
@@ -156,7 +157,8 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       dueTime,
       duration,
       timezone,
-      reminderSetting
+      reminderSetting,
+      recurrenceRule
     );
 
     yield put(

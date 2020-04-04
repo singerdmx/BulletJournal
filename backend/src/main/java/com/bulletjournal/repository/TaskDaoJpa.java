@@ -346,35 +346,28 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
                 taskId, task.getProject().getOwner());
 
-        DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(),
-                task::setDuration);
-
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
 
         updateAssignee(requester, taskId, updateTaskParams, task, events);
 
-        DaoHelper.updateIfPresent(
-                updateTaskParams.hasDueDate(), updateTaskParams.getDueDate(), task::setDueDate);
+        String date = updateTaskParams.getDueDate();
+        String time = updateTaskParams.getDueTime();
+        String timezone = updateTaskParams.getTimezone();
 
-        DaoHelper.updateIfPresent(
-                updateTaskParams.hasDueTime(), updateTaskParams.getDueTime(), task::setDueTime);
+        task.setDueDate(date);
+        task.setDueTime(time);
+        task.setTimezone(timezone);
+        task.setRecurrenceRule(updateTaskParams.getRecurrenceRule());
+        task.setDuration(updateTaskParams.getDuration());
 
-        DaoHelper.updateIfPresent(
-                updateTaskParams.hasTimezone(), updateTaskParams.getTimezone(), task::setTimezone);
-
-        DaoHelper.updateIfPresent(
-                updateTaskParams.hasRecurrenceRule(), updateTaskParams.getRecurrenceRule(), task::setRecurrenceRule);
-
-        String date = updateTaskParams.getOrDefaultDate(task.getDueDate());
-        String time = updateTaskParams.getOrDefaultTime(task.getDueTime());
-        String timezone = updateTaskParams.getOrDefaultTimezone(updateTaskParams.getTimezone());
-
-        DaoHelper.updateIfPresent(updateTaskParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()), task::setStartTime);
-
-        DaoHelper.updateIfPresent(updateTaskParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()), task::setEndTime);
+        if (updateTaskParams.hasDueDate()) {
+            task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+            task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+        } else {
+            task.setStartTime(null);
+            task.setEndTime(null);
+        }
 
         DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
                 task::setReminderSetting);
