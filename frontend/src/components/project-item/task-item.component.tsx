@@ -134,20 +134,21 @@ const TaskItem: React.FC<TaskProps> = (props) => {
   } = props;
 
   const getDueDateTime = () => {
+    if (task.recurrenceRule) {
+      return <div className='project-item-time'>Every sunday</div>;
+    }
+
     if (!task.dueDate) {
       return null;
     }
 
     let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
     if (task.duration) {
-        dueDateTitle += `, duration ${task.duration} minutes`
+      dueDateTitle += `, duration ${task.duration} minutes`;
     }
 
     return (
-      <Tooltip
-        title={dueDateTitle}
-        placement={'bottom'}
-      >
+      <Tooltip title={dueDateTitle} placement={'bottom'}>
         <div className='project-item-time'>
           {task.dueDate} {task.dueTime}
         </div>

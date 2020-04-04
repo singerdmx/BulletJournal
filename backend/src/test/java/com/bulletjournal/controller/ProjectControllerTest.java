@@ -814,13 +814,14 @@ public class ProjectControllerTest {
         //update task parameter
         UpdateTaskParams updateTaskParams = new UpdateTaskParams(
                 assignedTo, dueDate, dueTime, name, null, reminderSetting, TIMEZONE, null);
-        ResponseEntity<Task> response = this.restTemplate.exchange(
+        ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateTaskParams),
-                Task.class,
+                Task[].class,
                 task.getId());
-        Task updated = response.getBody();
+        Task updated = Arrays.asList(response.getBody()).stream()
+                .filter(t -> task.getId().equals(t.getId())).findFirst().orElse(null);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expectedOwner, updated.getAssignedTo());
         assertEquals(dueDate, updated.getDueDate());

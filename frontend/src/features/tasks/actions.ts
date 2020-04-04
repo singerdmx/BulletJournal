@@ -26,10 +26,9 @@ export const createTask = (
     duration: duration,
     reminderSetting: reminderSetting,
     recurrenceRule: recurrenceRule,
-    timezone: timezone
+    timezone: timezone,
   });
-export const getTask = (taskId: number) =>
-    actions.TaskGet({ taskId: taskId });
+export const getTask = (taskId: number) => actions.TaskGet({ taskId: taskId });
 export const putTask = (projectId: number, tasks: Task[]) =>
   actions.TaskPut({ projectId: projectId, tasks: tasks });
 export const deleteTask = (taskId: number) =>
@@ -43,7 +42,9 @@ export const patchTask = (
   dueDate: string,
   dueTime: string,
   duration: number,
-  reminderSetting: ReminderSetting
+  timezone: string,
+  reminderSetting: ReminderSetting,
+  recurrenceRule: string
 ) =>
   actions.TaskPatch({
     taskId: taskId,
@@ -52,7 +53,9 @@ export const patchTask = (
     dueDate: dueDate,
     dueTime: dueTime,
     duration: duration,
-    reminderSetting: reminderSetting
+    timezone: timezone,
+    reminderSetting: reminderSetting,
+    recurrenceRule: recurrenceRule,
   });
 export const completeTask = (taskId: number) =>
   actions.TaskComplete({ taskId: taskId });
@@ -60,9 +63,27 @@ export const uncompleteTask = (taskId: number) =>
   actions.TaskUncomplete({ taskId: taskId });
 export const setTaskLabels = (taskId: number, labels: number[]) =>
   actions.TaskSetLabels({ taskId: taskId, labels: labels });
-export const moveTask = (taskId: number, targetProject: number, history: History) =>
-  actions.TaskMove({ taskId: taskId, targetProject: targetProject, history: history });
+export const moveTask = (
+  taskId: number,
+  targetProject: number,
+  history: History
+) =>
+  actions.TaskMove({
+    taskId: taskId,
+    targetProject: targetProject,
+    history: history,
+  });
 export const updateTaskVisible = (visible: boolean) =>
   actions.UpdateAddTaskVisible({ visible: visible });
-export const shareTask = (taskId: number, targetUser: string, targetGroup: number, generateLink: boolean) =>
-    actions.TaskShare({taskId: taskId, targetUser: targetUser, targetGroup: targetGroup, generateLink: generateLink});
+export const shareTask = (
+  taskId: number,
+  targetUser: string,
+  targetGroup: number,
+  generateLink: boolean
+) =>
+  actions.TaskShare({
+    taskId: taskId,
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+    generateLink: generateLink,
+  });

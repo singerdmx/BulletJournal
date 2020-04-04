@@ -15,4 +15,5 @@ export interface Task extends ProjectItem {
   duration?: number;
   timezone: string;
   reminderSetting: ReminderSetting;
+  recurrenceRule: string;
 }

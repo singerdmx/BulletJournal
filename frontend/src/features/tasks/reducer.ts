@@ -58,12 +58,14 @@ export type ShareTask = {
 
 export type PatchTask = {
   taskId: number;
+  timezone: string;
   name?: string;
   assignedTo?: string;
   dueDate?: string;
   dueTime?: string;
   duration?: number;
   reminderSetting?: ReminderSetting;
+  recurrenceRule?: string;
 };
 
 export type CompleteTask = {
@@ -91,7 +93,7 @@ let initialState = {
   addTaskVisible: false,
   task: {} as Task,
   tasks: [] as Array<Task>,
-  completedTasks: [] as Array<Task>
+  completedTasks: [] as Array<Task>,
 };
 
 const slice = createSlice({
@@ -131,8 +133,8 @@ const slice = createSlice({
     TaskUncomplete: (state, action: PayloadAction<UncompleteTask>) => state,
     TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state,
     TaskMove: (state, action: PayloadAction<MoveTask>) => state,
-    TaskShare: (state, action: PayloadAction<ShareTask>) => state
-  }
+    TaskShare: (state, action: PayloadAction<ShareTask>) => state,
+  },
 });
 
 export const reducer = slice.reducer;
