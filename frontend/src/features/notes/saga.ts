@@ -15,7 +15,7 @@ import {
   UpdateNotes,
   CreateContent,
   DeleteContent,
-  PatchContent
+  PatchContent,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -31,7 +31,7 @@ import {
   getContents,
   addContent,
   deleteContent,
-  updateContent
+  updateContent,
 } from '../../apis/noteApis';
 import { updateNoteContents, updateNotes } from './actions';
 
@@ -45,7 +45,7 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
     const notes = yield data.json();
     yield put(
       notesActions.notesReceived({
-        notes: notes
+        notes: notes,
       })
     );
   } catch (error) {
@@ -59,7 +59,7 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
     const contents = yield data;
     yield put(
       notesActions.noteContentsReceived({
-        contents: contents
+        contents: contents,
       })
     );
   } catch (error) {
@@ -111,14 +111,14 @@ function* patchNote(action: PayloadAction<PatchNote>) {
     const data = yield call(updateNote, noteId, name);
     yield put(
       notesActions.notesReceived({
-        notes: data
+        notes: data,
       })
     );
 
     const note = yield call(getNoteById, action.payload.noteId);
     yield put(
       notesActions.noteReceived({
-        note: note
+        note: note,
       })
     );
   } catch (error) {
@@ -132,7 +132,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
     const contents = yield call(updateContent, noteId, contentId, text);
     yield put(
       notesActions.noteContentsReceived({
-        contents: contents
+        contents: contents,
       })
     );
   } catch (error) {
@@ -157,7 +157,7 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
     const notes = yield data.json();
     yield put(
       notesActions.notesReceived({
-        notes: notes
+        notes: notes,
       })
     );
   } catch (error) {
@@ -172,7 +172,7 @@ function* deleteNoteContent(action: PayloadAction<DeleteContent>) {
     const contents = yield data.json();
     yield put(
       notesActions.noteContentsReceived({
-        contents: contents
+        contents: contents,
       })
     );
   } catch (error) {
@@ -228,6 +228,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NoteDelete.type, noteDelete),
     yield takeLatest(notesActions.NoteContentDelete.type, deleteNoteContent),
     yield takeLatest(notesActions.NoteMove.type, noteMove),
-    yield takeLatest(notesActions.NoteShare.type, shareNote)
+    yield takeLatest(notesActions.NoteShare.type, shareNote),
   ]);
 }
