@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Form, Modal, Select, Tabs, Result, Input } from 'antd';
-import {
-  ShareAltOutlined,
-  LinkOutlined,
-  SolutionOutlined,
-  TeamOutlined,
-  UserOutlined
-} from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
-import { updateGroups } from '../../features/group/actions';
-import { IState } from '../../store';
-import { shareTask } from '../../features/tasks/actions';
-import { shareNote } from '../../features/notes/actions';
-import { shareTransaction } from '../../features/transactions/actions';
+import React, {useEffect, useState} from 'react';
+import {Avatar, Form, Input, Modal, Result, Select, Tabs} from 'antd';
+import {LinkOutlined, ShareAltOutlined, SolutionOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {GroupsWithOwner} from '../../features/group/interface';
+import {updateGroups} from '../../features/group/actions';
+import {IState} from '../../store';
+import {shareTask} from '../../features/tasks/actions';
+import {shareNote} from '../../features/notes/actions';
+import {shareTransaction} from '../../features/transactions/actions';
 import './modals.styles.less';
-import { updateUser, clearUser } from '../../features/user/actions';
-import { UserWithAvatar } from '../../features/user/reducer';
+import {clearUser, updateUser} from '../../features/user/actions';
+import {UserWithAvatar} from '../../features/user/reducer';
+import {getProjectItemType, ProjectType} from "../../features/project/constants";
 
 const { TabPane } = Tabs;
 const { Option } = Select;
 
 type ProjectItemProps = {
   mode: string;
-  type: string;
+  type: ProjectType;
   projectItemId: number;
   user: UserWithAvatar;
   shareTask: (
@@ -79,13 +74,13 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
 
   const shareProjectItem = (values: any) => {
     switch (props.type) {
-      case 'NOTE':
+      case ProjectType.NOTE:
         // props.moveNote(props.projectItemId, projectId, history);
         break;
-      case 'TASK':
+      case ProjectType.TODO:
         // props.moveTask(props.projectItemId, projectId, history);
         break;
-      case 'TRANSACTION':
+      case ProjectType.LEDGER:
         // props.moveTransaction(props.projectItemId, projectId, history);
         break;
     }
@@ -132,7 +127,7 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     const { user } = props;
     return (
       <Modal
-        title={`SHARE ${props.type}`}
+        title={`SHARE ${getProjectItemType(props.type)}`}
         destroyOnClose
         centered
         okText='Confirm'
@@ -155,7 +150,7 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                 {shareWithGroup()}
                 <Result
                   icon={<TeamOutlined />}
-                  title={`Share ${props.type} with GROUP`}
+                  title={`Share ${getProjectItemType(props.type)} with GROUP`}
                 />
               </TabPane>
               <TabPane tab='User' key='User'>
@@ -181,7 +176,7 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                 </div>
                 <Result
                   icon={<SolutionOutlined />}
-                  title={`Share ${props.type} with USER`}
+                  title={`Share ${getProjectItemType(props.type)} with USER`}
                 />
               </TabPane>
               <TabPane tab='Link' key='Link'>

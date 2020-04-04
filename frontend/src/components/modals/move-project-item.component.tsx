@@ -1,29 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
-import { useHistory } from 'react-router-dom';
-import { RightCircleOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
-import { createProjectByName } from '../../features/project/actions';
-import { updateGroups } from '../../features/group/actions';
-import { IState } from '../../store';
-import { Project, ProjectsWithOwner } from '../../features/project/interface';
-import { iconMapper } from '../side-menu/side-menu.component';
-import { moveTask } from '../../features/tasks/actions';
-import { moveNote } from '../../features/notes/actions';
-import { moveTransaction } from '../../features/transactions/actions';
-import { History } from 'history';
+import React, {useEffect, useState} from 'react';
+import {Avatar, Form, Modal, Select, Tooltip} from 'antd';
+import {useHistory} from 'react-router-dom';
+import {RightCircleOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {GroupsWithOwner} from '../../features/group/interface';
+import {createProjectByName} from '../../features/project/actions';
+import {updateGroups} from '../../features/group/actions';
+import {IState} from '../../store';
+import {Project, ProjectsWithOwner} from '../../features/project/interface';
+import {iconMapper} from '../side-menu/side-menu.component';
+import {moveTask} from '../../features/tasks/actions';
+import {moveNote} from '../../features/notes/actions';
+import {moveTransaction} from '../../features/transactions/actions';
+import {History} from 'history';
 import './modals.styles.less';
-import {
-  flattenOwnedProject,
-  flattenSharedProject
-} from '../../pages/projects/projects.pages';
+import {flattenOwnedProject, flattenSharedProject} from '../../pages/projects/projects.pages';
+import {getProjectItemType, ProjectType} from "../../features/project/constants";
 
 const { Option } = Select;
 
 type ProjectItemProps = {
   mode: string;
-  type: string;
+  type: ProjectType;
   projectItemId: number;
   project: Project;
   ownedProjects: Project[];
@@ -80,13 +78,13 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     }
 
     switch (props.type) {
-      case 'NOTE':
+      case ProjectType.NOTE:
         props.moveNote(props.projectItemId, projectId, history);
         break;
-      case 'TODO':
+      case ProjectType.TODO:
         props.moveTask(props.projectItemId, projectId, history);
         break;
-      case 'LEDGER':
+      case ProjectType.LEDGER:
         props.moveTransaction(props.projectItemId, projectId, history);
         break;
     }
@@ -131,7 +129,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const getModal = () => {
     return (
       <Modal
-        title={`MOVE ${props.type}`}
+        title={`MOVE ${getProjectItemType(props.type)}`}
         destroyOnClose
         centered
         okText='Confirm'

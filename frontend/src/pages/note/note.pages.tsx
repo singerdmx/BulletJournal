@@ -1,34 +1,30 @@
 // page display contents of notes
 // react imports
-import React, { useState } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {connect} from 'react-redux';
 // features
-import { getNote } from '../../features/notes/actions';
-import { Note } from '../../features/notes/interface';
-import { stringToRGB, Label } from '../../features/label/interface';
-import { addSelectedLabel } from '../../features/label/actions';
-import { IState } from '../../store';
+//actions
+import {deleteNote, getNote} from '../../features/notes/actions';
+import {Note} from '../../features/notes/interface';
+import {Label, stringToRGB} from '../../features/label/interface';
+import {addSelectedLabel} from '../../features/label/actions';
+import {IState} from '../../store';
 // components
 import NoteEditorDrawer from '../../components/note-editor/editor-drawer.component';
 import NoteContentList from '../../components/note-content/content-list.component';
 // antd imports
-import { Tooltip, Tag, Avatar, Divider, Button, Popconfirm } from 'antd';
-import {
-  TagOutlined,
-  DeleteTwoTone,
-  PlusCircleTwoTone
-} from '@ant-design/icons';
+import {Avatar, Button, Divider, Popconfirm, Tag, Tooltip} from 'antd';
+import {DeleteTwoTone, PlusCircleTwoTone, TagOutlined} from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
-//actions
-import { deleteNote } from '../../features/notes/actions';
 
-import { icons } from '../../assets/icons/index';
+import {icons} from '../../assets/icons/index';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
+import {ProjectType} from "../../features/project/constants";
 
 type NoteProps = {
   note: Note;
@@ -107,10 +103,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
             <EditNote note={note} mode="icon" />
           </Tooltip>
           <Tooltip title="Move Note">
-            <MoveProjectItem type="NOTE" projectItemId={note.id} mode="icon" />
+            <MoveProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
           </Tooltip>
           <Tooltip title="Share Note">
-            <ShareProjectItem type="NOTE" projectItemId={note.id} mode="icon" />
+            <ShareProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
           </Tooltip>
           <Tooltip title="Delete">
             <Popconfirm

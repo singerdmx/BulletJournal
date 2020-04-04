@@ -1,33 +1,28 @@
 // page display contents of tasks
 // react imports
-import React, { useState } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {connect} from 'react-redux';
 // features
-import { getTask } from '../../features/tasks/actions';
-import { Task } from '../../features/tasks/interface';
-import { stringToRGB, Label } from '../../features/label/interface';
-import { addSelectedLabel } from '../../features/label/actions';
-import { IState } from '../../store';
-// components
-
+//actions
+import {deleteTask, getTask} from '../../features/tasks/actions';
+import {Task} from '../../features/tasks/interface';
+import {Label, stringToRGB} from '../../features/label/interface';
+import {addSelectedLabel} from '../../features/label/actions';
+import {IState} from '../../store';
 // antd imports
-import { Tooltip, Tag, Avatar, Divider, Button, Popconfirm } from 'antd';
-import {
-  TagOutlined,
-  DeleteTwoTone,
-  PlusCircleTwoTone
-} from '@ant-design/icons';
+import {Avatar, Button, Divider, Popconfirm, Tag, Tooltip} from 'antd';
+import {DeleteTwoTone, PlusCircleTwoTone, TagOutlined} from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
-//actions
-import { deleteTask } from '../../features/tasks/actions';
 
-import { icons } from '../../assets/icons/index';
+import {icons} from '../../assets/icons/index';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
+import {ProjectType} from "../../features/project/constants";
+// components
 
 type TaskProps = {
   task: Task;
@@ -106,10 +101,10 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
             <EditTask task={task} mode="icon" />
           </Tooltip>
           <Tooltip title="Move Task">
-            <MoveProjectItem type="NOTE" projectItemId={task.id} mode="icon" />
+            <MoveProjectItem type={ProjectType.TODO} projectItemId={task.id} mode="icon" />
           </Tooltip>
           <Tooltip title="Share Task">
-            <ShareProjectItem type="NOTE" projectItemId={task.id} mode="icon" />
+            <ShareProjectItem type={ProjectType.TODO} projectItemId={task.id} mode="icon" />
           </Tooltip>
           <Tooltip title="Delete">
             <Popconfirm

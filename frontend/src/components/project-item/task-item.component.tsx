@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
+import {Avatar, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 import {
   CheckCircleTwoTone,
   CloseCircleOutlined,
@@ -8,23 +8,19 @@ import {
   MoreOutlined,
   TagOutlined
 } from '@ant-design/icons';
-import { Task } from '../../features/tasks/interface';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import {
-  completeTask,
-  deleteCompletedTask,
-  deleteTask,
-  uncompleteTask
-} from '../../features/tasks/actions';
+import {Task} from '../../features/tasks/interface';
+import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
+import {completeTask, deleteCompletedTask, deleteTask, uncompleteTask} from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import { icons } from '../../assets/icons';
-import { stringToRGB } from '../../features/label/interface';
+import {icons} from '../../assets/icons';
+import {stringToRGB} from '../../features/label/interface';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
+import {ProjectType} from "../../features/project/constants";
 
 type TaskProps = {
   task: Task;
@@ -74,8 +70,8 @@ const ManageTask: React.FC<TaskProps> = props => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <EditTask task={task} mode='div'/>
-      <MoveProjectItem type='TODO' projectItemId={task.id} mode='div' />
-      <ShareProjectItem type='TODO' projectItemId={task.id} mode='div' />
+      <MoveProjectItem type={ProjectType.TODO} projectItemId={task.id} mode='div' />
+      <ShareProjectItem type={ProjectType.TODO} projectItemId={task.id} mode='div' />
       <div
         onClick={() => completeTask(task.id)}
         className='popover-control-item'

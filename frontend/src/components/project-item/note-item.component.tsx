@@ -1,21 +1,16 @@
 // note item component for note tree
 // react import
 import React from 'react';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 // antd imports
-import {
-  DeleteTwoTone,
-  TagOutlined,
-  MoreOutlined,
-  SnippetsOutlined
-} from '@ant-design/icons';
-import { Popconfirm, Popover, Tag, Tooltip, Avatar } from 'antd';
+import {DeleteTwoTone, MoreOutlined, SnippetsOutlined, TagOutlined} from '@ant-design/icons';
+import {Avatar, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 // features import
-import { deleteNote } from '../../features/notes/actions';
-import { Note } from '../../features/notes/interface';
-import { stringToRGB, Label } from '../../features/label/interface';
-import { addSelectedLabel } from '../../features/label/actions';
+import {deleteNote} from '../../features/notes/actions';
+import {Note} from '../../features/notes/interface';
+import {Label, stringToRGB} from '../../features/label/interface';
+import {addSelectedLabel} from '../../features/label/actions';
 // modals import
 import EditNote from '../modals/edit-note.component';
 import MoveProjectItem from '../modals/move-project-item.component';
@@ -23,8 +18,9 @@ import ShareProjectItem from '../modals/share-project-item.component';
 //  third party import
 import moment from 'moment';
 // assets import
-import { icons } from '../../assets/icons';
+import {icons} from '../../assets/icons';
 import './project-item.styles.less';
+import {ProjectType} from "../../features/project/constants";
 
 type NoteProps = {
   note: Note;
@@ -43,8 +39,8 @@ const ManageNote: React.FC<NoteManageProps> = props => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <EditNote note={note} mode='div' />
-      <MoveProjectItem type='NOTE' projectItemId={note.id} mode='div' />
-      <ShareProjectItem type='NOTE' projectItemId={note.id} mode='div' />
+      <MoveProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode='div' />
+      <ShareProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode='div' />
       <Popconfirm
         title='Deleting Note also deletes its child notes. Are you sure?'
         okText='Yes'

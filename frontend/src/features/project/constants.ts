@@ -22,3 +22,16 @@ export enum ProjectItemType {
   NOTE = 'NOTE',
   TRANSACTION = 'TRANSACTION'
 }
+
+export const getProjectItemType = (input: ProjectType) => {
+  switch (input) {
+    case ProjectType.TODO:
+      return ProjectItemType.TASK;
+    case ProjectType.NOTE:
+      return ProjectItemType.NOTE;
+    case ProjectType.LEDGER:
+      return ProjectItemType.TRANSACTION;
+  }
+
+  return ProjectItemType.TASK;
+};
