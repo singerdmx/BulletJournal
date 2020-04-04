@@ -110,6 +110,20 @@ const TaskItem: React.FC<TaskProps> = props => {
     deleteTask,
     deleteCompletedTask
   } = props;
+
+  const getDueDateTime = () => {
+    if (!task.dueDate) {
+      return null;
+    }
+
+    return (
+        <Tooltip title={moment(task.dueDate, dateFormat).fromNow()} placement={"bottom"}>
+          <div className='project-item-time'>
+            {task.dueDate} {task.dueTime}
+          </div>
+        </Tooltip>);
+  };
+
   return (
     <div className='project-item'>
       <div className='project-item-content'>
@@ -141,9 +155,7 @@ const TaskItem: React.FC<TaskProps> = props => {
                 );
               })}
           </div>
-          <div className='project-item-time'>
-            {task.dueDate && moment(task.dueDate, dateFormat).fromNow()}
-          </div>
+          {getDueDateTime()}
         </div>
       </div>
 
