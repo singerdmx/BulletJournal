@@ -14,6 +14,7 @@ import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
 import { icons } from '../../assets/icons';
 import moment from 'moment';
+import {dateFormat} from "../../features/myBuJo/constants";
 
 type TransactionProps = {
   transaction: Transaction;
@@ -49,6 +50,19 @@ const TransactionItem: React.FC<TransactionProps> = props => {
     return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
+  const getPaymentDateTime = () => {
+    if (!transaction.date) {
+      return null;
+    }
+
+    return (
+        <Tooltip title={moment(transaction.date, dateFormat).fromNow()} placement={"bottom"}>
+          <div className='project-item-time'>
+            {transaction.date} {transaction.time}
+          </div>
+        </Tooltip>);
+  };
+
   return (
     <div className='project-item'>
       <div className='project-item-content'>
@@ -80,9 +94,7 @@ const TransactionItem: React.FC<TransactionProps> = props => {
                 );
               })}
           </div>
-          <div className='project-item-time'>
-            {transaction.date && moment(transaction.date).fromNow()}
-          </div>
+          {getPaymentDateTime()}
         </div>
       </div>
 
