@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,14 +91,16 @@ public class TaskController {
     }
 
     @PatchMapping(TASK_ROUTE)
-    public Task updateTask(@NotNull @PathVariable Long taskId,
+    public ResponseEntity<List<Task>> updateTask(@NotNull @PathVariable Long taskId,
                            @Valid @RequestBody UpdateTaskParams updateTaskParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Event> events = this.taskDaoJpa.partialUpdate(username, taskId, updateTaskParams);
+        List<Event> events = new ArrayList<>();
+        Task task = this.taskDaoJpa.partialUpdate(
+                username, taskId, updateTaskParams, events).toPresentationModel();
         if (!events.isEmpty()) {
             notificationService.inform(new UpdateTaskAssigneeEvent(events, username, updateTaskParams.getAssignedTo()));
         }
-        return getTask(taskId);
+        return getTasks(task.getProjectId());
     }
 
     @PutMapping(TASKS_ROUTE)
