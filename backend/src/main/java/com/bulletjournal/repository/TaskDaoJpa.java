@@ -3,7 +3,10 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.CreateTaskParams;
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.UpdateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -11,9 +14,6 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
@@ -205,11 +205,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(String assignee, ZonedDateTime now) {
-        ZonedDateTime minimumRemindingTime = now.minusHours(Before.TWO_HR_BEFORE.getValue());
-        return this.getRecurringTasks(assignee, minimumRemindingTime, now)
+        ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
+        return this.getRecurringTasks(assignee, now, maxRemindingTime)
                 .stream()
-                .filter(t -> t.getReminderDateTime().after(ZonedDateTimeHelper.getTimestamp(now))
-                        && t.getStartTime().before(ZonedDateTimeHelper.getTimestamp(now)))
+                .filter(t -> t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now))
+                        && t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
                 .map(TaskModel::toPresentationModel)
                 .collect(Collectors.toList());
     }

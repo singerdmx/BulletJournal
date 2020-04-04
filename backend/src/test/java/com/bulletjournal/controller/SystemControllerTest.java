@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
+import org.dmfs.rfc5545.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -34,8 +37,8 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test")
 public class SystemControllerTest {
     private static final String ROOT_URL = "http://localhost:";
-    private final String expectedOwner = "BulletJournal";
     private static String TIMEZONE = "America/Los_Angeles";
+    private final String expectedOwner = "BulletJournal";
     private final String[] sampleUsers = {
             "Michael_Zhou"
     };
@@ -81,7 +84,7 @@ public class SystemControllerTest {
         systemUpdates = getRemindingTasks(p1);
         remindingTasks = systemUpdates.getReminders();
 
-        assertEquals(3, systemUpdates.getReminders().size());
+        assertEquals(3, remindingTasks.size());
 
         // Check if t2, t3, t4 in the reminding tasks
         TestHelpers.assertIfContains(remindingTasks, t2, t3, t4);
@@ -93,18 +96,30 @@ public class SystemControllerTest {
         systemUpdates = testRemindingTaskEtagMatch(p1, remindingTaskEtag);
         assertNull(systemUpdates.getReminders());
 
-        addRecurringTasks(p1);
+        Task recurringRemindingTask = addRecurringRemindingTasks(p1, 5, null, null);
+        systemUpdates = getRemindingTasks(p1);
+        remindingTasks = systemUpdates.getReminders();
+        assertEquals(4, remindingTasks.size());
 
+        List<Task> recurringRemindingTaskList = remindingTasks
+                .stream()
+                .filter(t -> t.getId().equals(recurringRemindingTask.getId()))
+                .collect(Collectors.toList());
 
+        assertNotNull(recurringRemindingTaskList);
+        assertNotEquals(0, recurringRemindingTaskList.size());
+
+        deleteTask(recurringRemindingTask);
     }
 
-    private Task addRecurringTasks(Project project) {
-
-        String recurrenceRule = "DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1";
+    private Task addRecurringRemindingTasks(Project project, Integer before, String date, String time) {
+        DateTime now = DateTime.now(TimeZone.getTimeZone(TIMEZONE));
+        String recurrenceRule = "DTSTART:" + now.toString() + " RRULE:FREQ=HOURLY;INTERVAL=1";
         String taskName = "rt1";
+        ReminderSetting reminderSetting = new ReminderSetting(date, time, before);
 
         CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
-                null, null, null, TIMEZONE, recurrenceRule);
+                null, null, reminderSetting, TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,

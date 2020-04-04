@@ -19,6 +19,7 @@ public class ZonedDateTimeHelper {
     public static final String TIME_DELIMITER = ":";
     public static final String DEFAULT_TIME = "00:00";
     public static final String PATTERN = "yyyy-MM-dd HH:mm";
+    public static final int MAX_HOURS_BEFORE = 2;
     private static final String MIN_TIME = "00:00";
     private static final String MAX_TIME = "23:59";
 
