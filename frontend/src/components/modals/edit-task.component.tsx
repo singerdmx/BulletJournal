@@ -101,10 +101,14 @@ const EditTask: React.FC<
     const { task } = props;
 
     //convert time object to string
-    let dueDate = values.dueDate
-      ? values.dueDate.format(dateFormat)
-      : undefined;
-    let dueTime = values.dueTime ? values.dueTime.format('HH:mm') : undefined;
+    let dueDate = values.dueDate ? values.dueDate.format(dateFormat) : task.dueDate;
+    if (values.dueDate === null) {
+      dueDate = undefined;
+    }
+    let dueTime = values.dueTime ? values.dueTime.format('HH:mm') : task.dueTime;
+    if (values.dueTime === null) {
+      dueTime = undefined;
+    }
     let recurrence : string | undefined = useTaskRecurrenceRule ? props.task.recurrenceRule : props.rRuleString;
     if (dueType === 'dueByRec') {
       dueDate = undefined;
@@ -264,7 +268,7 @@ const EditTask: React.FC<
                     onChange={(value) => setDueTimeVisible(value !== null)}
                     defaultValue={
                       task.dueDate
-                        ? moment(task.dueDate, 'YYYY-MM-DD')
+                        ? moment(task.dueDate, dateFormat)
                         : undefined
                     }
                   />

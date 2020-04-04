@@ -367,6 +367,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         } else {
             task.setStartTime(null);
             task.setEndTime(null);
+            if (!updateTaskParams.hasRecurrenceRule()) {
+                //  set no reminder
+                updateTaskParams.setReminderSetting(new ReminderSetting());
+            }
         }
 
         DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),

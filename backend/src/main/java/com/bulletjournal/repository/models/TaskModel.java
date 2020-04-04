@@ -186,6 +186,8 @@ public abstract class TaskModel extends ProjectItemModel {
             this.setReminderBeforeTask(reminderSetting.getBefore());
             if (this.getStartTime() != null) {
                 this.setReminderDateTime(getReminderDateTime(this.getStartTime(), reminderSetting.getBefore()));
+            } else {
+                this.setReminderDateTime(null);
             }
             this.setReminderDate(null);
             this.setReminderTime(null);
