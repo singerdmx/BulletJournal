@@ -6,7 +6,8 @@ import {
   DeleteTwoTone,
   TagOutlined,
   MoreOutlined,
-  SnippetsOutlined
+  SnippetsOutlined,
+  MoneyCollectOutlined,
 } from '@ant-design/icons';
 import { deleteTransaction } from '../../features/transactions/actions';
 import { stringToRGB, Label } from '../../features/label/interface';
@@ -63,6 +64,25 @@ const TransactionItem: React.FC<TransactionProps> = props => {
         </Tooltip>);
   };
 
+  const getTransactionType = (transactionType: number) => {
+    switch (transactionType) {
+      case 0:
+        return (<Tooltip title='Income'>
+          <span className='transaction-item-income'>
+            <MoneyCollectOutlined/>
+          </span>
+        </Tooltip>);
+      case 1:
+        return (<Tooltip title='Expense'>
+          <span className='transaction-item-expense'>
+            <MoneyCollectOutlined/>
+          </span>
+        </Tooltip>);
+    }
+
+    return null;
+  };
+
   return (
     <div className='project-item'>
       <div className='project-item-content'>
@@ -108,6 +128,9 @@ const TransactionItem: React.FC<TransactionProps> = props => {
           <Tooltip title={`Payer ${transaction.payer}`}>
             <Avatar src={transaction.payerAvatar} size='small' />
           </Tooltip>
+        </div>
+        <div className='project-item-owner'>
+          {getTransactionType(transaction.transactionType)}
         </div>
         <Popover
           arrowPointAtCenter
