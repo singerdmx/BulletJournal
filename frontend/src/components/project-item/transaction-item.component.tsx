@@ -10,14 +10,17 @@ import {
   MoneyCollectOutlined,
 } from '@ant-design/icons';
 import { deleteTransaction } from '../../features/transactions/actions';
-import { stringToRGB, Label } from '../../features/label/interface';
+import { stringToRGB } from '../../features/label/interface';
 import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
 import { icons } from '../../assets/icons';
 import moment from 'moment';
 import {dateFormat} from "../../features/myBuJo/constants";
+import {IState} from "../../store";
+const LocaleCurrency = require('locale-currency'); //currency code
 
 type TransactionProps = {
+  currency: string;
   transaction: Transaction;
   deleteTransaction: (transactionId: number) => void;
 };
@@ -64,18 +67,19 @@ const TransactionItem: React.FC<TransactionProps> = props => {
         </Tooltip>);
   };
 
-  const getTransactionType = (transactionType: number) => {
-    switch (transactionType) {
+  const getTransactionInfo = (transaction: Transaction) => {
+    const amount = `${transaction.amount} ${props.currency ? LocaleCurrency.getCurrency(props.currency) : ''}`;
+    switch (transaction.transactionType) {
       case 0:
-        return (<Tooltip title='Income'>
+        return (<Tooltip title={`Income ${amount}`}>
           <span className='transaction-item-income'>
-            <MoneyCollectOutlined/>
+            <MoneyCollectOutlined/> {transaction.amount}
           </span>
         </Tooltip>);
       case 1:
-        return (<Tooltip title='Expense'>
+        return (<Tooltip title={`Expense ${amount}`}>
           <span className='transaction-item-expense'>
-            <MoneyCollectOutlined/>
+            <MoneyCollectOutlined/> {transaction.amount}
           </span>
         </Tooltip>);
     }
@@ -130,7 +134,7 @@ const TransactionItem: React.FC<TransactionProps> = props => {
           </Tooltip>
         </div>
         <div className='project-item-owner'>
-          {getTransactionType(transaction.transactionType)}
+          {getTransactionInfo(transaction)}
         </div>
         <Popover
           arrowPointAtCenter
@@ -148,6 +152,10 @@ const TransactionItem: React.FC<TransactionProps> = props => {
   );
 };
 
-export default connect(null, {
+const mapStateToProps = (state: IState) => ({
+  currency: state.myself.currency
+});
+
+export default connect(mapStateToProps, {
   deleteTransaction
 })(TransactionItem);
