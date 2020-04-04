@@ -396,7 +396,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<Event> events = new ArrayList<>();
         String newAssignee = updateTaskParams.getAssignedTo();
         String oldAssignee = task.getAssignedTo();
-        if (!Objects.equals(newAssignee, oldAssignee)) {
+        if (newAssignee != null && !Objects.equals(newAssignee, oldAssignee)) {
             task.setAssignedTo(newAssignee);
             if (!Objects.equals(newAssignee, requester)) {
                 events.add(new Event(newAssignee, taskId, task.getName()));
