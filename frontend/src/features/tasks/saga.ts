@@ -165,7 +165,7 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       })
     );
 
-    const task = yield call(getTaskById, action.payload.taskId);
+    const task = yield call(getTaskById, taskId);
     yield put(
       tasksActions.taskReceived({
         task: task,

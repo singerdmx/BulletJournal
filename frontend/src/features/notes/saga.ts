@@ -115,7 +115,7 @@ function* patchNote(action: PayloadAction<PatchNote>) {
       })
     );
 
-    const note = yield call(getNoteById, action.payload.noteId);
+    const note = yield call(getNoteById, noteId);
     yield put(
       notesActions.noteReceived({
         note: note,
