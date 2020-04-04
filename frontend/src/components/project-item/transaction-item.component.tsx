@@ -111,7 +111,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
       <div className='project-item-content'>
         <Link to={`/transaction/${transaction.id}`}>
           <h3 className='project-item-name'>
-            {getTransactionIcon(transaction)}
+            {getTransactionIcon(transaction)}&nbsp;
             {transaction.name}
           </h3>
         </Link>

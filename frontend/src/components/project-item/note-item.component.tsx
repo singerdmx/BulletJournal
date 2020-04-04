@@ -93,7 +93,7 @@ const NoteItem: React.FC<NoteProps> = (props) => {
       <div className='project-item-content'>
         <Link to={`/note/${note.id}`}>
           <h3 className='project-item-name'>
-            {getNoteIcon(note)}
+            {getNoteIcon(note)}&nbsp;
             {note.name}
           </h3>
         </Link>

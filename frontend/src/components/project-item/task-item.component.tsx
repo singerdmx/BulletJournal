@@ -138,9 +138,14 @@ const TaskItem: React.FC<TaskProps> = (props) => {
       return null;
     }
 
+    let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
+    if (task.duration) {
+        dueDateTitle += `, duration ${task.duration} minutes`
+    }
+
     return (
       <Tooltip
-        title={moment(task.dueDate, dateFormat).fromNow()}
+        title={dueDateTitle}
         placement={'bottom'}
       >
         <div className='project-item-time'>
