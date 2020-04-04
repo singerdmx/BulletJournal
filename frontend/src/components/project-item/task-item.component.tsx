@@ -7,8 +7,9 @@ import {
   MoreOutlined,
   TagOutlined,
   CarryOutOutlined,
+  AlertOutlined
 } from '@ant-design/icons';
-import { Task } from '../../features/tasks/interface';
+import {getReminderSettingString, Task} from '../../features/tasks/interface';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
@@ -198,6 +199,11 @@ const TaskItem: React.FC<TaskProps> = (props) => {
         <div className='project-item-assignee'>
           <Tooltip title={`Assignee ${task.assignedTo}`}>
             <Avatar src={task.assignedToAvatar} size='small' />
+          </Tooltip>
+        </div>
+        <div className='project-item-assignee'>
+          <Tooltip title={getReminderSettingString(task.reminderSetting)}>
+            <AlertOutlined />
           </Tooltip>
         </div>
         <Popover

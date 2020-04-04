@@ -1,4 +1,5 @@
 import { ProjectItem } from '../myBuJo/interface';
+import {ReminderBeforeTaskText} from "../../components/settings/reducer";
 
 export interface ReminderSetting {
   date?: string;
@@ -17,3 +18,17 @@ export interface Task extends ProjectItem {
   reminderSetting: ReminderSetting;
   recurrenceRule: string;
 }
+
+export const getReminderSettingString = (reminderSetting: ReminderSetting) => {
+  if (reminderSetting.before || reminderSetting.before === 0) {
+    const s = ReminderBeforeTaskText[reminderSetting.before];
+    if (reminderSetting.before === 6) {
+      return s;
+    }
+
+    return `Reminder: ${s}`;
+  }
+
+  return `Reminder: ${reminderSetting.date} ${reminderSetting.time ? reminderSetting.time : ''}`;
+};
+

@@ -110,7 +110,7 @@ const AddTask: React.FC<
       time: values.reminderTime
         ? values.reminderTime.format('HH:mm')
         : undefined,
-      before: props.before ? props.before : 0,
+      before: values.remindBefore === undefined ? props.before : values.remindBefore,
     } as ReminderSetting;
     if (reminderType === 'remindBefore') {
       reminderSetting.date = undefined;
@@ -359,7 +359,7 @@ const AddTask: React.FC<
                 >
                   {ReminderBeforeTaskText.map(
                     (before: string, index: number) => (
-                      <Option key={index} value={before}>
+                      <Option key={index} value={index}>
                         {before}
                       </Option>
                     )
