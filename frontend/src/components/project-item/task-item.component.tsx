@@ -26,6 +26,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
 import { ProjectType } from '../../features/project/constants';
+import { convertToTextWithRRule } from '../../features/recurrence/actions';
 
 type TaskProps = {
   task: Task;
@@ -134,20 +135,23 @@ const TaskItem: React.FC<TaskProps> = (props) => {
   } = props;
 
   const getDueDateTime = () => {
+    if (task.recurrenceRule) {
+      return <div className='project-item-time'>
+        {convertToTextWithRRule(task.recurrenceRule)}
+      </div>;
+    }
+
     if (!task.dueDate) {
       return null;
     }
 
     let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
     if (task.duration) {
-        dueDateTitle += `, duration ${task.duration} minutes`
+      dueDateTitle += `, duration ${task.duration} minutes`;
     }
 
     return (
-      <Tooltip
-        title={dueDateTitle}
-        placement={'bottom'}
-      >
+      <Tooltip title={dueDateTitle} placement={'bottom'}>
         <div className='project-item-time'>
           {task.dueDate} {task.dueTime}
         </div>

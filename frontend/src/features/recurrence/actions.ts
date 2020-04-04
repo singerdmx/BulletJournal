@@ -6,7 +6,7 @@ import {
   YearlyOnThe,
   MonthlyOn,
   MonthlyOnThe,
-  Weekly
+  Weekly,
 } from './interface';
 import { End } from './reducer';
 import RRule from 'rrule';
@@ -14,7 +14,7 @@ import RRule from 'rrule';
 export const updateStartString = (startDate: string, startTime: string) =>
   actions.updateStart({
     startDate: startDate,
-    startTime: startTime
+    startTime: startTime,
   });
 
 export const updateEndString = (
@@ -25,52 +25,52 @@ export const updateEndString = (
   actions.updateEnd({
     mode: mode,
     endDate: endDate,
-    endCount: endCount
+    endCount: endCount,
   });
 
 export const updateRepeatHourly = (repeatHourly: Hourly) =>
   actions.updateRepeatHourly({
-    repeatHourly: repeatHourly
+    repeatHourly: repeatHourly,
   });
 
 export const updateRepeatDaily = (repeatDaily: Daily) =>
   actions.updateRepeatDaily({
-    repeatDaily: repeatDaily
+    repeatDaily: repeatDaily,
   });
 
 export const updateRepeatYearlyOn = (repeatYearlyOn: YearlyOn) =>
   actions.updateRepeatYearlyOn({
-    repeatYearlyOn: repeatYearlyOn
+    repeatYearlyOn: repeatYearlyOn,
   });
 
 export const updateRepeatYearlyOnThe = (repeatYearlyOnThe: YearlyOnThe) =>
   actions.updateRepeatYearlyOnThe({
-    repeatYearlyOnThe: repeatYearlyOnThe
+    repeatYearlyOnThe: repeatYearlyOnThe,
   });
 
 export const updateRepeatMonthlyOn = (repeatMonthlyOn: MonthlyOn) =>
   actions.updateRepeatMonthlyOn({
-    repeatMonthlyOn: repeatMonthlyOn
+    repeatMonthlyOn: repeatMonthlyOn,
   });
 
 export const updateRepeatMonthlyOnThe = (repeatMonthlyOnThe: MonthlyOnThe) =>
   actions.updateRepeatMonthlyOnThe({
-    repeatMonthlyOnThe: repeatMonthlyOnThe
+    repeatMonthlyOnThe: repeatMonthlyOnThe,
   });
 
 export const updateRepeatMonthlyCount = (repeatMonthlyCount: number) =>
   actions.updateRepeatMonthlyCount({
-    repeatMonthlyCount: repeatMonthlyCount
+    repeatMonthlyCount: repeatMonthlyCount,
   });
 
 export const updateRepeatWeeklyCount = (repeatWeeklyCount: number) =>
   actions.updateRepeatWeeklyCount({
-    repeatWeeklyCount: repeatWeeklyCount
+    repeatWeeklyCount: repeatWeeklyCount,
   });
 
 export const updateRepeatWeekly = (repeatWeekly: Weekly) =>
   actions.updateRepeatWeekly({
-    repeatWeekly: repeatWeekly
+    repeatWeekly: repeatWeekly,
   });
 
 export const updateMonthlyOn = (monthlyOn: boolean) =>
@@ -79,12 +79,22 @@ export const updateMonthlyOn = (monthlyOn: boolean) =>
 export const updateYearlyOn = (yearlyOn: boolean) =>
   actions.updateYearlyOn({ yearlyOn: yearlyOn });
 
+export const convertToTextWithRRule = (rrule: string) => {
+    const rule = RRule.fromString(rrule);
+    const resultString = rule.toText();
+
+    return resultString.charAt(0).toUpperCase() + resultString.slice(1) + ' starting at ' +
+        rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' +
+        rrule.substr(14, 2) + ' ' + rrule.substr(17, 2) + ':' +
+        rrule.substr(19, 2);
+};
+
 export const convertToTextWithTime = (start: any, repeat: any, end: End) => {
   let resultString = '';
   const rRuleFirstPart = new RRule({
     ...start,
     ...repeat,
-    ...end
+    ...end,
   });
   resultString = rRuleFirstPart.toText();
 

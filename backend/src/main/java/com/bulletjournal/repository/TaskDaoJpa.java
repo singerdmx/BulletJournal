@@ -338,7 +338,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal List<Event> - a list of events for users notification
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams) {
+    public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams, List<Event> events) {
 
         Task task = this.getProjectItem(taskId, requester);
 
@@ -352,7 +352,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
 
-        List<Event> events = updateAssignee(requester, taskId, updateTaskParams, task);
+        updateAssignee(requester, taskId, updateTaskParams, task, events);
 
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasDueDate(), updateTaskParams.getDueDate(), task::setDueDate);
@@ -379,8 +379,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
                 task::setReminderSetting);
 
-        this.taskRepository.save(task);
-        return events;
+        return this.taskRepository.save(task);
     }
 
     /*
@@ -392,8 +391,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @param task
      * @retVal List<Event> - a list of events for users notification
      */
-    private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams, Task task) {
-        List<Event> events = new ArrayList<>();
+    private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams,
+                                       Task task, List<Event> events) {
         String newAssignee = updateTaskParams.getAssignedTo();
         String oldAssignee = task.getAssignedTo();
         if (newAssignee != null && !Objects.equals(newAssignee, oldAssignee)) {
