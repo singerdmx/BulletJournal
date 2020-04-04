@@ -26,6 +26,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
 import { ProjectType } from '../../features/project/constants';
+import { convertToTextWithRRule } from '../../features/recurrence/actions';
 
 type TaskProps = {
   task: Task;
@@ -135,7 +136,9 @@ const TaskItem: React.FC<TaskProps> = (props) => {
 
   const getDueDateTime = () => {
     if (task.recurrenceRule) {
-      return <div className='project-item-time'>Every sunday</div>;
+      return <div className='project-item-time'>
+        {convertToTextWithRRule(task.recurrenceRule)}
+      </div>;
     }
 
     if (!task.dueDate) {

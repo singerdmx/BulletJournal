@@ -79,6 +79,16 @@ export const updateMonthlyOn = (monthlyOn: boolean) =>
 export const updateYearlyOn = (yearlyOn: boolean) =>
   actions.updateYearlyOn({ yearlyOn: yearlyOn });
 
+export const convertToTextWithRRule = (rrule: string) => {
+    const rule = RRule.fromString(rrule);
+    const resultString = rule.toText();
+
+    return resultString.charAt(0).toUpperCase() + resultString.slice(1) + ' starting at ' +
+        rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' +
+        rrule.substr(14, 2) + ' ' + rrule.substr(17, 2) + ':' +
+        rrule.substr(19, 2);
+};
+
 export const convertToTextWithTime = (start: any, repeat: any, end: End) => {
   let resultString = '';
   const rRuleFirstPart = new RRule({

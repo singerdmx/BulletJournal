@@ -24,7 +24,7 @@ import { Group } from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
-import { convertToTextWithTime } from '../../features/recurrence/actions';
+import {convertToTextWithRRule, convertToTextWithTime} from '../../features/recurrence/actions';
 import { ReminderSetting, Task } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
 import moment from 'moment';
@@ -160,7 +160,7 @@ const EditTask: React.FC<
     //set due time
     if (task.dueTime) setDueTimeVisible(true);
     //set remind type
-    if (task.reminderSetting.date) {
+    if (task.reminderSetting && task.reminderSetting.date) {
       setRemindButton('reminderDate');
       setReminderType('reminderDate');
     } else {
@@ -168,19 +168,14 @@ const EditTask: React.FC<
       setReminderType('remindBefore');
     }
     //set remind time
-    if (task.reminderSetting.time) setReminderTimeVisible(true);
+    if (task.reminderSetting && task.reminderSetting.time) setReminderTimeVisible(true);
   }, []);
   const result = ['15', '30', '45', '60'];
   const options = result.map((time: string) => {
     return { value: time };
   });
 
-  let rRuleText = convertToTextWithTime(props.start, props.repeat, props.end);
-  rRuleText =
-    rRuleText === 'Every year'
-      ? 'Recurrence'
-      : (rRuleText +=
-          ' starting at ' + props.startDate + ' ' + props.startTime);
+  const rRuleText = props.task.recurrenceRule ? convertToTextWithRRule(props.task.recurrenceRule) : 'Recurrence';
   // split string by n words including marks like space , - : n is setting by {0, n} which is {0, 5} right now
   const rRuleTextList = rRuleText.match(
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
@@ -188,7 +183,7 @@ const EditTask: React.FC<
 
   const getModal = () => {
     const { task } = props;
-    console.log(task.recurrenceRule);
+
     return (
       <Modal
         title='Edit Task'
@@ -392,7 +387,7 @@ const EditTask: React.FC<
             <Form.Item name='remindBefore'>
               <Select
                 defaultValue={
-                  task.reminderSetting.before
+                  task.reminderSetting && task.reminderSetting.before
                     ? ReminderBeforeTaskText[task.reminderSetting.before]
                     : ReminderBeforeTaskText[props.before]
                 }
@@ -412,7 +407,7 @@ const EditTask: React.FC<
                 <Form.Item name='reminderDate'>
                   <DatePicker
                     defaultValue={
-                      task.reminderSetting.date
+                      task.reminderSetting && task.reminderSetting.date
                         ? moment(task.reminderSetting.date, 'YYYY-MM-DD')
                         : undefined
                     }
