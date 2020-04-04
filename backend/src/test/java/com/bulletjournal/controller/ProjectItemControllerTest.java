@@ -148,6 +148,18 @@ public class ProjectItemControllerTest {
         assertEquals("rt1", projectItemsRecurring.get(1).getTasks().get(0).getName());
         assertEquals("2020-04-27", projectItemsRecurring.get(0).getTasks().get(0).getDueDate());
         assertEquals("2020-04-20", projectItemsRecurring.get(1).getTasks().get(0).getDueDate());
+        deleteTask(recurTask);
+    }
+
+    private void deleteTask(Task task) {
+        ResponseEntity<Task[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASK_ROUTE, // this is TASK bc one task?
+                HttpMethod.DELETE,
+                null,
+                Task[].class,
+                task.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     private List<ProjectItems> getProjectItemsOtherUser(String startDate, String endDate, String timezone, List<ProjectType> types) {

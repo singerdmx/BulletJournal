@@ -35,6 +35,7 @@ import static org.junit.Assert.*;
 public class SystemControllerTest {
     private static final String ROOT_URL = "http://localhost:";
     private final String expectedOwner = "BulletJournal";
+    private static String TIMEZONE = "America/Los_Angeles";
     private final String[] sampleUsers = {
             "Michael_Zhou"
     };
@@ -91,6 +92,31 @@ public class SystemControllerTest {
         String remindingTaskEtag = systemUpdates.getRemindingTaskEtag();
         systemUpdates = testRemindingTaskEtagMatch(p1, remindingTaskEtag);
         assertNull(systemUpdates.getReminders());
+
+        addRecurringTasks(p1);
+
+
+    }
+
+    private Task addRecurringTasks(Project project) {
+
+        String recurrenceRule = "DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1";
+        String taskName = "rt1";
+
+        CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
+                null, null, null, TIMEZONE, recurrenceRule);
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(task, sampleUsers[0]),
+                Task.class,
+                project.getId());
+        Task createdTask = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(taskName, createdTask.getName());
+        assertEquals(project.getId(), createdTask.getProjectId());
+
+        return createdTask;
     }
 
     private void deleteTask(Task task) {
