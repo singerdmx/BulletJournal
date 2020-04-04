@@ -20,6 +20,9 @@ export interface Task extends ProjectItem {
 }
 
 export const getReminderSettingString = (reminderSetting: ReminderSetting) => {
+  if (!reminderSetting) {
+    return '';
+  }
   if (reminderSetting.before || reminderSetting.before === 0) {
     const s = ReminderBeforeTaskText[reminderSetting.before];
     if (reminderSetting.before === 6) {

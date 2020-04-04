@@ -111,6 +111,31 @@ const ManageTask: React.FC<TaskProps> = (props) => {
   );
 };
 
+const getDueDateTime = (task: Task) => {
+  if (task.recurrenceRule) {
+    return <div className='project-item-time'>
+      {convertToTextWithRRule(task.recurrenceRule)}
+    </div>;
+  }
+
+  if (!task.dueDate) {
+    return null;
+  }
+
+  let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
+  if (task.duration) {
+    dueDateTitle += `, duration ${task.duration} minutes`;
+  }
+
+  return (
+      <Tooltip title={dueDateTitle} placement={'bottom'}>
+        <div className='project-item-time'>
+          {task.dueDate} {task.dueTime}
+        </div>
+      </Tooltip>
+  );
+};
+
 const TaskItem: React.FC<TaskProps> = (props) => {
   const getTaskIcon = (task: Task) => {
     if (task.labels && task.labels[0]) {
@@ -134,31 +159,6 @@ const TaskItem: React.FC<TaskProps> = (props) => {
     deleteTask,
     deleteCompletedTask,
   } = props;
-
-  const getDueDateTime = () => {
-    if (task.recurrenceRule) {
-      return <div className='project-item-time'>
-        {convertToTextWithRRule(task.recurrenceRule)}
-      </div>;
-    }
-
-    if (!task.dueDate) {
-      return null;
-    }
-
-    let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
-    if (task.duration) {
-      dueDateTitle += `, duration ${task.duration} minutes`;
-    }
-
-    return (
-      <Tooltip title={dueDateTitle} placement={'bottom'}>
-        <div className='project-item-time'>
-          {task.dueDate} {task.dueTime}
-        </div>
-      </Tooltip>
-    );
-  };
 
   return (
     <div className='project-item'>
@@ -186,7 +186,7 @@ const TaskItem: React.FC<TaskProps> = (props) => {
                 );
               })}
           </div>
-          {getDueDateTime()}
+          {getDueDateTime(task)}
         </div>
       </div>
 
