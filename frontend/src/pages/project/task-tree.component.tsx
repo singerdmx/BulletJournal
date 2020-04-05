@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { IState } from '../../store';
 
 type TasksProps = {
+  showCompletedTask: boolean;
   projectId: number;
   tasks: Task[];
   completedTasks: Task[];
@@ -134,6 +135,25 @@ const TaskTree: React.FC<TasksProps> = props => {
     }
   }, [projectId]);
   let treeTask = getTree(tasks);
+
+  let completedTaskList = null;
+  if (props.showCompletedTask) {
+    completedTaskList =
+    <div>
+      <Divider />
+      <div className='completed-tasks'>
+        <List>
+          {completedTasks.map(task => {
+            return (
+                <List.Item key={task.id}>
+                  <TreeItem task={task} isComplete={true} />
+                </List.Item>
+            );
+          })}
+        </List>
+      </div>
+    </div>;
+  }
   return (
     <div>
       <Tree
@@ -144,16 +164,7 @@ const TaskTree: React.FC<TasksProps> = props => {
         onDrop={onDrop(tasks, putTask, projectId)}
         treeData={treeTask}
       />
-      <Divider />
-      <List>
-        {completedTasks.map(task => {
-          return (
-            <List.Item key={task.id}>
-              <TreeItem task={task} isComplete={true} />
-            </List.Item>
-          );
-        })}
-      </List>
+      {completedTaskList}
     </div>
   );
 };

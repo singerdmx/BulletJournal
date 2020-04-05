@@ -7,7 +7,7 @@ import { GroupsWithOwner } from '../../features/group/interface';
 import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
-import { DeleteOutlined, TeamOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TeamOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
@@ -28,6 +28,7 @@ type ProjectPathParams = {
 type ModalState = {
   isShow: boolean;
   groupName: string;
+  completeTasksShown: boolean;
 };
 
 type GroupProps = {
@@ -59,7 +60,8 @@ class ProjectPage extends React.Component<
 > {
   state: ModalState = {
     isShow: false,
-    groupName: ''
+    groupName: '',
+    completeTasksShown: false,
   };
 
   componentDidMount() {
@@ -78,8 +80,24 @@ class ProjectPage extends React.Component<
     this.props.history.push(`/groups/group${groupId}`);
   };
 
-  saveProject = () => {
-    this.setState({ isShow: false });
+  getShowCompletedTasksIcon = () => {
+    if (this.state.completeTasksShown) {
+      return <Tooltip placement='top' title='Hide Completed Tasks'>
+        <div onClick={this.handleClickShowCompletedTasksButton}>
+          <CloseCircleOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
+        </div>
+      </Tooltip>;
+    }
+
+    return <Tooltip placement='top' title='Show Completed Tasks'>
+      <div onClick={this.handleClickShowCompletedTasksButton}>
+        <CheckCircleOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
+      </div>
+    </Tooltip>;
+  };
+
+  handleClickShowCompletedTasksButton = () => {
+    this.setState({ completeTasksShown: !this.state.completeTasksShown });
   };
 
   onCancel = () => {
@@ -99,12 +117,8 @@ class ProjectPage extends React.Component<
         break;
       case ProjectType.TODO:
         createContent = <AddTask />;
-        projectContent = <TaskTree />;
-        showCompletedTasks = <Tooltip placement='top' title='Show Completed Tasks'>
-          <div>
-            <CheckCircleOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
-          </div>
-        </Tooltip>;
+        projectContent = <TaskTree showCompletedTask={this.state.completeTasksShown}/>;
+        showCompletedTasks = this.getShowCompletedTasksIcon();
         break;
       case ProjectType.LEDGER:
         createContent = <AddTransaction />;

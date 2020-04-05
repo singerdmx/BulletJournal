@@ -58,7 +58,7 @@ const ManageTask: React.FC<TaskProps> = props => {
           <CloseCircleOutlined twoToneColor="#52c41a" />
         </div>
         <Popconfirm
-          title="Deleting Task also deletes its child tasks. Are you sure?"
+          title="Are you sure?"
           okText="Yes"
           cancelText="No"
           onConfirm={() => deleteCompletedTask(task.id)}
@@ -165,10 +165,11 @@ const TaskItem: React.FC<TaskProps> = props => {
   const taskStyle = isComplete
     ? 'project-item-name completed-task'
     : 'project-item-name';
+  const taskLink = isComplete ? `/completedTask/${task.id}` : `/task/${task.id}`;
   return (
     <div className="project-item">
       <div className="project-item-content">
-        <Link to={`/task/${task.id}`}>
+        <Link to={taskLink}>
           <h3 className={taskStyle}>
             {getTaskIcon(task)} {task.name}
           </h3>
