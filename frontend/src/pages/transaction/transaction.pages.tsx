@@ -149,7 +149,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             </div>
           </Tooltip>
           <Tooltip title='Manage Labels'>
-            <div style={{ cursor: 'pointer' }}>
+            <div>
               <TagOutlined />
             </div>
           </Tooltip>
@@ -170,13 +170,13 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               className='group-setting'
               placement='bottom'
             >
-              <div style={{ cursor: 'pointer' }}>
+              <div>
                 <DeleteTwoTone twoToneColor='#f5222d' />
               </div>
             </Popconfirm>
           </Tooltip>
           <Tooltip title='Go Back'>
-            <div style={{ cursor: 'pointer' }}>
+            <div>
               <RollbackOutlined onClick={e => history.goBack()}/>
             </div>
           </Tooltip>

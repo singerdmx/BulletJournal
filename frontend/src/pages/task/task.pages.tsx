@@ -135,7 +135,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
                         </div>
                     </Tooltip>
                     <Tooltip title="Manage Labels">
-                        <div style={{ cursor: 'pointer' }}>
+                        <div>
                             <TagOutlined/>
                         </div>
                     </Tooltip>
@@ -154,7 +154,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
                             className="group-setting"
                             placement="bottom"
                         >
-                            <div style={{ cursor: 'pointer' }}>
+                            <div>
                                 <DeleteTwoTone twoToneColor="#f5222d"/>
                             </div>
                         </Popconfirm>

@@ -108,7 +108,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
               className="group-setting"
               placement="bottom"
             >
-              <div style={{ cursor: 'pointer' }}>
+              <div>
                 <DeleteTwoTone twoToneColor="#f5222d" />
               </div>
             </Popconfirm>

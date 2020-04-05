@@ -165,7 +165,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     } else {
       return (
           <Tooltip title={`MOVE ${getProjectItemType(props.type)}`}>
-            <div style={{ cursor: 'pointer' }}>
+            <div>
               <span onClick={openModal}>
                 <RightCircleOutlined />
                 {getModal()}

@@ -468,7 +468,7 @@ const EditTask: React.FC<
   return (
     <>
       <Tooltip title={'Edit Task'}>
-        <div style={{ cursor: 'pointer' }}>
+        <div>
           <EditTwoTone onClick={() => setVisible(!visible)} />
         </div>
       </Tooltip>
