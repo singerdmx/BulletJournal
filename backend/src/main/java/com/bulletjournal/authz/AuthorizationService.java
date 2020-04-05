@@ -5,16 +5,23 @@ import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.SharedProjectItemDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.ProjectItemModel;
+import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class AuthorizationService {
+
+    public static String SUPER_USER = UUID.randomUUID().toString();
+
+    private static Set<String> ADMINS = ImmutableSet.of(SUPER_USER);
 
     @Autowired
     @Lazy
@@ -28,6 +35,10 @@ public class AuthorizationService {
     }
 
     public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, Project project) {
+        if (ADMINS.contains(SUPER_USER)) {
+            return;
+        }
+
         List<String> projectGroupUsers = project.getGroup()
                 .getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toList());
         if (!projectGroupUsers.stream().anyMatch(u -> Objects.equals(requester, u))) {

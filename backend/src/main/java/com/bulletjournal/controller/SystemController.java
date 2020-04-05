@@ -1,13 +1,13 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.repository.GroupDaoJpa;
-import com.bulletjournal.repository.NotificationDaoJpa;
-import com.bulletjournal.repository.ProjectDaoJpa;
-import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +36,15 @@ public class SystemController {
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private PublicProjectItemDaoJpa publicProjectItemDaoJpa;
+
+    @Autowired
+    private NoteController noteController;
+
+    @Autowired
+    private TaskController taskController;
 
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
@@ -94,7 +103,29 @@ public class SystemController {
     }
 
     @GetMapping(PUBLIC_ITEM_ROUTE)
-    public PublicProjectItem getPublicProjectItem(@NotNull @PathVariable String itemId) {
-        return new PublicProjectItem();
+    public <T extends ProjectItemModel> PublicProjectItem getPublicProjectItem(
+            @NotNull @PathVariable String itemId) {
+        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
+
+        T item = this.publicProjectItemDaoJpa.getPublicItem(itemId);
+        List<Content> contents;
+        ProjectItem projectItem;
+        ContentType contentType = item.getContentType();
+        switch (contentType) {
+            case NOTE:
+                Note note = this.noteController.getNote(item.getId());
+                projectItem = note;
+                contents = this.noteController.getContents(item.getId());
+                break;
+            case TASK:
+                Task task = this.taskController.getTask(item.getId());
+                projectItem = task;
+                contents = this.taskController.getContents(item.getId());
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        return new PublicProjectItem(contentType, contents, projectItem);
     }
 }
