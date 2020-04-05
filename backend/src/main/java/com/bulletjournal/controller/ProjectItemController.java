@@ -90,18 +90,18 @@ public class ProjectItemController {
         // Task query
         if (types.contains(ProjectType.TODO)) {
             List<Task> tasks = taskDaoJpa.getTasksBetween(user.getName(), startTime, endTime);
-            Map<Long, List<Long>> tasklabels = tasks.stream().distinct().collect(
+            Map<Long, List<Long>> taskLabels = tasks.stream().distinct().collect(
                     Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
-            labelIds.put(ProjectItemType.TASK, tasklabels);
+            labelIds.put(ProjectItemType.TASK, taskLabels);
             // Group tasks by date
             taskMap = ProjectItemsGrouper.groupTasksByDate(tasks);
         }
         // Ledger query
         if (types.contains(ProjectType.LEDGER)) {
             List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(user.getName(), startTime, endTime);
-            Map<Long, List<Long>> transactionlabels = transactions.stream().collect(
+            Map<Long, List<Long>> transactionLabels = transactions.stream().collect(
                     Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
-            labelIds.put(ProjectItemType.TRANSACTION, transactionlabels);
+            labelIds.put(ProjectItemType.TRANSACTION, transactionLabels);
             // Group transaction by date
             transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         }

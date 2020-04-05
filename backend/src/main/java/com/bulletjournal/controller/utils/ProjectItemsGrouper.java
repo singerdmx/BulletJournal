@@ -39,8 +39,12 @@ public class ProjectItemsGrouper {
     public static Map<ZonedDateTime, List<Task>> groupTasksByDate(List<Task> tasks) {
         Map<ZonedDateTime, List<Task>> map = new HashMap<>();
         for (Task task : tasks) {
+            String dueDate = task.getDueDate();
+            if (dueDate == null) {
+                dueDate = ZonedDateTimeHelper.getNow(task.getTimezone()).format(ZonedDateTimeHelper.DATE_FORMATTER);
+            }
             ZonedDateTime zonedDateTime =
-                    ZonedDateTimeHelper.convertDateOnly(task.getDueDate(), task.getTimezone());
+                    ZonedDateTimeHelper.convertDateOnly(dueDate, task.getTimezone());
             map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(task);
         }
         return map;
