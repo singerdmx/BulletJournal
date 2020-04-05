@@ -1,7 +1,7 @@
 // page display contents of notes
 // react imports
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import {useHistory, useParams} from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 //actions
@@ -17,7 +17,8 @@ import { Avatar, Button, Divider, Popconfirm, Tag, Tooltip } from 'antd';
 import {
   DeleteTwoTone,
   PlusCircleTwoTone,
-  TagOutlined
+  TagOutlined,
+  RollbackOutlined
 } from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
@@ -41,6 +42,8 @@ interface NotePageHandler {
 // get icons by string name
 
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
+  // hook history in router
+  const history = useHistory();
   const { note, deleteNote } = props;
   // get id of note from oruter
   const { noteId } = useParams();
@@ -105,6 +108,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
             >
               <DeleteTwoTone twoToneColor="#f5222d" />
             </Popconfirm>
+          </Tooltip>
+          <Tooltip title='Go Back'>
+            <RollbackOutlined onClick={e => history.goBack()}/>
           </Tooltip>
         </div>
       </div>
