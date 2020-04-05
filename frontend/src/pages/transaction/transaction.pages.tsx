@@ -12,7 +12,7 @@ import { ProjectType } from '../../features/project/constants';
 import { deleteTransaction } from '../../features/transactions/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
-import EditTransaction from '../../components/modals/edit-task.component';
+import EditTransaction from '../../components/modals/edit-transaction.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 
 // antd imports
@@ -69,9 +69,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const { transactionId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
-  const [currencyType, setCurrencyType] = useState(
-    LocaleCurrency.getCurrency(currency)
-  );
+  const currencyType = LocaleCurrency.getCurrency(currency);
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click

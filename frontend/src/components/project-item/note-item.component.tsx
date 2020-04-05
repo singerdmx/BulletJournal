@@ -9,7 +9,6 @@ import {
   MoreOutlined,
   FileTextOutlined,
   TagOutlined,
-  CarryOutOutlined,
 } from '@ant-design/icons';
 import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 // features import

@@ -47,7 +47,7 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
         mode='div'
       />
       <Popconfirm
-        title='Deleting Note also deletes its child notes. Are you sure?'
+        title='Are you sure?'
         okText='Yes'
         cancelText='No'
         className='group-setting'
