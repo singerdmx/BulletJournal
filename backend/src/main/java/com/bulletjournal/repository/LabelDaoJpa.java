@@ -153,7 +153,7 @@ public class LabelDaoJpa {
                 Collectors.toMap(n -> n.getId(), n -> n.getLabels()));
         labelIds.put(ProjectItemType.NOTE, notelabels);
 
-        Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks);
+        Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
         Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);

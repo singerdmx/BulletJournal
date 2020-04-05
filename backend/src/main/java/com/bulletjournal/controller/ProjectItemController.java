@@ -94,7 +94,7 @@ public class ProjectItemController {
                     Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
             labelIds.put(ProjectItemType.TASK, taskLabels);
             // Group tasks by date
-            taskMap = ProjectItemsGrouper.groupTasksByDate(tasks);
+            taskMap = ProjectItemsGrouper.groupTasksByDate(tasks, false);
         }
         // Ledger query
         if (types.contains(ProjectType.LEDGER)) {

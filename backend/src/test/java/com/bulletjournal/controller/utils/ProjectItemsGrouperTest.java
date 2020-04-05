@@ -62,7 +62,7 @@ public class ProjectItemsGrouperTest {
         tasks.add(t3);
         tasks.add(t4);
 
-        Map<ZonedDateTime, List<Task>> map = ProjectItemsGrouper.groupTasksByDate(tasks);
+        Map<ZonedDateTime, List<Task>> map = ProjectItemsGrouper.groupTasksByDate(tasks, true);
         assertEquals(4, map.size());
         for (Map.Entry<ZonedDateTime, List<Task>> entry : map.entrySet()) {
             List<Task> t = entry.getValue();
