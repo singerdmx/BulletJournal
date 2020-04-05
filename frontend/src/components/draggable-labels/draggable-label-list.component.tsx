@@ -129,7 +129,17 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                           color={stringToRGB(label.value)}
                           closable={editable}
                           onClose={() => handleLabelDelete(label.id)}
-                          style={editable ? { cursor: 'grab' } : {}}
+                          onClick={() => {
+                            if (editable) {
+                              return;
+                            }
+                            toLabelSearching(label);
+                          }}
+                          style={
+                            editable
+                              ? { cursor: 'grab' }
+                              : { cursor: 'pointer' }
+                          }
                         >
                           <span>
                             {getIcon(label.icon)} &nbsp;
