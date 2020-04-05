@@ -737,8 +737,6 @@ public class ProjectControllerTest {
                 Object.class,
                 response.getBody());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
-        //PublicProjectItem publicProjectItem = publicProjectItemResponse.getBody();
-
 
         shareProjectItemParams = new ShareProjectItemParams();
         shareProjectItemParams.setGenerateLink(true);
@@ -751,6 +749,14 @@ public class ProjectControllerTest {
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(8, response.getBody().length());
+
+        publicProjectItemResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, sampleUsers[7]),
+                Object.class,
+                response.getBody());
+        assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
     }
 
     private void deleteTaskContent(Task task, Content content) {
