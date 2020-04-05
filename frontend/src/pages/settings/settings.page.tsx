@@ -1,7 +1,11 @@
 import React from 'react';
 import { Tabs } from 'antd';
 import Account from '../../components/settings/account';
-
+import {
+  GoogleOutlined,
+  AppleOutlined,
+  WindowsOutlined
+} from '@ant-design/icons';
 import './setting.style.less';
 
 const { TabPane } = Tabs;
@@ -13,8 +17,17 @@ const SettingPage = () => {
         <TabPane tab='Account' key='account'>
           <Account />
         </TabPane>
-        <TabPane tab='General' key='general'>
-          Gneral setting
+        <TabPane tab='Calendar Sync' key='calendarSync'>
+          <div>
+            <Tabs type="card">
+              <TabPane tab={<span><GoogleOutlined /> Google Calendar</span>} key="GoogleCalendar">
+              </TabPane>
+              <TabPane tab={<span><WindowsOutlined /> Outlook Calendar</span>} key="OutlookCalendar">
+              </TabPane>
+              <TabPane tab={<span><AppleOutlined /> Apple Calendar</span>} key="AppleCalendar">
+              </TabPane>
+            </Tabs>
+          </div>
         </TabPane>
       </Tabs>
     </div>
