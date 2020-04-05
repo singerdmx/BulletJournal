@@ -17,6 +17,11 @@ import { icons } from '../../assets/icons';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import { IState } from '../../store';
+import { ProjectType } from '../../features/project/constants';
+//import modal
+import MoveProjectItem from '../modals/move-project-item.component';
+import EditTransaction from '../modals/edit-transaction.component';
+
 const LocaleCurrency = require('locale-currency'); //currency code
 
 type TransactionProps = {
@@ -25,17 +30,29 @@ type TransactionProps = {
   deleteTransaction: (transactionId: number) => void;
 };
 
-type NoteManageProps = {};
+type NoteManageProps = {
+  transaction: Transaction;
+  deleteTransaction: (transactionId: number) => void;
+};
 
 const ManageNote: React.FC<NoteManageProps> = (props) => {
+  const { transaction, deleteTransaction } = props;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <EditTransaction />
+      <MoveProjectItem
+        type={ProjectType.LEDGER}
+        projectItemId={transaction.id}
+        mode='div'
+      />
       <Popconfirm
         title='Deleting Note also deletes its child notes. Are you sure?'
         okText='Yes'
         cancelText='No'
         className='group-setting'
         placement='bottom'
+        onConfirm={() => deleteTransaction(transaction.id)}
       >
         <div className='popover-control-item'>
           <span>Delete</span>
@@ -47,7 +64,7 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
 };
 
 const TransactionItem: React.FC<TransactionProps> = (props) => {
-  const { transaction } = props;
+  const { transaction, deleteTransaction } = props;
 
   const getTransactionIcon = (transaction: Transaction) => {
     if (transaction.labels && transaction.labels[0]) {
@@ -81,7 +98,9 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
   };
 
   const getTransactionInfo = (transaction: Transaction) => {
-    const amount = `${transaction.amount} ${props.currency ? LocaleCurrency.getCurrency(props.currency) : ''}`;
+    const amount = `${transaction.amount} ${
+      props.currency ? LocaleCurrency.getCurrency(props.currency) : ''
+    }`;
     switch (transaction.transactionType) {
       case 0:
         return (
@@ -153,7 +172,12 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
           arrowPointAtCenter
           placement='rightTop'
           overlayStyle={{ width: '150px' }}
-          content={<ManageNote />}
+          content={
+            <ManageNote
+              transaction={transaction}
+              deleteTransaction={deleteTransaction}
+            />
+          }
           trigger='click'
         >
           <span className='project-control-more'>

@@ -9,7 +9,7 @@ import {
   Radio,
   Select,
   TimePicker,
-  Tooltip
+  Tooltip,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -22,7 +22,7 @@ import './modals.styles.less';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { zones } from '../settings/constants';
 import { updateTransactionVisible } from '../../features/transactions/actions';
-import {dateFormat} from "../../features/myBuJo/constants";
+import { dateFormat } from '../../features/myBuJo/constants';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -67,9 +67,9 @@ interface TransactionCreateFormProps {
   addTransactionVisible: boolean;
 }
 
-const AddTransaction: React.FC<RouteComponentProps &
-  TransactionProps &
-  TransactionCreateFormProps> = props => {
+const AddTransaction: React.FC<
+  RouteComponentProps & TransactionProps & TransactionCreateFormProps
+> = (props) => {
   const [form] = Form.useForm();
   const addTransaction = (values: any) => {
     //convert time object to format string
@@ -116,12 +116,12 @@ const AddTransaction: React.FC<RouteComponentProps &
           onOk={() => {
             form
               .validateFields()
-              .then(values => {
+              .then((values) => {
                 console.log(values);
                 form.resetFields();
                 addTransaction(values);
               })
-              .catch(info => console.log(info));
+              .catch((info) => console.log(info));
           }}
         >
           <Form form={form} labelAlign='left'>
@@ -146,7 +146,7 @@ const AddTransaction: React.FC<RouteComponentProps &
                   defaultValue={props.myself}
                   style={{ marginLeft: '-8px' }}
                 >
-                  {props.group.users.map(user => {
+                  {props.group.users.map((user) => {
                     return (
                       <Option value={user.name} key={user.name}>
                         <Avatar size='small' src={user.avatar} />
@@ -167,10 +167,10 @@ const AddTransaction: React.FC<RouteComponentProps &
               >
                 <InputNumber
                   style={{ width: 160 }}
-                  formatter={value =>
+                  formatter={(value) =>
                     `${LocaleCurrency.getCurrency(props.currency)} ${value}`
                   }
-                  parser={value => {
+                  parser={(value) => {
                     return value ? value.replace(/^[A-Za-z]+\s?/g, '') : 0;
                   }}
                 />
@@ -190,7 +190,7 @@ const AddTransaction: React.FC<RouteComponentProps &
             </div>
 
             <div style={{ display: 'flex' }}>
-              <Tooltip title='Select Date'>
+              <Tooltip title='Select Date' placement='bottom'>
                 <Form.Item
                   name='date'
                   rules={[{ required: true, message: 'Missing Date!' }]}
@@ -198,7 +198,7 @@ const AddTransaction: React.FC<RouteComponentProps &
                   <DatePicker placeholder='Select Date' />
                 </Form.Item>
               </Tooltip>
-              <Tooltip title='Select Time'>
+              <Tooltip title='Select Time' placement='bottom'>
                 <Form.Item name='time' style={{ width: '100px' }}>
                   <TimePicker
                     allowClear
@@ -239,11 +239,11 @@ const mapStateToProps = (state: IState) => ({
   currency: state.settings.currency,
   timezone: state.settings.timezone,
   myself: state.myself.username,
-  addTransactionVisible: state.transaction.addTransactionVisible
+  addTransactionVisible: state.transaction.addTransactionVisible,
 });
 
 export default connect(mapStateToProps, {
   createTransaction,
   updateExpandedMyself,
-  updateTransactionVisible
+  updateTransactionVisible,
 })(withRouter(AddTransaction));
