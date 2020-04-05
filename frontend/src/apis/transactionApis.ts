@@ -93,7 +93,7 @@ export const setTransactionLabels = (
   labels: number[]
 ) => {
   const putBody = JSON.stringify(labels);
-  return doPut(`/api/transactions/{transactionId}/setLabels`, putBody)
+  return doPut(`/api/transactions/${transactionId}/setLabels`, putBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);

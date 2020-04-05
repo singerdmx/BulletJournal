@@ -122,7 +122,7 @@ export const uncompleteTaskById = (taskId: number) => {
 
 export const setTaskLabels = (taskId: number, labels: number[]) => {
   const putBody = JSON.stringify(labels);
-  return doPut(`/api/tasks/{taskId}/setLabels`, putBody)
+  return doPut(`/api/tasks/${taskId}/setLabels`, putBody)
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err.message);
