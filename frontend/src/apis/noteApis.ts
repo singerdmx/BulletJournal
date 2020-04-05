@@ -60,7 +60,7 @@ export const updateNote = (
 
 export const setNoteLabels = (noteId: number, labels: number[]) => {
   const putBody = JSON.stringify(labels);
-  return doPut(`/api/notes/{noteId}/setLabels`, putBody)
+  return doPut(`/api/notes/${noteId}/setLabels`, putBody)
     .then(res => res.json())
     .catch(err => {
       throw Error(err.message);
