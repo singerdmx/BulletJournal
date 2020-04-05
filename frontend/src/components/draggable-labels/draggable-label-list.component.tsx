@@ -85,7 +85,6 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
 
   const getListStyle = () => ({
     display: 'flex',
-    overflow: 'auto',
     alignItems: 'baseline',
     flexWrap: 'wrap'
   });
@@ -107,7 +106,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
-              style={getListStyle()}
+              style={getListStyle() as React.CSSProperties}
               {...provided.droppableProps}
             >
               {labels &&
@@ -130,6 +129,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                           color={stringToRGB(label.value)}
                           closable={editable}
                           onClose={() => handleLabelDelete(label.id)}
+                          style={editable ? { cursor: 'grab' } : {}}
                         >
                           <span>
                             {getIcon(label.icon)} &nbsp;
