@@ -111,17 +111,19 @@ class ProjectPage extends React.Component<
       editContent = <EditProject project={project} />;
       deleteContent = (
         <Popconfirm
-          title='Deleting BuJo also deletes its child BuJo. Are you sure?'
-          okText='Yes'
-          cancelText='No'
+          title="Deleting BuJo also deletes its child BuJo. Are you sure?"
+          okText="Yes"
+          cancelText="No"
           onConfirm={() => {
             this.props.deleteProject(project.id, project.name, history);
           }}
-          className='group-setting'
-          placement='bottom'
+          className="group-setting"
+          placement="bottom"
         >
-          <Tooltip placement='top' title='Delete BuJo'>
-            <DeleteOutlined style={{ paddingLeft: '0.5em' }} />
+          <Tooltip placement="top" title="Delete BuJo">
+            <div className="project-delete">
+              <DeleteOutlined style={{ paddingLeft: '0.5em' }} />
+            </div>
           </Tooltip>
         </Popconfirm>
       );
@@ -130,7 +132,7 @@ class ProjectPage extends React.Component<
     let description = null;
     if (project.description) {
       description = (
-        <div className='project-description'>
+        <div className="project-description">
           {project.description.split('\n').map((s, key) => {
             return <p>{s}</p>;
           })}
@@ -146,7 +148,7 @@ class ProjectPage extends React.Component<
         <div>
           {group.users.map((u, index) => (
             <p key={index}>
-              <Avatar size='small' src={u.avatar} />
+              <Avatar size="small" src={u.avatar} />
               &nbsp;{u.name}
             </p>
           ))}
@@ -155,20 +157,20 @@ class ProjectPage extends React.Component<
     }
 
     return (
-      <div className='project'>
+      <div className="project">
         <Tooltip
-          placement='top'
+          placement="top"
           title={project.owner}
-          className='project-avatar'
+          className="project-avatar"
         >
           <span>
-            <Avatar size='large' src={project.ownerAvatar} />
+            <Avatar size="large" src={project.ownerAvatar} />
           </span>
         </Tooltip>
-        <div className='project-header'>
+        <div className="project-header">
           <h2>
             <Tooltip
-              placement='top'
+              placement="top"
               title={`${project.projectType} ${project.name}`}
             >
               <span>
@@ -177,10 +179,10 @@ class ProjectPage extends React.Component<
               </span>
             </Tooltip>
           </h2>
-          <div className='project-control'>
+          <div className="project-control">
             <Popover
               title={group && group.name}
-              placement='bottom'
+              placement="bottom"
               content={popContent}
             >
               <span
@@ -197,9 +199,9 @@ class ProjectPage extends React.Component<
           </div>
         </div>
         {description && (
-          <div className='project-description'>{description}</div>
+          <div className="project-description">{description}</div>
         )}
-        <div className='project-content'>{projectContent}</div>
+        <div className="project-content">{projectContent}</div>
       </div>
     );
   }
