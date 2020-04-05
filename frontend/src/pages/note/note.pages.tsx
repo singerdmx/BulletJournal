@@ -1,30 +1,33 @@
 // page display contents of notes
 // react imports
-import React, {useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
-import {connect} from 'react-redux';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
 // features
 //actions
-import {deleteNote, getNote} from '../../features/notes/actions';
-import {Note} from '../../features/notes/interface';
-import {Label, stringToRGB} from '../../features/label/interface';
-import {addSelectedLabel} from '../../features/label/actions';
-import {IState} from '../../store';
+import { deleteNote, getNote } from '../../features/notes/actions';
+import { Note } from '../../features/notes/interface';
+
+import { IState } from '../../store';
 // components
 import NoteEditorDrawer from '../../components/note-editor/editor-drawer.component';
 import NoteContentList from '../../components/note-content/content-list.component';
 // antd imports
-import {Avatar, Button, Divider, Popconfirm, Tag, Tooltip} from 'antd';
-import {DeleteTwoTone, PlusCircleTwoTone, TagOutlined} from '@ant-design/icons';
+import { Avatar, Button, Divider, Popconfirm, Tag, Tooltip } from 'antd';
+import {
+  DeleteTwoTone,
+  PlusCircleTwoTone,
+  TagOutlined
+} from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
 
-import {icons} from '../../assets/icons/index';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
-import {ProjectType} from "../../features/project/constants";
+import { ProjectType } from '../../features/project/constants';
+import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 
 type NoteProps = {
   note: Note;
@@ -33,14 +36,9 @@ type NoteProps = {
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
-  addSelectedLabel: (label: Label) => void;
 }
 
 // get icons by string name
-const getIcon = (icon: string) => {
-  let res = icons.filter(item => item.name === icon);
-  return res.length > 0 ? res[0].icon : <TagOutlined />;
-};
 
 const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { note, deleteNote } = props;
@@ -48,14 +46,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   const { noteId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
-  // hook history in router
-  const history = useHistory();
-  // jump to label searching page by label click
-  const toLabelSearching = (label: Label) => {
-    console.log(label);
-    props.addSelectedLabel(label);
-    history.push('/labels/search');
-  };
+  const [labelEditable, setLabelEditable] = useState(false);
+
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
     noteId && props.getNote(parseInt(noteId));
@@ -63,6 +55,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   // show drawer
   const createHandler = () => {
     setEditorShow(true);
+  };
+
+  const labelEditableHandler = () => {
+    setLabelEditable(labelEditable => !labelEditable);
   };
 
   return (
@@ -75,33 +71,27 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
       <div className="note-title">
         <div className="label-and-name">
           {note.name}
-          <div className="note-labels">
-            {note.labels &&
-              note.labels.map((label, index) => {
-                return (
-                  <Tag
-                    key={index}
-                    className="labels"
-                    color={stringToRGB(label.value)}
-                    style={{ cursor: 'pointer', display: 'inline-block' }}
-                  >
-                    <span onClick={() => toLabelSearching(label)}>
-                      {getIcon(label.icon)} &nbsp;
-                      {label.value}
-                    </span>
-                  </Tag>
-                );
-              })}
-          </div>
+          <DraggableLabelsList
+            labels={note.labels}
+            editable={labelEditable}
+            noteId={note.id}
+          />
         </div>
-
         <div className="note-operation">
           <Tooltip title="Manage Labels">
-            <TagOutlined />
+            <TagOutlined onClick={labelEditableHandler} />
           </Tooltip>
           <EditNote note={note} mode="icon" />
-          <MoveProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
-          <ShareProjectItem type={ProjectType.NOTE} projectItemId={note.id} mode="icon" />
+          <MoveProjectItem
+            type={ProjectType.NOTE}
+            projectItemId={note.id}
+            mode="icon"
+          />
+          <ShareProjectItem
+            type={ProjectType.NOTE}
+            projectItemId={note.id}
+            mode="icon"
+          />
           <Tooltip title="Delete">
             <Popconfirm
               title="Deleting Note also deletes its child notes. Are you sure?"
@@ -109,7 +99,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
               cancelText="No"
               onConfirm={() => {
                 deleteNote(note.id);
-                history.goBack();
               }}
               className="group-setting"
               placement="bottom"
@@ -146,6 +135,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   deleteNote,
-  getNote,
-  addSelectedLabel
+  getNote
 })(NotePage);
