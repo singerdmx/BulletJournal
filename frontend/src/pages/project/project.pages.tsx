@@ -7,7 +7,7 @@ import { GroupsWithOwner } from '../../features/group/interface';
 import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
-import { DeleteOutlined, TeamOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TeamOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
@@ -91,6 +91,7 @@ class ProjectPage extends React.Component<
 
     let createContent = null;
     let projectContent = null;
+    let showCompletedTasks = null;
     switch (project.projectType) {
       case ProjectType.NOTE:
         createContent = <AddNote />;
@@ -99,6 +100,9 @@ class ProjectPage extends React.Component<
       case ProjectType.TODO:
         createContent = <AddTask />;
         projectContent = <TaskTree />;
+        showCompletedTasks = <Tooltip placement='top' title='Show Completed Tasks'>
+          <CheckCircleOutlined style={{ paddingLeft: '0.5em' }} />
+        </Tooltip>;
         break;
       case ProjectType.LEDGER:
         createContent = <AddTransaction />;
@@ -191,6 +195,7 @@ class ProjectPage extends React.Component<
                 {group && group.users.length}
               </span>
             </Popover>
+            {showCompletedTasks}
             {createContent}
             {editContent}
             {deleteContent}
