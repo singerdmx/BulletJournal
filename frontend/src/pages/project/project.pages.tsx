@@ -102,7 +102,7 @@ class ProjectPage extends React.Component<
         projectContent = <TaskTree />;
         showCompletedTasks = <Tooltip placement='top' title='Show Completed Tasks'>
           <div>
-            <CheckCircleOutlined style={{ paddingLeft: '0.5em' }} />
+            <CheckCircleOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
           </div>
         </Tooltip>;
         break;
@@ -128,7 +128,7 @@ class ProjectPage extends React.Component<
         >
           <Tooltip placement="top" title="Delete BuJo">
             <div className="project-delete">
-              <DeleteOutlined style={{ paddingLeft: '0.5em' }} />
+              <DeleteOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
             </div>
           </Tooltip>
         </Popconfirm>
