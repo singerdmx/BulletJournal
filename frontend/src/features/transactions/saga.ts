@@ -169,7 +169,8 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
 function* transactionSetLabels(action: PayloadAction<SetTransactionLabels>) {
   try {
     const { transactionId, labels } = action.payload;
-    yield call(setTransactionLabels, transactionId, labels);
+    const data = yield call(setTransactionLabels, transactionId, labels);
+    yield put(transactionsActions.transactionReceived({transaction: data}));
   } catch (error) {
     yield call(message.error, `transactionSetLabels Error Received: ${error}`);
   }

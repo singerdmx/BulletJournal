@@ -119,6 +119,7 @@ function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
   try {
     const { taskId, labels } = action.payload;
     const data = yield call(setTaskLabels, taskId, labels);
+    yield put(tasksActions.taskReceived({task: data}));
     yield put(updateTasks(data.projectId));
   } catch (error) {
     yield call(message.error, `taskSetLabels Error Received: ${error}`);
