@@ -8,7 +8,7 @@ import {
   DeleteTwoTone,
   MoreOutlined,
   FileTextOutlined,
-  TagOutlined,
+  TagOutlined
 } from '@ant-design/icons';
 import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 // features import
@@ -38,40 +38,40 @@ type NoteManageProps = {
   deleteNote: (noteId: number) => void;
 };
 
-const ManageNote: React.FC<NoteManageProps> = (props) => {
+const ManageNote: React.FC<NoteManageProps> = props => {
   const { note, deleteNote } = props;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditNote note={note} mode='div' />
+      <EditNote note={note} mode="div" />
       <MoveProjectItem
         type={ProjectType.NOTE}
         projectItemId={note.id}
-        mode='div'
+        mode="div"
       />
       <ShareProjectItem
         type={ProjectType.NOTE}
         projectItemId={note.id}
-        mode='div'
+        mode="div"
       />
       <Popconfirm
-        title='Deleting Note also deletes its child notes. Are you sure?'
-        okText='Yes'
-        cancelText='No'
+        title="Deleting Note also deletes its child notes. Are you sure?"
+        okText="Yes"
+        cancelText="No"
         onConfirm={() => deleteNote(note.id)}
-        className='group-setting'
-        placement='bottom'
+        className="group-setting"
+        placement="bottom"
       >
-        <div className='popover-control-item'>
+        <div className="popover-control-item">
           <span>Delete</span>
-          <DeleteTwoTone twoToneColor='#f5222d' />
+          <DeleteTwoTone twoToneColor="#f5222d" />
         </div>
       </Popconfirm>
     </div>
   );
 };
 
-const NoteItem: React.FC<NoteProps> = (props) => {
+const NoteItem: React.FC<NoteProps> = props => {
   const { note, deleteNote } = props;
   const getNoteIcon = (note: Note) => {
     if (note.labels && note.labels[0]) {
@@ -83,28 +83,29 @@ const NoteItem: React.FC<NoteProps> = (props) => {
   };
 
   const getIcon = (icon: string) => {
-    const res = icons.filter((item) => item.name === icon);
+    const res = icons.filter(item => item.name === icon);
     return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
   return (
-    <div className='project-item'>
-      <div className='project-item-content'>
+    <div className="project-item">
+      <div className="project-item-content">
         <Link to={`/note/${note.id}`}>
-          <h3 className='project-item-name'>
+          <h3 className="project-item-name">
             {getNoteIcon(note)}&nbsp;
             {note.name}
           </h3>
         </Link>
-        <div className='project-item-subs'>
-          <div className='project-item-labels'>
+        <div className="project-item-subs">
+          <div className="project-item-labels">
             {note.labels &&
-              note.labels.map((label) => {
+              note.labels.map(label => {
                 return (
                   <Tag
                     key={`label${label.id}`}
-                    className='labels'
+                    className="labels"
                     color={stringToRGB(label.value)}
+                    style={{ borderRadius: 10 }}
                   >
                     <span>
                       {getIcon(label.icon)} &nbsp;
@@ -114,26 +115,26 @@ const NoteItem: React.FC<NoteProps> = (props) => {
                 );
               })}
           </div>
-          <div className='project-item-time'>
+          <div className="project-item-time">
             {note.updatedAt && moment(note.updatedAt).fromNow()}
           </div>
         </div>
       </div>
 
-      <div className='project-control'>
-        <div className='project-item-owner'>
+      <div className="project-control">
+        <div className="project-item-owner">
           <Tooltip title={note.owner}>
-            <Avatar src={note.ownerAvatar} size='small' />
+            <Avatar src={note.ownerAvatar} size="small" />
           </Tooltip>
         </div>
         <Popover
           arrowPointAtCenter
-          placement='rightTop'
+          placement="rightTop"
           overlayStyle={{ width: '150px' }}
           content={<ManageNote note={note} deleteNote={deleteNote} />}
-          trigger='click'
+          trigger="click"
         >
-          <span className='project-control-more'>
+          <span className="project-control-more">
             <MoreOutlined />
           </span>
         </Popover>

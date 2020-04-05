@@ -137,8 +137,8 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                           }}
                           style={
                             editable
-                              ? { cursor: 'grab' }
-                              : { cursor: 'pointer' }
+                              ? { cursor: 'grab', borderRadius: 10 }
+                              : { cursor: 'pointer', borderRadius: 10 }
                           }
                         >
                           <span>
