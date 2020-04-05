@@ -101,7 +101,9 @@ class ProjectPage extends React.Component<
         createContent = <AddTask />;
         projectContent = <TaskTree />;
         showCompletedTasks = <Tooltip placement='top' title='Show Completed Tasks'>
-          <CheckCircleOutlined style={{ paddingLeft: '0.5em' }} />
+          <div>
+            <CheckCircleOutlined style={{ paddingLeft: '0.5em' }} />
+          </div>
         </Tooltip>;
         break;
       case ProjectType.LEDGER:
