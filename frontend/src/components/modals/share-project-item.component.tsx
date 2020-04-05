@@ -210,10 +210,12 @@ const ShareProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     } else {
       return (
           <Tooltip title={`SHARE ${getProjectItemType(props.type)}`}>
-            <span onClick={openModal}>
-              <ShareAltOutlined />
-              {getModal()}
-            </span>
+            <div>
+              <span onClick={openModal}>
+                <ShareAltOutlined />
+                {getModal()}
+              </span>
+            </div>
           </Tooltip>
       );
     }

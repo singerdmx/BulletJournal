@@ -165,10 +165,12 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     } else {
       return (
           <Tooltip title={`MOVE ${getProjectItemType(props.type)}`}>
-            <span onClick={openModal}>
-              <RightCircleOutlined />
-              {getModal()}
-            </span>
+            <div>
+              <span onClick={openModal}>
+                <RightCircleOutlined />
+                {getModal()}
+              </span>
+            </div>
           </Tooltip>
       );
     }

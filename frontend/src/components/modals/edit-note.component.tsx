@@ -68,7 +68,9 @@ const EditNote: React.FC<NoteProps> = props => {
   return (
         <>
           <Tooltip title={'Edit Note'}>
-            <EditTwoTone onClick={() => setVisible(!visible)} />
+            <div>
+              <EditTwoTone onClick={() => setVisible(!visible)} style={{ cursor: 'pointer' }}/>
+            </div>
           </Tooltip>
           {getModal()}
         </>

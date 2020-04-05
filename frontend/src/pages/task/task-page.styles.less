@@ -32,6 +32,22 @@
       max-width: 200px;
     }
 
+    .task-operation {
+      flex-grow: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: baseline;
+
+      .task-owner {
+        cursor: default;
+      }
+    }
+
+    .task-operation > div {
+      margin-left: 0.5em;
+      cursor: pointer;
+    }
+
     .task-operation > span {
       margin-left: 0.5em;
       cursor: pointer;

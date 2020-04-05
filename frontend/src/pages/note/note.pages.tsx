@@ -13,7 +13,7 @@ import { IState } from '../../store';
 import NoteEditorDrawer from '../../components/note-editor/editor-drawer.component';
 import NoteContentList from '../../components/note-content/content-list.component';
 // antd imports
-import { Avatar, Button, Divider, Popconfirm, Tag, Tooltip } from 'antd';
+import { Avatar, Button, Divider, Popconfirm, Tooltip } from 'antd';
 import {
   DeleteTwoTone,
   PlusCircleTwoTone,
@@ -45,7 +45,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   // hook history in router
   const history = useHistory();
   const { note, deleteNote } = props;
-  // get id of note from oruter
+  // get id of note from router
   const { noteId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
@@ -82,7 +82,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
         </div>
         <div className="note-operation">
           <Tooltip title="Manage Labels">
-            <TagOutlined onClick={labelEditableHandler} />
+            <div>
+              <TagOutlined onClick={labelEditableHandler} />
+            </div>
           </Tooltip>
           <EditNote note={note} mode="icon" />
           <MoveProjectItem
@@ -106,11 +108,15 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
               className="group-setting"
               placement="bottom"
             >
-              <DeleteTwoTone twoToneColor="#f5222d" />
+              <div>
+                <DeleteTwoTone twoToneColor="#f5222d" />
+              </div>
             </Popconfirm>
           </Tooltip>
           <Tooltip title='Go Back'>
-            <RollbackOutlined onClick={e => history.goBack()}/>
+            <div>
+              <RollbackOutlined onClick={e => history.goBack()}/>
+            </div>
           </Tooltip>
         </div>
       </div>

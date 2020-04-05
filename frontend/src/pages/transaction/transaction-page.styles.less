@@ -32,6 +32,22 @@
       max-width: 200px;
     }
 
+    .transaction-operation {
+      flex-grow: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: baseline;
+
+      .transaction-owner {
+        cursor: default;
+      }
+    }
+
+    .transaction-operation > div {
+      margin-left: 0.5em;
+      cursor: pointer;
+    }
+
     .transaction-operation > span {
       margin-left: 0.5em;
       cursor: pointer;

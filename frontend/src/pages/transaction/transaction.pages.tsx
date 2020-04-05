@@ -144,10 +144,14 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
         <div className='transaction-operation'>
           <Tooltip title={`Created by ${transaction.owner}`}>
-            <Avatar src={transaction.ownerAvatar} />
+            <div className='transaction-owner'>
+              <Avatar src={transaction.ownerAvatar} />
+            </div>
           </Tooltip>
           <Tooltip title='Manage Labels'>
-            <TagOutlined />
+            <div>
+              <TagOutlined />
+            </div>
           </Tooltip>
           <MoveProjectItem
             type={ProjectType.LEDGER}
@@ -166,11 +170,15 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               className='group-setting'
               placement='bottom'
             >
-              <DeleteTwoTone twoToneColor='#f5222d' />
+              <div>
+                <DeleteTwoTone twoToneColor='#f5222d' />
+              </div>
             </Popconfirm>
           </Tooltip>
           <Tooltip title='Go Back'>
-            <RollbackOutlined onClick={e => history.goBack()}/>
+            <div>
+              <RollbackOutlined onClick={e => history.goBack()}/>
+            </div>
           </Tooltip>
         </div>
       </div>

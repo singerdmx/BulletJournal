@@ -130,10 +130,14 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
 
                 <div className="task-operation">
                     <Tooltip title={`Created by ${task.owner}`}>
-                        <Avatar src={task.ownerAvatar}/>
+                        <div className='task-owner'>
+                            <Avatar src={task.ownerAvatar}/>
+                        </div>
                     </Tooltip>
                     <Tooltip title="Manage Labels">
-                        <TagOutlined/>
+                        <div>
+                            <TagOutlined/>
+                        </div>
                     </Tooltip>
                     <EditTask task={task} mode="icon"/>
                     <MoveProjectItem type={ProjectType.TODO} projectItemId={task.id} mode="icon"/>
@@ -150,11 +154,15 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
                             className="group-setting"
                             placement="bottom"
                         >
-                            <DeleteTwoTone twoToneColor="#f5222d"/>
+                            <div>
+                                <DeleteTwoTone twoToneColor="#f5222d"/>
+                            </div>
                         </Popconfirm>
                     </Tooltip>
                     <Tooltip title='Go Back'>
-                        <RollbackOutlined onClick={e => history.goBack()}/>
+                        <div>
+                            <RollbackOutlined onClick={e => history.goBack()}/>
+                        </div>
                     </Tooltip>
                 </div>
             </div>
