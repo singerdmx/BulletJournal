@@ -144,6 +144,7 @@ function* noteSetLabels(action: PayloadAction<SetNoteLabels>) {
   try {
     const { noteId, labels } = action.payload;
     const data = yield call(setNoteLabels, noteId, labels);
+    yield put(notesActions.noteReceived({note: data}));
     yield put(updateNotes(data.projectId));
   } catch (error) {
     yield call(message.error, `noteSetLabels Error Received: ${error}`);
