@@ -34,7 +34,7 @@ import {
   PlusCircleTwoTone,
   AccountBookOutlined,
   DollarCircleOutlined,
-  RollbackOutlined
+  UpSquareOutlined
 } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -175,9 +175,9 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               </div>
             </Popconfirm>
           </Tooltip>
-          <Tooltip title='Go Back'>
+          <Tooltip title='Go to Parent BuJo'>
             <div>
-              <RollbackOutlined onClick={e => history.goBack()}/>
+              <UpSquareOutlined onClick={e => history.push(`/projects/${transaction.projectId}`)}/>
             </div>
           </Tooltip>
         </div>

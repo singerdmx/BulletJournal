@@ -160,11 +160,12 @@ const TaskItem: React.FC<TaskProps> = (props) => {
     deleteCompletedTask,
   } = props;
 
+  const taskStyle = isComplete ? 'project-item-name completed-task' : 'project-item-name';
   return (
     <div className='project-item'>
       <div className='project-item-content'>
         <Link to={`/task/${task.id}`}>
-          <h3 className='project-item-name'>
+          <h3 className={taskStyle}>
             {getTaskIcon(task)} {task.name}
           </h3>
         </Link>

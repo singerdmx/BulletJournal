@@ -18,7 +18,7 @@ import {
   DeleteTwoTone,
   PlusCircleTwoTone,
   TagOutlined,
-  RollbackOutlined
+  UpSquareOutlined
 } from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
@@ -113,9 +113,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
               </div>
             </Popconfirm>
           </Tooltip>
-          <Tooltip title='Go Back'>
+          <Tooltip title='Go to Parent BuJo'>
             <div>
-              <RollbackOutlined onClick={e => history.goBack()}/>
+              <UpSquareOutlined onClick={e => history.push(`/projects/${note.projectId}`)}/>
             </div>
           </Tooltip>
         </div>
