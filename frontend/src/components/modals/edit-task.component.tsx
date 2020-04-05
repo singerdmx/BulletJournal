@@ -468,7 +468,9 @@ const EditTask: React.FC<
   return (
     <>
       <Tooltip title={'Edit Task'}>
-        <EditTwoTone onClick={() => setVisible(!visible)} />
+        <div style={{ cursor: 'pointer' }}>
+          <EditTwoTone onClick={() => setVisible(!visible)} />
+        </div>
       </Tooltip>
       {getModal()}
     </>
