@@ -12,7 +12,7 @@ import {addSelectedLabel} from '../../features/label/actions';
 import {IState} from '../../store';
 // antd imports
 import {Avatar, Button, Card, Col, Divider, Popconfirm, Row, Statistic, Tag, Tooltip} from 'antd';
-import {DeleteTwoTone, FileDoneOutlined, LoadingOutlined, PlusCircleTwoTone, TagOutlined, AlertOutlined} from '@ant-design/icons';
+import {DeleteTwoTone, FileDoneOutlined, LoadingOutlined, PlusCircleTwoTone, TagOutlined, AlertOutlined, RollbackOutlined} from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -152,6 +152,9 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = props => {
                         >
                             <DeleteTwoTone twoToneColor="#f5222d"/>
                         </Popconfirm>
+                    </Tooltip>
+                    <Tooltip title='Go Back'>
+                        <RollbackOutlined onClick={e => history.goBack()}/>
                     </Tooltip>
                 </div>
             </div>

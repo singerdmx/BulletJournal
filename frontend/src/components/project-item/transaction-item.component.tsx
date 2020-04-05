@@ -7,7 +7,7 @@ import {
   TagOutlined,
   MoreOutlined,
   AccountBookOutlined,
-  MoneyCollectOutlined,
+  DollarOutlined,
 } from '@ant-design/icons';
 import { deleteTransaction } from '../../features/transactions/actions';
 import { stringToRGB } from '../../features/label/interface';
@@ -106,7 +106,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
         return (
           <Tooltip title={`Income ${amount}`}>
             <span className='transaction-item-income'>
-              <MoneyCollectOutlined /> {transaction.amount}
+              <DollarOutlined /> {transaction.amount}
             </span>
           </Tooltip>
         );
@@ -114,7 +114,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
         return (
           <Tooltip title={`Expense ${amount}`}>
             <span className='transaction-item-expense'>
-              <MoneyCollectOutlined /> {transaction.amount}
+              <DollarOutlined /> {transaction.amount}
             </span>
           </Tooltip>
         );

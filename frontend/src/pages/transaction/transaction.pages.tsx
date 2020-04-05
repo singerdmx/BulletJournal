@@ -34,6 +34,7 @@ import {
   PlusCircleTwoTone,
   AccountBookOutlined,
   DollarCircleOutlined,
+  RollbackOutlined
 } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -167,6 +168,9 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             >
               <DeleteTwoTone twoToneColor='#f5222d' />
             </Popconfirm>
+          </Tooltip>
+          <Tooltip title='Go Back'>
+            <RollbackOutlined onClick={e => history.goBack()}/>
           </Tooltip>
         </div>
       </div>

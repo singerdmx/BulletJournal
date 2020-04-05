@@ -15,7 +15,7 @@ type LabelsPageProps = {
   labelsUpdate: () => void;
 };
 
-const LablesPage: React.FC<LabelsPageProps> = props => {
+const LabelsPage: React.FC<LabelsPageProps> = props => {
   const { createOrSearch } = useParams();
   const history = useHistory();
   const [path, setPath] = useState(createOrSearch || 'create');
@@ -59,4 +59,4 @@ const mapStateToProps = (state: IState) => ({
   labelOptions: state.label.labelOptions
 });
 
-export default connect(mapStateToProps, { labelsUpdate })(LablesPage);
+export default connect(mapStateToProps, { labelsUpdate })(LabelsPage);
