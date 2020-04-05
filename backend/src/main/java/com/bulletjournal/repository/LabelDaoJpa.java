@@ -196,11 +196,12 @@ public class LabelDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabels(List<Long> labels) {
+    protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabels(
+            final List<Long> labels) {
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
         if (labels != null && !labels.isEmpty()) {
             labelsForPresentation = this.labelRepository.findAllById(labels).stream()
-                    .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                    .sorted(Comparator.comparingInt(label -> labels.indexOf(label.getId())))
                     .map(Label::toPresentationModel)
                     .collect(Collectors.toList());
         }
