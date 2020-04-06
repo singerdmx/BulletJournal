@@ -7,7 +7,9 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "public_project_items")
+@Table(name = "public_project_items",
+        indexes = {@Index(name = "public_project_items_task_index", columnList = "task_id"),
+                @Index(name = "public_project_items_note_index", columnList = "note_id")})
 public class PublicProjectItem extends AuditModel {
 
     @Id
@@ -49,6 +51,10 @@ public class PublicProjectItem extends AuditModel {
 
     public void setExpirationTime(Timestamp expirationTime) {
         this.expirationTime = expirationTime;
+    }
+
+    public boolean hasExpirationTime() {
+        return this.expirationTime != null;
     }
 
     public String getUsername() {

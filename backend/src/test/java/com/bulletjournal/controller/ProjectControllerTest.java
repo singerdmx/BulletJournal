@@ -778,6 +778,24 @@ public class ProjectControllerTest {
                 response.getBody());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
         assertNull(publicProjectItemResponse.getBody());
+
+        ResponseEntity<ProjectItemSharables> projectItemSharablesResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.GET_SHARABLES_ROUTE,
+                HttpMethod.GET,
+                null,
+                ProjectItemSharables.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, projectItemSharablesResponse.getStatusCode());
+        ProjectItemSharables projectItemSharables = projectItemSharablesResponse.getBody();
+        assertEquals(1, projectItemSharables.getUsers().size());
+        User user = projectItemSharables.getUsers().get(0);
+        assertEquals(targetUser, user.getName());
+        assertNotNull(user.getAvatar());
+
+        assertEquals(2, projectItemSharables.getLinks().size());
+        projectItemSharables.getLinks().forEach((sharableLink) -> {
+            assertEquals(8, sharableLink.getLink().length());
+        });
     }
 
     private void deleteTaskContent(Task task, Content content) {

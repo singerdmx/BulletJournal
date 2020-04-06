@@ -4,10 +4,7 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.Revision;
-import com.bulletjournal.controller.models.ShareProjectItemParams;
-import com.bulletjournal.controller.models.UpdateContentParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
@@ -30,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
@@ -86,6 +84,18 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         ProjectType projectType = ProjectType.getType(projectItem.getProject().getType());
         return this.sharedProjectItemDaoJpa.save(projectType, projectItem, users, requester);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> ProjectItemSharables getSharables(Long projectItemId, String requester) {
+        T projectItem = getProjectItem(projectItemId, requester);
+
+        List<SharableLink> links = this.publicProjectItemDaoJpa.getPublicItemLinks(projectItem);
+        Set<String> users = this.sharedProjectItemDaoJpa.getProjectItemSharedUsers(projectItem);
+        ProjectItemSharables result = new ProjectItemSharables();
+        result.setLinks(links);
+        result.setUsers(users.stream().map(u -> new User(u)).collect(Collectors.toList()));
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -32,6 +32,7 @@ public class TaskController {
     protected static final String TASK_SET_LABELS_ROUTE = "/api/tasks/{taskId}/setLabels";
     protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
+    protected static final String GET_SHARABLES_ROUTE = "/api/tasks/{taskId}/sharables";
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
@@ -181,6 +182,16 @@ public class TaskController {
         Informed inform = this.taskDaoJpa.shareProjectItem(taskId, shareProjectItemParams, username);
         this.notificationService.inform(inform);
         return null;
+    }
+
+    @GetMapping(GET_SHARABLES_ROUTE)
+    public ProjectItemSharables getSharables(@NotNull @PathVariable Long taskId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        ProjectItemSharables result = this.taskDaoJpa.getSharables(taskId, username);
+        List<User> users = result.getUsers().stream().map((u) -> this.userClient.getUser(u.getName()))
+                .collect(Collectors.toList());
+        result.setUsers(users);
+        return result;
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)

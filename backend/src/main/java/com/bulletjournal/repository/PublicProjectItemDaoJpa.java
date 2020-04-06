@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.SharableLink;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.*;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class PublicProjectItemDaoJpa {
@@ -52,7 +55,7 @@ public class PublicProjectItemDaoJpa {
         PublicProjectItem publicProjectItem = this.publicProjectItemRepository.findById(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException("PublicProjectItem " + uuid + " not found"));
 
-        if (publicProjectItem.getExpirationTime() != null &&
+        if (publicProjectItem.hasExpirationTime() &&
                 publicProjectItem.getExpirationTime().compareTo(Timestamp.from(Instant.now())) < 0) {
             LOGGER.info("Link {} expired", uuid);
             this.publicProjectItemRepository.delete(publicProjectItem);
@@ -69,5 +72,25 @@ public class PublicProjectItemDaoJpa {
         }
 
         return item;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> List<SharableLink> getPublicItemLinks(T projectItem) {
+        List<PublicProjectItem> publicProjectItems;
+        switch (projectItem.getContentType()) {
+            case TASK:
+                publicProjectItems = this.publicProjectItemRepository.findByTask((Task) projectItem);
+                break;
+            case NOTE:
+                publicProjectItems = this.publicProjectItemRepository.findByNote((Note) projectItem);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        return publicProjectItems.stream()
+                .map(item -> new SharableLink(item.getId(),
+                        item.hasExpirationTime() ? item.getExpirationTime().getTime() : null,
+                        item.getCreatedAt().getTime()))
+                .collect(Collectors.toList());
     }
 }

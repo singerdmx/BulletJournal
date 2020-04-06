@@ -30,6 +30,7 @@ public class NoteController {
     protected static final String NOTE_SET_LABELS_ROUTE = "/api/notes/{noteId}/setLabels";
     protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
+    protected static final String GET_SHARABLES_ROUTE = "/api/notes/{noteId}/sharables";
     protected static final String ADD_CONTENT_ROUTE = "/api/notes/{noteId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
@@ -140,6 +141,16 @@ public class NoteController {
         Informed inform = this.noteDaoJpa.shareProjectItem(noteId, shareProjectItemParams, username);
         this.notificationService.inform(inform);
         return null;
+    }
+
+    @GetMapping(GET_SHARABLES_ROUTE)
+    public ProjectItemSharables getSharables(@NotNull @PathVariable Long noteId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        ProjectItemSharables result = this.noteDaoJpa.getSharables(noteId, username);
+        List<User> users = result.getUsers().stream().map((u) -> this.userClient.getUser(u.getName()))
+                .collect(Collectors.toList());
+        result.setUsers(users);
+        return result;
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)

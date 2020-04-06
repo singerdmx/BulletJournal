@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -137,5 +138,22 @@ public class SharedProjectItemDaoJpa {
 
         userConsumer.accept(project);
         this.userRepository.save(user);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> Set<String> getProjectItemSharedUsers(T projectItem) {
+        List<SharedProjectItem> sharedProjectItems;
+        switch (projectItem.getContentType()) {
+            case TASK:
+                sharedProjectItems = this.sharedProjectItemsRepository.findByTask((Task) projectItem);
+                break;
+            case NOTE:
+                sharedProjectItems = this.sharedProjectItemsRepository.findByNote((Note) projectItem);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        return sharedProjectItems.stream().map(item -> item.getUsername()).collect(Collectors.toSet());
     }
 }

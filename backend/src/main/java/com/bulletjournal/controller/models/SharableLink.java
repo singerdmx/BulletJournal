@@ -6,6 +6,16 @@ public class SharableLink {
 
     private Long expirationTime;
 
+    public Long createdAt;
+
+    public SharableLink() {
+    }
+
+    public SharableLink(String link, Long expirationTime, Long createdAt) {
+        this.link = link;
+        this.expirationTime = expirationTime;
+    }
+
     public String getLink() {
         return link;
     }
@@ -20,5 +30,13 @@ public class SharableLink {
 
     public void setExpirationTime(Long expirationTime) {
         this.expirationTime = expirationTime;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 }
