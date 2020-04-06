@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import HomePage from '../../pages/home/home.pages';
 import SettingPage from '../../pages/settings/settings.page';
 import BujoPage from '../../pages/bujo/bujo.pages';
@@ -17,22 +17,22 @@ const { Content } = Layout;
 class ContentLayout extends React.Component {
   render() {
     return (
-      <Content className='content'>
+      <Content className="content">
         <Switch>
-          <Route exact path='/' component={HomePage} />
-          <Route exact path='/bujo/:category' component={BujoPage} />
-          <Route exact path='/settings' component={SettingPage} />
-          <Route exact path='/projects' component={ProjectsPage} />
-          <Route exact path='/projects/:projectId' component={ProjectPage} />
-          <Route exact path='/groups' component={GroupsPage} />
-          <Route exact path='/groups/:groupId' component={GroupPage} />
-          <Route exact path='/labels/:createOrSearch' component={LabelsPage} />
-          <Route path='/labels' component={LabelsPage} />
-          <Route exact path='/note/:noteId' component={NotePage} />
-          <Route exact path='/task/:taskId' component={TaskPage} />
+          <Redirect exact from="/" to="/bujo/today" />
+          <Route exact path="/bujo/:category" component={BujoPage} />
+          <Route exact path="/settings" component={SettingPage} />
+          <Route exact path="/projects" component={ProjectsPage} />
+          <Route exact path="/projects/:projectId" component={ProjectPage} />
+          <Route exact path="/groups" component={GroupsPage} />
+          <Route exact path="/groups/:groupId" component={GroupPage} />
+          <Route exact path="/labels/:createOrSearch" component={LabelsPage} />
+          <Route path="/labels" component={LabelsPage} />
+          <Route exact path="/note/:noteId" component={NotePage} />
+          <Route exact path="/task/:taskId" component={TaskPage} />
           <Route
             exact
-            path='/transaction/:transactionId'
+            path="/transaction/:transactionId"
             component={TransactionPage}
           />
         </Switch>
