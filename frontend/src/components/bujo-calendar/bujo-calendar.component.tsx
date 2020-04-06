@@ -90,7 +90,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps> {
       title={title}>
       {content}
     </Popover>);
-  }
+  };
 
   onPanelChange = (value: moment.Moment, mode: CalendarMode) => {
     const modeChanged = this.props.calendarMode !== mode;

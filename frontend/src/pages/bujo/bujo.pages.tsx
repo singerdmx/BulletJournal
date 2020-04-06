@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import ProjectItemList from '../../components/project-item-list/project-item-list.component';
 import BujoCalendar from '../../components/bujo-calendar/bujo-calendar.component';
-import { AccountBookOutlined, CarryOutOutlined } from '@ant-design/icons';
+import { AccountBookOutlined, CarryOutOutlined, SyncOutlined } from '@ant-design/icons';
 import { IState } from '../../store/index';
 import { Project } from '../../features/project/interface';
 import AddProject from '../../components/modals/add-project.component';
@@ -60,8 +60,7 @@ class BujoPage extends React.Component<
     showForm: false
   };
 
-  handleOnChange = (type: string) => {
-    const { category } = this.props.match.params;
+  handleOnChange = (type: string, category: string) => {
     let { ledgerSelected, todoSelected } = this.props;
     if (type === 'todo') {
       todoSelected = !todoSelected;
@@ -73,6 +72,15 @@ class BujoPage extends React.Component<
       todoSelected,
       ledgerSelected,
       category
+    );
+  };
+
+  refresh = (category: string) => {
+    let { ledgerSelected, todoSelected } = this.props;
+    this.props.getProjectItemsAfterUpdateSelect(
+        todoSelected,
+        ledgerSelected,
+        category
     );
   };
 
@@ -91,7 +99,7 @@ class BujoPage extends React.Component<
             <Checkbox
               checked={this.props.todoSelected}
               value='todo'
-              onChange={e => this.handleOnChange(e.target.value)}
+              onChange={e => this.handleOnChange(e.target.value, category)}
             >
               <Tooltip placement='top' title='TODO'>
                 <CarryOutOutlined />
@@ -100,12 +108,15 @@ class BujoPage extends React.Component<
             <Checkbox
               checked={this.props.ledgerSelected}
               value='ledger'
-              onChange={e => this.handleOnChange(e.target.value)}
+              onChange={e => this.handleOnChange(e.target.value, category)}
             >
               <Tooltip placement='top' title='LEDGER'>
                 <AccountBookOutlined />
               </Tooltip>
             </Checkbox>
+            <Tooltip title='Refresh'>
+              <SyncOutlined className='refreshButton' onClick={e => this.refresh(category)}/>
+            </Tooltip>
           </div>
 
           {plusIcon}
