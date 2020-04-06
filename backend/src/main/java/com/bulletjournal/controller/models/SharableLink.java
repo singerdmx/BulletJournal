@@ -1,6 +1,6 @@
 package com.bulletjournal.controller.models;
 
-public class ShareableLink {
+public class SharableLink {
 
     private String link;
 
