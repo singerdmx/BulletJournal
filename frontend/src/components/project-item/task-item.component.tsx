@@ -1,33 +1,28 @@
 import React from 'react';
-import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
+import {Avatar, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 import {
+  AlertOutlined,
+  CarryOutOutlined,
   CheckCircleTwoTone,
   CloseCircleOutlined,
   DeleteTwoTone,
   MoreOutlined,
-  TagOutlined,
-  CarryOutOutlined,
-  AlertOutlined
+  TagOutlined
 } from '@ant-design/icons';
-import { getReminderSettingString, Task } from '../../features/tasks/interface';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import {
-  completeTask,
-  deleteCompletedTask,
-  deleteTask,
-  uncompleteTask
-} from '../../features/tasks/actions';
+import {getReminderSettingString, Task} from '../../features/tasks/interface';
+import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
+import {completeTask, deleteCompletedTask, deleteTask, uncompleteTask} from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import { icons } from '../../assets/icons';
-import { stringToRGB } from '../../features/label/interface';
+import {icons} from '../../assets/icons';
+import {stringToRGB} from '../../features/label/interface';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
-import { ProjectType } from '../../features/project/constants';
-import { convertToTextWithRRule } from '../../features/recurrence/actions';
+import {ProjectType} from '../../features/project/constants';
+import {convertToTextWithRRule} from '../../features/recurrence/actions';
 
 type TaskProps = {
   task: Task;
@@ -165,15 +160,17 @@ const TaskItem: React.FC<TaskProps> = props => {
   const taskStyle = isComplete
     ? 'project-item-name completed-task'
     : 'project-item-name';
-  const taskLink = isComplete ? `/completedTask/${task.id}` : `/task/${task.id}`;
+  const taskLink = isComplete ? <h3 className={taskStyle}>
+    {getTaskIcon(task)} {task.name}
+  </h3> : <Link to={`/task/${task.id}`}>
+    <h3 className={taskStyle}>
+      {getTaskIcon(task)} {task.name}
+    </h3>
+  </Link>;
   return (
     <div className="project-item">
       <div className="project-item-content">
-        <Link to={taskLink}>
-          <h3 className={taskStyle}>
-            {getTaskIcon(task)} {task.name}
-          </h3>
-        </Link>
+        {taskLink}
         <div className="project-item-subs">
           <div className="project-item-labels">
             {task.labels &&

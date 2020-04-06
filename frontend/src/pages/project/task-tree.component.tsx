@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { List, Divider, Tree } from 'antd';
+import {List, Divider, Tree, Empty} from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
@@ -138,21 +138,27 @@ const TaskTree: React.FC<TasksProps> = props => {
 
   let completedTaskList = null;
   if (props.showCompletedTask) {
-    completedTaskList =
-    <div>
-      <Divider />
-      <div className='completed-tasks'>
-        <List>
-          {completedTasks.map(task => {
-            return (
-                <List.Item key={task.id}>
-                  <TreeItem task={task} isComplete={true} />
-                </List.Item>
-            );
-          })}
-        </List>
-      </div>
-    </div>;
+    if (completedTasks.length === 0) {
+      completedTaskList =  <div>
+        <Divider/><Empty/>
+      </div>;
+    } else {
+      completedTaskList =
+          <div>
+            <Divider/>
+            <div className='completed-tasks'>
+              <List>
+                {completedTasks.map(task => {
+                  return (
+                      <List.Item key={task.id}>
+                        <TreeItem task={task} isComplete={true}/>
+                      </List.Item>
+                  );
+                })}
+              </List>
+            </div>
+          </div>;
+    }
   }
   return (
     <div>
