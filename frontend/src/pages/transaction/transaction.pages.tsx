@@ -34,7 +34,7 @@ import {
   PlusCircleTwoTone,
   AccountBookOutlined,
   DollarCircleOutlined,
-  UpSquareOutlined
+  UpSquareOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -153,6 +153,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               <TagOutlined />
             </div>
           </Tooltip>
+          <EditTransaction transaction={transaction} mode='icon' />
           <MoveProjectItem
             type={ProjectType.LEDGER}
             projectItemId={transaction.id}
@@ -177,7 +178,11 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           </Tooltip>
           <Tooltip title='Go to Parent BuJo'>
             <div>
-              <UpSquareOutlined onClick={e => history.push(`/projects/${transaction.projectId}`)}/>
+              <UpSquareOutlined
+                onClick={(e) =>
+                  history.push(`/projects/${transaction.projectId}`)
+                }
+              />
             </div>
           </Tooltip>
         </div>

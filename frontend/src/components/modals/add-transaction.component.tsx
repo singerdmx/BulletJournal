@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Avatar,
   DatePicker,
@@ -71,6 +71,7 @@ const AddTransaction: React.FC<
   RouteComponentProps & TransactionProps & TransactionCreateFormProps
 > = (props) => {
   const [form] = Form.useForm();
+  const [timeVisible, setTimeVisible] = useState(false);
   const addTransaction = (values: any) => {
     //convert time object to format string
     const date_value = values.date.format(dateFormat);
@@ -195,18 +196,24 @@ const AddTransaction: React.FC<
                   name='date'
                   rules={[{ required: true, message: 'Missing Date!' }]}
                 >
-                  <DatePicker placeholder='Select Date' />
-                </Form.Item>
-              </Tooltip>
-              <Tooltip title='Select Time' placement='bottom'>
-                <Form.Item name='time' style={{ width: '100px' }}>
-                  <TimePicker
-                    allowClear
-                    format='HH:mm'
-                    placeholder='Select Time'
+                  <DatePicker
+                    placeholder='Select Date'
+                    onChange={(value) => setTimeVisible(value !== null)}
                   />
                 </Form.Item>
               </Tooltip>
+
+              {timeVisible && (
+                <Tooltip title='Select Time' placement='bottom'>
+                  <Form.Item name='time' style={{ width: '100px' }}>
+                    <TimePicker
+                      allowClear
+                      format='HH:mm'
+                      placeholder='Select Time'
+                    />
+                  </Form.Item>
+                </Tooltip>
+              )}
 
               <Tooltip title='Time Zone'>
                 <Form.Item name='timezone'>
