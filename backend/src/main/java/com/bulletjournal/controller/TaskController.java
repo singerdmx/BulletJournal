@@ -35,7 +35,7 @@ public class TaskController {
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
-    protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions";
+    protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -219,9 +219,11 @@ public class TaskController {
     }
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
-    public List<Revision> getContentRevisions(
-            @NotNull @PathVariable Long taskId,
-            @NotNull @PathVariable Long contentId) {
-        return null;
+    public String getContentRevision(
+        @NotNull @PathVariable Long taskId,
+        @NotNull @PathVariable Long contentId,
+        @NotNull @PathVariable Long revisionId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
     }
 }

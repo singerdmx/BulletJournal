@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 public class Revision {
 
     @NotNull
-    private Integer id;
+    private Long id;
 
     private String diff;
 
@@ -23,18 +23,18 @@ public class Revision {
 
     }
 
-    public Revision(@NotNull Integer id, String diff, @NotNull Long createdAt, @NotNull String username) {
+    public Revision(@NotNull Long id, String diff, @NotNull Long createdAt, @NotNull String username) {
         this.id = id;
         this.diff = diff;
         this.createdAt = createdAt;
         this.user = username;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 

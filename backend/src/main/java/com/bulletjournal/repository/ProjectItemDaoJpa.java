@@ -2,8 +2,10 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.Revision;
 import com.bulletjournal.controller.models.ShareProjectItemParams;
 import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -14,7 +16,10 @@ import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.util.ContentDiffTool;
 import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +28,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
 
 abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
@@ -41,6 +44,10 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
     @Autowired
     private PublicProjectItemDaoJpa publicProjectItemDaoJpa;
+    @Autowired
+    private ContentRevisionConfig revisionConfig;
+    @Autowired
+    private ContentDiffTool contentDiffTool;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -108,6 +115,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 content.getOwner(), requester, ContentType.CONTENT, Operation.UPDATE, content.getId(),
                 projectItem.getOwner(), projectItem.getProject().getOwner(), projectItem);
+        updateRevision(content, updateContentParams.getText(), requester);
         content.setText(updateContentParams.getText());
         this.getContentJpaRepository().save(content);
         return content;
@@ -153,5 +161,67 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         this.getJpaRepository().save(projectItem);
         return new SetLabelEvent(events, requester, projectItem.getContentType());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> String getContentRevision(
+        String requester, Long projectItemId, Long contentId, Long revisionId) {
+        T projectItem = getProjectItem(projectItemId, requester);
+        K content = getContent(contentId, requester);
+        Preconditions.checkState(
+            Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
+            "ProjectItem ID mismatch");
+        Gson gson = new GsonBuilder().create();
+        Revision[] revisions = gson.fromJson(content.getRevisions(), Revision[].class);
+        Preconditions.checkNotNull(
+            revisionId,
+            "Revisions for Content: {} is null", contentId);
+        boolean hasRevisionId = false;
+        for (Revision revision : revisions) {
+            if (revision.getId().equals(revisionId)) {
+                hasRevisionId = true;
+                break;
+            }
+        }
+        Preconditions.checkState(
+            hasRevisionId,
+            "Invalid revisionId: {} for content: {}", revisionId, contentId);
+        if (revisionId.equals(revisions[revisions.length - 1].getId())) {
+            return content.getText();
+        } else {
+            String ret = content.getBaseText();
+            for (Revision revision : revisions) {
+                ret = contentDiffTool.applyDiff(ret, revision.getDiff());
+                if (revision.getId().equals(revisionId)) {
+                    return ret;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void updateRevision(K content, String newText, String requester) {
+        Gson gson = new GsonBuilder().create();
+        LinkedList<Revision> revisionList = gson.fromJson(content.getRevisions(), LinkedList.class);
+        if (revisionList == null) {
+            revisionList = new LinkedList<>();
+        }
+        int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
+        long nextRevisionId;
+        if (revisionList.isEmpty()) {
+            content.setBaseText(content.getText());
+            nextRevisionId = 1;
+        } else if (revisionList.size() == maxRevisionNumber) {
+            String oldBaseText = content.getBaseText();
+            String diffToMerge = revisionList.pollFirst().getDiff();
+            content.setBaseText(contentDiffTool.applyDiff(oldBaseText, diffToMerge));
+            nextRevisionId = revisionList.getLast().getId() + 1;
+        } else {
+            nextRevisionId = revisionList.getLast().getId() + 1;
+        }
+        String diff = contentDiffTool.computeDiff(content.getText(), newText);
+        Revision newRevision = new Revision(nextRevisionId, diff, Instant.now().toEpochMilli(), requester);
+        revisionList.offerLast(newRevision);
+        content.setRevisions(gson.toJson(revisionList));
     }
 }

@@ -1,9 +1,14 @@
 package com.bulletjournal.controller.models;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class Content {
+
+    private static final Gson GSON = new GsonBuilder().create();
 
     @NotNull
     private Long id;
@@ -15,6 +20,8 @@ public class Content {
 
     @NotBlank
     private String text;
+
+    private String baseText;
 
     @NotNull
     private Long createdAt;
@@ -28,12 +35,25 @@ public class Content {
     }
 
     public Content(@NotNull Long id, @NotBlank String owner,
-                   @NotBlank String text, @NotNull Long createdAt, @NotNull Long updatedAt) {
+                   @NotBlank String text, String baseText,
+                   @NotNull Long createdAt, @NotNull Long updatedAt,
+                   String revisions) {
         this.id = id;
         this.owner = owner;
         this.text = text;
+        this.baseText = baseText;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.revisions = GSON.fromJson(revisions, Revision[].class);
+        deleteRevisionDiff();
+    }
+
+    private void deleteRevisionDiff() {
+        if (revisions != null) {
+            for (Revision revision : revisions) {
+                revision.setDiff(null);
+            }
+        }
     }
 
     public Long getId() {
@@ -58,6 +78,14 @@ public class Content {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getBaseText() {
+        return baseText;
+    }
+
+    public void setBaseText(String baseText) {
+        this.baseText = baseText;
     }
 
     public Long getCreatedAt() {

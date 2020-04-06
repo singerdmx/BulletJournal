@@ -17,6 +17,12 @@ public abstract class ContentModel<T extends ProjectItemModel> extends AuditMode
     @Column(columnDefinition = "TEXT")
     private String text;
 
+    @Column(columnDefinition = "TEXT")
+    private String baseText;
+
+    @Column(columnDefinition = "TEXT")
+    private String revisions;
+
     public abstract Long getId();
 
     public abstract T getProjectItem();
@@ -39,9 +45,26 @@ public abstract class ContentModel<T extends ProjectItemModel> extends AuditMode
         this.owner = owner;
     }
 
+    public String getBaseText() {
+        return baseText;
+    }
+
+    public void setBaseText(String baseText) {
+        this.baseText = baseText;
+    }
+
+    public String getRevisions() {
+        return revisions;
+    }
+
+    public void setRevisions(String revisions) {
+        this.revisions = revisions;
+    }
+
     public Content toPresentationModel() {
         return new Content(
-                this.getId(), this.getOwner(), this.getText(),
-                this.getCreatedAt().getTime(), this.getUpdatedAt().getTime());
+            this.getId(), this.getOwner(), this.getText(),
+            this.getBaseText(), this.getCreatedAt().getTime(),
+            this.getUpdatedAt().getTime(), this.getRevisions());
     }
 }
