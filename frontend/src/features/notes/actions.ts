@@ -28,5 +28,9 @@ export const moveNote = (noteId: number, targetProject: number, history: History
   actions.NoteMove({ noteId: noteId, targetProject: targetProject, history: history });
 export const updateNoteVisible = (visible: boolean) =>
   actions.UpdateAddNoteVisible({ visible: visible });
-export const shareNote = (noteId: number, targetUser: string, targetGroup: number, generateLink: boolean) =>
-  actions.NoteShare({noteId: noteId, targetUser: targetUser, targetGroup: targetGroup, generateLink: generateLink});
+export const shareNote = (noteId: number, generateLink: boolean, targetUser?: string, targetGroup?: number, ttl?: number) =>
+    actions.NoteShare({noteId: noteId, generateLink: generateLink, targetUser: targetUser, targetGroup: targetGroup, ttl: ttl});
+export const getNoteSharables = (noteId: number) =>
+    actions.NoteSharablesGet({noteId: noteId});
+export const revokeNoteSharable = (noteId: number, user?: string, link?: string) =>
+    actions.NoteRevokeSharable({noteId: noteId, user: user, link: link});

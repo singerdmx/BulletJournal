@@ -77,13 +77,19 @@ export const updateTaskVisible = (visible: boolean) =>
   actions.UpdateAddTaskVisible({ visible: visible });
 export const shareTask = (
   taskId: number,
-  targetUser: string,
-  targetGroup: number,
-  generateLink: boolean
+  generateLink: boolean,
+  targetUser?: string,
+  targetGroup?: number,
+  ttl?: number
 ) =>
   actions.TaskShare({
     taskId: taskId,
     targetUser: targetUser,
     targetGroup: targetGroup,
     generateLink: generateLink,
+    ttl: ttl
   });
+export const getTaskSharables = (taskId: number) =>
+    actions.TaskSharablesGet({taskId: taskId});
+export const revokeTaskSharable = (taskId: number, user?: string, link?: string) =>
+    actions.TaskRevokeSharable({taskId: taskId, user: user, link: link});

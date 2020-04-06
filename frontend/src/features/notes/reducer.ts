@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Note } from './interface';
 import { History } from 'history';
 import {Content} from "../myBuJo/interface";
+import {ProjectItemSharables, SharableLink} from "../system/interface";
+import {User} from "../group/interface";
 
 export type NoteApiErrorAction = {
   error: string;
@@ -78,11 +80,22 @@ export type MoveNote = {
 };
 
 export type ShareNote = {
-  targetUser: string;
+  targetUser?: string;
   noteId: number;
-  targetGroup: number;
+  targetGroup?: number;
   generateLink: boolean;
+  ttl?: number;
 };
+
+export type GetSharables = {
+  noteId: number;
+}
+
+export type RevokeSharable = {
+  noteId: number;
+  user?: string;
+  link?: string;
+}
 
 export type ContentsAction = {
   contents: Content[];
@@ -93,7 +106,9 @@ let initialState = {
   contents: [] as Array<Content>,
   notes: [] as Array<Note>,
   addNoteVisible: false,
-  patchLoading: true
+  patchLoading: true,
+  sharedUsers: [] as User[],
+  sharedLinks: [] as SharableLink[]
 };
 
 const slice = createSlice({
@@ -112,6 +127,11 @@ const slice = createSlice({
     noteContentsReceived: (state, action: PayloadAction<ContentsAction>) => {
       const { contents } = action.payload;
       state.contents = contents;
+    },
+    noteSharablesReceived: (state, action: PayloadAction<ProjectItemSharables>) => {
+      const { users, links } = action.payload;
+      state.sharedUsers = users;
+      state.sharedLinks = links;
     },
     UpdateAddNoteVisible: (
       state,
@@ -136,6 +156,8 @@ const slice = createSlice({
     NoteSetLabels: (state, action: PayloadAction<SetNoteLabels>) => state,
     NoteMove: (state, action: PayloadAction<MoveNote>) => state,
     NoteShare: (state, action: PayloadAction<ShareNote>) => state,
+    NoteSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
+    NoteRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
   }
 });
 

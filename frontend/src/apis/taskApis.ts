@@ -142,20 +142,43 @@ export const moveToTargetProject = (taskId: number, targetProject: number) => {
 
 export const shareTaskWithOther = (
   taskId: number,
-  targetUser: string,
-  targetGroup: number,
-  generateLink: boolean
+  generateLink: boolean,
+  targetUser?: string,
+  targetGroup?: number,
+  ttl?: number,
 ) => {
   const postBody = JSON.stringify({
     targetUser: targetUser,
     targetGroup: targetGroup,
     generateLink: generateLink,
+    ttl: ttl
   });
   return doPost(`/api/tasks/${taskId}/share`, postBody)
     .then((res) => res)
     .catch((err) => {
       throw Error(err);
     });
+};
+
+export const getSharables = (taskId: number) => {
+  return doFetch(`/api/notes/{taskId}/sharables`)
+      .then(res => res.json())
+      .catch(err => {
+        throw Error(err.message);
+      });
+};
+
+export const revokeSharable = (taskId: number, user?: string, link?: string) => {
+  const postBody = JSON.stringify({
+    user: user,
+    link: link
+  });
+
+  return doPost(`/api/tasks/{taskId}/revokeSharable`, postBody)
+      .then(res => res)
+      .catch(err => {
+        throw Error(err);
+      });
 };
 
 export const getContents = (taskId: number) => {

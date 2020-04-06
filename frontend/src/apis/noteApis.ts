@@ -78,13 +78,35 @@ export const moveToTargetProject = (noteId: number, targetProject: number) => {
         });
 };
 
-export const shareNoteWithOther = (noteId: number, targetUser: string, targetGroup: number, generateLink: boolean) => {
+export const shareNoteWithOther = (noteId: number, generateLink: boolean, targetUser?: string, targetGroup?: number, ttl?: number) => {
     const postBody = JSON.stringify({
         targetUser: targetUser,
         targetGroup: targetGroup,
-        generateLink: generateLink
+        generateLink: generateLink,
+        ttl: ttl
     });
     return doPost(`/api/notes/${noteId}/share`, postBody)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err);
+        });
+};
+
+export const getSharables = (noteId: number) => {
+    return doFetch(`/api/notes/{noteId}/sharables`)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+};
+
+export const revokeSharable = (noteId: number, user?: string, link?: string) => {
+    const postBody = JSON.stringify({
+        user: user,
+        link: link
+    });
+
+    return doPost(`/api/notes/{noteId}/revokeSharable`, postBody)
         .then(res => res)
         .catch(err => {
             throw Error(err);

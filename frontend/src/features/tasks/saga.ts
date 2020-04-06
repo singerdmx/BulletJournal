@@ -14,6 +14,8 @@ import {
   TaskApiErrorAction,
   UncompleteTask,
   UpdateTasks,
+  GetSharables,
+  RevokeSharable
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -34,6 +36,7 @@ import {
 import { updateTasks } from './actions';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { IState } from '../../store';
+import {getSharables, revokeSharable} from "../../apis/taskApis";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -283,17 +286,67 @@ function* moveTask(action: PayloadAction<MoveTask>) {
 
 function* shareTask(action: PayloadAction<ShareTask>) {
   try {
-    const { taskId, targetUser, targetGroup, generateLink } = action.payload;
+    const { taskId, targetUser, targetGroup, generateLink, ttl } = action.payload;
     yield call(
       shareTaskWithOther,
       taskId,
+      generateLink,
       targetUser,
       targetGroup,
-      generateLink
+      ttl
     );
     yield call(message.success, 'Task shared successfully');
   } catch (error) {
     yield call(message.error, `shareTask Error Received: ${error}`);
+  }
+}
+
+function* getTaskSharables(action: PayloadAction<GetSharables>) {
+  try {
+    const { taskId } = action.payload;
+    const data = yield call(
+        getSharables,
+        taskId,
+    );
+
+    yield put(tasksActions.taskSharablesReceived({
+      users: data.users,
+      links: data.links
+    }));
+  } catch (error) {
+    yield call(message.error, `getTaskSharables Error Received: ${error}`);
+  }
+}
+
+function* revokeTaskSharable(action: PayloadAction<RevokeSharable>) {
+  try {
+    const { taskId, user, link } = action.payload;
+    yield call(
+        revokeSharable,
+        taskId,
+        user,
+        link
+    );
+
+    const state: IState = yield select();
+
+    let sharedUsers = state.task.sharedUsers;
+    let sharedLinks = state.task.sharedLinks;
+
+    if (user) {
+      sharedUsers = sharedUsers.filter(u => u.name !== user);
+    }
+
+    if (link) {
+      sharedLinks = sharedLinks.filter(l => l.link !== link);
+    }
+
+    yield put(tasksActions.taskSharablesReceived({
+      users: sharedUsers,
+      links: sharedLinks
+    }));
+  } catch (error) {
+    yield call(message.error, `revokeTaskSharable Error Received: ${error}`);
   }
 }
 
@@ -318,6 +371,8 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskSetLabels.type, taskSetLabels),
     yield takeLatest(tasksActions.TaskMove.type, moveTask),
     yield takeLatest(tasksActions.TaskShare.type, shareTask),
+    yield takeLatest(tasksActions.TaskSharablesGet.type, getTaskSharables),
+    yield takeLatest(tasksActions.TaskRevokeSharable.type, revokeSharable),
     yield takeLatest(
       tasksActions.CompletedTasksUpdate.type,
       completedTasksUpdate

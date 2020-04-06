@@ -1,4 +1,4 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as notesActions,
@@ -16,6 +16,7 @@ import {
   CreateContent,
   DeleteContent,
   PatchContent,
+  GetSharables, RevokeSharable,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -32,7 +33,10 @@ import {
   addContent,
   deleteContent,
   updateContent,
+  getSharables,
+  revokeSharable,
 } from '../../apis/noteApis';
+import { IState } from '../../store';
 import { updateNoteContents, updateNotes } from './actions';
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
@@ -197,17 +201,67 @@ function* noteMove(action: PayloadAction<MoveNote>) {
 
 function* shareNote(action: PayloadAction<ShareNote>) {
   try {
-    const { noteId, targetUser, targetGroup, generateLink } = action.payload;
+    const { noteId, targetUser, targetGroup, generateLink, ttl } = action.payload;
     yield call(
       shareNoteWithOther,
       noteId,
+      generateLink,
       targetUser,
       targetGroup,
-      generateLink
+      ttl
     );
     yield call(message.success, 'Note shared successfully');
   } catch (error) {
     yield call(message.error, `noteShare Error Received: ${error}`);
+  }
+}
+
+function* getNoteSharables(action: PayloadAction<GetSharables>) {
+  try {
+    const { noteId } = action.payload;
+    const data = yield call(
+        getSharables,
+        noteId,
+    );
+
+    yield put(notesActions.noteSharablesReceived({
+      users: data.users,
+      links: data.links
+    }));
+  } catch (error) {
+    yield call(message.error, `getNoteSharables Error Received: ${error}`);
+  }
+}
+
+function* revokeNoteSharable(action: PayloadAction<RevokeSharable>) {
+  try {
+    const { noteId, user, link } = action.payload;
+    yield call(
+        revokeSharable,
+        noteId,
+        user,
+        link
+    );
+
+    const state: IState = yield select();
+
+    let sharedUsers = state.note.sharedUsers;
+    let sharedLinks = state.note.sharedLinks;
+
+    if (user) {
+      sharedUsers = sharedUsers.filter(u => u.name !== user);
+    }
+
+    if (link) {
+      sharedLinks = sharedLinks.filter(l => l.link !== link);
+    }
+
+    yield put(notesActions.noteSharablesReceived({
+      users: sharedUsers,
+      links: sharedLinks
+    }));
+  } catch (error) {
+    yield call(message.error, `revokeNoteSharable Error Received: ${error}`);
   }
 }
 
@@ -230,5 +284,7 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NoteContentDelete.type, deleteNoteContent),
     yield takeLatest(notesActions.NoteMove.type, noteMove),
     yield takeLatest(notesActions.NoteShare.type, shareNote),
+    yield takeLatest(notesActions.NoteSharablesGet.type, getNoteSharables),
+    yield takeLatest(notesActions.NoteRevokeSharable.type, revokeNoteSharable),
   ]);
 }

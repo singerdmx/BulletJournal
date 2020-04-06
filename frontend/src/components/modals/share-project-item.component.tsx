@@ -23,21 +23,17 @@ type ProjectItemProps = {
   user: UserWithAvatar;
   shareTask: (
     taskId: number,
-    targetUser: string,
-    targetGroup: number,
-    generateLink: boolean
+    generateLink: boolean,
+    targetUser?: string,
+    targetGroup?: number,
+    ttl?: number
   ) => void;
   shareNote: (
     noteId: number,
-    targetUser: string,
-    targetGroup: number,
-    generateLink: boolean
-  ) => void;
-  shareTransaction: (
-    transactionId: number,
-    targetUser: string,
-    targetGroup: number,
-    generateLink: boolean
+    generateLink: boolean,
+    targetUser?: string,
+    targetGroup?: number,
+    ttl?: number
   ) => void;
 };
 

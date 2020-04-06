@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Task, ReminderSetting } from './interface';
 import { History } from 'history';
+import {User} from "../group/interface";
+import {ProjectItemSharables, SharableLink} from "../system/interface";
 
 export type TaskApiErrorAction = {
   error: string;
@@ -50,11 +52,22 @@ export type MoveTask = {
 };
 
 export type ShareTask = {
-  targetUser: string;
+  targetUser?: string;
   taskId: number;
-  targetGroup: number;
+  targetGroup?: number;
   generateLink: boolean;
+  ttl?: number
 };
+
+export type GetSharables = {
+  taskId: number;
+}
+
+export type RevokeSharable = {
+  taskId: number;
+  user?: string;
+  link?: string;
+}
 
 export type PatchTask = {
   taskId: number;
@@ -94,6 +107,8 @@ let initialState = {
   task: {} as Task,
   tasks: [] as Array<Task>,
   completedTasks: [] as Array<Task>,
+  sharedUsers: [] as User[],
+  sharedLinks: [] as SharableLink[]
 };
 
 const slice = createSlice({
@@ -107,6 +122,11 @@ const slice = createSlice({
     taskReceived: (state, action: PayloadAction<TaskAction>) => {
       const { task } = action.payload;
       state.task = task;
+    },
+    taskSharablesReceived: (state, action: PayloadAction<ProjectItemSharables>) => {
+      const { users, links } = action.payload;
+      state.sharedUsers = users;
+      state.sharedLinks = links;
     },
     UpdateAddTaskVisible: (
       state,
@@ -134,6 +154,8 @@ const slice = createSlice({
     TaskSetLabels: (state, action: PayloadAction<SetTaskLabels>) => state,
     TaskMove: (state, action: PayloadAction<MoveTask>) => state,
     TaskShare: (state, action: PayloadAction<ShareTask>) => state,
+    TaskSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
+    TaskRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
   },
 });
 
