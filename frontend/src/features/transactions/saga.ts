@@ -10,7 +10,7 @@ import {
   MoveTransaction,
   SetTransactionLabels,
   ShareTransaction,
-  DeleteTransaction
+  DeleteTransaction,
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -22,10 +22,10 @@ import {
   deleteTransactionById,
   moveToTargetProject,
   setTransactionLabels,
-  shareTransactionWithOther
+  shareTransactionWithOther,
 } from '../../apis/transactionApis';
 import { LedgerSummary } from './interface';
-import {getProjectItemsAfterUpdateSelect} from "../myBuJo/actions";
+import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -41,7 +41,7 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
       startDate,
       endDate,
       frequencyType,
-      ledgerSummaryType
+      ledgerSummaryType,
     } = action.payload;
 
     const data = yield call(
@@ -57,7 +57,7 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
 
     yield put(
       transactionsActions.transactionsReceived({
-        ledgerSummary: ledgerSummary
+        ledgerSummary: ledgerSummary,
       })
     );
   } catch (error) {
@@ -75,7 +75,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       transactionType,
       date,
       timezone,
-      time
+      time,
     } = action.payload;
     yield call(
       createTransaction,
@@ -110,7 +110,7 @@ function* shareTransaction(action: PayloadAction<ShareTransaction>) {
       transactionId,
       targetUser,
       targetGroup,
-      generateLink
+      generateLink,
     } = action.payload;
     yield call(
       shareTransactionWithOther,
@@ -136,13 +136,18 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
 
 function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
   try {
-    const {transactionId} = action.payload;
+    const { transactionId } = action.payload;
     yield call(deleteTransactionById, transactionId);
 
     const state: IState = yield select();
 
-    yield put(getProjectItemsAfterUpdateSelect(
-        state.myBuJo.todoSelected, state.myBuJo.ledgerSelected, 'today'));
+    yield put(
+      getProjectItemsAfterUpdateSelect(
+        state.myBuJo.todoSelected,
+        state.myBuJo.ledgerSelected,
+        'today'
+      )
+    );
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
@@ -150,16 +155,32 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
 function* patchTransaction(action: PayloadAction<PatchTransaction>) {
   try {
-    yield call(
+    const {
+      transactionId,
+      amount,
+      name,
+      payer,
+      transactionType,
+      date,
+      time,
+      timezone,
+    } = action.payload;
+    const data = yield call(
       updateTransaction,
-      action.payload.transactionId,
-      action.payload.amount,
-      action.payload.name,
-      action.payload.payer,
-      action.payload.transactionType,
-      action.payload.date,
-      action.payload.time,
-      action.payload.timezone
+      transactionId,
+      amount,
+      name,
+      payer,
+      transactionType,
+      date,
+      time,
+      timezone
+    );
+
+    yield put(
+      transactionsActions.transactionReceived({
+        transaction: data,
+      })
     );
   } catch (error) {
     yield call(message.error, `Patch Transaction Error Received: ${error}`);
@@ -170,7 +191,7 @@ function* transactionSetLabels(action: PayloadAction<SetTransactionLabels>) {
   try {
     const { transactionId, labels } = action.payload;
     const data = yield call(setTransactionLabels, transactionId, labels);
-    yield put(transactionsActions.transactionReceived({transaction: data}));
+    yield put(transactionsActions.transactionReceived({ transaction: data }));
   } catch (error) {
     yield call(message.error, `transactionSetLabels Error Received: ${error}`);
   }
@@ -201,12 +222,12 @@ export default function* transactionSagas() {
       shareTransaction
     ),
     yield takeLatest(
-        transactionsActions.TransactionDelete.type,
-        deleteTransaction
+      transactionsActions.TransactionDelete.type,
+      deleteTransaction
     ),
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,
       transactionSetLabels
-    )
+    ),
   ]);
 }

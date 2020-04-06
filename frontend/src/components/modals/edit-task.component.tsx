@@ -24,7 +24,10 @@ import { Group } from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
-import {convertToTextWithRRule, convertToTextWithTime} from '../../features/recurrence/actions';
+import {
+  convertToTextWithRRule,
+  convertToTextWithTime,
+} from '../../features/recurrence/actions';
 import { ReminderSetting, Task } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
 import moment from 'moment';
@@ -91,25 +94,34 @@ const EditTask: React.FC<
   const [recurrenceVisible, setRecurrenceVisible] = useState(false);
   const [remindButton, setRemindButton] = useState('remindBefore');
   const [useTaskRecurrenceRule, setUseTaskRecurrenceRule] = useState(true);
-  const rRuleText = useTaskRecurrenceRule ? (props.task.recurrenceRule ? convertToTextWithRRule(props.task.recurrenceRule) : 'Recurrence') :
-      convertToTextWithRRule(props.rRuleString);
+  const rRuleText = useTaskRecurrenceRule
+    ? props.task.recurrenceRule
+      ? convertToTextWithRRule(props.task.recurrenceRule)
+      : 'Recurrence'
+    : convertToTextWithRRule(props.rRuleString);
   const rRuleTextList = rRuleText.match(
-      /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
+    /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
 
   const updateTask = (values: any) => {
     const { task } = props;
 
     //convert time object to string
-    let dueDate = values.dueDate ? values.dueDate.format(dateFormat) : task.dueDate;
+    let dueDate = values.dueDate
+      ? values.dueDate.format(dateFormat)
+      : task.dueDate;
     if (values.dueDate === null) {
       dueDate = undefined;
     }
-    let dueTime = values.dueTime ? values.dueTime.format('HH:mm') : task.dueTime;
+    let dueTime = values.dueTime
+      ? values.dueTime.format('HH:mm')
+      : task.dueTime;
     if (values.dueTime === null) {
       dueTime = undefined;
     }
-    let recurrence : string | undefined = useTaskRecurrenceRule ? props.task.recurrenceRule : props.rRuleString;
+    let recurrence: string | undefined = useTaskRecurrenceRule
+      ? props.task.recurrenceRule
+      : props.rRuleString;
     if (dueType === 'dueByRec') {
       dueDate = undefined;
       dueTime = undefined;
@@ -125,7 +137,8 @@ const EditTask: React.FC<
       time: values.reminderTime
         ? values.reminderTime.format('HH:mm')
         : undefined,
-      before: values.remindBefore === undefined ? props.before : values.remindBefore,
+      before:
+        values.remindBefore === undefined ? props.before : values.remindBefore,
     } as ReminderSetting;
     if (reminderType === 'remindBefore') {
       reminderSetting.date = undefined;
@@ -176,7 +189,8 @@ const EditTask: React.FC<
       setReminderType('remindBefore');
     }
     //set remind time
-    if (task.reminderSetting && task.reminderSetting.time) setReminderTimeVisible(true);
+    if (task.reminderSetting && task.reminderSetting.time)
+      setReminderTimeVisible(true);
   }, []);
   const result = ['15', '30', '45', '60'];
   const options = result.map((time: string) => {
@@ -184,7 +198,7 @@ const EditTask: React.FC<
   });
 
   const onClickRecurrenceButton = () => {
-    setUseTaskRecurrenceRule(false)
+    setUseTaskRecurrenceRule(false);
   };
 
   const getModal = () => {
@@ -309,7 +323,9 @@ const EditTask: React.FC<
                           rRuleTextList.length > 1 &&
                           rRuleTextList
                             .slice(1)
-                            .map((text, index) => <div key={index}>{text}</div>)}
+                            .map((text, index) => (
+                              <div key={index}>{text}</div>
+                            ))}
                       </div>
                       <Button
                         onClick={() => setRecurrenceVisible(false)}
@@ -326,7 +342,11 @@ const EditTask: React.FC<
                   trigger='click'
                   placement='top'
                 >
-                  <Button type='default' disabled={dueType !== 'dueByRec'} onClick={onClickRecurrenceButton}>
+                  <Button
+                    type='default'
+                    disabled={dueType !== 'dueByRec'}
+                    onClick={onClickRecurrenceButton}
+                  >
                     <p className='marquee'>{rRuleText}</p>
                   </Button>
                 </Popover>

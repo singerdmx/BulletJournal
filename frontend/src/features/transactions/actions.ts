@@ -15,7 +15,7 @@ export const updateTransactions = (
     frequencyType: frequencyType,
     ledgerSummaryType: ledgerSummaryType,
     startDate: startDate,
-    endDate: endDate
+    endDate: endDate,
   });
 export const createTransaction = (
   projectId: number,
@@ -35,7 +35,7 @@ export const createTransaction = (
     date: date,
     transactionType: transactionType,
     timezone: timezone,
-    time: time
+    time: time,
   });
 export const getTransaction = (transactionId: number) =>
   actions.TransactionGet({ transactionId: transactionId });
@@ -48,7 +48,8 @@ export const patchTransaction = (
   payer: string,
   date: string,
   time: string,
-  transactionType: number
+  transactionType: number,
+  timezone: string
 ) =>
   actions.TransactionPatch({
     transactionId: transactionId,
@@ -57,28 +58,38 @@ export const patchTransaction = (
     payer: payer,
     date: date,
     time: time,
-    transactionType: transactionType
+    transactionType: transactionType,
+    timezone: timezone,
   });
 export const setTransactionLabels = (transactionId: number, labels: number[]) =>
   actions.TransactionSetLabels({
     transactionId: transactionId,
-    labels: labels
+    labels: labels,
   });
 
 export const updateTransactionVisible = (visible: boolean) =>
   actions.UpdateAddTransactionVisible({ visible: visible });
 
-export const shareTransaction = (transactionId: number, targetUser: string, targetGroup: number, generateLink: boolean) =>
-    actions.TransactionShare({
-        transactionId: transactionId,
-        targetUser: targetUser,
-        targetGroup: targetGroup,
-        generateLink: generateLink
-    });
+export const shareTransaction = (
+  transactionId: number,
+  targetUser: string,
+  targetGroup: number,
+  generateLink: boolean
+) =>
+  actions.TransactionShare({
+    transactionId: transactionId,
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+    generateLink: generateLink,
+  });
 
-export const moveTransaction = (transactionId: number, targetProject: number, history: History) =>
+export const moveTransaction = (
+  transactionId: number,
+  targetProject: number,
+  history: History
+) =>
   actions.TransactionMove({
     transactionId: transactionId,
     targetProject: targetProject,
-    history: history
+    history: history,
   });

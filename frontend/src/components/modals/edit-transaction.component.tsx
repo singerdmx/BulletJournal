@@ -17,7 +17,6 @@ import {
 import { EditTwoTone } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { patchTask } from '../../features/tasks/actions';
 import { IState } from '../../store';
 import './modals.styles.less';
 import { Transaction } from '../../features/transactions/interface';
@@ -27,6 +26,7 @@ import { updateExpandedMyself } from '../../features/myself/actions';
 import { zones } from '../settings/constants';
 import { dateFormat } from '../../features/myBuJo/constants';
 import moment from 'moment';
+import { patchTransaction } from '../../features/transactions/actions';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -56,6 +56,16 @@ type TransactionProps = {
 
 interface TransactionEditFormProps {
   updateExpandedMyself: (updateSettings: boolean) => void;
+  patchTransaction: (
+    transactionId: number,
+    amount: number,
+    name: string,
+    payer: string,
+    date: string,
+    time: string,
+    transactionType: number,
+    timezone: string
+  ) => void;
   currency: string;
   myself: string;
 }
@@ -67,30 +77,57 @@ const EditTransaction: React.FC<
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [timeVisible, setTimeVisible] = useState(false);
+
+  const [transactionName, setTransactionName] = useState(transaction.name);
+  const [payerName, setPayerName] = useState(transaction.payer);
+  const [amount, setAmount] = useState(transaction.amount);
+  const [transactionType, setTransactionType] = useState(
+    transaction.transactionType
+  );
+  const [transTimezone, setTransTimezone] = useState(transaction.timezone);
   const editTransaction = (values: any) => {
     //convert time object to format string
-    const date_value = values.date.format(dateFormat);
+    const date_value = values.date
+      ? values.date.format(dateFormat)
+      : transaction.date;
     const time_value = values.time ? values.time.format('HH:mm') : undefined;
-    const payerName = values.payerName ? values.payerName : props.myself;
-    //const timezone = values.timezone ? values.timezone : props.timezone;
 
+    props.patchTransaction(
+      transaction.id,
+      values.amount,
+      values.transactionName,
+      values.payerName,
+      date_value,
+      time_value,
+      values.transactionType,
+      values.timezone
+    );
     setVisible(false);
   };
 
-  const onCancel = () => setVisible(false);
+  const onCancel = () => {
+    form.resetFields();
+    setVisible(false);
+  };
   const openModal = () => {
     setVisible(true);
   };
 
   useEffect(() => {
     props.updateExpandedMyself(true);
-
     if (transaction.time) setTimeVisible(true);
   }, []);
 
+  useEffect(() => {
+    setTransactionName(props.transaction.name);
+    setAmount(props.transaction.amount);
+    setTransactionType(props.transaction.transactionType);
+    setTransTimezone(props.transaction.timezone);
+    setPayerName(props.transaction.payer);
+  }, [props.transaction]);
+
   const getModal = () => {
     const { transaction } = props;
-
     return (
       <Modal
         destroyOnClose
@@ -110,19 +147,28 @@ const EditTransaction: React.FC<
             .catch((info) => console.log(info));
         }}
       >
-        <Form form={form} labelAlign='left'>
+        <Form
+          form={form}
+          labelAlign='left'
+          initialValues={{
+            transactionName: transactionName,
+            payerName: payerName,
+            amount: amount,
+            transactionType: transactionType,
+            timezone: transTimezone,
+          }}
+        >
           {/* transaction name */}
           <Form.Item
             name='transactionName'
             label='Name'
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
-            rules={[{ required: true, message: 'Missing Transaction Name!' }]}
           >
             <Input
               placeholder='Enter Transaction Name'
-              allowClear
-              defaultValue={transaction.name ? transaction.name : ''}
+              value={transactionName}
+              onChange={(e: any) => setTransactionName(e.target.value)}
             />
           </Form.Item>
           {/* payer name */}
@@ -135,8 +181,9 @@ const EditTransaction: React.FC<
           >
             {props.group.users && (
               <Select
-                defaultValue={transaction.payer ? transaction.payer : ''}
                 style={{ marginLeft: '-8px' }}
+                value={payerName}
+                onChange={(e: any) => setPayerName(e.target.value)}
               >
                 {props.group.users.map((user) => {
                   return (
@@ -156,11 +203,11 @@ const EditTransaction: React.FC<
               label='Amount'
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 8 }}
-              rules={[{ required: true, message: 'Missing Amount!' }]}
             >
               <InputNumber
-                style={{ paddingLeft: '120px', width: 160 }}
-                defaultValue={transaction.amount}
+                value={amount}
+                onChange={(e: any) => setAmount(e)}
+                style={{ width: 160 }}
                 formatter={(value) =>
                   `${LocaleCurrency.getCurrency(props.currency)} ${value}`
                 }
@@ -174,9 +221,11 @@ const EditTransaction: React.FC<
               name='transactionType'
               style={{ marginLeft: 15 }}
               colon={false}
-              rules={[{ required: true, message: 'Missing Type!' }]}
             >
-              <Radio.Group defaultValue={transaction.transactionType}>
+              <Radio.Group
+                value={transactionType}
+                onChange={(e: any) => setTransactionType(e.target.value)}
+              >
                 <Radio value={0}>Income</Radio>
                 <Radio value={1}>Expense</Radio>
               </Radio.Group>
@@ -185,10 +234,7 @@ const EditTransaction: React.FC<
 
           <div style={{ display: 'flex' }}>
             <Tooltip title='Select Date' placement='bottom'>
-              <Form.Item
-                name='date'
-                rules={[{ required: true, message: 'Missing Date!' }]}
-              >
+              <Form.Item name='date'>
                 <DatePicker
                   onChange={(value) => setTimeVisible(value !== null)}
                   placeholder='Select Date'
@@ -220,6 +266,8 @@ const EditTransaction: React.FC<
             <Tooltip title='Time Zone'>
               <Form.Item name='timezone'>
                 <Select
+                  value={transTimezone}
+                  onChange={(e: any) => setTransTimezone(e)}
                   showSearch={true}
                   placeholder='Select Time Zone'
                   defaultValue={transaction.timezone}
@@ -274,4 +322,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   updateExpandedMyself,
+  patchTransaction,
 })(withRouter(EditTransaction));

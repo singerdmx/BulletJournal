@@ -9,16 +9,15 @@ import {
   Select,
   Button,
   Form,
-  List
+  List,
 } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
 import { zones } from '../../components/settings/constants';
 import { updateTransactions } from '../../features/transactions/actions';
 import { updateExpandedMyself } from '../../features/myself/actions';
-import {
-  LedgerSummary,
-} from '../../features/transactions/interface';
+import { LedgerSummary } from '../../features/transactions/interface';
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from './ledger-summary';
@@ -59,7 +58,7 @@ type TransactionProps = {
   ) => void;
 };
 
-const TransactionProject: React.FC<TransactionProps> = props => {
+const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [form] = Form.useForm();
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
   const {
@@ -68,7 +67,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
     expense,
     startDate,
     endDate,
-    transactionsSummaries
+    transactionsSummaries,
   } = props.ledgerSummary;
 
   const updateTransactions = (
@@ -113,10 +112,10 @@ const TransactionProject: React.FC<TransactionProps> = props => {
             setLedgerSummaryType(LedgerSummaryTypeMap[current]);
             form
               .validateFields()
-              .then(values => {
+              .then((values) => {
                 updateTransactions(values, LedgerSummaryTypeMap[current]);
               })
-              .catch(info => console.log(info));
+              .catch((info) => console.log(info));
           }}
         >
           <div className='transaction-summary'>
@@ -247,7 +246,7 @@ const TransactionProject: React.FC<TransactionProps> = props => {
           form={form}
           initialValues={{
             frequencyType: 'MONTHLY',
-            timezone: props.timezone ? props.timezone : currentZone
+            timezone: props.timezone ? props.timezone : currentZone,
           }}
         >
           <Form.Item name='frequencyType'>
@@ -282,26 +281,23 @@ const TransactionProject: React.FC<TransactionProps> = props => {
             </Select>
           </Form.Item>
 
-          <Tooltip title={"Click to Refresh Transactions"}>
-            <Button
+          <Tooltip title={'Click to Refresh Transactions'}>
+            <SyncOutlined
               onClick={() => {
                 form
                   .validateFields()
-                  .then(values => {
+                  .then((values) => {
                     console.log(values);
                     updateTransactions(values, ledgerSummaryType);
                   })
-                  .catch(info => console.log(info));
+                  .catch((info) => console.log(info));
               }}
-            >
-
-                <span>Refresh</span>
-            </Button>
+            />
           </Tooltip>
         </Form>
       </div>
       <List className='transaction-list'>
-        {transactions.map(item => (
+        {transactions.map((item) => (
           <List.Item>
             <TransactionItem transaction={item} />
           </List.Item>
@@ -314,10 +310,10 @@ const TransactionProject: React.FC<TransactionProps> = props => {
 const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
   timezone: state.settings.timezone,
-  ledgerSummary: state.transaction.ledgerSummary
+  ledgerSummary: state.transaction.ledgerSummary,
 });
 
 export default connect(mapStateToProps, {
   updateTransactions,
-  updateExpandedMyself
+  updateExpandedMyself,
 })(TransactionProject);
