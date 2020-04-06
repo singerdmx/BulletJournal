@@ -108,6 +108,9 @@ public class SystemController {
         MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
 
         T item = this.publicProjectItemDaoJpa.getPublicItem(itemId);
+        if (item == null) {
+            return null;
+        }
         List<Content> contents;
         ProjectItem projectItem;
         ContentType contentType = item.getContentType();

@@ -757,6 +757,27 @@ public class ProjectControllerTest {
                 Object.class,
                 response.getBody());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
+
+        shareProjectItemParams = new ShareProjectItemParams();
+        shareProjectItemParams.setGenerateLink(true);
+        shareProjectItemParams.setTtl(-2L);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(shareProjectItemParams),
+                String.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(8, response.getBody().length());
+
+        publicProjectItemResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, sampleUsers[7]),
+                Object.class,
+                response.getBody());
+        assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
+        assertNull(publicProjectItemResponse.getBody());
     }
 
     private void deleteTaskContent(Task task, Content content) {

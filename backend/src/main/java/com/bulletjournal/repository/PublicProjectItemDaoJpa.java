@@ -23,16 +23,12 @@ public class PublicProjectItemDaoJpa {
     @Autowired
     private PublicProjectItemRepository publicProjectItemRepository;
 
-    @Autowired
-    private UserDaoJpa userDaoJpa;
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> String generatePublicItemLink(T projectItem, String requester, Long ttl) {
         String uuid = RandomStringUtils.randomAlphanumeric(8);
-        User user = this.userDaoJpa.getByName(requester);
         PublicProjectItem publicProjectItem = new PublicProjectItem(uuid, requester);
         if (ttl != null) {
-            ZonedDateTime zonedDateTime = ZonedDateTimeHelper.getNow(user.getTimezone());
+            ZonedDateTime zonedDateTime = ZonedDateTimeHelper.getNow();
             Instant instant = zonedDateTime.plusDays(ttl).toInstant();
             publicProjectItem.setExpirationTime(Timestamp.from(instant));
         }
@@ -55,6 +51,13 @@ public class PublicProjectItemDaoJpa {
     public <T extends ProjectItemModel> T getPublicItem(String uuid) {
         PublicProjectItem publicProjectItem = this.publicProjectItemRepository.findById(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException("PublicProjectItem " + uuid + " not found"));
+
+        if (publicProjectItem.getExpirationTime() != null &&
+                publicProjectItem.getExpirationTime().compareTo(Timestamp.from(Instant.now())) < 0) {
+            LOGGER.info("Link {} expired", uuid);
+            this.publicProjectItemRepository.delete(publicProjectItem);
+            return null;
+        }
 
         T item;
         if (publicProjectItem.getNote() != null) {

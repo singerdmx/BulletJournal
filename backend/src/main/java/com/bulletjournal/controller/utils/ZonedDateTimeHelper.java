@@ -250,7 +250,7 @@ public class ZonedDateTimeHelper {
      * 2. Remove second and nano second.
      */
     public static ZonedDateTime getNow(String timezone) {
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
         return ZonedDateTime.of(now.getYear(),
                 now.getMonthValue(),
                 now.getDayOfMonth(),
