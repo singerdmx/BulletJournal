@@ -8,6 +8,7 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.Revision;
 import com.bulletjournal.controller.models.ShareProjectItemParams;
 import com.bulletjournal.controller.models.UpdateContentParams;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SetLabelEvent;
@@ -19,7 +20,6 @@ import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.util.ContentDiffTool;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,8 @@ import java.util.*;
 abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
+    private static final Gson GSON = new Gson();
+
     @Autowired
     private LabelDaoJpa labelDaoJpa;
     @Autowired
@@ -171,38 +173,30 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         Preconditions.checkState(
             Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
             "ProjectItem ID mismatch");
-        Gson gson = new GsonBuilder().create();
-        Revision[] revisions = gson.fromJson(content.getRevisions(), Revision[].class);
+        Revision[] revisions = GSON.fromJson(content.getRevisions(), Revision[].class);
         Preconditions.checkNotNull(
-            revisionId,
-            "Revisions for Content: {} is null", contentId);
-        boolean hasRevisionId = false;
-        for (Revision revision : revisions) {
-            if (revision.getId().equals(revisionId)) {
-                hasRevisionId = true;
-                break;
-            }
+                revisions,
+                "Revisions for Content: {} is null", contentId);
+        if (!Arrays.stream(revisions).anyMatch(revision -> Objects.equals(revision.getId(), revisionId))) {
+            throw new BadRequestException("Invalid revisionId: " + revisionId + " for content: " + contentId);
         }
-        Preconditions.checkState(
-            hasRevisionId,
-            "Invalid revisionId: {} for content: {}", revisionId, contentId);
+
         if (revisionId.equals(revisions[revisions.length - 1].getId())) {
             return content.getText();
-        } else {
-            String ret = content.getBaseText();
-            for (Revision revision : revisions) {
-                ret = contentDiffTool.applyDiff(ret, revision.getDiff());
-                if (revision.getId().equals(revisionId)) {
-                    return ret;
-                }
+        }
+
+        String ret = content.getBaseText();
+        for (Revision revision : revisions) {
+            ret = contentDiffTool.applyDiff(ret, revision.getDiff());
+            if (revision.getId().equals(revisionId)) {
+                return ret;
             }
         }
-        return null;
+        throw new IllegalStateException("Cannot reach here");
     }
 
     private void updateRevision(K content, String newText, String requester) {
-        Gson gson = new GsonBuilder().create();
-        LinkedList<Revision> revisionList = gson.fromJson(content.getRevisions(), LinkedList.class);
+        LinkedList<Revision> revisionList = GSON.fromJson(content.getRevisions(), LinkedList.class);
         if (revisionList == null) {
             revisionList = new LinkedList<>();
         }
@@ -211,17 +205,17 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         if (revisionList.isEmpty()) {
             content.setBaseText(content.getText());
             nextRevisionId = 1;
-        } else if (revisionList.size() == maxRevisionNumber) {
-            String oldBaseText = content.getBaseText();
-            String diffToMerge = revisionList.pollFirst().getDiff();
-            content.setBaseText(contentDiffTool.applyDiff(oldBaseText, diffToMerge));
-            nextRevisionId = revisionList.getLast().getId() + 1;
         } else {
             nextRevisionId = revisionList.getLast().getId() + 1;
+            if (revisionList.size() == maxRevisionNumber) {
+                String oldBaseText = content.getBaseText();
+                String diffToMerge = revisionList.pollFirst().getDiff();
+                content.setBaseText(contentDiffTool.applyDiff(oldBaseText, diffToMerge));
+            }
         }
         String diff = contentDiffTool.computeDiff(content.getText(), newText);
         Revision newRevision = new Revision(nextRevisionId, diff, Instant.now().toEpochMilli(), requester);
         revisionList.offerLast(newRevision);
-        content.setRevisions(gson.toJson(revisionList));
+        content.setRevisions(GSON.toJson(revisionList));
     }
 }

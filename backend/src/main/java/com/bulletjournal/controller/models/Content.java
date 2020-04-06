@@ -1,14 +1,13 @@
 package com.bulletjournal.controller.models;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class Content {
 
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final Gson GSON = new Gson();
 
     @NotNull
     private Long id;
