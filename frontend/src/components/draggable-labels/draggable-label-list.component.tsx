@@ -177,7 +177,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                     style={{ height: '70%' }}
                     onClick={() => setShowAdd(true)}
                   >
-                    <PlusOutlined /> New Tag
+                    <PlusOutlined /> New Label
                   </Tag>
                 )
               ) : (
