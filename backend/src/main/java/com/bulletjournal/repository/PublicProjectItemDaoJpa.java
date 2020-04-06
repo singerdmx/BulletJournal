@@ -1,9 +1,11 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.controller.models.SharableLink;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.Note;
+import com.bulletjournal.repository.models.ProjectItemModel;
+import com.bulletjournal.repository.models.PublicProjectItem;
+import com.bulletjournal.repository.models.Task;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Repository
 public class PublicProjectItemDaoJpa {
@@ -75,7 +77,7 @@ public class PublicProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> List<SharableLink> getPublicItemLinks(T projectItem) {
+    public <T extends ProjectItemModel> List<PublicProjectItem> getPublicItemLinks(T projectItem) {
         List<PublicProjectItem> publicProjectItems;
         switch (projectItem.getContentType()) {
             case TASK:
@@ -87,10 +89,15 @@ public class PublicProjectItemDaoJpa {
             default:
                 throw new IllegalArgumentException();
         }
-        return publicProjectItems.stream()
-                .map(item -> new SharableLink(item.getId(),
-                        item.hasExpirationTime() ? item.getExpirationTime().getTime() : null,
-                        item.getCreatedAt().getTime()))
-                .collect(Collectors.toList());
+
+        return publicProjectItems;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void revokeSharableLink(T projectItem, String link) {
+        PublicProjectItem publicProjectItem = this.getPublicItemLinks(projectItem).stream()
+                .filter(item -> Objects.equals(item.getId(), link))
+                .findAny().orElseThrow(() -> new ResourceNotFoundException("Link " + link + " not found"));
+        this.publicProjectItemRepository.delete(publicProjectItem);
     }
 }

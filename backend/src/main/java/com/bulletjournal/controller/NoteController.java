@@ -31,6 +31,7 @@ public class NoteController {
     protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
     protected static final String GET_SHARABLES_ROUTE = "/api/notes/{noteId}/sharables";
+    protected static final String REVOKE_SHARABLE_ROUTE = "/api/notes/{noteId}/revokeSharable";
     protected static final String ADD_CONTENT_ROUTE = "/api/notes/{noteId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
@@ -151,6 +152,14 @@ public class NoteController {
                 .collect(Collectors.toList());
         result.setUsers(users);
         return result;
+    }
+
+    @PostMapping(REVOKE_SHARABLE_ROUTE)
+    public void revokeSharable(
+            @NotNull @PathVariable Long noteId,
+            @NotNull @RequestBody RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.revokeSharable(noteId, username, revokeProjectItemSharableParams);
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)

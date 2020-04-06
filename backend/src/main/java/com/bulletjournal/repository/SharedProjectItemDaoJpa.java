@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.ShareProjectItemEvent;
 import com.bulletjournal.repository.models.*;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -141,7 +142,7 @@ public class SharedProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> Set<String> getProjectItemSharedUsers(T projectItem) {
+    public <T extends ProjectItemModel> List<SharedProjectItem> getProjectItemSharedUsers(T projectItem) {
         List<SharedProjectItem> sharedProjectItems;
         switch (projectItem.getContentType()) {
             case TASK:
@@ -154,6 +155,15 @@ public class SharedProjectItemDaoJpa {
                 throw new IllegalArgumentException();
         }
 
-        return sharedProjectItems.stream().map(item -> item.getUsername()).collect(Collectors.toSet());
+        return sharedProjectItems;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void revokeSharableWithUser(T projectItem, String user) {
+        SharedProjectItem sharedProjectItem = this.getProjectItemSharedUsers(projectItem)
+                .stream()
+                .filter(item -> Objects.equals(item.getUsername(), user))
+                .findAny().orElseThrow(() -> new ResourceNotFoundException("User " + user + " not found"));
+        this.sharedProjectItemsRepository.delete(sharedProjectItem);
     }
 }

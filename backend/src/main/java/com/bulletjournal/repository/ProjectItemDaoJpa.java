@@ -90,12 +90,34 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     public <T extends ProjectItemModel> ProjectItemSharables getSharables(Long projectItemId, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
 
-        List<SharableLink> links = this.publicProjectItemDaoJpa.getPublicItemLinks(projectItem);
-        Set<String> users = this.sharedProjectItemDaoJpa.getProjectItemSharedUsers(projectItem);
+        List<SharableLink> links = this.publicProjectItemDaoJpa.getPublicItemLinks(projectItem)
+                .stream()
+                .map(item -> new SharableLink(item.getId(),
+                        item.hasExpirationTime() ? item.getExpirationTime().getTime() : null,
+                        item.getCreatedAt().getTime()))
+                .collect(Collectors.toList());
+        Set<String> users = this.sharedProjectItemDaoJpa.getProjectItemSharedUsers(projectItem)
+                .stream().map(item -> item.getUsername()).collect(Collectors.toSet());
         ProjectItemSharables result = new ProjectItemSharables();
         result.setLinks(links);
         result.setUsers(users.stream().map(u -> new User(u)).collect(Collectors.toList()));
         return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void revokeSharable(Long projectItemId, String requester,
+                               RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
+        T projectItem = getProjectItem(projectItemId, requester);
+
+        String link = revokeProjectItemSharableParams.getLink();
+        if (link != null) {
+            this.publicProjectItemDaoJpa.revokeSharableLink(projectItem, link);
+        }
+
+        String user = revokeProjectItemSharableParams.getUser();
+        if (user != null) {
+            this.sharedProjectItemDaoJpa.revokeSharableWithUser(projectItem, user);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -228,4 +250,5 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         revisionList.offerLast(newRevision);
         content.setRevisions(GSON.toJson(revisionList));
     }
+
 }

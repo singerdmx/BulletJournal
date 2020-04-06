@@ -791,11 +791,37 @@ public class ProjectControllerTest {
         User user = projectItemSharables.getUsers().get(0);
         assertEquals(targetUser, user.getName());
         assertNotNull(user.getAvatar());
+        ResponseEntity<?> revokeResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.REVOKE_SHARABLE_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(new RevokeProjectItemSharableParams(user.getName(), null)),
+                Void.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, revokeResponse.getStatusCode());
 
         assertEquals(2, projectItemSharables.getLinks().size());
         projectItemSharables.getLinks().forEach((sharableLink) -> {
-            assertEquals(8, sharableLink.getLink().length());
+            String link = sharableLink.getLink();
+            assertEquals(8, link.length());
+            ResponseEntity<?> revokeLinkResponse = this.restTemplate.exchange(
+                    ROOT_URL + randomServerPort + TaskController.REVOKE_SHARABLE_ROUTE,
+                    HttpMethod.POST,
+                    new HttpEntity<>(new RevokeProjectItemSharableParams(null, link)),
+                    Void.class,
+                    task.getId());
+            assertEquals(HttpStatus.OK, revokeLinkResponse.getStatusCode());
         });
+
+        projectItemSharablesResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.GET_SHARABLES_ROUTE,
+                HttpMethod.GET,
+                null,
+                ProjectItemSharables.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, projectItemSharablesResponse.getStatusCode());
+        projectItemSharables = projectItemSharablesResponse.getBody();
+        assertEquals(0, projectItemSharables.getUsers().size());
+        assertEquals(0, projectItemSharables.getLinks().size());
     }
 
     private void deleteTaskContent(Task task, Content content) {
