@@ -1,5 +1,5 @@
 import React from 'react';
-import {Avatar, Form, Input, Result} from 'antd';
+import {Avatar, Form, Input, Result, Button} from 'antd';
 import {UserOutlined, SolutionOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
@@ -82,6 +82,11 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = props =
                     icon={<SolutionOutlined/>}
                     title={`Share ${getProjectItemType(props.type)} with USER`}
                 />
+            </Form.Item>
+            <Form.Item>
+                <Button type="primary" htmlType="submit">
+                    Submit
+                </Button>
             </Form.Item>
         </Form>
     </div>
