@@ -287,7 +287,7 @@ function* moveTask(action: PayloadAction<MoveTask>) {
 function* shareTask(action: PayloadAction<ShareTask>) {
   try {
     const { taskId, targetUser, targetGroup, generateLink, ttl } = action.payload;
-    yield call(
+    const data = yield call(
       shareTaskWithOther,
       taskId,
       generateLink,
@@ -296,6 +296,9 @@ function* shareTask(action: PayloadAction<ShareTask>) {
       ttl
     );
     yield call(message.success, 'Task shared successfully');
+    if (generateLink) {
+      yield put(tasksActions.sharedLinkReceived({link: data}));
+    }
   } catch (error) {
     yield call(message.error, `shareTask Error Received: ${error}`);
   }

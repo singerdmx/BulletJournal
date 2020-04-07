@@ -161,7 +161,7 @@ export const shareTaskWithOther = (
 };
 
 export const getSharables = (taskId: number) => {
-  return doFetch(`/api/notes/{taskId}/sharables`)
+  return doFetch(`/api/notes/${taskId}/sharables`)
       .then(res => res.json())
       .catch(err => {
         throw Error(err.message);
@@ -174,7 +174,7 @@ export const revokeSharable = (taskId: number, user?: string, link?: string) => 
     link: link
   });
 
-  return doPost(`/api/tasks/{taskId}/revokeSharable`, postBody)
+  return doPost(`/api/tasks/${taskId}/revokeSharable`, postBody)
       .then(res => res)
       .catch(err => {
         throw Error(err);

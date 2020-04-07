@@ -202,7 +202,7 @@ function* noteMove(action: PayloadAction<MoveNote>) {
 function* shareNote(action: PayloadAction<ShareNote>) {
   try {
     const { noteId, targetUser, targetGroup, generateLink, ttl } = action.payload;
-    yield call(
+    const data = yield call(
       shareNoteWithOther,
       noteId,
       generateLink,
@@ -211,6 +211,9 @@ function* shareNote(action: PayloadAction<ShareNote>) {
       ttl
     );
     yield call(message.success, 'Note shared successfully');
+    if (generateLink) {
+      yield put(notesActions.sharedLinkReceived({link: data}));
+    }
   } catch (error) {
     yield call(message.error, `noteShare Error Received: ${error}`);
   }

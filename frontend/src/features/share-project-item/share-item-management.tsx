@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Form, Result} from 'antd';
 import {LinkOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
@@ -25,19 +25,17 @@ type ProjectItemProps = {
 const ShareProjectItemManagement: React.FC<ProjectItemProps> = props => {
     const [form] = Form.useForm();
 
-    const shareProjectItem = (values: any) => {
-        switch (props.type) {
-            case ProjectType.NOTE:
-                // props.moveNote(props.projectItemId, projectId, history);
-                break;
-            case ProjectType.TODO:
-                // props.moveTask(props.projectItemId, projectId, history);
-                break;
-            case ProjectType.LEDGER:
-                // props.moveTransaction(props.projectItemId, projectId, history);
-                break;
-        }
+    const getSharablesCall: { [key in ProjectType]: Function } = {
+        [ProjectType.NOTE]: props.getNoteSharables,
+        [ProjectType.TODO]: props.getTaskSharables,
+        [ProjectType.LEDGER]: () => {},
     };
+
+    const getSharablesFunction = getSharablesCall[props.type];
+
+    useEffect(() => {
+        getSharablesFunction(props.projectItemId);
+    }, []);
 
     return <div>
         <Form form={form}>

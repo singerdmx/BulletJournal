@@ -93,7 +93,7 @@ export const shareNoteWithOther = (noteId: number, generateLink: boolean, target
 };
 
 export const getSharables = (noteId: number) => {
-    return doFetch(`/api/notes/{noteId}/sharables`)
+    return doFetch(`/api/notes/${noteId}/sharables`)
         .then(res => res.json())
         .catch(err => {
             throw Error(err.message);
@@ -106,7 +106,7 @@ export const revokeSharable = (noteId: number, user?: string, link?: string) => 
         link: link
     });
 
-    return doPost(`/api/notes/{noteId}/revokeSharable`, postBody)
+    return doPost(`/api/notes/${noteId}/revokeSharable`, postBody)
         .then(res => res)
         .catch(err => {
             throw Error(err);

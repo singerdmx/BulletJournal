@@ -98,6 +98,10 @@ export type updateVisibleAction = {
   visible: boolean;
 };
 
+export type ShareLinkAction = {
+  link: string;
+}
+
 export type GetCompletedTasks = {
   projectId: number;
 };
@@ -108,7 +112,8 @@ let initialState = {
   tasks: [] as Array<Task>,
   completedTasks: [] as Array<Task>,
   sharedUsers: [] as User[],
-  sharedLinks: [] as SharableLink[]
+  sharedLinks: [] as SharableLink[],
+  sharedLink: ''
 };
 
 const slice = createSlice({
@@ -127,6 +132,10 @@ const slice = createSlice({
       const { users, links } = action.payload;
       state.sharedUsers = users;
       state.sharedLinks = links;
+    },
+    sharedLinkReceived: (state, action: PayloadAction<ShareLinkAction>) => {
+      const { link } = action.payload;
+      state.sharedLink = link;
     },
     UpdateAddTaskVisible: (
       state,

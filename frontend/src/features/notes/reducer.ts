@@ -101,6 +101,10 @@ export type ContentsAction = {
   contents: Content[];
 }
 
+export type ShareLinkAction = {
+  link: string;
+}
+
 let initialState = {
   note: {} as Note,
   contents: [] as Array<Content>,
@@ -108,7 +112,8 @@ let initialState = {
   addNoteVisible: false,
   patchLoading: true,
   sharedUsers: [] as User[],
-  sharedLinks: [] as SharableLink[]
+  sharedLinks: [] as SharableLink[],
+  sharedLink: ''
 };
 
 const slice = createSlice({
@@ -132,6 +137,10 @@ const slice = createSlice({
       const { users, links } = action.payload;
       state.sharedUsers = users;
       state.sharedLinks = links;
+    },
+    sharedLinkReceived: (state, action: PayloadAction<ShareLinkAction>) => {
+      const { link } = action.payload;
+      state.sharedLink = link;
     },
     UpdateAddNoteVisible: (
       state,

@@ -37,17 +37,7 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = props => {
     const shareFunction = shareProjectItemCall[props.type];
 
     const shareProjectItem = (values: any) => {
-        switch (props.type) {
-            case ProjectType.NOTE:
-                // props.moveNote(props.projectItemId, projectId, history);
-                break;
-            case ProjectType.TODO:
-                // props.moveTask(props.projectItemId, projectId, history);
-                break;
-            case ProjectType.LEDGER:
-                // props.moveTransaction(props.projectItemId, projectId, history);
-                break;
-        }
+        shareFunction(props.projectItemId, true, undefined, undefined, values.expiration);
     };
 
     const result = ['15', '30', '45', '60'];
@@ -57,24 +47,27 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = props => {
 
     return <div>
         <Form form={form}>
-            <Form.Item name='link'>
-                <Result
-                    icon={<LinkOutlined/>}
-                    title={`Generate Shareable LINK`}
-                />
-            </Form.Item>
+            <Result
+                icon={<LinkOutlined/>}
+                title={`Generate Shareable LINK`}
+            />
             <Form.Item
                 name='expiration'
                 label='Expire in '
                 rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Expiration in Days' }]}
-                style={{ display: 'inline-block', width: '30%' }}
             >
                 <AutoComplete options={options}>
                     <Input suffix='Days' />
                 </AutoComplete>
             </Form.Item>
             <Form.Item>
-                <Button type="primary" htmlType="submit">
+                <Button type="primary" htmlType="submit" onClick={() =>
+                    form
+                        .validateFields()
+                        .then(values => {
+                            shareProjectItem(values);
+                        })
+                        .catch(info => console.log(info))}>
                     Submit
                 </Button>
             </Form.Item>
