@@ -1,13 +1,17 @@
-import React, {useEffect} from 'react';
-import {Form, Result} from 'antd';
+import React from 'react';
+import {Form, Collapse, Avatar, Empty, Tag, Tooltip} from 'antd';
+import moment from 'moment';
 import {LinkOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
-import {getTaskSharables, revokeTaskSharable} from '../../features/tasks/actions';
-import {getNoteSharables, revokeNoteSharable} from '../../features/notes/actions';
-import {getProjectItemType, ProjectType} from "../../features/project/constants";
+import {revokeTaskSharable} from '../../features/tasks/actions';
+import {revokeNoteSharable} from '../../features/notes/actions';
+import {ProjectType} from "../../features/project/constants";
 import {IState} from "../../store";
 import {User} from "../group/interface";
 import {SharableLink} from "../system/interface";
+import {Link} from "react-router-dom";
+
+const { Panel } = Collapse;
 
 type ProjectItemProps = {
     type: ProjectType;
@@ -16,36 +20,65 @@ type ProjectItemProps = {
     taskSharedLinks: SharableLink[];
     noteSharedUsers: User[];
     noteSharedLinks: SharableLink[];
-    getTaskSharables: (taskId: number) => void;
     revokeTaskSharable: (taskId: number, user?: string, link?: string) => void;
-    getNoteSharables: (noteId: number) => void;
     revokeNoteSharable: (noteId: number, user?: string, link?: string) => void;
 };
 
 const ShareProjectItemManagement: React.FC<ProjectItemProps> = props => {
     const [form] = Form.useForm();
 
-    const getSharablesCall: { [key in ProjectType]: Function } = {
-        [ProjectType.NOTE]: props.getNoteSharables,
-        [ProjectType.TODO]: props.getTaskSharables,
-        [ProjectType.LEDGER]: () => {},
+    const getSharedUsers: { [key in ProjectType]: User[] } = {
+        [ProjectType.NOTE]: props.noteSharedUsers,
+        [ProjectType.TODO]: props.taskSharedUsers,
+        [ProjectType.LEDGER]: [],
     };
 
-    const getSharablesFunction = getSharablesCall[props.type];
+    const getSharedLinks: { [key in ProjectType]: SharableLink[] } = {
+        [ProjectType.NOTE]: props.noteSharedLinks,
+        [ProjectType.TODO]: props.taskSharedLinks,
+        [ProjectType.LEDGER]: [],
+    };
 
-    useEffect(() => {
-        getSharablesFunction(props.projectItemId);
-    }, []);
+    const sharedUsers = getSharedUsers[props.type];
+    const sharedLinks = getSharedLinks[props.type];
+
+    const showSharedUsers = () => {
+        if (sharedUsers) {
+            return sharedUsers.map((u, index) => (
+                <p key={index}>
+                    <Avatar size="small" src={u.avatar} />
+                    &nbsp;{u.name}
+                </p>));
+        }
+        return <Empty />;
+    };
+
+    const showSharedLinks = () => {
+        if (sharedLinks) {
+            return sharedLinks.map((l, index) => (
+                <p key={index}>
+                    <Tooltip title='Click to Copy Link'>
+                        <LinkOutlined style={{cursor: 'pointer'}}/>
+                    </Tooltip>
+                    <Link title={l.link} to={`/api/public/items/${l.link}`}> {l.link} </Link>
+                    &nbsp;
+                    <Tag color="blue">{'Created ' + moment(l.createdAt).fromNow()}</Tag>
+                    &nbsp;&nbsp;
+                    <Tag color="red">{l.expirationTime ? 'Expires ' + moment(l.expirationTime).fromNow() : 'Never Expire'}</Tag>
+                </p>));
+        }
+        return <Empty />;
+    };
 
     return <div>
-        <Form form={form}>
-            <Form.Item name='manage'>
-                <Result
-                    icon={<LinkOutlined/>}
-                    title={`Manage Shared ${getProjectItemType(props.type)}`}
-                />
-            </Form.Item>
-        </Form>
+        <Collapse defaultActiveKey={['1', '2']}>
+            <Panel header="Shared Users" key="1">
+                {showSharedUsers()}
+            </Panel>
+            <Panel header="Shared Links" key="2">
+                {showSharedLinks()}
+            </Panel>
+        </Collapse>
     </div>
 };
 
@@ -57,8 +90,6 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getTaskSharables,
     revokeTaskSharable,
-    getNoteSharables,
     revokeNoteSharable
 })(ShareProjectItemManagement);
