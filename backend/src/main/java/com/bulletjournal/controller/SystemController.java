@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,9 @@ public class SystemController {
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private NoteDaoJpa noteDaoJpa;
 
     @Autowired
     private PublicProjectItemDaoJpa publicProjectItemDaoJpa;
@@ -105,9 +109,22 @@ public class SystemController {
     @GetMapping(PUBLIC_ITEM_ROUTE)
     public <T extends ProjectItemModel> PublicProjectItem getPublicProjectItem(
             @NotNull @PathVariable String itemId) {
-        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
+        String username = AuthorizationService.SUPER_USER;
+        MDC.put(UserClient.USER_NAME_KEY, username);
 
-        T item = this.publicProjectItemDaoJpa.getPublicItem(itemId);
+        T item;
+        if (!isUUID(itemId)) {
+            Long id = Long.parseLong(itemId.substring(4));
+            if (itemId.startsWith(ProjectItemType.TASK.name())) {
+                item = this.taskDaoJpa.getProjectItem(id, username);
+            } else if (itemId.startsWith(ProjectItemType.NOTE.name())) {
+                item = this.noteDaoJpa.getProjectItem(id, username);
+            } else {
+                throw new BadRequestException("Invalid itemId " + itemId);
+            }
+        } else {
+            item = this.publicProjectItemDaoJpa.getPublicItem(itemId);
+        }
         if (item == null) {
             return null;
         }
@@ -130,5 +147,17 @@ public class SystemController {
         }
 
         return new PublicProjectItem(contentType, contents, projectItem);
+    }
+
+    private boolean isUUID(String itemId) {
+        if (itemId.length() != PublicProjectItemDaoJpa.UUID_LENGTH) {
+            return false;
+        }
+
+        if (itemId.startsWith(ProjectItemType.NOTE.name()) || itemId.startsWith(ProjectItemType.TASK.name())) {
+            return !itemId.substring(4).chars().allMatch(Character::isDigit);
+        }
+
+        return true;
     }
 }

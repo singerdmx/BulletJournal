@@ -23,6 +23,7 @@ import java.util.Objects;
 @Repository
 public class PublicProjectItemDaoJpa {
 
+    public static final int UUID_LENGTH = 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(PublicProjectItemDaoJpa.class);
 
     @Autowired
@@ -30,7 +31,7 @@ public class PublicProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> String generatePublicItemLink(T projectItem, String requester, Long ttl) {
-        String uuid = RandomStringUtils.randomAlphanumeric(8);
+        String uuid = RandomStringUtils.randomAlphanumeric(UUID_LENGTH);
         PublicProjectItem publicProjectItem = new PublicProjectItem(uuid, requester);
         if (ttl != null) {
             ZonedDateTime zonedDateTime = ZonedDateTimeHelper.getNow();

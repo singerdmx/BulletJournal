@@ -719,6 +719,12 @@ public class ProjectControllerTest {
         Task sharedTask = tasks.get(0);
         assertEquals(task, sharedTask);
 
+        shareLink(task, targetUser);
+    }
+
+    private void shareLink(Task task, String targetUser) {
+        ShareProjectItemParams shareProjectItemParams;
+        ResponseEntity<String> response;
         shareProjectItemParams = new ShareProjectItemParams();
         shareProjectItemParams.setGenerateLink(true);
         response = this.restTemplate.exchange(
@@ -736,6 +742,26 @@ public class ProjectControllerTest {
                 TestHelpers.actAsOtherUser(null, sampleUsers[7]),
                 Object.class,
                 response.getBody());
+        assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
+
+        shareProjectItemParams = new ShareProjectItemParams();
+        shareProjectItemParams.setGenerateLink(true);
+        shareProjectItemParams.setTtl(20L);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(shareProjectItemParams),
+                String.class,
+                task.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(8, response.getBody().length());
+
+        publicProjectItemResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, sampleUsers[7]),
+                Object.class,
+                ProjectItemType.TASK.name() + task.getId());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
 
         shareProjectItemParams = new ShareProjectItemParams();
@@ -799,7 +825,7 @@ public class ProjectControllerTest {
                 task.getId());
         assertEquals(HttpStatus.OK, revokeResponse.getStatusCode());
 
-        assertEquals(2, projectItemSharables.getLinks().size());
+        assertEquals(3, projectItemSharables.getLinks().size());
         projectItemSharables.getLinks().forEach((sharableLink) -> {
             String link = sharableLink.getLink();
             assertEquals(8, link.length());

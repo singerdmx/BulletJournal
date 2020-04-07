@@ -110,10 +110,14 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
   };
 
   // TODO: if readOnly, link to public item page
+  let noteLink = `/note/${note.id}`;
+  if (props.readOnly) {
+    noteLink = `/api/public/items/NOTE${note.id}`;
+  }
   return (
     <div className="project-item">
       <div className="project-item-content">
-        <Link to={`/note/${note.id}`}>
+        <Link to={noteLink}>
           <h3 className="project-item-name">
             {getNoteIcon(note)}&nbsp;
             {note.name}

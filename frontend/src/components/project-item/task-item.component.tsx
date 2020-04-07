@@ -192,17 +192,20 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = props => {
     : 'project-item-name';
   // TODO: if readOnly, link to public item page
   // TODO: if isComplete, go to completedTask page
-  const taskLink = isComplete ? <h3 className={taskStyle}>
-    {getTaskIcon(task)} {task.name}
-  </h3> : <Link to={`/task/${task.id}`}>
-    <h3 className={taskStyle}>
-      {getTaskIcon(task)} {task.name}
-    </h3>
-  </Link>;
+  let taskLink = `/task/${task.id}`;
+  if (props.readOnly) {
+    taskLink = `/api/public/items/TASK${task.id}`;
+  } else if (isComplete) {
+    taskLink = `/completedTasks/${task.id}`;
+  }
   return (
     <div className="project-item">
       <div className="project-item-content">
-        {taskLink}
+        <Link to={taskLink}>
+          <h3 className={taskStyle}>
+            {getTaskIcon(task)} {task.name}
+          </h3>
+        </Link>
         <div className="project-item-subs">
           <div className="project-item-labels">
             {task.labels &&
