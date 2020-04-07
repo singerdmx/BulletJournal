@@ -6,6 +6,8 @@ import './modals.styles.less';
 import {getProjectItemType, ProjectType} from "../../features/project/constants";
 import ShareProjectItemWithGroup from "../../features/share-project-item/share-item-with-group";
 import ShareProjectItemWithUser from "../../features/share-project-item/share-item-with-user";
+import ShareProjectItemGenerateLink from "../../features/share-project-item/share-item-generate-link";
+import ShareProjectItemManagement from "../../features/share-project-item/share-item-management";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -58,16 +60,10 @@ const ShareProjectItem: React.FC<ProjectItemProps> = props => {
                 <ShareProjectItemWithUser type={props.type} projectItemId={props.projectItemId}/>
               </TabPane>
               <TabPane tab='Link' key='Link'>
-                <Result
-                    icon={<LinkOutlined/>}
-                    title={`Generate Shareable LINK`}
-                />
+                <ShareProjectItemGenerateLink type={props.type} projectItemId={props.projectItemId}/>
               </TabPane>
               <TabPane tab='Manage' key='Manage'>
-                <Result
-                    icon={<LinkOutlined/>}
-                    title={`Manage Shared ${getProjectItemType(props.type)}`}
-                />
+                <ShareProjectItemManagement type={props.type} projectItemId={props.projectItemId}/>
               </TabPane>
             </Tabs>
           </div>
