@@ -24,7 +24,7 @@ const getTasksPanel = (items: ProjectItems, index: number) => {
         >
             {items.tasks.map((item, index) => {
                 return (<div key={`task${item.id}#${index}`}>
-                    <TaskItem task={item} isComplete={false}/>
+                    <TaskItem task={item} isComplete={false} readOnly={false}/>
                 </div>);
             })}
         </Panel>
@@ -65,7 +65,7 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
             <List>
                 {items.notes.map((item, index) => {
                     return (<div key={`note${item.id}#${index}`}>
-                        <NoteItem note={item}/>
+                        <NoteItem note={item} readOnly={false}/>
                     </div>);
                 })}
             </List>

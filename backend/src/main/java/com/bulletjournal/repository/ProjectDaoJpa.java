@@ -81,6 +81,10 @@ public class ProjectDaoJpa {
                 continue;
             }
             for (Project project : group.getProjects()) {
+                if (project.isShared()) {
+                    // skip shared projects
+                    continue;
+                }
                 String projectOwner = project.getOwner();
                 if (Objects.equals(user.getName(), projectOwner)) {
                     // skip projects owned by me

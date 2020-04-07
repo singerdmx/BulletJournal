@@ -13,6 +13,7 @@ import { IState } from '../../store';
 
 type TasksProps = {
   showCompletedTask: boolean;
+  readOnly: boolean;
   projectId: number;
   tasks: Task[];
   completedTasks: Task[];
@@ -21,17 +22,17 @@ type TasksProps = {
   putTask: (projectId: number, tasks: Task[]) => void;
 };
 
-const getTree = (data: Task[]): TreeNodeNormal[] => {
+const getTree = (data: Task[], readOnly: boolean): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Task) => {
     const node = {} as TreeNodeNormal;
     if (item.subTasks && item.subTasks.length) {
-      node.children = getTree(item.subTasks);
+      node.children = getTree(item.subTasks, readOnly);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
 
-    node.title = <TreeItem task={item} isComplete={false} />;
+    node.title = <TreeItem task={item} isComplete={false} readOnly={readOnly}/>;
     node.key = item.id.toString();
     res.push(node);
   });
@@ -121,6 +122,7 @@ const onDrop = (tasks: Task[], putTask: Function, projectId: number) => (
 const TaskTree: React.FC<TasksProps> = props => {
   const {
     projectId,
+    readOnly,
     tasks,
     completedTasks,
     updateTasks,
@@ -134,7 +136,7 @@ const TaskTree: React.FC<TasksProps> = props => {
       updateCompletedTasks(projectId);
     }
   }, [projectId]);
-  let treeTask = getTree(tasks);
+  let treeTask = getTree(tasks, readOnly);
 
   let completedTaskList = null;
   if (props.showCompletedTask) {
@@ -151,7 +153,7 @@ const TaskTree: React.FC<TasksProps> = props => {
                 {completedTasks.map(task => {
                   return (
                       <List.Item key={task.id}>
-                        <TreeItem task={task} isComplete={true}/>
+                        <TreeItem task={task} isComplete={true} readOnly={readOnly}/>
                       </List.Item>
                   );
                 })}

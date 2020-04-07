@@ -78,6 +78,9 @@ public class SharedProjectItemDaoJpa {
             ProjectType projectType, T projectItem, List<String> users, String requester) {
         List<Event> events = new ArrayList<>();
         for (String user : new HashSet<>(users)) {
+            if (Objects.equals(user, requester)) {
+                continue;
+            }
             List<K> existingItems = this.getSharedProjectItems(user);
             if (existingItems.contains(projectItem)) {
                 LOGGER.error(projectItem.getClass().getSimpleName() + " " + projectItem.getName() +

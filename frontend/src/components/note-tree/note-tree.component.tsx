@@ -11,21 +11,22 @@ import './note-tree.component.styles.less';
 
 type NotesProps = {
   notes: Note[];
+  readOnly: boolean;
   projectId: number;
   updateNotes: (projectId: number) => void;
   putNote: (projectId: number, notes: Note[]) => void;
 };
 
-const getTree = (data: Note[]): TreeNodeNormal[] => {
+const getTree = (data: Note[], readOnly: boolean): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Note) => {
     const node = {} as TreeNodeNormal;
     if (item.subNotes && item.subNotes.length) {
-      node.children = getTree(item.subNotes);
+      node.children = getTree(item.subNotes, readOnly);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
-    node.title = <TreeItem note={item} />;
+    node.title = <TreeItem note={item} readOnly={readOnly}/>;
     node.key = item.id.toString();
     res.push(node);
   });
@@ -113,13 +114,13 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (
 };
 
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
-  const { projectId, notes, putNote, updateNotes } = props;
+  const { projectId, notes, putNote, updateNotes, readOnly } = props;
   useEffect(() => {
     if (projectId) {
       updateNotes(projectId);
     }
   }, [projectId]);
-  let treeNote = getTree(notes);
+  let treeNote = getTree(notes, readOnly);
 
   return (
     <Tree

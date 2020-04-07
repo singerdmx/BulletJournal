@@ -24,6 +24,10 @@ import ShareProjectItem from '../modals/share-project-item.component';
 import {ProjectType} from '../../features/project/constants';
 import {convertToTextWithRRule} from '../../features/recurrence/actions';
 
+type ProjectProps = {
+  readOnly: boolean;
+};
+
 type TaskProps = {
   task: Task;
   isComplete: boolean;
@@ -133,7 +137,7 @@ const getDueDateTime = (task: Task) => {
   );
 };
 
-const TaskItem: React.FC<TaskProps> = props => {
+const TaskItem: React.FC<ProjectProps & TaskProps> = props => {
   const getTaskIcon = (task: Task) => {
     if (task.labels && task.labels[0]) {
       const icon = task.labels[0].icon;
@@ -148,6 +152,32 @@ const TaskItem: React.FC<TaskProps> = props => {
     return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
+  const getMore = () => {
+    if (props.readOnly) {
+      return null;
+    }
+    return <Popover
+        arrowPointAtCenter
+        placement="rightTop"
+        overlayStyle={{ width: '150px' }}
+        content={
+          <ManageTask
+              task={task}
+              isComplete={isComplete}
+              completeTask={completeTask}
+              uncompleteTask={uncompleteTask}
+              deleteTask={deleteTask}
+              deleteCompletedTask={deleteCompletedTask}
+          />
+        }
+        trigger="click"
+    >
+          <span className="project-control-more">
+            <MoreOutlined />
+          </span>
+    </Popover>
+  };
+
   const {
     task,
     isComplete,
@@ -160,6 +190,8 @@ const TaskItem: React.FC<TaskProps> = props => {
   const taskStyle = isComplete
     ? 'project-item-name completed-task'
     : 'project-item-name';
+  // TODO: if readOnly, link to public item page
+  // TODO: if isComplete, go to completedTask page
   const taskLink = isComplete ? <h3 className={taskStyle}>
     {getTaskIcon(task)} {task.name}
   </h3> : <Link to={`/task/${task.id}`}>
@@ -210,26 +242,7 @@ const TaskItem: React.FC<TaskProps> = props => {
             <AlertOutlined />
           </Tooltip>
         </div>
-        <Popover
-          arrowPointAtCenter
-          placement="rightTop"
-          overlayStyle={{ width: '150px' }}
-          content={
-            <ManageTask
-              task={task}
-              isComplete={isComplete}
-              completeTask={completeTask}
-              uncompleteTask={uncompleteTask}
-              deleteTask={deleteTask}
-              deleteCompletedTask={deleteCompletedTask}
-            />
-          }
-          trigger="click"
-        >
-          <span className="project-control-more">
-            <MoreOutlined />
-          </span>
-        </Popover>
+        {getMore()}
       </div>
     </div>
   );

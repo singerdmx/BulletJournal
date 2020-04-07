@@ -27,6 +27,10 @@ import { icons } from '../../assets/icons';
 import './project-item.styles.less';
 import { ProjectType } from '../../features/project/constants';
 
+type ProjectProps = {
+  readOnly: boolean;
+};
+
 type NoteProps = {
   note: Note;
   deleteNote: (noteId: number) => void;
@@ -71,7 +75,7 @@ const ManageNote: React.FC<NoteManageProps> = props => {
   );
 };
 
-const NoteItem: React.FC<NoteProps> = props => {
+const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
   const { note, deleteNote } = props;
   const getNoteIcon = (note: Note) => {
     if (note.labels && note.labels[0]) {
@@ -87,6 +91,25 @@ const NoteItem: React.FC<NoteProps> = props => {
     return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
+  const getMore = () => {
+    if (props.readOnly) {
+      return null;
+    }
+
+    return <Popover
+        arrowPointAtCenter
+        placement="rightTop"
+        overlayStyle={{ width: '150px' }}
+        content={<ManageNote note={note} deleteNote={deleteNote} />}
+        trigger="click"
+    >
+          <span className="project-control-more">
+            <MoreOutlined />
+          </span>
+    </Popover>
+  };
+
+  // TODO: if readOnly, link to public item page
   return (
     <div className="project-item">
       <div className="project-item-content">
@@ -127,17 +150,7 @@ const NoteItem: React.FC<NoteProps> = props => {
             <Avatar src={note.ownerAvatar} size="small" />
           </Tooltip>
         </div>
-        <Popover
-          arrowPointAtCenter
-          placement="rightTop"
-          overlayStyle={{ width: '150px' }}
-          content={<ManageNote note={note} deleteNote={deleteNote} />}
-          trigger="click"
-        >
-          <span className="project-control-more">
-            <MoreOutlined />
-          </span>
-        </Popover>
+        {getMore()}
       </div>
     </div>
   );

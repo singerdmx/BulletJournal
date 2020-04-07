@@ -110,14 +110,15 @@ class ProjectPage extends React.Component<
     let createContent = null;
     let projectContent = null;
     let showCompletedTasks = null;
+
     switch (project.projectType) {
       case ProjectType.NOTE:
         createContent = <AddNote />;
-        projectContent = <NoteTree />;
+        projectContent = <NoteTree readOnly={project.shared}/>;
         break;
       case ProjectType.TODO:
         createContent = <AddTask />;
-        projectContent = <TaskTree showCompletedTask={this.state.completeTasksShown}/>;
+        projectContent = <TaskTree showCompletedTask={this.state.completeTasksShown} readOnly={project.shared}/>;
         showCompletedTasks = this.getShowCompletedTasksIcon();
         break;
       case ProjectType.LEDGER:
@@ -162,11 +163,22 @@ class ProjectPage extends React.Component<
     }
 
     const group = getGroupByProject(this.props.groups, project);
+    let groupUsers = group ? group.users : [];
+    if (project.shared) {
+      createContent = null;
+      showCompletedTasks = null;
+      editContent = null;
+      deleteContent = null;
+      if (groupUsers) {
+        groupUsers = groupUsers.filter(u => u.name === project.owner);
+      }
+    }
+
     let popContent = null;
     if (group) {
       popContent = (
         <div>
-          {group.users.map((u, index) => (
+          {groupUsers.map((u, index) => (
             <p key={index}>
               <Avatar size="small" src={u.avatar} />
               &nbsp;{u.name}
@@ -210,7 +222,7 @@ class ProjectPage extends React.Component<
                 onClick={e => this.onClickGroup(group.id)}
               >
                 <TeamOutlined />
-                {group && group.users.length}
+                {group && groupUsers.length}
               </span>
             </Popover>
             {showCompletedTasks}

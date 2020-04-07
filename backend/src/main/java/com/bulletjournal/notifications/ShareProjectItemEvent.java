@@ -20,6 +20,6 @@ public class ShareProjectItemEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return this.getOriginator() + " shared " + contentType.name() + " " + event.getContentName() + "with you";
+        return this.getOriginator() + " shared " + contentType.name() + " " + event.getContentName() + " with you";
     }
 }
