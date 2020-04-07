@@ -57,16 +57,8 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
   const shareFunction = shareProjectItemCall[props.type];
 
   const shareProjectItem = (values: any) => {
-    switch (props.type) {
-      case ProjectType.NOTE:
-        // props.moveNote(props.projectItemId, projectId, history);
-        break;
-      case ProjectType.TODO:
-        // props.moveTask(props.projectItemId, projectId, history);
-        break;
-      case ProjectType.LEDGER:
-        // props.moveTransaction(props.projectItemId, projectId, history);
-        break;
+    if (props.user.name) {
+      shareFunction(props.projectItemId, false, props.user.name);
     }
   };
 
@@ -98,7 +90,13 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
           title={`Share ${getProjectItemType(props.type)} with USER`}
         />
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" onClick={() =>
+              form
+                  .validateFields()
+                  .then(values => {
+                    shareProjectItem(values);
+                  })
+                  .catch(info => console.log(info))}>
             Submit
           </Button>
         </Form.Item>
