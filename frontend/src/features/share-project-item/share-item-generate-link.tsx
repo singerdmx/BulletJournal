@@ -28,6 +28,14 @@ type ProjectItemProps = {
 const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = props => {
     const [form] = Form.useForm();
 
+    const shareProjectItemCall: { [key in ProjectType]: Function } = {
+        [ProjectType.NOTE]: props.shareNote,
+        [ProjectType.TODO]: props.shareTask,
+        [ProjectType.LEDGER]: () => {},
+    };
+
+    const shareFunction = shareProjectItemCall[props.type];
+
     const shareProjectItem = (values: any) => {
         switch (props.type) {
             case ProjectType.NOTE:
@@ -58,7 +66,7 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = props => {
             <Form.Item
                 name='expiration'
                 label='Expire in '
-                rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Expiration Days' }]}
+                rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Expiration in Days' }]}
                 style={{ display: 'inline-block', width: '30%' }}
             >
                 <AutoComplete options={options}>

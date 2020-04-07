@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Form, Result} from 'antd';
+import {Form, Result} from 'antd';
 import {LinkOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {getTaskSharables, revokeTaskSharable} from '../../features/tasks/actions';
@@ -46,11 +46,6 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = props => {
                     icon={<LinkOutlined/>}
                     title={`Manage Shared ${getProjectItemType(props.type)}`}
                 />
-            </Form.Item>
-            <Form.Item>
-                <Button type="primary" htmlType="submit">
-                    Submit
-                </Button>
             </Form.Item>
         </Form>
     </div>

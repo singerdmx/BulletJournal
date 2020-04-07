@@ -1,6 +1,6 @@
 import React from 'react';
-import {Avatar, Form, Input, Result, Button} from 'antd';
-import {UserOutlined, SolutionOutlined} from '@ant-design/icons';
+import {Avatar, Button, Form, Input, Result} from 'antd';
+import {SolutionOutlined, UserOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
 import {shareTask} from '../../features/tasks/actions';
@@ -43,6 +43,15 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = props =
         props.clearUser();
     };
 
+    const shareProjectItemCall: { [key in ProjectType]: Function } = {
+        [ProjectType.NOTE]: props.shareNote,
+        [ProjectType.TODO]: props.shareTask,
+        [ProjectType.LEDGER]: () => {
+        },
+    };
+
+    const shareFunction = shareProjectItemCall[props.type];
+
     const shareProjectItem = (values: any) => {
         switch (props.type) {
             case ProjectType.NOTE:
@@ -59,30 +68,30 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = props =
 
     return <div>
         <Form form={form}>
-            <Form.Item name='user'>
-        <Input.Search
-            allowClear
-            prefix={<UserOutlined/>}
-            onSearch={() =>
-                form
-                    .validateFields()
-                    .then(values => {
-                        form.resetFields();
-                        searchUser(values.username);
-                    })
-                    .catch(info => console.log(info))
-            }
-            className='input-search-box'
-            placeholder='Enter Username'
-        />
+            <Form.Item name='username' rules={[{min: 1, required: true}]}>
+                <Input.Search
+                    allowClear
+                    prefix={<UserOutlined/>}
+                    onSearch={() =>
+                        form
+                            .validateFields()
+                            .then(values => {
+                                console.log(values);
+                                searchUser(values.username);
+                            })
+                            .catch(info => console.log(info))
+                    }
+                    className='input-search-box'
+                    placeholder='Enter Username'
+                />
                 <div className='search-result'>
                     {user.name ? <Avatar size='large' src={user.avatar}/> : null}
                 </div>
-                <Result
-                    icon={<SolutionOutlined/>}
-                    title={`Share ${getProjectItemType(props.type)} with USER`}
-                />
             </Form.Item>
+            <Result
+                icon={<SolutionOutlined/>}
+                title={`Share ${getProjectItemType(props.type)} with USER`}
+            />
             <Form.Item>
                 <Button type="primary" htmlType="submit">
                     Submit
