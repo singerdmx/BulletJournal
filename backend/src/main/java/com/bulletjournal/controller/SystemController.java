@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,9 @@ public class SystemController {
 
     @Autowired
     private PublicProjectItemDaoJpa publicProjectItemDaoJpa;
+
+    @Autowired
+    private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
     @Autowired
     private NoteController noteController;
@@ -109,15 +113,27 @@ public class SystemController {
     @GetMapping(PUBLIC_ITEM_ROUTE)
     public <T extends ProjectItemModel> PublicProjectItem getPublicProjectItem(
             @NotNull @PathVariable String itemId) {
+        String originalUser = MDC.get(UserClient.USER_NAME_KEY);
         String username = AuthorizationService.SUPER_USER;
         MDC.put(UserClient.USER_NAME_KEY, username);
 
         T item;
         if (!isUUID(itemId)) {
+            if (StringUtils.isBlank(originalUser)) {
+                throw new UnAuthorizedException("User not logged in");
+            }
             Long id = Long.parseLong(itemId.substring(4));
             if (itemId.startsWith(ProjectItemType.TASK.name())) {
+                if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.TODO)
+                    .stream().anyMatch(m -> m.getId().equals(id))) {
+                    throw new UnAuthorizedException("Task not shared with user " + originalUser);
+                }
                 item = this.taskDaoJpa.getProjectItem(id, username);
             } else if (itemId.startsWith(ProjectItemType.NOTE.name())) {
+                if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.NOTE)
+                        .stream().anyMatch(m -> m.getId().equals(id))) {
+                    throw new UnAuthorizedException("Note not shared with user " + originalUser);
+                }
                 item = this.noteDaoJpa.getProjectItem(id, username);
             } else {
                 throw new BadRequestException("Invalid itemId " + itemId);

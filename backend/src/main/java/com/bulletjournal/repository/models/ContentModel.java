@@ -1,6 +1,7 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.Content;
+import com.google.gson.annotations.Expose;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -10,10 +11,13 @@ import javax.validation.constraints.Size;
 @MappedSuperclass
 public abstract class ContentModel<T extends ProjectItemModel> extends AuditModel {
 
+    @Expose
     @NotBlank
     @Size(min = 2, max = 100)
     @Column(length = 100, nullable = false, updatable = false)
     private String owner;
+
+    @Expose
     @Column(columnDefinition = "TEXT")
     private String text;
 

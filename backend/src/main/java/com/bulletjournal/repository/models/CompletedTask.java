@@ -19,6 +19,9 @@ public class CompletedTask extends TaskModel {
     )
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
+    private String contents;
+
     public CompletedTask() {
     }
 
@@ -54,6 +57,14 @@ public class CompletedTask extends TaskModel {
     @Override
     public ContentType getContentType() {
         return ContentType.TASK;
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
     }
 
     @Override

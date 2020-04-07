@@ -502,6 +502,8 @@ public class ProjectControllerTest {
         assertEquals(t1, tasks.get(0));
         assertEquals(0, tasks.get(0).getSubTasks().size());
 
+        createTaskContent(t1);
+
         ResponseEntity<Task> completeTaskResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.COMPLETE_TASK_ROUTE,
                 HttpMethod.POST,
@@ -548,7 +550,6 @@ public class ProjectControllerTest {
         assertEquals(t1.getDueDate(), uncompletedTask.getDueDate());
         assertEquals(t1.getDueTime(), uncompletedTask.getDueTime());
 
-
         tasksResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.GET,
@@ -560,6 +561,7 @@ public class ProjectControllerTest {
         assertNotNull(tasksResponse.getBody());
         tasks = Arrays.asList(tasksResponse.getBody());
         assertFalse(tasks.contains(t1));
+        assertTrue(tasks.contains(uncompletedTask));
     }
 
     private void moveTasks(Project project, Project projectToMoveTo, Task t1, Task t2, Task t3) {
@@ -759,7 +761,7 @@ public class ProjectControllerTest {
         publicProjectItemResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
                 HttpMethod.GET,
-                TestHelpers.actAsOtherUser(null, sampleUsers[7]),
+                TestHelpers.actAsOtherUser(null, targetUser),
                 Object.class,
                 ProjectItemType.TASK.name() + task.getId());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());

@@ -3,10 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.CreateTaskParams;
-import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -15,9 +12,13 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
@@ -37,6 +38,9 @@ import java.util.stream.Collectors;
 public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     private static final Gson GSON = new Gson();
+
+    private static final Gson GSON_ALLOW_EXPOSE_ONLY = new GsonBuilder()
+            .excludeFieldsWithoutExposeAnnotation().create();
 
     @Autowired
     private TaskRepository taskRepository;
@@ -136,10 +140,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal List<com.bulletjournal.controller.models.Task> - A list of completed tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public com.bulletjournal.controller.models.Task getCompletedTask(Long id) {
+    public CompletedTask getCompletedTask(Long id, String requester) {
         CompletedTask task = this.completedTaskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
-        return task.toPresentationModel();
+        this.authorizationService.validateRequesterInProjectGroup(requester, task.getProject());
+        return task;
     }
 
     /*
@@ -424,6 +429,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 requester, ContentType.TASK,
                 Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
 
+        // clone its contents
+        String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
+                .stream().collect(Collectors.toList()));
 
         deleteTaskAndAdjustRelations(
                 requester, task,
@@ -439,6 +447,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 });
 
         CompletedTask completedTask = new CompletedTask(task);
+        completedTask.setContents(contents);
         this.completedTaskRepository.save(completedTask);
         return completedTask;
     }
@@ -601,8 +610,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
                 requester, ContentType.TASK,
                 Operation.UPDATE, projectId, task.getProject().getOwner());
+        List<TaskContent> contents = getCompletedTaskContents(taskId, requester);
         this.completedTaskRepository.delete(task);
-        return create(projectId, task.getOwner(), getCreateTaskParams(task)).getId();
+        Long newId = create(projectId, task.getOwner(), getCreateTaskParams(task)).getId();
+        for (TaskContent content : contents) {
+            this.addContent(newId, content.getOwner(), content);
+        }
+        return newId;
     }
 
     /*
@@ -678,5 +692,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
                 .collect(Collectors.toList());
         return contents;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<TaskContent> getCompletedTaskContents(Long taskId, String requester) {
+        CompletedTask task = getCompletedTask(taskId, requester);
+        return Arrays.asList(GSON.fromJson(task.getContents(), TaskContent[].class));
     }
 }

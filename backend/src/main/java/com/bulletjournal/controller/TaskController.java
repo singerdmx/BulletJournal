@@ -37,6 +37,7 @@ public class TaskController {
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
+    protected static final String COMPLETED_TASK_CONTENTS_ROUTE = "/api/completedTasks/{taskId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
 
     @Autowired
@@ -81,7 +82,8 @@ public class TaskController {
 
     @GetMapping(COMPLETED_TASK_ROUTE)
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
-        return this.taskDaoJpa.getCompletedTask(taskId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getCompletedTask(taskId, username).toPresentationModel();
     }
 
     @PostMapping(TASKS_ROUTE)
@@ -215,6 +217,18 @@ public class TaskController {
     public List<Content> getContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getContents(taskId, username).stream()
+                .map(t -> {
+                    Content content = t.toPresentationModel();
+                    content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
+                    return content;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping(COMPLETED_TASK_CONTENTS_ROUTE)
+    public List<Content> getCompletedTaskContents(@NotNull @PathVariable Long taskId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getCompletedTaskContents(taskId, username).stream()
                 .map(t -> {
                     Content content = t.toPresentationModel();
                     content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
