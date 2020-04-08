@@ -1,15 +1,18 @@
 import React from 'react';
-import { AutoComplete, Button, Form, Input, Result } from 'antd';
+import { AutoComplete, Button, Form, Input, Result, message } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { shareTask } from '../../features/tasks/actions';
 import { shareNote } from '../../features/notes/actions';
 import { ProjectType } from '../../features/project/constants';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import './share-item-modal.styles.less';
+import { IState } from '../../store';
 
 type ProjectItemProps = {
   type: ProjectType;
   projectItemId: number;
+  sharedlink: string;
   shareTask: (
     taskId: number,
     generateLink: boolean,
@@ -66,9 +69,6 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
             <Input suffix="Days" />
           </AutoComplete>
         </Form.Item>
-        <div className="share-info">
-          <Result icon={<LinkOutlined />} title={`Generate Shareable LINK`} />
-        </div>
         <Form.Item>
           <Button
             type="primary"
@@ -85,12 +85,40 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
             Submit
           </Button>
         </Form.Item>
+        <div className="share-info">
+          <Result icon={<LinkOutlined />} title={`Generate Shareable LINK`}>
+            {props.sharedlink && (
+              <div
+                className="shared-link"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  alignItems: 'baseline',
+                }}
+              >
+                <span>{props.sharedlink}</span>
+                <CopyToClipboard
+                  text={props.sharedlink}
+                  onCopy={() => message.success('Copied')}
+                >
+                  <Button type="default" size="small">
+                    Copy To Clipboard
+                  </Button>
+                </CopyToClipboard>
+              </div>
+            )}
+          </Result>
+        </div>
       </Form>
     </div>
   );
 };
 
-export default connect(null, {
+const mapStateToProps = (state: IState) => ({
+  sharedlink: state.task.sharedLink,
+});
+
+export default connect(mapStateToProps, {
   shareTask,
   shareNote,
 })(ShareProjectItemGenerateLink);

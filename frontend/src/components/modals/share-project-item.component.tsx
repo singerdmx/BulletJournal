@@ -13,10 +13,10 @@ import {
   getProjectItemType,
   ProjectType,
 } from '../../features/project/constants';
-import ShareProjectItemWithGroup from '../../features/share-project-item/share-item-with-group';
-import ShareProjectItemWithUser from '../../features/share-project-item/share-item-with-user';
-import ShareProjectItemGenerateLink from '../../features/share-project-item/share-item-generate-link';
-import ShareProjectItemManagement from '../../features/share-project-item/share-item-management';
+import ShareProjectItemWithGroup from '../share-project-item/share-item-with-group';
+import ShareProjectItemWithUser from '../share-project-item/share-item-with-user';
+import ShareProjectItemGenerateLink from '../share-project-item/share-item-generate-link';
+import ShareProjectItemManagement from '../share-project-item/share-item-management';
 import { getTaskSharables } from '../../features/tasks/actions';
 import { getNoteSharables } from '../../features/notes/actions';
 

@@ -9,8 +9,8 @@ import {
   getProjectItemType,
   ProjectType,
 } from '../../features/project/constants';
-import { clearUser, updateUser } from '../user/actions';
-import { UserWithAvatar } from '../user/reducer';
+import { clearUser, updateUser } from '../../features/user/actions';
+import { UserWithAvatar } from '../../features/user/reducer';
 import './share-item-modal.styles.less';
 
 type ProjectItemProps = {
