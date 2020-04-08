@@ -726,24 +726,24 @@ public class ProjectControllerTest {
 
     private void shareLink(Task task, String targetUser) {
         ShareProjectItemParams shareProjectItemParams;
-        ResponseEntity<String> response;
+        ResponseEntity<SharableLink> response;
         shareProjectItemParams = new ShareProjectItemParams();
         shareProjectItemParams.setGenerateLink(true);
         response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(shareProjectItemParams),
-                String.class,
+                SharableLink.class,
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(8, response.getBody().length());
+        assertEquals(8, response.getBody().getLink().length());
 
         ResponseEntity<?> publicProjectItemResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, sampleUsers[7]),
                 Object.class,
-                response.getBody());
+                response.getBody().getLink());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
 
         shareProjectItemParams = new ShareProjectItemParams();
@@ -753,10 +753,10 @@ public class ProjectControllerTest {
                 ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(shareProjectItemParams),
-                String.class,
+                SharableLink.class,
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(8, response.getBody().length());
+        assertEquals(8, response.getBody().getLink().length());
 
         publicProjectItemResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
@@ -773,17 +773,17 @@ public class ProjectControllerTest {
                 ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(shareProjectItemParams),
-                String.class,
+                SharableLink.class,
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(8, response.getBody().length());
+        assertEquals(8, response.getBody().getLink().length());
 
         publicProjectItemResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, sampleUsers[7]),
                 Object.class,
-                response.getBody());
+                response.getBody().getLink());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
 
         shareProjectItemParams = new ShareProjectItemParams();
@@ -793,17 +793,17 @@ public class ProjectControllerTest {
                 ROOT_URL + randomServerPort + TaskController.SHARE_TASK_ROUTE,
                 HttpMethod.POST,
                 new HttpEntity<>(shareProjectItemParams),
-                String.class,
+                SharableLink.class,
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(8, response.getBody().length());
+        assertEquals(8, response.getBody().getLink().length());
 
         publicProjectItemResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + SystemController.PUBLIC_ITEM_ROUTE,
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, sampleUsers[7]),
                 Object.class,
-                response.getBody());
+                response.getBody().getLink());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
         assertNull(publicProjectItemResponse.getBody());
 
