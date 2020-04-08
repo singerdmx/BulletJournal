@@ -53,7 +53,9 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
             <Button
               type="link"
               icon={<DeleteOutlined />}
-              onClick={(e) => revokeNoteSharable(props.projectItemId, u.name)}
+              onClick={(e) =>
+                props.revokeNoteSharable(props.projectItemId, u.name)
+              }
             />
           </Tooltip>
         </div>
@@ -100,7 +102,11 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
                 type="link"
                 icon={<DeleteOutlined />}
                 onClick={(e) =>
-                  revokeNoteSharable(props.projectItemId, undefined, l.link)
+                  props.revokeNoteSharable(
+                    props.projectItemId,
+                    undefined,
+                    l.link
+                  )
                 }
               />
             </Tooltip>
