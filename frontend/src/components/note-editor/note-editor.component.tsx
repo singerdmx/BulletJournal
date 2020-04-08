@@ -44,14 +44,7 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
     'separator',
     {
       key: 'my-dropdown',
-      type: 'dropdown',
-      title: '这是一个自定义的下拉组件', // 指定鼠标悬停提示文案
-      className: 'my-dropdown', // 指定下拉组件容器的样式名
-      html: null, // 指定在按钮中渲染的html字符串
-      text: 'Upload', // 指定按钮文字，此处可传入jsx，若已指定html，则text不会显示
-      showArrow: true, // 指定是否显示下拉组件顶部的小三角形
-      arrowActive: false, // 指定是否高亮下拉组件顶部的小三角形
-      autoHide: true, // 指定是否在失去焦点时自动隐藏下拉组件
+      type: 'component',
       component: <FileUploader />, // 指定在下拉组件中显示的内容组件
     },
   ];
@@ -66,6 +59,7 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
           language="en"
           className="note-editor"
           extendControls={extendControls}
+          excludeControls={['media']}
         />
       </Form.Item>
       <Form.Item>
