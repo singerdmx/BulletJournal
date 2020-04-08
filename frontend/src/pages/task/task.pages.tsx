@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 //actions
 import { deleteTask, getTask } from '../../features/tasks/actions';
 import { getReminderSettingString, Task } from '../../features/tasks/interface';
-import { Label, stringToRGB } from '../../features/label/interface';
+import { Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 

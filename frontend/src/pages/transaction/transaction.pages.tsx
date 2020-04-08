@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 // features
 import { getTransaction } from '../../features/transactions/actions';
 import { Transaction } from '../../features/transactions/interface';
-import { stringToRGB, Label } from '../../features/label/interface';
+import { Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 import { ProjectType } from '../../features/project/constants';
