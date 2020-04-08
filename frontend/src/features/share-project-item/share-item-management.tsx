@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Collapse, Avatar, Empty, Tag, Tooltip, Button } from 'antd';
 import moment from 'moment';
-import { LinkOutlined, RollbackOutlined } from '@ant-design/icons';
+import { LinkOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { revokeTaskSharable } from '../../features/tasks/actions';
 import { revokeNoteSharable } from '../../features/notes/actions';
@@ -50,9 +50,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
             <Avatar size="small" src={u.avatar} />
             &nbsp;{u.name}
           </p>
-          <Button type="link" icon={<RollbackOutlined />}>
-            revoke
-          </Button>
+          <Button type="link" icon={<DeleteOutlined />}></Button>
         </div>
       ));
     }
@@ -62,23 +60,30 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
   const showSharedLinks = () => {
     if (sharedLinks) {
       return sharedLinks.map((l, index) => (
-        <p key={index}>
-          <Tooltip title="Click to Copy Link">
-            <LinkOutlined style={{ cursor: 'pointer' }} />
-          </Tooltip>
-          <Link title={l.link} to={`/api/public/items/${l.link}`}>
-            {' '}
-            {l.link}{' '}
-          </Link>
-          <div className="sub-tag-list">
-            <Tag color="blue">{'Created ' + moment(l.createdAt).fromNow()}</Tag>
-            <Tag color="red">
-              {l.expirationTime
-                ? 'Expires ' + moment(l.expirationTime).fromNow()
-                : 'Never Expire'}
-            </Tag>
+        <div key={index} className="row-item-has-space">
+          <div className="row-item-left">
+            <Tooltip title="Click to Copy Link">
+              <LinkOutlined style={{ cursor: 'pointer' }} />
+            </Tooltip>
+            <Link title={l.link} to={`/api/public/items/${l.link}`}>
+              {' '}
+              {l.link}{' '}
+            </Link>
+            <div className="sub-tag-list">
+              <Tag color="blue">
+                {'Created ' + moment(l.createdAt).fromNow()}
+              </Tag>
+              <Tag color="red">
+                {l.expirationTime
+                  ? 'Expires ' + moment(l.expirationTime).fromNow()
+                  : 'Never Expire'}
+              </Tag>
+            </div>
           </div>
-        </p>
+          <div className="row-item-right">
+            <Button type="link" icon={<DeleteOutlined />}></Button>
+          </div>
+        </div>
       ));
     }
     return <Empty />;
