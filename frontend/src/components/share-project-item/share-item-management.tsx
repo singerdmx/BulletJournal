@@ -44,13 +44,17 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
   const showSharedUsers = () => {
     if (sharedUsers) {
       return sharedUsers.map((u) => (
-        <div className="row-item-has-space" key={u.id}>
+        <div className="row-item-has-space" key={u.name}>
           <p>
             <Avatar size="small" src={u.avatar} />
             &nbsp;{u.name}
           </p>
           <Tooltip title="Revoke" placement="right">
-            <Button type="link" icon={<DeleteOutlined />}></Button>
+            <Button
+              type="link"
+              icon={<DeleteOutlined />}
+              onClick={(e) => revokeNoteSharable(props.projectItemId, u.name)}
+            />
           </Tooltip>
         </div>
       ));
@@ -92,7 +96,13 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
           </div>
           <div className="row-item-right">
             <Tooltip title="Revoke" placement="right">
-              <Button type="link" icon={<DeleteOutlined />}></Button>
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={(e) =>
+                  revokeNoteSharable(props.projectItemId, undefined, l.link)
+                }
+              />
             </Tooltip>
           </div>
         </div>
