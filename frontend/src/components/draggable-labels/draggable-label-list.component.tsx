@@ -6,28 +6,34 @@ import { TagOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { addSelectedLabel, labelsUpdate } from '../../features/label/actions';
 import { setNoteLabels } from '../../features/notes/actions';
+import { setTaskLabels } from '../../features/tasks/actions';
+import { setTransactionLabels } from '../../features/transactions/actions';
+import { ProjectType } from '../../features/project/constants';
 
 import { icons } from '../../assets/icons/index';
 import {
   DragDropContext,
   Droppable,
   Draggable,
-  DropResult
+  DropResult,
 } from 'react-beautiful-dnd';
 import { IState } from '../../store';
 
 type DraggableLabelsProps = {
+  mode: ProjectType;
   labels: Label[];
   editable: boolean;
   labelOptions: Label[];
-  noteId: number;
+  itemId: number;
   addSelectedLabel: (label: Label) => void;
   setNoteLabels: (noteId: number, labels: number[]) => void;
+  setTaskLabels: (taskId: number, labels: number[]) => void;
+  setTransactionLabels: (transactionId: number, labels: number[]) => void;
   labelsUpdate: () => void;
 };
 
 const getIcon = (icon: string) => {
-  let res = icons.filter(item => item.name === icon);
+  let res = icons.filter((item) => item.name === icon);
   return res.length > 0 ? res[0].icon : <TagOutlined />;
 };
 
@@ -41,19 +47,31 @@ const reorder = (list: number[], startIndex: number, endIndex: number) => {
 };
 
 const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
+  mode,
   labels,
   editable,
-  noteId,
+  itemId,
   addSelectedLabel,
   setNoteLabels,
+  setTaskLabels,
+  setTransactionLabels,
   labelOptions,
-  labelsUpdate
+  labelsUpdate,
 }) => {
   // hook history in router
   const history = useHistory();
   const [showAdd, setShowAdd] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<number[]>([]);
-  const labelsId = labels && labels.map(label => label.id);
+  const labelsId = labels && labels.map((label) => label.id);
+
+  const shareProjectLabelUpdate: { [key in ProjectType]: Function } = {
+    [ProjectType.NOTE]: setNoteLabels,
+    [ProjectType.TODO]: setTaskLabels,
+    [ProjectType.LEDGER]: setTransactionLabels,
+  };
+
+  const shareFunction = shareProjectLabelUpdate[mode];
+
   useEffect(() => {
     labelsUpdate();
   }, []);
@@ -75,34 +93,34 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
       result.destination.index
     );
     console.log(newLabels);
-    setNoteLabels(noteId, newLabels);
+    shareFunction(itemId, newLabels);
   };
 
   const handleLabelDelete = (labelId: number) => {
-    const deletedLabels = labelsId.filter(id => id !== labelId);
-    setNoteLabels(noteId, deletedLabels);
+    const deletedLabels = labelsId.filter((id) => id !== labelId);
+    shareFunction(itemId, deletedLabels);
   };
 
   const getListStyle = () => ({
     display: 'flex',
     alignItems: 'baseline',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   });
   // when adding labels for note
   const handleSubmit = () => {
     const newLabels = [...labelsId, ...selectedLabels];
-    setNoteLabels(noteId, newLabels);
+    shareFunction(itemId, newLabels);
     setShowAdd(false);
   };
   // when change in selections
   const handleChange = (newlabels: number[]) => {
-    setSelectedLabels(selectedLabels => [...selectedLabels, ...newlabels]);
+    setSelectedLabels((selectedLabels) => [...selectedLabels, ...newlabels]);
   };
 
   return (
-    <div className="note-labels">
+    <div className='note-labels'>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable" direction="horizontal">
+        <Droppable droppableId='droppable' direction='horizontal'>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -117,7 +135,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                     index={index}
                     isDragDisabled={!editable}
                   >
-                    {provided => (
+                    {(provided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
@@ -125,7 +143,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                       >
                         <Tag
                           key={label.id}
-                          className="labels"
+                          className='labels'
                           color={stringToRGB(label.value)}
                           closable={editable}
                           onClose={() => handleLabelDelete(label.id)}
@@ -153,17 +171,17 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
               {editable ? (
                 showAdd ? (
                   <Select
-                    mode="multiple"
+                    mode='multiple'
                     style={{ height: '70%', width: 100 }}
                     value={selectedLabels}
-                    size="small"
+                    size='small'
                     onBlur={handleSubmit}
                     onChange={handleChange}
                   >
                     {labelOptions &&
                       labelOptions
-                        .filter(option => !labelsId.includes(option.id))
-                        .map(option => {
+                        .filter((option) => !labelsId.includes(option.id))
+                        .map((option) => {
                           return (
                             <Select.Option key={option.id} value={option.id}>
                               {option.value}
@@ -173,7 +191,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                   </Select>
                 ) : (
                   <Tag
-                    className="site-tag-plus"
+                    className='site-tag-plus'
                     style={{ height: '70%' }}
                     onClick={() => setShowAdd(true)}
                   >
@@ -193,11 +211,13 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
 };
 
 const mapStateToProps = (state: IState) => ({
-  labelOptions: state.label.labelOptions
+  labelOptions: state.label.labelOptions,
 });
 
 export default connect(mapStateToProps, {
   setNoteLabels,
+  setTaskLabels,
+  setTransactionLabels,
   addSelectedLabel,
-  labelsUpdate
+  labelsUpdate,
 })(DraggableLabelsList);
