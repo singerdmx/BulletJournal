@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.SharableLink;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -87,5 +88,11 @@ public class PublicProjectItem extends AuditModel {
 
     public boolean hasNote() {
         return this.note != null;
+    }
+
+    public SharableLink toSharableLink() {
+        return new SharableLink(this.getId(),
+                this.hasExpirationTime() ? this.getExpirationTime().getTime() : null,
+                this.getCreatedAt().getTime());
     }
 }

@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.SharableLink;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.Note;
@@ -30,7 +31,7 @@ public class PublicProjectItemDaoJpa {
     private PublicProjectItemRepository publicProjectItemRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> String generatePublicItemLink(T projectItem, String requester, Long ttl) {
+    public <T extends ProjectItemModel> SharableLink generatePublicItemLink(T projectItem, String requester, Long ttl) {
         String uuid = RandomStringUtils.randomAlphanumeric(UUID_LENGTH);
         PublicProjectItem publicProjectItem = new PublicProjectItem(uuid, requester);
         if (ttl != null) {
@@ -49,8 +50,8 @@ public class PublicProjectItemDaoJpa {
             default:
                 throw new IllegalArgumentException();
         }
-        this.publicProjectItemRepository.save(publicProjectItem);
-        return uuid;
+        publicProjectItem = this.publicProjectItemRepository.save(publicProjectItem);
+        return publicProjectItem.toSharableLink();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

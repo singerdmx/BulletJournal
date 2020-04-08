@@ -210,10 +210,10 @@ function* shareNote(action: PayloadAction<ShareNote>) {
       targetGroup,
       ttl
     );
-    yield call(message.success, 'Note shared successfully');
     if (generateLink) {
-      yield put(notesActions.sharedLinkReceived({link: data}));
+      yield put(notesActions.sharedLinkReceived({link: data.link}));
     }
+    yield call(message.success, 'Note shared successfully');
   } catch (error) {
     yield call(message.error, `noteShare Error Received: ${error}`);
   }

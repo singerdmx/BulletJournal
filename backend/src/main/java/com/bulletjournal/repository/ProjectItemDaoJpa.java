@@ -56,7 +56,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     abstract List<K> getContents(Long projectItemId, String requester);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> String generatePublicItemLink(
+    public <T extends ProjectItemModel> SharableLink generatePublicItemLink(
             Long projectItemId, String requester, Long ttl) {
         T projectItem = getProjectItem(projectItemId, requester);
         return this.publicProjectItemDaoJpa.generatePublicItemLink(projectItem, requester, ttl);
@@ -92,9 +92,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         List<SharableLink> links = this.publicProjectItemDaoJpa.getPublicItemLinks(projectItem)
                 .stream()
-                .map(item -> new SharableLink(item.getId(),
-                        item.hasExpirationTime() ? item.getExpirationTime().getTime() : null,
-                        item.getCreatedAt().getTime()))
+                .map(item -> item.toSharableLink())
                 .collect(Collectors.toList());
         Set<String> users = this.sharedProjectItemDaoJpa.getProjectItemSharedUsers(projectItem)
                 .stream().map(item -> item.getUsername()).collect(Collectors.toSet());

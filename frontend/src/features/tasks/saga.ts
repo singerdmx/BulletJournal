@@ -295,10 +295,10 @@ function* shareTask(action: PayloadAction<ShareTask>) {
       targetGroup,
       ttl
     );
-    yield call(message.success, 'Task shared successfully');
     if (generateLink) {
-      yield put(tasksActions.sharedLinkReceived({link: data}));
+      yield put(tasksActions.sharedLinkReceived({link: data.link}));
     }
+    yield call(message.success, 'Task shared successfully');
   } catch (error) {
     yield call(message.error, `shareTask Error Received: ${error}`);
   }

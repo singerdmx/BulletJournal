@@ -130,7 +130,7 @@ public class NoteController {
     }
 
     @PostMapping(SHARE_NOTE_ROUTE)
-    public String shareNote(
+    public SharableLink shareNote(
             @NotNull @PathVariable Long noteId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

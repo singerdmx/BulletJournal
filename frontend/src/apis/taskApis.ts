@@ -154,7 +154,7 @@ export const shareTaskWithOther = (
     ttl: ttl
   });
   return doPost(`/api/tasks/${taskId}/share`, postBody)
-    .then((res) => res)
+    .then(res => generateLink ? res.json() : res)
     .catch((err) => {
       throw Error(err);
     });

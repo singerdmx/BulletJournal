@@ -173,7 +173,7 @@ public class TaskController {
     }
 
     @PostMapping(SHARE_TASK_ROUTE)
-    public String shareTask(
+    public SharableLink shareTask(
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

@@ -45,7 +45,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
   const showSharedUsers = () => {
     if (sharedUsers) {
       return sharedUsers.map((u, index) => (
-        <div className="row-item-has-space">
+        <div key={`div${index}`} className="row-item-has-space">
           <p key={index}>
             <Avatar size="small" src={u.avatar} />
             &nbsp;&nbsp;{u.name}

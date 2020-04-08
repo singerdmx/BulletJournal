@@ -86,7 +86,7 @@ export const shareNoteWithOther = (noteId: number, generateLink: boolean, target
         ttl: ttl
     });
     return doPost(`/api/notes/${noteId}/share`, postBody)
-        .then(res => res)
+        .then(res => generateLink ? res.json() : res)
         .catch(err => {
             throw Error(err);
         });
