@@ -1,5 +1,14 @@
 import React from 'react';
-import { Form, Collapse, Avatar, Empty, Tag, Tooltip, Button } from 'antd';
+import {
+  Form,
+  Collapse,
+  Avatar,
+  Empty,
+  Tag,
+  Tooltip,
+  Button,
+  message,
+} from 'antd';
 import moment from 'moment';
 import { LinkOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -10,6 +19,7 @@ import { IState } from '../../store';
 import { User } from '../../features/group/interface';
 import { SharableLink } from '../../features/system/interface';
 import { Link } from 'react-router-dom';
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 const { Panel } = Collapse;
 
@@ -63,7 +73,12 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
         <div key={index} className="row-item-has-space">
           <div className="row-item-left">
             <Tooltip title="Click to Copy Link">
-              <LinkOutlined style={{ cursor: 'pointer' }} />
+              <CopyToClipboard
+                text={l.link}
+                onCopy={() => message.success('Copied')}
+              >
+                <LinkOutlined style={{ cursor: 'pointer' }} />
+              </CopyToClipboard>
             </Tooltip>
             <Link title={l.link} to={`/api/public/items/${l.link}`}>
               {' '}
