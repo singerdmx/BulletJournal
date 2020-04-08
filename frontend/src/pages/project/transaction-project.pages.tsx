@@ -9,6 +9,9 @@ import {
   Select,
   Form,
   List,
+  Row,
+  Col,
+  Card,
 } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { dateFormat } from '../../features/myBuJo/constants';
@@ -68,6 +71,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     endDate,
     transactionsSummaries,
   } = props.ledgerSummary;
+  const { transactions = [] } = props.ledgerSummary;
 
   const updateTransactions = (
     values: any,
@@ -100,7 +104,93 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     );
   }, []);
 
-  const { transactions = [] } = props.ledgerSummary;
+  const getDefault = () => {
+    return transactionsSummaries
+      ? transactionsSummaries.map(
+          (transactionsSummary: TransactionsSummary, index: number) => (
+            <div>
+              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+              <span>balance: {transactionsSummary.balance}</span>
+              &nbsp;&nbsp;
+              <span>
+                expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                {transactionsSummary.expensePercentage}%,
+              </span>
+              &nbsp;&nbsp;
+              <span>income: {transactionsSummary.income}</span>
+              &nbsp;&nbsp;
+              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
+            </div>
+          )
+        )
+      : 'Loading...';
+  };
+
+  const getPayer = () => {
+    return transactionsSummaries
+      ? transactionsSummaries.map(
+          (transactionsSummary: TransactionsSummary, index: number) => (
+            <div>
+              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+              <span>balance: {transactionsSummary.balance}</span>
+              &nbsp;&nbsp;
+              <span>
+                expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                {transactionsSummary.expensePercentage}%,
+              </span>
+              &nbsp;&nbsp;
+              <span>income: {transactionsSummary.income}</span>
+              &nbsp;&nbsp;
+              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
+            </div>
+          )
+        )
+      : 'Loading...';
+  };
+
+  const getLabel = () => {
+    return transactionsSummaries
+      ? transactionsSummaries.map(
+          (transactionsSummary: TransactionsSummary, index: number) => (
+            <div>
+              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+              <span>balance: {transactionsSummary.balance}</span>
+              &nbsp;&nbsp;
+              <span>
+                expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                {transactionsSummary.expensePercentage}%,
+              </span>
+              &nbsp;&nbsp;
+              <span>income: {transactionsSummary.income}</span>
+              &nbsp;&nbsp;
+              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
+            </div>
+          )
+        )
+      : 'Loading...';
+  };
+
+  const getTimeline = () => {
+    return transactionsSummaries
+      ? transactionsSummaries.map(
+          (transactionsSummary: TransactionsSummary, index: number) => (
+            <div>
+              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+              <span>balance: {transactionsSummary.balance}</span>
+              &nbsp;&nbsp;
+              <span>
+                expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                {transactionsSummary.expensePercentage}%,
+              </span>
+              &nbsp;&nbsp;
+              <span>income: {transactionsSummary.income}</span>
+              &nbsp;&nbsp;
+              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
+            </div>
+          )
+        )
+      : 'Loading...';
+  };
 
   return (
     <div className='transaction-page'>
@@ -126,28 +216,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               startDate={startDate}
               endDate={endDate}
             />
-            {transactionsSummaries
-              ? transactionsSummaries.map(
-                  (transactionsSummary: TransactionsSummary, index: number) => (
-                    <div>
-                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-                      <span>balance: {transactionsSummary.balance}</span>
-                      &nbsp;&nbsp;
-                      <span>
-                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                        {transactionsSummary.expensePercentage}%,
-                      </span>
-                      &nbsp;&nbsp;
-                      <span>income: {transactionsSummary.income}</span>
-                      &nbsp;&nbsp;
-                      {transactionsSummary.incomePercentage}%
-                      <span>&nbsp;&nbsp;</span>
-                    </div>
-                  )
-                )
-              : 'Loading...'}
+            {getDefault()}
           </div>
-          <div className='transaction-static'>
+          <div className='transaction-payer'>
             <LedgerSummaries
               title={'By Payer'}
               balance={balance}
@@ -156,28 +227,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               startDate={startDate}
               endDate={endDate}
             />
-            {transactionsSummaries
-              ? transactionsSummaries.map(
-                  (transactionsSummary: TransactionsSummary, index: number) => (
-                    <div>
-                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-                      <span>balance: {transactionsSummary.balance}</span>
-                      &nbsp;&nbsp;
-                      <span>
-                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                        {transactionsSummary.expensePercentage}%,
-                      </span>
-                      &nbsp;&nbsp;
-                      <span>income: {transactionsSummary.income}</span>
-                      &nbsp;&nbsp;
-                      {transactionsSummary.incomePercentage}%
-                      <span>&nbsp;&nbsp;</span>
-                    </div>
-                  )
-                )
-              : 'Loading...'}
+            {getPayer()}
           </div>
-          <div className='transaction-static'>
+          <div className='transaction-label'>
             <LedgerSummaries
               title={'By Label'}
               balance={balance}
@@ -186,28 +238,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               startDate={startDate}
               endDate={endDate}
             />
-            {transactionsSummaries
-              ? transactionsSummaries.map(
-                  (transactionsSummary: TransactionsSummary, index: number) => (
-                    <div>
-                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-                      <span>balance: {transactionsSummary.balance}</span>
-                      &nbsp;&nbsp;
-                      <span>
-                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                        {transactionsSummary.expensePercentage}%,
-                      </span>
-                      &nbsp;&nbsp;
-                      <span>income: {transactionsSummary.income}</span>
-                      &nbsp;&nbsp;
-                      {transactionsSummary.incomePercentage}%
-                      <span>&nbsp;&nbsp;</span>
-                    </div>
-                  )
-                )
-              : 'Loading...'}
+            {getLabel()}
           </div>
-          <div className='transaction-static'>
+          <div className='transaction-timeline'>
             <LedgerSummaries
               title={'Timeline'}
               balance={balance}
@@ -216,26 +249,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               startDate={startDate}
               endDate={endDate}
             />
-            {transactionsSummaries
-              ? transactionsSummaries.map(
-                  (transactionsSummary: TransactionsSummary, index: number) => (
-                    <div>
-                      <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-                      <span>balance: {transactionsSummary.balance}</span>
-                      &nbsp;&nbsp;
-                      <span>
-                        expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                        {transactionsSummary.expensePercentage}%,
-                      </span>
-                      &nbsp;&nbsp;
-                      <span>income: {transactionsSummary.income}</span>
-                      &nbsp;&nbsp;
-                      {transactionsSummary.incomePercentage}%
-                      <span>&nbsp;&nbsp;</span>
-                    </div>
-                  )
-                )
-              : 'Loading...'}
+            {getTimeline()}
           </div>
           {/* maybe others? */}
         </Carousel>
