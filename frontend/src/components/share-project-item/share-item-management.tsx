@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  Form,
-  Collapse,
-  Avatar,
-  Empty,
-  Tag,
-  Tooltip,
-  Button,
-  message,
-} from 'antd';
+import { Collapse, Avatar, Empty, Tag, Tooltip, Button, message } from 'antd';
 import moment from 'moment';
 import { LinkOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -35,8 +26,6 @@ type ProjectItemProps = {
 };
 
 const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
-  const [form] = Form.useForm();
-
   const getSharedUsers: { [key in ProjectType]: User[] } = {
     [ProjectType.NOTE]: props.noteSharedUsers,
     [ProjectType.TODO]: props.taskSharedUsers,
@@ -60,7 +49,9 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
             <Avatar size="small" src={u.avatar} />
             &nbsp;{u.name}
           </p>
-          <Tooltip title='Revoke' placement='right'><Button type="link" icon={<DeleteOutlined />}></Button></Tooltip>
+          <Tooltip title="Revoke" placement="right">
+            <Button type="link" icon={<DeleteOutlined />}></Button>
+          </Tooltip>
         </div>
       ));
     }
@@ -100,7 +91,9 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
             </div>
           </div>
           <div className="row-item-right">
-            <Tooltip title='Revoke' placement='right'><Button type="link" icon={<DeleteOutlined />}></Button></Tooltip>
+            <Tooltip title="Revoke" placement="right">
+              <Button type="link" icon={<DeleteOutlined />}></Button>
+            </Tooltip>
           </div>
         </div>
       ));
