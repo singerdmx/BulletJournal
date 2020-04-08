@@ -11,6 +11,7 @@ import {
 } from '../../features/project/constants';
 import { clearUser, updateUser } from '../user/actions';
 import { UserWithAvatar } from '../user/reducer';
+import './share-item-modal.styles.less';
 
 type ProjectItemProps = {
   type: ProjectType;
@@ -68,6 +69,7 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
         <Form.Item name="username" rules={[{ min: 1, required: true }]}>
           <Input.Search
             allowClear
+            style={{ width: '100%' }}
             prefix={<UserOutlined />}
             onSearch={() =>
               form
@@ -82,21 +84,30 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
             placeholder="Enter Username"
           />
         </Form.Item>
-        <div className="search-result">
-          {user.name ? <Avatar size="large" src={user.avatar} /> : null}
+        <div className="share-info">
+          {user.name ? (
+            <Avatar size="large" src={user.avatar} />
+          ) : (
+            <Result
+              icon={<SolutionOutlined />}
+              title={`Share ${getProjectItemType(props.type)} with USER`}
+            />
+          )}
         </div>
-        <Result
-          icon={<SolutionOutlined />}
-          title={`Share ${getProjectItemType(props.type)} with USER`}
-        />
+
         <Form.Item>
-          <Button type="primary" htmlType="submit" onClick={() =>
+          <Button
+            type="primary"
+            htmlType="submit"
+            onClick={() =>
               form
-                  .validateFields()
-                  .then(values => {
-                    shareProjectItem(values);
-                  })
-                  .catch(info => console.log(info))}>
+                .validateFields()
+                .then((values) => {
+                  shareProjectItem(values);
+                })
+                .catch((info) => console.log(info))
+            }
+          >
             Submit
           </Button>
         </Form.Item>
