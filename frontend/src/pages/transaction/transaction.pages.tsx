@@ -37,6 +37,7 @@ import {
   UpSquareOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
+import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 
 import { icons } from '../../assets/icons/index';
 import './transaction-page.styles.less';
@@ -70,6 +71,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const { transactionId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
+  const [labelEditable, setLabelEditable] = useState(false);
   const currencyType = LocaleCurrency.getCurrency(currency);
   // hook history in router
   const history = useHistory();
@@ -108,6 +110,10 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     );
   };
 
+  const labelEditableHandler = () => {
+    setLabelEditable((labelEditable) => !labelEditable);
+  };
+
   return (
     <div className='tran-page'>
       <Tooltip
@@ -122,26 +128,13 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       <div className='transaction-title'>
         <div className='label-and-name'>
           {transaction.name}
-          <div className='transaction-labels'>
-            {transaction.labels &&
-              transaction.labels.map((label, index) => {
-                return (
-                  <Tag
-                    key={index}
-                    className='labels'
-                    color={stringToRGB(label.value)}
-                    style={{ cursor: 'pointer', display: 'inline-block' }}
-                  >
-                    <span onClick={() => toLabelSearching(label)}>
-                      {getIcon(label.icon)} &nbsp;
-                      {label.value}
-                    </span>
-                  </Tag>
-                );
-              })}
-          </div>
+          <DraggableLabelsList
+            mode={ProjectType.LEDGER}
+            labels={transaction.labels}
+            editable={labelEditable}
+            itemId={transaction.id}
+          />
         </div>
-
         <div className='transaction-operation'>
           <Tooltip title={`Created by ${transaction.owner}`}>
             <div className='transaction-owner'>
@@ -150,7 +143,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           </Tooltip>
           <Tooltip title='Manage Labels'>
             <div>
-              <TagOutlined />
+              <TagOutlined onClick={labelEditableHandler} />
             </div>
           </Tooltip>
           <EditTransaction transaction={transaction} mode='icon' />

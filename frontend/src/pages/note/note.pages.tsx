@@ -1,7 +1,7 @@
 // page display contents of notes
 // react imports
 import React, { useState } from 'react';
-import {useHistory, useParams} from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 //actions
@@ -18,7 +18,7 @@ import {
   DeleteTwoTone,
   PlusCircleTwoTone,
   TagOutlined,
-  UpSquareOutlined
+  UpSquareOutlined,
 } from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
@@ -41,7 +41,7 @@ interface NotePageHandler {
 
 // get icons by string name
 
-const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
+const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   // hook history in router
   const history = useHistory();
   const { note, deleteNote } = props;
@@ -61,68 +61,73 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
   };
 
   const labelEditableHandler = () => {
-    setLabelEditable(labelEditable => !labelEditable);
+    setLabelEditable((labelEditable) => !labelEditable);
   };
 
   return (
-    <div className="note-page">
-      <Tooltip placement="top" title={note.owner} className="note-avatar">
+    <div className='note-page'>
+      <Tooltip placement='top' title={note.owner} className='note-avatar'>
         <span>
-          <Avatar size="large" src={note.ownerAvatar} />
+          <Avatar size='large' src={note.ownerAvatar} />
         </span>
       </Tooltip>
-      <div className="note-title">
-        <div className="label-and-name">
+
+      <div className='note-title'>
+        <div className='label-and-name'>
           {note.name}
           <DraggableLabelsList
+            mode={ProjectType.NOTE}
             labels={note.labels}
             editable={labelEditable}
-            noteId={note.id}
+            itemId={note.id}
           />
         </div>
-        <div className="note-operation">
-          <Tooltip title="Manage Labels">
+
+        <div className='note-operation'>
+          <Tooltip title='Manage Labels'>
             <div>
               <TagOutlined onClick={labelEditableHandler} />
             </div>
           </Tooltip>
-          <EditNote note={note} mode="icon" />
+          <EditNote note={note} mode='icon' />
           <MoveProjectItem
             type={ProjectType.NOTE}
             projectItemId={note.id}
-            mode="icon"
+            mode='icon'
           />
           <ShareProjectItem
             type={ProjectType.NOTE}
             projectItemId={note.id}
-            mode="icon"
+            mode='icon'
           />
-          <Tooltip title="Delete">
+          <Tooltip title='Delete'>
             <Popconfirm
-              title="Deleting Note also deletes its child notes. Are you sure?"
-              okText="Yes"
-              cancelText="No"
+              title='Deleting Note also deletes its child notes. Are you sure?'
+              okText='Yes'
+              cancelText='No'
               onConfirm={() => {
                 deleteNote(note.id);
               }}
-              className="group-setting"
-              placement="bottom"
+              className='group-setting'
+              placement='bottom'
             >
               <div>
-                <DeleteTwoTone twoToneColor="#f5222d" />
+                <DeleteTwoTone twoToneColor='#f5222d' />
               </div>
             </Popconfirm>
           </Tooltip>
           <Tooltip title='Go to Parent BuJo'>
             <div>
-              <UpSquareOutlined onClick={e => history.push(`/projects/${note.projectId}`)}/>
+              <UpSquareOutlined
+                onClick={(e) => history.push(`/projects/${note.projectId}`)}
+              />
             </div>
           </Tooltip>
         </div>
       </div>
       <Divider />
-      <div className="content">
-        <div className="content-list">
+      <div className='content'>
+        <div className='content-list'>
           <NoteContentList noteId={note.id} />
         </div>
         <Button onClick={createHandler}>
@@ -130,7 +135,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
           New
         </Button>
       </div>
-      <div className="note-drawer">
+      <div className='note-drawer'>
         <NoteEditorDrawer
           noteId={note.id}
           visible={showEditor}
@@ -142,10 +147,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = props => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  note: state.note.note
+  note: state.note.note,
 });
 
 export default connect(mapStateToProps, {
   deleteNote,
-  getNote
+  getNote,
 })(NotePage);
