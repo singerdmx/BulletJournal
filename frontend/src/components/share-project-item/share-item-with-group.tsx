@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {Avatar, Button, Form, Result, Select} from 'antd';
+import { Avatar, Button, Form, Result, Select } from 'antd';
 import { TeamOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interface';
@@ -11,6 +11,7 @@ import {
   getProjectItemType,
   ProjectType,
 } from '../../features/project/constants';
+import './share-item-modal.styles.less';
 
 const { Option } = Select;
 
@@ -73,11 +74,10 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
 
     return (
       <div>
-        <Form form={form}>
+        <Form form={form} layout="inline">
           <Form.Item name="group">
             <Select
               placeholder="Choose Group"
-              style={{ width: '100%' }}
               defaultValue={groupsWithOwner[0].groups[0].id}
             >
               {groupsWithOwner.map(
@@ -98,23 +98,31 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
               )}
             </Select>
           </Form.Item>
-            <Result
-                icon={<TeamOutlined />}
-                title={`Share ${getProjectItemType(props.type)} with GROUP`}
-            />
-            <Form.Item>
-                <Button type="primary" htmlType="submit" onClick={() =>
-                    form
-                        .validateFields()
-                        .then(values => {
-                            shareProjectItem(values);
-                        })
-                        .catch(info => console.log(info))}>
-                    Submit
-                </Button>
-            </Form.Item>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={() =>
+                form
+                  .validateFields()
+                  .then((values) => {
+                    shareProjectItem(values);
+                  })
+                  .catch((info) => console.log(info))
+              }
+            >
+              Submit
+            </Button>
+          </Form.Item>
         </Form>
-
+        <div className="share-info">
+          <Result
+            icon={<TeamOutlined />}
+            title={`Share ${getProjectItemType(
+              props.type
+            ).toLocaleLowerCase()} with group`}
+          />
+        </div>
       </div>
     );
   };

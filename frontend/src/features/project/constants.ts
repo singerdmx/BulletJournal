@@ -1,7 +1,7 @@
 export enum ProjectType {
   TODO = 'TODO',
   NOTE = 'NOTE',
-  LEDGER = 'LEDGER'
+  LEDGER = 'LEDGER',
 }
 
 export const toProjectType = (input: string) => {
@@ -12,15 +12,15 @@ export const toProjectType = (input: string) => {
       return ProjectType.NOTE;
     case 'LEDGER':
       return ProjectType.LEDGER;
+    default:
+      return ProjectType.TODO;
   }
-
-  return ProjectType.TODO;
 };
 
 export enum ProjectItemType {
   TASK = 'TASK',
   NOTE = 'NOTE',
-  TRANSACTION = 'TRANSACTION'
+  TRANSACTION = 'TRANSACTION',
 }
 
 export const getProjectItemType = (input: ProjectType) => {
@@ -31,7 +31,7 @@ export const getProjectItemType = (input: ProjectType) => {
       return ProjectItemType.NOTE;
     case ProjectType.LEDGER:
       return ProjectItemType.TRANSACTION;
+    default:
+      return ProjectItemType.TASK;
   }
-
-  return ProjectItemType.TASK;
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Button, Form, Input, Result } from 'antd';
+import { List, Button, Form, Input, Result, Avatar } from 'antd';
 import { SolutionOutlined, UserOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
@@ -65,7 +65,7 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
 
   return (
     <div>
-      <Form form={form}>
+      <Form form={form} layout="inline">
         <Form.Item name="username" rules={[{ min: 1, required: true }]}>
           <Input.Search
             allowClear
@@ -84,34 +84,44 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
             placeholder="Enter Username"
           />
         </Form.Item>
-        <div className="share-info">
-          {user.name ? (
-            <Avatar size="large" src={user.avatar} />
-          ) : (
-            <Result
-              icon={<SolutionOutlined />}
-              title={`Share ${getProjectItemType(props.type)} with USER`}
-            />
-          )}
-        </div>
-
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            onClick={() =>
-              form
-                .validateFields()
-                .then((values) => {
-                  shareProjectItem(values);
-                })
-                .catch((info) => console.log(info))
-            }
-          >
-            Submit
-          </Button>
-        </Form.Item>
       </Form>
+      <div className="share-info">
+        {user.name ? (
+          <List>
+            <List.Item
+              actions={[
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  onClick={() =>
+                    form
+                      .validateFields()
+                      .then((values) => {
+                        shareProjectItem(values);
+                      })
+                      .catch((info) => console.log(info))
+                  }
+                >
+                  Submit
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={<Avatar src={user.avatar} />}
+                title={user.name}
+                description={'Cilck on submit to share'}
+              />
+            </List.Item>
+          </List>
+        ) : (
+          <Result
+            icon={<SolutionOutlined />}
+            title={`Share ${getProjectItemType(
+              props.type
+            ).toLocaleLowerCase()} with user`}
+          />
+        )}
+      </div>
     </div>
   );
 };

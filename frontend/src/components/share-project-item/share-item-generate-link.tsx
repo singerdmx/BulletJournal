@@ -1,6 +1,6 @@
 import React from 'react';
 import { AutoComplete, Button, Form, Input, Result, message } from 'antd';
-import { LinkOutlined } from '@ant-design/icons';
+import { LinkOutlined, CopyOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { shareTask } from '../../features/tasks/actions';
 import { shareNote } from '../../features/notes/actions';
@@ -57,7 +57,7 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
 
   return (
     <div>
-      <Form form={form}>
+      <Form form={form} layout="inline">
         <Form.Item
           name="expiration"
           label="Expire in "
@@ -82,34 +82,42 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
                 .catch((info) => console.log(info))
             }
           >
-            Submit
+            Gnerate
           </Button>
         </Form.Item>
-        <div className="share-info">
-          <Result icon={<LinkOutlined />} title={`Generate Shareable LINK`}>
-            {props.sharedlink && (
-              <div
-                className="shared-link"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-around',
-                  alignItems: 'baseline',
-                }}
-              >
-                <span>{`${window.location.origin.toString()}/public/items/${props.sharedlink}`}</span>
-                <CopyToClipboard
-                  text={`${window.location.origin.toString()}/public/items/${props.sharedlink}`}
-                  onCopy={() => message.success('Link Copied to Clipboard')}
-                >
-                  <Button type="default" size="small">
-                    Copy To Clipboard
-                  </Button>
-                </CopyToClipboard>
-              </div>
-            )}
-          </Result>
-        </div>
       </Form>
+      <div className="share-info">
+        <Result icon={<LinkOutlined />} title={`Generate shareable link`}>
+          {props.sharedlink && (
+            <div
+              className="shared-link"
+              style={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                alignItems: 'baseline',
+              }}
+            >
+              <span
+                style={{ marginRight: '0.5em' }}
+              >{`${window.location.origin.toString()}/public/items/${
+                props.sharedlink
+              }`}</span>
+              <CopyToClipboard
+                text={`${window.location.origin.toString()}/public/items/${
+                  props.sharedlink
+                }`}
+                onCopy={() => message.success('Link Copied to Clipboard')}
+              >
+                <Button
+                  type="default"
+                  size="small"
+                  icon={<CopyOutlined />}
+                ></Button>
+              </CopyToClipboard>
+            </div>
+          )}
+        </Result>
+      </div>
     </div>
   );
 };

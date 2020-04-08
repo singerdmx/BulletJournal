@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Form, Modal, Select, Tabs, Tooltip } from 'antd';
+import { Modal, Tabs, Tooltip } from 'antd';
 import {
   ShareAltOutlined,
   UserSwitchOutlined,
@@ -21,7 +21,6 @@ import { getTaskSharables } from '../../features/tasks/actions';
 import { getNoteSharables } from '../../features/notes/actions';
 
 const { TabPane } = Tabs;
-const { Option } = Select;
 
 type ProjectItemProps = {
   mode: string;
@@ -32,7 +31,6 @@ type ProjectItemProps = {
 };
 
 const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
-  const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const { mode } = props;
 
@@ -53,7 +51,8 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
     setVisible(true);
   };
 
-  const handleTabClick = (key: string) => {
+  const handleTabClick = (key: string, e: MouseEvent) => {
+    e.stopPropagation();
     if (key === 'Manage') {
       getSharablesFunction(props.projectItemId);
     }
@@ -62,7 +61,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
   const getModal = () => {
     return (
       <Modal
-        title={`SHARE ${getProjectItemType(props.type)}`}
+        title={`Share ${getProjectItemType(props.type).toLocaleLowerCase()}`}
         destroyOnClose
         centered
         visible={visible}
@@ -73,7 +72,8 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
           <Tabs
             defaultActiveKey="Group"
             tabPosition={'left'}
-            onTabClick={(k: string) => handleTabClick(k)}
+            type="card"
+            onTabClick={(k: string, e: MouseEvent) => handleTabClick(k, e)}
           >
             <TabPane
               tab={
@@ -144,7 +144,9 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
       );
     }
     return (
-      <Tooltip title={`SHARE ${getProjectItemType(props.type)}`}>
+      <Tooltip
+        title={`Share ${getProjectItemType(props.type).toLocaleLowerCase}`}
+      >
         <div>
           <span onClick={openModal}>
             <ShareAltOutlined />
