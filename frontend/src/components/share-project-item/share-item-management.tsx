@@ -74,15 +74,15 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
           <div className="row-item-left">
             <Tooltip title="Click to Copy Link">
               <CopyToClipboard
-                text={l.link}
-                onCopy={() => message.success('Copied')}
+                text={`${window.location.origin.toString()}/public/items/${l.link}`}
+                onCopy={() => message.success('Link Copied to Clipboard')}
               >
                 <LinkOutlined style={{ cursor: 'pointer' }} />
               </CopyToClipboard>
             </Tooltip>
             <Link title={l.link} to={`/api/public/items/${l.link}`}>
               {' '}
-              {l.link}{' '}
+              {`${window.location.origin.toString()}/public/items/${l.link}`}{' '}
             </Link>
             <div className="sub-tag-list">
               <Tag color="blue">

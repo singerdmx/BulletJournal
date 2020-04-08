@@ -96,10 +96,10 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
                   alignItems: 'baseline',
                 }}
               >
-                <span>{props.sharedlink}</span>
+                <span>{`${window.location.origin.toString()}/public/items/${props.sharedlink}`}</span>
                 <CopyToClipboard
-                  text={props.sharedlink}
-                  onCopy={() => message.success('Copied')}
+                  text={`${window.location.origin.toString()}/public/items/${props.sharedlink}`}
+                  onCopy={() => message.success('Link Copied to Clipboard')}
                 >
                   <Button type="default" size="small">
                     Copy To Clipboard
