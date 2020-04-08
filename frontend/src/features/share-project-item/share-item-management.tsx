@@ -48,9 +48,9 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
         <div className="row-item-has-space">
           <p key={index}>
             <Avatar size="small" src={u.avatar} />
-            &nbsp;{u.name}
+            &nbsp;&nbsp;{u.name}
           </p>
-          <Button type="link" icon={<DeleteOutlined />}></Button>
+          <Tooltip title='Revoke'><Button type="link" icon={<DeleteOutlined />}></Button></Tooltip>
         </div>
       ));
     }
@@ -81,7 +81,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
             </div>
           </div>
           <div className="row-item-right">
-            <Button type="link" icon={<DeleteOutlined />}></Button>
+            <Tooltip title='Revoke'><Button type="link" icon={<DeleteOutlined />}></Button></Tooltip>
           </div>
         </div>
       ));
