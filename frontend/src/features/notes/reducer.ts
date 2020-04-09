@@ -17,6 +17,12 @@ export type UpdateNoteContents = {
   noteId: number;
 };
 
+export type UpdateNoteContentRevision = {
+  noteId: number;
+  contentId: number;
+  revisionId: number;
+}
+
 export type updateVisibleAction = {
   visible: boolean;
 };
@@ -153,6 +159,7 @@ const slice = createSlice({
       state,
     NotesUpdate: (state, action: PayloadAction<UpdateNotes>) => state,
     NoteContentsUpdate: (state, action: PayloadAction<UpdateNoteContents>) => state,
+    NoteContentRevisionUpdate: (state, action: PayloadAction<UpdateNoteContentRevision>) => state,
     NotesCreate: (state, action: PayloadAction<CreateNote>) => state,
     NoteContentCreate: (state, action: PayloadAction<CreateContent>) => state,
     NotePut: (state, action: PayloadAction<PutNote>) => state,

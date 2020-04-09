@@ -223,3 +223,11 @@ export const updateContent = (
       throw Error(err);
     });
 };
+
+export const getContentRevision = (taskId: number, contentId: number, revisionId: number) => {
+    return doFetch(`/api/tasks/${taskId}/contents/${contentId}/revisions/${revisionId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+};

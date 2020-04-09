@@ -61,6 +61,7 @@ public class Cleaner {
     }
 
     private void cleanPublicProjectItems() {
+        this.publicProjectItemDaoJpa.deleteAllExpiredPublicItems();
         LOGGER.info("PublicProjectItems Cleaning Done");
     }
 

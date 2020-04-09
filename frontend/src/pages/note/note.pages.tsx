@@ -107,6 +107,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
               cancelText='No'
               onConfirm={() => {
                 deleteNote(note.id);
+                history.goBack();
               }}
               className='group-setting'
               placement='bottom'

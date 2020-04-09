@@ -49,16 +49,12 @@ export type DeleteProjectAction = {
 export type Projects = {
   owned: Project[];
   shared: ProjectsWithOwner[];
-  sharedProjectsEtag: string;
-  ownedProjectsEtag: string;
 };
 
 let initialState = {
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
   project: {} as Project,
-  ownedProjectsEtag: '',
-  sharedProjectsEtag: ''
 };
 
 const slice = createSlice({
@@ -68,19 +64,10 @@ const slice = createSlice({
     projectsReceived: (state, action: PayloadAction<Projects>) => {
       const {
         owned,
-        shared,
-        ownedProjectsEtag,
-        sharedProjectsEtag
+        shared
       } = action.payload;
       state.owned = owned;
       state.shared = shared;
-
-      if (ownedProjectsEtag && ownedProjectsEtag.length > 0) {
-        state.ownedProjectsEtag = ownedProjectsEtag;
-      }
-      if (sharedProjectsEtag && sharedProjectsEtag.length > 0) {
-        state.sharedProjectsEtag = sharedProjectsEtag;
-      }
     },
 
     projectsApiErrorReceived: (

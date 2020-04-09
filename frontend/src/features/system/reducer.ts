@@ -15,11 +15,12 @@ export type SystemUpdate = {
   notificationsEtag: string;
   ownedProjectsEtag: string;
   sharedProjectsEtag: string;
+  remindingTaskEtag: string;
 };
 
 export type PublicProjectItemUpdate = {
-  note?: Note;
-  task?: Task;
+  publicNote?: Note;
+  publicTask?: Task;
   contents: Content[];
   contentType: ContentType;
 };
@@ -33,8 +34,9 @@ let initialState = {
   notificationsEtag: '',
   ownedProjectsEtag: '',
   sharedProjectsEtag: '',
-  note: {} as Note,
-  task: {} as Task,
+  remindingTaskEtag: '',
+  publicNote: {} as Note,
+  publicTask: {} as Task,
   contents: [] as Array<Content>,
   contentType: ContentType.NOTE
 };
@@ -48,12 +50,14 @@ const slice = createSlice({
         groupsEtag,
         notificationsEtag,
         ownedProjectsEtag,
-        sharedProjectsEtag
+        sharedProjectsEtag,
+        remindingTaskEtag
       } = action.payload;
       state.groupsEtag = groupsEtag;
       state.notificationsEtag = notificationsEtag;
       state.ownedProjectsEtag = ownedProjectsEtag;
       state.sharedProjectsEtag = sharedProjectsEtag;
+      state.remindingTaskEtag = remindingTaskEtag;
     },
     systemApiErrorReceived: (
       state,
@@ -62,14 +66,14 @@ const slice = createSlice({
     systemUpdate: (state, action: PayloadAction<UpdateSystem>) => state,
     fetchPublicProjectItem: (state, action: PayloadAction<GetPublicProjectItem>) => state,
     publicProjectItemReceived: (state, action: PayloadAction<PublicProjectItemUpdate>) => {
-      const {contents, contentType, note, task} = action.payload;
+      const {contents, contentType, publicNote, publicTask} = action.payload;
       state.contentType = contentType;
       state.contents = contents;
-      if (note) {
-        state.note = note;
+      if (publicNote) {
+        state.publicNote = publicNote;
       }
-      if (task) {
-        state.task = task;
+      if (publicTask) {
+        state.publicTask = publicTask;
       }
     }
   }
