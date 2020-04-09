@@ -8,7 +8,6 @@ import {
   DeleteTwoTone,
   MoreOutlined,
   FileTextOutlined,
-  TagOutlined
 } from '@ant-design/icons';
 import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 // features import
@@ -23,9 +22,9 @@ import ShareProjectItem from '../modals/share-project-item.component';
 //  third party import
 import moment from 'moment';
 // assets import
-import { icons } from '../../assets/icons';
 import './project-item.styles.less';
 import { ProjectType } from '../../features/project/constants';
+import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
 
 type ProjectProps = {
   readOnly: boolean;
@@ -77,19 +76,6 @@ const ManageNote: React.FC<NoteManageProps> = props => {
 
 const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
   const { note, deleteNote } = props;
-  const getNoteIcon = (note: Note) => {
-    if (note.labels && note.labels[0]) {
-      const icon = note.labels[0].icon;
-      return getIcon(icon);
-    }
-
-    return <FileTextOutlined />;
-  };
-
-  const getIcon = (icon: string) => {
-    const res = icons.filter(item => item.name === icon);
-    return res.length > 0 ? res[0].icon : <TagOutlined />;
-  };
 
   const getMore = () => {
     if (props.readOnly) {
@@ -119,7 +105,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
       <div className="project-item-content">
         <Link to={noteLink}>
           <h3 className="project-item-name">
-            {getNoteIcon(note)}&nbsp;
+            {getItemIcon(note, <FileTextOutlined />)}&nbsp;
             {note.name}
           </h3>
         </Link>

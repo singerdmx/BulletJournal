@@ -21,7 +21,6 @@ import {
   Popconfirm,
   Row,
   Statistic,
-  Tag,
   Tooltip,
 } from 'antd';
 import {
@@ -58,15 +57,9 @@ interface TaskPageHandler {
   addSelectedLabel: (label: Label) => void;
 }
 
-// get icons by string name
-const getIcon = (icon: string) => {
-  let res = icons.filter((item) => item.name === icon);
-  return res.length > 0 ? res[0].icon : <TagOutlined />;
-};
-
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const { task, deleteTask } = props;
-  // get id of task from oruter
+  // get id of task from router
   const { taskId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);

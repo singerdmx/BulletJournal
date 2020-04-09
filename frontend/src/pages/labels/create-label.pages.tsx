@@ -17,13 +17,13 @@ import {
   message,
   Tooltip
 } from 'antd';
-import { iconOptions, icons } from '../../assets/icons/index';
+import { iconOptions } from '../../assets/icons/index';
 import {
   SearchOutlined,
   PlusCircleOutlined,
-  TagOutlined,
   DeleteOutlined
 } from '@ant-design/icons';
+import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 
 type LabelsProps = {
   labels: Label[];
@@ -106,11 +106,6 @@ const Labels: React.FC<LabelsProps> = props => {
       .catch(err => {
         message.error(err);
       });
-  };
-
-  const getIcon = (icon: string) => {
-    let res = icons.filter(item => item.name === icon);
-    return res.length > 0 ? res[0].icon : <TagOutlined />;
   };
 
   return (

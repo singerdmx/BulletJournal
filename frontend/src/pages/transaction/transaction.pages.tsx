@@ -18,7 +18,6 @@ import MoveProjectItem from '../../components/modals/move-project-item.component
 // antd imports
 import {
   Tooltip,
-  Tag,
   Avatar,
   Divider,
   Button,
@@ -55,12 +54,6 @@ interface TransactionPageHandler {
   getTransaction: (transactionId: number) => void;
   addSelectedLabel: (label: Label) => void;
 }
-
-// get icons by string name
-const getIcon = (icon: string) => {
-  let res = icons.filter((item) => item.name === icon);
-  return res.length > 0 ? res[0].icon : <TagOutlined />;
-};
 
 const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props

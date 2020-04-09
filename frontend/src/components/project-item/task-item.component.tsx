@@ -7,7 +7,6 @@ import {
   CloseCircleOutlined,
   DeleteTwoTone,
   MoreOutlined,
-  TagOutlined,
 } from '@ant-design/icons';
 import { getReminderSettingString, Task } from '../../features/tasks/interface';
 import { connect } from 'react-redux';
@@ -28,6 +27,7 @@ import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
 import { ProjectType } from '../../features/project/constants';
 import { convertToTextWithRRule } from '../../features/recurrence/actions';
+import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
 
 type ProjectProps = {
   readOnly: boolean;
@@ -143,19 +143,6 @@ const getDueDateTime = (task: Task) => {
 };
 
 const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
-  const getTaskIcon = (task: Task) => {
-    if (task.labels && task.labels[0]) {
-      const icon = task.labels[0].icon;
-      return getIcon(icon);
-    }
-
-    return <CarryOutOutlined />;
-  };
-
-  const getIcon = (icon: string) => {
-    const res = icons.filter((item) => item.name === icon);
-    return res.length > 0 ? res[0].icon : <TagOutlined />;
-  };
 
   const getMore = () => {
     if (props.readOnly) {
@@ -211,7 +198,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
       <div className="project-item-content">
         <Link to={taskLink}>
           <h3 className={taskStyle}>
-            {getTaskIcon(task)} {task.name}
+            {getItemIcon(task, <CarryOutOutlined />)} {task.name}
           </h3>
         </Link>
         <div className="project-item-subs">

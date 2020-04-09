@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Label, stringToRGB } from '../../features/label/interface';
-import { Tag, Select } from 'antd';
-import { useHistory } from 'react-router-dom';
-import { TagOutlined, PlusOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { addSelectedLabel, labelsUpdate } from '../../features/label/actions';
-import { setNoteLabels } from '../../features/notes/actions';
-import { setTaskLabels } from '../../features/tasks/actions';
-import { setTransactionLabels } from '../../features/transactions/actions';
-import { ProjectType } from '../../features/project/constants';
+import React, {useEffect, useState} from 'react';
+import {Label, stringToRGB} from '../../features/label/interface';
+import {Select, Tag} from 'antd';
+import {useHistory} from 'react-router-dom';
+import {PlusOutlined, TagOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {addSelectedLabel, labelsUpdate} from '../../features/label/actions';
+import {setNoteLabels} from '../../features/notes/actions';
+import {setTaskLabels} from '../../features/tasks/actions';
+import {setTransactionLabels} from '../../features/transactions/actions';
+import {ProjectType} from '../../features/project/constants';
 
-import { icons } from '../../assets/icons/index';
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import { IState } from '../../store';
+import {icons} from '../../assets/icons/index';
+import {DragDropContext, Draggable, Droppable, DropResult,} from 'react-beautiful-dnd';
+import {IState} from '../../store';
+import {ProjectItem} from "../../features/myBuJo/interface";
 
 type DraggableLabelsProps = {
   mode: ProjectType;
@@ -32,9 +28,18 @@ type DraggableLabelsProps = {
   labelsUpdate: () => void;
 };
 
-const getIcon = (icon: string) => {
+export const getIcon = (icon: string) => {
   let res = icons.filter((item) => item.name === icon);
   return res.length > 0 ? res[0].icon : <TagOutlined />;
+};
+
+export const getItemIcon = (item: ProjectItem, defaultElem: React.ReactNode) => {
+  if (item.labels && item.labels[0]) {
+    const icon = item.labels[0].icon;
+    return getIcon(icon);
+  }
+
+  return defaultElem;
 };
 
 const reorder = (list: number[], startIndex: number, endIndex: number) => {

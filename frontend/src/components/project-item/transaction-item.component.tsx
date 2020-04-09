@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { Avatar, Popconfirm, Popover, Tooltip, Tag } from 'antd';
 import {
   DeleteTwoTone,
-  TagOutlined,
   MoreOutlined,
   AccountBookOutlined,
   DollarOutlined,
@@ -13,7 +12,6 @@ import { deleteTransaction } from '../../features/transactions/actions';
 import { stringToRGB } from '../../features/label/interface';
 import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
-import { icons } from '../../assets/icons';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import { IState } from '../../store';
@@ -21,6 +19,7 @@ import { ProjectType } from '../../features/project/constants';
 //import modal
 import MoveProjectItem from '../modals/move-project-item.component';
 import EditTransaction from '../modals/edit-transaction.component';
+import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
 
 const LocaleCurrency = require('locale-currency'); //currency code
 
@@ -65,20 +64,6 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
 
 const TransactionItem: React.FC<TransactionProps> = (props) => {
   const { transaction, deleteTransaction } = props;
-
-  const getTransactionIcon = (transaction: Transaction) => {
-    if (transaction.labels && transaction.labels[0]) {
-      const icon = transaction.labels[0].icon;
-      return getIcon(icon);
-    }
-
-    return <AccountBookOutlined />;
-  };
-
-  const getIcon = (icon: string) => {
-    const res = icons.filter((item) => item.name === icon);
-    return res.length > 0 ? res[0].icon : <TagOutlined />;
-  };
 
   const getPaymentDateTime = () => {
     if (!transaction.date) {
@@ -128,7 +113,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
       <div className='project-item-content'>
         <Link to={`/transaction/${transaction.id}`}>
           <h3 className='project-item-name'>
-            {getTransactionIcon(transaction)}&nbsp;
+            {getItemIcon(transaction, <AccountBookOutlined />)}&nbsp;
             {transaction.name}
           </h3>
         </Link>
