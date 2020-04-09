@@ -375,7 +375,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskMove.type, moveTask),
     yield takeLatest(tasksActions.TaskShare.type, shareTask),
     yield takeLatest(tasksActions.TaskSharablesGet.type, getTaskSharables),
-    yield takeLatest(tasksActions.TaskRevokeSharable.type, revokeSharable),
+    yield takeLatest(tasksActions.TaskRevokeSharable.type, revokeTaskSharable),
     yield takeLatest(
       tasksActions.CompletedTasksUpdate.type,
       completedTasksUpdate

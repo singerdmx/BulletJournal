@@ -38,11 +38,22 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
     [ProjectType.LEDGER]: [],
   };
 
+  const revokeShareableCall: { [key in ProjectType]: Function } = {
+    [ProjectType.NOTE]: props.revokeNoteSharable,
+    [ProjectType.TODO]: props.revokeTaskSharable,
+    [ProjectType.LEDGER]: () => {},
+  };
+
   const sharedUsers = getSharedUsers[props.type];
   const sharedLinks = getSharedLinks[props.type];
+  const revokeShareable = revokeShareableCall[props.type];
+
+  const handleRevokeButtonClick = (id: number, user?: string, link?: string) => {
+    revokeShareable(id, user, link);
+  };
 
   const showSharedUsers = () => {
-    if (sharedUsers) {
+    if (sharedUsers && sharedUsers.length > 0) {
       return sharedUsers.map((u) => (
         <div className="row-item-has-space" key={u.name}>
           <p>
@@ -53,9 +64,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
             <Button
               type="link"
               icon={<DeleteOutlined />}
-              onClick={(e) =>
-                props.revokeNoteSharable(props.projectItemId, u.name)
-              }
+              onClick={(e) => handleRevokeButtonClick(props.projectItemId, u.name)}
             />
           </Tooltip>
         </div>
@@ -65,7 +74,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
   };
 
   const showSharedLinks = () => {
-    if (sharedLinks) {
+    if (sharedLinks && sharedLinks.length > 0) {
       return sharedLinks.map((l, index) => (
         <div key={index} className="row-item-has-space">
           <div className="row-item-left">
@@ -101,13 +110,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
               <Button
                 type="link"
                 icon={<DeleteOutlined />}
-                onClick={(e) =>
-                  props.revokeNoteSharable(
-                    props.projectItemId,
-                    undefined,
-                    l.link
-                  )
-                }
+                onClick={(e) => handleRevokeButtonClick(props.projectItemId, undefined, l.link)}
               />
             </Tooltip>
           </div>
