@@ -16,7 +16,9 @@ import {
   CreateContent,
   DeleteContent,
   PatchContent,
-  GetSharables, RevokeSharable,
+  GetSharables,
+  RevokeSharable,
+  UpdateNoteContentRevision
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -35,9 +37,11 @@ import {
   updateContent,
   getSharables,
   revokeSharable,
+  getContentRevision
 } from '../../apis/noteApis';
 import { IState } from '../../store';
 import { updateNoteContents, updateNotes } from './actions';
+import {Content, Revision} from "../myBuJo/interface";
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -59,8 +63,7 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
 
 function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
   try {
-    const data = yield call(getContents, action.payload.noteId);
-    const contents = yield data;
+    const contents = yield call(getContents, action.payload.noteId);
     yield put(
       notesActions.noteContentsReceived({
         contents: contents,
@@ -68,6 +71,30 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
     );
   } catch (error) {
     yield call(message.error, `noteContentsUpdate Error Received: ${error}`);
+  }
+}
+
+function* noteContentRevisionUpdate(action: PayloadAction<UpdateNoteContentRevision>) {
+  try {
+    const { noteId, contentId, revisionId } = action.payload;
+    const state: IState = yield select();
+
+    const contents : Content[] = state.note.contents;
+    const targetContent : Content = contents.filter(c => c.id === contentId)[0];
+    const revision: Revision = targetContent.revisions.filter(r => r.id === revisionId)[0];
+
+    if (!revision.content) {
+      const content = yield call(getContentRevision, noteId, contentId, revisionId);
+      revision.content = content;
+
+      yield put(
+          notesActions.noteContentsReceived({
+            contents: contents,
+          })
+      );
+    }
+  } catch (error) {
+    yield call(message.error, `noteContentRevisionUpdate Error Received: ${error}`);
   }
 }
 
@@ -276,6 +303,7 @@ export default function* noteSagas() {
     ),
     yield takeLatest(notesActions.NotesUpdate.type, notesUpdate),
     yield takeLatest(notesActions.NoteContentsUpdate.type, noteContentsUpdate),
+    yield takeLatest(notesActions.NoteContentRevisionUpdate.type, noteContentRevisionUpdate),
     yield takeLatest(notesActions.NotesCreate.type, noteCreate),
     yield takeLatest(notesActions.NoteContentCreate.type, createNoteContent),
     yield takeLatest(notesActions.NotePut.type, notePut),

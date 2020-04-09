@@ -33,5 +33,6 @@ export interface Content {
 export interface Revision {
     id: number,
     createdAt: number,
-    user: string
+    user: string,
+    content?: string
 }

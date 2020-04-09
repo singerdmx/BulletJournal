@@ -6,6 +6,8 @@ export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });
 export const updateNoteContents = (noteId: number) =>
     actions.NoteContentsUpdate({ noteId: noteId });
+export const updateNoteContentRevision = (noteId: number, contentId: number, revisionId: number) =>
+    actions.NoteContentRevisionUpdate({noteId: noteId, contentId: contentId, revisionId: revisionId});
 export const createNote = (projectId: number, name: string) =>
   actions.NotesCreate({ projectId: projectId, name: name });
 export const createContent = (noteId: number, text: string) =>

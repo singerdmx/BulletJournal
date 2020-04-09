@@ -151,3 +151,11 @@ export const updateContent = (noteId: number, contentId: number, text: string) =
             throw Error(err);
         });
 };
+
+export const getContentRevision = (noteId: number, contentId: number, revisionId: number) => {
+    return doFetch(`/api/notes/${noteId}/contents/${contentId}/revisions/${revisionId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+};
