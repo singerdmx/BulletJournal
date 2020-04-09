@@ -36,18 +36,14 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
     const projects = yield data.json();
     const state = yield select();
     const systemState = state.system;
-    let ownEtag = state.project.ownedProjectsEtag;
-    let shared = state.project.sharedProjectsEtag;
     if (data.headers.get('Etag')) {
       const etags = data.headers.get('Etag').split('|');
-      ownEtag = etags[0];
-      shared = etags[1];
       yield put(
         SystemActions.systemUpdateReceived({
           groupsEtag: systemState.groupsEtag,
           notificationsEtag: systemState.notificationsEtag,
           ownedProjectsEtag: etags[0],
-          sharedProjectsEtag: etags[0],
+          sharedProjectsEtag: etags[1],
           remindingTaskEtag: systemState.remindingTaskEtag
         })
       )
@@ -55,9 +51,7 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
     yield put(
       projectActions.projectsReceived({
         owned: projects.owned,
-        shared: projects.shared,
-        ownedProjectsEtag: ownEtag,
-        sharedProjectsEtag: shared
+        shared: projects.shared
       })
     );
   } catch (error) {
@@ -101,9 +95,7 @@ function* updateSharedProjectOwnersOrder(
           .sort(
             (p1, p2) =>
               projectOwners.indexOf(p1.owner) - projectOwners.indexOf(p2.owner)
-          ),
-        ownedProjectsEtag: '',
-        sharedProjectsEtag: ''
+          )
       })
     );
     yield call(updateSharedProjectsOrder, projectOwners);
@@ -161,18 +153,26 @@ function* putProjectRelations(
 ) {
   try {
     const { projects } = action.payload;
+    const state = yield select();
+    const systemState = state.system;
     const data = yield call(updateProjectRelations, projects);
     const updatedProjects = yield data.json();
-    const etags = data.headers.get('Etag')!.split('|');
-    const ownEtag = etags[0];
-    const shared = etags[1];
-
+    const etags = (data.headers.get('Etag') || '').split('|');
+    if(etags.length===2){
+      yield put(
+        SystemActions.systemUpdateReceived({
+          groupsEtag: systemState.groupsEtag,
+          notificationsEtag: systemState.notificationsEtag,
+          ownedProjectsEtag: etags[0],
+          sharedProjectsEtag: etags[1],
+          remindingTaskEtag: systemState.remindingTaskEtag
+        })
+      )
+    }
     yield put(
       projectActions.projectsReceived({
         owned: updatedProjects.owned,
-        shared: updatedProjects.shared,
-        ownedProjectsEtag: ownEtag,
-        sharedProjectsEtag: shared
+        shared: updatedProjects.shared
       })
     );
     yield call(message.success, 'Successfully updated project relations');
