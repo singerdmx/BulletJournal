@@ -70,6 +70,9 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "recurrence_rule")
     private String recurrenceRule;
 
+    @Column(name = "completed_slots")
+    private String completedSlots;
+
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -205,6 +208,14 @@ public abstract class TaskModel extends ProjectItemModel {
         ZonedDateTime reminderZonedDateTime =
                 ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
         this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
+    }
+
+    public String getCompletedSlots() {
+        return completedSlots;
+    }
+
+    public void setCompletedSlots(String completedSlots) {
+        this.completedSlots = completedSlots;
     }
 
     public String getRecurrenceRule() {

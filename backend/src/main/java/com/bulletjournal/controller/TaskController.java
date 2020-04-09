@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -96,7 +99,7 @@ public class TaskController {
 
     @PatchMapping(TASK_ROUTE)
     public ResponseEntity<List<Task>> updateTask(@NotNull @PathVariable Long taskId,
-                           @Valid @RequestBody UpdateTaskParams updateTaskParams) {
+                                                 @Valid @RequestBody UpdateTaskParams updateTaskParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> events = new ArrayList<>();
         Task task = this.taskDaoJpa.partialUpdate(
@@ -114,9 +117,17 @@ public class TaskController {
     }
 
     @PostMapping(COMPLETE_TASK_ROUTE)
-    public Task completeTask(@NotNull @PathVariable Long taskId) {
+    public Task completeTask(@NotNull @PathVariable Long taskId,
+                             @RequestBody Optional<ZonedDateTimeParam> optionalParam) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        CompletedTask task = this.taskDaoJpa.complete(username, taskId);
+        ZonedDateTime targetDateTime = null;
+        if (optionalParam.isPresent()) {
+            ZonedDateTimeParam zonedDateTimeParam = optionalParam.get();
+            targetDateTime =
+                    ZonedDateTimeHelper.convertDateTime(zonedDateTimeParam.getDateTime(), zonedDateTimeParam.getTimezone());
+        }
+
+        CompletedTask task = this.taskDaoJpa.complete(username, taskId, targetDateTime);
         return getCompletedTask(task.getId());
     }
 
@@ -254,9 +265,9 @@ public class TaskController {
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
     public String getContentRevision(
-        @NotNull @PathVariable Long taskId,
-        @NotNull @PathVariable Long contentId,
-        @NotNull @PathVariable Long revisionId) {
+            @NotNull @PathVariable Long taskId,
+            @NotNull @PathVariable Long contentId,
+            @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
     }

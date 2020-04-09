@@ -398,11 +398,11 @@ public class ProjectControllerTest {
     }
 
     private void updateNoteRelations(Project project, Note note1, Note note2, Note note3) {
-//        note1
-//          |
-//           --note2
-//               |
-//                --- note3
+        //        note1
+        //          |
+        //           --note2
+        //               |
+        //                --- note3
         note1.addSubNote(note2);
         note2.addSubNote(note3);
         ResponseEntity<Note[]> response = this.restTemplate.exchange(
@@ -562,6 +562,49 @@ public class ProjectControllerTest {
         tasks = Arrays.asList(tasksResponse.getBody());
         assertFalse(tasks.contains(t1));
         assertTrue(tasks.contains(uncompletedTask));
+
+        //DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20200520T070000Z
+        Task recurTask = addRecurringTasks(project);
+        final String startTime = "2020-04-20 00:00";
+        ZonedDateTimeParam zonedDateTimeParam = new ZonedDateTimeParam(startTime, TIMEZONE);
+        completeTaskResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.COMPLETE_TASK_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(zonedDateTimeParam, null),
+                Task.class,
+                recurTask.getId());
+
+        assertEquals(HttpStatus.OK, completeTaskResponse.getStatusCode());
+        assertNotNull(completeTaskResponse.getBody());
+        completedTask = completeTaskResponse.getBody();
+        assertEquals(recurTask.getName(), completedTask.getName());
+        assertEquals(recurTask.getTimezone(), completedTask.getTimezone());
+        assertEquals(recurTask.getAssignedTo(), completedTask.getAssignedTo());
+
+        deleteTask(recurTask);
+    }
+
+    private Task addRecurringTasks(Project project) {
+        String recurrenceRule = "DTSTART:20200420T000000Z RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20200520T000000Z";
+        String taskName = "rt1";
+
+        CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
+                null, null, null, TIMEZONE, recurrenceRule);
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(task, sampleUsers[0]),
+                Task.class,
+                project.getId());
+        Task createdTask = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(taskName, createdTask.getName());
+        assertEquals(project.getId(), createdTask.getProjectId());
+        assertEquals(TIMEZONE, createdTask.getTimezone());
+        assertEquals(sampleUsers[0], createdTask.getAssignedTo());
+        assertEquals(recurrenceRule, createdTask.getRecurrenceRule());
+
+        return createdTask;
     }
 
     private void moveTasks(Project project, Project projectToMoveTo, Task t1, Task t2, Task t3) {

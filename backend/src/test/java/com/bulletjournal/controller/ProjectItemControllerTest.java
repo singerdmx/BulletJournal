@@ -148,6 +148,7 @@ public class ProjectItemControllerTest {
         assertEquals("rt1", projectItemsRecurring.get(1).getTasks().get(0).getName());
         assertEquals("2020-04-27", projectItemsRecurring.get(0).getTasks().get(0).getDueDate());
         assertEquals("2020-04-20", projectItemsRecurring.get(1).getTasks().get(0).getDueDate());
+
         deleteTask(recurTask);
     }
 
@@ -295,6 +296,9 @@ public class ProjectItemControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(taskName, createdTask.getName());
         assertEquals(project.getId(), createdTask.getProjectId());
+        assertEquals(TIMEZONE, createdTask.getTimezone());
+        assertEquals(sampleUsers[0], createdTask.getAssignedTo());
+        assertEquals(recurrenceRule, createdTask.getRecurrenceRule());
 
         return createdTask;
     }

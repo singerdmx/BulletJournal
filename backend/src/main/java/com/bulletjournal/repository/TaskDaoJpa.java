@@ -3,7 +3,10 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.CreateTaskParams;
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.UpdateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -12,9 +15,6 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
@@ -71,12 +71,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository;
     }
 
-    /*
+    /**
      * Get all tasks from project
      *
-     * @param projectId
-     * @param requester
-     * @retVal List<com.bulletjournal.controller.models.Task> - a list of controller model tasks with labels
+     * @param projectId the project identifier
+     * @param requester the username of action requester
+     * @return List<com.bulletjournal.controller.models.Task> - a list of controller model tasks with labels
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
@@ -98,12 +98,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .collect(Collectors.toList());
     }
 
-    /*
+    /**
      * Apply labels to tasks
      *
-     * @param task
-     * @param taskMap - Mapping relationship between TaskId and Task Instance
-     * @retVal com.bulletjournal.controller.models.Task - Task instance with labels
+     * @param task     the task object
+     * @param tasksMap the Map object mapping relationship between TaskId and Task Instance
+     * @return com.bulletjournal.controller.models.Task - task instance with labels
      */
     private com.bulletjournal.controller.models.Task addLabels(
             com.bulletjournal.controller.models.Task task, Map<Long, Task> tasksMap) {
@@ -116,15 +116,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return task;
     }
 
-    /*
+    /**
      * Get completed task by task identifier
-     *
+     * <p>
      * 1. Get task from database
      * 2. Look up task labels and add to task
      *
-     * @param requester
-     * @param id
-     * @retVal com.bulletjournal.controller.models.Task - controller model task with label
+     * @param requester the username of action requester
+     * @param id        the task identifier
+     * @return com.bulletjournal.controller.models.Task - controller model task with label
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getTask(String requester, Long id) {
@@ -133,11 +133,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return task.toPresentationModel(labels);
     }
 
-    /*
+    /**
      * Get completed tasks from database
      *
-     * @param id
-     * @retVal List<com.bulletjournal.controller.models.Task> - A list of completed tasks
+     * @param id the task id
+     * @return List<com.bulletjournal.controller.models.Task> - a list of completed tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public CompletedTask getCompletedTask(Long id, String requester) {
@@ -147,16 +147,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return task;
     }
 
-    /*
+    /**
      * Get assignee's reminding tasks and recurring reminding tasks from database.
-     *
+     * <p>
      * Reminding tasks qualifications:
      * 1. Reminding Time is before current time.
      * 2. Starting time is after the current time.
      *
-     * @param assignee
-     * @param now
-     * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks to be reminded
+     * @param assignee the username of task assignee
+     * @param now      the ZonedDateTime object of the current time
+     * @return List<com.bulletjournal.controller.models.Task> - a list of tasks to be reminded
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
@@ -177,13 +177,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return regularTasks;
     }
 
-    /*
+    /**
      * Get user's tasks between the request start time and request end time.
      *
-     * @param assignee
-     * @param startTime
-     * @param endTime
-     * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks
+     * @param assignee  the username of task assignee
+     * @param startTime the ZonedDateTime object of start time
+     * @param endTime   the ZonedDateTime object of end time
+     * @return List<com.bulletjournal.controller.models.Task> - a list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
@@ -197,16 +197,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return tasks;
     }
 
-    /*
+    /**
      * Get recurring reminding tasks from database.
-     *
+     * <p>
      * Reminding tasks qualifications:
      * 1. Reminding Time is before current time.
      * 2. Starting time is after the current time.
      *
-     * @param assignee
-     * @param now
-     * @retVal List<com.bulletjournal.controller.models.Task> - A list of tasks
+     * @param assignee the username of task assignee
+     * @param now      the ZonedDateTime object of the current time
+     * @return List<com.bulletjournal.controller.models.Task> - a list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(String assignee, ZonedDateTime now) {
@@ -219,18 +219,18 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .collect(Collectors.toList());
     }
 
-    /*
+    /**
      * Get all recurrent tasks of an assignee within requested start time and end time
-     *
+     * <p>
      * Procedure:
      * 1. Fetch all tasks with recurrence rule
      * 2. Obtain new DateTime instance by using RecurrenceRule iterator
      * 3. Clone the original recurring task and set its start/end time and reminding setting
      *
-     * @param assignee
-     * @param startTime
-     * @param endTime
-     * @retVal List<Task> - A list of recurrent tasks within the time range
+     * @param assignee  the username of task assignee
+     * @param startTime the ZonedDateTime object of start time
+     * @param endTime   the ZonedDateTime object of end time
+     * @return List<Task> - a list of recurrent tasks within the time range
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecurringTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
@@ -240,18 +240,18 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
 
         for (Task t : recurrentTasks) {
-            String recurrenceRule = t.getRecurrenceRule();
-            String timezone = t.getTimezone();
             try {
+                String recurrenceRule = t.getRecurrenceRule();
+                String timezone = t.getTimezone();
+                Set<DateTime> completedSlots = ZonedDateTimeHelper.parseDateTimeSet(t.getCompletedSlots());
                 BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
-
                 RecurrenceRuleIterator it = rule.getIterator();
                 while (it.hasNext()) {
                     DateTime currDateTime = it.nextDateTime();
                     if (currDateTime.after(endDateTime)) {
                         break;
                     }
-                    if (currDateTime.before(startDateTime)) {
+                    if (currDateTime.before(startDateTime) || completedSlots.contains(currDateTime)) {
                         continue;
                     }
                     Task cloned = (Task) t.clone();
@@ -269,7 +269,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                     cloned.setReminderSetting(t.getReminderSetting()); // Set reminding setting to cloned
                     recurringTasksBetween.add(cloned);
                 }
-            } catch (InvalidRecurrenceRuleException e) {
+            } catch (InvalidRecurrenceRuleException | NumberFormatException e) {
                 throw new IllegalArgumentException("Recurrence rule format invalid");
             } catch (CloneNotSupportedException e) {
                 throw new IllegalStateException("Clone new Task failed");
@@ -278,13 +278,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return recurringTasksBetween;
     }
 
-    /*
+    /**
      * Create task based on CreateTaskParams
      *
-     * @param projectId
-     * @param owner
-     * @param createTaskParams
-     * @retVal Task - A repository task model
+     * @param projectId        the project id
+     * @param owner            the owner and assignee of task
+     * @param createTaskParams the CreateTaskParams object contains task information
+     * @return Task - A repository task model
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
@@ -334,13 +334,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return task;
     }
 
-    /*
+    /**
      * Partially update task based on UpdateTaskParams
      *
-     * @param requester
-     * @param taskId
-     * @param updateTaskParams
-     * @retVal List<Event> - a list of events for users notification
+     * @param requester        the username of action requester
+     * @param taskId           the task id
+     * @param updateTaskParams the update task param object contains task fields update information
+     * @return List<Event> - a list of events for users notification
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams, List<Event> events) {
@@ -384,14 +384,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository.save(task);
     }
 
-    /*
+    /**
      * Add assignee change event to notification
      *
-     * @param requester
-     * @param taskId
-     * @param updateTaskParams
-     * @param task
-     * @retVal List<Event> - a list of events for users notification
+     * @param requester        the username of action requester
+     * @param taskId           the task id
+     * @param updateTaskParams the update task param object contains task fields update information
+     * @param task             the task object gets updated
+     * @return List<Event> - a list of events for users notification
      */
     private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams,
                                        Task task, List<Event> events) {
@@ -409,25 +409,29 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return events;
     }
 
-    /*
+    /**
      * Set a task to complete
-     *
+     * <p>
      * 1. Get task from task table
      * 2. Delete task and its sub tasks from task table
      * 3. Add task and its sub tasks to complete task table
      *
-     * @param requester
-     * @param taskId
-     * @retVal CompleteTask - a repository model complete task object
+     * @param requester the username of action requester
+     * @param taskId    the task id
+     * @return CompleteTask - a repository model complete task object
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CompletedTask complete(String requester, Long taskId) {
+    public CompletedTask complete(String requester, Long taskId, ZonedDateTime dateTime) {
 
         Task task = this.getProjectItem(taskId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
                 requester, ContentType.TASK,
                 Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
+
+        if (dateTime != null) {
+            return completeSingleRecurringTask(task, dateTime);
+        }
 
         // clone its contents
         String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
@@ -452,12 +456,44 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return completedTask;
     }
 
-    /*
+    /**
+     * Complete the recurring task of target date time
+     *
+     * @param task          the recurring task
+     * @param zonedDateTime the date time of the task completed
+     * @return CompletedTask
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public CompletedTask completeSingleRecurringTask(Task task, ZonedDateTime zonedDateTime) {
+        Set<DateTime> completedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(task.getCompletedSlots());
+        DateTime dateTime = ZonedDateTimeHelper.getDateTime(zonedDateTime);
+
+        if (completedSlotsSet.contains(dateTime)) {
+            throw new IllegalArgumentException("Duplicated task completed");
+        }
+
+        // Added target date time to the recurring task's completed slots
+        task.setCompletedSlots(task.getCompletedSlots() + "," + dateTime.toString());
+        this.taskRepository.save(task);
+
+        CompletedTask completedTask = new CompletedTask(task);
+        completedTask.setDueDate(ZonedDateTimeHelper.getDate(dateTime));
+        completedTask.setDueTime(ZonedDateTimeHelper.getTime(dateTime));
+
+        // clone its contents
+        String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
+                .stream().collect(Collectors.toList()));
+        completedTask.setContents(contents);
+
+        this.completedTaskRepository.save(completedTask);
+        return completedTask;
+    }
+
+    /**
      * Update sub tasks relation
      *
-     * @param projectId
-     * @param tasks - a list of tasks
-     * @retVal void
+     * @param projectId the project id
+     * @param tasks     a list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateUserTasks(Long projectId, List<com.bulletjournal.controller.models.Task> tasks) {
@@ -470,12 +506,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         this.projectTasksRepository.save(projectTasks);
     }
 
-    /*
+    /**
      * Delete requester's task by task identifier
      *
-     * @param requester
-     * @param taskId
-     * @retVal List<Event> - a list of notification events
+     * @param requester the username of action requester
+     * @param taskId    the task id
+     * @return List<Event> - a list of notification events
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteTask(String requester, Long taskId) {
@@ -489,14 +525,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return generateEvents(task, requester, project);
     }
 
-    /*
+    /**
      * Delete task and adjust project relations after task completion
      *
-     *
-     * @param requester
-     * @param task
-     * @param targetTasksOperator - Consumer class or Lambda function operate upon target tasks list
-     * @param targetOperator - Consumer class or Lambda function operates upon target HierarchyItem
+     * @param requester           the username of action requester
+     * @param task                the task object gets deleted
+     * @param targetTasksOperator Consumer class or Lambda function operates upon target tasks list
+     * @param targetOperator      Consumer class or Lambda function operates upon target HierarchyItem
      * @retVal Project
      */
     private Project deleteTaskAndAdjustRelations(
@@ -529,15 +564,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return project;
     }
 
-    /*
+    /**
      * Delete completed tasks from database
-     *
+     * <p>
      * 1. Check if the requester is authorized for the operation
      * 2. Remove task from complete tasks table
      *
-     * @param requester
-     * @param taskId
-     * @retVal - A list of notification events
+     * @param requester the username of action requester
+     * @param taskId    the task id
+     * @retVal List<Event> - a list of notification events
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteCompletedTask(String requester, Long taskId) {
@@ -551,12 +586,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return generateEvents(task, requester, project);
     }
 
-    /*
+    /**
      * Generate events for notification
      *
-     * @param task
-     * @param requester
-     * @param project
+     * @param task      the task generate the notification event
+     * @param requester the username of action requester
+     * @param project   the project of the task
      * @retVal List<Event> - a list of notification events
      */
     private List<Event> generateEvents(TaskModel task, String requester, Project project) {
@@ -575,12 +610,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return events;
     }
 
-    /*
+    /**
      * Get completed tasks by project from database
      *
-     * @param projectId
-     * @param requester
-     * @retVal - A list of tasks
+     * @param projectId the project id
+     * @param requester the username of action requester
+     * @retVal List<Completed> - a list of completed tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> getCompletedTasks(Long projectId, String requester) {
@@ -591,16 +626,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .collect(Collectors.toList());
     }
 
-    /*
+    /**
      * Uncomplete completed task.
-     *
+     * <p>
      * 1. Check if requester is allowed to operate with this action
      * 2. Remove task from Completed Task table
      * 3. Create a new task and add it to regular Task table
      *
-     * @param requester
-     * @param taskId
-     * @retVal Long?
+     * @param requester the username of action requester
+     * @param taskId    the task id
+     * @retVal Long - the completed task id
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Long uncomplete(String requester, Long taskId) {
@@ -619,24 +654,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return newId;
     }
 
-    /*
+    /**
      * Remove reminder setting from CreateTaskParams
      *
-     * @param task
-     * @retVal CreateTaskParams
+     * @param task the task object to be completed
+     * @return CreateTaskParams - a create task parameter object contains completed task creation information
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
         return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
                 task.getDueTime(), task.getDuration(), null, task.getTimezone(), task.getRecurrenceRule());
     }
 
-    /*
+    /**
      * Move task from one project to another
      *
-     * @requester
-     * @taskId
-     * @targetProject
-     * @retVal void
+     * @param requester     the username of action requester
+     * @param taskId        the task id
+     * @param targetProject the target project where the task moves to
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void move(String requester, Long taskId, Long targetProject) {
@@ -667,22 +701,22 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 });
     }
 
-    /*
+    /**
      * Get Content Jpa Repository
      *
-     * @retVal JpaRepository
+     * @return JpaRepository
      */
     @Override
     public JpaRepository getContentJpaRepository() {
         return this.taskContentRepository;
     }
 
-    /*
+    /**
      * Get Contents for project
      *
-     * @param projectItemId
-     * @param requester
-     * @retVal List<TaskContent>
+     * @param projectItemId the project item id
+     * @param requester     the username of action requester
+     * @return List<TaskContent>
      */
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
