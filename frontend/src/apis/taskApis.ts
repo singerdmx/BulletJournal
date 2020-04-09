@@ -197,6 +197,14 @@ export const getContents = (taskId: number) => {
     });
 };
 
+export const getCompletedTaskContents = (taskId: number) => {
+    return doFetch(`/api/completedTasks/${taskId}/contents`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+};
+
 export const addContent = (taskId: number, text: string) => {
   const postBody = JSON.stringify({
     text: text,

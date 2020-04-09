@@ -181,6 +181,16 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       })
     );
 
+    const state: IState = yield select();
+
+    yield put(
+        getProjectItemsAfterUpdateSelect(
+            state.myBuJo.todoSelected,
+            state.myBuJo.ledgerSelected,
+            'today'
+        )
+    );
+
     const task = yield call(getTaskById, taskId);
     yield put(
       tasksActions.taskReceived({

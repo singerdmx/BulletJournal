@@ -182,6 +182,16 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
         transaction: data,
       })
     );
+
+    const state: IState = yield select();
+
+    yield put(
+        getProjectItemsAfterUpdateSelect(
+            state.myBuJo.todoSelected,
+            state.myBuJo.ledgerSelected,
+            'today'
+        )
+    );
   } catch (error) {
     yield call(message.error, `Patch Transaction Error Received: ${error}`);
   }
