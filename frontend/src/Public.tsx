@@ -9,8 +9,8 @@ import {Content} from "./features/myBuJo/interface";
 import {getPublicItem} from "./features/system/actions";
 
 import './App.less';
-import TaskPage from "./pages/task/task.pages";
 import NotePage from "./pages/note/note.pages";
+import TaskDetailPage from "./pages/task/task-detail.pages";
 
 type PageProps = {
   note: Note;
@@ -29,7 +29,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
 
   if (contentType === ContentType.TASK) {
     return <div>
-      <TaskPage />
+      <TaskDetailPage task={task} labelEditable={false} taskOperation={() => null}/>
     </div>;
   }
 
