@@ -3,7 +3,6 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -118,16 +116,14 @@ public class TaskController {
 
     @PostMapping(COMPLETE_TASK_ROUTE)
     public Task completeTask(@NotNull @PathVariable Long taskId,
-                             @RequestBody Optional<ZonedDateTimeParam> optionalParam) {
+                             @RequestBody Optional<String> dateTimeOptional) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        ZonedDateTime targetDateTime = null;
-        if (optionalParam.isPresent()) {
-            ZonedDateTimeParam zonedDateTimeParam = optionalParam.get();
-            targetDateTime =
-                    ZonedDateTimeHelper.convertDateTime(zonedDateTimeParam.getDateTime(), zonedDateTimeParam.getTimezone());
+        String dateTime = null;
+        if (dateTimeOptional.isPresent()) {
+            dateTime = dateTimeOptional.get();
         }
 
-        CompletedTask task = this.taskDaoJpa.complete(username, taskId, targetDateTime);
+        CompletedTask task = this.taskDaoJpa.complete(username, taskId, dateTime);
         return getCompletedTask(task.getId());
     }
 

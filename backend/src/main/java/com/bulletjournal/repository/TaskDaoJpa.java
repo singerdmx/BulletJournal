@@ -421,7 +421,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return CompleteTask - a repository model complete task object
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CompletedTask complete(String requester, Long taskId, ZonedDateTime dateTime) {
+    public CompletedTask complete(String requester, Long taskId, String dateTime) {
 
         Task task = this.getProjectItem(taskId, requester);
 
@@ -459,14 +459,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Complete the recurring task of target date time
      *
-     * @param task          the recurring task
-     * @param zonedDateTime the date time of the task completed
+     * @param task     the recurring task
+     * @param dateTime the date time of the task completed
      * @return CompletedTask
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CompletedTask completeSingleRecurringTask(Task task, ZonedDateTime zonedDateTime) {
+    public CompletedTask completeSingleRecurringTask(Task task, String dateTimeStr) {
         Set<DateTime> completedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(task.getCompletedSlots());
-        DateTime dateTime = ZonedDateTimeHelper.getDateTime(zonedDateTime);
+        String timezone = task.getTimezone();
+        DateTime dateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateTime(dateTimeStr, timezone));
 
         if (completedSlotsSet.contains(dateTime)) {
             throw new IllegalArgumentException("Duplicated task completed");

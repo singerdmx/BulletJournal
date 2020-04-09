@@ -566,11 +566,10 @@ public class ProjectControllerTest {
         //DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20200520T070000Z
         Task recurTask = addRecurringTasks(project);
         final String startTime = "2020-04-20 00:00";
-        ZonedDateTimeParam zonedDateTimeParam = new ZonedDateTimeParam(startTime, TIMEZONE);
         completeTaskResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.COMPLETE_TASK_ROUTE,
                 HttpMethod.POST,
-                new HttpEntity<>(zonedDateTimeParam, null),
+                new HttpEntity<>(startTime, null),
                 Task.class,
                 recurTask.getId());
 
