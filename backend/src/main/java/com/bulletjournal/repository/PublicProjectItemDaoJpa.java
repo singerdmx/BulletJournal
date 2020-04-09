@@ -102,4 +102,9 @@ public class PublicProjectItemDaoJpa {
                 .findAny().orElseThrow(() -> new ResourceNotFoundException("Link " + link + " not found"));
         this.publicProjectItemRepository.delete(publicProjectItem);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteAllExpiredPublicItems() {
+        this.publicProjectItemRepository.deleteByExpirationTimeBefore(new Timestamp(System.currentTimeMillis()));
+    }
 }
