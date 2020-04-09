@@ -145,7 +145,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
     }
     return (
       <Tooltip
-        title={`Share ${getProjectItemType(props.type).toLocaleLowerCase}`}
+        title={`Share ${getProjectItemType(props.type).toLocaleLowerCase()}`}
       >
         <div>
           <span onClick={openModal}>
