@@ -12,6 +12,7 @@ import { Project, ProjectsWithOwner } from '../project/interface';
 import { updateMyself, updateExpandedMyself } from './actions';
 import { updateGroups, groupUpdate } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
+import { updateSystem } from '../system/actions';
 
 import './myself.styles.less';
 
@@ -25,6 +26,7 @@ type MyselfProps = {
   updateGroups: () => void;
   updateNotifications: () => void;
   groupUpdate: () => void;
+  updateSystem: () => void;
 };
 
 type PathProps = RouteComponentProps;
@@ -39,6 +41,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
     this.props.updateGroups();
     this.props.updateNotifications();
     this.props.groupUpdate();
+    this.props.updateSystem();
   };
 
   render() {
@@ -92,5 +95,6 @@ export default connect(mapStateToProps, {
   updateExpandedMyself,
   updateGroups,
   updateNotifications,
-  groupUpdate
+  groupUpdate,
+  updateSystem
 })(withRouter(Myself));

@@ -15,6 +15,7 @@ export type SystemUpdate = {
   notificationsEtag: string;
   ownedProjectsEtag: string;
   sharedProjectsEtag: string;
+  remindingTaskEtag: string;
 };
 
 export type PublicProjectItemUpdate = {
@@ -33,6 +34,7 @@ let initialState = {
   notificationsEtag: '',
   ownedProjectsEtag: '',
   sharedProjectsEtag: '',
+  remindingTaskEtag: '',
   note: {} as Note,
   task: {} as Task,
   contents: [] as Array<Content>,
@@ -48,12 +50,14 @@ const slice = createSlice({
         groupsEtag,
         notificationsEtag,
         ownedProjectsEtag,
-        sharedProjectsEtag
+        sharedProjectsEtag,
+        remindingTaskEtag
       } = action.payload;
       state.groupsEtag = groupsEtag;
       state.notificationsEtag = notificationsEtag;
       state.ownedProjectsEtag = ownedProjectsEtag;
       state.sharedProjectsEtag = sharedProjectsEtag;
+      state.remindingTaskEtag = remindingTaskEtag;
     },
     systemApiErrorReceived: (
       state,

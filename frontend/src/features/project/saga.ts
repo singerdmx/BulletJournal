@@ -24,6 +24,7 @@ import {
 } from '../../apis/projectApis';
 import { IState } from '../../store';
 import { Project } from './interface';
+import { actions as SystemActions } from '../system/reducer';
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
   yield call(message.error, `Project Error Received: ${action.payload.error}`);
@@ -34,12 +35,22 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
     const data = yield call(fetchProjects);
     const projects = yield data.json();
     const state = yield select();
+    const systemState = state.system;
     let ownEtag = state.project.ownedProjectsEtag;
     let shared = state.project.sharedProjectsEtag;
     if (data.headers.get('Etag')) {
       const etags = data.headers.get('Etag').split('|');
       ownEtag = etags[0];
       shared = etags[1];
+      yield put(
+        SystemActions.systemUpdateReceived({
+          groupsEtag: systemState.groupsEtag,
+          notificationsEtag: systemState.notificationsEtag,
+          ownedProjectsEtag: etags[0],
+          sharedProjectsEtag: etags[0],
+          remindingTaskEtag: systemState.remindingTaskEtag
+        })
+      )
     }
     yield put(
       projectActions.projectsReceived({
