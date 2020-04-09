@@ -25,6 +25,7 @@ import {
   deleteTaskById,
   fetchCompletedTasks,
   fetchTasks,
+  getCompletedTaskById,
   getTaskById,
   moveToTargetProject,
   putTasks,
@@ -132,6 +133,15 @@ function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
 function* getTask(action: PayloadAction<GetTask>) {
   try {
     const data = yield call(getTaskById, action.payload.taskId);
+    yield put(tasksActions.taskReceived({ task: data }));
+  } catch (error) {
+    yield call(message.error, `Get Task Error Received: ${error}`);
+  }
+}
+
+function* getCompletedTask(action: PayloadAction<GetTask>) {
+  try {
+    const data = yield call(getCompletedTaskById, action.payload.taskId);
     yield put(tasksActions.taskReceived({ task: data }));
   } catch (error) {
     yield call(message.error, `Get Task Error Received: ${error}`);
@@ -363,6 +373,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TasksCreate.type, taskCreate),
     yield takeLatest(tasksActions.TaskPut.type, taskPut),
     yield takeLatest(tasksActions.TaskGet.type, getTask),
+    yield takeLatest(tasksActions.CompletedTaskGet.type, getCompletedTask),
     yield takeLatest(tasksActions.TaskPatch.type, patchTask),
     yield takeLatest(tasksActions.TaskComplete.type, completeTask),
     yield takeLatest(tasksActions.TaskUncomplete.type, uncompleteTask),

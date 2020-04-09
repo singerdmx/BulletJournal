@@ -29,6 +29,7 @@ export const createTask = (
     timezone: timezone,
   });
 export const getTask = (taskId: number) => actions.TaskGet({ taskId: taskId });
+export const getCompletedTask = (taskId: number) => actions.CompletedTaskGet({ taskId: taskId });
 export const putTask = (projectId: number, tasks: Task[]) =>
   actions.TaskPut({ projectId: projectId, tasks: tasks });
 export const deleteTask = (taskId: number) =>

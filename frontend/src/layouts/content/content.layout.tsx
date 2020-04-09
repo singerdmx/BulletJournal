@@ -10,6 +10,7 @@ import LabelsPage from '../../pages/labels';
 import NotePage from '../../pages/note/note.pages';
 import TaskPage from '../../pages/task/task.pages';
 import TransactionPage from '../../pages/transaction/transaction.pages';
+import CompletedTaskPage from "../../pages/task/completed-task.pages";
 import { Layout } from 'antd';
 
 const { Content } = Layout;
@@ -29,6 +30,7 @@ class ContentLayout extends React.Component {
           <Route path="/labels" component={LabelsPage} />
           <Route exact path="/note/:noteId" component={NotePage} />
           <Route exact path="/task/:taskId" component={TaskPage} />
+          <Route exact path="/completedTask/:taskId" component={CompletedTaskPage} />
           <Route
             exact
             path="/transaction/:transactionId"

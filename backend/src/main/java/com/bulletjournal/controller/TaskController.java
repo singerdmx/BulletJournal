@@ -83,7 +83,7 @@ public class TaskController {
     @GetMapping(COMPLETED_TASK_ROUTE)
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.getCompletedTask(taskId, username).toPresentationModel();
+        return addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username).toPresentationModel());
     }
 
     @PostMapping(TASKS_ROUTE)

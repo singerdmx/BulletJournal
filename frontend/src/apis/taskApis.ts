@@ -18,11 +18,19 @@ export const fetchCompletedTasks = (projectId: number) => {
 };
 
 export const getTaskById = (taskId: number) => {
-  return doFetch(`/api/tasks/${taskId}`)
-    .then((res) => res.json())
-    .catch((err) => {
-      throw Error(err.message);
-    });
+    return doFetch(`/api/tasks/${taskId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+};
+
+export const getCompletedTaskById = (taskId: number) => {
+    return doFetch(`/api/completedTasks/${taskId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
 };
 
 export const deleteTaskById = (taskId: number) => {

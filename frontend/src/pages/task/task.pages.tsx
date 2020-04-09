@@ -6,13 +6,12 @@ import {connect} from 'react-redux';
 // features
 //actions
 import {deleteTask, getTask} from '../../features/tasks/actions';
-import {Task} from '../../features/tasks/interface';
 import {Label} from '../../features/label/interface';
 import {addSelectedLabel} from '../../features/label/actions';
 import {IState} from '../../store';
 // antd imports
-import {Avatar, Card, Col, Popconfirm, Statistic, Tooltip,} from 'antd';
-import {DeleteTwoTone, FileDoneOutlined, LoadingOutlined, TagOutlined, UpSquareOutlined,} from '@ant-design/icons';
+import {Avatar, Popconfirm, Tooltip,} from 'antd';
+import {DeleteTwoTone, TagOutlined, UpSquareOutlined,} from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -21,15 +20,8 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
 import {ProjectType} from '../../features/project/constants';
-import {convertToTextWithRRule} from '../../features/recurrence/actions';
-import moment from 'moment';
-import {dateFormat} from '../../features/myBuJo/constants';
 // components
-import TaskDetailPage from "./task-detail.pages";
-
-export type TaskProps = {
-    task: Task;
-};
+import TaskDetailPage, {TaskProps} from "./task-detail.pages";
 
 interface TaskPageHandler {
     getTask: (taskId: number) => void;
@@ -63,43 +55,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 
     const labelEditableHandler = () => {
         setLabelEditable((labelEditable) => !labelEditable);
-    };
-
-    const getDueDateTime = (task: Task) => {
-        if (task.recurrenceRule) {
-            return (
-                <Col span={12}>
-                    <Card>
-                        <Statistic
-                            title='Recurring'
-                            value={convertToTextWithRRule(task.recurrenceRule)}
-                            prefix={<LoadingOutlined/>}
-                        />
-                    </Card>
-                </Col>
-            );
-        }
-
-        if (!task.dueDate) {
-            return null;
-        }
-
-        let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
-        if (task.duration) {
-            dueDateTitle += `, duration ${task.duration} minutes`;
-        }
-
-        return (
-            <Col span={12}>
-                <Card>
-                    <Statistic
-                        title={`Due ${dueDateTitle}`}
-                        value={`${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
-                        prefix={<FileDoneOutlined/>}
-                    />
-                </Card>
-            </Col>
-        );
     };
 
     const taskOperation = () => {

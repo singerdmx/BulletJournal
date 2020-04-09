@@ -14,7 +14,6 @@ import {convertToTextWithRRule} from '../../features/recurrence/actions';
 import moment from 'moment';
 import {dateFormat} from '../../features/myBuJo/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
-import {TaskProps} from "./task.pages";
 // modals import
 // components
 
@@ -22,6 +21,10 @@ type TaskDetailProps = {
     labelEditable: boolean;
     taskOperation: Function;
 }
+
+export type TaskProps = {
+    task: Task;
+};
 
 const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     const {task, labelEditable, taskOperation} = props;
