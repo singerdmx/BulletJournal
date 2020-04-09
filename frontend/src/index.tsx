@@ -3,17 +3,21 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import createStore from './store';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import './index.less';
 import * as serviceWorker from './serviceWorker';
+import PublicPage from './Public';
 
 const store = createStore();
 
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
-      <App />
+      <Switch>
+        <Route path="/public" component={PublicPage} />
+        <Route path="/" component={App} />
+      </Switch>
     </BrowserRouter>
   </Provider>,
   document.getElementById('root')
@@ -25,11 +29,9 @@ ReactDOM.render(
 if (Notification.permission === 'granted') {
   serviceWorker.register();
 } else if (Notification.permission !== 'denied') {
-  Notification.requestPermission().then(permission => {
+  Notification.requestPermission().then((permission) => {
     if (permission === 'granted') {
       serviceWorker.register();
     }
   });
 }
-
-
