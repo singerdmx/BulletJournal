@@ -41,7 +41,7 @@ function* getPublicItem(action: PayloadAction<GetPublicProjectItem>) {
     const task = type === ContentType.TASK ? data.projectItem : undefined;
     yield put(systemActions.publicProjectItemReceived({
       contentType: type, contents: data.contents,
-      note: note, task: task
+      publicNote: note, publicTask: task
     }));
   } catch (error) {
     yield call(message.error, `getPublicItem Received: ${error}`);
