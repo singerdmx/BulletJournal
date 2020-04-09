@@ -88,7 +88,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
                 <LinkOutlined style={{ cursor: 'pointer' }} />
               </CopyToClipboard>
             </Tooltip>
-            <Link title={l.link} to={`/api/public/items/${l.link}`}>
+            <Link title={l.link} to={`/public/items/${l.link}`}>
               {' '}
               {`${window.location.origin.toString()}/public/items/${
                 l.link

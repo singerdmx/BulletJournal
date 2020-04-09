@@ -15,7 +15,7 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <Switch>
-        <Route path="/public" component={PublicPage} />
+        <Route path="/public/items/:itemId" component={PublicPage} />
         <Route path="/" component={App} />
       </Switch>
     </BrowserRouter>
