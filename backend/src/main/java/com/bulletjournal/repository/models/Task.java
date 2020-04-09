@@ -24,6 +24,9 @@ public class Task extends TaskModel {
     )
     private Long id;
 
+    @Column(name = "completed_slots", columnDefinition = "TEXT")
+    private String completedSlots;
+
     @Override
     public Long getId() {
         return id;
@@ -41,5 +44,13 @@ public class Task extends TaskModel {
     @Override
     public ContentType getContentType() {
         return ContentType.TASK;
+    }
+
+    public String getCompletedSlots() {
+        return completedSlots;
+    }
+
+    public void setCompletedSlots(String completedSlots) {
+        this.completedSlots = completedSlots;
     }
 }
