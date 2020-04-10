@@ -53,12 +53,6 @@ public class TransactionControllerTest {
 
     @Test
     public void testGetTransactions() throws Exception {
-        // Get Groups => use first group
-        // Create Project
-        // Create Transactions
-        // Get Transactions
-
-
         Group group = createGroup();
         List<String> users = new ArrayList<>();
         users.add("BulletJournal");
@@ -71,16 +65,11 @@ public class TransactionControllerTest {
         }
 
         Project p1 = createProject("p_Ledger_transaction", group, ProjectType.LEDGER);
-        // add more users to projects
-        // create transactions in same months
-        // TransactionType : 0 : income : 1 : expense
         Transaction t1 = createTransaction(p1, "T1", "2019-12-01", "BulletJournal", 1000.0, 0);
         Transaction t2 = createTransaction(p1, "T2", "2019-12-13", "Thinker", 500.0, 1);
         Transaction t3 = createTransaction(p1, "T3", "2019-12-15", "ccc", 300.0, 0);
         Transaction t4 = createTransaction(p1, "T4", "2019-12-22", "Joker", 200.0, 1);
         Transaction t5 = createTransaction(p1, "T5", "2019-12-28", "ccc", 100.0, 0);
-
-        // Bu Jo Thin cc
 
         // Get transactions by payer
         String url = UriComponentsBuilder.fromHttpUrl(
@@ -96,8 +85,6 @@ public class TransactionControllerTest {
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, USER),
                 LedgerSummary.class);
-
-        // transactions was passed into getTransaction reverse date order
         List<Transaction> transactions = transactionsResponse.getBody().getTransactions();
         LedgerSummary summary = transactionsResponse.getBody();
         List<TransactionsSummary> transactionsSummaries = summary.getTransactionsSummaries();
@@ -108,7 +95,6 @@ public class TransactionControllerTest {
         assertEquals(Double.valueOf("-500.0"), transactionsSummaries.get(2).getBalance());
         assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71.43) < 1e-4);
         assertEquals(Double.valueOf("-200.0"), transactionsSummaries.get(1).getBalance());
-
 
         List<Label> label = createLabels();
         // labels set is in reverse order ?
@@ -130,8 +116,6 @@ public class TransactionControllerTest {
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, USER),
                 LedgerSummary.class);
-
-        transactions = transactionsResponse.getBody().getTransactions();
         summary = transactionsResponse.getBody();
         transactionsSummaries = summary.getTransactionsSummaries();
         assertEquals(5, summary.getTransactions().size());
@@ -142,7 +126,6 @@ public class TransactionControllerTest {
         assertTrue(Math.abs(transactionsSummaries.get(0).getExpensePercentage() - 71.43) < 1e-4);
 
         // get transactions default (MONTHLY)
-        // wat bout different year same month?
         Transaction t6 = createTransaction(p1, "T6", "2019-11-28", "BulletJournal", 250.0, 1);
         Transaction t7 = createTransaction(p1, "T7", "2019-10-28", "999999", 700.0, 0);
         Transaction t8 = createTransaction(p1, "T8", "2019-09-28", "mqm", 300.0, 1);
@@ -163,8 +146,6 @@ public class TransactionControllerTest {
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, USER),
                 LedgerSummary.class);
-
-        transactions = transactionsResponse.getBody().getTransactions();
         summary = transactionsResponse.getBody();
         transactionsSummaries = summary.getTransactionsSummaries();
         assertTrue(Math.abs(summary.getBalance() - 550.0) < 1e-4);
@@ -177,7 +158,49 @@ public class TransactionControllerTest {
         assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 16.67) < 1e-4);
         assertEquals((Double) 0.0, transactionsSummaries.get(0).getExpensePercentage());
 
+        // get transactions by default, yearly
 
+        url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.YEARLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
+                .queryParam("startDate", "2018-09-01")
+                .queryParam("endDate", "2019-09-30")
+                .buildAndExpand(p1.getId()).toUriString();
+        transactionsResponse = this.restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                LedgerSummary.class);
+        summary = transactionsResponse.getBody();
+        transactionsSummaries = summary.getTransactionsSummaries();
+        assertEquals(4, summary.getTransactions().size());
+        assertEquals("2018", transactionsSummaries.get(0).getName());
+        assertEquals(Double.valueOf("-400.0"), transactionsSummaries.get(1).getBalance());
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 100.0) < 1e-4);
+
+        // get transactions by default, weekly
+        url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.WEEKLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
+                .queryParam("startDate", "2019-12-01")
+                .queryParam("endDate", "2019-12-30")
+                .buildAndExpand(p1.getId()).toUriString();
+        transactionsResponse = this.restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                LedgerSummary.class);
+        summary = transactionsResponse.getBody();
+        transactionsSummaries = summary.getTransactionsSummaries();
+        assertEquals(5, summary.getTransactions().size());
+        assertEquals("2019 DECEMBER Week 1", transactionsSummaries.get(0).getName());
+        assertEquals("2019 DECEMBER Week 4", transactionsSummaries.get(3).getName());
+        assertEquals(Double.valueOf("-100.0"), transactionsSummaries.get(3).getBalance());
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71.43) < 1e-4);
     }
 
     private Group createGroup() {

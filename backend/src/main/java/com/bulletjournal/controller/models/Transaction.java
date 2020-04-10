@@ -6,9 +6,13 @@ import com.bulletjournal.repository.models.Project;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Month;
-import java.util.List;
-import java.util.Objects;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Transaction extends ProjectItem {
     @NotBlank
@@ -126,6 +130,43 @@ public class Transaction extends ProjectItem {
         String y = this.date.substring(0, 4);
         String month = Month.of(Integer.parseInt(m)).name();
         return y + " " + month;
+    }
+
+    public List<String> getWeek() {
+        List<String> weekInfo = new ArrayList<>();
+
+        // month year weekNum
+        String year = date.substring(0, 4);
+        String month = date.substring(5, 7);
+
+        String oraceDt = date + " 00:00:00.0";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+//        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(oraceDt, formatter.withZone(ZoneId.of(timezone)));
+        Calendar cal = GregorianCalendar.from(zonedDateTime);
+        cal.setFirstDayOfWeek(Calendar.SUNDAY);
+
+        int weekNumber = cal.get(Calendar.WEEK_OF_MONTH);
+
+        String m = Month.of(Integer.parseInt(month)).name();
+        weekInfo.add(year + " " + m + " Week " + weekNumber);
+
+
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String startDate = df.format(cal.getTime());
+
+        cal.add(Calendar.DATE, 6);
+
+
+        String endDate = df.format(cal.getTime());
+
+        weekInfo.add(startDate + " " + endDate);
+
+        return weekInfo;
+
+
     }
 
     @Override
