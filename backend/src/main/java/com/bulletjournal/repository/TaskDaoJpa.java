@@ -450,20 +450,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 requester, ContentType.TASK,
                 Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
 
-        if (dateTime != null) {
-            return completeSingleRecurringTask(task, dateTime);
-        }
-
         // clone its contents
         String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
                 .stream().collect(Collectors.toList()));
+
+        if (dateTime != null) {
+            return completeSingleRecurringTask(task, dateTime, contents);
+        }
 
         deleteTaskAndAdjustRelations(
                 requester, task,
                 (targetTasks) -> {
                     targetTasks.forEach(t -> {
                         if (!t.getId().equals(task.getId())) {
-                            this.completedTaskRepository.save(new CompletedTask(t));
+                            this.completedTaskRepository.save(
+                                    new CompletedTask(t,
+                                            GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(t)
+                                            .stream().collect(Collectors.toList()))));
                         }
                     });
                     this.taskRepository.deleteAll(targetTasks);
@@ -471,8 +474,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 (target) -> {
                 });
 
-        CompletedTask completedTask = new CompletedTask(task);
-        completedTask.setContents(contents);
+        CompletedTask completedTask = new CompletedTask(task, contents);
         this.completedTaskRepository.save(completedTask);
         return completedTask;
     }
@@ -485,7 +487,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return CompletedTask
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CompletedTask completeSingleRecurringTask(Task task, String dateTimeStr) {
+    public CompletedTask completeSingleRecurringTask(Task task, String dateTimeStr, String contents) {
         Set<DateTime> completedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(task.getCompletedSlots());
         String timezone = task.getTimezone();
         DateTime dateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateTime(dateTimeStr, timezone));
@@ -499,14 +501,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 dateTime.toString() : task.getCompletedSlots() + "," + dateTime.toString());
         this.taskRepository.save(task);
 
-        CompletedTask completedTask = new CompletedTask(task);
+        CompletedTask completedTask = new CompletedTask(task, contents);
+        completedTask.setRecurrenceRule(null);
         completedTask.setDueDate(ZonedDateTimeHelper.getDate(dateTime));
         completedTask.setDueTime(ZonedDateTimeHelper.getTime(dateTime));
-
-        // clone its contents
-        String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
-                .stream().collect(Collectors.toList()));
-        completedTask.setContents(contents);
 
         this.completedTaskRepository.save(completedTask);
         return completedTask;
