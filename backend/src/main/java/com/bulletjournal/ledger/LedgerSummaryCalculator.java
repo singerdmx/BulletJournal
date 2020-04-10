@@ -6,6 +6,7 @@ import com.bulletjournal.controller.models.TransactionsSummary;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import org.springframework.stereotype.Component;
 
+
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -32,9 +33,7 @@ public class LedgerSummaryCalculator {
 
                 switch (frequencyType) {
                     case MONTHLY:
-
                         transactionsSummariesComparator = TransactionsSummary::getMetadata;
-
                         processTransaction(transactions, total, (t -> {
                             double amount = t.getAmount();
                             Transactions tran = m.computeIfAbsent(t.getReadableYearMonth(), k -> new Transactions());
@@ -50,8 +49,40 @@ public class LedgerSummaryCalculator {
                         }));
                         break;
                     case YEARLY:
+                        transactionsSummariesComparator = TransactionsSummary::getMetadata;
+                        processTransaction(transactions, total, (t -> {
+                            double amount = t.getAmount();
+                            String year = t.getDate().substring(0, 4);
+                            Transactions tran = m.computeIfAbsent(year, k -> new Transactions());
+                            tran.setMeta(year);
+                            switch (TransactionType.getType(t.getTransactionType())) {
+                                case INCOME:
+                                    tran.addIncome(amount);
+                                    break;
+                                case EXPENSE:
+                                    tran.addExpense(amount);
+                                    break;
+                            }
+                        }));
                         break;
                     case WEEKLY:
+                        transactionsSummariesComparator = TransactionsSummary::getMetadata;
+                        processTransaction(transactions, total, (t -> {
+                            double amount = t.getAmount();
+                            List<String> weekInfo = t.getWeek();
+
+                            Transactions tran = m.computeIfAbsent(weekInfo.get(0), k -> new Transactions());
+
+                            tran.setMeta(weekInfo.get(1));
+                            switch (TransactionType.getType(t.getTransactionType())) {
+                                case INCOME:
+                                    tran.addIncome(amount);
+                                    break;
+                                case EXPENSE:
+                                    tran.addExpense(amount);
+                                    break;
+                            }
+                        }));
                         break;
                 }
 
