@@ -360,11 +360,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String time = updateTaskParams.getDueTime();
         String timezone = updateTaskParams.getTimezone();
 
-        task.setDueDate(date);
-        task.setDueTime(time);
-        task.setTimezone(timezone);
-        task.setRecurrenceRule(updateTaskParams.getRecurrenceRule());
-        task.setDuration(updateTaskParams.getDuration());
+        DaoHelper.updateIfPresent(updateTaskParams.hasDueDate(), date, task::setDueDate);
+        DaoHelper.updateIfPresent(updateTaskParams.hasDueTime(), time, task::setDueTime);
+        DaoHelper.updateIfPresent(updateTaskParams.hasTimezone(), timezone, task::setTimezone);
+        DaoHelper.updateIfPresent(updateTaskParams.hasRecurrenceRule(), updateTaskParams.getRecurrenceRule(), task::setRecurrenceRule);
+        DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(), task::setDuration);
+
+        if (updateTaskParams.hasTimezone()) {
+            updateCompletedSlotsWithTimezone(task, timezone);
+        }
 
         if (updateTaskParams.hasDueDate()) {
             task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
@@ -382,6 +386,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 task::setReminderSetting);
 
         return this.taskRepository.save(task);
+    }
+
+    /**
+     * @param task     the target task to be updated
+     * @param timezone the timezone
+     * @return Task
+     */
+    private Task updateCompletedSlotsWithTimezone(Task task, String timezone) {
+        List<DateTime> completedSlots = ZonedDateTimeHelper.parseDateTimeList(task.getCompletedSlots());
+        StringBuilder sb = new StringBuilder();
+        for (DateTime completedSlot : completedSlots) {
+            TimeZone convertedTimezone = TimeZone.getTimeZone(timezone);
+            DateTime shiftedDateTime = completedSlot.shiftTimeZone(convertedTimezone);
+            sb.append(shiftedDateTime.toString());
+        }
+        task.setCompletedSlots(sb.toString());
+        return task;
     }
 
     /**
