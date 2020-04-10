@@ -83,6 +83,7 @@ export type PatchTask = {
 
 export type CompleteTask = {
   taskId: number;
+  dateTime?: string;
 };
 
 export type UncompleteTask = {

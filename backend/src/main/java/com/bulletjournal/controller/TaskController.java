@@ -116,14 +116,9 @@ public class TaskController {
 
     @PostMapping(COMPLETE_TASK_ROUTE)
     public Task completeTask(@NotNull @PathVariable Long taskId,
-                             @RequestBody Optional<String> dateTimeOptional) {
+                             @RequestBody Optional<String> dateTime) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        String dateTime = null;
-        if (dateTimeOptional.isPresent()) {
-            dateTime = dateTimeOptional.get();
-        }
-
-        CompletedTask task = this.taskDaoJpa.complete(username, taskId, dateTime);
+        CompletedTask task = this.taskDaoJpa.complete(username, taskId, dateTime.orElse(null));
         return getCompletedTask(task.getId());
     }
 

@@ -75,7 +75,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
           </div>
           <Divider />
           <div>
-            <ProjectModelItems projectItems={this.props.projectItems}/>
+            <ProjectModelItems projectItems={this.props.projectItems} completeOnyOccurrence={true}/>
           </div>
         </div>
     );

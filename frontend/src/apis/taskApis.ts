@@ -112,8 +112,14 @@ export const updateTask = (
     });
 };
 
-export const completeTaskById = (taskId: number) => {
-  return doPost(`/api/tasks/${taskId}/complete`)
+export const completeTaskById = (taskId: number, dateTime?: string) => {
+  let postBody = undefined;
+  if (dateTime) {
+    postBody = JSON.stringify({
+      dateTime: dateTime
+    });
+  }
+  return doPost(`/api/tasks/${taskId}/complete`, postBody)
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err);

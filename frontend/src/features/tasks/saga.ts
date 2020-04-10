@@ -204,8 +204,8 @@ function* patchTask(action: PayloadAction<PatchTask>) {
 
 function* completeTask(action: PayloadAction<CompleteTask>) {
   try {
-    const { taskId } = action.payload;
-    const task = yield call(completeTaskById, taskId);
+    const { taskId, dateTime } = action.payload;
+    const task = yield call(completeTaskById, taskId, dateTime);
     const tasks = yield call(fetchTasks, task.projectId);
     yield put(
       tasksActions.tasksReceived({

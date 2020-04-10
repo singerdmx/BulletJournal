@@ -11,9 +11,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 public class ZonedDateTimeHelper {
 
@@ -236,7 +234,7 @@ public class ZonedDateTimeHelper {
      * Parse DateTime set string to a set of DateTime
      *
      * @param string the string of the completed slots list. Each slot is splitted by comma.
-     *               *        Format: slot1,slot2,slot3
+     *               Format: slot1,slot2,slot3
      * @return Set<DateTime> - a set of Date Time
      */
     public static Set<DateTime> parseDateTimeSet(String string) {
@@ -248,6 +246,23 @@ public class ZonedDateTimeHelper {
         }
         return targetSet;
     }
+
+    /**
+     * Parse DateTime set string to a set of DateTime
+     * @param string the string of the completed slots list. Each slot is splitted by comma.
+     *              Format: slot1,slot2,slot3
+     * @return List<DateTime> - a list of Date Time
+     */
+    public static List<DateTime> parseDateTimeList(String string) {
+        List<DateTime> targetList = new ArrayList<>();
+        if (StringUtils.isNoneEmpty(string) || StringUtils.isEmpty(string))
+            return targetList;
+        for(String s : string.split(",")) {
+            targetList.add(DateTime.parse(s));
+        }
+        return targetList;
+    }
+
 
     /**
      * 1. Get now ZonedDateTime.
