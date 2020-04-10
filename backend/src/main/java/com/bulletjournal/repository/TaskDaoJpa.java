@@ -243,7 +243,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             try {
                 String recurrenceRule = t.getRecurrenceRule();
                 String timezone = t.getTimezone();
-                Set<DateTime> completedSlots = ZonedDateTimeHelper.parseDateTimeSet(t.getCompletedSlots());
+                Set<String> completedSlots = ZonedDateTimeHelper.parseDateTimeSet(t.getCompletedSlots());
                 BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
                 RecurrenceRuleIterator it = rule.getIterator();
                 while (it.hasNext()) {
@@ -251,7 +251,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                     if (currDateTime.after(endDateTime)) {
                         break;
                     }
-                    if (currDateTime.before(startDateTime) || completedSlots.contains(currDateTime)) {
+                    if (currDateTime.before(startDateTime) || completedSlots.contains(currDateTime.toString())) {
                         continue;
                     }
                     Task cloned = (Task) t.clone();
@@ -389,11 +389,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
+     * Update completed slots with target timezone
+     *
      * @param task     the target task to be updated
      * @param timezone the timezone
-     * @return Task
      */
-    private Task updateCompletedSlotsWithTimezone(Task task, String timezone) {
+    private void updateCompletedSlotsWithTimezone(Task task, String timezone) {
         List<DateTime> completedSlots = ZonedDateTimeHelper.parseDateTimeList(task.getCompletedSlots());
         StringBuilder sb = new StringBuilder();
         for (DateTime completedSlot : completedSlots) {
@@ -402,7 +403,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             sb.append(shiftedDateTime.toString());
         }
         task.setCompletedSlots(sb.toString());
-        return task;
     }
 
     /**
@@ -450,20 +450,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 requester, ContentType.TASK,
                 Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
 
-        if (dateTime != null) {
-            return completeSingleRecurringTask(task, dateTime);
-        }
-
         // clone its contents
         String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
                 .stream().collect(Collectors.toList()));
+
+        if (dateTime != null) {
+            return completeSingleRecurringTask(task, dateTime, contents);
+        }
 
         deleteTaskAndAdjustRelations(
                 requester, task,
                 (targetTasks) -> {
                     targetTasks.forEach(t -> {
                         if (!t.getId().equals(task.getId())) {
-                            this.completedTaskRepository.save(new CompletedTask(t));
+                            this.completedTaskRepository.save(
+                                    new CompletedTask(t,
+                                            GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(t)
+                                                    .stream().collect(Collectors.toList()))));
                         }
                     });
                     this.taskRepository.deleteAll(targetTasks);
@@ -471,8 +474,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 (target) -> {
                 });
 
-        CompletedTask completedTask = new CompletedTask(task);
-        completedTask.setContents(contents);
+        CompletedTask completedTask = new CompletedTask(task, contents);
         this.completedTaskRepository.save(completedTask);
         return completedTask;
     }
@@ -480,32 +482,29 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Complete the recurring task of target date time
      *
-     * @param task     the recurring task
-     * @param dateTime the date time of the task completed
+     * @param task        the recurring task
+     * @param dateTimeStr the date time of the task completed
      * @return CompletedTask
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CompletedTask completeSingleRecurringTask(Task task, String dateTimeStr) {
-        Set<DateTime> completedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(task.getCompletedSlots());
+    public CompletedTask completeSingleRecurringTask(Task task, String dateTimeStr, String contents) {
+        Set<String> completedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(task.getCompletedSlots());
         String timezone = task.getTimezone();
         DateTime dateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateTime(dateTimeStr, timezone));
 
-        if (completedSlotsSet.contains(dateTime)) {
+        if (completedSlotsSet.contains(dateTime.toString())) {
             throw new IllegalArgumentException("Duplicated task completed");
         }
 
         // Added target date time to the recurring task's completed slots
-        task.setCompletedSlots(task.getCompletedSlots() + "," + dateTime.toString());
+        task.setCompletedSlots(task.getCompletedSlots() == null ?
+                dateTime.toString() : task.getCompletedSlots() + "," + dateTime.toString());
         this.taskRepository.save(task);
 
-        CompletedTask completedTask = new CompletedTask(task);
+        CompletedTask completedTask = new CompletedTask(task, contents);
+        completedTask.setRecurrenceRule(null);
         completedTask.setDueDate(ZonedDateTimeHelper.getDate(dateTime));
         completedTask.setDueTime(ZonedDateTimeHelper.getTime(dateTime));
-
-        // clone its contents
-        String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
-                .stream().collect(Collectors.toList()));
-        completedTask.setContents(contents);
 
         this.completedTaskRepository.save(completedTask);
         return completedTask;

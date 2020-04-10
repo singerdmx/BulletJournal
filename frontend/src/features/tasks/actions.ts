@@ -58,8 +58,8 @@ export const patchTask = (
     reminderSetting: reminderSetting,
     recurrenceRule: recurrenceRule,
   });
-export const completeTask = (taskId: number) =>
-  actions.TaskComplete({ taskId: taskId });
+export const completeTask = (taskId: number, dateTime?: string) =>
+  actions.TaskComplete({ taskId: taskId, dateTime: dateTime });
 export const uncompleteTask = (taskId: number) =>
   actions.TaskUncomplete({ taskId: taskId });
 export const setTaskLabels = (taskId: number, labels: number[]) =>

@@ -5,7 +5,8 @@ import {
   actions as projectItemsActions,
   ApiErrorAction,
   GetProjectItemsAction,
-  GetProjectItemsAfterUpdateSelectAction
+  GetProjectItemsAfterUpdateSelectAction,
+  MyBuJo,
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -35,7 +36,9 @@ function* getProjectItems(action: PayloadAction<GetProjectItemsAction>) {
 
     data = yield call(fetchProjectItems, types, timezone, startDate, endDate);
     if (category === 'calendar') {
-      yield put(projectItemsActions.projectItemsForCalenderReceived({ items: data }));
+      yield put(
+        projectItemsActions.projectItemsForCalenderReceived({ items: data })
+      );
     } else {
       yield put(projectItemsActions.projectItemsReceived({ items: data }));
     }
@@ -48,16 +51,12 @@ function* getProjectItemsAfterUpdateSelect(
   action: PayloadAction<GetProjectItemsAfterUpdateSelectAction>
 ) {
   try {
-    const {
-      todoSelected,
-      ledgerSelected,
-      category
-    } = action.payload;
+    const { todoSelected, ledgerSelected, category } = action.payload;
 
     yield put(
       projectItemsActions.updateSelected({
         todoSelected: todoSelected,
-        ledgerSelected: ledgerSelected
+        ledgerSelected: ledgerSelected,
       })
     );
 
@@ -70,23 +69,65 @@ function* getProjectItemsAfterUpdateSelect(
 
     if (category === 'calendar') {
       if (state.myBuJo.calendarMode === 'month') {
-        data = yield call(fetchProjectItems, types, state.myself.timezone,
-          moment(state.myBuJo.selectedCalendarDay).add(-60, 'days').format(dateFormat),
-          moment(state.myBuJo.selectedCalendarDay).add(60, 'days').format(dateFormat));
-      } else { // calendarMode is 'year'
+        data = yield call(
+          fetchProjectItems,
+          types,
+          state.myself.timezone,
+          moment(state.myBuJo.selectedCalendarDay)
+            .add(-60, 'days')
+            .format(dateFormat),
+          moment(state.myBuJo.selectedCalendarDay)
+            .add(60, 'days')
+            .format(dateFormat)
+        );
+      } else {
+        // calendarMode is 'year'
         const year = state.myBuJo.selectedCalendarDay.substring(0, 4);
-        data = yield call(fetchProjectItems, types, state.myself.timezone,
+        data = yield call(
+          fetchProjectItems,
+          types,
+          state.myself.timezone,
           year + '-01-01',
-          year + '-12-31');
+          year + '-12-31'
+        );
       }
-      yield put(projectItemsActions.projectItemsForCalenderReceived({ items: data }));
+      yield put(
+        projectItemsActions.projectItemsForCalenderReceived({ items: data })
+      );
     } else {
-      data = yield call(fetchProjectItems, types, state.myself.timezone,
-        state.myBuJo.startDate, state.myBuJo.endDate);
+      data = yield call(
+        fetchProjectItems,
+        types,
+        state.myself.timezone,
+        state.myBuJo.startDate,
+        state.myBuJo.endDate
+      );
       yield put(projectItemsActions.projectItemsReceived({ items: data }));
     }
   } catch (error) {
     yield call(message.error, `Get ProjectItems Error Received: ${error}`);
+  }
+}
+
+function* updateMyBuJoDates(action: PayloadAction<MyBuJo>) {
+  try {
+    const { startDate, endDate } = action.payload;
+
+    const state: IState = yield select();
+    const timezone = state.myself.timezone;
+
+    let types = [] as ProjectType[];
+    if (state.myBuJo.ledgerSelected) types.push(ProjectType.LEDGER);
+    if (state.myBuJo.todoSelected) types.push(ProjectType.TODO);
+
+    let data = [];
+    if (!startDate || !endDate) return;
+
+    data = yield call(fetchProjectItems, types, timezone, startDate, endDate);
+
+    yield put(projectItemsActions.projectItemsReceived({ items: data }));
+  } catch (error) {
+    yield call(message.error, `update Date Saga Error Received: ${error}`);
   }
 }
 
@@ -100,6 +141,11 @@ export default function* myBuJoSagas() {
     yield takeLatest(
       projectItemsActions.getProjectItemsAfterUpdateSelect.type,
       getProjectItemsAfterUpdateSelect
-    )
+    ),
+    yield takeLatest(
+      projectItemsActions.getProjectItemsAfterUpdateSelect.type,
+      getProjectItemsAfterUpdateSelect
+    ),
+    yield takeLatest(projectItemsActions.datesReceived.type, updateMyBuJoDates),
   ]);
 }

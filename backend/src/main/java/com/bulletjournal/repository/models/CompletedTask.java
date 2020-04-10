@@ -25,7 +25,7 @@ public class CompletedTask extends TaskModel {
     public CompletedTask() {
     }
 
-    public CompletedTask(Task task) {
+    public CompletedTask(Task task, String contents) {
         this.setName(task.getName());
         this.setOwner(task.getOwner());
         this.setProject(task.getProject());
@@ -43,6 +43,8 @@ public class CompletedTask extends TaskModel {
         this.setCreatedAt(task.getCreatedAt());
         this.setUpdatedAt(task.getUpdatedAt());
         this.setLabels(task.getLabels());
+        this.setRecurrenceRule(task.getRecurrenceRule());
+        this.setContents(contents);
     }
 
     @Override

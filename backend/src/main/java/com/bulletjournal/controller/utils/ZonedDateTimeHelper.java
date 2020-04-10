@@ -235,29 +235,29 @@ public class ZonedDateTimeHelper {
      *
      * @param string the string of the completed slots list. Each slot is splitted by comma.
      *               Format: slot1,slot2,slot3
-     * @return Set<DateTime> - a set of Date Time
+     * @return Set<String> - a set of Date Time
      */
-    public static Set<DateTime> parseDateTimeSet(String string) {
-        Set<DateTime> targetSet = new HashSet<>();
-        if (StringUtils.isNoneEmpty(string) || StringUtils.isEmpty(string))
+    public static Set<String> parseDateTimeSet(String string) {
+        Set<String> targetSet = new HashSet<>();
+        if (StringUtils.isBlank(string)) {
             return targetSet;
-        for (String s : string.split(",")) {
-            targetSet.add(DateTime.parse(s));
         }
+        targetSet.addAll(Arrays.asList(string.split(",")));
         return targetSet;
     }
 
     /**
      * Parse DateTime set string to a set of DateTime
+     *
      * @param string the string of the completed slots list. Each slot is splitted by comma.
-     *              Format: slot1,slot2,slot3
-     * @return List<DateTime> - a list of Date Time
+     *               Format: slot1,slot2,slot3
+     * @return List<String> - a list of Date Time
      */
     public static List<DateTime> parseDateTimeList(String string) {
         List<DateTime> targetList = new ArrayList<>();
         if (StringUtils.isNoneEmpty(string) || StringUtils.isEmpty(string))
             return targetList;
-        for(String s : string.split(",")) {
+        for (String s : string.split(",")) {
             targetList.add(DateTime.parse(s));
         }
         return targetList;

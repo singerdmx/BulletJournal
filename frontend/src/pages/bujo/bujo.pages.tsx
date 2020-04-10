@@ -3,7 +3,11 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import ProjectItemList from '../../components/project-item-list/project-item-list.component';
 import BujoCalendar from '../../components/bujo-calendar/bujo-calendar.component';
-import { AccountBookOutlined, CarryOutOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  AccountBookOutlined,
+  CarryOutOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import { IState } from '../../store/index';
 import { Project } from '../../features/project/interface';
 import AddProject from '../../components/modals/add-project.component';
@@ -13,7 +17,7 @@ import { Checkbox, Tooltip } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import {
   getProjectItemsAfterUpdateSelect,
-  getProjectItems
+  getProjectItems,
 } from '../../features/myBuJo/actions';
 
 import './bujo.styles.less';
@@ -57,7 +61,7 @@ class BujoPage extends React.Component<
   todoState
 > {
   state: todoState = {
-    showForm: false
+    showForm: false,
   };
 
   handleOnChange = (type: string, category: string) => {
@@ -78,9 +82,9 @@ class BujoPage extends React.Component<
   refresh = (category: string) => {
     let { ledgerSelected, todoSelected } = this.props;
     this.props.getProjectItemsAfterUpdateSelect(
-        todoSelected,
-        ledgerSelected,
-        category
+      todoSelected,
+      ledgerSelected,
+      category
     );
   };
 
@@ -90,7 +94,9 @@ class BujoPage extends React.Component<
     if (this.props.ownedProjects.length === 0) {
       plusIcon = <AddProject history={this.props.history} mode={'MyBuJo'} />;
     } else {
-      plusIcon = <AddProjectItem history={this.props.history} mode={'MyBuJo'} />;
+      plusIcon = (
+        <AddProjectItem history={this.props.history} mode={'MyBuJo'} />
+      );
     }
     return (
       <div className='todo'>
@@ -99,7 +105,7 @@ class BujoPage extends React.Component<
             <Checkbox
               checked={this.props.todoSelected}
               value='todo'
-              onChange={e => this.handleOnChange(e.target.value, category)}
+              onChange={(e) => this.handleOnChange(e.target.value, category)}
             >
               <Tooltip placement='top' title='TODO'>
                 <CarryOutOutlined />
@@ -108,14 +114,17 @@ class BujoPage extends React.Component<
             <Checkbox
               checked={this.props.ledgerSelected}
               value='ledger'
-              onChange={e => this.handleOnChange(e.target.value, category)}
+              onChange={(e) => this.handleOnChange(e.target.value, category)}
             >
               <Tooltip placement='top' title='LEDGER'>
                 <AccountBookOutlined />
               </Tooltip>
             </Checkbox>
             <Tooltip title='Refresh'>
-              <SyncOutlined className='refreshButton' onClick={e => this.refresh(category)}/>
+              <SyncOutlined
+                className='refreshButton'
+                onClick={(e) => this.refresh(category)}
+              />
             </Tooltip>
           </div>
 
@@ -134,10 +143,10 @@ const mapStateToProps = (state: IState) => ({
   ledgerSelected: state.myBuJo.ledgerSelected,
   timezone: state.myself.timezone,
   startDate: state.myBuJo.startDate,
-  endDate: state.myBuJo.endDate
+  endDate: state.myBuJo.endDate,
 });
 
 export default connect(mapStateToProps, {
   getProjectItemsAfterUpdateSelect,
-  getProjectItems
+  getProjectItems,
 })(withRouter(BujoPage));

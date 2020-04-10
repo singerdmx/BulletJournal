@@ -36,7 +36,7 @@ type TaskProps = {
   task: Task;
   isComplete: boolean;
   completeOnyOccurrence: boolean;
-  completeTask: (taskId: number) => void;
+  completeTask: (taskId: number, dateTime?: string) => void;
   uncompleteTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
   deleteCompletedTask: (taskId: number) => void;
@@ -81,6 +81,7 @@ const ManageTask: React.FC<TaskProps> = (props) => {
 
   const handleCompleteTaskClick = () => {
     if (completeOnyOccurrence) {
+      completeTask(task.id, task.dueDate + ' ' + task.dueTime);
     } else {
       completeTask(task.id);
     }
