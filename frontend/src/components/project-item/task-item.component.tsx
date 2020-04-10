@@ -19,7 +19,6 @@ import {
 } from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import { icons } from '../../assets/icons';
 import { stringToRGB } from '../../features/label/interface';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
@@ -36,6 +35,7 @@ type ProjectProps = {
 type TaskProps = {
   task: Task;
   isComplete: boolean;
+  completeOnyOccurrence: boolean;
   completeTask: (taskId: number) => void;
   uncompleteTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
@@ -46,6 +46,7 @@ const ManageTask: React.FC<TaskProps> = (props) => {
   const {
     task,
     isComplete,
+    completeOnyOccurrence,
     completeTask,
     uncompleteTask,
     deleteTask,
@@ -78,6 +79,13 @@ const ManageTask: React.FC<TaskProps> = (props) => {
     );
   }
 
+  const handleCompleteTaskClick = () => {
+    if (completeOnyOccurrence) {
+    } else {
+      completeTask(task.id);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <EditTask task={task} mode="div" />
@@ -92,7 +100,7 @@ const ManageTask: React.FC<TaskProps> = (props) => {
         mode="div"
       />
       <div
-        onClick={() => completeTask(task.id)}
+        onClick={() => handleCompleteTaskClick()}
         className="popover-control-item"
       >
         <span>Complete</span>
@@ -157,6 +165,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
           <ManageTask
             task={task}
             isComplete={isComplete}
+            completeOnyOccurrence={completeOnyOccurrence}
             completeTask={completeTask}
             uncompleteTask={uncompleteTask}
             deleteTask={deleteTask}
@@ -176,6 +185,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
   const {
     task,
     isComplete,
+    completeOnyOccurrence,
     completeTask,
     uncompleteTask,
     deleteTask,

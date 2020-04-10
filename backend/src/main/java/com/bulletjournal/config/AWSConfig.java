@@ -37,10 +37,10 @@ public class AWSConfig {
     }
 
     public String getAwsSecretKey() {
-        return System.getenv(SECRET_KEY) == null ? "" : System.getenv(SECRET_KEY);
+        return "APD5bxDbNs9nYX/E7pOwlo2kqP78hlRgei+pOtqs";
     }
 
     public String getAWSAccessKey() {
-        return System.getenv(ACCESS_KEY) == null ? "" : System.getenv(ACCESS_KEY);
+        return "AKIASJN5WBAHS73NDBO3";
     }
 }
