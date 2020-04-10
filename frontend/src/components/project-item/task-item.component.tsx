@@ -81,6 +81,7 @@ const ManageTask: React.FC<TaskProps> = (props) => {
 
   const handleCompleteTaskClick = () => {
     if (completeOnyOccurrence) {
+      completeTask(task.id, task.dueDate + ' ' + task.dueTime);
     } else {
       completeTask(task.id);
     }

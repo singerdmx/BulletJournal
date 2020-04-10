@@ -495,7 +495,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
 
         // Added target date time to the recurring task's completed slots
-        task.setCompletedSlots(task.getCompletedSlots() + "," + dateTime.toString());
+        task.setCompletedSlots(task.getCompletedSlots() == null ?
+                dateTime.toString() : task.getCompletedSlots() + "," + dateTime.toString());
         this.taskRepository.save(task);
 
         CompletedTask completedTask = new CompletedTask(task);

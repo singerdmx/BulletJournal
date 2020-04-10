@@ -239,8 +239,9 @@ public class ZonedDateTimeHelper {
      */
     public static Set<DateTime> parseDateTimeSet(String string) {
         Set<DateTime> targetSet = new HashSet<>();
-        if (StringUtils.isNoneEmpty(string) || StringUtils.isEmpty(string))
+        if (StringUtils.isBlank(string)) {
             return targetSet;
+        }
         for (String s : string.split(",")) {
             targetSet.add(DateTime.parse(s));
         }

@@ -113,13 +113,7 @@ export const updateTask = (
 };
 
 export const completeTaskById = (taskId: number, dateTime?: string) => {
-  let postBody = undefined;
-  if (dateTime) {
-    postBody = JSON.stringify({
-      dateTime: dateTime
-    });
-  }
-  return doPost(`/api/tasks/${taskId}/complete`, postBody)
+  return doPost(`/api/tasks/${taskId}/complete`, dateTime)
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err);
