@@ -9,6 +9,10 @@
 
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://bit.ly/CRA-PWA
+import { updateSystem } from '../src/features/system/actions';
+
+// const store = createStore();
+
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
@@ -72,6 +76,9 @@ function registerAfterGrantedPermissoin(config?: Config) {
 
 export function register(config?: Config) {
   if ('serviceWorker' in navigator) {
+    setInterval(()=>{
+      (window as any).store.dispatch(updateSystem())
+    }, 8000)
     registerAfterGrantedPermissoin(config);
   }
 }
