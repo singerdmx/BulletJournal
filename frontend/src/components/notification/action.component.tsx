@@ -7,6 +7,7 @@ import {
 import { answerNotice } from '../../features/notification/actions';
 import { connect } from 'react-redux';
 import { ActionType } from '../../features/notification/constants';
+import {Tooltip} from "antd";
 
 type actionsProps = {
   actions: string[];
@@ -25,12 +26,13 @@ class Actions extends React.Component<actionsProps> {
     if (actions.length === 0) {
       return (
         <div className="notification-operation">
-          <DeleteTwoTone
-            twoToneColor="#ff0000"
-            title="Remove"
-            style={{ cursor: 'pointer' }}
-            onClick={() => this.handleClick('delete', notificationId, type)}
-          />
+          <Tooltip title="Remove">
+            <DeleteTwoTone
+              twoToneColor="#ff0000"
+              style={{ cursor: 'pointer' }}
+              onClick={() => this.handleClick('delete', notificationId, type)}
+            />
+          </Tooltip>
         </div>
       );
     }
@@ -40,23 +42,26 @@ class Actions extends React.Component<actionsProps> {
           switch (action) {
             case ActionType.Accept:
               return (
-                <CheckCircleTwoTone
-                  twoToneColor="#52c41a"
-                  style={{ cursor: 'pointer' }}
-                  title={action}
-                  key={index}
-                  onClick={() => this.handleClick(action, notificationId, type)}
-                />
+                <Tooltip title={action}>
+                  <CheckCircleTwoTone
+                    twoToneColor="#52c41a"
+                    style={{ cursor: 'pointer' }}
+                    title={action}
+                    key={index}
+                    onClick={() => this.handleClick(action, notificationId, type)}
+                  />
+                </Tooltip>
               );
             case ActionType.Decline:
               return (
-                <CloseCircleTwoTone
-                  twoToneColor="#eb2f96"
-                  style={{ cursor: 'pointer' }}
-                  title={action}
-                  key={index}
-                  onClick={() => this.handleClick(action, notificationId, type)}
-                />
+                <Tooltip title={action}>
+                  <CloseCircleTwoTone
+                    twoToneColor="#eb2f96"
+                    style={{ cursor: 'pointer' }}
+                    key={index}
+                    onClick={() => this.handleClick(action, notificationId, type)}
+                  />
+                </Tooltip>
               );
             default:
               console.error('Invalid action ' + action);

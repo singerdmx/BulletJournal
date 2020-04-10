@@ -1,19 +1,56 @@
 import React from 'react';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import { Notification } from './interface';
-import { BellFilled } from '@ant-design/icons';
-import { List, Badge, Popover, Tooltip } from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {Notification} from './interface';
+import {BellFilled} from '@ant-design/icons';
+import {Badge, List, Popover, Tooltip} from 'antd';
 import TitleAvatar from '../../components/notification/avatar.compoennt';
 import Actions from '../../components/notification/action.component';
 import ListTitle from '../../components/notification/list-title.component';
-import { updateNotifications } from './actions';
+import {updateNotifications} from './actions';
 
 import './notification.styles.less';
+import {Link} from "react-router-dom";
 
 type NotificationsProps = {
   notifications: Notification[];
   updateNotifications: () => void;
+};
+
+const getNotification = (item: Notification) => {
+    let meta = <List.Item.Meta
+        avatar={
+            <TitleAvatar source={item.originator.avatar} type={item.type}/>
+        }
+        title={
+            <ListTitle
+                title={item.title}
+                type={item.type}
+                time={item.timestamp}
+            />
+        }
+        description={item.content ? item.content : ''}
+    />;
+
+    if (item.link) {
+        meta = <Link to={item.link}>
+            {meta}
+        </Link>;
+    }
+    return <List.Item
+        extra={
+            item.actions && (
+                <Actions
+                    type={item.type}
+                    actions={item.actions}
+                    notificationId={item.id}
+                ></Actions>
+            )
+        }
+        key={item.id}
+    >
+        {meta}
+    </List.Item>
 };
 
 const NotificationList = ({ notifications }: NotificationsProps) => {
@@ -21,34 +58,7 @@ const NotificationList = ({ notifications }: NotificationsProps) => {
     <List
       itemLayout='horizontal'
       dataSource={notifications}
-      renderItem={item => (
-        <List.Item
-          extra={
-            item.actions && (
-              <Actions
-                type={item.type}
-                actions={item.actions}
-                notificationId={item.id}
-              ></Actions>
-            )
-          }
-          key={item.id}
-        >
-          <List.Item.Meta
-            avatar={
-              <TitleAvatar source={item.originator.avatar} type={item.type} />
-            }
-            title={
-              <ListTitle
-                title={item.title}
-                type={item.type}
-                time={item.timestamp}
-              />
-            }
-            description={item.content ? item.content : ''}
-          />
-        </List.Item>
-      )}
+      renderItem={item => getNotification(item)}
     />
   ) : (
     <div className='no-data'>No Notifications</div>

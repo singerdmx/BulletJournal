@@ -13,4 +13,5 @@ export interface Originator {
     originator: Originator;
     actions: Array<string>;
     type: string;
+    link: string;
   }
