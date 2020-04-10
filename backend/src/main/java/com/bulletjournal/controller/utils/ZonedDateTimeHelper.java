@@ -249,15 +249,16 @@ public class ZonedDateTimeHelper {
 
     /**
      * Parse DateTime set string to a set of DateTime
+     *
      * @param string the string of the completed slots list. Each slot is splitted by comma.
-     *              Format: slot1,slot2,slot3
+     *               Format: slot1,slot2,slot3
      * @return List<DateTime> - a list of Date Time
      */
     public static List<DateTime> parseDateTimeList(String string) {
         List<DateTime> targetList = new ArrayList<>();
         if (StringUtils.isNoneEmpty(string) || StringUtils.isEmpty(string))
             return targetList;
-        for(String s : string.split(",")) {
+        for (String s : string.split(",")) {
             targetList.add(DateTime.parse(s));
         }
         return targetList;
