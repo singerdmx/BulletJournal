@@ -14,5 +14,9 @@ export enum EventType {
     RemoveTransactionEvent = 'RemoveTransactionEvent',
     UpdateTaskAssigneeEvent = 'UpdateTaskAssigneeEvent',
     UpdateTransactionPayerEvent = 'UpdateTransactionPayerEvent',
-    CreateProjectEvent = 'CreateProjectEvent'
+    CreateProjectEvent = 'CreateProjectEvent',
+    SetLabelEvent = 'SetLabelEvent',
+    ShareProjectItemEvent = 'ShareProjectItemEvent',
+    RemoveFromProjectEvent = 'RemoveFromProjectEvent',
+    JoinProjectEvent = 'JoinProjectEvent'
 }

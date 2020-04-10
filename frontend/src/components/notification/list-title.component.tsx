@@ -52,6 +52,14 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
         </span>
       );
       break;
+    case EventType.JoinProjectEvent:
+      beg = title.indexOf(' by ');
+      titleText = (
+        <span>
+          You've been added to <strong>{title.slice(21, beg)}</strong> by <strong>{title.slice(beg + 4)}</strong>
+        </span>
+      );
+      break;
     case EventType.RemoveTaskEvent:
       beg = title.indexOf(' removed Task ');
       titleText = (
@@ -90,6 +98,29 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
         <span>
           Group <strong>{title.slice(6, beg)}</strong> is deleted
         </span>
+      );
+      break;
+    case EventType.RemoveFromProjectEvent:
+      titleText = (
+        <span>
+          You've been removed from <strong>{title.slice(25)}</strong>
+        </span>
+      );
+      break;
+    case EventType.ShareProjectItemEvent:
+      beg = title.indexOf(' shared ');
+      titleText = (
+          <span>
+            <strong>{title.slice(0, beg)}</strong> shared <strong>{title.slice(beg + 8, title.length - 9)}</strong> with you
+          </span>
+      );
+      break;
+    case EventType.SetLabelEvent:
+      beg = title.indexOf(' updated labels for ');
+      titleText = (
+          <span>
+            <strong>{title.slice(0, beg)}</strong> updated labels for <strong>{title.slice(beg + 20)}</strong>
+          </span>
       );
       break;
   }

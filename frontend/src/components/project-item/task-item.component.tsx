@@ -200,7 +200,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
   // TODO: if isComplete, go to completedTask page
   let taskLink = `/task/${task.id}`;
   if (props.readOnly) {
-    taskLink = `/api/public/items/TASK${task.id}`;
+    taskLink = `/public/items/TASK${task.id}`;
   } else if (isComplete) {
     taskLink = `/completedTask/${task.id}`;
   }
