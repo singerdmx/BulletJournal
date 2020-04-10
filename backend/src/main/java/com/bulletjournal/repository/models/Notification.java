@@ -47,18 +47,22 @@ public class Notification extends AuditModel {
     @Column
     private String actions;
 
+    @Column
+    private String link;
+
     public Notification() {
     }
 
     public Notification(
             String originator, String title, String content, String targetUser,
-            String type, Long contentId) {
+            String type, Long contentId, String link) {
         this.originator = originator;
         this.title = title;
         this.content = content;
         this.targetUser = targetUser;
         this.type = type;
         this.contentId = contentId;
+        this.link = link;
     }
 
     public Long getId() {
@@ -123,6 +127,14 @@ public class Notification extends AuditModel {
 
     public void setActions(String actions) {
         this.actions = actions;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public com.bulletjournal.controller.models.Notification toPresentationModel() {

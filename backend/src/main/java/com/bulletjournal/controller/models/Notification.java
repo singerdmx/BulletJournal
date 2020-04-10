@@ -16,6 +16,8 @@ public class Notification {
 
     private String content;
 
+    private String link;
+
     @NotNull
     private Long timestamp;
 
@@ -93,6 +95,14 @@ public class Notification {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     @Override

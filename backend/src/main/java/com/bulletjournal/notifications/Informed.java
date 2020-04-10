@@ -34,6 +34,11 @@ public abstract class Informed {
 
     protected abstract String getEventTitle(Event event);
 
+    // TODO: abstract
+    protected String getLink(Long contentId) {
+        return null;
+    }
+
     public List<Notification> toNotifications() {
         return this.getEvents().stream()
                 .map(event -> {
@@ -43,7 +48,8 @@ public abstract class Informed {
                             this.getEventContent(event),
                             event.getTargetUser(),
                             this.getEventType(),
-                            event.getContentId());
+                            event.getContentId(),
+                            this.getLink(event.getContentId()));
                     List<Action> actions = this.getEventActions(event);
                     if (actions != null) {
                         notification.setActions(GSON.toJson(actions));

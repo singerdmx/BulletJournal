@@ -26,6 +26,11 @@ public class JoinGroupEvent extends Informed {
     }
 
     @Override
+    protected String getLink(Long contentId) {
+        return String.format("/groups/group%d", contentId);
+    }
+
+    @Override
     public List<Action> getEventActions(Event event) {
         return ImmutableList.of(Action.ACCEPT, Action.DECLINE);
     }

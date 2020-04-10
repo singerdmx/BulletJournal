@@ -23,4 +23,9 @@ public class JoinProjectEvent extends Informed {
     protected String getEventTitle(Event event) {
         return "You've been added to " + event.getContentName() + " by " + this.getOriginator();
     }
+
+    @Override
+    protected String getLink(Long contentId) {
+        return String.format("/projects/%d", contentId);
+    }
 }
