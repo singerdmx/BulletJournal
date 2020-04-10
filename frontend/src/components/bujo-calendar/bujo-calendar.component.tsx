@@ -59,7 +59,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
   }
 
   onClickMonthProjectItem = (value: moment.Moment) => {
-    const dateString = value.format('YYYY-MM-DD');
+    const dateString = value.format(dateFormat);
     this.props.history.push('/bujo/today');
     this.props.updateMyBuJoDates(dateString, dateString);
   };
@@ -69,7 +69,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
     const lastDayString = moment(firstDayString, dateFormat)
       .add(1, 'month')
       .subtract(1, 'day')
-      .format('YYYY-MM-DD');
+      .format(dateFormat);
 
     this.props.history.push('/bujo/today');
     this.props.updateMyBuJoDates(firstDayString, lastDayString);
