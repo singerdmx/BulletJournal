@@ -5,11 +5,15 @@ import {
   MyselfApiErrorAction,
   UpdateMyself,
   PatchMyself,
-  UpdateExpandedMyself
+  UpdateExpandedMyself,
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
-import { updateMyBuJoDates, updateSelectedCalendarDay, getProjectItems } from '../../features/myBuJo/actions';
+import {
+  updateMyBuJoDates,
+  updateSelectedCalendarDay,
+  getProjectItems,
+} from '../../features/myBuJo/actions';
 import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself } from '../../apis/myselfApis';
 import moment from 'moment';
@@ -25,7 +29,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
 
     const data = yield call(fetchMyself, true);
     let currentTime = new Date().toLocaleString('fr-CA', {
-      timeZone: data.timezone
+      timeZone: data.timezone,
     });
     if (currentTime) currentTime = currentTime.substring(0, 10);
 
@@ -36,20 +40,24 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
         timezone: data.timezone,
         before: data.reminderBeforeTask,
         currency: data.currency,
-        theme: data.theme
+        theme: data.theme,
       })
     );
     const state: IState = yield select();
     if (!state.myBuJo.startDate) {
       yield put(updateMyBuJoDates(currentTime, currentTime));
-      yield put(getProjectItems(currentTime, currentTime, data.timezone, 'today'));
+      //yield put(getProjectItems(currentTime, currentTime, data.timezone, 'today'));
     }
 
     yield put(updateSelectedCalendarDay(currentTime));
-    yield put(getProjectItems(
-      moment(new Date()).add(-60, 'days').format(dateFormat),
-      moment(new Date()).add(60, 'days').format(dateFormat),
-      data.timezone, 'calendar'));
+    yield put(
+      getProjectItems(
+        moment(new Date()).add(-60, 'days').format(dateFormat),
+        moment(new Date()).add(60, 'days').format(dateFormat),
+        data.timezone,
+        'calendar'
+      )
+    );
 
     if (updateSettings) {
       yield put(settingsActions.updateTimezone({ timezone: data.timezone }));
@@ -71,7 +79,7 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
     yield put(
       myselfActions.myselfDataReceived({
         username: data.name,
-        avatar: data.avatar
+        avatar: data.avatar,
       })
     );
   } catch (error) {
@@ -84,14 +92,14 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
     const { timezone, before, currency, theme } = action.payload;
     yield call(patchMyself, timezone, before, currency, theme);
     let currentTime = new Date().toLocaleString('fr-CA', {
-      timeZone: timezone
+      timeZone: timezone,
     });
     yield put(
       myselfActions.myselfDataReceived({
         timezone: timezone,
         before: before,
         currency: currency,
-        theme: theme
+        theme: theme,
       })
     );
     yield put(updateMyBuJoDates(currentTime, currentTime));
@@ -109,6 +117,9 @@ export default function* myselfSagas() {
     ),
     yield takeLatest(myselfActions.myselfUpdate.type, myselfUpdate),
     yield takeLatest(myselfActions.patchMyself.type, myselfPatch),
-    yield takeLatest(myselfActions.expandedMyselfUpdate.type, getExpandedMyself)
+    yield takeLatest(
+      myselfActions.expandedMyselfUpdate.type,
+      getExpandedMyself
+    ),
   ]);
 }
