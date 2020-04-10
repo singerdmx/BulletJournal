@@ -9,8 +9,8 @@ import {Content} from "./features/myBuJo/interface";
 import {getPublicItem} from "./features/system/actions";
 
 import './App.less';
-import NotePage from "./pages/note/note.pages";
 import TaskDetailPage from "./pages/task/task-detail.pages";
+import NoteDetailPage from "./pages/note/note-detail.pages";
 
 type PageProps = {
   note: Note;
@@ -21,8 +21,8 @@ type PageProps = {
 };
 
 const PublicPage: React.FC<PageProps> = (props) => {
-  const { note, task, contentType, contents } = props;
-  const { itemId } = useParams();
+  const {note, task, contentType, contents} = props;
+  const {itemId} = useParams();
   React.useEffect(() => {
     props.getPublicItem(itemId!);
   }, []);
@@ -35,7 +35,8 @@ const PublicPage: React.FC<PageProps> = (props) => {
 
   if (contentType === ContentType.NOTE) {
     return <div>
-      <NotePage />
+      <NoteDetailPage note={note} labelEditable={false} createContentElem={null} noteOperation={() => null}
+                      noteEditorElem={null}/>
     </div>;
   }
 
@@ -49,4 +50,4 @@ const mapStateToProps = (state: IState) => ({
   contents: state.system.contents
 });
 
-export default connect(mapStateToProps, {getPublicItem}) (PublicPage);
+export default connect(mapStateToProps, {getPublicItem})(PublicPage);
