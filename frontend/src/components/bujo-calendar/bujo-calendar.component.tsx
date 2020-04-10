@@ -59,10 +59,20 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
   }
 
   onClickMonthProjectItem = (value: moment.Moment) => {
-    const { selectedValue } = this.state;
     const dateString = value.format('YYYY-MM-DD');
     this.props.history.push('/bujo/today');
     this.props.updateMyBuJoDates(dateString, dateString);
+  };
+
+  onClickYearProjectItem = (value: moment.Moment) => {
+    const firstDayString = value.format('YYYY-MM-01');
+    const lastDayString = moment(firstDayString, dateFormat)
+      .add(1, 'month')
+      .subtract(1, 'day')
+      .format('YYYY-MM-DD');
+
+    this.props.history.push('/bujo/today');
+    this.props.updateMyBuJoDates(firstDayString, lastDayString);
   };
 
   dateCellRender = (value: moment.Moment) => {
@@ -81,6 +91,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
     }
 
     const targetDay = target[0];
+
     const content = (
       <div
         style={{ height: '100%', width: '100%' }}
@@ -90,25 +101,31 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
       >
         {targetDay.notes.map((n) => (
           <div key={`notes${n.id}`}>
-            <Badge>
-              <FileTextOutlined />
-              &nbsp;{n.name}
-            </Badge>
+            <div style={{ display: 'flex' }}>
+              <Badge>
+                <FileTextOutlined />
+                &nbsp;{n.name}
+              </Badge>
+            </div>
           </div>
         ))}
         {targetDay.tasks.map((t) => (
           <div key={`tasks${t.id}`}>
             <Badge>
-              <CarryOutOutlined />
-              &nbsp;{t.name}
+              <div style={{ display: 'flex' }}>
+                <CarryOutOutlined />
+                &nbsp;{t.name}&nbsp;{t.dueTime ? t.dueTime : ''}
+              </div>
             </Badge>
           </div>
         ))}
         {targetDay.transactions.map((t) => (
           <div key={`transactions${t.id}`}>
             <Badge>
-              <AccountBookOutlined />
-              &nbsp;{t.name}
+              <div style={{ display: 'flex' }}>
+                <AccountBookOutlined />
+                &nbsp;{t.name}&nbsp;{t.time ? t.time : ''}
+              </div>
             </Badge>
           </div>
         ))}
@@ -130,32 +147,48 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
       (p: ProjectItems) => p.date.substring(0, 7) === title
     );
     if (targets.length === 0) {
-      return null;
+      return (
+        <div
+          style={{ height: '100%', width: '100%' }}
+          onClick={() => this.onClickYearProjectItem(value)}
+        />
+      );
     }
 
     const content = (
-      <div>
+      <div
+        style={{ height: '100%', width: '100%' }}
+        onClick={() => this.onClickYearProjectItem(value)}
+      >
         {targets.map((targetDay: ProjectItems, index: number) => {
           return (
-            <div key={`bujo${index}`}>
+            <div
+              key={`bujo${index}`}
+              style={{ height: '100%', width: '100%' }}
+              onClick={() => this.onClickYearProjectItem(value)}
+            >
               {targetDay.notes.map((n) => (
                 <div key={`notes${n.id}`}>
                   <Badge>
-                    {iconMapper[ProjectType.NOTE]}&nbsp;{n.name}
+                    {iconMapper[ProjectType.NOTE]}&nbsp;{n.name}&nbsp;
                   </Badge>
                 </div>
               ))}
               {targetDay.tasks.map((t) => (
                 <div key={`tasks${t.id}`}>
                   <Badge>
-                    {iconMapper[ProjectType.TODO]}&nbsp;{t.name}
+                    {iconMapper[ProjectType.TODO]}&nbsp;{t.name}&nbsp;
+                    {t.dueDate ? t.dueDate : ''}
+                    {t.dueTime ? ' ' + t.dueTime : ''}
                   </Badge>
                 </div>
               ))}
               {targetDay.transactions.map((t) => (
                 <div key={`transactions${t.id}`}>
                   <Badge>
-                    {iconMapper[ProjectType.LEDGER]}&nbsp;{t.name}
+                    {iconMapper[ProjectType.LEDGER]}&nbsp;{t.name}&nbsp;
+                    {t.date ? t.date : ''}
+                    {t.time ? ' ' + t.time : ''}
                   </Badge>
                 </div>
               ))}
@@ -166,7 +199,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
     );
     return (
       <Popover content={content} title={title}>
-        {content}
+        <div style={{ height: '100%', width: '100%' }}>{content}</div>
       </Popover>
     );
   };
