@@ -8,6 +8,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.RevokeSharableEvent;
 import com.bulletjournal.notifications.SetLabelEvent;
 import com.bulletjournal.notifications.ShareProjectItemEvent;
 import com.bulletjournal.repository.models.ContentModel;
@@ -103,8 +104,9 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> void revokeSharable(Long projectItemId, String requester,
-                               RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
+    public <T extends ProjectItemModel> RevokeSharableEvent revokeSharable(
+            Long projectItemId, String requester,
+            RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
         T projectItem = getProjectItem(projectItemId, requester);
 
         String link = revokeProjectItemSharableParams.getLink();
@@ -115,7 +117,11 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String user = revokeProjectItemSharableParams.getUser();
         if (user != null) {
             this.sharedProjectItemDaoJpa.revokeSharableWithUser(projectItem, user);
+            return new RevokeSharableEvent(
+                    new Event(user, projectItemId, projectItem.getName()), requester, projectItem.getContentType());
         }
+
+        return null;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

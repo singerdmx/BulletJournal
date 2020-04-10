@@ -115,6 +115,14 @@ function getTitleText(title: string, type: string, time: number): JSX.Element {
           </span>
       );
       break;
+    case EventType.RevokeSharableEvent:
+      beg = title.indexOf(' stopped sharing ');
+      titleText = (
+          <span>
+            <strong>{title.slice(0, beg)}</strong> stopped sharing <strong>{title.slice(beg + 17, title.length - 9)}</strong> with you
+          </span>
+      );
+      break;
     case EventType.SetLabelEvent:
       beg = title.indexOf(' updated labels for ');
       titleText = (

@@ -11,7 +11,8 @@ import {
   ContactsOutlined,
   UserDeleteOutlined,
   ShareAltOutlined,
-  TagOutlined
+  TagOutlined,
+  StopOutlined
 } from '@ant-design/icons';
 
 import { Avatar, Badge } from 'antd';
@@ -59,6 +60,9 @@ const TitleAvatar = ({ source, type }: titleAvatarProps) => {
       break;
     case EventType.SetLabelEvent:
       icon = <TagOutlined />
+      break;
+    case EventType.RevokeSharableEvent:
+      icon = <StopOutlined />
       break;
     default:
       icon = <EyeOutlined />;

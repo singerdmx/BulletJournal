@@ -18,5 +18,6 @@ export enum EventType {
     SetLabelEvent = 'SetLabelEvent',
     ShareProjectItemEvent = 'ShareProjectItemEvent',
     RemoveFromProjectEvent = 'RemoveFromProjectEvent',
-    JoinProjectEvent = 'JoinProjectEvent'
+    JoinProjectEvent = 'JoinProjectEvent',
+    RevokeSharableEvent = 'RevokeSharableEvent'
 }
