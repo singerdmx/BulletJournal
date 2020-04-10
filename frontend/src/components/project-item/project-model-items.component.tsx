@@ -10,9 +10,10 @@ const {Panel} = Collapse;
 
 type ProjectModelItemsProps = {
     projectItems: ProjectItems[];
+    completeOnyOccurrence: boolean;
 };
 
-const getTasksPanel = (items: ProjectItems, index: number) => {
+const getTasksPanel = (items: ProjectItems, index: number, completeOnyOccurrence: boolean) => {
     if (items.tasks.length === 0) {
         return null;
     }
@@ -24,7 +25,7 @@ const getTasksPanel = (items: ProjectItems, index: number) => {
         >
             {items.tasks.map((item, index) => {
                 return (<div key={`task${item.id}#${index}`}>
-                    <TaskItem task={item} isComplete={false} readOnly={false}/>
+                    <TaskItem task={item} isComplete={false} readOnly={false} completeOnyOccurrence={completeOnyOccurrence}/>
                 </div>);
             })}
         </Panel>
@@ -93,7 +94,7 @@ const ProjectModelItems: React.FC<ProjectModelItemsProps> = props => {
                                 'notes' + index
                             ]}
                         >
-                            {getTasksPanel(items, index)}
+                            {getTasksPanel(items, index, props.completeOnyOccurrence)}
                             {getTransactionsPanel(items, index)}
                             {getNotesPanel(items, index)}
                         </Collapse>
