@@ -12,7 +12,8 @@ import { IState } from '../../store';
 type ProjectItemProps = {
   type: ProjectType;
   projectItemId: number;
-  sharedlink: string;
+  sharedTaskLink: string;
+  sharedNoteLink: string;
   shareTask: (
     taskId: number,
     generateLink: boolean,
@@ -39,6 +40,14 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
   };
 
   const shareFunction = shareProjectItemCall[props.type];
+
+  const sharedProjectItemLink: { [key in ProjectType]: string } = {
+    [ProjectType.NOTE]: props.sharedNoteLink,
+    [ProjectType.TODO]: props.sharedTaskLink,
+    [ProjectType.LEDGER]: '',
+  };
+
+  const sharedLink = sharedProjectItemLink[props.type];
 
   const shareProjectItem = (values: any) => {
     shareFunction(
@@ -87,7 +96,7 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
       </Form>
       <div className="share-info">
         <Result icon={<LinkOutlined />} title={`Generate shareable link`}>
-          {props.sharedlink && (
+          {sharedLink && (
             <div
               className="shared-link"
               style={{
@@ -98,13 +107,9 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
             >
               <span
                 style={{ marginRight: '0.5em' }}
-              >{`${window.location.origin.toString()}/public/items/${
-                props.sharedlink
-              }`}</span>
+              >{`${window.location.origin.toString()}/public/items/${sharedLink}`}</span>
               <CopyToClipboard
-                text={`${window.location.origin.toString()}/public/items/${
-                  props.sharedlink
-                }`}
+                text={`${window.location.origin.toString()}/public/items/${sharedLink}`}
                 onCopy={() => message.success('Link Copied to Clipboard')}
               >
                 <Button
@@ -122,7 +127,8 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  sharedlink: state.task.sharedLink,
+  sharedTaskLink: state.task.sharedLink,
+  sharedNoteLink: state.note.sharedLink,
 });
 
 export default connect(mapStateToProps, {
