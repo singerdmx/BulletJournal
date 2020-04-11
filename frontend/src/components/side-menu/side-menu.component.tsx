@@ -48,6 +48,9 @@ export const iconMapper = {
 
 // props of router
 type PathProps = RouteComponentProps;
+
+declare var adsbygoogle: any;
+
 // class component
 class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   // click handler when click menu item
@@ -68,6 +71,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   componentDidMount() {
     this.props.updateGroups();
     this.props.updateProjects();
+    (adsbygoogle = (window as any).adsbygoogle || []).push({});
   }
 
   render() {
@@ -176,6 +180,15 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
         <Menu.Item key='settings'>
           <SettingOutlined />
           Settings
+        </Menu.Item>
+        <Menu.Item key='ads'>
+          <ins className="adsbygoogle"
+               style={{display:'block'}}
+               data-ad-client="ca-pub-8783793954376932"
+               data-ad-slot="1070434431"
+               data-ad-format="auto"
+               data-full-width-responsive="true">
+          </ins>
         </Menu.Item>
       </Menu>
     );
