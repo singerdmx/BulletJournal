@@ -60,7 +60,7 @@ const NoteEditorDrawer: React.FC<
         <NoteEditor
           content={content || undefined}
           noteId={noteId}
-          afterFinish={onClose}
+          afterFinish={handleClose}
         />
       )}
     </Drawer>
