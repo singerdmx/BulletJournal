@@ -17,6 +17,7 @@ import { IState } from '../../store';
 import { EventType } from './constants';
 import { fetchSystemUpdates } from '../../apis/systemApis';
 import { displayNotification } from '../../serviceWorker';
+import { actions as SystemActions } from '../system/reducer';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -29,16 +30,20 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     const notifications = yield data.json();
 
     const state: IState = yield select();
+    const systemState = state.system;
 
-    if (etag && state.notice.etag && state.notice.etag !== etag) {
+    if (etag && state.system.notificationsEtag && state.system.notificationsEtag !== etag) {
+      yield put(
+        SystemActions.systemUpdateReceived({
+          notificationsEtag: etag,
+          ...systemState
+        })
+      )
       yield call(message.info, "You've got new notifications");
       displayNotification("You've got new notifications");
     }
     yield put(
-      notificationsActions.notificationsReceived({
-        notifications: notifications,
-        etag: etag
-      })
+      notificationsActions.notificationsReceived({ notifications: notifications })
     );
   } catch (error) {
     yield call(message.error, `Notice Error Received: ${error}`);
