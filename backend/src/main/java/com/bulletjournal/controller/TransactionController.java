@@ -198,11 +198,12 @@ public class TransactionController {
     }
 
     @PatchMapping(CONTENT_ROUTE)
-    public void updateContent(@NotNull @PathVariable Long transactionId,
+    public List<Content> updateContent(@NotNull @PathVariable Long transactionId,
                               @NotNull @PathVariable Long contentId,
                               @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.updateContent(contentId, transactionId, username, updateContentParams);
+        return getContents(transactionId);
     }
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)

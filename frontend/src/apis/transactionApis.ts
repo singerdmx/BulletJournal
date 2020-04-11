@@ -160,7 +160,7 @@ export const updateContent = (transactionId: number, contentId: number, text: st
     text: text
   });
   return doPatch(`/api/transactions/${transactionId}/contents/${contentId}`, patchBody)
-      .then(res => res)
+      .then(res => res.json())
       .catch(err => {
         throw Error(err);
       });
