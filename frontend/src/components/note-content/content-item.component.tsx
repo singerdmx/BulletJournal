@@ -35,12 +35,16 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
       ]}
     >
       <List.Item.Meta
-        avatar={<Avatar src={content.ownerAvatar} />}
-        title={
+        avatar={
           <Tooltip title={`Created: ${createdTime}`}>
-            <span>Owned by {content.owner}</span>
+            <Avatar src={content.ownerAvatar} />
           </Tooltip>
         }
+        // title={
+        //   <Tooltip title={`Created: ${createdTime}`}>
+        //     <span>Owned by {content.owner}</span>
+        //   </Tooltip>
+        // }
       />
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
