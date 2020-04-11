@@ -28,27 +28,16 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
     <List.Item
       key={content.id}
       actions={[
+        <Avatar src={content.ownerAvatar} size="small" />,
         <span>{`Last Update: ${updateTime}`}</span>,
-        <Button type="link" onClick={handleOpen}>
-          Detail
-        </Button>,
       ]}
     >
-      <List.Item.Meta
-        avatar={
-          <Tooltip title={`Created: ${createdTime}`}>
-            <Avatar src={content.ownerAvatar} />
-          </Tooltip>
-        }
-        // title={
-        //   <Tooltip title={`Created: ${createdTime}`}>
-        //     <span>Owned by {content.owner}</span>
-        //   </Tooltip>
-        // }
-      />
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
         : contentText}
+      <Button type="link" onClick={handleOpen}>
+        Detail
+      </Button>
       <NoteEditorDrawer
         content={content}
         visible={displayMore}
