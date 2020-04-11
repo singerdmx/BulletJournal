@@ -234,7 +234,7 @@ export const updateContent = (
     text: text,
   });
   return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody)
-    .then((res) => res)
+    .then((res) => res.json())
     .catch((err) => {
       throw Error(err);
     });

@@ -232,10 +232,12 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     private void updateRevision(K content, String newText, String requester) {
-        LinkedList<Revision> revisionList = GSON.fromJson(content.getRevisions(), LinkedList.class);
-        if (revisionList == null) {
-            revisionList = new LinkedList<>();
+        String revisionsJson = content.getRevisions();
+        if (revisionsJson == null) {
+            revisionsJson = "[]";
         }
+        LinkedList<Revision> revisionList = new LinkedList<>(
+                Arrays.asList(GSON.fromJson(revisionsJson, Revision[].class)));
         int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
         long nextRevisionId;
         if (revisionList.isEmpty()) {
