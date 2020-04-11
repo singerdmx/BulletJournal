@@ -24,6 +24,7 @@ import {
 } from '../../apis/groupApis';
 import { IState } from '../../store';
 import { clearUser } from '../user/actions';
+import { actions as SystemActions } from '../system/reducer';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -32,12 +33,19 @@ function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
 function* groupsUpdate(action: PayloadAction<GroupsAction>) {
   try {
     //get etag from header
+    const state = yield select();
+    const systemState = state.system;
     const data = yield call(fetchGroups);
     const etag = data.headers.get('Etag')!;
+    if(etag){
+      yield put(
+        SystemActions.systemUpdateReceived({
+          groupsEtag: etag,
+          ...systemState
+        })
+      )}
     const groups = yield data.json();
-    console.log(groups);
-
-    yield put(groupsActions.groupsReceived({ groups: groups, etag: etag }));
+    yield put(groupsActions.groupsReceived({ groups: groups }));
   } catch (error) {
     yield call(message.error, `Group Error Received: ${error}`);
   }
