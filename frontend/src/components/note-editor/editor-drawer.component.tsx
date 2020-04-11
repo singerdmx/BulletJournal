@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Drawer } from 'antd';
+import { Drawer, Button } from 'antd';
 
 import { Content } from '../../features/myBuJo/interface';
 
@@ -12,7 +12,6 @@ type NoteEditorDrawerProps = {
   noteId: number;
   visible: boolean;
   onClose: Function;
-  readonly: boolean;
 };
 
 const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
@@ -20,18 +19,27 @@ const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
   noteId,
   visible,
   onClose,
-  readonly,
 }) => {
+  const [readMode, setReadMode] = useState(true);
+
+  const handleEdit = () => setReadMode(false);
+  const handleClose = () => {
+    setReadMode(true);
+    onClose();
+  };
   return (
     <Drawer
-      onClose={() => onClose()}
+      onClose={handleClose}
       visible={visible}
       width="700"
       destroyOnClose
       closable={false}
     >
-      {readonly && content ? (
-        <NoteReader content={content} />
+      {readMode && content ? (
+        <div>
+          <Button onClick={handleEdit}>Edit</Button>
+          <NoteReader content={content} />
+        </div>
       ) : (
         <NoteEditor
           content={content || undefined}
