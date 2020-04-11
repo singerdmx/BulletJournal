@@ -1,6 +1,4 @@
 @import '~antd/dist/antd.less';
-@primary-color: #f78cba;
-@link-color: #f78cba;
 
 .App {
   height: 100vh;
@@ -12,7 +10,7 @@
 
 /* ----------------------Header ---------------------- */
 .header {
-  background: #fcd4ef;
+  background: @primary-color;
 
   padding: 0 15px 0 30px;
   height: 50px;
@@ -55,7 +53,7 @@
 }
 
 .search-box .ant-input:focus {
-  outline-color: #fcd4e5;
+  outline-color: @primary-color;
   background: white;
 }
 
@@ -64,7 +62,7 @@
 }
 /* ----------------------Body---------------------- */
 .content {
-  height: 100%;
+  height: 95%;
 }
 
 .ant-popover-message {
