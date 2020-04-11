@@ -68,6 +68,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   componentDidMount() {
     this.props.updateGroups();
     this.props.updateProjects();
+    (adsbygoogle = window.adsbygoogle || []).push({});
   }
 
   render() {
@@ -176,6 +177,14 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
         <Menu.Item key='settings'>
           <SettingOutlined />
           Settings
+        </Menu.Item>
+        <Menu.Item key='ads'>
+          <ins className="adsbygoogle"
+               style={{display:'block'}}
+               data-ad-client="ca-pub-23452425"
+               data-ad-slot="24524524"
+               data-ad-format="auto">
+          </ins>
         </Menu.Item>
       </Menu>
     );
