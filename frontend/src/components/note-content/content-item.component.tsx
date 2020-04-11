@@ -4,6 +4,7 @@ import { Content } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
 import NoteEditorDrawer from '../note-editor/editor-drawer.component';
 import moment from 'moment';
+import './content.-item.styles.less';
 
 type NoteContentProps = {
   content: Content;
@@ -28,7 +29,9 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
     <List.Item
       key={content.id}
       actions={[
-        <Avatar src={content.ownerAvatar} size="small" />,
+        <Tooltip title={createdTime}>
+          <Avatar src={content.ownerAvatar} size="small" />
+        </Tooltip>,
         <span>{`Last Update: ${updateTime}`}</span>,
       ]}
     >
