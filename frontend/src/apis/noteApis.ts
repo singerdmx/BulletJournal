@@ -146,7 +146,7 @@ export const updateContent = (noteId: number, contentId: number, text: string) =
         text: text
     });
     return doPatch(`/api/notes/${noteId}/contents/${contentId}`, patchBody)
-        .then(res => res)
+        .then(res => res.json())
         .catch(err => {
             throw Error(err);
         });

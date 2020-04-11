@@ -15,12 +15,10 @@ export type AnswerNotificationAction = {
 
 export type NotificationsAction = {
   notifications: Array<Notification>;
-  etag: string;
 };
 
 let initialState = {
   notifications: [] as Array<Notification>,
-  etag: ''
 };
 
 const slice = createSlice({
@@ -31,11 +29,8 @@ const slice = createSlice({
       state,
       action: PayloadAction<NotificationsAction>
     ) => {
-      const { notifications, etag } = action.payload;
+      const { notifications } = action.payload;
       state.notifications = notifications;
-      if (etag && etag.length > 0) {
-        state.etag = etag;
-      }
     },
     noticeApiErrorReceived: (
       state,

@@ -5,6 +5,8 @@ import {PayloadAction} from 'redux-starter-kit';
 import {fetchSystemUpdates, getPublicProjectItem} from '../../apis/systemApis';
 import {ContentType} from "../myBuJo/constants";
 import { updateProjects } from '../project/actions';
+import { updateGroups } from '../group/actions';
+
 
 function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
   yield call(message.error, `System Error Received: ${action.payload.error}`);
@@ -14,9 +16,13 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
   try {
     const data = yield call(fetchSystemUpdates);
     const state = yield select();
-    const { ownedProjectsEtag, sharedProjectsEtag } = state.system;
+    const { groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag } = state.system;
     if(ownedProjectsEtag!==data.ownedProjectsEtag || sharedProjectsEtag !== data.sharedProjectsEtag){
       yield put(updateProjects());
+    }
+
+    if(groupsEtag !== data.groupsEtag){
+      yield put(updateGroups());
     }
     yield put(
         systemActions.systemUpdateReceived({

@@ -10,7 +10,6 @@ export type UpdateGroups = {};
 
 export type GroupsAction = {
   groups: GroupsWithOwner[];
-  etag: string;
 };
 
 export type GroupUpdateAction = {};
@@ -53,7 +52,6 @@ export type PatchGroupAction = {
 
 let initialState = {
   groups: [] as GroupsWithOwner[],
-  etag: '',
   group: {} as Group
 };
 
@@ -62,9 +60,8 @@ const slice = createSlice({
   initialState,
   reducers: {
     groupsReceived: (state, action: PayloadAction<GroupsAction>) => {
-      const { groups, etag } = action.payload;
+      const { groups } = action.payload;
       state.groups = groups;
-      state.etag = etag;
     },
     groupsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
       state,
