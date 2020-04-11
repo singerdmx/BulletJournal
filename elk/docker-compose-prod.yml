@@ -3,10 +3,7 @@ version: '2.1'
 services:
   elasticsearch:
     container_name: elasticsearch
-    build:
-      context: /root/ws/BulletJournal/elk/elasticsearch/
-      args:
-        ELK_VERSION: 7.6.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
     volumes:
       - /root/ws/BulletJournal/elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - $HOME/docker/volumes/elasticsearch:/usr/share/elasticsearch/data
