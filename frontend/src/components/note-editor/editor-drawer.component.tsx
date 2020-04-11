@@ -50,7 +50,6 @@ const NoteEditorDrawer: React.FC<
       visible={visible}
       width="700"
       destroyOnClose
-      closable={false}
       footer={readMode && footerControl}
     >
       {readMode && content ? (
