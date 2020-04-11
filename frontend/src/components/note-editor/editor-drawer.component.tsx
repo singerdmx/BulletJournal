@@ -34,10 +34,10 @@ const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
       width="700"
       destroyOnClose
       closable={false}
+      footer={readMode && <Button onClick={handleEdit}>Edit</Button>}
     >
       {readMode && content ? (
         <div>
-          <Button onClick={handleEdit}>Edit</Button>
           <NoteReader content={content} />
         </div>
       ) : (
