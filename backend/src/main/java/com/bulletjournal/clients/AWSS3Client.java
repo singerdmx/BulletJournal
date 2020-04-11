@@ -19,39 +19,53 @@ import java.io.File;
 
 @Component
 public class AWSS3Client {
-    private static AmazonS3 amazonS3;
+
     @Autowired
     private AWSConfig awsConfig;
 
-    public String uploadFile(MultipartFile multipartFile) {
-        String fileUrl = "";
-        try {
-            File file = FileUtil.convertMultiPartToFile(multipartFile);
-            String fileName = FileUtil.generateFileName(multipartFile);
-            fileUrl = awsConfig.getEndpointUrl() + "/" + awsConfig.getBucketName() + "/" + fileName;
-            uploadFileTos3bucket(fileName, file);
-            file.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return fileUrl;
-    }
-
-    private void uploadFileTos3bucket(String fileName, File file) {
-        amazonS3.putObject(new PutObjectRequest(awsConfig.getBucketName(), fileName, file)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
-    }
+    private AmazonS3 amazonS3Client;
 
     @PostConstruct
     public void initializeAwsConnection() {
+        if (awsConfig.getAWSAccessKey() == null || awsConfig.getAwsSecretKey() == null) {
+            return;
+        }
+
         AWSCredentials credentials = new BasicAWSCredentials(
                 awsConfig.getAWSAccessKey(),
                 awsConfig.getAwsSecretKey()
         );
-        amazonS3 = AmazonS3ClientBuilder
+
+        this.amazonS3Client = AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withRegion(Regions.US_WEST_1)
                 .build();
+    }
+
+    public String uploadFile(MultipartFile multipartFile) {
+        if (this.amazonS3Client == null) {
+            return "amazonS3Client not set up";
+        }
+
+        File file = null;
+        try {
+            file = FileUtil.convertMultiPartToFile(multipartFile);
+            String fileName = FileUtil.generateFileName(multipartFile.getOriginalFilename());
+            String fileUrl = awsConfig.getEndpointUrl() + "/" + awsConfig.getBucketName() + "/" + fileName;
+            uploadFileTos3bucket(fileName, file);
+            return fileUrl;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+    }
+
+    private void uploadFileTos3bucket(String fileName, File file) {
+        this.amazonS3Client.putObject(new PutObjectRequest(awsConfig.getBucketName(), fileName, file)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 }
