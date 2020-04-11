@@ -25,6 +25,8 @@ services:
     environment:
       spring_profiles_active: prod
       SSO_API_KEY: "${SSO_API_KEY}"
+      AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
+      AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
     depends_on:
