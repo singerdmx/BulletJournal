@@ -13,8 +13,19 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
+  const [readMode, setReadMode] = useState(true);
 
-  const handleDisplay = () => {
+  const startReading = () => {
+    setDisplayMore(true);
+  };
+
+  const handleClose = () => {
+    setReadMode(true);
+    setDisplayMore(false);
+  };
+
+  const startEdit = () => {
+    setReadMode(false);
     setDisplayMore(true);
   };
 
@@ -25,14 +36,18 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
         ? `${contentText.slice(0, 300)}...`
         : contentText}
 
-      <Button type="link" onClick={handleDisplay}>
-        {contentText.length > 300 ? 'More' : 'Open'}
+      <Button type="link" onClick={startReading}>
+        {contentText.length > 300 ? 'Read More' : 'Read'}
+      </Button>
+      <Button type="link" onClick={startEdit}>
+        Edit
       </Button>
 
       <NoteEditorDrawer
+        readonly={readMode}
         content={content}
         visible={displayMore}
-        setVisible={setDisplayMore}
+        onClose={handleClose}
         noteId={noteId}
       />
     </List.Item>

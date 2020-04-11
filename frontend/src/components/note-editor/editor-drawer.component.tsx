@@ -5,36 +5,40 @@ import { Drawer } from 'antd';
 import { Content } from '../../features/myBuJo/interface';
 
 import NoteEditor from './note-editor.component';
+import NoteReader from './note-reader.component';
 
 type NoteEditorDrawerProps = {
   content?: Content;
   noteId: number;
   visible: boolean;
-  setVisible: Function;
+  onClose: Function;
+  readonly: boolean;
 };
 
 const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
   content,
   noteId,
   visible,
-  setVisible
+  onClose,
+  readonly,
 }) => {
-  const afterFinish = () => {
-    setVisible(false);
-  };
   return (
     <Drawer
-      onClose={() => setVisible(false)}
+      onClose={() => onClose()}
       visible={visible}
       width="700"
       destroyOnClose
       closable={false}
     >
-      <NoteEditor
-        content={content || undefined}
-        noteId={noteId}
-        afterFinish={afterFinish}
-      />
+      {readonly && content ? (
+        <NoteReader content={content} />
+      ) : (
+        <NoteEditor
+          content={content || undefined}
+          noteId={noteId}
+          afterFinish={onClose}
+        />
+      )}
     </Drawer>
   );
 };

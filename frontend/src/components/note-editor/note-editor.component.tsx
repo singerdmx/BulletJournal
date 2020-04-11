@@ -1,9 +1,9 @@
 // a editor component for taking and update note
 import React, { useState } from 'react';
-import { Form, Button } from 'antd';
+import { Form, Button, message } from 'antd';
 import { connect } from 'react-redux';
 import BraftEditor from 'braft-editor';
-import { createContent } from '../../features/notes/actions';
+import { createContent, patchContent } from '../../features/notes/actions';
 import { Content } from '../../features/myBuJo/interface';
 
 import axios from 'axios';
@@ -15,13 +15,15 @@ type NoteEditorProps = {
 
 interface NoteEditorHandler {
   createContent: (noteId: number, text: string) => void;
-  afterFinish: () => void;
+  patchContent: (noteId: number, contentId: number, text: string) => void;
+  afterFinish: Function;
 }
 
 const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
   noteId,
   content,
   createContent,
+  patchContent,
   afterFinish,
 }) => {
   // get hook of form from ant form
@@ -32,12 +34,22 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
   );
   const handleFormSubmit = () => {
     if (!isEdit) {
-      form.validateFields().then(async (values) => {
-        await createContent(noteId, values.noteContent.toRAW());
-        afterFinish();
-      });
+      form
+        .validateFields()
+        .then(async (values) => {
+          await createContent(noteId, values.noteContent.toRAW());
+          afterFinish();
+        })
+        .catch((err) => message.error(err));
     } else {
-      return;
+      content &&
+        form
+          .validateFields()
+          .then(async (values) => {
+            await patchContent(noteId, content.id, values.noteContent.toRAW());
+            afterFinish();
+          })
+          .catch((err) => message.error(err));
     }
   };
 
@@ -107,4 +119,4 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
   );
 };
 
-export default connect(null, { createContent })(NoteEditor);
+export default connect(null, { createContent, patchContent })(NoteEditor);
