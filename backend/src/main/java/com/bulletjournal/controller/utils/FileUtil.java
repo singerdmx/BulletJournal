@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public class FileUtil {
 
-    public static File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
+    public static File convertMultiPartToFile(MultipartFile file, String fileName) throws IOException {
+        File convFile = new File(fileName);
         try (FileOutputStream fos = new FileOutputStream(convFile)) {
             byte[] byteArr = file.getBytes();
             if (byteArr.length > 25_000_000) {

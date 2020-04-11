@@ -50,10 +50,10 @@ public class AWSS3Client {
 
         File file = null;
         try {
-            file = FileUtil.convertMultiPartToFile(multipartFile);
             String fileName = FileUtil.generateFileName(multipartFile.getOriginalFilename());
+            file = FileUtil.convertMultiPartToFile(multipartFile, fileName);
             String fileUrl = awsConfig.getEndpointUrl() + "/" + awsConfig.getBucketName() + "/" + fileName;
-            uploadFileTos3bucket(fileName, file);
+            uploadFileToS3Bucket(fileName, file);
             return fileUrl;
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -64,7 +64,7 @@ public class AWSS3Client {
         }
     }
 
-    private void uploadFileTos3bucket(String fileName, File file) {
+    private void uploadFileToS3Bucket(String fileName, File file) {
         this.amazonS3Client.putObject(new PutObjectRequest(awsConfig.getBucketName(), fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
