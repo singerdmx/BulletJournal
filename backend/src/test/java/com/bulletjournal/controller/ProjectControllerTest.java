@@ -924,16 +924,18 @@ public class ProjectControllerTest {
         getTaskContents(task, ImmutableList.of(content), text);
 
         text = "TEXT2";
+        Long contentId = content.getId();
         UpdateContentParams updateContentParams = new UpdateContentParams(text);
-        ResponseEntity<Content> updateResponse = this.restTemplate.exchange(
+        ResponseEntity<Content[]> updateResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateContentParams),
-                Content.class,
+                Content[].class,
                 task.getId(),
                 content.getId());
         assertEquals(HttpStatus.OK, updateResponse.getStatusCode());
-        content = updateResponse.getBody();
+        content = Arrays.stream(updateResponse.getBody())
+                .filter(c -> c.getId().equals(contentId)).findFirst().orElse(null);
         assertEquals(expectedOwner, content.getOwner());
         assertEquals(text, content.getText());
         assertNotNull(content.getId());
