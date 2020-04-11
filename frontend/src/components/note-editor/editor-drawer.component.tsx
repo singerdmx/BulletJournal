@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
 import { Drawer, Button } from 'antd';
+import { deleteContent } from '../../features/notes/actions';
+import { connect } from 'react-redux';
 
 import { Content } from '../../features/myBuJo/interface';
 
@@ -14,15 +16,30 @@ type NoteEditorDrawerProps = {
   onClose: Function;
 };
 
-const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
-  content,
-  noteId,
-  visible,
-  onClose,
-}) => {
-  const [readMode, setReadMode] = useState(true);
+interface NoteEditorDrawerHandler {
+  deleteContent: (noteId: number, contentId: number) => void;
+}
 
+const NoteEditorDrawer: React.FC<
+  NoteEditorDrawerProps & NoteEditorDrawerHandler
+> = ({ content, noteId, visible, onClose, deleteContent }) => {
+  const [readMode, setReadMode] = useState(true);
   const handleEdit = () => setReadMode(false);
+  const handleDelete = () => {
+    if (!content) {
+      return;
+    }
+    deleteContent(noteId, content.id);
+  };
+  const footerControl = (
+    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <Button onClick={handleEdit}>Edit</Button>
+      <Button danger onClick={handleDelete} style={{ marginLeft: '0.5em' }}>
+        Delete
+      </Button>
+    </div>
+  );
+
   const handleClose = () => {
     setReadMode(true);
     onClose();
@@ -34,7 +51,7 @@ const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
       width="700"
       destroyOnClose
       closable={false}
-      footer={readMode && <Button onClick={handleEdit}>Edit</Button>}
+      footer={readMode && footerControl}
     >
       {readMode && content ? (
         <div>
@@ -51,4 +68,4 @@ const NoteEditorDrawer: React.FC<NoteEditorDrawerProps> = ({
   );
 };
 
-export default NoteEditorDrawer;
+export default connect(null, { deleteContent })(NoteEditorDrawer);

@@ -15,16 +15,16 @@ type NoteContentListProps = {
 const NoteContentList: React.FC<NoteContentListProps> = ({
   noteId,
   contents,
-  updateNoteContents
+  updateNoteContents,
 }) => {
   useEffect(() => {
     noteId && updateNoteContents(noteId);
   }, [noteId]);
 
   return (
-    <List>
+    <List itemLayout="vertical">
       {contents &&
-        contents.map(content => (
+        contents.map((content) => (
           <NoteContentItem noteId={noteId} key={content.id} content={content} />
         ))}
     </List>
@@ -32,7 +32,7 @@ const NoteContentList: React.FC<NoteContentListProps> = ({
 };
 
 const mapStateToProps = (state: IState) => ({
-  contents: state.note.contents
+  contents: state.note.contents,
 });
 
 export default connect(mapStateToProps, { updateNoteContents })(

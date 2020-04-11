@@ -1,29 +1,21 @@
 import React, { useState } from 'react';
-import { List, Button, Avatar } from 'antd';
+import { List, Button, Avatar, Tooltip } from 'antd';
 import { Content } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
 import NoteEditorDrawer from '../note-editor/editor-drawer.component';
-import { deleteContent } from '../../features/notes/actions';
-import { connect } from 'react-redux';
+import moment from 'moment';
 
 type NoteContentProps = {
   content: Content;
   noteId: number;
 };
 
-interface NoteContentHandler {
-  deleteContent: (noteId: number, contentId: number) => void;
-}
-
-const NoteContentItem: React.FC<NoteContentProps & NoteContentHandler> = ({
-  content,
-  noteId,
-  deleteContent,
-}) => {
+const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
-
+  const createdTime = moment(content.createdAt).fromNow();
+  const updateTime = moment(content.updatedAt).format('MMM Do YYYY');
   const handleOpen = () => {
     setDisplayMore(true);
   };
@@ -32,31 +24,27 @@ const NoteContentItem: React.FC<NoteContentProps & NoteContentHandler> = ({
     setDisplayMore(false);
   };
 
-  const handleDelete = (contentId: number) => {
-    deleteContent(noteId, contentId);
-  };
-
   return (
     <List.Item
       key={content.id}
       actions={[
+        <span>{`Last Update: ${updateTime}`}</span>,
         <Button type="link" onClick={handleOpen}>
-          Open
-        </Button>,
-        <Button type="link" danger onClick={() => handleDelete(content.id)}>
-          Delete
+          Detail
         </Button>,
       ]}
     >
       <List.Item.Meta
         avatar={<Avatar src={content.ownerAvatar} />}
-        description={
-          contentText.length > 300
-            ? `${contentText.slice(0, 300)}...`
-            : contentText
+        title={
+          <Tooltip title={`Created: ${createdTime}`}>
+            <span>Owned by {content.owner}</span>
+          </Tooltip>
         }
       />
-
+      {contentText.length > 300
+        ? `${contentText.slice(0, 300)}...`
+        : contentText}
       <NoteEditorDrawer
         content={content}
         visible={displayMore}
@@ -67,4 +55,4 @@ const NoteContentItem: React.FC<NoteContentProps & NoteContentHandler> = ({
   );
 };
 
-export default connect(null, { deleteContent })(NoteContentItem);
+export default NoteContentItem;
