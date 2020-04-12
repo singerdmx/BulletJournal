@@ -27,6 +27,8 @@ services:
       SSO_API_KEY: "${SSO_API_KEY}"
       AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
+      GOOGLE_CALENDAR_CLIENT_ID: "${GOOGLE_CALENDAR_CLIENT_ID}"
+      GOOGLE_CALENDAR_CLIENT_SECRET: "${GOOGLE_CALENDAR_CLIENT_SECRET}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
     depends_on:
