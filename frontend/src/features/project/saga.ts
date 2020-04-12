@@ -26,6 +26,8 @@ import { IState } from '../../store';
 import { Project } from './interface';
 import { actions as SystemActions } from '../system/reducer';
 
+import { flattenOwnedProject, flattenSharedProject } from '../../pages/projects/projects.pages';
+
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
   yield call(message.error, `Project Error Received: ${action.payload.error}`);
 }
@@ -36,6 +38,8 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
     const projects = yield data.json();
     const state = yield select();
     const systemState = state.system;
+
+    const selectedProject = state.project.project;
     if (data.headers.get('Etag')) {
       const etags = data.headers.get('Etag').split('|');
       yield put(
@@ -48,6 +52,19 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
         })
       )
     }
+
+    let flattenedProjects = [] as Project[];
+
+    flattenOwnedProject(projects.owned, flattenedProjects);
+    flattenSharedProject(projects.shared, flattenedProjects);
+    const renewedProject = flattenedProjects.find((prj: any) => prj.id===selectedProject.id);
+
+    if(renewedProject){
+      yield put(projectActions.projectReceived({
+        project:renewedProject
+      }));
+    }
+
     yield put(
       projectActions.projectsReceived({
         owned: projects.owned,
