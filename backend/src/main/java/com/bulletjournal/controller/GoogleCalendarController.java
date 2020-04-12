@@ -71,7 +71,7 @@ public class GoogleCalendarController {
     }
 
     private String authorize() {
-        if (this.googleCalClient.getFlow() != null) {
+        if (this.googleCalClient.getFlow() == null) {
             throw new IllegalStateException("Google Calendar Settings missing");
         }
         AuthorizationCodeRequestUrl authorizationUrl;
