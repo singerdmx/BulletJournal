@@ -38,9 +38,6 @@ class Myself extends React.Component<MyselfProps & PathProps> {
 
   handleRefreshOnClick = () => {
     this.props.updateExpandedMyself(true);
-    this.props.updateGroups();
-    this.props.updateNotifications();
-    this.props.groupUpdate();
     this.props.updateSystem();
   };
 

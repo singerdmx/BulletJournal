@@ -6,6 +6,7 @@ import {fetchSystemUpdates, getPublicProjectItem} from '../../apis/systemApis';
 import {ContentType} from "../myBuJo/constants";
 import { updateProjects } from '../project/actions';
 import { updateGroups } from '../group/actions';
+import { updateNotifications } from '../notification/actions';
 
 
 function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
@@ -23,6 +24,10 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
 
     if(groupsEtag !== data.groupsEtag){
       yield put(updateGroups());
+    }
+
+    if(notificationsEtag !== data.notificationsEtag){
+      yield put(updateNotifications());
     }
     yield put(
         systemActions.systemUpdateReceived({
