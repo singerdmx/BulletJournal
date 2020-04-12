@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.GoogleCalClient;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
@@ -11,6 +12,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,8 @@ public class GoogleCalendarController {
 
     @RequestMapping(value = "/api/calendar/google/login", method = RequestMethod.GET)
     public RedirectView googleConnectionStatus(HttpServletRequest request) throws Exception {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        LOGGER.info("Logging in for Google Calendar");
         return new RedirectView(authorize());
     }
 
