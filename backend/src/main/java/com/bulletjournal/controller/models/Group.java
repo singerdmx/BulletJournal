@@ -87,15 +87,17 @@ public class Group {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Group)) return false;
         Group group = (Group) o;
-        return Objects.equals(id, group.id) &&
-                Objects.equals(name, group.name) &&
-                Objects.equals(owner, group.owner);
+        return Objects.equals(getId(), group.getId()) &&
+                Objects.equals(getName(), group.getName()) &&
+                Objects.equals(getOwner(), group.getOwner()) &&
+                Objects.equals(getUsers(), group.getUsers()) &&
+                Objects.equals(isDefault, group.isDefault);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, owner);
+        return Objects.hash(getId(), getName(), getOwner(), getUsers(), isDefault);
     }
 }

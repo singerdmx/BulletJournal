@@ -2,6 +2,8 @@ package com.bulletjournal.controller.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Objects;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserGroup extends User {
 
@@ -28,4 +30,17 @@ public class UserGroup extends User {
         this.accepted = accepted;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserGroup)) return false;
+        if (!super.equals(o)) return false;
+        UserGroup userGroup = (UserGroup) o;
+        return isAccepted() == userGroup.isAccepted();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), isAccepted());
+    }
 }
