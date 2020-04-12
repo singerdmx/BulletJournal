@@ -29,10 +29,12 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
     <List.Item
       key={content.id}
       actions={[
-        <Tooltip title={createdTime}>
+        <Tooltip title={`${content.owner} created ${createdTime}`}>
           <Avatar src={content.ownerAvatar} size="small" />
         </Tooltip>,
-        <span>{`Last Update: ${updateTime}`}</span>,
+        <Tooltip title={`Updated ${moment(content.updatedAt).fromNow()}`}>
+          <span>{updateTime}</span>
+        </Tooltip>,
       ]}
     >
       {contentText.length > 300

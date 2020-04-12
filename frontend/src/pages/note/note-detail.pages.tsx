@@ -5,7 +5,7 @@ import React from 'react';
 //actions
 import {Note} from '../../features/notes/interface';
 // components
-import NoteContentList from '../../components/note-content/content-list.component';
+import NoteContentList from '../../components/content/content-list.component';
 // antd imports
 import {Avatar, Divider, Tooltip} from 'antd';
 import './note-page.styles.less';
