@@ -42,23 +42,21 @@ class Actions extends React.Component<actionsProps> {
           switch (action) {
             case ActionType.Accept:
               return (
-                <Tooltip title={action}>
+                <Tooltip title={action} key={`${action}-${index}`}>
                   <CheckCircleTwoTone
                     twoToneColor="#52c41a"
                     style={{ cursor: 'pointer' }}
                     title={action}
-                    key={index}
                     onClick={() => this.handleClick(action, notificationId, type)}
                   />
                 </Tooltip>
               );
             case ActionType.Decline:
               return (
-                <Tooltip title={action}>
+                <Tooltip title={action} key={`${action}-${index}`}>
                   <CloseCircleTwoTone
                     twoToneColor="#eb2f96"
                     style={{ cursor: 'pointer' }}
-                    key={index}
                     onClick={() => this.handleClick(action, notificationId, type)}
                   />
                 </Tooltip>
