@@ -15,7 +15,7 @@ public class CreateTaskParams {
 
     private String dueDate; // "yyyy-MM-dd"
 
-    private String dueTime; // "HH-mm"
+    private String dueTime; // "HH:mm"
 
     // In minutes
     private Integer duration;

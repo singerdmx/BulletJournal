@@ -130,6 +130,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         T projectItem = getProjectItem(projectItemId, owner);
         content.setProjectItem(projectItem);
         content.setOwner(owner);
+        updateRevision(content, content.getText(), owner);
         this.getContentJpaRepository().save(content);
         return content;
     }
