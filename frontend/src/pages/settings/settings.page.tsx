@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tabs } from 'antd';
+import { Link } from 'react-router-dom';
 import Account from '../../components/settings/account';
 import {
   GoogleOutlined,
@@ -21,6 +22,9 @@ const SettingPage = () => {
           <div>
             <Tabs type="card">
               <TabPane tab={<span><GoogleOutlined /> Google Calendar</span>} key="GoogleCalendar">
+                <Link to='/api/calender/google/login'>
+                  Log in
+                </Link>
               </TabPane>
               <TabPane tab={<span><WindowsOutlined /> Outlook Calendar</span>} key="OutlookCalendar">
               </TabPane>
