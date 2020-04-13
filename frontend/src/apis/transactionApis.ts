@@ -16,22 +16,22 @@ export const fetchTransactions = (
     url += `&startDate=${startDate}&endDate=${endDate}`;
   }
   return doFetch(url)
-    .then(res => res)
-    .catch(err => {
+    .then((res) => res)
+    .catch((err) => {
       throw Error(err.message);
     });
 };
 
 export const getTransactionById = (transactionId: number) => {
   return doFetch(`/api/transactions/${transactionId}`)
-    .then(res => res.json())
-    .catch(err => {
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err.message);
     });
 };
 
 export const deleteTransactionById = (transactionId: number) => {
-  return doDelete(`/api/transactions/${transactionId}`).catch(err => {
+  return doDelete(`/api/transactions/${transactionId}`).catch((err) => {
     throw Error(err.message);
   });
 };
@@ -53,11 +53,11 @@ export const createTransaction = (
     transactionType: transactionType,
     date: date,
     time: time,
-    timezone: timezone
+    timezone: timezone,
   });
   return doPost(`/api/projects/${projectId}/transactions`, postBody)
-    .then(res => res.json())
-    .catch(err => {
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err.message);
     });
 };
@@ -79,11 +79,11 @@ export const updateTransaction = (
     transactionType: transactionType,
     date: date,
     time: time,
-    timezone: timezone
+    timezone: timezone,
   });
   return doPatch(`/api/transactions/${transactionId}`, patchBody)
-    .then(res => res.json())
-    .catch(err => {
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err);
     });
 };
@@ -94,8 +94,8 @@ export const setTransactionLabels = (
 ) => {
   const putBody = JSON.stringify(labels);
   return doPut(`/api/transactions/${transactionId}/setLabels`, putBody)
-    .then(res => res.json())
-    .catch(err => {
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err.message);
     });
 };
@@ -105,34 +105,39 @@ export const moveToTargetProject = (
   targetProject: number
 ) => {
   const postBody = JSON.stringify({
-    targetProject: targetProject
+    targetProject: targetProject,
   });
   return doPost(`/api/transactions/${transactionId}/move`, postBody)
-    .then(res => res)
-    .catch(err => {
+    .then((res) => res)
+    .catch((err) => {
       throw Error(err);
     });
 };
 
-export const shareTransactionWithOther = (transactionId: number, targetUser: string, targetGroup: number, generateLink: boolean) => {
+export const shareTransactionWithOther = (
+  transactionId: number,
+  targetUser: string,
+  targetGroup: number,
+  generateLink: boolean
+) => {
   const postBody = JSON.stringify({
     targetUser: targetUser,
     targetGroup: targetGroup,
-    generateLink: generateLink
+    generateLink: generateLink,
   });
   return doPost(`/api/transactions/${transactionId}/share`, postBody)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err);
-      });
+    .then((res) => res)
+    .catch((err) => {
+      throw Error(err);
+    });
 };
 
 export const getContents = (transactionId: number) => {
   return doFetch(`/api/transactions/${transactionId}/contents`)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err.message);
-      });
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };
 
 export const addContent = (transactionId: number, text: string) => {
@@ -141,27 +146,48 @@ export const addContent = (transactionId: number, text: string) => {
   });
 
   return doPost(`/api/transactions/${transactionId}/addContent`, postBody)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err);
-      });
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err);
+    });
 };
 
 export const deleteContent = (transactionId: number, contentId: number) => {
   return doDelete(`/api/transactions/${transactionId}/contents/${contentId}`)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err.message);
-      });
+    .then((res) => res)
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };
 
-export const updateContent = (transactionId: number, contentId: number, text: string) => {
+export const updateContent = (
+  transactionId: number,
+  contentId: number,
+  text: string
+) => {
   const patchBody = JSON.stringify({
-    text: text
+    text: text,
   });
-  return doPatch(`/api/transactions/${transactionId}/contents/${contentId}`, patchBody)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err);
-      });
+  return doPatch(
+    `/api/transactions/${transactionId}/contents/${contentId}`,
+    patchBody
+  )
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err);
+    });
+};
+
+export const getContentRevision = (
+  transactionId: number,
+  contentId: number,
+  revisionId: number
+) => {
+  return doFetch(
+    `/api/transactions/${transactionId}/contents/${contentId}/revisions/${revisionId}`
+  )
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };

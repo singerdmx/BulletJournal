@@ -15,7 +15,12 @@ import {
   UncompleteTask,
   UpdateTasks,
   GetSharables,
-  RevokeSharable
+  RevokeSharable,
+  CreateContent,
+  DeleteContent,
+  PatchContent,
+  UpdateTaskContentRevision,
+  UpdateTaskContents,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -33,11 +38,18 @@ import {
   shareTaskWithOther,
   uncompleteTaskById,
   updateTask,
+  deleteContent,
+  getSharables,
+  revokeSharable,
+  addContent,
+  getContents,
+  getContentRevision,
+  updateContent,
 } from '../../apis/taskApis';
-import { updateTasks } from './actions';
+import { updateTasks, updateTaskContents } from './actions';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { IState } from '../../store';
-import {getSharables, revokeSharable} from "../../apis/taskApis";
+import { Content, Revision } from '../myBuJo/interface';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -184,11 +196,11 @@ function* patchTask(action: PayloadAction<PatchTask>) {
     const state: IState = yield select();
 
     yield put(
-        getProjectItemsAfterUpdateSelect(
-            state.myBuJo.todoSelected,
-            state.myBuJo.ledgerSelected,
-            'today'
-        )
+      getProjectItemsAfterUpdateSelect(
+        state.myBuJo.todoSelected,
+        state.myBuJo.ledgerSelected,
+        'today'
+      )
     );
 
     const task = yield call(getTaskById, taskId);
@@ -306,7 +318,13 @@ function* moveTask(action: PayloadAction<MoveTask>) {
 
 function* shareTask(action: PayloadAction<ShareTask>) {
   try {
-    const { taskId, targetUser, targetGroup, generateLink, ttl } = action.payload;
+    const {
+      taskId,
+      targetUser,
+      targetGroup,
+      generateLink,
+      ttl,
+    } = action.payload;
     const data = yield call(
       shareTaskWithOther,
       taskId,
@@ -316,7 +334,7 @@ function* shareTask(action: PayloadAction<ShareTask>) {
       ttl
     );
     if (generateLink) {
-      yield put(tasksActions.sharedLinkReceived({link: data.link}));
+      yield put(tasksActions.sharedLinkReceived({ link: data.link }));
     }
     yield call(message.success, 'Task shared successfully');
   } catch (error) {
@@ -327,15 +345,14 @@ function* shareTask(action: PayloadAction<ShareTask>) {
 function* getTaskSharables(action: PayloadAction<GetSharables>) {
   try {
     const { taskId } = action.payload;
-    const data = yield call(
-        getSharables,
-        taskId,
-    );
+    const data = yield call(getSharables, taskId);
 
-    yield put(tasksActions.taskSharablesReceived({
-      users: data.users,
-      links: data.links
-    }));
+    yield put(
+      tasksActions.taskSharablesReceived({
+        users: data.users,
+        links: data.links,
+      })
+    );
   } catch (error) {
     yield call(message.error, `getTaskSharables Error Received: ${error}`);
   }
@@ -344,12 +361,7 @@ function* getTaskSharables(action: PayloadAction<GetSharables>) {
 function* revokeTaskSharable(action: PayloadAction<RevokeSharable>) {
   try {
     const { taskId, user, link } = action.payload;
-    yield call(
-        revokeSharable,
-        taskId,
-        user,
-        link
-    );
+    yield call(revokeSharable, taskId, user, link);
 
     const state: IState = yield select();
 
@@ -357,19 +369,114 @@ function* revokeTaskSharable(action: PayloadAction<RevokeSharable>) {
     let sharedLinks = state.task.sharedLinks;
 
     if (user) {
-      sharedUsers = sharedUsers.filter(u => u.name !== user);
+      sharedUsers = sharedUsers.filter((u) => u.name !== user);
     }
 
     if (link) {
-      sharedLinks = sharedLinks.filter(l => l.link !== link);
+      sharedLinks = sharedLinks.filter((l) => l.link !== link);
     }
 
-    yield put(tasksActions.taskSharablesReceived({
-      users: sharedUsers,
-      links: sharedLinks
-    }));
+    yield put(
+      tasksActions.taskSharablesReceived({
+        users: sharedUsers,
+        links: sharedLinks,
+      })
+    );
   } catch (error) {
     yield call(message.error, `revokeTaskSharable Error Received: ${error}`);
+  }
+}
+
+function* createTaskContent(action: PayloadAction<CreateContent>) {
+  try {
+    const { taskId, text } = action.payload;
+    yield call(addContent, taskId, text);
+    yield put(updateTaskContents(taskId));
+  } catch (error) {
+    yield call(message.error, `createTaskContent Error Received: ${error}`);
+  }
+}
+
+function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
+  try {
+    const contents = yield call(getContents, action.payload.taskId);
+    yield put(
+      tasksActions.taskContentsReceived({
+        contents: contents,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `taskContentsUpdate Error Received: ${error}`);
+  }
+}
+
+function* taskContentRevisionUpdate(
+  action: PayloadAction<UpdateTaskContentRevision>
+) {
+  try {
+    const { taskId, contentId, revisionId } = action.payload;
+    const state: IState = yield select();
+
+    const contents: Content[] = state.task.contents;
+    const targetContent: Content = contents.filter(
+      (c) => c.id === contentId
+    )[0];
+    const revision: Revision = targetContent.revisions.filter(
+      (r) => r.id === revisionId
+    )[0];
+
+    if (!revision.content) {
+      const content = yield call(
+        getContentRevision,
+        taskId,
+        contentId,
+        revisionId
+      );
+      revision.content = content;
+
+      yield put(
+        tasksActions.taskContentsReceived({
+          contents: contents,
+        })
+      );
+    }
+  } catch (error) {
+    yield call(
+      message.error,
+      `taskContentRevisionUpdate Error Received: ${error}`
+    );
+  }
+}
+
+function* patchContent(action: PayloadAction<PatchContent>) {
+  try {
+    const { taskId, contentId, text } = action.payload;
+    const contents = yield call(updateContent, taskId, contentId, text);
+    yield put(
+      tasksActions.taskContentsReceived({
+        contents: contents,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Patch Content Error Received: ${error}`);
+  }
+}
+
+function* deleteTaskContent(action: PayloadAction<DeleteContent>) {
+  try {
+    const { taskId, contentId } = action.payload;
+    const data = yield call(deleteContent, taskId, contentId);
+    const contents = yield data.json();
+    yield put(
+      tasksActions.taskContentsReceived({
+        contents: contents,
+      })
+    );
+  } catch (error) {
+    yield call(
+      message.error,
+      `taskContentDelete Task Error Received: ${error}`
+    );
   }
 }
 
@@ -401,5 +508,13 @@ export default function* taskSagas() {
       tasksActions.CompletedTasksUpdate.type,
       completedTasksUpdate
     ),
+    yield takeLatest(tasksActions.TaskContentsUpdate.type, taskContentsUpdate),
+    yield takeLatest(
+      tasksActions.TaskContentRevisionUpdate.type,
+      taskContentRevisionUpdate
+    ),
+    yield takeLatest(tasksActions.TaskContentCreate.type, createTaskContent),
+    yield takeLatest(tasksActions.TaskContentPatch.type, patchContent),
+    yield takeLatest(tasksActions.TaskContentDelete.type, deleteTaskContent),
   ]);
 }

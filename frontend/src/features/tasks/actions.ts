@@ -29,7 +29,8 @@ export const createTask = (
     timezone: timezone,
   });
 export const getTask = (taskId: number) => actions.TaskGet({ taskId: taskId });
-export const getCompletedTask = (taskId: number) => actions.CompletedTaskGet({ taskId: taskId });
+export const getCompletedTask = (taskId: number) =>
+  actions.CompletedTaskGet({ taskId: taskId });
 export const putTask = (projectId: number, tasks: Task[]) =>
   actions.TaskPut({ projectId: projectId, tasks: tasks });
 export const deleteTask = (taskId: number) =>
@@ -88,9 +89,36 @@ export const shareTask = (
     targetUser: targetUser,
     targetGroup: targetGroup,
     generateLink: generateLink,
-    ttl: ttl
+    ttl: ttl,
   });
 export const getTaskSharables = (taskId: number) =>
-    actions.TaskSharablesGet({taskId: taskId});
-export const revokeTaskSharable = (taskId: number, user?: string, link?: string) =>
-    actions.TaskRevokeSharable({taskId: taskId, user: user, link: link});
+  actions.TaskSharablesGet({ taskId: taskId });
+export const revokeTaskSharable = (
+  taskId: number,
+  user?: string,
+  link?: string
+) => actions.TaskRevokeSharable({ taskId: taskId, user: user, link: link });
+export const updateTaskContents = (taskId: number) =>
+  actions.TaskContentsUpdate({ taskId: taskId });
+export const updateTaskContentRevision = (
+  taskId: number,
+  contentId: number,
+  revisionId: number
+) =>
+  actions.TaskContentRevisionUpdate({
+    taskId: taskId,
+    contentId: contentId,
+    revisionId: revisionId,
+  });
+
+export const createContent = (taskId: number, text: string) =>
+  actions.TaskContentCreate({ taskId: taskId, text: text });
+
+export const deleteContent = (taskId: number, contentId: number) =>
+  actions.TaskContentDelete({ taskId: taskId, contentId: contentId });
+export const patchContent = (taskId: number, contentId: number, text: string) =>
+  actions.TaskContentPatch({
+    taskId: taskId,
+    contentId: contentId,
+    text: text,
+  });

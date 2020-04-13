@@ -11,6 +11,11 @@ import {
   SetTransactionLabels,
   ShareTransaction,
   DeleteTransaction,
+  CreateContent,
+  DeleteContent,
+  PatchContent,
+  UpdateTransactionContentRevision,
+  UpdateTransactionContents,
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -23,9 +28,16 @@ import {
   moveToTargetProject,
   setTransactionLabels,
   shareTransactionWithOther,
+  deleteContent,
+  addContent,
+  getContents,
+  updateContent,
+  getContentRevision,
 } from '../../apis/transactionApis';
 import { LedgerSummary } from './interface';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
+import { updateTransactionContents } from './actions';
+import { Content, Revision } from '../myBuJo/interface';
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -186,11 +198,11 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
     const state: IState = yield select();
 
     yield put(
-        getProjectItemsAfterUpdateSelect(
-            state.myBuJo.todoSelected,
-            state.myBuJo.ledgerSelected,
-            'today'
-        )
+      getProjectItemsAfterUpdateSelect(
+        state.myBuJo.todoSelected,
+        state.myBuJo.ledgerSelected,
+        'today'
+      )
     );
   } catch (error) {
     yield call(message.error, `Patch Transaction Error Received: ${error}`);
@@ -204,6 +216,107 @@ function* transactionSetLabels(action: PayloadAction<SetTransactionLabels>) {
     yield put(transactionsActions.transactionReceived({ transaction: data }));
   } catch (error) {
     yield call(message.error, `transactionSetLabels Error Received: ${error}`);
+  }
+}
+
+function* createTransactionContent(action: PayloadAction<CreateContent>) {
+  try {
+    const { transactionId, text } = action.payload;
+    yield call(addContent, transactionId, text);
+    yield put(updateTransactionContents(transactionId));
+  } catch (error) {
+    yield call(
+      message.error,
+      `createTransactionContent Error Received: ${error}`
+    );
+  }
+}
+
+function* transactionContentsUpdate(
+  action: PayloadAction<UpdateTransactionContents>
+) {
+  try {
+    const contents = yield call(getContents, action.payload.transactionId);
+    yield put(
+      transactionsActions.transactionContentsReceived({
+        contents: contents,
+      })
+    );
+  } catch (error) {
+    yield call(
+      message.error,
+      `transactionContentsUpdate Error Received: ${error}`
+    );
+  }
+}
+
+function* transactionContentRevisionUpdate(
+  action: PayloadAction<UpdateTransactionContentRevision>
+) {
+  try {
+    const { transactionId, contentId, revisionId } = action.payload;
+    const state: IState = yield select();
+
+    const contents: Content[] = state.transaction.contents;
+    const targetContent: Content = contents.filter(
+      (c) => c.id === contentId
+    )[0];
+    const revision: Revision = targetContent.revisions.filter(
+      (r) => r.id === revisionId
+    )[0];
+
+    if (!revision.content) {
+      const content = yield call(
+        getContentRevision,
+        transactionId,
+        contentId,
+        revisionId
+      );
+      revision.content = content;
+
+      yield put(
+        transactionsActions.transactionContentsReceived({
+          contents: contents,
+        })
+      );
+    }
+  } catch (error) {
+    yield call(
+      message.error,
+      `transactionContentRevisionUpdate Error Received: ${error}`
+    );
+  }
+}
+
+function* patchContent(action: PayloadAction<PatchContent>) {
+  try {
+    const { transactionId, contentId, text } = action.payload;
+    const contents = yield call(updateContent, transactionId, contentId, text);
+    yield put(
+      transactionsActions.transactionContentsReceived({
+        contents: contents,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Patch Content Error Received: ${error}`);
+  }
+}
+
+function* deleteTransactionContent(action: PayloadAction<DeleteContent>) {
+  try {
+    const { transactionId, contentId } = action.payload;
+    const data = yield call(deleteContent, transactionId, contentId);
+    const contents = yield data.json();
+    yield put(
+      transactionsActions.transactionContentsReceived({
+        contents: contents,
+      })
+    );
+  } catch (error) {
+    yield call(
+      message.error,
+      `transactionContentDelete Transaction Error Received: ${error}`
+    );
   }
 }
 
@@ -238,6 +351,26 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,
       transactionSetLabels
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionContentsUpdate.type,
+      transactionContentsUpdate
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionContentRevisionUpdate.type,
+      transactionContentRevisionUpdate
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionContentCreate.type,
+      createTransactionContent
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionContentPatch.type,
+      patchContent
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionContentDelete.type,
+      deleteTransactionContent
     ),
   ]);
 }

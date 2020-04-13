@@ -1,9 +1,40 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Transaction, LedgerSummary } from './interface';
 import { History } from 'history';
+import { Content } from '../myBuJo/interface';
 
 export type TransactionApiErrorAction = {
   error: string;
+};
+
+export type UpdateTransactionContents = {
+  transactionId: number;
+};
+
+export type UpdateTransactionContentRevision = {
+  transactionId: number;
+  contentId: number;
+  revisionId: number;
+};
+
+export type ContentsAction = {
+  contents: Content[];
+};
+
+export type DeleteContent = {
+  transactionId: number;
+  contentId: number;
+};
+
+export type CreateContent = {
+  transactionId: number;
+  text: string;
+};
+
+export type PatchContent = {
+  transactionId: number;
+  contentId: number;
+  text: string;
 };
 
 export type UpdateTransactions = {
@@ -80,9 +111,10 @@ export type SetTransactionLabels = {
 };
 
 let initialState = {
+  contents: [] as Array<Content>,
   transaction: {} as Transaction,
   ledgerSummary: {} as LedgerSummary,
-  addTransactionVisible: false
+  addTransactionVisible: false,
 };
 
 const slice = createSlice({
@@ -124,8 +156,29 @@ const slice = createSlice({
     TransactionSetLabels: (
       state,
       action: PayloadAction<SetTransactionLabels>
-    ) => state
-  }
+    ) => state,
+    transactionContentsReceived: (
+      state,
+      action: PayloadAction<ContentsAction>
+    ) => {
+      const { contents } = action.payload;
+      state.contents = contents;
+    },
+    TransactionContentsUpdate: (
+      state,
+      action: PayloadAction<UpdateTransactionContents>
+    ) => state,
+    TransactionContentRevisionUpdate: (
+      state,
+      action: PayloadAction<UpdateTransactionContentRevision>
+    ) => state,
+    TransactionContentCreate: (state, action: PayloadAction<CreateContent>) =>
+      state,
+    TransactionContentDelete: (state, action: PayloadAction<DeleteContent>) =>
+      state,
+    TransactionContentPatch: (state, action: PayloadAction<PatchContent>) =>
+      state,
+  },
 });
 
 export const reducer = slice.reducer;

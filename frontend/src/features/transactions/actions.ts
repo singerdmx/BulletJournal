@@ -93,3 +93,38 @@ export const moveTransaction = (
     targetProject: targetProject,
     history: history,
   });
+
+export const updateTransactionContents = (transactionId: number) =>
+  actions.TransactionContentsUpdate({ transactionId: transactionId });
+export const updateTransactionContentRevision = (
+  transactionId: number,
+  contentId: number,
+  revisionId: number
+) =>
+  actions.TransactionContentRevisionUpdate({
+    transactionId: transactionId,
+    contentId: contentId,
+    revisionId: revisionId,
+  });
+
+export const createContent = (transactionId: number, text: string) =>
+  actions.TransactionContentCreate({
+    transactionId: transactionId,
+    text: text,
+  });
+
+export const deleteContent = (transactionId: number, contentId: number) =>
+  actions.TransactionContentDelete({
+    transactionId: transactionId,
+    contentId: contentId,
+  });
+export const patchContent = (
+  transactionId: number,
+  contentId: number,
+  text: string
+) =>
+  actions.TransactionContentPatch({
+    transactionId: transactionId,
+    contentId: contentId,
+    text: text,
+  });

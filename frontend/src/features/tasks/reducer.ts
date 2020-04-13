@@ -1,11 +1,22 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Task, ReminderSetting } from './interface';
 import { History } from 'history';
-import {User} from "../group/interface";
-import {ProjectItemSharables, SharableLink} from "../system/interface";
+import { User } from '../group/interface';
+import { Content } from '../myBuJo/interface';
+import { ProjectItemSharables, SharableLink } from '../system/interface';
 
 export type TaskApiErrorAction = {
   error: string;
+};
+
+export type UpdateTaskContents = {
+  taskId: number;
+};
+
+export type UpdateTaskContentRevision = {
+  taskId: number;
+  contentId: number;
+  revisionId: number;
 };
 
 export type UpdateTasks = {
@@ -24,6 +35,15 @@ export type CreateTask = {
   recurrenceRule?: string;
 };
 
+export type ContentsAction = {
+  contents: Content[];
+};
+
+export type DeleteContent = {
+  taskId: number;
+  contentId: number;
+};
+
 export type GetTask = {
   taskId: number;
 };
@@ -34,6 +54,11 @@ export type TasksAction = {
 
 export type TaskAction = {
   task: Task;
+};
+
+export type CreateContent = {
+  taskId: number;
+  text: string;
 };
 
 export type PutTask = {
@@ -56,18 +81,24 @@ export type ShareTask = {
   taskId: number;
   targetGroup?: number;
   generateLink: boolean;
-  ttl?: number
+  ttl?: number;
 };
 
 export type GetSharables = {
   taskId: number;
-}
+};
+
+export type PatchContent = {
+  taskId: number;
+  contentId: number;
+  text: string;
+};
 
 export type RevokeSharable = {
   taskId: number;
   user?: string;
   link?: string;
-}
+};
 
 export type PatchTask = {
   taskId: number;
@@ -101,7 +132,7 @@ export type updateVisibleAction = {
 
 export type ShareLinkAction = {
   link: string;
-}
+};
 
 export type GetCompletedTasks = {
   projectId: number;
@@ -109,12 +140,13 @@ export type GetCompletedTasks = {
 
 let initialState = {
   addTaskVisible: false,
+  contents: [] as Array<Content>,
   task: {} as Task,
   tasks: [] as Array<Task>,
   completedTasks: [] as Array<Task>,
   sharedUsers: [] as User[],
   sharedLinks: [] as SharableLink[],
-  sharedLink: ''
+  sharedLink: '',
 };
 
 const slice = createSlice({
@@ -129,7 +161,10 @@ const slice = createSlice({
       const { task } = action.payload;
       state.task = task;
     },
-    taskSharablesReceived: (state, action: PayloadAction<ProjectItemSharables>) => {
+    taskSharablesReceived: (
+      state,
+      action: PayloadAction<ProjectItemSharables>
+    ) => {
       const { users, links } = action.payload;
       state.sharedUsers = users;
       state.sharedLinks = links;
@@ -167,6 +202,19 @@ const slice = createSlice({
     TaskShare: (state, action: PayloadAction<ShareTask>) => state,
     TaskSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
     TaskRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
+    taskContentsReceived: (state, action: PayloadAction<ContentsAction>) => {
+      const { contents } = action.payload;
+      state.contents = contents;
+    },
+    TaskContentsUpdate: (state, action: PayloadAction<UpdateTaskContents>) =>
+      state,
+    TaskContentRevisionUpdate: (
+      state,
+      action: PayloadAction<UpdateTaskContentRevision>
+    ) => state,
+    TaskContentCreate: (state, action: PayloadAction<CreateContent>) => state,
+    TaskContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
+    TaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
   },
 });
 
