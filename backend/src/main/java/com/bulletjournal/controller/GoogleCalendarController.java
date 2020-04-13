@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
+import com.bulletjournal.repository.CalendarTokenDaoJpa;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
@@ -41,6 +42,9 @@ public class GoogleCalendarController {
     @Autowired
     private GoogleCalClient googleCalClient;
 
+    @Autowired
+    private CalendarTokenDaoJpa calendarTokenDaoJpa;
+
     @RequestMapping(value = "/api/calendar/google/login", method = RequestMethod.GET)
     public RedirectView googleConnectionStatus(HttpServletRequest request) throws Exception {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -56,6 +60,10 @@ public class GoogleCalendarController {
             TokenResponse response = this.googleCalClient.getFlow().newTokenRequest(code)
                     .setRedirectUri(this.googleCalConfig.getRedirectURI()).execute();
             Credential credential = this.googleCalClient.getFlow().createAndStoreCredential(response, "userID");
+
+            String username = MDC.get(UserClient.USER_NAME_KEY);
+            calendarTokenDaoJpa.merge(credential, username);
+
             Calendar client = new com.google.api.services.calendar.Calendar.Builder(
                     this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
                     .setApplicationName(APPLICATION_NAME).build();

@@ -45,6 +45,10 @@ public class CalendarToken extends AuditModel {
         return owner;
     }
 
+    public void setGoogleTokenExpirationTime(Timestamp timestamp) {
+        this.googleTokenExpirationTime = timestamp;
+    }
+
     public void setOwner(String owner) {
         this.owner = owner;
     }
