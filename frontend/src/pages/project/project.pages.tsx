@@ -7,7 +7,7 @@ import { GroupsWithOwner } from '../../features/group/interface';
 import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
-import { DeleteOutlined, TeamOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TeamOutlined, CheckCircleOutlined, CloseCircleOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
@@ -110,6 +110,7 @@ class ProjectPage extends React.Component<
     let createContent = null;
     let projectContent = null;
     let showCompletedTasks = null;
+    let punchCard = null;
 
     switch (project.projectType) {
       case ProjectType.NOTE:
@@ -120,6 +121,11 @@ class ProjectPage extends React.Component<
         createContent = <AddTask />;
         projectContent = <TaskTree showCompletedTask={this.state.completeTasksShown} readOnly={project.shared}/>;
         showCompletedTasks = this.getShowCompletedTasksIcon();
+        punchCard = <Tooltip title='Punch Card'>
+          <div>
+            <FieldTimeOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
+          </div>
+        </Tooltip>;
         break;
       case ProjectType.LEDGER:
         createContent = <AddTransaction />;
@@ -169,6 +175,7 @@ class ProjectPage extends React.Component<
       showCompletedTasks = null;
       editContent = null;
       deleteContent = null;
+      punchCard = null;
       if (groupUsers) {
         groupUsers = groupUsers.filter(u => u.name === project.owner);
       }
@@ -227,6 +234,7 @@ class ProjectPage extends React.Component<
             </Popover>
             {showCompletedTasks}
             {createContent}
+            {punchCard}
             {editContent}
             {deleteContent}
           </div>
