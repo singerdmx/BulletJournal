@@ -7,7 +7,10 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "calendar_tokens",
-        indexes = {@Index(name = "calendar_token_owner_index", columnList = "owner")})
+        indexes = {@Index(name = "calendar_token_owner_index", columnList = "owner")},
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"owner"})
+        })
 public class CalendarToken extends AuditModel {
     @Id
     @GeneratedValue(generator = "calendar_token_generator")
