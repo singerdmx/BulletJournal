@@ -12,11 +12,11 @@ import java.sql.Timestamp;
 @Repository
 public class CalendarTokenDaoJpa {
     @Autowired
-    CalendarTokenRepository googleCalendarRepository;
+    private CalendarTokenRepository googleCalendarRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void merge(Credential credential, String owner) {
-        CalendarToken calendarToken = googleCalendarRepository.findByOwner(owner);
+        CalendarToken calendarToken = get(owner);
         if (calendarToken == null) {
             calendarToken = new CalendarToken();
         }
@@ -24,5 +24,11 @@ public class CalendarTokenDaoJpa {
         calendarToken.setGoogleTokenExpirationTime(new Timestamp(credential.getExpirationTimeMilliseconds().longValue()));
         calendarToken.setOwner(owner);
         googleCalendarRepository.save(calendarToken);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public CalendarToken get(String owner) {
+        CalendarToken calendarToken = this.googleCalendarRepository.findByOwner(owner);
+        return calendarToken;
     }
 }

@@ -3,27 +3,28 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
+import com.bulletjournal.controller.models.LoginStatus;
+import com.bulletjournal.controller.models.PullCalendarEventsParams;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.CalendarTokenDaoJpa;
+import com.bulletjournal.repository.models.CalendarToken;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
-import com.google.api.services.calendar.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.Date;
 
 @RestController
@@ -45,41 +46,61 @@ public class GoogleCalendarController {
     @Autowired
     private CalendarTokenDaoJpa calendarTokenDaoJpa;
 
-    @RequestMapping(value = "/api/calendar/google/login", method = RequestMethod.GET)
-    public RedirectView googleConnectionStatus(HttpServletRequest request) throws Exception {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
+    @PostMapping(value = "/api/calendar/google/login")
+    public ResponseEntity<?> loginGoogleCalendar() {
         LOGGER.info("Logging in for Google Calendar");
-        return new RedirectView(authorize());
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setLocation(URI.create(authorize()));
+        return ResponseEntity.ok().headers(responseHeader).build();
     }
 
     @RequestMapping(value = "/api/calendar/google/oauth2_basic/callback", method = RequestMethod.GET, params = "code")
-    public ResponseEntity<String> oauth2Callback(@RequestParam(value = "code") String code) {
-        com.google.api.services.calendar.model.Events eventList;
-        String message;
+    public RedirectView oauth2Callback(@RequestParam(value = "code") String code) {
+
+        Credential credential;
         try {
             TokenResponse response = this.googleCalClient.getFlow().newTokenRequest(code)
                     .setRedirectUri(this.googleCalConfig.getRedirectURI()).execute();
-            Credential credential = this.googleCalClient.getFlow().createAndStoreCredential(response, "userID");
-
-            String username = MDC.get(UserClient.USER_NAME_KEY);
-            calendarTokenDaoJpa.merge(credential, username);
-
-            Calendar client = new com.google.api.services.calendar.Calendar.Builder(
-                    this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
-                    .setApplicationName(APPLICATION_NAME).build();
-            Calendar.Events events = client.events();
-            eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
-            message = eventList.getItems().toString();
-            System.out.println("My:" + eventList.getItems());
-        } catch (Exception e) {
-            LOGGER.warn("Exception while handling OAuth2 callback (" + e.getMessage() + ")."
-                    + " Redirecting to google connection status page.");
-            message = "Exception while handling OAuth2 callback (" + e.getMessage() + ")."
-                    + " Redirecting to google connection status page.";
+            credential = this.googleCalClient.getFlow().createAndStoreCredential(response, "userID");
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
         }
 
-        System.out.println("cal message:" + message);
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.calendarTokenDaoJpa.merge(credential, username);
+        return new RedirectView("/settings#google");
+    }
+
+    @GetMapping("/api/calendar/google/loginStatus")
+    public LoginStatus getLoginStatus() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        CalendarToken calendarToken = this.calendarTokenDaoJpa.get(username);
+        if (calendarToken == null) {
+            return new LoginStatus(false, null);
+        }
+
+        return new LoginStatus(true, calendarToken.getGoogleTokenExpirationTime().getTime());
+    }
+
+    @PostMapping("/api/calendar/google/pullEvents")
+    public void pullEvents(@Valid @RequestBody PullCalendarEventsParams pullCalendarEventsParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        CalendarToken calendarToken = this.calendarTokenDaoJpa.get(username);
+        if (calendarToken == null) {
+            throw new BadRequestException("User not logged in");
+        }
+//        com.google.api.services.calendar.model.Events eventList;
+//
+//        Credential.Builder credential = new Credential.Builder();
+//            Calendar client = new com.google.api.services.calendar.Calendar.Builder(
+//                    this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
+//                    .setApplicationName(APPLICATION_NAME).build();
+//            Calendar.Events events = client.events();
+//            eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
+//            String message = eventList.getItems().toString();
+//            System.out.println("My:" + eventList.getItems());
+//
+//        System.out.println("cal message:" + message);
     }
 
     private String authorize() {

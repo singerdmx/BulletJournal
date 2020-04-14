@@ -87,4 +87,24 @@ public class CalendarToken extends AuditModel {
     public void setApple(String apple) {
         this.apple = apple;
     }
+
+    public Timestamp getGoogleTokenExpirationTime() {
+        return googleTokenExpirationTime;
+    }
+
+    public Timestamp getMicrosoftTokenExpirationTime() {
+        return microsoftTokenExpirationTime;
+    }
+
+    public void setMicrosoftTokenExpirationTime(Timestamp microsoftTokenExpirationTime) {
+        this.microsoftTokenExpirationTime = microsoftTokenExpirationTime;
+    }
+
+    public Timestamp getAppleTokenExpirationTime() {
+        return appleTokenExpirationTime;
+    }
+
+    public void setAppleTokenExpirationTime(Timestamp appleTokenExpirationTime) {
+        this.appleTokenExpirationTime = appleTokenExpirationTime;
+    }
 }
