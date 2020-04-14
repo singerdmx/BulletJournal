@@ -1,12 +1,15 @@
 package com.bulletjournal.clients;
 
 import com.bulletjournal.config.GoogleCalConfig;
+import com.bulletjournal.repository.GoogleCredentialRepository;
+import com.bulletjournal.repository.utils.GoogleCalendarDataStoreFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +32,9 @@ public class GoogleCalClient {
     @Autowired
     private GoogleCalConfig googleCalConfig;
 
+    @Autowired
+    private GoogleCredentialRepository repository;
+
     @PostConstruct
     void initializeFlow() throws GeneralSecurityException, IOException {
         if (this.googleCalConfig.getClientId() == null || this.googleCalConfig.getClientSecret() == null) {
@@ -40,10 +46,12 @@ public class GoogleCalClient {
         web.setClientSecret(this.googleCalConfig.getClientSecret());
         GoogleClientSecrets clientSecrets = new GoogleClientSecrets().setWeb(web);
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        DataStoreFactory dataStore = new GoogleCalendarDataStoreFactory(this.repository);
         this.flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets,
                 Collections.singleton(CalendarScopes.CALENDAR))
                 .setAccessType("offline")
                 .setApprovalPrompt("force")
+                .setDataStoreFactory(dataStore)
                 .build();
     }
 
