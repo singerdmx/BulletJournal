@@ -23,9 +23,16 @@ public class JoinGroupResponseEvent extends Informed {
         return ContentType.GROUP;
     }
 
+
+
     @Override
     protected String getEventTitle(Event event) {
         return this.getOriginator() + " " + this.action.getPastTenseDescription()
                 + " your invitation to join Group " + event.getContentName();
+    }
+
+    @Override
+    public String getLink(Long contentId) {
+        return String.format("/groups/group%d", contentId);
     }
 }

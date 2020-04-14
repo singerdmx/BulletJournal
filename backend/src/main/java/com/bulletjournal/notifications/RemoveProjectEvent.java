@@ -23,4 +23,9 @@ public class RemoveProjectEvent extends Informed {
     protected String getEventTitle(Event event) {
         return this.getOriginator() + " removed Project " + event.getContentName();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return null; // ?
+    }
 }

@@ -25,4 +25,12 @@ public class UpdateTaskAssigneeEvent extends Informed {
         }
         return "Task " + event.getContentName() + " is assigned to " + this.assignedTo + " by " + this.getOriginator();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        if(assignedTo != null){
+            return String.format("/tasks/task%d", contentId);
+        }
+        return null;
+    }
 }

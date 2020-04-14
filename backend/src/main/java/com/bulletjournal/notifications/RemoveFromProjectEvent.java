@@ -23,4 +23,9 @@ public class RemoveFromProjectEvent extends Informed {
     protected String getEventTitle(Event event) {
         return "You've been removed from " + event.getContentName();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return null; // ?
+    }
 }

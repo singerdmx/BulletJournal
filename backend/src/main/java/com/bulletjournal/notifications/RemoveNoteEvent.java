@@ -23,4 +23,9 @@ public class RemoveNoteEvent extends Informed {
     protected String getEventTitle(Event event) {
         return this.getOriginator() + " removed Note " + event.getContentName();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return null;
+    }
 }

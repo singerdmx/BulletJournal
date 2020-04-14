@@ -22,4 +22,9 @@ public class SetLabelEvent extends Informed {
     protected String getEventTitle(Event event) {
         return this.getOriginator() + " updated labels for " + this.contentType.name() + " " + event.getContentName();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return String.format("/" + this.contentType.name() + "/%d", contentId); // this returns project/task etc?
+    }
 }
