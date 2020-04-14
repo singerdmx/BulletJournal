@@ -1,9 +1,11 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.calendars.google.Converter;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
 import com.bulletjournal.controller.models.LoginStatus;
+import com.bulletjournal.controller.models.PublicProjectItem;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
@@ -14,7 +16,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
-import com.google.api.services.calendar.model.Events;
+import com.google.api.services.calendar.model.Event;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class GoogleCalendarController {
@@ -89,7 +92,7 @@ public class GoogleCalendarController {
     }
 
     @GetMapping("/api/calendar/google/calendars/{calendarId}/eventList")
-    public void getEventList(
+    public List<PublicProjectItem> getEventList(
             @NotNull @PathVariable String calendarId,
             @RequestParam(name = "startDate", required = false) String startDate,
             @RequestParam(name = "endDate", required = false) String endDate) throws IOException {
@@ -101,7 +104,8 @@ public class GoogleCalendarController {
         if (StringUtils.isNotBlank(endDate)) {
             list.setTimeMax(DateTime.parseRfc3339(endDate));
         }
-        Events events = list.execute();
+        List<Event> events = list.execute().getItems();
+        return events.stream().map(e -> Converter.toTask(e)).collect(Collectors.toList());
     }
 
     @GetMapping("/api/calendar/google/calendarList")
