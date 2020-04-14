@@ -321,6 +321,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return task;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void create(Long projectId, String username, CreateTaskParams createTaskParams,
+                       String iCalUID, Content content) {
+        Task task = create(projectId, username, createTaskParams);
+        task.setGoogleCalendarEventId(iCalUID);
+        this.taskRepository.save(task);
+        // create content
+    }
+
     private ReminderSetting getReminderSetting(
             String dueDate, Task task, String time, String timezone, String recurrenceRule,
             ReminderSetting reminderSetting) {

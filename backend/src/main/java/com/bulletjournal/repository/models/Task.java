@@ -27,6 +27,9 @@ public class Task extends TaskModel {
     @Column(name = "completed_slots", columnDefinition = "TEXT")
     private String completedSlots;
 
+    @Column(name = "google_calendar_event_id")
+    private String googleCalendarEventId;
+
     @Override
     public Long getId() {
         return id;
@@ -52,5 +55,13 @@ public class Task extends TaskModel {
 
     public void setCompletedSlots(String completedSlots) {
         this.completedSlots = completedSlots;
+    }
+
+    public String getGoogleCalendarEventId() {
+        return googleCalendarEventId;
+    }
+
+    public void setGoogleCalendarEventId(String googleCalendarEventId) {
+        this.googleCalendarEventId = googleCalendarEventId;
     }
 }

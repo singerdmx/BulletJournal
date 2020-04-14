@@ -134,7 +134,7 @@ public class GoogleCalendarController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         createGoogleCalendarEventsParams.getEvents().forEach((e -> {
             taskDaoJpa.create(createGoogleCalendarEventsParams.getProjectId(), username,
-                    Converter.toCreateTaskParams(e));
+                    Converter.toCreateTaskParams(e), e.getiCalUID(), e.getContent());
         }));
     }
 
@@ -155,6 +155,18 @@ public class GoogleCalendarController {
         } while (pageToken != null);
 
         return result;
+    }
+
+    @PostMapping("/api/calendar/google/calendars/{calendarId}/watch")
+    public void watchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
+        Calendar service = getCalendarService();
+        // https://developers.google.com/calendar/v3/reference/events/watch
+    }
+
+    @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")
+    public void unwatchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
+        Calendar service = getCalendarService();
+        // https://developers.google.com/calendar/v3/reference/channels/stop
     }
 
     private Calendar getCalendarService() throws IOException {
