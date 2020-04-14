@@ -9,6 +9,11 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -21,11 +26,15 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class GoogleCalendarController {
 
+    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
+    private static final String APPLICATION_NAME = "Bullet Journal";
 
     @Autowired
     private GoogleCalConfig googleCalConfig;
@@ -68,23 +77,39 @@ public class GoogleCalendarController {
 
     @PostMapping("/api/calendar/google/pullEvents")
     public void pullEvents(@Valid @RequestBody PullCalendarEventsParams pullCalendarEventsParams) throws IOException {
+        Calendar service = getCalendarService();
+    }
+
+    @GetMapping("/api/calendar/google/calendarList")
+    public List<CalendarListEntry> getCalendarList() throws IOException {
+        Calendar service = getCalendarService();
+        List<CalendarListEntry> result = new ArrayList<>();
+        // Iterate through entries in calendar list
+        String pageToken = null;
+        do {
+            CalendarList calendarList = service.calendarList().list().setPageToken(pageToken).execute();
+            List<CalendarListEntry> items = calendarList.getItems();
+
+            for (CalendarListEntry calendarListEntry : items) {
+                result.add(calendarListEntry);
+            }
+            pageToken = calendarList.getNextPageToken();
+        } while (pageToken != null);
+
+        return result;
+    }
+
+    private Calendar getCalendarService() throws IOException {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Credential credential = this.googleCalClient.getFlow().loadCredential(username);
         if (credential == null) {
             throw new BadRequestException("User not logged in");
         }
-//        com.google.api.services.calendar.model.Events eventList;
-//
-//        Credential.Builder credential = new Credential.Builder();
-//            Calendar client = new com.google.api.services.calendar.Calendar.Builder(
-//                    this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
-//                    .setApplicationName(APPLICATION_NAME).build();
-//            Calendar.Events events = client.events();
-//            eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
-//            String message = eventList.getItems().toString();
-//            System.out.println("My:" + eventList.getItems());
-//
-//        System.out.println("cal message:" + message);
+
+        // Initialize Calendar service with valid OAuth credentials
+        return new Calendar.Builder(
+                this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME).build();
     }
 
     private String authorize() {
