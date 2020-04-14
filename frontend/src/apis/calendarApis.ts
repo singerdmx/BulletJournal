@@ -15,3 +15,11 @@ export const getGoogleCalendarLoginStatus = () => {
             throw Error(err.message);
         });
 };
+
+export const getGoogleCalendarList = () => {
+    return doFetch('/api/calendar/google/calendarList')
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+};

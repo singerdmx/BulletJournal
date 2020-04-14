@@ -34,7 +34,7 @@ const SettingPage: React.FC<SettingProps> = (props) => {
             <div>
               <Tabs type="card" defaultActiveKey={calendarKey}>
                 <TabPane tab={<span><GoogleOutlined/> Google Calendar</span>} key="#google">
-                  <div className='calendar-login-button'>
+                  <div>
                     <GoogleCalendarSyncPage/>
                   </div>
                 </TabPane>
