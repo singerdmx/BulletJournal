@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.calendars.google.Converter;
+import com.bulletjournal.calendars.google.GoogleCalendarEvent;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
@@ -27,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
@@ -92,8 +94,9 @@ public class GoogleCalendarController {
     }
 
     @GetMapping("/api/calendar/google/calendars/{calendarId}/eventList")
-    public List<PublicProjectItem> getEventList(
+    public List<GoogleCalendarEvent> getEventList(
             @NotNull @PathVariable String calendarId,
+            @NotBlank @RequestParam String timezone,
             @RequestParam(name = "startDate", required = false) String startDate,
             @RequestParam(name = "endDate", required = false) String endDate) throws IOException {
         Calendar service = getCalendarService();
@@ -105,7 +108,7 @@ public class GoogleCalendarController {
             list.setTimeMax(DateTime.parseRfc3339(endDate));
         }
         List<Event> events = list.execute().getItems();
-        return events.stream().map(e -> Converter.toTask(e)).collect(Collectors.toList());
+        return events.stream().map(e -> Converter.toTask(e, timezone)).collect(Collectors.toList());
     }
 
     @GetMapping("/api/calendar/google/calendarList")

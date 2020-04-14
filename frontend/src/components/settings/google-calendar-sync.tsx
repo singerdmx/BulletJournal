@@ -51,7 +51,7 @@ const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
                             className='grid-style'
                             style={{backgroundColor: calendar.backgroundColor, color: calendar.foregroundColor}}>
                             <CalendarListEntryModal calendar={calendar}/>
-                        </Card.Grid>;
+                        </Card.Grid>
                     })}
                 </Card>
             </div>
@@ -61,7 +61,7 @@ const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
     return <div className='calendar-sync-div'>
         <Tooltip title='Enjoy a 2-way sync between your scheduled tasks and your Google Calendar'>
             <Button onClick={() => handleGoogleCalendarLogin()}><SwapOutlined/><span>{' '}Connect</span></Button>
-        </Tooltip>;
+        </Tooltip>
     </div>
 };
 
