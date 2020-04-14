@@ -41,7 +41,10 @@ public class GoogleCalClient {
         GoogleClientSecrets clientSecrets = new GoogleClientSecrets().setWeb(web);
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         this.flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets,
-                Collections.singleton(CalendarScopes.CALENDAR)).build();
+                Collections.singleton(CalendarScopes.CALENDAR))
+                .setAccessType("offline")
+                .setApprovalPrompt("force")
+                .build();
     }
 
     public HttpTransport getHttpTransport() {

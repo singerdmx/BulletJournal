@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 
@@ -56,17 +57,16 @@ public class GoogleCalendarController {
 
     @RequestMapping(value = "/api/calendar/google/oauth2_basic/callback", method = RequestMethod.GET, params = "code")
     public RedirectView oauth2Callback(@RequestParam(value = "code") String code) {
-
+        String username = MDC.get(UserClient.USER_NAME_KEY);
         Credential credential;
         try {
             TokenResponse response = this.googleCalClient.getFlow().newTokenRequest(code)
                     .setRedirectUri(this.googleCalConfig.getRedirectURI()).execute();
-            credential = this.googleCalClient.getFlow().createAndStoreCredential(response, "userID");
+            credential = this.googleCalClient.getFlow().createAndStoreCredential(response, username);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
 
-        String username = MDC.get(UserClient.USER_NAME_KEY);
         this.calendarTokenDaoJpa.merge(credential, username);
         return new RedirectView("/settings#google");
     }
@@ -83,8 +83,9 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/api/calendar/google/pullEvents")
-    public void pullEvents(@Valid @RequestBody PullCalendarEventsParams pullCalendarEventsParams) {
+    public void pullEvents(@Valid @RequestBody PullCalendarEventsParams pullCalendarEventsParams) throws IOException {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        Credential credential = this.googleCalClient.getFlow().loadCredential(username);
         CalendarToken calendarToken = this.calendarTokenDaoJpa.get(username);
         if (calendarToken == null) {
             throw new BadRequestException("User not logged in");
