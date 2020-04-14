@@ -2,6 +2,7 @@ package com.bulletjournal.calendars.google;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.Task;
 import com.google.api.services.calendar.model.Event;
@@ -18,12 +19,14 @@ public class Converter {
         task.setAssignedTo(username);
         task.setName(event.getSummary());
         event.getOriginalStartTime();
-        task.setRecurrenceRule(Strings.join(event.getRecurrence(), ";"));
+        if (!event.getRecurrence().isEmpty()) {
+            task.setRecurrenceRule(Strings.join(event.getRecurrence(), ";"));
+        }
         task.setTimezone(timezone);
 
         EventDateTime startDateTime = event.getStart();
-        EventDateTime endDateTime = event.getEnd();
         if (startDateTime != null) {
+            EventDateTime endDateTime = event.getEnd();
 //            task.setDueDate();
 //            task.setDueTime();
 //            task.setDuration();
@@ -43,5 +46,9 @@ public class Converter {
         GoogleCalendarEvent googleCalendarEvent = new GoogleCalendarEvent(
                 task, content, event.getICalUID());
         return googleCalendarEvent;
+    }
+
+    public static CreateTaskParams toCreateTaskParams(GoogleCalendarEvent event) {
+        return new CreateTaskParams();
     }
 }

@@ -1,13 +1,15 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.calendars.google.Converter;
+import com.bulletjournal.calendars.google.CreateGoogleCalendarEventsParams;
 import com.bulletjournal.calendars.google.GoogleCalendarEvent;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
 import com.bulletjournal.controller.models.LoginStatus;
-import com.bulletjournal.controller.models.PublicProjectItem;
+import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.repository.TaskDaoJpa;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
@@ -28,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -49,6 +52,12 @@ public class GoogleCalendarController {
 
     @Autowired
     private GoogleCalClient googleCalClient;
+
+    @Autowired
+    private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private UserClient userClient;
 
     @PostMapping(value = "/api/calendar/google/login")
     public ResponseEntity<?> loginGoogleCalendar() {
@@ -108,7 +117,25 @@ public class GoogleCalendarController {
             list.setTimeMax(DateTime.parseRfc3339(endDate));
         }
         List<Event> events = list.execute().getItems();
-        return events.stream().map(e -> Converter.toTask(e, timezone)).collect(Collectors.toList());
+        return events.stream()
+                .map(e -> {
+                    GoogleCalendarEvent event = Converter.toTask(e, timezone);
+                    Task task = event.getTask();
+                    task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
+                    task.setAssignedToAvatar(this.userClient.getUser(task.getAssignedTo()).getAvatar());
+                    return event;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @PostMapping("/api/calendar/google/events")
+    public void createEvents(
+            @Valid @RequestBody @NotNull CreateGoogleCalendarEventsParams createGoogleCalendarEventsParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        createGoogleCalendarEventsParams.getEvents().forEach((e -> {
+            taskDaoJpa.create(createGoogleCalendarEventsParams.getProjectId(), username,
+                    Converter.toCreateTaskParams(e));
+        }));
     }
 
     @GetMapping("/api/calendar/google/calendarList")
