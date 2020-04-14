@@ -1,15 +1,21 @@
 import React from 'react';
 import { Tabs } from 'antd';
-import { Link } from 'react-router-dom';
 import Account from '../../components/settings/account';
+import { loginGoogleCalendar } from '../../apis/calendarApis';
 import {
   GoogleOutlined,
   AppleOutlined,
-  WindowsOutlined
+  SwapOutlined
 } from '@ant-design/icons';
 import './setting.style.less';
 
 const { TabPane } = Tabs;
+
+const handleGoogleCalendarLogin = () => {
+  loginGoogleCalendar().then(res => {
+    window.location.href = res.headers.get('Location')!;
+  });
+};
 
 const SettingPage = () => {
   return (
@@ -22,11 +28,10 @@ const SettingPage = () => {
           <div>
             <Tabs type="card">
               <TabPane tab={<span><GoogleOutlined /> Google Calendar</span>} key="GoogleCalendar">
-                <Link to='/api/calender/google/login'>
-                  Log in
-                </Link>
-              </TabPane>
-              <TabPane tab={<span><WindowsOutlined /> Outlook Calendar</span>} key="OutlookCalendar">
+                <div className='calendar-login-button' onClick={() => handleGoogleCalendarLogin()}>
+                  <SwapOutlined /><span>{' '}Connect</span>
+                </div>
+                Enjoy a 2-way sync between your scheduled tasks and your Google Calendar.
               </TabPane>
               <TabPane tab={<span><AppleOutlined /> Apple Calendar</span>} key="AppleCalendar">
               </TabPane>
