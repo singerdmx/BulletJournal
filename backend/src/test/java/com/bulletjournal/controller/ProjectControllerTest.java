@@ -447,7 +447,7 @@ public class ProjectControllerTest {
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
         updateTaskRelations(project, t1, t2, t3);
-        t1 = updateTask(t1, expectedOwner, "2020-02-27", null, null, null, t1.getName());
+        t1 = updateTask(t1, expectedOwner, "2020-02-27", null, null, new ReminderSetting(), t1.getName());
 
         // Attach Labels to tasks
         ResponseEntity<Task> setLabelResponse = this.restTemplate.exchange(

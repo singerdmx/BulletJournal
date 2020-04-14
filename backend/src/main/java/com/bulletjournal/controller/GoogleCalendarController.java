@@ -4,16 +4,18 @@ import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
 import com.bulletjournal.controller.models.LoginStatus;
-import com.bulletjournal.controller.models.PullCalendarEventsParams;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.Events;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -23,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -86,9 +88,20 @@ public class GoogleCalendarController {
         return new LoginStatus(true, credential.getExpirationTimeMilliseconds());
     }
 
-    @PostMapping("/api/calendar/google/pullEvents")
-    public void pullEvents(@Valid @RequestBody PullCalendarEventsParams pullCalendarEventsParams) throws IOException {
+    @GetMapping("/api/calendar/google/calendars/{calendarId}/eventList")
+    public void getEventList(
+            @NotNull @PathVariable String calendarId,
+            @RequestParam(name = "startDate", required = false) String startDate,
+            @RequestParam(name = "endDate", required = false) String endDate) throws IOException {
         Calendar service = getCalendarService();
+        Calendar.Events.List list = service.events().list(calendarId);
+        if (StringUtils.isNotBlank(startDate)) {
+            list.setTimeMin(DateTime.parseRfc3339(startDate));
+        }
+        if (StringUtils.isNotBlank(endDate)) {
+            list.setTimeMax(DateTime.parseRfc3339(endDate));
+        }
+        Events events = list.execute();
     }
 
     @GetMapping("/api/calendar/google/calendarList")

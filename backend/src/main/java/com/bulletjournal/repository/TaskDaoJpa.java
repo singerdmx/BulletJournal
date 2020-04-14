@@ -330,10 +330,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         } else {
             task.setStartTime(null);
             task.setEndTime(null);
-            if (recurrenceRule != null) {
+            if (recurrenceRule == null) {
                 //  set no reminder
                 reminderSetting = new ReminderSetting();
             }
+        }
+
+        if (reminderSetting == null) {
+            reminderSetting = new ReminderSetting();
         }
         return reminderSetting;
     }
@@ -372,18 +376,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         if (updateTaskParams.hasTimezone()) {
             updateCompletedSlotsWithTimezone(task, timezone);
-        }
-
-        if (updateTaskParams.hasDueDate()) {
-            task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-            task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
-        } else {
-            task.setStartTime(null);
-            task.setEndTime(null);
-            if (!updateTaskParams.hasRecurrenceRule()) {
-                //  set no reminder
-                updateTaskParams.setReminderSetting(new ReminderSetting());
-            }
         }
 
         ReminderSetting reminderSetting = getReminderSetting(
@@ -687,7 +679,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
         return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
-                task.getDueTime(), task.getDuration(), null, task.getTimezone(), task.getRecurrenceRule());
+                task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getTimezone(), task.getRecurrenceRule());
     }
 
     /**
