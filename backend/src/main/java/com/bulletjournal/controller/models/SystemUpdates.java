@@ -13,6 +13,10 @@ public class SystemUpdates {
 
     private String groupsEtag;
 
+    private String tasksEtag;
+
+    private String notesEtag;
+
     private String notificationsEtag;
 
     private String remindingTaskEtag;
@@ -43,6 +47,7 @@ public class SystemUpdates {
         this.groupsEtag = groupsEtag;
     }
 
+
     public String getNotificationsEtag() {
         return notificationsEtag;
     }
@@ -66,4 +71,21 @@ public class SystemUpdates {
     public void setRemindingTaskEtag(String remindingTaskEtag) {
         this.remindingTaskEtag = remindingTaskEtag;
     }
+
+    public String getTasksEtag() {
+        return tasksEtag;
+    }
+
+    public void setTasksEtag(String tasksEtag) {
+        this.tasksEtag = tasksEtag;
+    }
+
+    public String getNotesEtag() {
+        return notesEtag;
+    }
+
+    public void setNotesEtag(String notesEtag) {
+        this.notesEtag = notesEtag;
+    }
+
 }

@@ -59,6 +59,9 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
 
   useEffect(() => {
     props.updateGroups();
+  }, []);
+
+  useEffect(() => {
     setProjects([]);
     setProjects(flattenOwnedProject(props.ownedProjects, projects));
     setProjects(flattenSharedProject(props.sharedProjects, projects));
@@ -69,7 +72,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         );
       })
     );
-  }, []);
+  }, [props.ownedProjects, props.sharedProjects]);
 
   const moveProjectItem = (values: any) => {
     let projectId: number | undefined = values.project;

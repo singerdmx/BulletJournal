@@ -1,8 +1,10 @@
 import { doFetch } from './api-helper';
 
-export const fetchSystemUpdates = (targets = '') => {
+export const fetchSystemUpdates = (targets = '', projectId = undefined) => {
   let endpoint = '/api/system/updates';
+  if (targets && projectId) endpoint += '?targets=' + targets + '&' + 'projectId=' + projectId;
   if (targets) endpoint += '?targets=' + targets;
+  if (projectId) endpoint += '?projectId=' + projectId;
   return doFetch(endpoint)
     .then(res => res.json())
     .catch(err => {

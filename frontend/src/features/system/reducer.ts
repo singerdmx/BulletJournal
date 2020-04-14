@@ -11,6 +11,8 @@ export type SystemApiErrorAction = {
 export type UpdateSystem = {};
 
 export type SystemUpdate = {
+  tasksEtag: string;
+  notesEtag: string;
   groupsEtag: string;
   notificationsEtag: string;
   ownedProjectsEtag: string;
@@ -30,6 +32,8 @@ export type GetPublicProjectItem = {
 };
 
 let initialState = {
+  tasksEtag: '',
+  notesEtag: '',
   groupsEtag: '',
   notificationsEtag: '',
   ownedProjectsEtag: '',
@@ -48,11 +52,15 @@ const slice = createSlice({
     systemUpdateReceived: (state, action: PayloadAction<SystemUpdate>) => {
       const {
         groupsEtag,
+        tasksEtag,
+        notesEtag,
         notificationsEtag,
         ownedProjectsEtag,
         sharedProjectsEtag,
         remindingTaskEtag
       } = action.payload;
+      state.tasksEtag = tasksEtag;
+      state.notesEtag = notesEtag;
       state.groupsEtag = groupsEtag;
       state.notificationsEtag = notificationsEtag;
       state.ownedProjectsEtag = ownedProjectsEtag;

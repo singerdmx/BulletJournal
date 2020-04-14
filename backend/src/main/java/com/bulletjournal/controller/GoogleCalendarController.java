@@ -3,38 +3,39 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
-import com.bulletjournal.repository.CalendarTokenDaoJpa;
+import com.bulletjournal.controller.models.LoginStatus;
+import com.bulletjournal.controller.models.PullCalendarEventsParams;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class GoogleCalendarController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
     private static final String APPLICATION_NAME = "Bullet Journal";
-
-    final DateTime date1 = new DateTime("2017-05-05T16:30:00.000+05:30");
-    final DateTime date2 = new DateTime(new Date());
+    private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
 
     @Autowired
     private GoogleCalConfig googleCalConfig;
@@ -42,44 +43,84 @@ public class GoogleCalendarController {
     @Autowired
     private GoogleCalClient googleCalClient;
 
-    @Autowired
-    private CalendarTokenDaoJpa calendarTokenDaoJpa;
-
-    @RequestMapping(value = "/api/calendar/google/login", method = RequestMethod.GET)
-    public RedirectView googleConnectionStatus(HttpServletRequest request) throws Exception {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
+    @PostMapping(value = "/api/calendar/google/login")
+    public ResponseEntity<?> loginGoogleCalendar() {
         LOGGER.info("Logging in for Google Calendar");
-        return new RedirectView(authorize());
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setLocation(URI.create(authorize()));
+        return ResponseEntity.ok().headers(responseHeader).build();
     }
 
     @RequestMapping(value = "/api/calendar/google/oauth2_basic/callback", method = RequestMethod.GET, params = "code")
-    public ResponseEntity<String> oauth2Callback(@RequestParam(value = "code") String code) {
-        com.google.api.services.calendar.model.Events eventList;
-        String message;
+    public RedirectView oauth2Callback(@RequestParam(value = "code") String code) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
         try {
             TokenResponse response = this.googleCalClient.getFlow().newTokenRequest(code)
                     .setRedirectUri(this.googleCalConfig.getRedirectURI()).execute();
-            Credential credential = this.googleCalClient.getFlow().createAndStoreCredential(response, "userID");
-
-            String username = MDC.get(UserClient.USER_NAME_KEY);
-            calendarTokenDaoJpa.merge(credential, username);
-
-            Calendar client = new com.google.api.services.calendar.Calendar.Builder(
-                    this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
-                    .setApplicationName(APPLICATION_NAME).build();
-            Calendar.Events events = client.events();
-            eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
-            message = eventList.getItems().toString();
-            System.out.println("My:" + eventList.getItems());
-        } catch (Exception e) {
-            LOGGER.warn("Exception while handling OAuth2 callback (" + e.getMessage() + ")."
-                    + " Redirecting to google connection status page.");
-            message = "Exception while handling OAuth2 callback (" + e.getMessage() + ")."
-                    + " Redirecting to google connection status page.";
+            this.googleCalClient.getFlow().createAndStoreCredential(response, username);
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
         }
 
-        System.out.println("cal message:" + message);
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        return new RedirectView(GOOGLE_CALENDAR_PAGE_PATH);
+    }
+
+    @PostMapping(value = "/api/calendar/google/logout")
+    public ResponseEntity<?> logoutGoogleCalendar() throws IOException {
+        LOGGER.info("Logging out for Google Calendar");
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.googleCalClient.getFlow().getCredentialDataStore().delete(username);
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setLocation(URI.create(GOOGLE_CALENDAR_PAGE_PATH));
+        return ResponseEntity.ok().headers(responseHeader).build();
+    }
+
+    @GetMapping("/api/calendar/google/loginStatus")
+    public LoginStatus getLoginStatus() throws IOException {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        Credential credential = this.googleCalClient.getFlow().loadCredential(username);
+        if (credential == null) {
+            return new LoginStatus(false, null);
+        }
+
+        return new LoginStatus(true, credential.getExpirationTimeMilliseconds());
+    }
+
+    @PostMapping("/api/calendar/google/pullEvents")
+    public void pullEvents(@Valid @RequestBody PullCalendarEventsParams pullCalendarEventsParams) throws IOException {
+        Calendar service = getCalendarService();
+    }
+
+    @GetMapping("/api/calendar/google/calendarList")
+    public List<CalendarListEntry> getCalendarList() throws IOException {
+        Calendar service = getCalendarService();
+        List<CalendarListEntry> result = new ArrayList<>();
+        // Iterate through entries in calendar list
+        String pageToken = null;
+        do {
+            CalendarList calendarList = service.calendarList().list().setPageToken(pageToken).execute();
+            List<CalendarListEntry> items = calendarList.getItems();
+
+            for (CalendarListEntry calendarListEntry : items) {
+                result.add(calendarListEntry);
+            }
+            pageToken = calendarList.getNextPageToken();
+        } while (pageToken != null);
+
+        return result;
+    }
+
+    private Calendar getCalendarService() throws IOException {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        Credential credential = this.googleCalClient.getFlow().loadCredential(username);
+        if (credential == null) {
+            throw new BadRequestException("User not logged in");
+        }
+
+        // Initialize Calendar service with valid OAuth credentials
+        return new Calendar.Builder(
+                this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME).build();
     }
 
     private String authorize() {
