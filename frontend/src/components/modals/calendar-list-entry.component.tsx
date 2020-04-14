@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Project, ProjectsWithOwner} from "../../features/project/interface";
 import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects/projects.pages";
 import {ProjectType} from "../../features/project/constants";
-import {Avatar, Card, Form, Modal, Select, Tooltip} from "antd";
+import {Avatar, Form, Modal, Select, Tooltip} from "antd";
 import {iconMapper} from "../side-menu/side-menu.component";
 import AddProject from "./add-project.component";
 import {useHistory} from "react-router-dom";
@@ -87,15 +87,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
             visible={visible}
             okText='Confirm'
             onCancel={(e) => handleCancel(e)}
-            onOk={() => {
-                form
-                    .validateFields()
-                    .then((values) => {
-                        console.log(values);
-                        form.resetFields();
-                    })
-                    .catch((info) => console.log(info));
-            }}
+            footer={false}
         >
             <Form form={form} labelAlign='left'>
                 <Form.Item

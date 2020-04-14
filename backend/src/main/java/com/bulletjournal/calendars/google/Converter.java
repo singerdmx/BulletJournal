@@ -7,7 +7,7 @@ import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.Task;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
-import jdk.internal.joptsimple.internal.Strings;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.MDC;
 
 public class Converter {
@@ -20,7 +20,7 @@ public class Converter {
         task.setName(event.getSummary());
         event.getOriginalStartTime();
         if (event.getRecurrence() != null && !event.getRecurrence().isEmpty()) {
-            task.setRecurrenceRule(Strings.join(event.getRecurrence(), ";"));
+            task.setRecurrenceRule(Strings.join(event.getRecurrence(), ';'));
         }
         task.setTimezone(timezone);
 
