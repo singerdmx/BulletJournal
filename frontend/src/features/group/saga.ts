@@ -32,7 +32,7 @@ const flattenGroup = (groups: any) =>{
     res.push(...element.groups);
   });
   return res;
-}
+};
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
