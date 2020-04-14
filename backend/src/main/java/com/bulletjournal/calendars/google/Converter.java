@@ -19,7 +19,7 @@ public class Converter {
         task.setAssignedTo(username);
         task.setName(event.getSummary());
         event.getOriginalStartTime();
-        if (!event.getRecurrence().isEmpty()) {
+        if (event.getRecurrence() != null && !event.getRecurrence().isEmpty()) {
             task.setRecurrenceRule(Strings.join(event.getRecurrence(), ";"));
         }
         task.setTimezone(timezone);

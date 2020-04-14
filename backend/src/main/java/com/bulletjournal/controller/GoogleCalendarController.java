@@ -12,6 +12,7 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -174,6 +175,12 @@ public class GoogleCalendarController {
         Credential credential = this.googleCalClient.getFlow().loadCredential(username);
         if (credential == null) {
             throw new BadRequestException("User not logged in");
+        }
+
+        if (credential.getExpiresInSeconds() <= 0) {
+            credential.refreshToken();
+            StoredCredential storedCredential = new StoredCredential(credential);
+            this.googleCalClient.getFlow().getCredentialDataStore().set(username, storedCredential);
         }
 
         // Initialize Calendar service with valid OAuth credentials

@@ -324,6 +324,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(Long projectId, String username, CreateTaskParams createTaskParams,
                        String iCalUID, Content content) {
+        // skip duplicated iCalUID
         Task task = create(projectId, username, createTaskParams);
         task.setGoogleCalendarEventId(iCalUID);
         this.taskRepository.save(task);
