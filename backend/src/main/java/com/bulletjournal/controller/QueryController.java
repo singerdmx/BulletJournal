@@ -21,6 +21,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+
 
 @RestController
 public class QueryController {
@@ -44,14 +47,16 @@ public class QueryController {
         }
         // return List<ProjectItems>
         // search by title and comment
-        // const project_item in service
         String username = MDC.get(UserClient.USER_NAME_KEY);
         SearchRequest searchRequest = new SearchRequest(SearchService.PROJECT_ITEM);
         searchRequest.source(new SearchSourceBuilder().query(
-                QueryBuilders.matchQuery("name", term)
-                        .fuzziness(Fuzziness.AUTO)
-                        .prefixLength(3)
-                        .maxExpansions(10)
+                QueryBuilders.boolQuery()
+                        .must(QueryBuilders.matchQuery("user", username))
+                        .must(QueryBuilders.matchQuery("name", term)
+                                .fuzziness(Fuzziness.AUTO)
+                                .prefixLength(3)
+                                .maxExpansions(10))
+
         ));
 
         SearchResponse response = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
