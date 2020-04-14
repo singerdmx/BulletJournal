@@ -87,5 +87,5 @@ public class SystemUpdates {
     public void setNotesEtag(String notesEtag) {
         this.notesEtag = notesEtag;
     }
-    
+
 }
