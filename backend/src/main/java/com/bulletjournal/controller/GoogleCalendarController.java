@@ -35,6 +35,7 @@ public class GoogleCalendarController {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
     private static final String APPLICATION_NAME = "Bullet Journal";
+    private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
 
     @Autowired
     private GoogleCalConfig googleCalConfig;
@@ -61,7 +62,17 @@ public class GoogleCalendarController {
             throw new IllegalStateException(ex);
         }
 
-        return new RedirectView("/settings#google");
+        return new RedirectView(GOOGLE_CALENDAR_PAGE_PATH);
+    }
+
+    @PostMapping(value = "/api/calendar/google/logout")
+    public ResponseEntity<?> logoutGoogleCalendar() throws IOException {
+        LOGGER.info("Logging out for Google Calendar");
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.googleCalClient.getFlow().getCredentialDataStore().delete(username);
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setLocation(URI.create(GOOGLE_CALENDAR_PAGE_PATH));
+        return ResponseEntity.ok().headers(responseHeader).build();
     }
 
     @GetMapping("/api/calendar/google/loginStatus")

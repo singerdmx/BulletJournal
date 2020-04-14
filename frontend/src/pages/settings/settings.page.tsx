@@ -1,20 +1,25 @@
 import React, {useEffect} from 'react';
-import {Tabs, Tooltip} from 'antd';
+import {Button, Tabs, Tooltip} from 'antd';
 import {connect} from 'react-redux';
 import Account from '../../components/settings/account';
-import {loginGoogleCalendar} from '../../apis/calendarApis';
+import {loginGoogleCalendar, logoutGoogleCalendar} from '../../apis/calendarApis';
 import {googleTokenExpirationTimeUpdate} from "../../features/calendarSync/actions";
-import {AppleOutlined, GoogleOutlined, SwapOutlined} from '@ant-design/icons';
+import {AppleOutlined, GoogleOutlined, SwapOutlined, ApiOutlined} from '@ant-design/icons';
 import './setting.style.less';
 import {useLocation} from "react-use";
 import {IState} from "../../store";
-import moment from "moment";
 
 const {TabPane} = Tabs;
 
 const handleGoogleCalendarLogin = () => {
   loginGoogleCalendar().then(res => {
     window.location.href = res.headers.get('Location')!;
+  });
+};
+
+const handleGoogleCalendarLogout = () => {
+  logoutGoogleCalendar().then(res => {
+    window.location.reload();
   });
 };
 
@@ -43,11 +48,13 @@ const SettingPage: React.FC<SettingProps> = (props) => {
 
   const getGoogleLoginStatus = () => {
     if (googleTokenExpirationTime) {
-      return <span>Logged in (expire {moment(googleTokenExpirationTime).fromNow()})</span>;
+      return <Tooltip title='Log out Google Account'>
+        <Button onClick={() => handleGoogleCalendarLogout()}><ApiOutlined /><span>{' '}Disconnect</span></Button>
+      </Tooltip>;
     }
 
     return <Tooltip title='Enjoy a 2-way sync between your scheduled tasks and your Google Calendar'>
-      <span onClick={() => handleGoogleCalendarLogin()}><SwapOutlined/><span>{' '}Connect</span></span>
+      <Button onClick={() => handleGoogleCalendarLogin()}><SwapOutlined/><span>{' '}Connect</span></Button>
     </Tooltip>;
   };
   return (
