@@ -116,4 +116,8 @@ public class CreateTaskParams {
     public void setRecurrenceRule(String recurrenceRule) {
         this.recurrenceRule = recurrenceRule;
     }
+
+    public boolean hasRecurrenceRule() {
+        return this.recurrenceRule != null;
+    }
 }

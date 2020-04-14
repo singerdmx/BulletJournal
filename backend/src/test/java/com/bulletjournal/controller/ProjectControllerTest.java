@@ -701,7 +701,7 @@ public class ProjectControllerTest {
 
     private Task createTask(Project project, String taskName) {
         CreateTaskParams task = new CreateTaskParams(taskName, expectedOwner, "2020-02-27",
-                null, null, null, TIMEZONE, null);
+                null, null, new ReminderSetting(), TIMEZONE, null);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,

@@ -3,10 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.CreateTaskParams;
-import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -15,6 +12,9 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
@@ -56,9 +56,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Autowired
     private CompletedTaskRepository completedTaskRepository;
-
-    @Autowired
-    private UserDaoJpa userDaoJpa;
 
     @Autowired
     private TaskContentRepository taskContentRepository;
@@ -209,7 +206,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<com.bulletjournal.controller.models.Task> - a list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(String assignee, ZonedDateTime now) {
+    public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(
+            final String assignee, final ZonedDateTime now) {
         ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
         return this.getRecurringTasks(assignee, now, maxRemindingTime)
                 .stream()
@@ -309,20 +307,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String date = createTaskParams.getDueDate();
         String time = createTaskParams.getDueTime();
         String timezone = createTaskParams.getTimezone();
-
-        if (date != null) {
-            task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-            task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
-        }
-
-        ReminderSetting reminderSetting = createTaskParams.getReminderSetting();
-
-        if (reminderSetting == null) {
-            reminderSetting = new ReminderSetting(null, null,
-                    this.userDaoJpa.getByName(owner).getReminderBeforeTask().getValue());
-        }
+        ReminderSetting reminderSetting = getReminderSetting(
+                date, task, time, timezone, createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
-
         task = this.taskRepository.save(task);
 
         final ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId).orElseGet(ProjectTasks::new);
@@ -332,6 +319,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         projectTasks.setTasks(newRelations);
         this.projectTasksRepository.save(projectTasks);
         return task;
+    }
+
+    private ReminderSetting getReminderSetting(
+            String dueDate, Task task, String time, String timezone, String recurrenceRule,
+            ReminderSetting reminderSetting) {
+        if (dueDate != null) {
+            task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(dueDate, time, timezone).toInstant()));
+            task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(dueDate, time, timezone).toInstant()));
+        } else {
+            task.setStartTime(null);
+            task.setEndTime(null);
+            if (recurrenceRule != null) {
+                //  set no reminder
+                reminderSetting = new ReminderSetting();
+            }
+        }
+        return reminderSetting;
     }
 
     /**
@@ -382,9 +386,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             }
         }
 
-        DaoHelper.updateIfPresent(updateTaskParams.hasReminderSetting(), updateTaskParams.getReminderSetting(),
-                task::setReminderSetting);
-
+        ReminderSetting reminderSetting = getReminderSetting(
+                date, task, time, timezone, updateTaskParams.getRecurrenceRule(), updateTaskParams.getReminderSetting());
+        task.setReminderSetting(reminderSetting);
         return this.taskRepository.save(task);
     }
 
