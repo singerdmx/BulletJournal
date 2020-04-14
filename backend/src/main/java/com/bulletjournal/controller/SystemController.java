@@ -56,6 +56,7 @@ public class SystemController {
 
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
+                                    @RequestParam(name = "projectId", required = false) Long projectId,
                                     @RequestHeader(IF_NONE_MATCH) Optional<String> remindingTaskRequestEtag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Set<String> targetEtags = null;
@@ -64,6 +65,8 @@ public class SystemController {
         }
         String ownedProjectsEtag = null;
         String sharedProjectsEtag = null;
+        String tasksEtag = null;
+        String notesEtag = null;
         String notificationsEtag = null;
         String groupsEtag = null;
         String remindingTaskEtag = null;
@@ -84,6 +87,27 @@ public class SystemController {
                     EtagGenerator.HashType.TO_HASHCODE,
                     notificationList);
         }
+
+        if (projectId != null) {
+            Project project = this.projectDaoJpa.getProject(projectId, username).toPresentationModel();
+            switch (project.getProjectType()) {
+                case TODO:
+                    List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
+                    tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                            EtagGenerator.HashType.TO_HASHCODE,
+                            taskList);
+                    break;
+                case NOTE:
+                    List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
+                    notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                            EtagGenerator.HashType.TO_HASHCODE,
+                            noteList);
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+
         if (targetEtags == null || targetEtags.contains("groupsEtag")) {
             List<Group> groupList = this.groupDaoJpa.getGroups(username);
             groupsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -104,6 +128,8 @@ public class SystemController {
         systemUpdates.setOwnedProjectsEtag(ownedProjectsEtag);
         systemUpdates.setSharedProjectsEtag(sharedProjectsEtag);
         systemUpdates.setNotificationsEtag(notificationsEtag);
+        systemUpdates.setTasksEtag(tasksEtag);
+        systemUpdates.setNotesEtag(notesEtag);
         systemUpdates.setGroupsEtag(groupsEtag);
         systemUpdates.setReminders(remindingTasks);
         systemUpdates.setRemindingTaskEtag(remindingTaskEtag);
@@ -125,7 +151,7 @@ public class SystemController {
             Long id = Long.parseLong(itemId.substring(4));
             if (itemId.startsWith(ProjectItemType.TASK.name())) {
                 if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.TODO)
-                    .stream().anyMatch(m -> m.getId().equals(id))) {
+                        .stream().anyMatch(m -> m.getId().equals(id))) {
                     throw new UnAuthorizedException("Task not shared with user " + originalUser);
                 }
                 item = this.taskDaoJpa.getProjectItem(id, username);
