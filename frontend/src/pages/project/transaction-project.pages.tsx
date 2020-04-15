@@ -10,9 +10,7 @@ import {
   Select,
   Form,
   List,
-  Row,
-  Col,
-  Card,
+  Tabs,
 } from 'antd';
 
 import { SyncOutlined } from '@ant-design/icons';
@@ -45,6 +43,7 @@ zones.sort((a, b) => {
   return 0;
 });
 const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL', 'TIMELINE'];
+const { TabPane } = Tabs;
 
 type TransactionProps = {
   projectId: number;
@@ -65,8 +64,16 @@ type TransactionProps = {
 const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [form] = Form.useForm();
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
+  //used for LABEL pie
   const [labelExpenseData, setLabelExpenseData] = useState([{}]);
   const [labelIncomeData, setLabelIncomeData] = useState([{}]);
+  const [showLabelExpenseTab, setShowLabelExpenseTab] = useState(false);
+  const [showLabelIncomeTab, setShowLabelIncomeTab] = useState(false);
+  //used for PAYER pie
+  const [payerExpenseData, setPayerExpenseData] = useState([{}]);
+  const [payerIncomeData, setPayerIncomeData] = useState([{}]);
+  const [showPayerExpenseTab, setShowPayerExpenseTab] = useState(false);
+  const [showPayerIncomeTab, setShowPayerIncomeTab] = useState(false);
   const {
     balance,
     income,
@@ -81,6 +88,12 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     values: any,
     currentLedgerSummaryType: string
   ) => {
+    //reset tab to false when refresh
+    setShowLabelExpenseTab(false);
+    setShowLabelIncomeTab(false);
+    setShowPayerExpenseTab(false);
+    setShowPayerIncomeTab(false);
+
     const startDate = values.date
       ? values.date[0].format(dateFormat)
       : undefined;
@@ -112,19 +125,48 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     if (ledgerSummaryType === 'LABEL') {
       const newExpenseData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
+          if (!showLabelExpenseTab && transaction.expense !== 0) {
+            setShowLabelExpenseTab(true);
+          }
           return { name: transaction.name, expense: transaction.expense };
         }
       );
       setLabelExpenseData(newExpenseData);
       const newIncomeData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
+          if (!showLabelIncomeTab && transaction.income !== 0)
+            setShowLabelIncomeTab(true);
           return { name: transaction.name, income: transaction.income };
         }
       );
       setLabelIncomeData(newIncomeData);
+    } else if (ledgerSummaryType === 'PAYER') {
+      const newExpenseData = transactionsSummaries.map(
+        (transaction: TransactionsSummary) => {
+          if (!showPayerExpenseTab && transaction.expense !== 0) {
+            setShowPayerExpenseTab(true);
+          }
+          return { name: transaction.name, expense: transaction.expense };
+        }
+      );
+      setPayerExpenseData(newExpenseData);
+      const newIncomeData = transactionsSummaries.map(
+        (transaction: TransactionsSummary) => {
+          if (!showPayerIncomeTab && transaction.income !== 0)
+            setShowPayerIncomeTab(true);
+          return { name: transaction.name, income: transaction.income };
+        }
+      );
+      setPayerIncomeData(newIncomeData);
     } else {
       setLabelExpenseData([]);
       setLabelIncomeData([]);
+      setShowLabelExpenseTab(false);
+      setShowLabelIncomeTab(false);
+      setPayerExpenseData([]);
+      setPayerIncomeData([]);
+      setShowPayerExpenseTab(false);
+      setShowPayerIncomeTab(false);
     }
   }, [props.ledgerSummary]);
 
@@ -291,41 +333,91 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         </Carousel>
       </div>
 
+      {/* label pie graph */}
       {ledgerSummaryType === 'LABEL' && (
-        <div style={{ display: 'block' }}>
-          <div style={{ border: '1px solid black' }}>
-            <div style={{ display: 'flex' }}>
-              <div style={{ paddingRight: '230px' }}>Expense</div>
-              <div>Income</div>
-            </div>
+        <div style={{ border: '1px solid black' }}>
+          <Tabs>
+            {showLabelExpenseTab && (
+              <TabPane tab='Expense' key='expense'>
+                <PieChart width={800} height={200}>
+                  {/* expense */}
+                  <Pie
+                    dataKey='expense'
+                    isAnimationActive={false}
+                    data={labelExpenseData}
+                    cx={140}
+                    cy={100}
+                    outerRadius={60}
+                    fill='#8884d8'
+                    label
+                  />
+                  <HoverHint />
+                </PieChart>
+              </TabPane>
+            )}
+            {showLabelIncomeTab && (
+              <TabPane tab='Income' key='income'>
+                <PieChart width={800} height={200}>
+                  {/* income */}
+                  <Pie
+                    dataKey='income'
+                    isAnimationActive={false}
+                    data={labelIncomeData}
+                    cx={140}
+                    cy={100}
+                    outerRadius={60}
+                    fill='#8884d8'
+                    label
+                  />
+                  <HoverHint />
+                </PieChart>
+              </TabPane>
+            )}
+          </Tabs>
+        </div>
+      )}
 
-            <PieChart width={800} height={200}>
-              {/* expense */}
-              <Pie
-                dataKey='expense'
-                isAnimationActive={false}
-                data={labelExpenseData}
-                cx={140}
-                cy={100}
-                outerRadius={60}
-                fill='#8884d8'
-                label
-              />
-              {/* income */}
-              <Pie
-                dataKey='income'
-                isAnimationActive={false}
-                data={labelIncomeData}
-                cx={400}
-                cy={100}
-                outerRadius={60}
-                fill='#8884d8'
-                label
-              />
-
-              <HoverHint />
-            </PieChart>
-          </div>
+      {/* payer pie graph */}
+      {ledgerSummaryType === 'PAYER' && (
+        <div style={{ border: '1px solid black' }}>
+          <Tabs>
+            {showPayerExpenseTab && (
+              <TabPane tab='Expense' key='expense'>
+                <PieChart width={800} height={200}>
+                  {/* expense */}
+                  <Pie
+                    dataKey='expense'
+                    isAnimationActive={false}
+                    data={payerExpenseData}
+                    cx={140}
+                    cy={100}
+                    outerRadius={60}
+                    fill='#8884d8'
+                    label
+                  />
+                  <HoverHint />
+                </PieChart>
+              </TabPane>
+            )}
+            {showPayerIncomeTab && (
+              <TabPane tab='Income' key='income'>
+                <PieChart width={800} height={200}>
+                  {/* income */}
+                  <Pie
+                    dataKey='income'
+                    isAnimationActive={false}
+                    data={payerIncomeData}
+                    cx={140}
+                    cy={100}
+                    outerRadius={60}
+                    fill='#8884d8'
+                    label
+                  />
+                  <HoverHint />
+                </PieChart>
+              </TabPane>
+            )}
+          </Tabs>
         </div>
       )}
 
