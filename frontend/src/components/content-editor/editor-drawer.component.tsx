@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 
 import { Content } from '../../features/myBuJo/interface';
 
-import NoteEditor from './note-editor.component';
-import NoteReader from './note-reader.component';
+import NoteEditor from './content-editor.component';
+import NoteReader from './content-reader.component';
 
 type NoteEditorDrawerProps = {
   content?: Content;
@@ -48,7 +48,7 @@ const NoteEditorDrawer: React.FC<
     <Drawer
       onClose={handleClose}
       visible={visible}
-      width="700"
+      width='700'
       destroyOnClose
       footer={readMode && content && footerControl}
     >

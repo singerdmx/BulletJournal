@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { List, Button, Avatar, Tooltip } from 'antd';
 import { Content } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
-import NoteEditorDrawer from '../note-editor/editor-drawer.component';
+import NoteEditorDrawer from '../content-editor/editor-drawer.component';
 import moment from 'moment';
 import './content.-item.styles.less';
 
@@ -30,7 +30,7 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
       key={content.id}
       actions={[
         <Tooltip title={`${content.owner} created ${createdTime}`}>
-          <Avatar src={content.ownerAvatar} size="small" />
+          <Avatar src={content.ownerAvatar} size='small' />
         </Tooltip>,
         <Tooltip title={`Updated ${moment(content.updatedAt).fromNow()}`}>
           <span>{updateTime}</span>
@@ -40,7 +40,7 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
         : contentText}
-      <Button type="link" onClick={handleOpen}>
+      <Button type='link' onClick={handleOpen}>
         Detail
       </Button>
       <NoteEditorDrawer

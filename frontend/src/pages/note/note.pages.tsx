@@ -9,7 +9,7 @@ import { deleteNote, getNote } from '../../features/notes/actions';
 
 import { IState } from '../../store';
 // components
-import NoteEditorDrawer from '../../components/note-editor/editor-drawer.component';
+import NoteEditorDrawer from '../../components/content-editor/editor-drawer.component';
 // antd imports
 import { Button, Popconfirm, Tooltip } from 'antd';
 import {
@@ -70,7 +70,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   );
 
   const noteEditorElem = (
-    <div className="note-drawer">
+    <div className='note-drawer'>
       <NoteEditorDrawer
         noteId={note.id}
         visible={showEditor}
@@ -81,41 +81,41 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
   const noteOperation = () => {
     return (
-      <div className="note-operation">
-        <Tooltip title="Manage Labels">
+      <div className='note-operation'>
+        <Tooltip title='Manage Labels'>
           <div>
             <TagOutlined onClick={labelEditableHandler} />
           </div>
         </Tooltip>
-        <EditNote note={note} mode="icon" />
+        <EditNote note={note} mode='icon' />
         <MoveProjectItem
           type={ProjectType.NOTE}
           projectItemId={note.id}
-          mode="icon"
+          mode='icon'
         />
         <ShareProjectItem
           type={ProjectType.NOTE}
           projectItemId={note.id}
-          mode="icon"
+          mode='icon'
         />
-        <Tooltip title="Delete">
+        <Tooltip title='Delete'>
           <Popconfirm
-            title="Deleting Note also deletes its child notes. Are you sure?"
-            okText="Yes"
-            cancelText="No"
+            title='Deleting Note also deletes its child notes. Are you sure?'
+            okText='Yes'
+            cancelText='No'
             onConfirm={() => {
               deleteNote(note.id);
               history.goBack();
             }}
-            className="group-setting"
-            placement="bottom"
+            className='group-setting'
+            placement='bottom'
           >
             <div>
-              <DeleteTwoTone twoToneColor="#f5222d" />
+              <DeleteTwoTone twoToneColor='#f5222d' />
             </div>
           </Popconfirm>
         </Tooltip>
-        <Tooltip title="Go to Parent BuJo">
+        <Tooltip title='Go to Parent BuJo'>
           <div>
             <UpSquareOutlined
               onClick={(e) => history.push(`/projects/${note.projectId}`)}
