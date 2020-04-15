@@ -26,6 +26,6 @@ public class RemoveFromProjectEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        return null; // ?
+        return null;
     }
 }

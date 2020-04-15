@@ -28,8 +28,8 @@ public class UpdateTransactionPayerEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        if(payer != null){
-            return String.format("/transactions/transactions%d", contentId);
+        if (payer != null) {
+            return String.format("/transaction/%d", contentId);
         }
         return null;
     }

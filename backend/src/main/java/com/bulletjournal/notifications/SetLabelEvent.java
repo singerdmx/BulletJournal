@@ -25,6 +25,6 @@ public class SetLabelEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        return String.format("/" + this.contentType.name() + "/%d", contentId); // this returns project/task etc?
+        return String.format("/" + this.contentType.name().toLowerCase() + "/%d", contentId);
     }
 }

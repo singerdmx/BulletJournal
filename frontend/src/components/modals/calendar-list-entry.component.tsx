@@ -83,7 +83,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         <Modal
             destroyOnClose
             centered
-            title='Sync Calendar'
+            title={`Sync Calendar ${calendar.summary}`}
             visible={visible}
             okText='Confirm'
             onCancel={(e) => handleCancel(e)}

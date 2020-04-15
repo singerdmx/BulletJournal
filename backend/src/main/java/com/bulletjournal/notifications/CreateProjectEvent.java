@@ -26,6 +26,6 @@ public class CreateProjectEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        return String.format("/project/project%d", contentId);
+        return String.format("/projects/%d", contentId);
     }
 }

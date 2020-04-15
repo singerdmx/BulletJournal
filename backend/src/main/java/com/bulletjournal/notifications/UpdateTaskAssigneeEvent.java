@@ -28,8 +28,8 @@ public class UpdateTaskAssigneeEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        if(assignedTo != null){
-            return String.format("/tasks/task%d", contentId);
+        if (assignedTo != null) {
+            return String.format("/task/%d", contentId);
         }
         return null;
     }
