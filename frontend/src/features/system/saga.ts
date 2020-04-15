@@ -18,7 +18,8 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     try {
         const state = yield select();
         const selectedProject = state.project.project;
-        const data = yield call(fetchSystemUpdates, '', selectedProject.id);
+        const data = yield call(fetchSystemUpdates, '',
+            selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined);
 
         const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag} = state.system;
         if (ownedProjectsEtag !== data.ownedProjectsEtag || sharedProjectsEtag !== data.sharedProjectsEtag) {

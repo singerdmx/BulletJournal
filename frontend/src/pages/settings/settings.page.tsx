@@ -19,7 +19,7 @@ const SettingPage: React.FC<SettingProps> = (props) => {
     defaultKey = 'Account'
   }
 
-  if (defaultKey.substr(0, 1) == '#') {
+  if (defaultKey.substr(0, 1) === '#') {
     calendarKey = defaultKey;
     defaultKey = 'calendarSync';
   }

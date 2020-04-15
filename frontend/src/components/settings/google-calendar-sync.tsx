@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Button, Card, Tabs, Tooltip} from 'antd';
+import {Button, Card, Tooltip} from 'antd';
 import {connect} from 'react-redux';
 import {loginGoogleCalendar, logoutGoogleCalendar} from '../../apis/calendarApis';
 import {googleTokenExpirationTimeUpdate} from "../../features/calendarSync/actions";
@@ -8,8 +8,6 @@ import './calendar-sync.styles.less';
 import {IState} from "../../store";
 import {CalendarListEntry} from "../../features/calendarSync/interface";
 import CalendarListEntryModal from "../modals/calendar-list-entry.component";
-
-const {TabPane} = Tabs;
 
 const handleGoogleCalendarLogin = () => {
     loginGoogleCalendar().then(res => {
