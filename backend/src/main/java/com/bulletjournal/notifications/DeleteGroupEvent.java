@@ -19,4 +19,9 @@ public class DeleteGroupEvent extends Informed {
     protected String getEventTitle(Event event) {
         return "Group " + event.getContentName() + " is deleted";
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return null;
+    }
 }

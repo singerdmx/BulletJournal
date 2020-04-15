@@ -4,7 +4,7 @@ import {actions as systemActions, GetPublicProjectItem, SystemApiErrorAction, Up
 import {PayloadAction} from 'redux-starter-kit';
 import {fetchSystemUpdates, getPublicProjectItem} from '../../apis/systemApis';
 import {ContentType} from "../myBuJo/constants";
-import { updateProjects } from '../project/actions';
+import { updateProjects, getProject } from '../project/actions';
 import { updateGroups } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
 
@@ -15,8 +15,10 @@ function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
 
 function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
   try {
-    const data = yield call(fetchSystemUpdates);
     const state = yield select();
+    const selectedProject = state.project.project;
+    const data = yield call(fetchSystemUpdates, '', selectedProject.id);
+    
     const { groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag } = state.system;
     if(ownedProjectsEtag!==data.ownedProjectsEtag || sharedProjectsEtag !== data.sharedProjectsEtag){
       yield put(updateProjects());
@@ -29,8 +31,31 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     if(notificationsEtag !== data.notificationsEtag){
       yield put(updateNotifications());
     }
+
+    let tasksEtag = state.system.tasksEtag;
+    let notesEtag = state.system.notesEtag;
+
+    switch (selectedProject.projectType){
+       case 'NOTE':
+          if(data.tasksEtag !== tasksEtag){
+            tasksEtag = data.tasksEtag;
+             yield put(getProject(selectedProject.id))
+          }
+        break;
+       case 'TODE':
+          if(data.notesEtag !== notesEtag){
+            notesEtag = data.notesEtag;
+            yield put(getProject(selectedProject.id))
+          }
+         break;
+       default:
+  }
+
+
     yield put(
         systemActions.systemUpdateReceived({
+          tasksEtag: tasksEtag,
+          notesEtag: notesEtag,
           groupsEtag: data.groupsEtag,
           notificationsEtag: data.notificationsEtag,
           ownedProjectsEtag: data.ownedProjectsEtag,

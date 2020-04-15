@@ -44,11 +44,10 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
       const etags = data.headers.get('Etag').split('|');
       yield put(
         SystemActions.systemUpdateReceived({
-          groupsEtag: systemState.groupsEtag,
-          notificationsEtag: systemState.notificationsEtag,
+          
           ownedProjectsEtag: etags[0],
           sharedProjectsEtag: etags[1],
-          remindingTaskEtag: systemState.remindingTaskEtag
+          ...systemState
         })
       )
     }
@@ -178,11 +177,9 @@ function* putProjectRelations(
     if(etags.length===2){
       yield put(
         SystemActions.systemUpdateReceived({
-          groupsEtag: systemState.groupsEtag,
-          notificationsEtag: systemState.notificationsEtag,
           ownedProjectsEtag: etags[0],
           sharedProjectsEtag: etags[1],
-          remindingTaskEtag: systemState.remindingTaskEtag
+          ...systemState
         })
       )
     }

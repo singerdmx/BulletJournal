@@ -285,7 +285,7 @@ public class ProjectItemControllerTest {
         String taskName = "rt1";
 
         CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
-                null, null, null, TIMEZONE, recurrenceRule);
+                null, null, new ReminderSetting(), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
@@ -325,7 +325,7 @@ public class ProjectItemControllerTest {
     private Task createTask(Project project, String name, String date) {
         CreateTaskParams task =
                 new CreateTaskParams(name, sampleUsers[0], date, null, 10,
-                        null, TIMEZONE, null);
+                        new ReminderSetting(), TIMEZONE, null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,

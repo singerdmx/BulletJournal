@@ -22,4 +22,9 @@ public class ShareProjectItemEvent extends Informed {
     protected String getEventTitle(Event event) {
         return this.getOriginator() + " shared " + contentType.name() + " " + event.getContentName() + " with you";
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return String.format("/" + this.contentType.name().toLowerCase() + "/%d", contentId);
+    }
 }

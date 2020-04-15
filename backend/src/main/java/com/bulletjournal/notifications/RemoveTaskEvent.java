@@ -23,4 +23,9 @@ public class RemoveTaskEvent extends Informed {
     protected String getEventTitle(Event event) {
         return this.getOriginator() + " removed Task " + event.getContentName();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return null;
+    }
 }

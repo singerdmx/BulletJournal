@@ -25,4 +25,12 @@ public class UpdateTransactionPayerEvent extends Informed {
         }
         return "Transaction " + event.getContentName() + " payer is changed to " + this.payer + " by " + this.getOriginator();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        if (payer != null) {
+            return String.format("/transaction/%d", contentId);
+        }
+        return null;
+    }
 }

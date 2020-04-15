@@ -35,9 +35,7 @@ public abstract class Informed {
     protected abstract String getEventTitle(Event event);
 
     // TODO: abstract
-    protected String getLink(Long contentId) {
-        return null;
-    }
+    public abstract String getLink(Long contentId);
 
     public List<Notification> toNotifications() {
         return this.getEvents().stream()

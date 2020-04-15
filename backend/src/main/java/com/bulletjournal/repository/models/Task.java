@@ -12,7 +12,10 @@ import javax.persistence.*;
         indexes = {@Index(name = "task_project_id_index", columnList = "project_id"),
                 @Index(name = "task_assignee_interval_index", columnList = "assigned_to, start_time, end_time"),
                 @Index(name = "task_assignee_reminder_date_time_index", columnList = "assigned_to, start_time, reminder_date_time"),
-                @Index(name = "task_assignee_recurrence_index", columnList = "assigned_to, recurrence_rule")
+                @Index(name = "task_assignee_recurrence_index", columnList = "assigned_to, recurrence_rule"),
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"google_calendar_event_id"})
         })
 public class Task extends TaskModel {
     @Id
@@ -26,6 +29,9 @@ public class Task extends TaskModel {
 
     @Column(name = "completed_slots", columnDefinition = "TEXT")
     private String completedSlots;
+
+    @Column(name = "google_calendar_event_id")
+    private String googleCalendarEventId;
 
     @Override
     public Long getId() {
@@ -52,5 +58,13 @@ public class Task extends TaskModel {
 
     public void setCompletedSlots(String completedSlots) {
         this.completedSlots = completedSlots;
+    }
+
+    public String getGoogleCalendarEventId() {
+        return googleCalendarEventId;
+    }
+
+    public void setGoogleCalendarEventId(String googleCalendarEventId) {
+        this.googleCalendarEventId = googleCalendarEventId;
     }
 }

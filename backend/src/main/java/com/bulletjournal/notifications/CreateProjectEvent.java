@@ -23,4 +23,9 @@ public class CreateProjectEvent extends Informed {
     protected String getEventTitle(Event event) {
         return this.getOriginator() + " created Project " + event.getContentName();
     }
+
+    @Override
+    public String getLink(Long contentId) {
+        return String.format("/projects/%d", contentId);
+    }
 }

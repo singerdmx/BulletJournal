@@ -11,6 +11,7 @@ import { reducer as myBuJoReducer } from '../features/myBuJo/reducer';
 import { reducer as rRuleReducer } from '../features/recurrence/reducer';
 import { reducer as transactionReducer } from '../features/transactions/reducer';
 import { reducer as taskReducer } from '../features/tasks/reducer';
+import { reducer as calendarSyncReducer } from '../features/calendarSync/reducer';
 
 export default {
   settings: settingsReducer,
@@ -26,4 +27,5 @@ export default {
   rRule: rRuleReducer,
   transaction: transactionReducer,
   task: taskReducer,
+  calendarSync: calendarSyncReducer
 };

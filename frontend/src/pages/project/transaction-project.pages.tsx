@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { PieChart, Pie, Tooltip as HoverHint } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import {
@@ -13,6 +14,7 @@ import {
   Col,
   Card,
 } from 'antd';
+
 import { SyncOutlined } from '@ant-design/icons';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
@@ -63,6 +65,8 @@ type TransactionProps = {
 const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [form] = Form.useForm();
   const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
+  const [labelExpenseData, setLabelExpenseData] = useState([{}]);
+  const [labelIncomeData, setLabelIncomeData] = useState([{}]);
   const {
     balance,
     income,
@@ -104,92 +108,164 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     );
   }, []);
 
+  useEffect(() => {
+    if (ledgerSummaryType === 'LABEL') {
+      const newExpenseData = transactionsSummaries.map(
+        (transaction: TransactionsSummary) => {
+          return { name: transaction.name, expense: transaction.expense };
+        }
+      );
+      setLabelExpenseData(newExpenseData);
+      const newIncomeData = transactionsSummaries.map(
+        (transaction: TransactionsSummary) => {
+          return { name: transaction.name, income: transaction.income };
+        }
+      );
+      setLabelIncomeData(newIncomeData);
+    } else {
+      setLabelExpenseData([]);
+      setLabelIncomeData([]);
+    }
+  }, [props.ledgerSummary]);
+
   const getDefault = () => {
-    return transactionsSummaries
-      ? transactionsSummaries.map(
-          (transactionsSummary: TransactionsSummary, index: number) => (
-            <div>
-              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-              <span>balance: {transactionsSummary.balance}</span>
-              &nbsp;&nbsp;
-              <span>
-                expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                {transactionsSummary.expensePercentage}%,
-              </span>
-              &nbsp;&nbsp;
-              <span>income: {transactionsSummary.income}</span>
-              &nbsp;&nbsp;
-              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
-            </div>
-          )
-        )
-      : 'Loading...';
+    return (
+      <div>
+        <LedgerSummaries
+          title={''}
+          balance={balance}
+          income={income}
+          expense={expense}
+          startDate={startDate}
+          endDate={endDate}
+        />
+        {transactionsSummaries
+          ? transactionsSummaries.map(
+              (transactionsSummary: TransactionsSummary, index: number) => (
+                <div>
+                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                  <span>balance: {transactionsSummary.balance}</span>
+                  &nbsp;&nbsp;
+                  <span>
+                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                    {transactionsSummary.expensePercentage}%,
+                  </span>
+                  &nbsp;&nbsp;
+                  <span>income: {transactionsSummary.income}</span>
+                  &nbsp;&nbsp;
+                  {transactionsSummary.incomePercentage}%
+                  <span>&nbsp;&nbsp;</span>
+                </div>
+              )
+            )
+          : 'Loading...'}
+      </div>
+    );
   };
 
   const getPayer = () => {
-    return transactionsSummaries
-      ? transactionsSummaries.map(
-          (transactionsSummary: TransactionsSummary, index: number) => (
-            <div>
-              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-              <span>balance: {transactionsSummary.balance}</span>
-              &nbsp;&nbsp;
-              <span>
-                expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                {transactionsSummary.expensePercentage}%,
-              </span>
-              &nbsp;&nbsp;
-              <span>income: {transactionsSummary.income}</span>
-              &nbsp;&nbsp;
-              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
-            </div>
-          )
-        )
-      : 'Loading...';
+    return (
+      <div>
+        <LedgerSummaries
+          title={'By Payer'}
+          balance={balance}
+          income={income}
+          expense={expense}
+          startDate={startDate}
+          endDate={endDate}
+        />
+        {transactionsSummaries
+          ? transactionsSummaries.map(
+              (transactionsSummary: TransactionsSummary, index: number) => (
+                <div>
+                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                  <span>balance: {transactionsSummary.balance}</span>
+                  &nbsp;&nbsp;
+                  <span>
+                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                    {transactionsSummary.expensePercentage}%,
+                  </span>
+                  &nbsp;&nbsp;
+                  <span>income: {transactionsSummary.income}</span>
+                  &nbsp;&nbsp;
+                  {transactionsSummary.incomePercentage}%
+                  <span>&nbsp;&nbsp;</span>
+                </div>
+              )
+            )
+          : 'Loading...'}
+      </div>
+    );
   };
 
   const getLabel = () => {
-    return transactionsSummaries
-      ? transactionsSummaries.map(
-          (transactionsSummary: TransactionsSummary, index: number) => (
-            <div>
-              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-              <span>balance: {transactionsSummary.balance}</span>
-              &nbsp;&nbsp;
-              <span>
-                expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                {transactionsSummary.expensePercentage}%,
-              </span>
-              &nbsp;&nbsp;
-              <span>income: {transactionsSummary.income}</span>
-              &nbsp;&nbsp;
-              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
-            </div>
-          )
-        )
-      : 'Loading...';
+    return (
+      <div>
+        <LedgerSummaries
+          title={'By Label'}
+          balance={balance}
+          income={income}
+          expense={expense}
+          startDate={startDate}
+          endDate={endDate}
+        />
+        {transactionsSummaries
+          ? transactionsSummaries.map(
+              (transactionsSummary: TransactionsSummary, index: number) => (
+                <div>
+                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                  <span>balance: {transactionsSummary.balance}</span>
+                  &nbsp;&nbsp;
+                  <span>
+                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                    {transactionsSummary.expensePercentage}%,
+                  </span>
+                  &nbsp;&nbsp;
+                  <span>income: {transactionsSummary.income}</span>
+                  &nbsp;&nbsp;
+                  {transactionsSummary.incomePercentage}%
+                  <span>&nbsp;&nbsp;</span>
+                </div>
+              )
+            )
+          : 'Loading...'}
+      </div>
+    );
   };
 
   const getTimeline = () => {
-    return transactionsSummaries
-      ? transactionsSummaries.map(
-          (transactionsSummary: TransactionsSummary, index: number) => (
-            <div>
-              <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-              <span>balance: {transactionsSummary.balance}</span>
-              &nbsp;&nbsp;
-              <span>
-                expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                {transactionsSummary.expensePercentage}%,
-              </span>
-              &nbsp;&nbsp;
-              <span>income: {transactionsSummary.income}</span>
-              &nbsp;&nbsp;
-              {transactionsSummary.incomePercentage}%<span>&nbsp;&nbsp;</span>
-            </div>
-          )
-        )
-      : 'Loading...';
+    return (
+      <div>
+        <LedgerSummaries
+          title={'Timeline'}
+          balance={balance}
+          income={income}
+          expense={expense}
+          startDate={startDate}
+          endDate={endDate}
+        />
+        {transactionsSummaries
+          ? transactionsSummaries.map(
+              (transactionsSummary: TransactionsSummary, index: number) => (
+                <div>
+                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                  <span>balance: {transactionsSummary.balance}</span>
+                  &nbsp;&nbsp;
+                  <span>
+                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
+                    {transactionsSummary.expensePercentage}%,
+                  </span>
+                  &nbsp;&nbsp;
+                  <span>income: {transactionsSummary.income}</span>
+                  &nbsp;&nbsp;
+                  {transactionsSummary.incomePercentage}%
+                  <span>&nbsp;&nbsp;</span>
+                </div>
+              )
+            )
+          : 'Loading...'}
+      </div>
+    );
   };
 
   return (
@@ -207,53 +283,52 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               .catch((info) => console.log(info));
           }}
         >
-          <div className='transaction-summary'>
-            <LedgerSummaries
-              title={''}
-              balance={balance}
-              income={income}
-              expense={expense}
-              startDate={startDate}
-              endDate={endDate}
-            />
-            {getDefault()}
-          </div>
-          <div className='transaction-payer'>
-            <LedgerSummaries
-              title={'By Payer'}
-              balance={balance}
-              income={income}
-              expense={expense}
-              startDate={startDate}
-              endDate={endDate}
-            />
-            {getPayer()}
-          </div>
-          <div className='transaction-label'>
-            <LedgerSummaries
-              title={'By Label'}
-              balance={balance}
-              income={income}
-              expense={expense}
-              startDate={startDate}
-              endDate={endDate}
-            />
-            {getLabel()}
-          </div>
-          <div className='transaction-timeline'>
-            <LedgerSummaries
-              title={'Timeline'}
-              balance={balance}
-              income={income}
-              expense={expense}
-              startDate={startDate}
-              endDate={endDate}
-            />
-            {getTimeline()}
-          </div>
+          <div className='transaction-summary'>{getDefault()}</div>
+          <div className='transaction-payer'>{getPayer()}</div>
+          <div className='transaction-label'>{getLabel()}</div>
+          <div className='transaction-timeline'>{getTimeline()}</div>
           {/* maybe others? */}
         </Carousel>
       </div>
+
+      {ledgerSummaryType === 'LABEL' && (
+        <div style={{ display: 'block' }}>
+          <div style={{ border: '1px solid black' }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ paddingRight: '230px' }}>Expense</div>
+              <div>Income</div>
+            </div>
+
+            <PieChart width={800} height={200}>
+              {/* expense */}
+              <Pie
+                dataKey='expense'
+                isAnimationActive={false}
+                data={labelExpenseData}
+                cx={140}
+                cy={100}
+                outerRadius={60}
+                fill='#8884d8'
+                label
+              />
+              {/* income */}
+              <Pie
+                dataKey='income'
+                isAnimationActive={false}
+                data={labelIncomeData}
+                cx={400}
+                cy={100}
+                outerRadius={60}
+                fill='#8884d8'
+                label
+              />
+
+              <HoverHint />
+            </PieChart>
+          </div>
+        </div>
+      )}
+
       <div className='transaction-control'>
         <Form
           form={form}

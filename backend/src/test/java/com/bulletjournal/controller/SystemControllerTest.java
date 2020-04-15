@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import org.dmfs.rfc5545.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -62,11 +63,16 @@ public class SystemControllerTest {
 
         Project p1 = createProject("p_SystemControl_Task", group, ProjectType.TODO);
 
-        Task t1 = createRemindingTask(p1, "T1", 0, null, null);
-        Task t2 = createRemindingTask(p1, "T2", 1, null, null);
-        Task t3 = createRemindingTask(p1, "T3", 2, null, null);
-        Task t4 = createRemindingTask(p1, "T4", 3, null, null);
-        Task t5 = createRemindingTask(p1, "T5", 6, null, null);
+        Task t1 = createRemindingTask(p1, "T1", 0,
+                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
+        Task t2 = createRemindingTask(p1, "T2", 1,
+                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
+        Task t3 = createRemindingTask(p1, "T3", 2,
+                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
+        Task t4 = createRemindingTask(p1, "T4", 3,
+                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
+        Task t5 = createRemindingTask(p1, "T5", 6,
+                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
 
         SystemUpdates systemUpdates = getRemindingTasks(p1);
         List<Task> remindingTasks = systemUpdates.getReminders();

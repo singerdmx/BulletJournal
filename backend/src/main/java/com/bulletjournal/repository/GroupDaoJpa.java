@@ -132,6 +132,24 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Group> getProjectItemGroups(String owner) {
+        User user = this.userDaoJpa.getByName(owner);
+        return user.getGroups()
+                .stream()
+                .map(userGroup -> userGroup.getGroup())
+                .sorted((a, b) -> {
+                    if (a.isDefaultGroup() && a.getOwner().equals(owner)) {
+                        return -1;
+                    }
+                    if (b.isDefaultGroup() && b.getOwner().equals(owner)) {
+                        return 1;
+                    }
+                    return Long.compare(a.getId(), b.getId());
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Group> getGroups(String owner) {
         User user = this.userDaoJpa.getByName(owner);
         return user.getGroups()
