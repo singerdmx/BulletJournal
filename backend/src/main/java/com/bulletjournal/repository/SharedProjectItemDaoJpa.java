@@ -82,7 +82,9 @@ public class SharedProjectItemDaoJpa {
                 continue;
             }
             List<K> existingItems = this.getSharedProjectItems(user);
-            if (existingItems.contains(projectItem)) {
+            if (existingItems.stream().anyMatch(existingItem ->
+                    Objects.equals(existingItem.getContentType(), projectItem.getContentType()) &&
+                            Objects.equals(existingItem.getId(), projectItem.getId()))) {
                 LOGGER.error(projectItem.getClass().getSimpleName() + " " + projectItem.getName() +
                         " (ID " + projectItem.getId() +
                         ") is already shared with User " + user);
