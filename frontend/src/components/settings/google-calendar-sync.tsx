@@ -3,7 +3,7 @@ import {Button, Card, Tooltip} from 'antd';
 import {connect} from 'react-redux';
 import {loginGoogleCalendar, logoutGoogleCalendar} from '../../apis/calendarApis';
 import {googleTokenExpirationTimeUpdate} from "../../features/calendarSync/actions";
-import {ApiOutlined, SwapOutlined} from '@ant-design/icons';
+import {DisconnectOutlined, SwapOutlined} from '@ant-design/icons';
 import './calendar-sync.styles.less';
 import {IState} from "../../store";
 import {CalendarListEntry} from "../../features/calendarSync/interface";
@@ -39,7 +39,7 @@ const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
             <div className='calendar-sync-div'>
                 <Tooltip title='Log out Google Account'>
                     <Button
-                        onClick={() => handleGoogleCalendarLogout()}><ApiOutlined/><span>{' '}Disconnect</span></Button>
+                        onClick={() => handleGoogleCalendarLogout()}><DisconnectOutlined /><span>{' '}Disconnect</span></Button>
                 </Tooltip>
             </div>
             <div className='calendar-sync-div'>
