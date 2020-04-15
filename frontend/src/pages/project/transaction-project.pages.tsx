@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { PieChart, Pie, Tooltip as HoverHint } from 'recharts';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { PieChart, Pie, Tooltip as HoverHint } from "recharts";
+import { IState } from "../../store";
+import { connect } from "react-redux";
 import {
   Carousel,
   Radio,
@@ -11,24 +11,24 @@ import {
   Form,
   List,
   Tabs,
-} from 'antd';
+} from "antd";
 
-import { SyncOutlined } from '@ant-design/icons';
-import { dateFormat } from '../../features/myBuJo/constants';
-import './project.styles.less';
-import { zones } from '../../components/settings/constants';
-import { updateTransactions } from '../../features/transactions/actions';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { LedgerSummary } from '../../features/transactions/interface';
-import TransactionItem from '../../components/project-item/transaction-item.component';
-import './transaction.styles.less';
-import LedgerSummaries from './ledger-summary';
-import { TransactionsSummary } from '../../features/transactions/interface';
+import { SyncOutlined } from "@ant-design/icons";
+import { dateFormat } from "../../features/myBuJo/constants";
+import "./project.styles.less";
+import { zones } from "../../components/settings/constants";
+import { updateTransactions } from "../../features/transactions/actions";
+import { updateExpandedMyself } from "../../features/myself/actions";
+import { LedgerSummary } from "../../features/transactions/interface";
+import TransactionItem from "../../components/project-item/transaction-item.component";
+import "./transaction.styles.less";
+import LedgerSummaries from "../../components/ledger-summary/ledger-summary";
+import { TransactionsSummary } from "../../features/transactions/interface";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const currentCountry = currentZone && currentZone.split('/')[0];
+const currentCountry = currentZone && currentZone.split("/")[0];
 zones.sort((a, b) => {
   if (currentZone && currentZone === a) {
     return -1;
@@ -42,7 +42,7 @@ zones.sort((a, b) => {
   }
   return 0;
 });
-const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL', 'TIMELINE'];
+const LedgerSummaryTypeMap = ["DEFAULT", "PAYER", "LABEL", "TIMELINE"];
 const { TabPane } = Tabs;
 
 type TransactionProps = {
@@ -63,7 +63,7 @@ type TransactionProps = {
 
 const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [form] = Form.useForm();
-  const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
+  const [ledgerSummaryType, setLedgerSummaryType] = useState("DEFAULT");
   //used for LABEL pie
   const [labelExpenseData, setLabelExpenseData] = useState([{}]);
   const [labelIncomeData, setLabelIncomeData] = useState([{}]);
@@ -114,15 +114,15 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     props.updateTransactions(
       props.projectId,
       currentZone,
-      'MONTHLY',
+      "MONTHLY",
       ledgerSummaryType,
-      '',
-      ''
+      "",
+      ""
     );
   }, []);
 
   useEffect(() => {
-    if (ledgerSummaryType === 'LABEL') {
+    if (ledgerSummaryType === "LABEL") {
       const newExpenseData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
           if (!showLabelExpenseTab && transaction.expense !== 0) {
@@ -140,7 +140,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         }
       );
       setLabelIncomeData(newIncomeData);
-    } else if (ledgerSummaryType === 'PAYER') {
+    } else if (ledgerSummaryType === "PAYER") {
       const newExpenseData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
           if (!showPayerExpenseTab && transaction.expense !== 0) {
@@ -172,120 +172,107 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
   const getDefault = () => {
     return (
-      <div>
-        <LedgerSummaries
-          title={''}
-          balance={balance}
-          income={income}
-          expense={expense}
-          startDate={startDate}
-          endDate={endDate}
-        />
+      <LedgerSummaries
+        title={""}
+        balance={balance}
+        income={income}
+        expense={expense}
+        startDate={startDate}
+        endDate={endDate}
+      >
+        {" "}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
                 <div>
-                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                  <span>{transactionsSummary.name}</span>
                   <span>balance: {transactionsSummary.balance}</span>
-                  &nbsp;&nbsp;
                   <span>
                     expense: {transactionsSummary.expense}&nbsp;&nbsp;
                     {transactionsSummary.expensePercentage}%,
                   </span>
-                  &nbsp;&nbsp;
                   <span>income: {transactionsSummary.income}</span>
-                  &nbsp;&nbsp;
                   {transactionsSummary.incomePercentage}%
-                  <span>&nbsp;&nbsp;</span>
                 </div>
               )
             )
-          : 'Loading...'}
-      </div>
+          : "Loading..."}
+      </LedgerSummaries>
     );
   };
 
   const getPayer = () => {
     return (
-      <div>
-        <LedgerSummaries
-          title={'By Payer'}
-          balance={balance}
-          income={income}
-          expense={expense}
-          startDate={startDate}
-          endDate={endDate}
-        />
+      <LedgerSummaries
+        title={"By Payer"}
+        balance={balance}
+        income={income}
+        expense={expense}
+        startDate={startDate}
+        endDate={endDate}
+      >
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
                 <div>
-                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
+                  <span>{transactionsSummary.name}</span>
                   <span>balance: {transactionsSummary.balance}</span>
-                  &nbsp;&nbsp;
                   <span>
                     expense: {transactionsSummary.expense}&nbsp;&nbsp;
                     {transactionsSummary.expensePercentage}%,
                   </span>
-                  &nbsp;&nbsp;
                   <span>income: {transactionsSummary.income}</span>
-                  &nbsp;&nbsp;
                   {transactionsSummary.incomePercentage}%
-                  <span>&nbsp;&nbsp;</span>
                 </div>
               )
             )
-          : 'Loading...'}
-      </div>
+          : "Loading..."}{" "}
+      </LedgerSummaries>
     );
   };
 
   const getLabel = () => {
     return (
-      <div>
-        <LedgerSummaries
-          title={'By Label'}
-          balance={balance}
-          income={income}
-          expense={expense}
-          startDate={startDate}
-          endDate={endDate}
-        />
+      <LedgerSummaries
+        title={"By Label"}
+        balance={balance}
+        income={income}
+        expense={expense}
+        startDate={startDate}
+        endDate={endDate}
+      >
+        {" "}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
                 <div>
                   <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
                   <span>balance: {transactionsSummary.balance}</span>
-                  &nbsp;&nbsp;
                   <span>
                     expense: {transactionsSummary.expense}&nbsp;&nbsp;
                     {transactionsSummary.expensePercentage}%,
                   </span>
-                  &nbsp;&nbsp;
                   <span>income: {transactionsSummary.income}</span>
-                  &nbsp;&nbsp;
                   {transactionsSummary.incomePercentage}%
-                  <span>&nbsp;&nbsp;</span>
                 </div>
               )
             )
-          : 'Loading...'}
-      </div>
+          : "Loading..."}
+      </LedgerSummaries>
     );
   };
 
   const getTimeline = () => {
     return (
-      <div>
-        <LedgerSummaries
-          title={'Timeline'}
-          balance={balance}
-          income={income}
-          expense={expense}
-          startDate={startDate}
-          endDate={endDate}
-        />
+      <LedgerSummaries
+        title={"Timeline"}
+        balance={balance}
+        income={income}
+        expense={expense}
+        startDate={startDate}
+        endDate={endDate}
+      >
+        {" "}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
@@ -305,16 +292,16 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : 'Loading...'}
-      </div>
+          : "Loading..."}
+      </LedgerSummaries>
     );
   };
 
   return (
-    <div className='transaction-page'>
-      <div className='transaction-display'>
+    <div className="transaction-page">
+      <div className="transaction-display">
         <Carousel
-          dotPosition='top'
+          dotPosition="top"
           afterChange={(current: number) => {
             setLedgerSummaryType(LedgerSummaryTypeMap[current]);
             form
@@ -325,30 +312,30 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               .catch((info) => console.log(info));
           }}
         >
-          <div className='transaction-summary'>{getDefault()}</div>
-          <div className='transaction-payer'>{getPayer()}</div>
-          <div className='transaction-label'>{getLabel()}</div>
-          <div className='transaction-timeline'>{getTimeline()}</div>
+          <div className="transaction-summary">{getDefault()}</div>
+          <div className="transaction-payer">{getPayer()}</div>
+          <div className="transaction-label">{getLabel()}</div>
+          <div className="transaction-timeline">{getTimeline()}</div>
           {/* maybe others? */}
         </Carousel>
       </div>
 
       {/* label pie graph */}
-      {ledgerSummaryType === 'LABEL' && (
-        <div style={{ border: '1px solid black' }}>
+      {ledgerSummaryType === "LABEL" && (
+        <div style={{ border: "1px solid black" }}>
           <Tabs>
             {showLabelExpenseTab && (
-              <TabPane tab='Expense' key='expense'>
+              <TabPane tab="Expense" key="expense">
                 <PieChart width={800} height={200}>
                   {/* expense */}
                   <Pie
-                    dataKey='expense'
+                    dataKey="expense"
                     isAnimationActive={false}
                     data={labelExpenseData}
                     cx={140}
                     cy={100}
                     outerRadius={60}
-                    fill='#8884d8'
+                    fill="#8884d8"
                     label
                   />
                   <HoverHint />
@@ -356,17 +343,17 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               </TabPane>
             )}
             {showLabelIncomeTab && (
-              <TabPane tab='Income' key='income'>
+              <TabPane tab="Income" key="income">
                 <PieChart width={800} height={200}>
                   {/* income */}
                   <Pie
-                    dataKey='income'
+                    dataKey="income"
                     isAnimationActive={false}
                     data={labelIncomeData}
                     cx={140}
                     cy={100}
                     outerRadius={60}
-                    fill='#8884d8'
+                    fill="#8884d8"
                     label
                   />
                   <HoverHint />
@@ -378,21 +365,21 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       )}
 
       {/* payer pie graph */}
-      {ledgerSummaryType === 'PAYER' && (
-        <div style={{ border: '1px solid black' }}>
+      {ledgerSummaryType === "PAYER" && (
+        <div style={{ border: "1px solid black" }}>
           <Tabs>
             {showPayerExpenseTab && (
-              <TabPane tab='Expense' key='expense'>
+              <TabPane tab="Expense" key="expense">
                 <PieChart width={800} height={200}>
                   {/* expense */}
                   <Pie
-                    dataKey='expense'
+                    dataKey="expense"
                     isAnimationActive={false}
                     data={payerExpenseData}
                     cx={140}
                     cy={100}
                     outerRadius={60}
-                    fill='#8884d8'
+                    fill="#8884d8"
                     label
                   />
                   <HoverHint />
@@ -400,17 +387,17 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               </TabPane>
             )}
             {showPayerIncomeTab && (
-              <TabPane tab='Income' key='income'>
+              <TabPane tab="Income" key="income">
                 <PieChart width={800} height={200}>
                   {/* income */}
                   <Pie
-                    dataKey='income'
+                    dataKey="income"
                     isAnimationActive={false}
                     data={payerIncomeData}
                     cx={140}
                     cy={100}
                     outerRadius={60}
-                    fill='#8884d8'
+                    fill="#8884d8"
                     label
                   />
                   <HoverHint />
@@ -421,39 +408,39 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         </div>
       )}
 
-      <div className='transaction-control'>
+      <div className="transaction-control">
         <Form
           form={form}
           initialValues={{
-            frequencyType: 'MONTHLY',
+            frequencyType: "MONTHLY",
             timezone: props.timezone ? props.timezone : currentZone,
           }}
         >
-          <Form.Item name='frequencyType'>
-            <Radio.Group value='YEARLY'>
-              <Radio value='WEEKLY'>WEEKLY</Radio>
-              <Radio value='MONTHLY'>MONTHLY</Radio>
-              <Radio value='YEARLY'>YEARLY</Radio>
+          <Form.Item name="frequencyType">
+            <Radio.Group value="YEARLY">
+              <Radio value="WEEKLY">WEEKLY</Radio>
+              <Radio value="MONTHLY">MONTHLY</Radio>
+              <Radio value="YEARLY">YEARLY</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item name='date'>
+          <Form.Item name="date">
             <RangePicker
               allowClear={true}
               format={dateFormat}
-              placeholder={['Start Date', 'End Date']}
+              placeholder={["Start Date", "End Date"]}
             />
           </Form.Item>
 
-          <Form.Item name='timezone'>
+          <Form.Item name="timezone">
             <Select
-              style={{ width: '200px' }}
+              style={{ width: "200px" }}
               showSearch={true}
-              placeholder='Select Time Zone'
+              placeholder="Select Time Zone"
             >
               {zones.map((zone: string, index: number) => (
                 <Option key={zone} value={zone}>
-                  <Tooltip title={zone} placement='right'>
+                  <Tooltip title={zone} placement="right">
                     {<span>{zone}</span>}
                   </Tooltip>
                 </Option>
@@ -461,7 +448,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             </Select>
           </Form.Item>
 
-          <Tooltip title={'Click to Refresh Transactions'}>
+          <Tooltip title={"Click to Refresh Transactions"}>
             <SyncOutlined
               onClick={() => {
                 form
@@ -476,7 +463,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </Tooltip>
         </Form>
       </div>
-      <List className='transaction-list'>
+      <List className="transaction-list">
         {transactions.map((item) => (
           <List.Item>
             <TransactionItem transaction={item} />
