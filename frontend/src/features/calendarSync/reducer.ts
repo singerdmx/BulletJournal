@@ -1,12 +1,23 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import {CalendarListEntry} from "./interface";
+import {CalendarListEntry, GoogleCalendarEvent} from "./interface";
 
 export type ExpirationTimeAction = {
   expirationTime: number;
 };
 
+export type UpdateGoogleCalendarEventListAction = {
+  calendarId: string;
+  timezone: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 export type CalendarListAction = {
   calendarList: CalendarListEntry[];
+};
+
+export type CalendarEventListAction = {
+  googleCalendarEventList: GoogleCalendarEvent[];
 };
 
 export type UpdateExpirationTimeAction = {
@@ -15,7 +26,8 @@ export type UpdateExpirationTimeAction = {
 let initialState = {
   googleTokenExpirationTime: 0 as number,
   appleTokenExpirationTime: 0 as number,
-  googleCalendarList: [] as CalendarListEntry[]
+  googleCalendarList: [] as CalendarListEntry[],
+  googleCalendarEventList: [] as GoogleCalendarEvent[],
 };
 
 const slice = createSlice({
@@ -30,11 +42,16 @@ const slice = createSlice({
       const { calendarList } = action.payload;
       state.googleCalendarList = calendarList;
     },
+    googleCalendarEventListReceived: (state, action: PayloadAction<CalendarEventListAction>) => {
+      const { googleCalendarEventList } = action.payload;
+      state.googleCalendarEventList = googleCalendarEventList;
+    },
     appleTokenExpirationTimeReceived: (state, action: PayloadAction<ExpirationTimeAction>) => {
       const { expirationTime } = action.payload;
       state.appleTokenExpirationTime = expirationTime;
     },
     googleTokenExpirationTimeUpdate: (state, action: PayloadAction<UpdateExpirationTimeAction>) => state,
+    googleCalendarEventListUpdate: (state, action: PayloadAction<UpdateGoogleCalendarEventListAction>) => state,
   }
 });
 
