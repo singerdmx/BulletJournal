@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
 import { Drawer, Button } from 'antd';
-import { deleteContent } from '../../features/notes/actions';
+import { deleteContent as deleteNoteContent } from '../../features/notes/actions';
+import { deleteContent as deleteTaskContent } from '../../features/tasks/actions';
+import { deleteContent as deleteTransactionContent } from '../../features/transactions/actions';
 import { getProject } from '../../features/project/actions';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
+import { ContentType } from '../../features/myBuJo/constants';
 
 import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
@@ -23,7 +26,9 @@ type ContentEditorDrawerProps = {
 
 interface ContentEditorDrawerHandler {
   getProject: (projectId: number) => void;
-  deleteContent: (noteId: number, contentId: number) => void;
+  deleteNoteContent: (noteId: number, contentId: number) => void;
+  deleteTaskContent: (taskId: number, contentId: number) => void;
+  deleteTransactionContent: (transactionId: number, contentId: number) => void;
 }
 
 const ContentEditorDrawer: React.FC<
@@ -33,22 +38,31 @@ const ContentEditorDrawer: React.FC<
   projectItem,
   visible,
   onClose,
-  deleteContent,
+  deleteNoteContent,
+  deleteTaskContent,
+  deleteTransactionContent,
   project,
   myself,
 }) => {
+  const deleteContentCall: { [key in ContentType]: Function } = {
+    [ContentType.NOTE]: deleteNoteContent,
+    [ContentType.TASK]: deleteTaskContent,
+    [ContentType.TRANSACTION]: deleteTransactionContent,
+    [ContentType.PROJECT]: () => {},
+    [ContentType.GROUP]: () => {},
+    [ContentType.LABEL]: () => {},
+    [ContentType.CONTENT]: () => {},
+  };
+
+  let deleteContentFunction = deleteContentCall[projectItem.contentType];
   const [readMode, setReadMode] = useState(true);
   const handleEdit = () => setReadMode(false);
   const handleDelete = () => {
     if (!content) {
       return;
     }
-    deleteContent(projectItem.id, content.id);
+    deleteContentFunction(projectItem.id, content.id);
   };
-
-  useEffect(() => {
-    getProject(projectItem.projectId);
-  }, []);
 
   const footerControl = (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -90,7 +104,7 @@ const ContentEditorDrawer: React.FC<
       ) : (
         <ContentEditor
           content={content || undefined}
-          noteId={projectItem.id}
+          projectItemId={projectItem.id}
           afterFinish={handleClose}
         />
       )}
@@ -103,6 +117,9 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself.username,
 });
 
-export default connect(mapStateToProps, { deleteContent, getProject })(
-  ContentEditorDrawer
-);
+export default connect(mapStateToProps, {
+  deleteNoteContent,
+  getProject,
+  deleteTaskContent,
+  deleteTransactionContent,
+})(ContentEditorDrawer);
