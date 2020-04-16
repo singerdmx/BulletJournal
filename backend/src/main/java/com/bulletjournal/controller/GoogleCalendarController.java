@@ -13,6 +13,7 @@ import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.models.GoogleCalendarProject;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.StoredCredential;
@@ -26,6 +27,7 @@ import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Channel;
 import com.google.api.services.calendar.model.Event;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,7 @@ import java.util.stream.Collectors;
 @RestController
 public class GoogleCalendarController {
 
+    private static final Gson GSON = new Gson();
     private static final String WATCH_CHANNEL_TOKEN = "BuJo";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
@@ -176,19 +179,28 @@ public class GoogleCalendarController {
             @Valid @RequestBody @NotNull WatchCalendarParams watchCalendarParams) throws IOException {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String channelId = UUID.randomUUID().toString();
-        this.googleCalendarProjectDaoJpa.create(
-                calendarId, watchCalendarParams.getProjectId(), channelId, username);
+
         Calendar service = getCalendarService();
-        Channel channel = new Channel();
-        channel.setId(calendarId);
-        channel.setType("web_hook");
-        channel.setType(WATCH_CHANNEL_TOKEN);
-        channel.setAddress("https://bulletjournal.us" + CHANNEL_NOTIFICATIONS_ROUTE);
-        channel.setParams(ImmutableMap.of("ttl", "-1"));
+        Channel channel = getChannel(channelId);
         // https://developers.google.com/calendar/v3/push
         // https://developers.google.com/calendar/v3/reference/events/watch
         Calendar.Events.Watch watch = service.events().watch(calendarId, channel);
         LOGGER.info("Created watch {}", watch);
+        Channel createdChannel = watch.execute();
+        LOGGER.info("Created channel {}", createdChannel);
+        GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
+                calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toJson(createdChannel), username);
+        LOGGER.info("Created GoogleCalendarProject {}", googleCalendarProject);
+    }
+
+    private Channel getChannel(String channelId) {
+        Channel channel = new Channel();
+        channel.setId(channelId);
+        channel.setType("web_hook");
+        channel.setType(WATCH_CHANNEL_TOKEN);
+        channel.setAddress("https://bulletjournal.us" + CHANNEL_NOTIFICATIONS_ROUTE);
+        channel.setParams(ImmutableMap.of("ttl", "-1"));
+        return channel;
     }
 
     @PostMapping(CHANNEL_NOTIFICATIONS_ROUTE)
@@ -200,13 +212,18 @@ public class GoogleCalendarController {
 
     @GetMapping("/api/calendar/google/calendars/{calendarId}/watchedProject")
     public Project getWatchedProject(@NotNull @PathVariable String calendarId) {
-        return this.googleCalendarProjectDaoJpa.get(calendarId).toPresentationModel();
+        return this.googleCalendarProjectDaoJpa.get(calendarId).getProject().toPresentationModel();
     }
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")
     public void unwatchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
         Calendar service = getCalendarService();
+        GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.get(calendarId);
         // https://developers.google.com/calendar/v3/reference/channels/stop
+        Channel channel = GSON.fromJson(googleCalendarProject.getChannel(), Channel.class);
+        LOGGER.info("Stopping channel {}", channel);
+        service.channels().stop(channel).execute();
+        this.googleCalendarProjectDaoJpa.delete(calendarId);
     }
 
     private Calendar getCalendarService() throws IOException {

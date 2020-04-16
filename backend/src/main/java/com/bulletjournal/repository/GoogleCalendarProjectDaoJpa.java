@@ -18,16 +18,23 @@ public class GoogleCalendarProjectDaoJpa {
     private ProjectDaoJpa projectDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void create(String calendarId, Long projectId, String channelId, String requester) {
+    public GoogleCalendarProject create(String calendarId, Long projectId, String channelId,
+                                        String channel, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-        GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(calendarId, project, channelId);
-        this.googleCalendarProjectRepository.save(googleCalendarProject);
+        GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(
+                calendarId, project, channelId, channel);
+        return this.googleCalendarProjectRepository.save(googleCalendarProject);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Project get(String calendarId) {
+    public GoogleCalendarProject get(String calendarId) {
         GoogleCalendarProject calendarProject = this.googleCalendarProjectRepository.findById(calendarId)
                 .orElseThrow(() -> new ResourceNotFoundException("Calendar " + calendarId + " not found"));
-        return calendarProject.getProject();
+        return calendarProject;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void delete(String calendarId) {
+        this.googleCalendarProjectRepository.delete(get(calendarId));
     }
 }

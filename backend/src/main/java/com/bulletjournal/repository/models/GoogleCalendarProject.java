@@ -22,13 +22,17 @@ public class GoogleCalendarProject extends AuditModel {
     @Column(name = "channel_id")
     private String channelId;
 
+    @Column(length = 5000)
+    private String channel;
+
     public GoogleCalendarProject() {
     }
 
-    public GoogleCalendarProject(String id, Project project, String channelId) {
+    public GoogleCalendarProject(String id, Project project, String channelId, String channel) {
         this.id = id;
         this.project = project;
         this.channelId = channelId;
+        this.channel = channel;
     }
 
     public String getId() {
@@ -53,5 +57,23 @@ public class GoogleCalendarProject extends AuditModel {
 
     public void setChannelId(String channelId) {
         this.channelId = channelId;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    @Override
+    public String toString() {
+        return "GoogleCalendarProject{" +
+                "id='" + id + '\'' +
+                ", project=" + project +
+                ", channelId='" + channelId + '\'' +
+                ", channel='" + channel + '\'' +
+                '}';
     }
 }
