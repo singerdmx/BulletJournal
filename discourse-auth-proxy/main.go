@@ -90,6 +90,7 @@ func main() {
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger.Printf("Request %s", r.RequestURI)
 		if checkWhitelist(handler, r, w) {
 			return
 		}
@@ -172,7 +173,8 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 	}
 
 	if (strings.HasPrefix(r.RequestURI, "/api/public/items/") ||
-		strings.HasPrefix(r.RequestURI, "/public/items/")) {
+		strings.HasPrefix(r.RequestURI, "/public/items/") ||
+		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback")) {
 		logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)
 		handler.ServeHTTP(w, r)
 		return
