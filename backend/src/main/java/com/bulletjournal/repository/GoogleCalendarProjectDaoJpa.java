@@ -18,9 +18,9 @@ public class GoogleCalendarProjectDaoJpa {
     private ProjectDaoJpa projectDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void create(String calendarId, Long projectId, String requester) {
+    public void create(String calendarId, Long projectId, String channelId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-        GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(calendarId, project);
+        GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(calendarId, project, channelId);
         this.googleCalendarProjectRepository.save(googleCalendarProject);
     }
 

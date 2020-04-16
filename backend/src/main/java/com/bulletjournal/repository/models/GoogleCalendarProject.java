@@ -6,7 +6,10 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "google_calendar_projects")
+@Table(name = "google_calendar_projects",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"channel_id"})
+        })
 public class GoogleCalendarProject extends AuditModel {
     @Id
     private String id; // calendarId
@@ -16,12 +19,16 @@ public class GoogleCalendarProject extends AuditModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
+    @Column(name = "channel_id")
+    private String channelId;
+
     public GoogleCalendarProject() {
     }
 
-    public GoogleCalendarProject(String id, Project project) {
+    public GoogleCalendarProject(String id, Project project, String channelId) {
         this.id = id;
         this.project = project;
+        this.channelId = channelId;
     }
 
     public String getId() {
@@ -38,5 +45,13 @@ public class GoogleCalendarProject extends AuditModel {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 }

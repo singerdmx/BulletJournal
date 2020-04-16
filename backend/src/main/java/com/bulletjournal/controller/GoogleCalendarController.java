@@ -23,7 +23,9 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.Channel;
 import com.google.api.services.calendar.model.Event;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,15 +43,19 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
 public class GoogleCalendarController {
 
+    private static final String WATCH_CHANNEL_TOKEN = "BuJo";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
     private static final String APPLICATION_NAME = "Bullet Journal";
     private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
+    protected static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
 
     @Autowired
     private GoogleCalConfig googleCalConfig;
@@ -169,9 +175,27 @@ public class GoogleCalendarController {
             @NotNull @PathVariable String calendarId,
             @Valid @RequestBody @NotNull WatchCalendarParams watchCalendarParams) throws IOException {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.googleCalendarProjectDaoJpa.create(calendarId, watchCalendarParams.getProjectId(), username);
+        String channelId = UUID.randomUUID().toString();
+        this.googleCalendarProjectDaoJpa.create(
+                calendarId, watchCalendarParams.getProjectId(), channelId, username);
         Calendar service = getCalendarService();
+        Channel channel = new Channel();
+        channel.setId(calendarId);
+        channel.setType("web_hook");
+        channel.setType(WATCH_CHANNEL_TOKEN);
+        channel.setAddress("https://bulletjournal.us" + CHANNEL_NOTIFICATIONS_ROUTE);
+        channel.setParams(ImmutableMap.of("ttl", "-1"));
+        // https://developers.google.com/calendar/v3/push
         // https://developers.google.com/calendar/v3/reference/events/watch
+        Calendar.Events.Watch watch = service.events().watch(calendarId, channel);
+        LOGGER.info("Created watch {}", watch);
+    }
+
+    @PostMapping(CHANNEL_NOTIFICATIONS_ROUTE)
+    public void getChannelNotifications(@RequestHeader Map<String, String> headers) {
+        headers.forEach((key, value) -> {
+            LOGGER.info("Header {} = {}", key, value);
+        });
     }
 
     @GetMapping("/api/calendar/google/calendars/{calendarId}/watchedProject")
