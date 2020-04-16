@@ -260,8 +260,61 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     );
   };
 
+  const handleFilterChange = (changed: any, allValue: any) => {
+    form
+      .validateFields()
+      .then((values) => updateTransactions(values, ledgerSummaryType))
+      .catch((info) => console.log(info));
+  };
+
   return (
     <div className="transaction-page">
+      <div className="transaction-control">
+        <Form
+          form={form}
+          onValuesChange={handleFilterChange}
+          layout="inline"
+          initialValues={{
+            frequencyType: 'MONTHLY',
+            timezone: props.timezone ? props.timezone : currentZone,
+          }}
+        >
+          <Form.Item name="frequencyType">
+            <Radio.Group value="YEARLY" size="small" buttonStyle="solid">
+              <Radio.Button value="WEEKLY">W</Radio.Button>
+              <Radio.Button value="MONTHLY">M</Radio.Button>
+              <Radio.Button value="YEARLY">Y</Radio.Button>
+            </Radio.Group>
+          </Form.Item>
+
+          <Form.Item name="date">
+            <RangePicker
+              size="small"
+              allowClear={true}
+              format={dateFormat}
+              placeholder={['Start Date', 'End Date']}
+            />
+          </Form.Item>
+
+          <Form.Item name="timezone">
+            <Select
+              size="small"
+              style={{ maxWidth: 100 }}
+              dropdownMatchSelectWidth={200}
+              showSearch={true}
+              placeholder="Select Time Zone"
+            >
+              {zones.map((zone: string, index: number) => (
+                <Option key={zone} value={zone}>
+                  <Tooltip title={zone} placement="right">
+                    {<span>{zone}</span>}
+                  </Tooltip>
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </div>
       <div className="transaction-display">
         <Carousel
           dotPosition="top"
@@ -284,9 +337,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
       {ledgerSummaryType === 'DEFAULT' && (
         <div className="transaction-visual">
-          <div className="transaction-graph">
-            <LineChart data={}></LineChart>
-          </div>
+          <div className="transaction-graph"></div>
         </div>
       )}
 
@@ -359,62 +410,6 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </div>
         </div>
       )}
-
-      <div className="transaction-control">
-        <Form
-          form={form}
-          initialValues={{
-            frequencyType: 'MONTHLY',
-            timezone: props.timezone ? props.timezone : currentZone,
-          }}
-        >
-          <Form.Item name="frequencyType">
-            <Radio.Group value="YEARLY">
-              <Radio value="WEEKLY">WEEKLY</Radio>
-              <Radio value="MONTHLY">MONTHLY</Radio>
-              <Radio value="YEARLY">YEARLY</Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          <Form.Item name="date">
-            <RangePicker
-              allowClear={true}
-              format={dateFormat}
-              placeholder={['Start Date', 'End Date']}
-            />
-          </Form.Item>
-
-          <Form.Item name="timezone">
-            <Select
-              style={{ width: '200px' }}
-              showSearch={true}
-              placeholder="Select Time Zone"
-            >
-              {zones.map((zone: string, index: number) => (
-                <Option key={zone} value={zone}>
-                  <Tooltip title={zone} placement="right">
-                    {<span>{zone}</span>}
-                  </Tooltip>
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Tooltip title={'Click to Refresh Transactions'}>
-            <SyncOutlined
-              onClick={() => {
-                form
-                  .validateFields()
-                  .then((values) => {
-                    console.log(values);
-                    updateTransactions(values, ledgerSummaryType);
-                  })
-                  .catch((info) => console.log(info));
-              }}
-            />
-          </Tooltip>
-        </Form>
-      </div>
       <List className="transaction-list">
         {transactions.map((item) => (
           <List.Item>
