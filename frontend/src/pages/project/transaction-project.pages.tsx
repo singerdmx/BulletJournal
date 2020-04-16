@@ -3,8 +3,7 @@ import { PieChart, Pie, Tooltip as HoverHint, LineChart } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { Carousel, Radio, DatePicker, Tooltip, Select, Form, List } from 'antd';
-
-import { SyncOutlined } from '@ant-design/icons';
+import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
 import { zones } from '../../components/settings/constants';
@@ -289,6 +288,14 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
           <Form.Item name="date">
             <RangePicker
+              ranges={{
+                Today: [moment(), moment()],
+                'This Month': [
+                  moment().startOf('month'),
+                  moment().endOf('month'),
+                ],
+                'This Week': [moment().startOf('week'), moment().endOf('week')],
+              }}
               size="small"
               allowClear={true}
               format={dateFormat}
