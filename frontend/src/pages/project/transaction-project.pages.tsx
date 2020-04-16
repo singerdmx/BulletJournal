@@ -201,7 +201,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const getPayer = () => {
     return (
       <LedgerSummaries
-        title={'By Payer'}
+        title={'Payer'}
         balance={balance}
         income={income}
         expense={expense}
@@ -231,7 +231,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const getLabel = () => {
     return (
       <LedgerSummaries
-        title={'By Label'}
+        title={'Label'}
         balance={balance}
         income={income}
         expense={expense}
