@@ -8,18 +8,18 @@ import { Content } from '../../features/myBuJo/interface';
 
 import axios from 'axios';
 
-type NoteEditorProps = {
+type ContentEditorProps = {
   noteId: number;
   content?: Content;
 };
 
-interface NoteEditorHandler {
+interface ContentEditorHandler {
   createContent: (noteId: number, text: string) => void;
   patchContent: (noteId: number, contentId: number, text: string) => void;
   afterFinish: Function;
 }
 
-const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
+const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   noteId,
   content,
   createContent,
@@ -102,16 +102,16 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
       onFinish={handleFormSubmit}
       initialValues={{ noteContent: editorState }}
     >
-      <Form.Item name="noteContent">
+      <Form.Item name='noteContent'>
         <BraftEditor
-          language="en"
-          className="note-editor"
+          language='en'
+          className='note-editor'
           value={editorState}
           media={{ uploadFn: handleUpload, validateFn: validateFile }}
         />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit">
+        <Button type='primary' htmlType='submit'>
           {isEdit ? 'Update' : 'Create'}
         </Button>
       </Form.Item>
@@ -119,4 +119,4 @@ const NoteEditor: React.FC<NoteEditorProps & NoteEditorHandler> = ({
   );
 };
 
-export default connect(null, { createContent, patchContent })(NoteEditor);
+export default connect(null, { createContent, patchContent })(ContentEditor);
