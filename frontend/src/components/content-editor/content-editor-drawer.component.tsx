@@ -6,22 +6,22 @@ import { connect } from 'react-redux';
 
 import { Content } from '../../features/myBuJo/interface';
 
-import NoteEditor from './content-editor.component';
-import NoteReader from './content-reader.component';
+import ContentEditor from './content-editor.component';
+import ContentReader from './content-reader.component';
 
-type NoteEditorDrawerProps = {
+type ContentEditorDrawerProps = {
   content?: Content;
   noteId: number;
   visible: boolean;
   onClose: Function;
 };
 
-interface NoteEditorDrawerHandler {
+interface ContentEditorDrawerHandler {
   deleteContent: (noteId: number, contentId: number) => void;
 }
 
-const NoteEditorDrawer: React.FC<
-  NoteEditorDrawerProps & NoteEditorDrawerHandler
+const ContentEditorDrawer: React.FC<
+  ContentEditorDrawerProps & ContentEditorDrawerHandler
 > = ({ content, noteId, visible, onClose, deleteContent }) => {
   const [readMode, setReadMode] = useState(true);
   const handleEdit = () => setReadMode(false);
@@ -54,10 +54,10 @@ const NoteEditorDrawer: React.FC<
     >
       {readMode && content ? (
         <div>
-          <NoteReader content={content} />
+          <ContentReader content={content} />
         </div>
       ) : (
-        <NoteEditor
+        <ContentEditor
           content={content || undefined}
           noteId={noteId}
           afterFinish={handleClose}
@@ -67,4 +67,4 @@ const NoteEditorDrawer: React.FC<
   );
 };
 
-export default connect(null, { deleteContent })(NoteEditorDrawer);
+export default connect(null, { deleteContent })(ContentEditorDrawer);

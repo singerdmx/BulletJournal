@@ -3,11 +3,11 @@ import { Content } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
 import './content-editor.style.less';
 
-type NoteReaderProps = {
+type ContentReaderProps = {
   content: Content;
 };
 
-const NoteReader: React.FC<NoteReaderProps> = ({ content }) => {
+const ContentReader: React.FC<ContentReaderProps> = ({ content }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentDisplay = contentState.toHTML();
   return (
@@ -17,4 +17,4 @@ const NoteReader: React.FC<NoteReaderProps> = ({ content }) => {
   );
 };
 
-export default NoteReader;
+export default ContentReader;

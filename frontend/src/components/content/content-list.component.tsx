@@ -4,15 +4,15 @@ import { connect } from 'react-redux';
 import { updateNoteContents } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { Content } from '../../features/myBuJo/interface';
-import NoteContentItem from './content-item.component';
+import ContentItem from './content-item.component';
 
-type NoteContentListProps = {
+type ContentListProps = {
   noteId: number;
   contents: Content[];
   updateNoteContents: (noteId: number) => void;
 };
 
-const NoteContentList: React.FC<NoteContentListProps> = ({
+const ContentList: React.FC<ContentListProps> = ({
   noteId,
   contents,
   updateNoteContents,
@@ -22,10 +22,10 @@ const NoteContentList: React.FC<NoteContentListProps> = ({
   }, [noteId]);
 
   return (
-    <List itemLayout="vertical">
+    <List itemLayout='vertical'>
       {contents &&
         contents.map((content) => (
-          <NoteContentItem noteId={noteId} key={content.id} content={content} />
+          <ContentItem noteId={noteId} key={content.id} content={content} />
         ))}
     </List>
   );
@@ -35,6 +35,4 @@ const mapStateToProps = (state: IState) => ({
   contents: state.note.contents,
 });
 
-export default connect(mapStateToProps, { updateNoteContents })(
-  NoteContentList
-);
+export default connect(mapStateToProps, { updateNoteContents })(ContentList);
