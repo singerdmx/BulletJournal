@@ -39,11 +39,11 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
           <RangePicker
             ranges={{
               Today: [moment(), moment()],
+              'This Week': [moment().startOf('week'), moment().endOf('week')],
               'This Month': [
                 moment().startOf('month'),
                 moment().endOf('month'),
               ],
-              'This Week': [moment().startOf('week'), moment().endOf('week')],
             }}
             allowClear={false}
             value={[

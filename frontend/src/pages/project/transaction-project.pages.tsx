@@ -290,11 +290,11 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             <RangePicker
               ranges={{
                 Today: [moment(), moment()],
+                'This Week': [moment().startOf('week'), moment().endOf('week')],
                 'This Month': [
                   moment().startOf('month'),
                   moment().endOf('month'),
                 ],
-                'This Week': [moment().startOf('week'), moment().endOf('week')],
               }}
               size="small"
               allowClear={true}
