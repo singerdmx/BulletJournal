@@ -1,10 +1,10 @@
-import React, { ReactNode } from "react";
-import { Statistic, Card } from "antd";
-import { IState } from "../../store";
-import { connect } from "react-redux";
-import "./ledger-summary.styles.less";
+import React, { ReactNode } from 'react';
+import { Statistic, Card } from 'antd';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import './ledger-summary.styles.less';
 
-const LocaleCurrency = require("locale-currency");
+const LocaleCurrency = require('locale-currency');
 
 type LedgerSummaryProps = {
   currency: string;
@@ -35,20 +35,20 @@ const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
         {startDate} - {endDate}
       </div>
       <div className="ledger-static">
-        <Card>
+        <Card bordered={false}>
           <Statistic
             title={`Balance (${LocaleCurrency.getCurrency(props.currency)})`}
             value={balance}
           />
         </Card>
 
-        <Card>
+        <Card bordered={false}>
           <Statistic
             title={`Income (${LocaleCurrency.getCurrency(props.currency)})`}
             value={income}
           />
         </Card>
-        <Card>
+        <Card bordered={false}>
           <Statistic
             title={`Expense (${LocaleCurrency.getCurrency(props.currency)})`}
             value={expense}

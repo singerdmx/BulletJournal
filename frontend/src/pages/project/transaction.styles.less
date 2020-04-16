@@ -1,4 +1,4 @@
-@import (reference) "../pages.style.less";
+@import (reference) '../pages.style.less';
 
 .transaction-page {
   padding: 0;
@@ -9,11 +9,9 @@
     width: 100%;
     height: 300px;
     border-radius: 8px;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
-              0 2px 2px rgba(0,0,0,0.11), 
-              0 4px 4px rgba(0,0,0,0.11), 
-              0 6px 8px rgba(0,0,0,0.11),
-              0 8px 16px rgba(0,0,0,0.11);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.11), 0 2px 2px rgba(0, 0, 0, 0.11),
+      0 4px 4px rgba(0, 0, 0, 0.11), 0 6px 8px rgba(0, 0, 0, 0.11),
+      0 8px 16px rgba(0, 0, 0, 0.11);
     // setting the basic backgoud of carousel in this
     .ant-carousel {
       height: 100%;
@@ -26,6 +24,19 @@
       .slick-dots li.slick-active button {
         background: #d3d3d3;
       }
+    }
+  }
+
+  .transaction-visual {
+    margin: 1.5em 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .transaction-graph {
+      width: 100%;
+      display: flex;
+      justify-content: center;
     }
   }
 

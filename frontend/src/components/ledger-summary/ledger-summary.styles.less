@@ -1,18 +1,21 @@
-.ledger-summary{
-    padding: 0 1em;
+.ledger-summary {
+  padding: 0 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+
+  .ledger-static {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
+    justify-content: space-between;
 
-    .ledger-static {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-
-        .ant-card.ant-card-bordered {
-            border: 1px solid @primary-color;
-        }
+    .ant-card {
+      text-align: center;
+      .ant-statistic-content-value-int {
+        text-shadow: 2px 4px 4px rgba(0, 0, 0, 0.2),
+          0px -5px 10px rgba(255, 255, 255, 0.15);
+      }
     }
+  }
 }
-

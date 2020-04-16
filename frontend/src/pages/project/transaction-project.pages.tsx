@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { PieChart, Pie, Tooltip as HoverHint } from "recharts";
-import { IState } from "../../store";
-import { connect } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { PieChart, Pie, Tooltip as HoverHint } from 'recharts';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
 import {
   Carousel,
   Radio,
@@ -11,24 +11,25 @@ import {
   Form,
   List,
   Tabs,
-} from "antd";
+} from 'antd';
 
-import { SyncOutlined } from "@ant-design/icons";
-import { dateFormat } from "../../features/myBuJo/constants";
-import "./project.styles.less";
-import { zones } from "../../components/settings/constants";
-import { updateTransactions } from "../../features/transactions/actions";
-import { updateExpandedMyself } from "../../features/myself/actions";
-import { LedgerSummary } from "../../features/transactions/interface";
-import TransactionItem from "../../components/project-item/transaction-item.component";
-import "./transaction.styles.less";
-import LedgerSummaries from "../../components/ledger-summary/ledger-summary";
-import { TransactionsSummary } from "../../features/transactions/interface";
+import { SyncOutlined } from '@ant-design/icons';
+import { dateFormat } from '../../features/myBuJo/constants';
+import './project.styles.less';
+import { zones } from '../../components/settings/constants';
+import { updateTransactions } from '../../features/transactions/actions';
+import { updateExpandedMyself } from '../../features/myself/actions';
+import { LedgerSummary } from '../../features/transactions/interface';
+import TransactionItem from '../../components/project-item/transaction-item.component';
+import './transaction.styles.less';
+import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
+import { TransactionsSummary } from '../../features/transactions/interface';
+import { RadioChangeEvent } from 'antd/lib/radio';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const currentCountry = currentZone && currentZone.split("/")[0];
+const currentCountry = currentZone && currentZone.split('/')[0];
 zones.sort((a, b) => {
   if (currentZone && currentZone === a) {
     return -1;
@@ -42,7 +43,7 @@ zones.sort((a, b) => {
   }
   return 0;
 });
-const LedgerSummaryTypeMap = ["DEFAULT", "PAYER", "LABEL", "TIMELINE"];
+const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL', 'TIMELINE'];
 const { TabPane } = Tabs;
 
 type TransactionProps = {
@@ -63,10 +64,11 @@ type TransactionProps = {
 
 const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [form] = Form.useForm();
-  const [ledgerSummaryType, setLedgerSummaryType] = useState("DEFAULT");
+  const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
   //used for LABEL pie
   const [labelExpenseData, setLabelExpenseData] = useState([{}]);
   const [labelIncomeData, setLabelIncomeData] = useState([{}]);
+  const [graphCate, setGraphCate] = useState('');
   const [showLabelExpenseTab, setShowLabelExpenseTab] = useState(false);
   const [showLabelIncomeTab, setShowLabelIncomeTab] = useState(false);
   //used for PAYER pie
@@ -114,19 +116,20 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     props.updateTransactions(
       props.projectId,
       currentZone,
-      "MONTHLY",
+      'MONTHLY',
       ledgerSummaryType,
-      "",
-      ""
+      '',
+      ''
     );
   }, []);
 
   useEffect(() => {
-    if (ledgerSummaryType === "LABEL") {
+    if (ledgerSummaryType === 'LABEL') {
       const newExpenseData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
           if (!showLabelExpenseTab && transaction.expense !== 0) {
             setShowLabelExpenseTab(true);
+            setGraphCate('expense');
           }
           return { name: transaction.name, expense: transaction.expense };
         }
@@ -134,17 +137,20 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       setLabelExpenseData(newExpenseData);
       const newIncomeData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
-          if (!showLabelIncomeTab && transaction.income !== 0)
+          if (!showLabelIncomeTab && transaction.income !== 0) {
             setShowLabelIncomeTab(true);
+            setGraphCate('income');
+          }
           return { name: transaction.name, income: transaction.income };
         }
       );
       setLabelIncomeData(newIncomeData);
-    } else if (ledgerSummaryType === "PAYER") {
+    } else if (ledgerSummaryType === 'PAYER') {
       const newExpenseData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
           if (!showPayerExpenseTab && transaction.expense !== 0) {
             setShowPayerExpenseTab(true);
+            setGraphCate('expense');
           }
           return { name: transaction.name, expense: transaction.expense };
         }
@@ -152,8 +158,10 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       setPayerExpenseData(newExpenseData);
       const newIncomeData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
-          if (!showPayerIncomeTab && transaction.income !== 0)
+          if (!showPayerIncomeTab && transaction.income !== 0) {
             setShowPayerIncomeTab(true);
+            setGraphCate('income');
+          }
           return { name: transaction.name, income: transaction.income };
         }
       );
@@ -173,14 +181,14 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const getDefault = () => {
     return (
       <LedgerSummaries
-        title={""}
+        title={''}
         balance={balance}
         income={income}
         expense={expense}
         startDate={startDate}
         endDate={endDate}
       >
-        {" "}
+        {' '}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
@@ -196,7 +204,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : "Loading..."}
+          : 'Loading...'}
       </LedgerSummaries>
     );
   };
@@ -204,7 +212,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const getPayer = () => {
     return (
       <LedgerSummaries
-        title={"By Payer"}
+        title={'By Payer'}
         balance={balance}
         income={income}
         expense={expense}
@@ -226,7 +234,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : "Loading..."}{" "}
+          : 'Loading...'}{' '}
       </LedgerSummaries>
     );
   };
@@ -234,14 +242,14 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const getLabel = () => {
     return (
       <LedgerSummaries
-        title={"By Label"}
+        title={'By Label'}
         balance={balance}
         income={income}
         expense={expense}
         startDate={startDate}
         endDate={endDate}
       >
-        {" "}
+        {' '}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
@@ -257,7 +265,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : "Loading..."}
+          : 'Loading...'}
       </LedgerSummaries>
     );
   };
@@ -265,14 +273,14 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const getTimeline = () => {
     return (
       <LedgerSummaries
-        title={"Timeline"}
+        title={'Timeline'}
         balance={balance}
         income={income}
         expense={expense}
         startDate={startDate}
         endDate={endDate}
       >
-        {" "}
+        {' '}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
@@ -292,7 +300,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : "Loading..."}
+          : 'Loading...'}
       </LedgerSummaries>
     );
   };
@@ -321,90 +329,72 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       </div>
 
       {/* label pie graph */}
-      {ledgerSummaryType === "LABEL" && (
-        <div style={{ border: "1px solid black" }}>
-          <Tabs>
-            {showLabelExpenseTab && (
-              <TabPane tab="Expense" key="expense">
-                <PieChart width={800} height={200}>
-                  {/* expense */}
-                  <Pie
-                    dataKey="expense"
-                    isAnimationActive={false}
-                    data={labelExpenseData}
-                    cx={140}
-                    cy={100}
-                    outerRadius={60}
-                    fill="#8884d8"
-                    label
-                  />
-                  <HoverHint />
-                </PieChart>
-              </TabPane>
+      {ledgerSummaryType === 'LABEL' && (
+        <div className="transaction-visual">
+          <Radio.Group
+            defaultValue="expense"
+            onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
+          >
+            {showLabelExpenseTab && <Radio value={'expense'}>Expense</Radio>}
+            {showLabelIncomeTab && <Radio value={'income'}>Income</Radio>}
+          </Radio.Group>
+          <div className="transaction-graph">
+            {showLabelExpenseTab || showLabelIncomeTab ? (
+              <PieChart width={200} height={200}>
+                {/* expense */}
+                <Pie
+                  dataKey={graphCate}
+                  isAnimationActive={false}
+                  data={
+                    graphCate === 'expense' ? labelExpenseData : labelIncomeData
+                  }
+                  cx={100}
+                  cy={100}
+                  outerRadius={60}
+                  fill="#8884d8"
+                  label
+                />
+                <HoverHint />
+              </PieChart>
+            ) : (
+              <React.Fragment />
             )}
-            {showLabelIncomeTab && (
-              <TabPane tab="Income" key="income">
-                <PieChart width={800} height={200}>
-                  {/* income */}
-                  <Pie
-                    dataKey="income"
-                    isAnimationActive={false}
-                    data={labelIncomeData}
-                    cx={140}
-                    cy={100}
-                    outerRadius={60}
-                    fill="#8884d8"
-                    label
-                  />
-                  <HoverHint />
-                </PieChart>
-              </TabPane>
-            )}
-          </Tabs>
+          </div>
         </div>
       )}
 
-      {/* payer pie graph */}
-      {ledgerSummaryType === "PAYER" && (
-        <div style={{ border: "1px solid black" }}>
-          <Tabs>
-            {showPayerExpenseTab && (
-              <TabPane tab="Expense" key="expense">
-                <PieChart width={800} height={200}>
-                  {/* expense */}
-                  <Pie
-                    dataKey="expense"
-                    isAnimationActive={false}
-                    data={payerExpenseData}
-                    cx={140}
-                    cy={100}
-                    outerRadius={60}
-                    fill="#8884d8"
-                    label
-                  />
-                  <HoverHint />
-                </PieChart>
-              </TabPane>
+      {ledgerSummaryType === 'PAYER' && (
+        <div className="transaction-visual">
+          <Radio.Group
+            defaultValue={graphCate}
+            value={graphCate}
+            onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
+          >
+            {showPayerExpenseTab && <Radio value={'expense'}>Expense</Radio>}
+            {showPayerIncomeTab && <Radio value={'income'}>Income</Radio>}
+          </Radio.Group>
+          <div className="transaction-graph">
+            {showPayerExpenseTab || showPayerIncomeTab ? (
+              <PieChart width={200} height={200}>
+                {/* expense */}
+                <Pie
+                  dataKey={graphCate}
+                  isAnimationActive={false}
+                  data={
+                    graphCate === 'expense' ? payerExpenseData : payerIncomeData
+                  }
+                  cx={100}
+                  cy={100}
+                  outerRadius={60}
+                  fill="#8884d8"
+                  label
+                />
+                <HoverHint />
+              </PieChart>
+            ) : (
+              <React.Fragment />
             )}
-            {showPayerIncomeTab && (
-              <TabPane tab="Income" key="income">
-                <PieChart width={800} height={200}>
-                  {/* income */}
-                  <Pie
-                    dataKey="income"
-                    isAnimationActive={false}
-                    data={payerIncomeData}
-                    cx={140}
-                    cy={100}
-                    outerRadius={60}
-                    fill="#8884d8"
-                    label
-                  />
-                  <HoverHint />
-                </PieChart>
-              </TabPane>
-            )}
-          </Tabs>
+          </div>
         </div>
       )}
 
@@ -412,7 +402,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         <Form
           form={form}
           initialValues={{
-            frequencyType: "MONTHLY",
+            frequencyType: 'MONTHLY',
             timezone: props.timezone ? props.timezone : currentZone,
           }}
         >
@@ -428,13 +418,13 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             <RangePicker
               allowClear={true}
               format={dateFormat}
-              placeholder={["Start Date", "End Date"]}
+              placeholder={['Start Date', 'End Date']}
             />
           </Form.Item>
 
           <Form.Item name="timezone">
             <Select
-              style={{ width: "200px" }}
+              style={{ width: '200px' }}
               showSearch={true}
               placeholder="Select Time Zone"
             >
@@ -448,7 +438,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             </Select>
           </Form.Item>
 
-          <Tooltip title={"Click to Refresh Transactions"}>
+          <Tooltip title={'Click to Refresh Transactions'}>
             <SyncOutlined
               onClick={() => {
                 form
