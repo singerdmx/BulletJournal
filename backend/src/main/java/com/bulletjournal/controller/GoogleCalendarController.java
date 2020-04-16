@@ -3,12 +3,15 @@ package com.bulletjournal.controller;
 import com.bulletjournal.calendars.google.Converter;
 import com.bulletjournal.calendars.google.CreateGoogleCalendarEventsParams;
 import com.bulletjournal.calendars.google.GoogleCalendarEvent;
+import com.bulletjournal.calendars.google.WatchCalendarParams;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
 import com.bulletjournal.controller.models.LoginStatus;
+import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
@@ -56,6 +59,9 @@ public class GoogleCalendarController {
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa;
 
     @Autowired
     private UserClient userClient;
@@ -159,9 +165,18 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/watch")
-    public void watchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
+    public void watchCalendar(
+            @NotNull @PathVariable String calendarId,
+            @Valid @RequestBody @NotNull WatchCalendarParams watchCalendarParams) throws IOException {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.googleCalendarProjectDaoJpa.create(calendarId, watchCalendarParams.getProjectId(), username);
         Calendar service = getCalendarService();
         // https://developers.google.com/calendar/v3/reference/events/watch
+    }
+
+    @GetMapping("/api/calendar/google/calendars/{calendarId}/watchedProject")
+    public Project getWatchedProject(@NotNull @PathVariable String calendarId) {
+        return this.googleCalendarProjectDaoJpa.get(calendarId).toPresentationModel();
     }
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")
