@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { PieChart, Pie, Tooltip as HoverHint } from 'recharts';
+import { PieChart, Pie, Tooltip as HoverHint, LineChart } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import {
-  Carousel,
-  Radio,
-  DatePicker,
-  Tooltip,
-  Select,
-  Form,
-  List,
-  Tabs,
-} from 'antd';
+import { Carousel, Radio, DatePicker, Tooltip, Select, Form, List } from 'antd';
 
 import { SyncOutlined } from '@ant-design/icons';
 import { dateFormat } from '../../features/myBuJo/constants';
@@ -43,8 +34,7 @@ zones.sort((a, b) => {
   }
   return 0;
 });
-const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL', 'TIMELINE'];
-const { TabPane } = Tabs;
+const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL'];
 
 type TransactionProps = {
   projectId: number;
@@ -270,41 +260,6 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     );
   };
 
-  const getTimeline = () => {
-    return (
-      <LedgerSummaries
-        title={'Timeline'}
-        balance={balance}
-        income={income}
-        expense={expense}
-        startDate={startDate}
-        endDate={endDate}
-      >
-        {' '}
-        {transactionsSummaries
-          ? transactionsSummaries.map(
-              (transactionsSummary: TransactionsSummary, index: number) => (
-                <div>
-                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-                  <span>balance: {transactionsSummary.balance}</span>
-                  &nbsp;&nbsp;
-                  <span>
-                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                    {transactionsSummary.expensePercentage}%,
-                  </span>
-                  &nbsp;&nbsp;
-                  <span>income: {transactionsSummary.income}</span>
-                  &nbsp;&nbsp;
-                  {transactionsSummary.incomePercentage}%
-                  <span>&nbsp;&nbsp;</span>
-                </div>
-              )
-            )
-          : 'Loading...'}
-      </LedgerSummaries>
-    );
-  };
-
   return (
     <div className="transaction-page">
       <div className="transaction-display">
@@ -323,10 +278,17 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           <div className="transaction-summary">{getDefault()}</div>
           <div className="transaction-payer">{getPayer()}</div>
           <div className="transaction-label">{getLabel()}</div>
-          <div className="transaction-timeline">{getTimeline()}</div>
           {/* maybe others? */}
         </Carousel>
       </div>
+
+      {ledgerSummaryType === 'DEFAULT' && (
+        <div className="transaction-visual">
+          <div className="transaction-graph">
+            <LineChart data={}></LineChart>
+          </div>
+        </div>
+      )}
 
       {/* label pie graph */}
       {ledgerSummaryType === 'LABEL' && (

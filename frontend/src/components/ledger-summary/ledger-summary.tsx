@@ -30,9 +30,11 @@ const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
 
   return (
     <div className="ledger-summary">
-      <div>
-        <b>{title}</b>
-        {startDate} - {endDate}
+      <div className="ledger-selection">
+        <span className="ledger-category">{title}</span>
+        <span className="ledger-time">
+          {startDate} - {endDate}
+        </span>
       </div>
       <div className="ledger-static">
         <Card bordered={false}>
