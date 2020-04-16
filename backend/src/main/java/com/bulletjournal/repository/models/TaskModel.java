@@ -31,8 +31,8 @@ import java.util.List;
 public abstract class TaskModel extends ProjectItemModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskModel.class);
     @NotBlank
-    @Size(min = 2, max = 100)
-    @Column(name = "assigned_to", length = 100)
+    @Size(min = 2, max = 1_000_000)
+    @Column(name = "assigned_to", length = 1_000_000)
     private String assignedTo;
 
     @Column(name = "due_date", length = 15)

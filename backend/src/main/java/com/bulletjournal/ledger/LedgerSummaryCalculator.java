@@ -93,8 +93,6 @@ public class LedgerSummaryCalculator {
                     }
                 }));
                 break;
-            case TIMELINE:
-                break;
             default:
                 throw new IllegalArgumentException("Invalid LedgerSummaryType " + ledgerSummaryType);
         }

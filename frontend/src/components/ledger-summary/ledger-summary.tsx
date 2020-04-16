@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Statistic, Card } from 'antd';
+import { Statistic, Card, Tag } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './ledger-summary.styles.less';
@@ -31,7 +31,7 @@ const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
   return (
     <div className="ledger-summary">
       <div className="ledger-selection">
-        <span className="ledger-category">{title}</span>
+        {title.length > 0 && <Tag color="orange" className="ledger-category">{title}</Tag>}
         <span className="ledger-time">
           {startDate} - {endDate}
         </span>

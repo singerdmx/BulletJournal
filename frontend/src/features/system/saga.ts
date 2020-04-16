@@ -8,7 +8,19 @@ import {getProject, updateProjects} from '../project/actions';
 import {updateGroups} from '../group/actions';
 import {updateNotifications} from '../notification/actions';
 import {ProjectType} from "../project/constants";
+import { Task } from '../tasks/interface';
 
+const removeTasksFromLocal = (tasks: Task[]) => {
+    tasks.forEach((task: Task)=>{
+        localStorage.removeItem(task.name);
+    });
+}
+
+const saveTasksIntoLocal = (tasks: Task[]) => {
+    tasks.forEach((task: Task)=>{
+        localStorage.setItem(task.name, `${new Date().valueOf()}`);
+    });
+}
 
 function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
     yield call(message.error, `System Error Received: ${action.payload.error}`);
@@ -18,10 +30,11 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     try {
         const state = yield select();
         const selectedProject = state.project.project;
+        const remindingTasks = state.system.reminders;
         const data = yield call(fetchSystemUpdates, '',
             selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined);
 
-        const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag} = state.system;
+        const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag, remindingTaskEtag} = state.system;
         if (ownedProjectsEtag !== data.ownedProjectsEtag || sharedProjectsEtag !== data.sharedProjectsEtag) {
             yield put(updateProjects());
         }
@@ -33,6 +46,17 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         if (notificationsEtag !== data.notificationsEtag) {
             yield put(updateNotifications());
         }
+
+        let newCommingTasks = [] as Task[];
+        let endTasks = [] as Task[];
+
+        if(remindingTaskEtag !== data.remindingTaskEtag){
+            newCommingTasks = data.reminders.filter((task: any)=>!remindingTasks.includes(task));
+            endTasks = remindingTasks.filter((task: any) => !data.reminders.includes(task));
+        }
+
+        saveTasksIntoLocal(newCommingTasks);
+        removeTasksFromLocal(endTasks);
 
         let tasksEtag = state.system.tasksEtag;
         let notesEtag = state.system.notesEtag;
@@ -61,7 +85,8 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
                 notificationsEtag: data.notificationsEtag,
                 ownedProjectsEtag: data.ownedProjectsEtag,
                 sharedProjectsEtag: data.sharedProjectsEtag,
-                remindingTaskEtag: data.remindingTaskEtag
+                remindingTaskEtag: data.remindingTaskEtag,
+                reminders: data.reminders
             })
         );
     } catch (error) {

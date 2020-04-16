@@ -1,0 +1,40 @@
+package com.bulletjournal.repository;
+
+import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.repository.models.GoogleCalendarProject;
+import com.bulletjournal.repository.models.Project;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+@Repository
+public class GoogleCalendarProjectDaoJpa {
+
+    @Autowired
+    private GoogleCalendarProjectRepository googleCalendarProjectRepository;
+
+    @Autowired
+    private ProjectDaoJpa projectDaoJpa;
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public GoogleCalendarProject create(String calendarId, Long projectId, String channelId,
+                                        String channel, String requester) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(
+                calendarId, project, channelId, channel);
+        return this.googleCalendarProjectRepository.save(googleCalendarProject);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public GoogleCalendarProject get(String calendarId) {
+        GoogleCalendarProject calendarProject = this.googleCalendarProjectRepository.findById(calendarId)
+                .orElseThrow(() -> new ResourceNotFoundException("Calendar " + calendarId + " not found"));
+        return calendarProject;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void delete(String calendarId) {
+        this.googleCalendarProjectRepository.delete(get(calendarId));
+    }
+}

@@ -10,7 +10,7 @@ public class CreateTaskParams {
     private String name;
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 1_000_000)
     private String assignedTo;
 
     private String dueDate; // "yyyy-MM-dd"

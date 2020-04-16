@@ -1,5 +1,5 @@
 package com.bulletjournal.ledger;
 
 public enum LedgerSummaryType {
-    DEFAULT, PAYER, LABEL, TIMELINE
+    DEFAULT, PAYER, LABEL
 }

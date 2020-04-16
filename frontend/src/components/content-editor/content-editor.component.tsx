@@ -9,7 +9,7 @@ import { Content } from '../../features/myBuJo/interface';
 import axios from 'axios';
 
 type ContentEditorProps = {
-  noteId: number;
+  projectItemId: number;
   content?: Content;
 };
 
@@ -20,7 +20,7 @@ interface ContentEditorHandler {
 }
 
 const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
-  noteId,
+  projectItemId,
   content,
   createContent,
   patchContent,
@@ -37,7 +37,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       form
         .validateFields()
         .then(async (values) => {
-          await createContent(noteId, values.noteContent.toRAW());
+          await createContent(projectItemId, values.noteContent.toRAW());
           afterFinish();
         })
         .catch((err) => message.error(err));
@@ -46,7 +46,11 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
         form
           .validateFields()
           .then(async (values) => {
-            await patchContent(noteId, content.id, values.noteContent.toRAW());
+            await patchContent(
+              projectItemId,
+              content.id,
+              values.noteContent.toRAW()
+            );
             afterFinish();
           })
           .catch((err) => message.error(err));
