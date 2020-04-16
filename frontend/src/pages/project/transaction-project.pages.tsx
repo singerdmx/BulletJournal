@@ -120,7 +120,10 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             setShowLabelExpenseTab(true);
             setGraphCate('expense');
           }
-          return { name: transaction.name, expense: transaction.expense };
+          return {
+            name: transaction.name,
+            expense: transaction.expensePercentage,
+          };
         }
       );
       setLabelExpenseData(newExpenseData);
@@ -130,7 +133,10 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             setShowLabelIncomeTab(true);
             setGraphCate('income');
           }
-          return { name: transaction.name, income: transaction.income };
+          return {
+            name: transaction.name,
+            income: transaction.incomePercentage,
+          };
         }
       );
       setLabelIncomeData(newIncomeData);
@@ -141,7 +147,10 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             setShowPayerExpenseTab(true);
             setGraphCate('expense');
           }
-          return { name: transaction.name, expense: transaction.expense };
+          return {
+            name: transaction.name,
+            expense: transaction.expensePercentage,
+          };
         }
       );
       setPayerExpenseData(newExpenseData);
@@ -151,7 +160,10 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             setShowPayerIncomeTab(true);
             setGraphCate('income');
           }
-          return { name: transaction.name, income: transaction.income };
+          return {
+            name: transaction.name,
+            income: transaction.incomePercentage,
+          };
         }
       );
       setPayerIncomeData(newIncomeData);
@@ -177,7 +189,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         startDate={startDate}
         endDate={endDate}
       >
-        {' '}
+        {/* {' '}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
@@ -193,7 +205,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : 'Loading...'}
+          : 'Loading...'} */}
       </LedgerSummaries>
     );
   };
@@ -208,7 +220,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         startDate={startDate}
         endDate={endDate}
       >
-        {transactionsSummaries
+        {/* {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
                 <div>
@@ -223,7 +235,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : 'Loading...'}{' '}
+          : 'Loading...'}{' '} */}
       </LedgerSummaries>
     );
   };
@@ -238,7 +250,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         startDate={startDate}
         endDate={endDate}
       >
-        {' '}
+        {/* {' '}
         {transactionsSummaries
           ? transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
@@ -254,7 +266,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 </div>
               )
             )
-          : 'Loading...'}
+          : 'Loading...'} */}
       </LedgerSummaries>
     );
   };
@@ -280,13 +292,13 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         >
           <Form.Item name="frequencyType">
             <Radio.Group value="YEARLY" size="small" buttonStyle="solid">
-              <Tooltip title='WEEKLY'>
+              <Tooltip title="WEEKLY">
                 <Radio.Button value="WEEKLY">W</Radio.Button>
               </Tooltip>
-              <Tooltip title='MONTHLY'>
+              <Tooltip title="MONTHLY">
                 <Radio.Button value="MONTHLY">M</Radio.Button>
               </Tooltip>
-              <Tooltip title='YEARLY'>
+              <Tooltip title="YEARLY">
                 <Radio.Button value="YEARLY">Y</Radio.Button>
               </Tooltip>
             </Radio.Group>
@@ -309,24 +321,24 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             />
           </Form.Item>
 
-          <Tooltip title='Time Zone'>
-          <Form.Item name="timezone">
-            <Select
-              size="small"
-              style={{ maxWidth: 100 }}
-              dropdownMatchSelectWidth={200}
-              showSearch={true}
-              placeholder="Select Time Zone"
-            >
-              {zones.map((zone: string, index: number) => (
-                <Option key={zone} value={zone}>
-                  <Tooltip title={zone} placement="right">
-                    {<span>{zone}</span>}
-                  </Tooltip>
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
+          <Tooltip title="Time Zone">
+            <Form.Item name="timezone">
+              <Select
+                size="small"
+                style={{ maxWidth: 100 }}
+                dropdownMatchSelectWidth={200}
+                showSearch={true}
+                placeholder="Select Time Zone"
+              >
+                {zones.map((zone: string, index: number) => (
+                  <Option key={zone} value={zone}>
+                    <Tooltip title={zone} placement="right">
+                      {<span>{zone}</span>}
+                    </Tooltip>
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </Tooltip>
         </Form>
       </div>
@@ -373,11 +385,10 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 <Pie
                   dataKey={graphCate}
                   isAnimationActive={false}
+                  legendType="circle"
                   data={
                     graphCate === 'expense' ? labelExpenseData : labelIncomeData
                   }
-                  cx={100}
-                  cy={100}
                   outerRadius={60}
                   fill="#8884d8"
                   label
@@ -411,8 +422,6 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   data={
                     graphCate === 'expense' ? payerExpenseData : payerIncomeData
                   }
-                  cx={100}
-                  cy={100}
                   outerRadius={60}
                   fill="#8884d8"
                   label
