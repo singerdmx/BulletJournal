@@ -19,6 +19,8 @@ export interface TransactionsSummary {
   incomePercentage: number;
   name: string;
   metadata?: string;
+  incomeCount: number;
+  expenseCount: number;
 }
 
 export interface LedgerSummary {

@@ -21,11 +21,16 @@ public class TransactionsSummary {
 
     private Double balancePercentage;
 
+    private Integer incomeCount;
+
+    private Integer expenseCount;
+
     public TransactionsSummary() {
     }
 
     public TransactionsSummary(String name, String metadata, Double income, Double incomePercentage,
-                               Double expense, Double expensePercentage, Double balance, Double balancePercentage) {
+                               Double expense, Double expensePercentage, Double balance, Double balancePercentage,
+                               Integer incomeCount, Integer expenseCount) {
         this.name = name;
         this.metadata = metadata;
         this.income = income;
@@ -34,6 +39,8 @@ public class TransactionsSummary {
         this.expensePercentage = expensePercentage;
         this.balance = balance;
         this.balancePercentage = balancePercentage;
+        this.incomeCount = incomeCount;
+        this.expenseCount = expenseCount;
     }
 
 
@@ -99,5 +106,21 @@ public class TransactionsSummary {
 
     public void setBalancePercentage(Double balancePercentage) {
         this.balancePercentage = balancePercentage;
+    }
+
+    public Integer getIncomeCount() {
+        return incomeCount;
+    }
+
+    public void setIncomeCount(Integer incomeCount) {
+        this.incomeCount = incomeCount;
+    }
+
+    public Integer getExpenseCount() {
+        return expenseCount;
+    }
+
+    public void setExpenseCount(Integer expenseCount) {
+        this.expenseCount = expenseCount;
     }
 }

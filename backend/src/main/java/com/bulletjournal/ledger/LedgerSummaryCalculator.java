@@ -113,7 +113,9 @@ public class LedgerSummaryCalculator {
                     v.getExpense(),
                     Math.round(v.getExpense() * 100 / total.totalExpense * 100.0) / 100.0,
                     balance,
-                    Math.round(balance * 100 / ledgerSummary.getBalance() * 100.0) / 100.0
+                    Math.round(balance * 100 / ledgerSummary.getBalance() * 100.0) / 100.0,
+                    v.getIncomeCount(),
+                    v.getExpenseCount()
             ));
         });
         transactionsSummaries.sort(Comparator.comparing(transactionsSummariesComparator));
@@ -142,14 +144,18 @@ public class LedgerSummaryCalculator {
     private static class Transactions {
         double income = 0.0;
         double expense = 0.0;
+        int incomeCount = 0;
+        int expenseCount = 0;
         String meta = null;
 
         void addIncome(double amount) {
             this.income += amount;
+            this.incomeCount++;
         }
 
         void addExpense(double amount) {
             this.expense += amount;
+            this.expenseCount++;
         }
 
         public double getIncome() {
@@ -166,6 +172,14 @@ public class LedgerSummaryCalculator {
 
         public void setMeta(String meta) {
             this.meta = meta;
+        }
+
+        public int getIncomeCount() {
+            return incomeCount;
+        }
+
+        public int getExpenseCount() {
+            return expenseCount;
         }
     }
 
