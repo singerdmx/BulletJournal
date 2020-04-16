@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { PieChart, Pie, Tooltip as HoverHint, LineChart } from 'recharts';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import { Carousel, Radio, DatePicker, Tooltip, Select, Form, List } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Pie, PieChart, Tooltip as HoverHint} from 'recharts';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {Carousel, DatePicker, Form, List, Radio, Select, Tooltip} from 'antd';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 import './project.styles.less';
-import { zones } from '../../components/settings/constants';
-import { updateTransactions } from '../../features/transactions/actions';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { LedgerSummary } from '../../features/transactions/interface';
+import {zones} from '../../components/settings/constants';
+import {updateTransactions} from '../../features/transactions/actions';
+import {updateExpandedMyself} from '../../features/myself/actions';
+import {LedgerSummary, LedgerSummaryType, TransactionsSummary} from '../../features/transactions/interface';
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
-import { TransactionsSummary } from '../../features/transactions/interface';
-import { RadioChangeEvent } from 'antd/lib/radio';
+import {RadioChangeEvent} from 'antd/lib/radio';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -33,7 +32,7 @@ zones.sort((a, b) => {
   }
   return 0;
 });
-const LedgerSummaryTypeMap = ['DEFAULT', 'PAYER', 'LABEL'];
+const LedgerSummaryTypeMap = [LedgerSummaryType.DEFAULT, LedgerSummaryType.PAYER, LedgerSummaryType.LABEL];
 
 type TransactionProps = {
   projectId: number;
@@ -53,7 +52,7 @@ type TransactionProps = {
 
 const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [form] = Form.useForm();
-  const [ledgerSummaryType, setLedgerSummaryType] = useState('DEFAULT');
+  const [ledgerSummaryType, setLedgerSummaryType] = useState(LedgerSummaryType.DEFAULT);
   //used for LABEL pie
   const [labelExpenseData, setLabelExpenseData] = useState([{}]);
   const [labelIncomeData, setLabelIncomeData] = useState([{}]);
@@ -77,7 +76,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
   const updateTransactions = (
     values: any,
-    currentLedgerSummaryType: string
+    currentLedgerSummaryType: LedgerSummaryType
   ) => {
     //reset tab to false when refresh
     setShowLabelExpenseTab(false);
@@ -113,7 +112,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (ledgerSummaryType === 'LABEL') {
+    if (ledgerSummaryType === LedgerSummaryType.LABEL) {
       const newExpenseData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
           if (!showLabelExpenseTab && transaction.expense !== 0) {
@@ -134,7 +133,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         }
       );
       setLabelIncomeData(newIncomeData);
-    } else if (ledgerSummaryType === 'PAYER') {
+    } else if (ledgerSummaryType === LedgerSummaryType.PAYER) {
       const newExpenseData = transactionsSummaries.map(
         (transaction: TransactionsSummary) => {
           if (!showPayerExpenseTab && transaction.expense !== 0) {
@@ -357,7 +356,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       )}
 
       {/* label pie graph */}
-      {ledgerSummaryType === 'LABEL' && (
+      {ledgerSummaryType === LedgerSummaryType.LABEL && (
         <div className="transaction-visual">
           <Radio.Group
             defaultValue="expense"

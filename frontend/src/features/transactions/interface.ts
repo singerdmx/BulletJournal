@@ -43,5 +43,4 @@ export enum LedgerSummaryType {
   DEFAULT = 'DEFAULT',
   PAYER = 'PAYER',
   LABEL = 'LABEL',
-  TIMELINE = 'TIMELINE'
 }
