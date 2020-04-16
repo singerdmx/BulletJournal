@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { List, Avatar, Tooltip } from 'antd';
 import { Content } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
-import ContentEditorDrawer from '../content-editor/editor-drawer.component';
+import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import { HighlightOutlined, FullscreenOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import './content-item.styles.less';
