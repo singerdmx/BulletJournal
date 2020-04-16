@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { List, Avatar, Tooltip } from 'antd';
 import { Content } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
-import NoteEditorDrawer from '../content-editor/editor-drawer.component';
-import {HighlightOutlined, FullscreenOutlined} from '@ant-design/icons';
+import ContentEditorDrawer from '../content-editor/editor-drawer.component';
+import { HighlightOutlined, FullscreenOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import './content-item.styles.less';
 
-type NoteContentProps = {
+type ContentProps = {
   content: Content;
   noteId: number;
 };
 
-const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
+const ContentItem: React.FC<ContentProps> = ({ content, noteId }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
@@ -21,8 +21,7 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
   const handleOpen = () => {
     setDisplayMore(true);
   };
-  const handleOpenRevisions = () => {
-  };
+  const handleOpenRevisions = () => {};
 
   const handleClose = () => {
     setDisplayMore(false);
@@ -37,7 +36,8 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
         </Tooltip>,
         <Tooltip title='View revision history'>
           <span className='open-revisions-button' onClick={handleOpenRevisions}>
-            <HighlightOutlined />{content.revisions.length}
+            <HighlightOutlined />
+            {content.revisions.length}
           </span>
         </Tooltip>,
         <Tooltip title={`${content.owner} created ${createdTime}`}>
@@ -51,7 +51,7 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
         : contentText}
-      <NoteEditorDrawer
+      <ContentEditorDrawer
         content={content}
         visible={displayMore}
         onClose={handleClose}
@@ -61,4 +61,4 @@ const NoteContentItem: React.FC<NoteContentProps> = ({ content, noteId }) => {
   );
 };
 
-export default NoteContentItem;
+export default ContentItem;
