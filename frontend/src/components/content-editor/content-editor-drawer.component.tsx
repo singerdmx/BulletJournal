@@ -1,36 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Drawer, Button } from 'antd';
 import { deleteContent } from '../../features/notes/actions';
+import { getProject } from '../../features/project/actions';
 import { connect } from 'react-redux';
+import { IState } from '../../store';
+import { Project } from '../../features/project/interface';
 
-import { Content } from '../../features/myBuJo/interface';
+import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
 import ContentEditor from './content-editor.component';
 import ContentReader from './content-reader.component';
 
 type ContentEditorDrawerProps = {
   content?: Content;
-  noteId: number;
+  projectItem: ProjectItem;
   visible: boolean;
   onClose: Function;
+  project: Project;
+  myself: string;
 };
 
 interface ContentEditorDrawerHandler {
+  getProject: (projectId: number) => void;
   deleteContent: (noteId: number, contentId: number) => void;
 }
 
 const ContentEditorDrawer: React.FC<
   ContentEditorDrawerProps & ContentEditorDrawerHandler
-> = ({ content, noteId, visible, onClose, deleteContent }) => {
+> = ({
+  content,
+  projectItem,
+  visible,
+  onClose,
+  deleteContent,
+  project,
+  myself,
+}) => {
   const [readMode, setReadMode] = useState(true);
   const handleEdit = () => setReadMode(false);
   const handleDelete = () => {
     if (!content) {
       return;
     }
-    deleteContent(noteId, content.id);
+    deleteContent(projectItem.id, content.id);
   };
+
+  useEffect(() => {
+    getProject(projectItem.projectId);
+  }, []);
+
   const footerControl = (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Button onClick={handleEdit}>Edit</Button>
@@ -39,6 +58,18 @@ const ContentEditorDrawer: React.FC<
       </Button>
     </div>
   );
+
+  const getFooterControl = () => {
+    if (
+      project.owner === myself ||
+      projectItem.owner === myself ||
+      (content && content.owner === myself)
+    ) {
+      return footerControl;
+    }
+
+    return null;
+  };
 
   const handleClose = () => {
     setReadMode(true);
@@ -50,7 +81,7 @@ const ContentEditorDrawer: React.FC<
       visible={visible}
       width='700'
       destroyOnClose
-      footer={readMode && content && footerControl}
+      footer={readMode && content && getFooterControl()}
     >
       {readMode && content ? (
         <div>
@@ -59,7 +90,7 @@ const ContentEditorDrawer: React.FC<
       ) : (
         <ContentEditor
           content={content || undefined}
-          noteId={noteId}
+          noteId={projectItem.id}
           afterFinish={handleClose}
         />
       )}
@@ -67,4 +98,11 @@ const ContentEditorDrawer: React.FC<
   );
 };
 
-export default connect(null, { deleteContent })(ContentEditorDrawer);
+const mapStateToProps = (state: IState) => ({
+  project: state.project.project,
+  myself: state.myself.username,
+});
+
+export default connect(mapStateToProps, { deleteContent, getProject })(
+  ContentEditorDrawer
+);

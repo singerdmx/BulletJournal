@@ -280,9 +280,15 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         >
           <Form.Item name="frequencyType">
             <Radio.Group value="YEARLY" size="small" buttonStyle="solid">
-              <Radio.Button value="WEEKLY">W</Radio.Button>
-              <Radio.Button value="MONTHLY">M</Radio.Button>
-              <Radio.Button value="YEARLY">Y</Radio.Button>
+              <Tooltip title='WEEKLY'>
+                <Radio.Button value="WEEKLY">W</Radio.Button>
+              </Tooltip>
+              <Tooltip title='MONTHLY'>
+                <Radio.Button value="MONTHLY">M</Radio.Button>
+              </Tooltip>
+              <Tooltip title='YEARLY'>
+                <Radio.Button value="YEARLY">Y</Radio.Button>
+              </Tooltip>
             </Radio.Group>
           </Form.Item>
 
@@ -303,6 +309,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             />
           </Form.Item>
 
+          <Tooltip title='Time Zone'>
           <Form.Item name="timezone">
             <Select
               size="small"
@@ -320,6 +327,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               ))}
             </Select>
           </Form.Item>
+          </Tooltip>
         </Form>
       </div>
       <div className="transaction-display">

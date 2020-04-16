@@ -9,7 +9,7 @@ import { deleteNote, getNote } from '../../features/notes/actions';
 
 import { IState } from '../../store';
 // components
-import NoteEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
+import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
 import { Button, Popconfirm, Tooltip } from 'antd';
 import {
@@ -71,8 +71,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
   const noteEditorElem = (
     <div className='note-drawer'>
-      <NoteEditorDrawer
-        noteId={note.id}
+      <ContentEditorDrawer
+        projectItem={note}
         visible={showEditor}
         onClose={handleClose}
       />

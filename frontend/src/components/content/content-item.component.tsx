@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { List, Avatar, Tooltip } from 'antd';
-import { Content } from '../../features/myBuJo/interface';
+import { Content, ProjectItem } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
 import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import { HighlightOutlined, FullscreenOutlined } from '@ant-design/icons';
@@ -9,10 +9,10 @@ import './content-item.styles.less';
 
 type ContentProps = {
   content: Content;
-  noteId: number;
+  projectItem: ProjectItem;
 };
 
-const ContentItem: React.FC<ContentProps> = ({ content, noteId }) => {
+const ContentItem: React.FC<ContentProps> = ({ content, projectItem }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
@@ -55,7 +55,7 @@ const ContentItem: React.FC<ContentProps> = ({ content, noteId }) => {
         content={content}
         visible={displayMore}
         onClose={handleClose}
-        noteId={noteId}
+        projectItem={projectItem}
       />
     </List.Item>
   );
