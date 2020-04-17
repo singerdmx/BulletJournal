@@ -131,7 +131,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           }
           return {
             name: transaction.name,
-            expense: transaction.expensePercentage,
+            expense: transaction.expense,
+            expensePercentage: transaction.expensePercentage,
+            expenseCount: transaction.expenseCount,
           };
         }
       );
@@ -144,7 +146,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           }
           return {
             name: transaction.name,
-            income: transaction.incomePercentage,
+            income: transaction.income,
+            incomePercentage: transaction.incomePercentage,
+            incomeCount: transaction.incomeCount,
           };
         }
       );
@@ -346,7 +350,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         </Carousel>
       </div>
 
-      {ledgerSummaryType === 'DEFAULT' && (
+      {ledgerSummaryType === LedgerSummaryType.DEFAULT && (
         <div className="transaction-visual">
           <div className="transaction-graph"></div>
         </div>
@@ -369,13 +373,12 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 <Pie
                   dataKey={graphCate}
                   isAnimationActive={false}
-                  legendType="circle"
                   data={
                     graphCate === 'expense' ? labelExpenseData : labelIncomeData
                   }
                   outerRadius={60}
                   fill="#8884d8"
-                  label
+                  labelLine={false}
                 />
                 <HoverHint />
               </PieChart>
@@ -386,7 +389,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         </div>
       )}
 
-      {ledgerSummaryType === 'PAYER' && (
+      {ledgerSummaryType === LedgerSummaryType.PAYER && (
         <div className="transaction-visual">
           <Radio.Group
             defaultValue={graphCate}
