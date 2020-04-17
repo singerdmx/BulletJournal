@@ -20,6 +20,8 @@ public class Task extends ProjectItem {
 
     private String assignedToAvatar;
 
+    private List<User> assignees;
+
     private String dueDate;
 
     private String dueTime;
@@ -148,6 +150,14 @@ public class Task extends ProjectItem {
 
     public void setRecurrenceRule(String recurrenceRule) {
         this.recurrenceRule = recurrenceRule;
+    }
+
+    public List<User> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<User> assignees) {
+        this.assignees = assignees;
     }
 
     @Override

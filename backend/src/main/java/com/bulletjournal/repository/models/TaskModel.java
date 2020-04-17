@@ -70,6 +70,9 @@ public abstract class TaskModel extends ProjectItemModel {
     @Column(name = "recurrence_rule")
     private String recurrenceRule;
 
+    @Column(name = "google_calendar_event_id")
+    private String googleCalendarEventId;
+
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -172,6 +175,14 @@ public abstract class TaskModel extends ProjectItemModel {
 
     public ReminderSetting getReminderSetting() {
         return new ReminderSetting(this.getReminderDate(), this.getReminderTime(), this.getReminderBeforeTask());
+    }
+
+    public String getGoogleCalendarEventId() {
+        return googleCalendarEventId;
+    }
+
+    public void setGoogleCalendarEventId(String googleCalendarEventId) {
+        this.googleCalendarEventId = googleCalendarEventId;
     }
 
     public void setReminderSetting(ReminderSetting reminderSetting) {

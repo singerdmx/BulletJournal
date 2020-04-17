@@ -9,12 +9,15 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositoryCustom {
     List<Task> findTaskByProject(Project project);
 
     List<Task> findTasksByAssignedToAndRecurrenceRuleNotNull(String assignedTo);
+
+    Optional<Task> findTaskByGoogleCalendarEventId(String googleCalendarEventId);
 
     @Query("SELECT task FROM Task task WHERE task.assignedTo = :assignee AND task.startTime IS NOT NULL AND " +
             "task.reminderDateTime IS NOT NULL AND " +

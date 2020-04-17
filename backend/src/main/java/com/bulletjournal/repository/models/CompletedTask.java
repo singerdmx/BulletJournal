@@ -45,6 +45,7 @@ public class CompletedTask extends TaskModel {
         this.setLabels(task.getLabels());
         this.setRecurrenceRule(task.getRecurrenceRule());
         this.setContents(contents);
+        this.setGoogleCalendarEventId(task.getGoogleCalendarEventId());
     }
 
     @Override
