@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Pie, PieChart, Tooltip as HoverHint } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Carousel, DatePicker, Form, List, Radio, Select, Tooltip } from 'antd';
+import {
+  Carousel,
+  DatePicker,
+  Form,
+  List,
+  Radio,
+  Select,
+  Tooltip,
+  Empty,
+} from 'antd';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
@@ -385,7 +394,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 <HoverHint />
               </PieChart>
             ) : (
-              <React.Fragment />
+              <Empty />
             )}
           </div>
         </div>
