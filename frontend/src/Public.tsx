@@ -34,6 +34,9 @@ const PublicPage: React.FC<PageProps> = (props) => {
           task={task}
           labelEditable={false}
           taskOperation={() => null}
+          contents={contents}
+          createContentElem={null}
+          taskEditorElem={null}
         />
       </div>
     );

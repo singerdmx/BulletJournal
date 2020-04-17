@@ -5,7 +5,11 @@ import { useHistory, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 //actions
-import { deleteNote, getNote } from '../../features/notes/actions';
+import {
+  deleteNote,
+  getNote,
+  updateNoteContents,
+} from '../../features/notes/actions';
 
 import { IState } from '../../store';
 // components
@@ -23,12 +27,10 @@ import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
 
-import { Content } from '../../features/myBuJo/interface';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import NoteDetailPage, { NoteProps } from './note-detail.pages';
-import { updateNoteContents } from '../../features/notes/actions';
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;

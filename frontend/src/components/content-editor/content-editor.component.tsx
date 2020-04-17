@@ -14,7 +14,7 @@ import {
 import {
   createContent as createTransactionContent,
   patchContent as patchTransactionContent,
-} from '../../features/tasks/actions';
+} from '../../features/transactions/actions';
 import { Content } from '../../features/myBuJo/interface';
 import { ContentType } from '../../features/myBuJo/constants';
 
@@ -31,9 +31,9 @@ interface ContentEditorHandler {
   patchNoteContent: (noteId: number, contentId: number, text: string) => void;
   createTaskContent: (taskId: number, text: string) => void;
   patchTaskContent: (taskId: number, contentId: number, text: string) => void;
-  createTransactionContent: (taskId: number, text: string) => void;
+  createTransactionContent: (transactionId: number, text: string) => void;
   patchTransactionContent: (
-    taskId: number,
+    transactionId: number,
     contentId: number,
     text: string
   ) => void;
@@ -47,6 +47,10 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   patchNoteContent,
   afterFinish,
   contentType,
+  createTaskContent,
+  createTransactionContent,
+  patchTransactionContent,
+  patchTaskContent,
 }) => {
   // get hook of form from ant form
   const [form] = Form.useForm();
@@ -67,7 +71,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   };
   let createContentFunction = createContentCall[contentType];
 
-  //general path content function
+  //general patch content function
   const patchContentCall: { [key in ContentType]: Function } = {
     [ContentType.NOTE]: patchNoteContent,
     [ContentType.TASK]: patchTaskContent,
