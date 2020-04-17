@@ -197,9 +197,9 @@ public class GoogleCalendarController {
         Channel channel = new Channel();
         channel.setId(channelId);
         channel.setType("web_hook");
-        channel.setType(WATCH_CHANNEL_TOKEN);
+        channel.setToken(WATCH_CHANNEL_TOKEN);
         channel.setAddress("https://bulletjournal.us" + CHANNEL_NOTIFICATIONS_ROUTE);
-        channel.setParams(ImmutableMap.of("ttl", "-1"));
+        channel.setParams(ImmutableMap.of("ttl", "99999999"));
         return channel;
     }
 
