@@ -40,7 +40,7 @@ export type PatchContent = {
 export type UpdateTransactions = {
   projectId: number;
   timezone: string;
-  frequencyType: string;
+  frequencyType?: string;
   ledgerSummaryType: string;
   startDate?: string;
   endDate?: string;

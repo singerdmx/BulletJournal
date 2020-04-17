@@ -3,15 +3,19 @@ import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
 export const fetchTransactions = (
   projectId: number,
   timezone: string,
-  frequencyType: string,
   ledgerSummaryType: string,
+  frequencyType?: string,
   startDate?: string,
   endDate?: string
 ) => {
   // e.g. /api/projects/105/transactions?frequencyType=MONTHLY&timezone=America%2FLos_Angeles
   let url = `/api/projects/${projectId}/transactions?timezone=${encodeURIComponent(
     timezone
-  )}&frequencyType=${frequencyType}&ledgerSummaryType=${ledgerSummaryType}`;
+  )}&ledgerSummaryType=${ledgerSummaryType}`;
+
+  if (frequencyType) {
+    url += `&frequencyType=${frequencyType}`;
+  }
   if (startDate && endDate) {
     url += `&startDate=${startDate}&endDate=${endDate}`;
   }

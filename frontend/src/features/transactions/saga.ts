@@ -60,8 +60,8 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
       fetchTransactions,
       projectId,
       timezone,
-      frequencyType,
       ledgerSummaryType,
+      frequencyType,
       startDate,
       endDate
     );

@@ -55,7 +55,7 @@ public class TransactionController {
     @GetMapping(TRANSACTIONS_ROUTE)
     public ResponseEntity<LedgerSummary> getTransactions(
             @NotNull @PathVariable Long projectId,
-            @NotNull @RequestParam FrequencyType frequencyType,
+            @NotNull @RequestParam(required = false) FrequencyType frequencyType,
             @NotBlank @RequestParam String timezone,
             @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
             @RequestParam(required = false) String startDate,

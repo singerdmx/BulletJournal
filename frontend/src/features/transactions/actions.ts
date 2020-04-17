@@ -4,8 +4,8 @@ import { History } from 'history';
 export const updateTransactions = (
   projectId: number,
   timezone: string,
-  frequencyType: string,
   ledgerSummaryType: string,
+  frequencyType?: string,
   startDate?: string,
   endDate?: string
 ) =>
