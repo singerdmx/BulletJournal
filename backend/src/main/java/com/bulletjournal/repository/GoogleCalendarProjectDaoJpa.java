@@ -1,5 +1,7 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.GoogleCalendarProject;
 import com.bulletjournal.repository.models.Project;
@@ -21,6 +23,10 @@ public class GoogleCalendarProjectDaoJpa {
     public GoogleCalendarProject create(String calendarId, Long projectId, String channelId,
                                         String channel, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
+        ProjectType projectType = ProjectType.getType(project.getType());
+        if (!ProjectType.TODO.equals(projectType)) {
+            throw new BadRequestException("Invalid project type " + projectType);
+        }
         GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(
                 calendarId, project, channelId, channel);
         return this.googleCalendarProjectRepository.save(googleCalendarProject);

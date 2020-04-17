@@ -9,6 +9,7 @@ import {iconMapper} from "../side-menu/side-menu.component";
 import AddProject from "./add-project.component";
 import {useHistory} from "react-router-dom";
 import {CalendarListEntry} from "../../features/calendarSync/interface";
+import {updateWatchedProject} from "../../features/calendarSync/actions";
 
 const {Option} = Select;
 
@@ -16,6 +17,8 @@ type ModalProps = {
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     calendar: CalendarListEntry;
+    watchedProject: Project | undefined;
+    updateWatchedProject: (calendarId: string) => void;
 }
 
 const CalendarListEntryModal: React.FC<ModalProps> = props => {
@@ -37,6 +40,10 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
             })
         );
     }, [props.ownedProjects, props.sharedProjects]);
+
+    useEffect(() => {
+        calendar && calendar.id && props.updateWatchedProject(calendar.id);
+    }, [props.calendar]);
 
     const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.stopPropagation();
@@ -106,6 +113,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
 const mapStateToProps = (state: IState) => ({
     ownedProjects: state.project.owned,
     sharedProjects: state.project.shared,
+    watchedProject: state.calendarSync.watchedProject
 });
 
-export default connect(mapStateToProps, {})(CalendarListEntryModal);
+export default connect(mapStateToProps, {updateWatchedProject})(CalendarListEntryModal);

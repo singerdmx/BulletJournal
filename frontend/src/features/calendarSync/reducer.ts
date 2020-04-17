@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import {CalendarListEntry, GoogleCalendarEvent} from "./interface";
+import {Project} from "../project/interface";
 
 export type ExpirationTimeAction = {
   expirationTime: number;
@@ -12,6 +13,15 @@ export type UpdateGoogleCalendarEventListAction = {
   endDate?: string;
 }
 
+export type GoogleCalendarCreateEventsAction = {
+  projectId: number,
+  events: GoogleCalendarEvent[]
+}
+
+export type UpdateWatchedProjectAction = {
+  calendarId: string;
+}
+
 export type CalendarListAction = {
   calendarList: CalendarListEntry[];
 };
@@ -19,6 +29,10 @@ export type CalendarListAction = {
 export type CalendarEventListAction = {
   googleCalendarEventList: GoogleCalendarEvent[];
 };
+
+export type WatchedProjectAction = {
+  project: Project;
+}
 
 export type UpdateExpirationTimeAction = {
 };
@@ -28,6 +42,7 @@ let initialState = {
   appleTokenExpirationTime: 0 as number,
   googleCalendarList: [] as CalendarListEntry[],
   googleCalendarEventList: [] as GoogleCalendarEvent[],
+  watchedProject: undefined as Project | undefined
 };
 
 const slice = createSlice({
@@ -46,12 +61,18 @@ const slice = createSlice({
       const { googleCalendarEventList } = action.payload;
       state.googleCalendarEventList = googleCalendarEventList;
     },
+    watchedProjectReceived: (state, action: PayloadAction<WatchedProjectAction>) => {
+      const { project } = action.payload;
+      state.watchedProject = project;
+    },
     appleTokenExpirationTimeReceived: (state, action: PayloadAction<ExpirationTimeAction>) => {
       const { expirationTime } = action.payload;
       state.appleTokenExpirationTime = expirationTime;
     },
     googleTokenExpirationTimeUpdate: (state, action: PayloadAction<UpdateExpirationTimeAction>) => state,
     googleCalendarEventListUpdate: (state, action: PayloadAction<UpdateGoogleCalendarEventListAction>) => state,
+    googleCalendarCreateEvents: (state, action: PayloadAction<GoogleCalendarCreateEventsAction>) => state,
+    watchedProjectUpdate: (state, action: PayloadAction<UpdateWatchedProjectAction>) => state,
   }
 });
 
