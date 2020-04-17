@@ -9,7 +9,7 @@ import {iconMapper} from "../side-menu/side-menu.component";
 import AddProject from "./add-project.component";
 import {useHistory} from "react-router-dom";
 import {CalendarListEntry, GoogleCalendarEvent} from "../../features/calendarSync/interface";
-import {googleCalendarEventListUpdate, updateWatchedProject} from "../../features/calendarSync/actions";
+import {googleCalendarEventListUpdate, updateWatchedProject, watchCalendar, unwatchCalendar} from "../../features/calendarSync/actions";
 
 const {Option} = Select;
 
@@ -20,6 +20,8 @@ type ModalProps = {
     watchedProject: Project | undefined;
     eventList: GoogleCalendarEvent[];
     updateWatchedProject: (calendarId: string) => void;
+    watchCalendar: (calendarId: string, projectId: number) => void;
+    unwatchCalendar: (calendarId: string) => void;
     googleCalendarEventListUpdate: (calendarId: string, timezone: string, startDate?: string, endDate?: string) => void;
 }
 
@@ -51,6 +53,14 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
     const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.stopPropagation();
         setVisible(false);
+    };
+
+    const handleWatchCalendar = () => {
+        props.watchCalendar(calendar.id, projects[0].id);
+    };
+
+    const handleUnwatchCalendar = () => {
+        props.unwatchCalendar(calendar.id);
     };
 
     const getProjectSelections = () => {
@@ -92,7 +102,13 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         return <div>
             <div>{props.watchedProject}</div>
             <div>
-                <Button>
+                <Button onClick={(e) => handleWatchCalendar()}>
+                    Keep in sync
+                </Button>
+            </div>
+            <div>
+                <Button onClick={(e) => handleUnwatchCalendar()}>
+                    Stop syncing
                 </Button>
             </div>
         </div>
@@ -131,4 +147,9 @@ const mapStateToProps = (state: IState) => ({
     eventList: state.calendarSync.googleCalendarEventList
 });
 
-export default connect(mapStateToProps, {updateWatchedProject, googleCalendarEventListUpdate})(CalendarListEntryModal);
+export default connect(mapStateToProps, {
+    updateWatchedProject,
+    googleCalendarEventListUpdate,
+    watchCalendar,
+    unwatchCalendar
+})(CalendarListEntryModal);
