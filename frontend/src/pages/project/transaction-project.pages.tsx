@@ -395,7 +395,11 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           <div className="transaction-graph">
             {transactionsSummaries ? (
               <ResponsiveContainer>
-                <LineChart data={lineData} height={200}>
+                <LineChart
+                  data={lineData}
+                  height={200}
+                  margin={{ left: 5, bottom: 5, right: 50, top: 20 }}
+                >
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Legend />
