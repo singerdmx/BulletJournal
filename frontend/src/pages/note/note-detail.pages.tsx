@@ -12,10 +12,12 @@ import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
-// modals import
+// redux
+import { Content } from '../../features/myBuJo/interface';
 
 export type NoteProps = {
   note: Note;
+  contents: Content[];
 };
 
 type NoteDetailProps = {
@@ -32,6 +34,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     noteOperation,
     noteEditorElem,
     createContentElem,
+    contents,
   } = props;
 
   return (
@@ -58,7 +61,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
       <Divider />
       <div className='content'>
         <div className='content-list'>
-          <NoteContentList projectItem={note} />
+          <NoteContentList projectItem={note} contents={contents} />
         </div>
         {createContentElem}
       </div>

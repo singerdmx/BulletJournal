@@ -23,14 +23,17 @@ import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
 
+import { Content } from '../../features/myBuJo/interface';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import NoteDetailPage, { NoteProps } from './note-detail.pages';
+import { updateNoteContents } from '../../features/notes/actions';
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
   deleteNote: (noteId: number) => void;
+  updateNoteContents: (noteId: number) => void;
 }
 
 // get icons by string name
@@ -38,7 +41,7 @@ interface NotePageHandler {
 const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   // hook history in router
   const history = useHistory();
-  const { note, deleteNote } = props;
+  const { note, deleteNote, contents, updateNoteContents } = props;
   // get id of note from router
   const { noteId } = useParams();
   // state control drawer displaying
@@ -49,6 +52,11 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   React.useEffect(() => {
     noteId && props.getNote(parseInt(noteId));
   }, [noteId]);
+
+  React.useEffect(() => {
+    note && note.id && updateNoteContents(note.id);
+  }, [note]);
+
   // show drawer
   const createHandler = () => {
     setEditorShow(true);
@@ -133,15 +141,18 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
       noteOperation={noteOperation}
       createContentElem={createContentElem}
       noteEditorElem={noteEditorElem}
+      contents={contents}
     />
   );
 };
 
 const mapStateToProps = (state: IState) => ({
   note: state.note.note,
+  contents: state.note.contents,
 });
 
 export default connect(mapStateToProps, {
   deleteNote,
   getNote,
+  updateNoteContents,
 })(NotePage);
