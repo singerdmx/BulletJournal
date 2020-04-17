@@ -22,6 +22,8 @@ import com.google.gson.GsonBuilder;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 @Repository
 public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskDaoJpa.class);
     private static final Gson GSON = new Gson();
 
     private static final Gson GSON_ALLOW_EXPOSE_ONLY = new GsonBuilder()
@@ -322,13 +325,18 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void create(Long projectId, String username, CreateTaskParams createTaskParams,
+    public void create(Long projectId, String owner, CreateTaskParams createTaskParams,
                        String iCalUID, Content content) {
-        // skip duplicated iCalUID
-        Task task = create(projectId, username, createTaskParams);
+        // Skip duplicated iCalUID
+        if (this.taskRepository.findTaskByGoogleCalendarEventId(iCalUID).isPresent()) {
+            LOGGER.info("Task with iCalUID {} already exists", iCalUID);
+            return;
+        }
+
+        Task task = create(projectId, owner, createTaskParams);
         task.setGoogleCalendarEventId(iCalUID);
-        this.taskRepository.save(task);
-        // create content
+        task = this.taskRepository.save(task);
+        addContent(task.getId(), owner, new TaskContent(content.getText()));
     }
 
     private ReminderSetting getReminderSetting(
