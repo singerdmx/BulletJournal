@@ -106,6 +106,7 @@ const ContentEditorDrawer: React.FC<
           content={content || undefined}
           projectItemId={projectItem.id}
           afterFinish={handleClose}
+          contentType={projectItem.contentType}
         />
       )}
     </Drawer>
