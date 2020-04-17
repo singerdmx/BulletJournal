@@ -1,19 +1,32 @@
-import React, {useEffect, useState} from 'react';
-import {Pie, PieChart, Tooltip as HoverHint} from 'recharts';
-import {IState} from '../../store';
-import {connect} from 'react-redux';
-import {Carousel, DatePicker, Form, List, Radio, Select, Tooltip} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Pie, PieChart, Tooltip as HoverHint } from 'recharts';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import {
+  Carousel,
+  DatePicker,
+  Form,
+  List,
+  Radio,
+  Select,
+  Tooltip,
+  Divider,
+} from 'antd';
 import moment from 'moment';
-import {dateFormat} from '../../features/myBuJo/constants';
+import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
-import {zones} from '../../components/settings/constants';
-import {updateTransactions} from '../../features/transactions/actions';
-import {updateExpandedMyself} from '../../features/myself/actions';
-import {LedgerSummary, LedgerSummaryType, TransactionsSummary} from '../../features/transactions/interface';
+import { zones } from '../../components/settings/constants';
+import { updateTransactions } from '../../features/transactions/actions';
+import { updateExpandedMyself } from '../../features/myself/actions';
+import {
+  LedgerSummary,
+  LedgerSummaryType,
+  TransactionsSummary,
+} from '../../features/transactions/interface';
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
-import {RadioChangeEvent} from 'antd/lib/radio';
+import { RadioChangeEvent } from 'antd/lib/radio';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -32,7 +45,11 @@ zones.sort((a, b) => {
   }
   return 0;
 });
-const LedgerSummaryTypeMap = [LedgerSummaryType.DEFAULT, LedgerSummaryType.PAYER, LedgerSummaryType.LABEL];
+const LedgerSummaryTypeMap = [
+  LedgerSummaryType.DEFAULT,
+  LedgerSummaryType.PAYER,
+  LedgerSummaryType.LABEL,
+];
 
 type TransactionProps = {
   projectId: number;
@@ -52,7 +69,9 @@ type TransactionProps = {
 
 const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [form] = Form.useForm();
-  const [ledgerSummaryType, setLedgerSummaryType] = useState(LedgerSummaryType.DEFAULT);
+  const [ledgerSummaryType, setLedgerSummaryType] = useState(
+    LedgerSummaryType.DEFAULT
+  );
   //used for LABEL pie
   const [labelExpenseData, setLabelExpenseData] = useState([{}]);
   const [labelIncomeData, setLabelIncomeData] = useState([{}]);
@@ -187,25 +206,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         expense={expense}
         startDate={startDate}
         endDate={endDate}
-      >
-        {/* {' '}
-        {transactionsSummaries
-          ? transactionsSummaries.map(
-              (transactionsSummary: TransactionsSummary, index: number) => (
-                <div>
-                  <span>{transactionsSummary.name}</span>
-                  <span>balance: {transactionsSummary.balance}</span>
-                  <span>
-                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                    {transactionsSummary.expensePercentage}%,
-                  </span>
-                  <span>income: {transactionsSummary.income}</span>
-                  {transactionsSummary.incomePercentage}%
-                </div>
-              )
-            )
-          : 'Loading...'} */}
-      </LedgerSummaries>
+      ></LedgerSummaries>
     );
   };
 
@@ -218,24 +219,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         expense={expense}
         startDate={startDate}
         endDate={endDate}
-      >
-        {/* {transactionsSummaries
-          ? transactionsSummaries.map(
-              (transactionsSummary: TransactionsSummary, index: number) => (
-                <div>
-                  <span>{transactionsSummary.name}</span>
-                  <span>balance: {transactionsSummary.balance}</span>
-                  <span>
-                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                    {transactionsSummary.expensePercentage}%,
-                  </span>
-                  <span>income: {transactionsSummary.income}</span>
-                  {transactionsSummary.incomePercentage}%
-                </div>
-              )
-            )
-          : 'Loading...'}{' '} */}
-      </LedgerSummaries>
+      ></LedgerSummaries>
     );
   };
 
@@ -248,32 +232,16 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         expense={expense}
         startDate={startDate}
         endDate={endDate}
-      >
-        {/* {' '}
-        {transactionsSummaries
-          ? transactionsSummaries.map(
-              (transactionsSummary: TransactionsSummary, index: number) => (
-                <div>
-                  <span>{transactionsSummary.name}</span>&nbsp;&nbsp;
-                  <span>balance: {transactionsSummary.balance}</span>
-                  <span>
-                    expense: {transactionsSummary.expense}&nbsp;&nbsp;
-                    {transactionsSummary.expensePercentage}%,
-                  </span>
-                  <span>income: {transactionsSummary.income}</span>
-                  {transactionsSummary.incomePercentage}%
-                </div>
-              )
-            )
-          : 'Loading...'} */}
-      </LedgerSummaries>
+      ></LedgerSummaries>
     );
   };
 
   const handleFilterChange = (changed: any, allValue: any) => {
     form
       .validateFields()
-      .then((values) => updateTransactions(values, ledgerSummaryType))
+      .then((values) => {
+        updateTransactions(values, ledgerSummaryType);
+      })
       .catch((info) => console.log(info));
   };
 
@@ -287,21 +255,24 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           initialValues={{
             frequencyType: 'MONTHLY',
             timezone: props.timezone ? props.timezone : currentZone,
+            date: [moment().startOf('month'), moment().endOf('month')],
           }}
         >
-          <Form.Item name="frequencyType">
-            <Radio.Group value="YEARLY" size="small" buttonStyle="solid">
-              <Tooltip title="WEEKLY">
-                <Radio.Button value="WEEKLY">W</Radio.Button>
-              </Tooltip>
-              <Tooltip title="MONTHLY">
-                <Radio.Button value="MONTHLY">M</Radio.Button>
-              </Tooltip>
-              <Tooltip title="YEARLY">
-                <Radio.Button value="YEARLY">Y</Radio.Button>
-              </Tooltip>
-            </Radio.Group>
-          </Form.Item>
+          {ledgerSummaryType === 'DEFAULT' && (
+            <Form.Item name="frequencyType">
+              <Radio.Group value="YEARLY" size="small" buttonStyle="solid">
+                <Tooltip title="WEEKLY">
+                  <Radio.Button value="WEEKLY">W</Radio.Button>
+                </Tooltip>
+                <Tooltip title="MONTHLY">
+                  <Radio.Button value="MONTHLY">M</Radio.Button>
+                </Tooltip>
+                <Tooltip title="YEARLY">
+                  <Radio.Button value="YEARLY">Y</Radio.Button>
+                </Tooltip>
+              </Radio.Group>
+            </Form.Item>
+          )}
 
           <Form.Item name="date">
             <RangePicker
@@ -358,6 +329,27 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           <div className="transaction-payer">{getPayer()}</div>
           <div className="transaction-label">{getLabel()}</div>
           {/* maybe others? */}
+        </Carousel>
+      </div>
+
+      <div className="transaction-display-mini">
+        <Carousel dotPosition="left" autoplay>
+          {transactionsSummaries ? (
+            transactionsSummaries.map(
+              (transactionsSummary: TransactionsSummary, index: number) => (
+                <div key={`${transactionsSummary.name}-${index}`}>
+                  <span>{transactionsSummary.name}</span>
+                  <span>balance: {transactionsSummary.balance}</span>
+                  <span>
+                    expense: {transactionsSummary.expensePercentage}%,
+                  </span>
+                  <span>income: {transactionsSummary.incomePercentage}%</span>
+                </div>
+              )
+            )
+          ) : (
+            <div>LedgerSummaries</div>
+          )}
         </Carousel>
       </div>
 

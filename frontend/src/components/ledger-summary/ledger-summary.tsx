@@ -14,24 +14,19 @@ type LedgerSummaryProps = {
   expense: number;
   startDate: string;
   endDate: string;
-  children: ReactNode;
 };
 
 const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
-  const {
-    title,
-    balance,
-    income,
-    expense,
-    startDate,
-    endDate,
-    children,
-  } = props;
+  const { title, balance, income, expense, startDate, endDate } = props;
 
   return (
     <div className="ledger-summary">
       <div className="ledger-selection">
-        {title.length > 0 && <Tag color="orange" className="ledger-category">{title}</Tag>}
+        {title.length > 0 && (
+          <Tag color="orange" className="ledger-category">
+            {title}
+          </Tag>
+        )}
         <span className="ledger-time">
           {startDate} - {endDate}
         </span>
@@ -57,7 +52,6 @@ const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
           />
         </Card>
       </div>
-      <div>{children}</div>
     </div>
   );
 };
