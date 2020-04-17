@@ -108,14 +108,16 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   };
 
   useEffect(() => {
+    const startDate = moment().startOf('month').format(dateFormat);
+    const endDate = moment().endOf('month').format(dateFormat);
     props.updateExpandedMyself(true);
     props.updateTransactions(
       props.projectId,
       currentZone,
       ledgerSummaryType,
       'MONTHLY',
-      '',
-      ''
+      startDate,
+      endDate
     );
   }, []);
 
