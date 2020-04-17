@@ -2,16 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pie, PieChart, Tooltip as HoverHint } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import {
-  Carousel,
-  DatePicker,
-  Form,
-  List,
-  Radio,
-  Select,
-  Tooltip,
-  Divider,
-} from 'antd';
+import { Carousel, DatePicker, Form, List, Radio, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
@@ -103,16 +94,14 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     setShowPayerExpenseTab(false);
     setShowPayerIncomeTab(false);
 
-    const startDate = values.date
-      ? values.date[0].format(dateFormat)
-      : undefined;
-    const endDate = values.date ? values.date[1].format(dateFormat) : undefined;
+    const startDate = values.date[0].format(dateFormat);
+    const endDate = values.date[1].format(dateFormat);
 
     props.updateTransactions(
       props.projectId,
       values.timezone,
-      values.frequencyType,
       currentLedgerSummaryType,
+      values.frequencyType,
       startDate,
       endDate
     );
@@ -123,8 +112,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     props.updateTransactions(
       props.projectId,
       currentZone,
-      'MONTHLY',
       ledgerSummaryType,
+      'MONTHLY',
       '',
       ''
     );
