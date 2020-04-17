@@ -13,6 +13,7 @@ import {
   LedgerSummary,
   LedgerSummaryType,
   TransactionsSummary,
+  FrequencyType,
 } from '../../features/transactions/interface';
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
@@ -96,7 +97,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
     const startDate = values.date[0].format(dateFormat);
     const endDate = values.date[1].format(dateFormat);
-    const frequencyType = values.frequencyType || 'MONTHLY';
+    const frequencyType = values.frequencyType || FrequencyType.MONTHLY;
 
     props.updateTransactions(
       props.projectId,
