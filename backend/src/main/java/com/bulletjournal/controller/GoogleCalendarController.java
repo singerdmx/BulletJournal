@@ -216,7 +216,7 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")
-    public void unwatchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
+    public Project unwatchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
         Calendar service = getCalendarService();
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.get(calendarId);
         // https://developers.google.com/calendar/v3/reference/channels/stop
@@ -224,6 +224,7 @@ public class GoogleCalendarController {
         LOGGER.info("Stopping channel {}", channel);
         service.channels().stop(channel).execute();
         this.googleCalendarProjectDaoJpa.delete(calendarId);
+        return googleCalendarProject.getProject().toPresentationModel();
     }
 
     private Calendar getCalendarService() throws IOException {

@@ -4,12 +4,12 @@ import {connect} from 'react-redux';
 import {Project, ProjectsWithOwner} from "../../features/project/interface";
 import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects/projects.pages";
 import {ProjectType} from "../../features/project/constants";
-import {Avatar, Form, Modal, Select, Tooltip} from "antd";
+import {Avatar, Button, Form, Modal, Select, Tooltip} from "antd";
 import {iconMapper} from "../side-menu/side-menu.component";
 import AddProject from "./add-project.component";
 import {useHistory} from "react-router-dom";
-import {CalendarListEntry} from "../../features/calendarSync/interface";
-import {updateWatchedProject} from "../../features/calendarSync/actions";
+import {CalendarListEntry, GoogleCalendarEvent} from "../../features/calendarSync/interface";
+import {googleCalendarEventListUpdate, updateWatchedProject} from "../../features/calendarSync/actions";
 
 const {Option} = Select;
 
@@ -18,7 +18,9 @@ type ModalProps = {
     sharedProjects: ProjectsWithOwner[];
     calendar: CalendarListEntry;
     watchedProject: Project | undefined;
+    eventList: GoogleCalendarEvent[];
     updateWatchedProject: (calendarId: string) => void;
+    googleCalendarEventListUpdate: (calendarId: string, timezone: string, startDate?: string, endDate?: string) => void;
 }
 
 const CalendarListEntryModal: React.FC<ModalProps> = props => {
@@ -43,6 +45,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
 
     useEffect(() => {
         calendar && calendar.id && props.updateWatchedProject(calendar.id);
+        calendar && calendar.id && props.googleCalendarEventListUpdate(calendar.id, calendar.timeZone);
     }, [props.calendar]);
 
     const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -85,6 +88,16 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         return <AddProject history={history} mode={'singular'}/>;
     };
 
+    const projectKeepInSync = () => {
+        return <div>
+            <div>{props.watchedProject}</div>
+            <div>
+                <Button>
+                </Button>
+            </div>
+        </div>
+    };
+
     return <div onClick={() => setVisible(true)}>
         <span>{calendar.summary}</span>
         <Modal
@@ -97,6 +110,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
             footer={false}
         >
             <Form form={form} labelAlign='left'>
+                {projectKeepInSync()}
                 <Form.Item
                     name='project'
                     label='Target BuJo'
@@ -113,7 +127,8 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
 const mapStateToProps = (state: IState) => ({
     ownedProjects: state.project.owned,
     sharedProjects: state.project.shared,
-    watchedProject: state.calendarSync.watchedProject
+    watchedProject: state.calendarSync.watchedProject,
+    eventList: state.calendarSync.googleCalendarEventList
 });
 
-export default connect(mapStateToProps, {updateWatchedProject})(CalendarListEntryModal);
+export default connect(mapStateToProps, {updateWatchedProject, googleCalendarEventListUpdate})(CalendarListEntryModal);

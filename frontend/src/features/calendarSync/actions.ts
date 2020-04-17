@@ -8,3 +8,7 @@ export const googleCalendarCreateEvents = (projectId: number, events: GoogleCale
     actions.googleCalendarCreateEvents({projectId: projectId, events: events});
 export const updateWatchedProject = (calendarId: string) =>
     actions.watchedProjectUpdate({calendarId: calendarId});
+export const watchCalendar = (calendarId: string, projectId: number) =>
+    actions.watchCalendar({calendarId: calendarId, projectId: projectId});
+export const unwatchCalendar = (calendarId: string) =>
+    actions.unwatchCalendar({calendarId: calendarId});

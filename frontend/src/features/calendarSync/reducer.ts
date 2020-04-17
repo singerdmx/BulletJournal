@@ -22,6 +22,15 @@ export type UpdateWatchedProjectAction = {
   calendarId: string;
 }
 
+export type WatchedCalendarAction = {
+  calendarId: string;
+  projectId: number;
+}
+
+export type UnwatchedCalendarAction = {
+  calendarId: string;
+}
+
 export type CalendarListAction = {
   calendarList: CalendarListEntry[];
 };
@@ -31,7 +40,7 @@ export type CalendarEventListAction = {
 };
 
 export type WatchedProjectAction = {
-  project: Project;
+  project: Project | undefined;
 }
 
 export type UpdateExpirationTimeAction = {
@@ -73,6 +82,8 @@ const slice = createSlice({
     googleCalendarEventListUpdate: (state, action: PayloadAction<UpdateGoogleCalendarEventListAction>) => state,
     googleCalendarCreateEvents: (state, action: PayloadAction<GoogleCalendarCreateEventsAction>) => state,
     watchedProjectUpdate: (state, action: PayloadAction<UpdateWatchedProjectAction>) => state,
+    watchCalendar: (state, action: PayloadAction<WatchedCalendarAction>) => state,
+    unwatchCalendar: (state, action: PayloadAction<UnwatchedCalendarAction>) => state,
   }
 });
 
