@@ -96,12 +96,13 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
     const startDate = values.date[0].format(dateFormat);
     const endDate = values.date[1].format(dateFormat);
+    const frequencyType = values.frequencyType || 'MONTHLY';
 
     props.updateTransactions(
       props.projectId,
       values.timezone,
       currentLedgerSummaryType,
-      values.frequencyType,
+      frequencyType,
       startDate,
       endDate
     );
