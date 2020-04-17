@@ -328,13 +328,15 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           {transactionsSummaries ? (
             transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
-                <div key={`${transactionsSummary.name}-${index}`}>
-                  <span>{transactionsSummary.name}</span>
-                  <span>balance: {transactionsSummary.balance}</span>
+                <div
+                  key={`${transactionsSummary.name}-${index}`}
+                  className="transaction-display-mini-content"
+                >
+                  <span className="title">{transactionsSummary.name}</span>
                   <span>
-                    expense: {transactionsSummary.expensePercentage}%,
+                    Expense: {transactionsSummary.expensePercentage}%,
                   </span>
-                  <span>income: {transactionsSummary.incomePercentage}%</span>
+                  <span>Income: {transactionsSummary.incomePercentage}%</span>
                 </div>
               )
             )
