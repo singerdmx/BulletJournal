@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Pie, PieChart, Tooltip as HoverHint } from 'recharts';
+import {
+  Pie,
+  PieChart,
+  Tooltip as HoverHint,
+  LineChart,
+  XAxis,
+  Legend,
+  Line,
+  ResponsiveContainer,
+  YAxis,
+} from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import {
@@ -73,6 +83,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [ledgerSummaryType, setLedgerSummaryType] = useState(
     LedgerSummaryType.DEFAULT
   );
+  // defaulte line chart
+  const [lineData, setLineData] = useState([{}]);
   //used for LABEL pie
   const [labelExpenseData, setLabelExpenseData] = useState([{}]);
   const [labelIncomeData, setLabelIncomeData] = useState([{}]);
@@ -173,7 +185,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           }
           return {
             name: transaction.name,
-            expense: transaction.expensePercentage,
+            expense: transaction.expense,
+            expensePercentage: transaction.expensePercentage,
+            expenseCount: transaction.expenseCount,
           };
         }
       );
@@ -186,11 +200,25 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           }
           return {
             name: transaction.name,
-            income: transaction.incomePercentage,
+            income: transaction.income,
+            incomePercentage: transaction.incomePercentage,
+            incomeCount: transaction.incomeCount,
           };
         }
       );
       setPayerIncomeData(newIncomeData);
+    } else if (ledgerSummaryType === LedgerSummaryType.DEFAULT) {
+      const newLineData =
+        transactionsSummaries &&
+        transactionsSummaries.map((transaction: TransactionsSummary) => {
+          return {
+            name: transaction.name,
+            income: transaction.income,
+            expense: transaction.expense,
+            balance: transaction.balance,
+          };
+        });
+      setLineData(newLineData);
     } else {
       setLabelExpenseData([]);
       setLabelIncomeData([]);
@@ -198,6 +226,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       setShowLabelIncomeTab(false);
       setPayerExpenseData([]);
       setPayerIncomeData([]);
+      setLineData([]);
       setShowPayerExpenseTab(false);
       setShowPayerIncomeTab(false);
     }
@@ -363,7 +392,22 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
       {ledgerSummaryType === LedgerSummaryType.DEFAULT && (
         <div className="transaction-visual">
-          <div className="transaction-graph"></div>
+          <div className="transaction-graph">
+            {transactionsSummaries ? (
+              <ResponsiveContainer>
+                <LineChart data={lineData} height={200}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Legend />
+                  <Line type="monotone" dataKey="expense" stroke="#8884d8" />
+                  <Line type="monotone" dataKey="income" stroke="#82ca9d" />
+                  <Line type="monotone" dataKey="balance" stroke="#3437eb" />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <Empty />
+            )}
+          </div>
         </div>
       )}
 
@@ -379,20 +423,24 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </Radio.Group>
           <div className="transaction-graph">
             {showLabelExpenseTab || showLabelIncomeTab ? (
-              <PieChart width={200} height={200}>
-                {/* expense */}
-                <Pie
-                  dataKey={graphCate}
-                  isAnimationActive={false}
-                  data={
-                    graphCate === 'expense' ? labelExpenseData : labelIncomeData
-                  }
-                  outerRadius={60}
-                  fill="#8884d8"
-                  labelLine={false}
-                />
-                <HoverHint />
-              </PieChart>
+              <ResponsiveContainer>
+                <PieChart>
+                  {/* expense */}
+                  <Pie
+                    dataKey={graphCate}
+                    isAnimationActive={false}
+                    data={
+                      graphCate === 'expense'
+                        ? labelExpenseData
+                        : labelIncomeData
+                    }
+                    outerRadius={60}
+                    fill="#8884d8"
+                    labelLine={false}
+                  />
+                  <HoverHint />
+                </PieChart>
+              </ResponsiveContainer>
             ) : (
               <Empty />
             )}
@@ -412,22 +460,26 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </Radio.Group>
           <div className="transaction-graph">
             {showPayerExpenseTab || showPayerIncomeTab ? (
-              <PieChart width={200} height={200}>
-                {/* expense */}
-                <Pie
-                  dataKey={graphCate}
-                  isAnimationActive={false}
-                  data={
-                    graphCate === 'expense' ? payerExpenseData : payerIncomeData
-                  }
-                  outerRadius={60}
-                  fill="#8884d8"
-                  label
-                />
-                <HoverHint />
-              </PieChart>
+              <ResponsiveContainer>
+                <PieChart width={200} height={200}>
+                  {/* expense */}
+                  <Pie
+                    dataKey={graphCate}
+                    isAnimationActive={false}
+                    data={
+                      graphCate === 'expense'
+                        ? payerExpenseData
+                        : payerIncomeData
+                    }
+                    outerRadius={60}
+                    fill="#8884d8"
+                    label
+                  />
+                  <HoverHint />
+                </PieChart>
+              </ResponsiveContainer>
             ) : (
-              <React.Fragment />
+              <Empty />
             )}
           </div>
         </div>
