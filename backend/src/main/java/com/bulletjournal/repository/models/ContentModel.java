@@ -1,7 +1,6 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.Content;
-import com.bulletjournal.controller.models.Revision;
 import com.google.gson.annotations.Expose;
 
 import javax.persistence.Column;
