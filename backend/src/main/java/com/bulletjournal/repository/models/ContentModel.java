@@ -1,6 +1,7 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.controller.models.Revision;
 import com.google.gson.annotations.Expose;
 
 import javax.persistence.Column;
@@ -67,8 +68,9 @@ public abstract class ContentModel<T extends ProjectItemModel> extends AuditMode
 
     public Content toPresentationModel() {
         return new Content(
-            this.getId(), this.getOwner(), this.getText(),
-            this.getBaseText(), this.getCreatedAt().getTime(),
-            this.getUpdatedAt().getTime(), this.getRevisions());
+                this.getId(), this.getOwner(), this.getText(),
+                this.getBaseText(), this.getCreatedAt() == null ? null : this.getCreatedAt().getTime(),
+                this.getUpdatedAt() == null ? null : this.getUpdatedAt().getTime(),
+                this.getRevisions());
     }
 }
