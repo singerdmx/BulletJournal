@@ -38,9 +38,8 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
           notificationsEtag: etag,
           ...systemState
         })
-      )
+      );
       yield call(message.info, "You've got new notifications");
-      displayNotification("You've got new notifications");
     }
     yield put(
       notificationsActions.notificationsReceived({ notifications: notifications })
