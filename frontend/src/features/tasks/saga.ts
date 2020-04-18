@@ -45,6 +45,7 @@ import {
   getContents,
   getContentRevision,
   updateContent,
+  getCompletedTaskContents,
 } from '../../apis/taskApis';
 import { updateTasks, updateTaskContents } from './actions';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
@@ -410,6 +411,27 @@ function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
   }
 }
 
+function* completeTaskContentsUpdate(
+  action: PayloadAction<UpdateTaskContents>
+) {
+  try {
+    const contents = yield call(
+      getCompletedTaskContents,
+      action.payload.taskId
+    );
+    yield put(
+      tasksActions.taskContentsReceived({
+        contents: contents,
+      })
+    );
+  } catch (error) {
+    yield call(
+      message.error,
+      `completeTaskContentsUpdate Error Received: ${error}`
+    );
+  }
+}
+
 function* taskContentRevisionUpdate(
   action: PayloadAction<UpdateTaskContentRevision>
 ) {
@@ -516,5 +538,9 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskContentCreate.type, createTaskContent),
     yield takeLatest(tasksActions.TaskContentPatch.type, patchContent),
     yield takeLatest(tasksActions.TaskContentDelete.type, deleteTaskContent),
+    yield takeLatest(
+      tasksActions.CompleteTaskContentsUpdate.type,
+      completeTaskContentsUpdate
+    ),
   ]);
 }

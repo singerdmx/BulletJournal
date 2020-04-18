@@ -5,7 +5,10 @@ import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 //actions
-import { getCompletedTask } from '../../features/tasks/actions';
+import {
+  getCompletedTask,
+  updateCompleteTaskContents,
+} from '../../features/tasks/actions';
 import { IState } from '../../store';
 // antd imports
 import './task-page.styles.less';
@@ -17,6 +20,7 @@ import TaskDetailPage, { TaskProps } from './task-detail.pages';
 
 interface TaskPageHandler {
   getCompletedTask: (taskId: number) => void;
+  updateCompleteTaskContents: (taskId: number) => void;
 }
 
 const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
@@ -26,6 +30,10 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
     taskId && props.getCompletedTask(parseInt(taskId));
+  }, [taskId]);
+
+  React.useEffect(() => {
+    taskId && props.updateCompleteTaskContents(parseInt(taskId));
   }, [taskId]);
 
   return (
@@ -47,4 +55,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   getCompletedTask,
+  updateCompleteTaskContents,
 })(CompletedTaskPage);
