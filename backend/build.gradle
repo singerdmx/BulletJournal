@@ -52,12 +52,12 @@ dependencies {
     compile group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '3.2.5.RELEASE'
     compile group: 'org.dmfs', name: 'rfc5545-datetime', version: '0.2.4'
     compile group: 'com.google.apis', name: 'google-api-services-calendar', version: 'v3-rev411-1.25.0'
+    compile group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '3.2.6.RELEASE'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
     testCompile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11'
-
 }
 
 test {
