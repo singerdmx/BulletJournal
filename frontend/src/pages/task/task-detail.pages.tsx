@@ -9,7 +9,7 @@ import { Avatar, Card, Col, Divider, Row, Statistic, Tooltip } from 'antd';
 import {
   AlertOutlined,
   FileDoneOutlined,
-  LoadingOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
@@ -52,7 +52,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
             <Statistic
               title='Recurring'
               value={convertToTextWithRRule(task.recurrenceRule)}
-              prefix={<LoadingOutlined />}
+              prefix={<ClockCircleOutlined />}
             />
           </Card>
         </Col>

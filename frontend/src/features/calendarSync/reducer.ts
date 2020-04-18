@@ -48,7 +48,6 @@ export type UpdateExpirationTimeAction = {
 
 let initialState = {
   googleTokenExpirationTime: 0 as number,
-  appleTokenExpirationTime: 0 as number,
   googleCalendarList: [] as CalendarListEntry[],
   googleCalendarEventList: [] as GoogleCalendarEvent[],
   watchedProject: undefined as Project | undefined
@@ -73,10 +72,6 @@ const slice = createSlice({
     watchedProjectReceived: (state, action: PayloadAction<WatchedProjectAction>) => {
       const { project } = action.payload;
       state.watchedProject = project;
-    },
-    appleTokenExpirationTimeReceived: (state, action: PayloadAction<ExpirationTimeAction>) => {
-      const { expirationTime } = action.payload;
-      state.appleTokenExpirationTime = expirationTime;
     },
     googleTokenExpirationTimeUpdate: (state, action: PayloadAction<UpdateExpirationTimeAction>) => state,
     googleCalendarEventListUpdate: (state, action: PayloadAction<UpdateGoogleCalendarEventListAction>) => state,
