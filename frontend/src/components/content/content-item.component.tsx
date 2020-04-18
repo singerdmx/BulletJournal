@@ -27,27 +27,36 @@ const ContentItem: React.FC<ContentProps> = ({ content, projectItem }) => {
     setDisplayMore(false);
   };
 
-  return (
-    <List.Item
-      key={content.id}
-      actions={[
-        <Tooltip title='Click to view'>
-          <FullscreenOutlined onClick={handleOpen} />
-        </Tooltip>,
-        <Tooltip title='View revision history'>
-          <span className='open-revisions-button' onClick={handleOpenRevisions}>
-            <HighlightOutlined />
-            {content.revisions.length}
-          </span>
-        </Tooltip>,
-        <Tooltip title={`${content.owner} created ${createdTime}`}>
-          <Avatar src={content.ownerAvatar} size='small' />
-        </Tooltip>,
+  const getActions = () => {
+    const actions = [
+      <Tooltip title='Click to view'>
+        <FullscreenOutlined onClick={handleOpen} />
+      </Tooltip>,
+      <Tooltip title='View revision history'>
+        <span className='open-revisions-button' onClick={handleOpenRevisions}>
+          <HighlightOutlined />
+          &nbsp;
+          {content.revisions.length}
+        </span>
+      </Tooltip>,
+      <Tooltip title={`${content.owner} created ${createdTime}`}>
+        <Avatar src={content.ownerAvatar} size='small' />
+      </Tooltip>,
+    ];
+
+    if (content.updatedAt) {
+      actions.push(
         <Tooltip title={`Updated ${moment(content.updatedAt).fromNow()}`}>
           <span>{updateTime}</span>
-        </Tooltip>,
-      ]}
-    >
+        </Tooltip>
+      );
+    }
+
+    return actions;
+  };
+
+  return (
+    <List.Item key={content.id} actions={getActions()}>
       {contentText.length > 300
         ? `${contentText.slice(0, 300)}...`
         : contentText}
