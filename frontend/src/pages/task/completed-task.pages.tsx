@@ -67,6 +67,7 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
       contents={contents}
       createContentElem={null}
       taskEditorElem={null}
+      contentEditable={false}
     />
   );
 };

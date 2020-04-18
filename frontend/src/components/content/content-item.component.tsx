@@ -8,11 +8,16 @@ import moment from 'moment';
 import './content-item.styles.less';
 
 type ContentProps = {
+  contentEditable?: boolean;
   content: Content;
   projectItem: ProjectItem;
 };
 
-const ContentItem: React.FC<ContentProps> = ({ content, projectItem }) => {
+const ContentItem: React.FC<ContentProps> = ({
+  content,
+  projectItem,
+  contentEditable,
+}) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
@@ -61,6 +66,7 @@ const ContentItem: React.FC<ContentProps> = ({ content, projectItem }) => {
         ? `${contentText.slice(0, 300)}...`
         : contentText}
       <ContentEditorDrawer
+        editable={contentEditable}
         content={content}
         visible={displayMore}
         onClose={handleClose}

@@ -21,10 +21,12 @@ import DraggableLabelsList from '../../components/draggable-labels/draggable-lab
 import { Content } from '../../features/myBuJo/interface';
 // components
 import TaskContentList from '../../components/content/content-list.component';
+import { StringNullableChain } from 'lodash';
 
 export type TaskProps = {
   task: Task;
   contents: Content[];
+  contentEditable?: boolean;
 };
 
 type TaskDetailProps = {
@@ -42,6 +44,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     createContentElem,
     taskEditorElem,
     contents,
+    contentEditable,
   } = props;
 
   const getDueDateTime = (task: Task) => {
@@ -123,7 +126,11 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       <Divider />
       <div className='content'>
         <div className='content-list'>
-          <TaskContentList projectItem={task} contents={contents} />
+          <TaskContentList
+            projectItem={task}
+            contents={contents}
+            contentEditable={contentEditable}
+          />
         </div>
         {createContentElem}
       </div>
