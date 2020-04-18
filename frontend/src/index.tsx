@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import './index.less';
-import * as serviceWorker from './serviceWorker';
 import PublicPage from './Public';
 
 const store = createStore();
