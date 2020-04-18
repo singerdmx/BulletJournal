@@ -240,10 +240,11 @@ public class TaskController {
     }
 
     @DeleteMapping(CONTENT_ROUTE)
-    public void deleteContent(@NotNull @PathVariable Long taskId,
+    public List<Content> deleteContent(@NotNull @PathVariable Long taskId,
                               @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.taskDaoJpa.deleteContent(contentId, taskId, username);
+        return getContents(taskId);
     }
 
     @PatchMapping(CONTENT_ROUTE)
