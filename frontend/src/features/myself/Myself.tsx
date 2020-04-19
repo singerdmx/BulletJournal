@@ -32,13 +32,18 @@ type MyselfProps = {
 type PathProps = RouteComponentProps;
 
 class Myself extends React.Component<MyselfProps & PathProps> {
+  interval:any = 0
   componentDidMount() {
     this.props.updateMyself();
     // TODO: remove updateNotifications
     this.props.updateNotifications();
-    setInterval(()=>{
+    this.interval =  setInterval(()=>{
       this.props.updateSystem()
     }, 8000)
+  }
+
+  componentWillMount() {
+    clearInterval(this.interval)
   }
 
   handleRefreshOnClick = () => {
