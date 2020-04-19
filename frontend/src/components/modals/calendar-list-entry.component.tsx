@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {IState} from "../../store";
 import {connect} from 'react-redux';
 import {Project} from "../../features/project/interface";
-import {Avatar, Button, Card, Form, Modal, Select, Tooltip} from "antd";
+import {Avatar, Button, Card, DatePicker, Form, Modal, Select, Tooltip} from "antd";
 import {iconMapper} from "../side-menu/side-menu.component";
 import AddProject from "./add-project.component";
 import {useHistory} from "react-router-dom";
@@ -16,6 +16,7 @@ import {
 
 import './modals.styles.less';
 
+const {RangePicker} = DatePicker;
 const {Option} = Select;
 
 type ModalProps = {
@@ -123,6 +124,10 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         >
             <Form form={form} labelAlign='left'>
                 {projectKeepInSync()}
+                <Form.Item>
+                    <RangePicker/>
+                    <Button>Pull</Button>
+                </Form.Item>
                 <Form.Item
                     name='project'
                     label='Target BuJo'
