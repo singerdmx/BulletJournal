@@ -9,7 +9,7 @@ class ESConfig {
 
     private Integer queryLimit;
 
-    public ESConfig() {
+    ESConfig() {
     }
 
     public Integer getQueryLimit() {
