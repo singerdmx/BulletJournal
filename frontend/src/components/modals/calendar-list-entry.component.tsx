@@ -39,7 +39,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
     const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.stopPropagation();
         calendar && calendar.id && props.updateWatchedProject(calendar.id);
-        calendar && calendar.id && props.googleCalendarEventListUpdate(calendar.id, calendar.timeZone);
+        // calendar && calendar.id && props.googleCalendarEventListUpdate(calendar.id, calendar.timeZone);
         setVisible(true);
     };
 
@@ -48,11 +48,13 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         setVisible(false);
     };
 
-    const handleWatchCalendar = () => {
+    const handleWatchCalendar = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.stopPropagation();
         props.watchCalendar(calendar.id, projects[0].id);
     };
 
-    const handleUnwatchCalendar = () => {
+    const handleUnwatchCalendar = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.stopPropagation();
         props.unwatchCalendar(calendar.id);
     };
 
@@ -95,12 +97,12 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         return <div>
             <div>{watchedProject ? watchedProject!.name : 'not synced'}</div>
             <div>
-                <Button onClick={(e) => handleWatchCalendar()}>
+                <Button onClick={(e) => handleWatchCalendar(e)}>
                     Keep in sync
                 </Button>
             </div>
             <div>
-                <Button onClick={(e) => handleUnwatchCalendar()}>
+                <Button onClick={(e) => handleUnwatchCalendar(e)}>
                     Stop syncing
                 </Button>
             </div>

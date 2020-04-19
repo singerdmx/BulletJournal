@@ -26,7 +26,7 @@ export const getGoogleCalendarList = () => {
 };
 
 export const getGoogleCalendarEventList = (calendarId: string, timezone: string, startDate?: string, endDate?: string) => {
-    let endpoint = `/api/calendar/google/calendars/${encodeURIComponent(calendarId)}/eventList?timezone=${timezone}`;
+    let endpoint = `/api/calendar/google/calendars/${encodeURIComponent(calendarId)}/eventList?timezone=${encodeURIComponent(timezone)}`;
     if (startDate) {
         endpoint += `&startDate=${startDate}`;
     }
