@@ -46,7 +46,6 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
     const state: IState = yield select();
     if (!state.myBuJo.startDate) {
       yield put(updateMyBuJoDates(currentTime, currentTime));
-      //yield put(getProjectItems(currentTime, currentTime, data.timezone, 'today'));
     }
 
     yield put(updateSelectedCalendarDay(currentTime));
@@ -94,6 +93,7 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
     let currentTime = new Date().toLocaleString('fr-CA', {
       timeZone: timezone,
     });
+    if (currentTime) currentTime = currentTime.substring(0, 10);
     yield put(
       myselfActions.myselfDataReceived({
         timezone: timezone,
