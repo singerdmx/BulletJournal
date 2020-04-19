@@ -140,6 +140,6 @@ public class Notification extends AuditModel {
     public com.bulletjournal.controller.models.Notification toPresentationModel() {
         return new com.bulletjournal.controller.models.Notification(
                 this.getId(), this.getTitle(), this.getContent(),
-                this.getUpdatedAt().getTime(), this.getType());
+                this.getUpdatedAt().getTime(), this.getType(), this.getLink());
     }
 }

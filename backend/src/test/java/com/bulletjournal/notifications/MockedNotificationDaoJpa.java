@@ -23,7 +23,7 @@ public class MockedNotificationDaoJpa extends NotificationDaoJpa {
         List<com.bulletjournal.controller.models.Notification> results = new ArrayList<>();
         for (Notification n : this.notifications) {
             results.add(new com.bulletjournal.controller.models.Notification(
-                    n.getId(), n.getTitle(), n.getContent(), System.currentTimeMillis(), n.getType()));
+                    n.getId(), n.getTitle(), n.getContent(), System.currentTimeMillis(), n.getType(), null));
         }
         return results;
     }

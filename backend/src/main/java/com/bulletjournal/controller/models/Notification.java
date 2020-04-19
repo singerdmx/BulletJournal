@@ -33,12 +33,13 @@ public class Notification {
     }
 
     public Notification(@NotNull Long id, @NotBlank String title, @NotBlank String content,
-                        @NotNull Long timestamp, @NotBlank String type) {
+                        @NotNull Long timestamp, @NotBlank String type, String link) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
         this.type = type;
+        this.link = link;
     }
 
     public Long getId() {
