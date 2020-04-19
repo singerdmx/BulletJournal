@@ -42,7 +42,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
     }, 8000)
   }
 
-  componentWillMount() {
+  componentWillUnmount() {
     clearInterval(this.interval)
   }
 
