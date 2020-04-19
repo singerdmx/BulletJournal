@@ -58,6 +58,13 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         props.unwatchCalendar(calendar.id);
     };
 
+    const handlePullEvents = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.stopPropagation();
+        form.validateFields().then(values => {
+            console.log(values.startEndDates);
+        });
+    };
+
     const getProjectSelections = () => {
         if (projects && projects[0]) {
             return (
@@ -126,9 +133,9 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         >
             <Form form={form} labelAlign='left'>
                 {projectKeepInSync()}
-                <Form.Item>
+                <Form.Item name='startEndDates'>
                     <RangePicker/>
-                    <Button>Pull</Button>
+                    <Button onClick={(e) => handlePullEvents(e)}>Pull</Button>
                 </Form.Item>
                 <Form.Item
                     name='project'
