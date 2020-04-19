@@ -52,7 +52,7 @@ function* updateWatchedProject(action: PayloadAction<UpdateWatchedProjectAction>
   try {
     const {calendarId} = action.payload;
     const project : Project = yield call(getWatchedProject, calendarId);
-    yield put(calendarSyncActions.watchedProjectReceived({project: project}));
+    yield put(calendarSyncActions.watchedProjectReceived({project: project && project.id ? project : undefined}));
   } catch (error) {
     yield call(message.error, `updateWatchedProject Error Received: ${error}`);
   }

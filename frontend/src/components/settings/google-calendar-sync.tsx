@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {Button, Card, Tooltip} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Button, Tooltip} from 'antd';
 import {connect} from 'react-redux';
 import {loginGoogleCalendar, logoutGoogleCalendar} from '../../apis/calendarApis';
 import {googleTokenExpirationTimeUpdate} from "../../features/calendarSync/actions";
@@ -8,6 +8,9 @@ import './calendar-sync.styles.less';
 import {IState} from "../../store";
 import {CalendarListEntry} from "../../features/calendarSync/interface";
 import CalendarListEntryModal from "../modals/calendar-list-entry.component";
+import {Project, ProjectsWithOwner} from "../../features/project/interface";
+import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects/projects.pages";
+import {ProjectType} from "../../features/project/constants";
 
 const handleGoogleCalendarLogin = () => {
     loginGoogleCalendar().then(res => {
@@ -22,6 +25,8 @@ const handleGoogleCalendarLogout = () => {
 };
 
 type SettingProps = {
+    ownedProjects: Project[];
+    sharedProjects: ProjectsWithOwner[];
     googleTokenExpirationTime: number;
     calendarList: CalendarListEntry[];
     googleTokenExpirationTimeUpdate: () => void;
@@ -29,6 +34,20 @@ type SettingProps = {
 
 const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
     const {googleTokenExpirationTime, calendarList} = props;
+    const [projects, setProjects] = useState<Project[]>([]);
+
+    useEffect(() => {
+        setProjects([]);
+        setProjects(flattenOwnedProject(props.ownedProjects, projects));
+        setProjects(flattenSharedProject(props.sharedProjects, projects));
+        setProjects(
+            projects.filter(p => {
+                return (
+                    p.projectType === ProjectType.TODO && !p.shared
+                );
+            })
+        );
+    }, [props.ownedProjects, props.sharedProjects]);
 
     useEffect(() => {
         props.googleTokenExpirationTimeUpdate();
@@ -39,19 +58,13 @@ const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
             <div className='calendar-sync-div'>
                 <Tooltip title='Log out Google Account'>
                     <Button
-                        onClick={() => handleGoogleCalendarLogout()}><DisconnectOutlined /><span>{' '}Disconnect</span></Button>
+                        onClick={() => handleGoogleCalendarLogout()}><DisconnectOutlined/><span>{' '}Disconnect</span></Button>
                 </Tooltip>
             </div>
             <div className='calendar-sync-div'>
-                <Card title="Calendar List">
-                    {calendarList.map((calendar, index) => {
-                        return <Card.Grid
-                            className='grid-style'
-                            style={{backgroundColor: calendar.backgroundColor, color: calendar.foregroundColor}}>
-                            <CalendarListEntryModal calendar={calendar}/>
-                        </Card.Grid>
-                    })}
-                </Card>
+                {calendarList.map((calendar, index) => {
+                    return <CalendarListEntryModal calendar={calendar} projects={projects}/>
+                })}
             </div>
         </div>;
     }
@@ -65,7 +78,9 @@ const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
     googleTokenExpirationTime: state.calendarSync.googleTokenExpirationTime,
-    calendarList: state.calendarSync.googleCalendarList
+    calendarList: state.calendarSync.googleCalendarList,
+    ownedProjects: state.project.owned,
+    sharedProjects: state.project.shared,
 });
 
 export default connect(mapStateToProps, {googleTokenExpirationTimeUpdate})(GoogleCalendarSyncPage);

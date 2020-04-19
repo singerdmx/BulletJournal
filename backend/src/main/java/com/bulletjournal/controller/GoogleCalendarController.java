@@ -11,6 +11,7 @@ import com.bulletjournal.controller.models.LoginStatus;
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.GoogleCalendarProject;
@@ -217,7 +218,11 @@ public class GoogleCalendarController {
 
     @GetMapping("/api/calendar/google/calendars/{calendarId}/watchedProject")
     public Project getWatchedProject(@NotNull @PathVariable String calendarId) {
-        return this.googleCalendarProjectDaoJpa.get(calendarId).getProject().toPresentationModel();
+        try {
+            return this.googleCalendarProjectDaoJpa.get(calendarId).getProject().toPresentationModel();
+        } catch (ResourceNotFoundException ex) {
+            return new Project();
+        }
     }
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")

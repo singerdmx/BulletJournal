@@ -1,21 +1,25 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {IState} from "../../store";
 import {connect} from 'react-redux';
-import {Project, ProjectsWithOwner} from "../../features/project/interface";
-import {flattenOwnedProject, flattenSharedProject} from "../../pages/projects/projects.pages";
-import {ProjectType} from "../../features/project/constants";
-import {Avatar, Button, Form, Modal, Select, Tooltip} from "antd";
+import {Project} from "../../features/project/interface";
+import {Avatar, Button, Card, Form, Modal, Select, Tooltip} from "antd";
 import {iconMapper} from "../side-menu/side-menu.component";
 import AddProject from "./add-project.component";
 import {useHistory} from "react-router-dom";
 import {CalendarListEntry, GoogleCalendarEvent} from "../../features/calendarSync/interface";
-import {googleCalendarEventListUpdate, updateWatchedProject, watchCalendar, unwatchCalendar} from "../../features/calendarSync/actions";
+import {
+    googleCalendarEventListUpdate,
+    unwatchCalendar,
+    updateWatchedProject,
+    watchCalendar
+} from "../../features/calendarSync/actions";
+
+import './modals.styles.less';
 
 const {Option} = Select;
 
 type ModalProps = {
-    ownedProjects: Project[];
-    sharedProjects: ProjectsWithOwner[];
+    projects: Project[];
     calendar: CalendarListEntry;
     watchedProject: Project | undefined;
     eventList: GoogleCalendarEvent[];
@@ -26,29 +30,17 @@ type ModalProps = {
 }
 
 const CalendarListEntryModal: React.FC<ModalProps> = props => {
-    const {calendar} = props;
+    const {calendar, watchedProject, projects} = props;
     const [visible, setVisible] = useState(false);
-    const [projects, setProjects] = useState<Project[]>([]);
     const history = useHistory();
     const [form] = Form.useForm();
 
-    useEffect(() => {
-        setProjects([]);
-        setProjects(flattenOwnedProject(props.ownedProjects, projects));
-        setProjects(flattenSharedProject(props.sharedProjects, projects));
-        setProjects(
-            projects.filter(p => {
-                return (
-                    p.projectType === ProjectType.TODO && !p.shared
-                );
-            })
-        );
-    }, [props.ownedProjects, props.sharedProjects]);
-
-    useEffect(() => {
+    const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.stopPropagation();
         calendar && calendar.id && props.updateWatchedProject(calendar.id);
         calendar && calendar.id && props.googleCalendarEventListUpdate(calendar.id, calendar.timeZone);
-    }, [props.calendar]);
+        setVisible(true);
+    };
 
     const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.stopPropagation();
@@ -100,7 +92,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
 
     const projectKeepInSync = () => {
         return <div>
-            <div>{props.watchedProject}</div>
+            <div>{watchedProject ? watchedProject!.name : 'not synced'}</div>
             <div>
                 <Button onClick={(e) => handleWatchCalendar()}>
                     Keep in sync
@@ -114,12 +106,16 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         </div>
     };
 
-    return <div onClick={() => setVisible(true)}>
+    return <Card
+        key={calendar.id}
+        onClick={(e) => handleOpen(e)}
+        className='card-style'
+        style={{backgroundColor: calendar.backgroundColor, color: calendar.foregroundColor}}>
         <span>{calendar.summary}</span>
         <Modal
             destroyOnClose
             centered
-            title={`Sync Calendar ${calendar.summary}`}
+            title={`Sync Calendar "${calendar.summary}"`}
             visible={visible}
             okText='Confirm'
             onCancel={(e) => handleCancel(e)}
@@ -137,12 +133,10 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
                 </Form.Item>
             </Form>
         </Modal>
-    </div>
+    </Card>
 };
 
 const mapStateToProps = (state: IState) => ({
-    ownedProjects: state.project.owned,
-    sharedProjects: state.project.shared,
     watchedProject: state.calendarSync.watchedProject,
     eventList: state.calendarSync.googleCalendarEventList
 });
