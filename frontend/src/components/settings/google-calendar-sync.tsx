@@ -63,7 +63,7 @@ const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
             </div>
             <div className='calendar-sync-div'>
                 {calendarList.map((calendar, index) => {
-                    return <CalendarListEntryModal calendar={calendar} projects={projects}/>
+                    return <CalendarListEntryModal key={index} calendar={calendar} projects={projects}/>
                 })}
             </div>
         </div>;

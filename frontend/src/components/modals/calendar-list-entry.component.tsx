@@ -15,6 +15,8 @@ import {
 } from "../../features/calendarSync/actions";
 
 import './modals.styles.less';
+import moment from "moment";
+import {dateFormat} from "../../features/myBuJo/constants";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -35,6 +37,8 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
     const [visible, setVisible] = useState(false);
     const history = useHistory();
     const [form] = Form.useForm();
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.stopPropagation();
@@ -61,39 +65,35 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
     const handlePullEvents = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.stopPropagation();
         form.validateFields().then(values => {
-            console.log(values.startEndDates);
-        });
+            console.log(values);
+        }).catch((info) => console.log(info));
     };
 
     const getProjectSelections = () => {
         if (projects && projects[0]) {
             return (
-                <Form form={form} labelAlign='left'>
-                    <Tooltip title='Choose BuJo' placement='topLeft'>
-                        <Form.Item name='project'>
-                            <Select
-                                placeholder='Choose BuJo'
-                                style={{width: '100%'}}
-                                defaultValue={projects[0].id}
-                            >
-                                {projects.map(project => {
-                                    return (
-                                        <Option value={project.id} key={project.id}>
-                                            <Tooltip title={project.owner} placement='right'>
+                <Tooltip title='Choose BuJo' placement='topLeft'>
+                    <Select
+                        placeholder='Choose BuJo'
+                        style={{width: '100%'}}
+                        defaultValue={projects[0].id}
+                    >
+                        {projects.map(project => {
+                            return (
+                                <Option value={project.id} key={project.id}>
+                                    <Tooltip title={project.owner} placement='right'>
                         <span>
                           <Avatar size='small' src={project.ownerAvatar}/>
                             &nbsp; {iconMapper[project.projectType]}
                             &nbsp; <strong>{project.name}</strong>
                             &nbsp; (Group <strong>{project.group.name}</strong>)
                         </span>
-                                            </Tooltip>
-                                        </Option>
-                                    );
-                                })}
-                            </Select>
-                        </Form.Item>
-                    </Tooltip>
-                </Form>
+                                    </Tooltip>
+                                </Option>
+                            );
+                        })}
+                    </Select>
+                </Tooltip>
             );
         }
 
@@ -131,10 +131,24 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
             onCancel={(e) => handleCancel(e)}
             footer={false}
         >
-            <Form form={form} labelAlign='left'>
+            <Form form={form}
+                  labelAlign='left'>
                 {projectKeepInSync()}
                 <Form.Item name='startEndDates'>
-                    <RangePicker/>
+                    <RangePicker
+                        ranges={{
+                            Today: [moment(), moment()],
+                            'This Week': [moment().startOf('week'), moment().endOf('week')],
+                            'This Month': [
+                                moment().startOf('month'),
+                                moment().endOf('month'),
+                            ],
+                        }}
+                        size="small"
+                        allowClear={true}
+                        format={dateFormat}
+                        placeholder={['Start Date', 'End Date']}
+                    />
                     <Button onClick={(e) => handlePullEvents(e)}>Pull</Button>
                 </Form.Item>
                 <Form.Item
