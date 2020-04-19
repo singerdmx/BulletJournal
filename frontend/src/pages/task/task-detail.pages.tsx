@@ -21,7 +21,6 @@ import DraggableLabelsList from '../../components/draggable-labels/draggable-lab
 import { Content } from '../../features/myBuJo/interface';
 // components
 import TaskContentList from '../../components/content/content-list.component';
-import { StringNullableChain } from 'lodash';
 
 export type TaskProps = {
   task: Task;

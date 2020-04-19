@@ -80,12 +80,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const currencyType = LocaleCurrency.getCurrency(currency);
   // hook history in router
   const history = useHistory();
-  // jump to label searching page by label click
-  const toLabelSearching = (label: Label) => {
-    console.log(label);
-    props.addSelectedLabel(label);
-    history.push('/labels/search');
-  };
+
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
     transactionId && props.getTransaction(parseInt(transactionId));

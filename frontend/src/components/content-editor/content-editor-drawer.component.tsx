@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import { Drawer, Button } from 'antd';
 import { deleteContent as deleteNoteContent } from '../../features/notes/actions';
@@ -14,7 +14,6 @@ import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
 import ContentEditor from './content-editor.component';
 import ContentReader from './content-reader.component';
-import { Task } from 'redux-saga';
 
 type ContentEditorDrawerProps = {
   editable?: boolean;
