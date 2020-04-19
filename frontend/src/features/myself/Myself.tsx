@@ -35,9 +35,6 @@ class Myself extends React.Component<MyselfProps & PathProps> {
   componentDidMount() {
     this.props.updateMyself();
     this.props.updateNotifications();
-    setInterval(()=>{
-      this.props.updateSystem()
-    }, 8000)
   }
 
   handleRefreshOnClick = () => {

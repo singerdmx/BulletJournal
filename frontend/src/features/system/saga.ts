@@ -1,5 +1,5 @@
 import {all, call, put, select, takeLatest} from 'redux-saga/effects';
-import {message, notification } from 'antd';
+import {message} from 'antd';
 import {actions as systemActions, GetPublicProjectItem, SystemApiErrorAction, UpdateSystem} from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {fetchSystemUpdates, getPublicProjectItem} from '../../apis/systemApis';
@@ -16,22 +16,10 @@ const removeTasksFromLocal = (tasks: Task[]) => {
     });
 }
 
-const fetchReminderFromLocal = ()=>{
-    const defaultReminders = [] as Task[];
-    const reminders = localStorage.getItem('reminders') || '';
-    if(!reminders){
-        localStorage.setItem('reminders', JSON.stringify(defaultReminders));
-        return defaultReminders;
-    }
-    return JSON.parse(reminders);
-  }
-
-const taskNameMapper = (item: any) => ({
-    name: item.name,
-})
-  
 const saveTasksIntoLocal = (tasks: Task[]) => {
-    localStorage.setItem('reminders', JSON.stringify(tasks));
+    tasks.forEach((task: Task)=>{
+        localStorage.setItem(task.name, `${new Date().valueOf()}`);
+    });
 }
 
 function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
@@ -43,13 +31,12 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         const state = yield select();
         const selectedProject = state.project.project;
         const remindingTasks = state.system.reminders;
-
         const data = yield call(fetchSystemUpdates, '',
-            selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined, remindingTasks.remindingTaskEtag);
+            selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined);
 
         const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag, remindingTaskEtag} = state.system;
         if (ownedProjectsEtag !== data.ownedProjectsEtag || sharedProjectsEtag !== data.sharedProjectsEtag) {
-            yield put(updateProjects()); 
+            yield put(updateProjects());
         }
 
         if (groupsEtag !== data.groupsEtag) {
@@ -62,25 +49,13 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
 
         let newCommingTasks = [] as Task[];
         let endTasks = [] as Task[];
-        const localReminders = fetchReminderFromLocal();
+
         if(remindingTaskEtag !== data.remindingTaskEtag){
-            newCommingTasks = data.reminders.map(taskNameMapper).filter((task: any)=>!localReminders.map(taskNameMapper).includes(task)).map((item: any)=>({
-                name: item.name,
-                time: new Date().valueOf()
-            }));
-            yield all(
-                [...newCommingTasks.map(item=>{
-                    const args = {
-                        message: item.name,
-                        description: 'task due time',
-                        duration: 100
-                    }
-                    return call(notification.open, args)
-                })]
-            )
-            saveTasksIntoLocal([...newCommingTasks, ...localReminders]);
+            newCommingTasks = data.reminders.filter((task: any)=>!remindingTasks.includes(task));
+            endTasks = remindingTasks.filter((task: any) => !data.reminders.includes(task));
         }
 
+        saveTasksIntoLocal(newCommingTasks);
         removeTasksFromLocal(endTasks);
 
         let tasksEtag = state.system.tasksEtag;
