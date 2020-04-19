@@ -40,7 +40,7 @@ let initialState = {
   timezone: '',
   before: 0,
   currency: '',
-  theme: 'PINK'
+  theme: 'LIGHT'
 };
 
 const slice = createSlice({

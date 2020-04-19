@@ -64,7 +64,7 @@ class Account extends React.Component<AccountProps> {
     window.less.modifyVars(vars).then(() => {
       console.log('Theme updated successfully');
     });
-  }
+  };
 
   render() {
     return (

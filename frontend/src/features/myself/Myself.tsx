@@ -1,18 +1,18 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { SyncOutlined } from '@ant-design/icons';
-import { Avatar, Popover, Tooltip } from 'antd';
-import { withRouter, RouteComponentProps } from 'react-router';
+import {connect} from 'react-redux';
+import {SyncOutlined} from '@ant-design/icons';
+import {Avatar, Popover, Tooltip} from 'antd';
+import {RouteComponentProps, withRouter} from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
-import { IState } from '../../store/index';
+import {IState} from '../../store/index';
 import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
-import { Project, ProjectsWithOwner } from '../project/interface';
-import { updateMyself, updateExpandedMyself } from './actions';
-import { updateGroups, groupUpdate } from '../group/actions';
-import { updateNotifications } from '../notification/actions';
-import { updateSystem } from '../system/actions';
+import {Project, ProjectsWithOwner} from '../project/interface';
+import {updateExpandedMyself, updateMyself} from './actions';
+import {groupUpdate, updateGroups} from '../group/actions';
+import {updateNotifications} from '../notification/actions';
+import {updateSystem} from '../system/actions';
 
 import './myself.styles.less';
 
@@ -32,18 +32,19 @@ type MyselfProps = {
 type PathProps = RouteComponentProps;
 
 class Myself extends React.Component<MyselfProps & PathProps> {
-  interval:any = 0
+  interval:any = 0;
+
   componentDidMount() {
     this.props.updateMyself();
     // TODO: remove updateNotifications
     this.props.updateNotifications();
-    this.interval =  setInterval(()=>{
-      this.props.updateSystem()
-    }, 8000)
+    this.interval = setInterval(() => {
+      this.props.updateSystem();
+    }, 8000);
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval)
+    clearInterval(this.interval);
   }
 
   handleRefreshOnClick = () => {
