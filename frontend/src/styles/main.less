@@ -1,0 +1,144 @@
+@import '~antd/dist/antd.less';
+
+@primary-color: #1890ff;
+@link-color: darken(@primary-color, 15%);
+
+.App {
+  height: 100vh;
+}
+
+.layout {
+  min-height: 100vh;
+}
+
+/* ----------------------Header ---------------------- */
+.header {
+  background: @primary-color;
+
+  padding: 0 15px 0 30px;
+  height: 50px;
+  line-height: 50px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+
+/* ----------------------search bar---------------------- */
+.search-box {
+  width: 100%;
+
+  input {
+    border-radius: 0 !important;
+  }
+}
+
+//used for extend search bar when focused
+.search-box {
+  .ant-input-affix-wrapper-focused {
+    width: 90% !important;
+  }
+
+  //search bar default width
+  .ant-input-search {
+    width: 30%;
+  }
+}
+
+.search-box .ant-input {
+  background: white;
+  border-radius: 15px;
+}
+
+.search-box .ant-input:hover {
+  outline: none;
+}
+
+.search-box .ant-input:focus {
+  outline-color: @primary-color;
+  background: white;
+}
+
+.header-icon {
+  width: 200px;
+}
+/* ----------------------Body---------------------- */
+.content {
+  height: 95%;
+}
+
+.ant-popover-message {
+  max-width: 180px;
+}
+
+.draggable-projects {
+  padding-left: 48px;
+}
+
+.popover-control-item {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row-item-has-space {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.sub-tag-list {
+  display: flex;
+  align-items: center;
+}
+
+/* ----------------------Sider---------------------- */
+
+.sider {
+  height: 100vh;
+  overflow-y: auto;
+  background: #fff !important;
+  position: fixed !important;
+  box-shadow: 5px 0px 6px -6px rgb(104, 103, 103);
+
+  .sider-header {
+    height: 50px;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .title {
+      height: 100%;
+      line-height: 55px;
+      margin-left: 1rem;
+
+      h2 {
+        color: @primary-color;
+      }
+    }
+
+    .icon-img {
+      height: 40px;
+    }
+  }
+
+  &::-webkit-scrollbar {
+    width: 0.2em;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: @primary-color;
+  }
+}
+
+.group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  & .group-name {
+    margin-left: 5px;
+  }
+}

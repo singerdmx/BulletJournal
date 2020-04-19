@@ -10,6 +10,7 @@
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^7.2.1",
     "antd": "^4.0.4",
+    "antd-theme-generator": "^1.1.9",
     "axios": "^0.19.2",
     "braft-editor": "^2.3.9",
     "country-code": "0.0.3",
@@ -42,6 +43,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
+    "color": "node color.js",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\""
