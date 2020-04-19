@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,10 +44,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -75,6 +73,9 @@ public class GoogleCalendarController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private Environment env;
+
     @PostMapping(value = "/api/calendar/google/login")
     public ResponseEntity<?> loginGoogleCalendar() {
         LOGGER.info("Logging in for Google Calendar");
@@ -92,6 +93,10 @@ public class GoogleCalendarController {
             this.googleCalClient.getFlow().createAndStoreCredential(response, username);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
+        }
+
+        if (Arrays.asList(this.env.getActiveProfiles()).contains("prod")) {
+            return new RedirectView("https://bulletjournal.us/settings#google");
         }
 
         return new RedirectView(GOOGLE_CALENDAR_PAGE_PATH);
