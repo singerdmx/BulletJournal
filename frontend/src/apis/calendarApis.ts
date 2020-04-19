@@ -26,7 +26,7 @@ export const getGoogleCalendarList = () => {
 };
 
 export const getGoogleCalendarEventList = (calendarId: string, timezone: string, startDate?: string, endDate?: string) => {
-    let endpoint = `/api/calendar/google/calendars/${calendarId}/eventList?timezone=${timezone}`;
+    let endpoint = `/api/calendar/google/calendars/${encodeURIComponent(calendarId)}/eventList?timezone=${timezone}`;
     if (startDate) {
         endpoint += `&startDate=${startDate}`;
     }
@@ -53,7 +53,7 @@ export const createGoogleCalendarEvents = (projectId: number, events: GoogleCale
 };
 
 export const getWatchedProject = (calendarId: string) => {
-    return doFetch(`/api/calendar/google/calendars/${calendarId}/watchedProject`)
+    return doFetch(`/api/calendar/google/calendars/${encodeURIComponent(calendarId)}/watchedProject`)
         .then(res => res.json())
         .catch(err => {
             throw Error(err.message);
@@ -64,7 +64,7 @@ export const watchCalendar = (calendarId: string, projectId: number) => {
     const postBody = JSON.stringify({
         projectId: projectId,
     });
-    return doPost(`/api/calendar/google/calendars/{calendarId}/watch`, postBody)
+    return doPost(`/api/calendar/google/calendars/${encodeURIComponent(calendarId)}/watch`, postBody)
         .then(res => res.json())
         .catch(err => {
             throw Error(err.message);
@@ -72,7 +72,7 @@ export const watchCalendar = (calendarId: string, projectId: number) => {
 };
 
 export const unwatchCalendar = (calendarId: string) => {
-    return doPost(`/api/calendar/google/calendars/{calendarId}/unwatch`)
+    return doPost(`/api/calendar/google/calendars/${encodeURIComponent(calendarId)}/unwatch`)
         .then(res => res)
         .catch(err => {
             throw Error(err.message);
