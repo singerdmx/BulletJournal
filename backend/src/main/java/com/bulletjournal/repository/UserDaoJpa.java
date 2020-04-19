@@ -41,7 +41,7 @@ public class UserDaoJpa {
         user.setDateFormat(0);
         user.setTimeFormat(0);
         user.setCurrency("US");
-        user.setTheme(Theme.LIGHT.name());
+        user.setTheme(Theme.PINK.name());
         user = this.userRepository.save(user);
 
         Group group = new Group();
