@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class SearchService {
@@ -38,22 +39,27 @@ public class SearchService {
     @Autowired
     private GroupDaoJpa groupDaoJpa;
 
-    // TODO user -> project id -> group -> all users
-    public void saveToES(ProjectItem projectItem, String username) {
+    public void saveToES(ProjectItem projectItem) {
         if (highLevelClient == null) {
             return;
         }
 
-        Map<String, Object> json = new HashMap<>();
-        json.put("name", projectItem.getName());
-        json.put("user", username);
-
-        String index = projectItem.getClass().getSimpleName() + "@" + projectItem.getId();
-        IndexRequest request = new IndexRequest(PROJECT_ITEM, "default", index)
-                .source(json)
-                .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+        List<Long> relatedGroupIds = groupDaoJpa.getProjectItemGroups(projectItem.getOwner()).stream()
+                .map(Group::getId)
+                .collect(Collectors.toList());
+        BulkRequest bulkRequest = new BulkRequest(PROJECT_ITEM, "default");
+        for (Long groupId : relatedGroupIds) {
+            Map<String, Object> json = new HashMap<>();
+            json.put("project_item_name", projectItem.getName());
+            json.put("group_id", groupId);
+            String index = projectItem.getClass().getSimpleName() + "@" + projectItem.getId();
+            IndexRequest request = new IndexRequest(PROJECT_ITEM, "default", index)
+                    .source(json)
+                    .setRefreshPolicy(WriteRequest.RefreshPolicy.NONE);
+            bulkRequest.add(request);
+        }
         try {
-            highLevelClient.index(request, RequestOptions.DEFAULT);
+            highLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             LOGGER.error("SaveToES fail", e);
         }
