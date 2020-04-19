@@ -25,10 +25,13 @@ import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -653,9 +656,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal List<Completed> - a list of completed tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<CompletedTask> getCompletedTasks(Long projectId, String requester) {
+    public List<CompletedTask> getCompletedTasks(Long projectId, String requester, Integer pageNo, Integer pageSize) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-        List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project);
+
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+
+        List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project, paging);
+
         return completedTasks
                 .stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
                 .collect(Collectors.toList());

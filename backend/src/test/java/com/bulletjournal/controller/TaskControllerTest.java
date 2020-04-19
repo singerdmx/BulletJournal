@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -70,8 +71,8 @@ public class TaskControllerTest {
         Group group = createGroup();
         Project p1 = createProject("task_project_1", group, ProjectType.TODO);
         Task task1 = createTask(
-            p1,
-            new CreateTaskParams("task_1", USER, "2021-01-01", "01:01", 3, new ReminderSetting(), TIMEZONE, RECURRENCERULE));
+                p1,
+                new CreateTaskParams("task_1", USER, "2021-01-01", "01:01", 3, new ReminderSetting(), TIMEZONE, RECURRENCERULE));
         Content content1 = addContent(task1, testContent1);
         List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testContent2);
         List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testContent3);
@@ -87,17 +88,101 @@ public class TaskControllerTest {
         }
         assertEquals(1, contents1.size());
         assertEquals(maxRevisionNumber, contents1.get(0).getRevisions().length);
+
+
+        // borrowing test for testing task pagination
+        Task task2 = createTask(p1, new CreateTaskParams("task2", USER, "2020-02-27",
+                null, null, new ReminderSetting(), TIMEZONE, null));
+        Task task3 = createTask(p1, new CreateTaskParams("task3", USER, "2020-02-27",
+                null, null, new ReminderSetting(), TIMEZONE, null));
+        Task task4 = createTask(p1, new CreateTaskParams("task4", USER, "2020-02-27",
+                null, null, new ReminderSetting(), TIMEZONE, null));
+        Task task5 = createTask(p1, new CreateTaskParams("task5", USER, "2020-02-27",
+                null, null, new ReminderSetting(), TIMEZONE, null));
+
+
+        task2 = completeTask(task2.getId());
+        task3 = completeTask(task3.getId());
+        task4 = completeTask(task4.getId());
+        task5 = completeTask(task5.getId());
+
+        // get completed task, first page, 2 items
+        String url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TaskController.COMPLETED_TASKS_ROUTE)
+                .queryParam("pageNo", 0)
+                .queryParam("pageSize", 2)
+                .buildAndExpand(p1.getId()).toUriString();
+        ResponseEntity<Task[]> completedTasksResponse = this.restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                Task[].class,
+                p1.getId());
+
+        assertEquals(HttpStatus.OK, completedTasksResponse.getStatusCode());
+        assertNotNull(completedTasksResponse.getBody());
+        List<Task> completedTasks = Arrays.asList(completedTasksResponse.getBody());
+        assertEquals(2, completedTasks.size());
+        assertEquals("task5", completedTasks.get(0).getName());
+        assertEquals("task4", completedTasks.get(1).getName());
+
+        // second page
+        url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TaskController.COMPLETED_TASKS_ROUTE)
+                .queryParam("pageNo", 1)
+                .queryParam("pageSize", 2)
+                .buildAndExpand(p1.getId()).toUriString();
+        completedTasksResponse = this.restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                Task[].class,
+                p1.getId());
+
+        assertEquals(HttpStatus.OK, completedTasksResponse.getStatusCode());
+        assertNotNull(completedTasksResponse.getBody());
+        completedTasks = Arrays.asList(completedTasksResponse.getBody());
+        assertEquals(2, completedTasks.size());
+        assertEquals("task3", completedTasks.get(0).getName());
+        assertEquals("task2", completedTasks.get(1).getName());
+
+        // default
+        completedTasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.COMPLETED_TASKS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                Task[].class,
+                p1.getId());
+
+        assertEquals(HttpStatus.OK, completedTasksResponse.getStatusCode());
+        assertNotNull(completedTasksResponse.getBody());
+        completedTasks = Arrays.asList(completedTasksResponse.getBody());
+        assertEquals(4, completedTasks.size());
+
+    }
+
+    private Task completeTask(long taskId) {
+        ResponseEntity<Task> completeTaskResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.COMPLETE_TASK_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(null, USER),
+                Task.class,
+                taskId);
+
+        assertEquals(HttpStatus.OK, completeTaskResponse.getStatusCode());
+        assertNotNull(completeTaskResponse.getBody());
+        return completeTaskResponse.getBody();
     }
 
     private String getContentRevision(Long taskId, Long contentId, Long revisionId) {
         ResponseEntity<String> response = this.restTemplate.exchange(
-            ROOT_URL + randomServerPort + TaskController.CONTENT_REVISIONS_ROUTE,
-            HttpMethod.GET,
-            TestHelpers.actAsOtherUser(null, USER),
-            String.class,
-            taskId,
-            contentId,
-            revisionId
+                ROOT_URL + randomServerPort + TaskController.CONTENT_REVISIONS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                String.class,
+                taskId,
+                contentId,
+                revisionId
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
         String text = response.getBody();
@@ -107,12 +192,12 @@ public class TaskControllerTest {
     private List<Content> updateContent(Long taskId, Long contentId, String text) {
         UpdateContentParams params = new UpdateContentParams(text);
         ResponseEntity<Content[]> response = this.restTemplate.exchange(
-            ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
-            HttpMethod.PATCH,
-            TestHelpers.actAsOtherUser(params, USER),
-            Content[].class,
-            taskId,
-            contentId
+                ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
+                HttpMethod.PATCH,
+                TestHelpers.actAsOtherUser(params, USER),
+                Content[].class,
+                taskId,
+                contentId
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
         List<Content> contents = Arrays.asList(response.getBody());
@@ -122,11 +207,11 @@ public class TaskControllerTest {
     private Content addContent(Task task, String text) {
         CreateContentParams params = new CreateContentParams(text);
         ResponseEntity<Content> response = this.restTemplate.exchange(
-            ROOT_URL + randomServerPort + TaskController.ADD_CONTENT_ROUTE,
-            HttpMethod.POST,
-            TestHelpers.actAsOtherUser(params, USER),
-            Content.class,
-            task.getId()
+                ROOT_URL + randomServerPort + TaskController.ADD_CONTENT_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(params, USER),
+                Content.class,
+                task.getId()
         );
 
         Content content = response.getBody();
@@ -135,14 +220,14 @@ public class TaskControllerTest {
     }
 
     private Task createTask(
-        Project project, CreateTaskParams params
+            Project project, CreateTaskParams params
     ) {
         ResponseEntity<Task> response = this.restTemplate.exchange(
-            ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
-            HttpMethod.POST,
-            TestHelpers.actAsOtherUser(params, USER),
-            Task.class,
-            project.getId());
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(params, USER),
+                Task.class,
+                project.getId());
         Task created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
@@ -155,10 +240,10 @@ public class TaskControllerTest {
         CreateGroupParams group = new CreateGroupParams("Group_ProjectItem");
 
         ResponseEntity<Group> response = this.restTemplate.exchange(
-            ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-            HttpMethod.POST,
-            TestHelpers.actAsOtherUser(group, USER),
-            Group.class);
+                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(group, USER),
+                Group.class);
         Group created = response.getBody();
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -171,13 +256,13 @@ public class TaskControllerTest {
 
     private Project createProject(String projectName, Group g, ProjectType type) {
         CreateProjectParams project = new CreateProjectParams(
-            projectName, type, "d14", g.getId());
+                projectName, type, "d14", g.getId());
 
         ResponseEntity<Project> response = this.restTemplate.exchange(
-            ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-            HttpMethod.POST,
-            TestHelpers.actAsOtherUser(project, USER),
-            Project.class);
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(project, USER),
+                Project.class);
         Project created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);

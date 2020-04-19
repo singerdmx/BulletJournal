@@ -83,6 +83,7 @@ public class TaskController {
 
     @GetMapping(COMPLETED_TASK_ROUTE)
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username).toPresentationModel());
     }
@@ -130,9 +131,12 @@ public class TaskController {
     }
 
     @GetMapping(COMPLETED_TASKS_ROUTE)
-    public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId) {
+    public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId,
+                                        @RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                                        @RequestParam(required = false, defaultValue = "50") Integer pageSize) {
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.getCompletedTasks(projectId, username)
+        return this.taskDaoJpa.getCompletedTasks(projectId, username, pageNo, pageSize)
                 .stream().map(t -> addAvatar(t.toPresentationModel()))
                 .collect(Collectors.toList());
     }
@@ -156,7 +160,7 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
-        return getCompletedTasks(task.getProjectId());
+        return getCompletedTasks(task.getProjectId(), 0, 50);
     }
 
     @PutMapping(TASK_SET_LABELS_ROUTE)
@@ -241,7 +245,7 @@ public class TaskController {
 
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long taskId,
-                              @NotNull @PathVariable Long contentId) {
+                                       @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.taskDaoJpa.deleteContent(contentId, taskId, username);
         return getContents(taskId);
@@ -249,8 +253,8 @@ public class TaskController {
 
     @PatchMapping(CONTENT_ROUTE)
     public List<Content> updateContent(@NotNull @PathVariable Long taskId,
-                                 @NotNull @PathVariable Long contentId,
-                                 @NotNull @RequestBody UpdateContentParams updateContentParams) {
+                                       @NotNull @PathVariable Long contentId,
+                                       @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams);
         return getContents(taskId);
