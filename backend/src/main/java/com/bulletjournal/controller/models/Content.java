@@ -44,6 +44,9 @@ public class Content {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.revisions = GSON.fromJson(revisions, Revision[].class);
+        if (this.revisions == null) {
+            this.revisions = new Revision[0];
+        }
         deleteRevisionDiff();
     }
 

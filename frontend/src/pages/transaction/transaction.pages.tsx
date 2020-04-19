@@ -3,13 +3,16 @@ import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
-import { getTransaction } from '../../features/transactions/actions';
 import { Transaction } from '../../features/transactions/interface';
 import { Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 import { ProjectType } from '../../features/project/constants';
-import { deleteTransaction } from '../../features/transactions/actions';
+import {
+  getTransaction,
+  deleteTransaction,
+  updateTransactionContents,
+} from '../../features/transactions/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
 import EditTransaction from '../../components/modals/edit-transaction.component';
@@ -37,17 +40,20 @@ import {
 } from '@ant-design/icons';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
-
-import { icons } from '../../assets/icons/index';
+import TransactionContentList from '../../components/content/content-list.component';
+import { Content } from '../../features/myBuJo/interface';
 import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
+import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 
 const LocaleCurrency = require('locale-currency');
 
 type TransactionProps = {
   currency: string;
   transaction: Transaction;
+  contents: Content[];
   deleteTransaction: (transactionId: number) => void;
+  updateTransactionContents: (transactionId: number) => void;
 };
 
 interface TransactionPageHandler {
@@ -58,7 +64,13 @@ interface TransactionPageHandler {
 const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props
 ) => {
-  const { transaction, deleteTransaction, currency } = props;
+  const {
+    transaction,
+    deleteTransaction,
+    currency,
+    contents,
+    updateTransactionContents,
+  } = props;
 
   // get id of Transaction from oruter
   const { transactionId } = useParams();
@@ -78,9 +90,17 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   React.useEffect(() => {
     transactionId && props.getTransaction(parseInt(transactionId));
   }, [transactionId]);
+
+  React.useEffect(() => {
+    transaction && transaction.id && updateTransactionContents(transaction.id);
+  }, [transaction]);
   // show drawer
   const createHandler = () => {
     setEditorShow(true);
+  };
+
+  const handleClose = () => {
+    setEditorShow(false);
   };
 
   const getPaymentDateTime = (transaction: Transaction) => {
@@ -191,16 +211,26 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           </Col>
         </Row>
       </div>
-
       <Divider />
       <div className='content'>
-        <div className='content-list'></div>
+        <div className='content-list'>
+          <TransactionContentList
+            projectItem={transaction}
+            contents={contents}
+          />
+        </div>
         <Button onClick={createHandler}>
           <PlusCircleTwoTone />
           New
         </Button>
       </div>
-      <div className='transaction-drawer'></div>
+      <div className='transaction-drawer'>
+        <ContentEditorDrawer
+          projectItem={transaction}
+          visible={showEditor}
+          onClose={handleClose}
+        />
+      </div>
     </div>
   );
 };
@@ -208,10 +238,12 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 const mapStateToProps = (state: IState) => ({
   transaction: state.transaction.transaction,
   currency: state.myself.currency,
+  contents: state.transaction.contents,
 });
 
 export default connect(mapStateToProps, {
   getTransaction,
   deleteTransaction,
   addSelectedLabel,
+  updateTransactionContents,
 })(TransactionPage);

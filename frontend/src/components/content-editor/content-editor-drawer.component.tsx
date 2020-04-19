@@ -14,8 +14,10 @@ import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
 import ContentEditor from './content-editor.component';
 import ContentReader from './content-reader.component';
+import { Task } from 'redux-saga';
 
 type ContentEditorDrawerProps = {
+  editable?: boolean;
   content?: Content;
   projectItem: ProjectItem;
   visible: boolean;
@@ -34,6 +36,7 @@ interface ContentEditorDrawerHandler {
 const ContentEditorDrawer: React.FC<
   ContentEditorDrawerProps & ContentEditorDrawerHandler
 > = ({
+  editable,
   content,
   projectItem,
   visible,
@@ -74,6 +77,8 @@ const ContentEditorDrawer: React.FC<
   );
 
   const getFooterControl = () => {
+    if (editable === false) return null;
+
     if (
       project.owner === myself ||
       projectItem.owner === myself ||

@@ -208,6 +208,10 @@ const slice = createSlice({
     },
     TaskContentsUpdate: (state, action: PayloadAction<UpdateTaskContents>) =>
       state,
+    CompleteTaskContentsUpdate: (
+      state,
+      action: PayloadAction<UpdateTaskContents>
+    ) => state,
     TaskContentRevisionUpdate: (
       state,
       action: PayloadAction<UpdateTaskContentRevision>

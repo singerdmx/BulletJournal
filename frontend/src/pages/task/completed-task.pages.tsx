@@ -1,11 +1,16 @@
 // page display contents of tasks
 // react imports
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 //actions
-import { getCompletedTask } from '../../features/tasks/actions';
+import {
+  getCompletedTask,
+  updateCompleteTaskContents,
+} from '../../features/tasks/actions';
+import { Avatar, Tooltip } from 'antd';
+import { UpSquareOutlined } from '@ant-design/icons';
 import { IState } from '../../store';
 // antd imports
 import './task-page.styles.less';
@@ -17,25 +22,52 @@ import TaskDetailPage, { TaskProps } from './task-detail.pages';
 
 interface TaskPageHandler {
   getCompletedTask: (taskId: number) => void;
+  updateCompleteTaskContents: (taskId: number) => void;
 }
 
 const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const { task, contents } = props;
   // get id of task from router
   const { taskId } = useParams();
+  // hook history in router
+  const history = useHistory();
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
     taskId && props.getCompletedTask(parseInt(taskId));
   }, [taskId]);
 
+  React.useEffect(() => {
+    taskId && props.updateCompleteTaskContents(parseInt(taskId));
+  }, [taskId]);
+
+  const taskOperation = () => {
+    return (
+      <div className='task-operation'>
+        <Tooltip title={`Created by ${task.owner}`}>
+          <div className='task-owner'>
+            <Avatar src={task.ownerAvatar} />
+          </div>
+        </Tooltip>
+        <Tooltip title='Go to Parent BuJo'>
+          <div>
+            <UpSquareOutlined
+              onClick={(e) => history.push(`/projects/${task.projectId}`)}
+            />
+          </div>
+        </Tooltip>
+      </div>
+    );
+  };
+
   return (
     <TaskDetailPage
       task={task}
       labelEditable={false}
-      taskOperation={() => null}
+      taskOperation={taskOperation}
       contents={contents}
       createContentElem={null}
       taskEditorElem={null}
+      contentEditable={false}
     />
   );
 };
@@ -47,4 +79,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   getCompletedTask,
+  updateCompleteTaskContents,
 })(CompletedTaskPage);
