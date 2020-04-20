@@ -23,9 +23,9 @@ const App: React.FC<RootProps> = (props) => {
 
   useEffect(() => {
     let themeColor = '';
+    console.log(props.theme);
     switch (props.theme) {
       case 'LIGHT': {
-        themeColor = '#428bca';
         break;
       }
       case 'PINK': {
@@ -37,7 +37,7 @@ const App: React.FC<RootProps> = (props) => {
       }
     }
     window.less.modifyVars({ '@primary-color': themeColor }).then(() => {
-      console.log('Theme updated successfully', themeColor);
+      console.log('Theme updated at first successfully', themeColor);
     });
   }, [props.theme]);
 
