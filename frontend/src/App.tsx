@@ -6,7 +6,7 @@ import HeaderLayout from './layouts/header/header.layout';
 import ContentLayout from './layouts/content/content.layout';
 import FooterLayout from './layouts/footer/footer.layout';
 
-import './App.less';
+import './styles/main.less';
 
 class App extends React.Component {
   render() {

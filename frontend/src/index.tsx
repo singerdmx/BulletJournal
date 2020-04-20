@@ -4,8 +4,6 @@ import App from './App';
 import createStore from './store';
 import { Provider } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-
-import './index.less';
 import PublicPage from './Public';
 
 const store = createStore();

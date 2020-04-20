@@ -1,5 +1,11 @@
 const path = require('path');
-const { updateConfig } = require('react-app-rewire-antd-theme');
+const {
+  override,
+  fixBabelImports,
+  addWebpackPlugin,
+  addLessLoader
+} = require('customize-cra'); 
+const AntDesignThemePlugin = require('antd-theme-webpack-plugin')
 
 const options = {
   stylesDir: path.join(__dirname, './src/styles'),
@@ -7,12 +13,20 @@ const options = {
   varFile: path.join(__dirname, './src/styles/vars.less'),
   mainLessFile: path.join(__dirname, './src/styles/main.less'),
   themeVariables: ['@primary-color'],
-  indexFileName: 'index.html',
+  indexFileName: false,
   outputFilePath: path.join(__dirname, './public/color.less'),
+  lessUrl: "https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js",
   customColorRegexArray: [/^darken\(.*\)$/],
 };
 
-module.exports = function override(config, env) {
-  config = updateConfig(config, env, options);
-  return config;
-};
+module.exports = override(
+  fixBabelImports('import', {
+    libraryName: 'antd',
+    libraryDirectory: 'es',
+    style: true,
+  }),
+  addWebpackPlugin(new AntDesignThemePlugin(options)),
+  addLessLoader({
+    javascriptEnabled : true,
+  })
+)
