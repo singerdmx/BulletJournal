@@ -16,7 +16,6 @@ import { Notification } from './interface';
 import { IState } from '../../store';
 import { EventType } from './constants';
 import { fetchSystemUpdates } from '../../apis/systemApis';
-import { displayNotification } from '../../serviceWorker';
 import { actions as SystemActions } from '../system/reducer';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
