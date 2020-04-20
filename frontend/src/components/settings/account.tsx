@@ -39,6 +39,13 @@ class Account extends React.Component<AccountProps> {
     this.props.updateExpandedMyself(true);
   }
 
+  componentDidUpdate(prevProps: AccountProps): void {
+    const currentTheme = this.props.currentTheme;
+    if (currentTheme !== prevProps.currentTheme) {
+      this.loadUpdatedTheme(currentTheme);
+    }
+  }
+
   handleOnThemeChange = (value: string) => {
     this.props.updateTheme(value);
   };
@@ -51,7 +58,6 @@ class Account extends React.Component<AccountProps> {
         undefined,
         this.props.currentTheme
       );
-      this.loadUpdatedTheme(this.props.currentTheme);
     } else {
       this.props.updateTheme(this.props.originalTheme);
     }
@@ -61,7 +67,7 @@ class Account extends React.Component<AccountProps> {
     let color = '';
     switch (theme) {
       case 'LIGHT': {
-        color = '#428bca';
+        color = '#1890ff'
         break;
       }
       case 'PINK': {
