@@ -18,6 +18,7 @@ import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself } from '../../apis/myselfApis';
 import moment from 'moment';
 import { dateFormat } from '../myBuJo/constants';
+import { expandedMyselfLoading } from './actions';
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -25,6 +26,7 @@ function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
 
 function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
   try {
+    yield put(expandedMyselfLoading(true));
     const { updateSettings } = action.payload;
 
     const data = yield call(fetchMyself, true);
@@ -66,7 +68,9 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
       yield put(settingsActions.updateCurrency({ currency: data.currency }));
       yield put(settingsActions.updateTheme({ theme: data.theme }));
     }
+    yield put(expandedMyselfLoading(false));
   } catch (error) {
+    yield put(expandedMyselfLoading(false));
     yield call(message.error, `Myself (Expand) Error Received: ${error}`);
   }
 }

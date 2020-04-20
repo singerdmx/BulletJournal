@@ -1,6 +1,8 @@
 import { actions } from './reducer';
 
 export const updateMyself = () => actions.myselfUpdate({});
+export const expandedMyselfLoading = (loading: boolean) =>
+  actions.expandedMyselfLoading({loading: loading});
 export const updateExpandedMyself = (updateSettings: boolean) =>
   actions.expandedMyselfUpdate({ updateSettings: updateSettings });
 export const updateTimezone = (timezone: string) =>
