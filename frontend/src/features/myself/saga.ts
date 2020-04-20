@@ -5,6 +5,7 @@ import {
   MyselfApiErrorAction,
   UpdateMyself,
   PatchMyself,
+  ThemeUpdate,
   UpdateExpandedMyself,
 } from './reducer';
 import { IState } from '../../store';
@@ -26,7 +27,6 @@ function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
 
 function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
   try {
-    yield put(expandedMyselfLoading(true));
     const { updateSettings } = action.payload;
 
     const data = yield call(fetchMyself, true);
@@ -68,11 +68,25 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
       yield put(settingsActions.updateCurrency({ currency: data.currency }));
       yield put(settingsActions.updateTheme({ theme: data.theme }));
     }
-    yield put(expandedMyselfLoading(false));
   } catch (error) {
-    yield put(expandedMyselfLoading(false));
     yield call(message.error, `Myself (Expand) Error Received: ${error}`);
   }
+}
+
+function* updateTheme(action: PayloadAction<ThemeUpdate>){
+   try {
+    yield put(expandedMyselfLoading(true));
+    const data = yield call(fetchMyself, true);
+    yield put(
+      myselfActions.themeUpdated({
+        theme: data.theme
+      })
+    );
+    yield put(expandedMyselfLoading(false));
+   } catch (error) {
+    yield put(expandedMyselfLoading(false));
+    yield call(message.error, `Update Theme  Error Received: ${error}`);
+   }
 }
 
 function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
@@ -125,5 +139,6 @@ export default function* myselfSagas() {
       myselfActions.expandedMyselfUpdate.type,
       getExpandedMyself
     ),
+    yield takeLatest(myselfActions.themeUpdate.type, updateTheme)
   ]);
 }

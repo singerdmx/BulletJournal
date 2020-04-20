@@ -15,6 +15,12 @@ export type MyselfApiErrorAction = {
 
 export type UpdateMyself = {};
 
+export type ThemeUpdate = {};
+
+export type ThemeUpdated = {
+   theme: string; 
+};
+
 export type UpdateExpandedMyself = {
   updateSettings: boolean;
 };
@@ -57,6 +63,11 @@ const slice = createSlice({
       state,
       action: PayloadAction<MyselfApiErrorAction>
     ) => state,
+    themeUpdate: (state, action: PayloadAction<ThemeUpdate>) => state,
+    themeUpdated: (state, action: PayloadAction<ThemeUpdated>) => {
+      const { theme } = action.payload;
+      state.theme = theme;
+    },
     myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state,
     patchMyself: (state, action: PayloadAction<PatchMyself>) => state,
     expandedMyselfLoading: (state, action: PayloadAction<ExpandedMyselfLoading>) => {
