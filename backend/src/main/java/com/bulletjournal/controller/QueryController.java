@@ -1,9 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.es.SearchService;
-import com.bulletjournal.es.repository.ProjectItemEsDaoJpa;
 import com.bulletjournal.repository.UserGroupRepository;
 import com.bulletjournal.repository.UserRepository;
 import com.bulletjournal.repository.models.Group;
@@ -39,8 +37,8 @@ public class QueryController {
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
     @Autowired
     UserGroupRepository userGroupRepository;
-    @Autowired
-    ProjectItemEsDaoJpa projectItemESDaoJpa;
+    //    @Autowired
+//    ProjectItemEsDaoJpa projectItemESDaoJpa;
     @Autowired
     private UserRepository userRepository;
     @Qualifier("client")
@@ -80,10 +78,10 @@ public class QueryController {
         return response;
     }
 
-    @GetMapping(SEARCH_ROUTE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<ProjectItem> search(@Valid @RequestParam @NotBlank String term) throws IOException {
-        return projectItemESDaoJpa.search(term);
-    }
+//    @GetMapping(SEARCH_ROUTE)
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<ProjectItem> search(@Valid @RequestParam @NotBlank String term) throws IOException {
+//        return projectItemESDaoJpa.search(term);
+//    }
 
 }

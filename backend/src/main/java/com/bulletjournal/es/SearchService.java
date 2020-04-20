@@ -2,7 +2,6 @@ package com.bulletjournal.es;
 
 import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.controller.models.ProjectItem;
-import com.bulletjournal.es.repository.ProjectItemEsDaoJpa;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.repository.models.Group;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -39,8 +38,8 @@ public class SearchService {
     @Autowired
     private GroupDaoJpa groupDaoJpa;
 
-    @Autowired
-    private ProjectItemEsDaoJpa projectItemEsDaoJpa;
+//    @Autowired
+//    private ProjectItemEsDaoJpa projectItemEsDaoJpa;
 
     public void saveToES(ProjectItem projectItem) {
         if (highLevelClient == null) {
@@ -69,17 +68,17 @@ public class SearchService {
         }
     }
 
-    public Long save(ProjectItem projectItem) {
-        if (highLevelClient == null) {
-            LOGGER.error("Missing HighLevelClient");
-            throw new IllegalStateException("Missing Elastic Search HigH Level Client");
-        }
-
-        List<Long> relatedGroupIds = groupDaoJpa.getProjectItemGroups(projectItem.getOwner())
-                .stream()
-                .map(Group::getId)
-                .collect(Collectors.toList());
-
-        return projectItemEsDaoJpa.create(projectItem);
-    }
+//    public Long save(ProjectItem projectItem) {
+//        if (highLevelClient == null) {
+//            LOGGER.error("Missing HighLevelClient");
+//            throw new IllegalStateException("Missing Elastic Search HigH Level Client");
+//        }
+//
+//        List<Long> relatedGroupIds = groupDaoJpa.getProjectItemGroups(projectItem.getOwner())
+//                .stream()
+//                .map(Group::getId)
+//                .collect(Collectors.toList());
+//
+//        return projectItemEsDaoJpa.create(projectItem);
+//    }
 }

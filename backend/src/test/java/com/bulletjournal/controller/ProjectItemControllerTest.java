@@ -22,8 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Tests {@link ProjectController}
@@ -144,8 +143,24 @@ public class ProjectItemControllerTest {
                 types);
         assertNotNull(projectItemsRecurring);
         assertEquals(2, projectItemsRecurring.size());
-        assertEquals("rt1", projectItemsRecurring.get(0).getTasks().get(0).getName());
-        assertEquals("rt1", projectItemsRecurring.get(1).getTasks().get(0).getName());
+        boolean contains = false;
+        for (Task rct : projectItemsRecurring.get(0).getTasks()) {
+            if (rct.getName().equals("rt1")) {
+                contains = true;
+                break;
+            }
+        }
+        assertTrue(contains);
+        //assertEquals("rt1", projectItemsRecurring.get(0).getTasks().get(0).getName());
+        contains = false;
+        for (Task rct : projectItemsRecurring.get(1).getTasks()) {
+            if (rct.getName().equals("rt1")) {
+                contains = true;
+                break;
+            }
+        }
+        assertTrue(contains);
+        //assertEquals("rt1", projectItemsRecurring.get(1).getTasks().get(0).getName());
         assertEquals("2020-04-27", projectItemsRecurring.get(0).getTasks().get(0).getDueDate());
         assertEquals("2020-04-20", projectItemsRecurring.get(1).getTasks().get(0).getDueDate());
 
