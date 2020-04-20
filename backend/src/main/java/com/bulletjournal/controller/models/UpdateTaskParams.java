@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import java.util.List;
+
 public class UpdateTaskParams {
 
     private String assignedTo;
@@ -18,6 +20,8 @@ public class UpdateTaskParams {
     private String timezone;
 
     private String recurrenceRule;
+
+    private List<User> assignees;
 
     public UpdateTaskParams() {
     }
@@ -129,5 +133,13 @@ public class UpdateTaskParams {
 
     public boolean hasRecurrenceRule() {
         return this.recurrenceRule != null;
+    }
+
+    public List<User> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<User> assignees) {
+        this.assignees = assignees;
     }
 }

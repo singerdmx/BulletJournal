@@ -3,10 +3,8 @@ package com.bulletjournal.repository.models;
 import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.repository.utils.LongArrayType;
 import com.google.common.base.Preconditions;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
+import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +19,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
-@TypeDefs({
-        @TypeDef(
-                name = "long-array",
-                typeClass = LongArrayType.class
-        )
-})
 @MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskModel.class);
@@ -72,6 +64,13 @@ public abstract class TaskModel extends ProjectItemModel {
 
     @Column(name = "google_calendar_event_id")
     private String googleCalendarEventId;
+
+    @Type(type = "string-array")
+    @Column(
+            name = "assignees",
+            columnDefinition = "text[]"
+    )
+    private String[] assignees;
 
     public Timestamp getStartTime() {
         return startTime;
@@ -183,6 +182,14 @@ public abstract class TaskModel extends ProjectItemModel {
 
     public void setGoogleCalendarEventId(String googleCalendarEventId) {
         this.googleCalendarEventId = googleCalendarEventId;
+    }
+
+    public String[] getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(String[] assignees) {
+        this.assignees = assignees;
     }
 
     public void setReminderSetting(ReminderSetting reminderSetting) {

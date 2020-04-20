@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 public class CreateTaskParams {
 
@@ -21,6 +22,8 @@ public class CreateTaskParams {
     private Integer duration;
 
     private ReminderSetting reminderSetting;
+
+    private List<User> assignees;
 
     @NotBlank
     @Size(min = 1, max = 100)
@@ -119,5 +122,13 @@ public class CreateTaskParams {
 
     public boolean hasRecurrenceRule() {
         return this.recurrenceRule != null;
+    }
+
+    public List<User> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<User> assignees) {
+        this.assignees = assignees;
     }
 }
