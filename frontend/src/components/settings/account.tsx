@@ -5,10 +5,13 @@ import ReminderBeforeTaskPicker from './reminder-before-task';
 import CurrencyPicker from './currency';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
-import { patchMyself, updateExpandedMyself } from '../../features/myself/actions';
+import {
+  patchMyself,
+  updateExpandedMyself,
+} from '../../features/myself/actions';
 import { updateTheme } from './actions';
 import './account.styles.less';
-import { Select, Tooltip } from "antd";
+import { Select, Tooltip } from 'antd';
 
 const { Option } = Select;
 
@@ -16,7 +19,12 @@ type AccountProps = {
   originalTheme: string;
   currentTheme: string;
   updateExpandedMyself: (updateSettings: boolean) => void;
-  patchMyself: (timezone?: string, before?: number, currency?: string, theme?: string) => void;
+  patchMyself: (
+    timezone?: string,
+    before?: number,
+    currency?: string,
+    theme?: string
+  ) => void;
   updateTheme: (theme: string) => void;
 };
 
@@ -37,7 +45,12 @@ class Account extends React.Component<AccountProps> {
 
   handleOnThemeClick = (save: boolean) => {
     if (save) {
-      this.props.patchMyself(undefined, undefined, undefined, this.props.currentTheme);
+      this.props.patchMyself(
+        undefined,
+        undefined,
+        undefined,
+        this.props.currentTheme
+      );
       this.loadUpdatedTheme(this.props.currentTheme);
     } else {
       this.props.updateTheme(this.props.originalTheme);
@@ -46,7 +59,6 @@ class Account extends React.Component<AccountProps> {
 
   loadUpdatedTheme = (theme: string) => {
     let color = '';
-    let vars = { '@primary-color': '#dddddd' };
     switch (theme) {
       case 'LIGHT': {
         color = '#428bca';
@@ -60,8 +72,7 @@ class Account extends React.Component<AccountProps> {
         break;
       }
     }
-    vars['@primary-color'] = color;
-    window.less.modifyVars(vars).then(() => {
+    window.less.modifyVars({ '@primary-color': color }).then(() => {
       console.log('Theme updated successfully');
     });
   };
@@ -69,31 +80,37 @@ class Account extends React.Component<AccountProps> {
   render() {
     return (
       <div>
-        <div className='option-container'>
+        <div className="option-container">
           <span>Time Zone &nbsp;&nbsp;&nbsp;</span> <TimezonePicker />
         </div>
-        <div className='option-container'>
+        <div className="option-container">
           <span>Default Reminder Before Task&nbsp;&nbsp;&nbsp;</span>
           <ReminderBeforeTaskPicker />
         </div>
-        <div className='option-container'>
+        <div className="option-container">
           <span>Currency&nbsp;&nbsp;&nbsp;</span>
           <CurrencyPicker />
         </div>
-        <div className='option-container'>
+        <div className="option-container">
           <span>Theme&nbsp;&nbsp;&nbsp;</span>
           <span>
             <Select
               style={{ width: 80 }}
-              placeholder='Select Theme'
+              placeholder="Select Theme"
               onChange={this.handleOnThemeChange}
               value={this.props.currentTheme}
             >
-              <Option key='LIGHT' value='LIGHT'>Light</Option>
-              <Option key='DARK' value='DARK'>Dark</Option>
-              <Option key='PINK' value='PINK'>Pink</Option>
+              <Option key="LIGHT" value="LIGHT">
+                Light
+              </Option>
+              <Option key="DARK" value="DARK">
+                Dark
+              </Option>
+              <Option key="PINK" value="PINK">
+                Pink
+              </Option>
             </Select>
-            <Tooltip placement='top' title='Save'>
+            <Tooltip placement="top" title="Save">
               <CheckCircleOutlined
                 onClick={() => this.handleOnThemeClick(true)}
                 style={{
@@ -104,11 +121,11 @@ class Account extends React.Component<AccountProps> {
                   visibility:
                     this.props.currentTheme !== this.props.originalTheme
                       ? 'visible'
-                      : 'hidden'
+                      : 'hidden',
                 }}
               />
             </Tooltip>
-            <Tooltip placement='top' title='Cancel'>
+            <Tooltip placement="top" title="Cancel">
               <CloseCircleOutlined
                 onClick={() => this.handleOnThemeClick(false)}
                 style={{
@@ -119,7 +136,7 @@ class Account extends React.Component<AccountProps> {
                   visibility:
                     this.props.currentTheme !== this.props.originalTheme
                       ? 'visible'
-                      : 'hidden'
+                      : 'hidden',
                 }}
               />
             </Tooltip>
@@ -132,11 +149,11 @@ class Account extends React.Component<AccountProps> {
 
 const mapStateToProps = (state: IState) => ({
   originalTheme: state.myself.theme,
-  currentTheme: state.settings.theme
+  currentTheme: state.settings.theme,
 });
 
 export default connect(mapStateToProps, {
   patchMyself,
   updateExpandedMyself,
-  updateTheme
+  updateTheme,
 })(Account);
