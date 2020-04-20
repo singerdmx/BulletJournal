@@ -5,22 +5,20 @@ import SideLayout from './layouts/side/side.layout';
 import HeaderLayout from './layouts/header/header.layout';
 import ContentLayout from './layouts/content/content.layout';
 import FooterLayout from './layouts/footer/footer.layout';
-import { updateExpandedMyself, updateTheme } from './features/myself/actions';
+import { updateTheme } from './features/myself/actions';
 
 import './styles/main.less';
 import { connect } from 'react-redux';
 import { IState } from './store';
 
 type RootProps = {
-  updateExpandedMyself: (updateSettings: boolean) => void;
   updateTheme: () => void;
   theme: string;
 };
 
 const App: React.FC<RootProps> = (props) => {
   useEffect(() => {
-    props.updateExpandedMyself(true);
-    props.updateTheme()
+    props.updateTheme();
   }, []);
 
   useEffect(() => {
@@ -62,4 +60,4 @@ const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
 });
 
-export default connect(mapStateToProps, { updateExpandedMyself, updateTheme })(App);
+export default connect(mapStateToProps, {updateTheme})(App);

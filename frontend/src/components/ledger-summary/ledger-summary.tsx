@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { Statistic, Card, Tag } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
