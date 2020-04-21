@@ -59,6 +59,7 @@ zones.sort((a, b) => {
   }
   return 0;
 });
+const LocaleCurrency = require('locale-currency');
 const LedgerSummaryTypeMap = [
   LedgerSummaryType.DEFAULT,
   LedgerSummaryType.PAYER,
@@ -66,6 +67,7 @@ const LedgerSummaryTypeMap = [
 ];
 
 type TransactionProps = {
+  currency: string;
   projectId: number;
   timezone: string;
   ledgerSummary: LedgerSummary;
@@ -93,7 +95,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [ledgerSummaryType, setLedgerSummaryType] = useState(
     LedgerSummaryType.DEFAULT
   );
-  // defaulte line chart
+  // default line chart
   const [lineData, setLineData] = useState([{}]);
   //used for LABEL pie
   const [labelExpenseData, setLabelExpenseData] = useState([{}]);
@@ -299,15 +301,16 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       .catch((info) => console.log(info));
   };
 
-  const PieTooltipContent = (props: any) => {
-    if (!props.payload.length) return null;
+  const PieTooltipContent = (input: any) => {
+    if (!input.payload.length) return null;
 
+    const currency = props.currency ? LocaleCurrency.getCurrency(props.currency) : '';
     return (
       <div>
-        {props.payload[0].name}&nbsp;{props.payload[0].value} (
+        [{input.payload[0].name}]&nbsp;{`${input.payload[0].value} ${currency}`} (
         {graphCate === 'expense'
-          ? `${props.payload[0].payload.payload.expensePercentage}%`
-          : `${props.payload[0].payload.payload.incomePercentage}%`}
+          ? `${input.payload[0].payload.payload.expensePercentage}%`
+          : `${input.payload[0].payload.payload.incomePercentage}%`}
         )
       </div>
     );
@@ -522,6 +525,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                     fill='#8884d8'
                   />
                   <Cell key={0} fill='#0088FE' />
+                  <Cell key={1} fill='#1081FE' />
                   {/* {graphCate === 'expense'
                     ? labelExpenseData.map((entry, index) => (
                         <Cell
@@ -582,7 +586,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       )}
       <List className='transaction-list'>
         {transactions.map((item) => (
-          <List.Item className='transaction-list-item'>
+          <List.Item key={item.id} className='transaction-list-item'>
             <TransactionItem transaction={item} />
           </List.Item>
         ))}
@@ -595,6 +599,7 @@ const mapStateToProps = (state: IState) => ({
   projectId: state.project.project.id,
   timezone: state.settings.timezone,
   ledgerSummary: state.transaction.ledgerSummary,
+  currency: state.myself.currency,
 });
 
 export default connect(mapStateToProps, {

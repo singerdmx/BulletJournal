@@ -78,9 +78,14 @@ function* updateTheme(action: PayloadAction<ThemeUpdate>){
     yield put(expandedMyselfLoading(true));
     const data = yield call(fetchMyself, true);
     yield put(
-      myselfActions.themeUpdated({
-        theme: data.theme
-      })
+        myselfActions.myselfDataReceived({
+            username: data.name,
+            avatar: data.avatar,
+            timezone: data.timezone,
+            before: data.reminderBeforeTask,
+            currency: data.currency,
+            theme: data.theme,
+        })
     );
     yield put(expandedMyselfLoading(false));
    } catch (error) {
