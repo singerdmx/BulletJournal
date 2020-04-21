@@ -23,7 +23,7 @@ public class CreateTaskParams {
 
     private ReminderSetting reminderSetting;
 
-    private List<User> assignees;
+    private List<String> assignees;
 
     @NotBlank
     @Size(min = 1, max = 100)
@@ -124,11 +124,11 @@ public class CreateTaskParams {
         return this.recurrenceRule != null;
     }
 
-    public List<User> getAssignees() {
+    public List<String> getAssignees() {
         return assignees;
     }
 
-    public void setAssignees(List<User> assignees) {
+    public void setAssignees(List<String> assignees) {
         this.assignees = assignees;
     }
 }
