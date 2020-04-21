@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { List, Avatar, Tooltip } from "antd";
-import { Content, ProjectItem } from "../../features/myBuJo/interface";
-import BraftEditor from "braft-editor";
-import ContentEditorDrawer from "../content-editor/content-editor-drawer.component";
-import RevisionDrawer from "../revision/revision-drawer.component";
-import { HighlightOutlined, FullscreenOutlined } from "@ant-design/icons";
-import moment from "moment";
-import "./content-item.styles.less";
+import React, { useState } from 'react';
+import { List, Avatar, Tooltip } from 'antd';
+import { Content, ProjectItem } from '../../features/myBuJo/interface';
+import BraftEditor from 'braft-editor';
+import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
+import RevisionDrawer from '../revision/revision-drawer.component';
+import { HighlightOutlined, FullscreenOutlined } from '@ant-design/icons';
+import moment from 'moment';
+import './content-item.styles.less';
 
 type ContentProps = {
   contentEditable?: boolean;
@@ -18,14 +18,13 @@ const ContentItem: React.FC<ContentProps> = ({
   content,
   projectItem,
   contentEditable,
-  noteId,
 }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
   const [displayRevision, setDisplayRevision] = useState(false);
   const createdTime = moment(content.createdAt).fromNow();
-  const updateTime = moment(content.updatedAt).format("MMM Do YYYY");
+  const updateTime = moment(content.updatedAt).format('MMM Do YYYY');
   const handleOpen = () => {
     setDisplayMore(true);
   };
