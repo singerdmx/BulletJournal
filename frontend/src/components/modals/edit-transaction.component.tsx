@@ -180,7 +180,11 @@ const EditTransaction: React.FC<
               <Select
                 style={{ marginLeft: '-8px' }}
                 value={payerName}
-                onChange={(e: any) => setPayerName(e.target.value)}
+                onChange={(e: any) => {
+                  console.log('========-=-=-=-=-');
+                  console.log(e);
+                  //setPayerName(e.target.value)
+                }}
               >
                 {props.group.users.map((user) => {
                   return (
