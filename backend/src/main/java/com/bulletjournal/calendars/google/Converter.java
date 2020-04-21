@@ -47,16 +47,16 @@ public class Converter {
 
         StringBuilder text = new StringBuilder();
         if (event.getDescription() != null) {
-            text.append("description:").append(event.getDescription()).append(System.lineSeparator());
+            text.append(event.getDescription()).append(System.lineSeparator());
         }
         if (event.getLocation() != null) {
-            text.append("location:").append(event.getLocation()).append(System.lineSeparator());
+            text.append("Location: ").append(event.getLocation()).append(System.lineSeparator());
         }
         List<EventAttendee> attendeeList = event.getAttendees();
-        if (attendeeList != null) {
-            text.append("attendees:").append(System.lineSeparator());
+        if (attendeeList != null && !attendeeList.isEmpty()) {
+            text.append("Attendees:").append(System.lineSeparator());
             for (EventAttendee attendee : attendeeList) {
-                text.append("name:").append(attendee.getDisplayName()).append(" email:").append(attendee.getEmail());
+                text.append(attendee.getDisplayName()).append(" ").append(attendee.getEmail());
                 text.append(System.lineSeparator());
             }
         }
@@ -89,10 +89,11 @@ public class Converter {
         task.setReminderSetting(reminderSetting);
     }
 
-    /*Set recurrence of event to task, rRule complies with rfc5545
-    * rRule:
-    *        RRULE:FREQ=DAILY;UNTIL=20200724T065959Z
-    */
+    /**
+     * Set recurrence of event to task, rRule complies with rfc5545
+     * rRule:
+     * RRULE:FREQ=DAILY;UNTIL=20200724T065959Z
+     */
     private static void setTaskRecurrence(Task task, String timezone, List<String> rRule, long startDateTimeValue) {
         if (rRule != null && !rRule.isEmpty()) {
             DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startDateTimeValue, timezone);
