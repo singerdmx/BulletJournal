@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Cell,
   Legend,
@@ -11,15 +11,27 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {IState} from '../../store';
-import {connect} from 'react-redux';
-import {Carousel, DatePicker, Empty, Form, List, Radio, Select, Tooltip,} from 'antd';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import {
+  Carousel,
+  DatePicker,
+  Empty,
+  Form,
+  List,
+  Radio,
+  Select,
+  Tooltip,
+} from 'antd';
 import moment from 'moment';
-import {dateFormat} from '../../features/myBuJo/constants';
+import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
-import {zones} from '../../components/settings/constants';
-import {updateTransactionForm, updateTransactions,} from '../../features/transactions/actions';
-import {updateExpandedMyself} from '../../features/myself/actions';
+import { zones } from '../../components/settings/constants';
+import {
+  updateTransactionForm,
+  updateTransactions,
+} from '../../features/transactions/actions';
+import { updateExpandedMyself } from '../../features/myself/actions';
 import {
   FrequencyType,
   LedgerSummary,
@@ -29,7 +41,7 @@ import {
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
-import {RadioChangeEvent} from 'antd/lib/radio';
+import { RadioChangeEvent } from 'antd/lib/radio';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -293,10 +305,13 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const PieTooltipContent = (input: any) => {
     if (!input.payload.length) return null;
 
-    const currency = props.currency ? LocaleCurrency.getCurrency(props.currency) : '';
+    const currency = props.currency
+      ? LocaleCurrency.getCurrency(props.currency)
+      : '';
     return (
       <div>
-        [{input.payload[0].name}]&nbsp;{`${input.payload[0].value} ${currency}`} (
+        [{input.payload[0].name}]&nbsp;{`${input.payload[0].value} ${currency}`}{' '}
+        (
         {graphCate === 'expense'
           ? `${input.payload[0].payload.payload.expensePercentage}%`
           : `${input.payload[0].payload.payload.incomePercentage}%`}
@@ -440,31 +455,35 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         </Carousel>
       </div>
 
-      <div className='transaction-display-mini'>
-        <Carousel dotPosition='left' autoplay>
-          {transactionsSummaries ? (
-            transactionsSummaries.map(
-              (transactionsSummary: TransactionsSummary, index: number) => (
-                <div
-                  key={`${transactionsSummary.name}-${index}`}
-                  className='transaction-display-mini-content'
-                >
-                  <span className='title'>{transactionsSummary.name}</span>
-                  <span>Expense: {transactionsSummary.expensePercentage}%</span>
-                  <span>Income: {transactionsSummary.incomePercentage}%</span>
-                </div>
-              )
-            )
-          ) : (
-            <div>LedgerSummaries</div>
-          )}
-        </Carousel>
-      </div>
-
-      {ledgerSummaryType === LedgerSummaryType.DEFAULT && (
-        <div className='transaction-visual'>
-          <div className='transaction-graph'>
+      {transactionsSummaries && transactionsSummaries.length > 0 && (
+        <div className='transaction-display-mini'>
+          <Carousel dotPosition='left' autoplay>
             {transactionsSummaries ? (
+              transactionsSummaries.map(
+                (transactionsSummary: TransactionsSummary, index: number) => (
+                  <div
+                    key={`${transactionsSummary.name}-${index}`}
+                    className='transaction-display-mini-content'
+                  >
+                    <span className='title'>{transactionsSummary.name}</span>
+                    <span>
+                      Expense: {transactionsSummary.expensePercentage}%
+                    </span>
+                    <span>Income: {transactionsSummary.incomePercentage}%</span>
+                  </div>
+                )
+              )
+            ) : (
+              <div>LedgerSummaries</div>
+            )}
+          </Carousel>
+        </div>
+      )}
+      {ledgerSummaryType === LedgerSummaryType.DEFAULT &&
+        transactionsSummaries &&
+        transactionsSummaries.length > 0 && (
+          <div className='transaction-visual'>
+            <div className='transaction-graph'>
               <ResponsiveContainer>
                 <LineChart
                   data={lineData}
@@ -479,75 +498,62 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   <Line type='monotone' dataKey='balance' stroke='#3437eb' />
                 </LineChart>
               </ResponsiveContainer>
-            ) : (
-              <Empty />
-            )}
+            </div>
           </div>
-        </div>
-      )}
-
+        )}
       {/* label pie graph */}
-      {ledgerSummaryType === LedgerSummaryType.LABEL && (
-        <div className='transaction-visual'>
-          <Radio.Group
-            defaultValue={graphCate}
-            value={graphCate}
-            onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
-          >
-            {showLabelExpenseTab && <Radio value={'expense'}>Expense</Radio>}
-            {showLabelIncomeTab && <Radio value={'income'}>Income</Radio>}
-          </Radio.Group>
-          <div className='transaction-graph'>
-            {showLabelExpenseTab || showLabelIncomeTab ? (
+      {ledgerSummaryType === LedgerSummaryType.LABEL &&
+        (showLabelExpenseTab || showLabelIncomeTab) && (
+          <div className='transaction-visual'>
+            <Radio.Group
+              defaultValue={graphCate}
+              value={graphCate}
+              onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
+            >
+              {showLabelExpenseTab && <Radio value={'expense'}>Expense</Radio>}
+              {showLabelIncomeTab && <Radio value={'income'}>Income</Radio>}
+            </Radio.Group>
+            <div className='transaction-graph'>
               <ResponsiveContainer>
                 <PieChart>
                   <Pie
-                      dataKey={graphCate}
-                      isAnimationActive={true}
-                      data={
-                        graphCate === 'expense'
-                            ? labelExpenseData
-                            : labelIncomeData
-                      }
-                      outerRadius={60}
-                      labelLine={true}
+                    dataKey={graphCate}
+                    isAnimationActive={true}
+                    data={
+                      graphCate === 'expense'
+                        ? labelExpenseData
+                        : labelIncomeData
+                    }
+                    outerRadius={60}
+                    labelLine={true}
                   >
                     {graphCate === 'expense'
-                        ? labelExpenseData.map((entry, index) => (
-                            <Cell
-                                key={`cell-${index}`}
-                                fill={COLORS[index]}
-                            />
+                      ? labelExpenseData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index]} />
                         ))
-                        : labelIncomeData.map((entry, index) => (
-                            <Cell
-                                key={`cell-${index}`}
-                                fill={COLORS[index]}
-                            />
+                      : labelIncomeData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index]} />
                         ))}
                   </Pie>
                   <HoverHint content={<PieTooltipContent />} />
                 </PieChart>
               </ResponsiveContainer>
-            ) : (
-              <Empty />
-            )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
       {/* payer pie graph */}
-      {ledgerSummaryType === LedgerSummaryType.PAYER && (
-        <div className='transaction-visual'>
-          <Radio.Group
-            defaultValue={graphCate}
-            value={graphCate}
-            onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
-          >
-            {showPayerExpenseTab && <Radio value={'expense'}>Expense</Radio>}
-            {showPayerIncomeTab && <Radio value={'income'}>Income</Radio>}
-          </Radio.Group>
-          <div className='transaction-graph'>
-            {showPayerExpenseTab || showPayerIncomeTab ? (
+      {ledgerSummaryType === LedgerSummaryType.PAYER &&
+        (showPayerExpenseTab || showPayerIncomeTab) && (
+          <div className='transaction-visual'>
+            <Radio.Group
+              defaultValue={graphCate}
+              value={graphCate}
+              onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
+            >
+              {showPayerExpenseTab && <Radio value={'expense'}>Expense</Radio>}
+              {showPayerIncomeTab && <Radio value={'income'}>Income</Radio>}
+            </Radio.Group>
+            <div className='transaction-graph'>
               <ResponsiveContainer>
                 <PieChart width={200} height={200}>
                   <HoverHint content={<PieTooltipContent />} />
@@ -564,12 +570,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   />
                 </PieChart>
               </ResponsiveContainer>
-            ) : (
-              <Empty />
-            )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
       <List className='transaction-list'>
         {transactions.map((item) => (
           <List.Item key={item.id} className='transaction-list-item'>
