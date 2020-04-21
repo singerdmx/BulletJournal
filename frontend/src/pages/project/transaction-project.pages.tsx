@@ -9,6 +9,7 @@ import {
   Line,
   ResponsiveContainer,
   YAxis,
+  Cell,
 } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
@@ -41,7 +42,6 @@ import TransactionItem from '../../components/project-item/transaction-item.comp
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
 import { RadioChangeEvent } from 'antd/lib/radio';
-
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -300,8 +300,20 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   };
 
   const PieTooltipContent = (props: any) => {
-    return <div>ssssss</div>;
+    if (!props.payload.length) return null;
+
+    return (
+      <div>
+        {props.payload[0].name}&nbsp;{props.payload[0].value} (
+        {graphCate === 'expense'
+          ? `${props.payload[0].payload.payload.expensePercentage}%`
+          : `${props.payload[0].payload.payload.incomePercentage}%`}
+        )
+      </div>
+    );
   };
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
     <div className='transaction-page'>
@@ -446,9 +458,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   className='transaction-display-mini-content'
                 >
                   <span className='title'>{transactionsSummary.name}</span>
-                  <span>
-                    Expense: {transactionsSummary.expensePercentage}%,
-                  </span>
+                  <span>Expense: {transactionsSummary.expensePercentage}%</span>
                   <span>Income: {transactionsSummary.incomePercentage}%</span>
                 </div>
               )
@@ -488,7 +498,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       {ledgerSummaryType === LedgerSummaryType.LABEL && (
         <div className='transaction-visual'>
           <Radio.Group
-            defaultValue='expense'
+            defaultValue={graphCate}
+            value={graphCate}
             onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
           >
             {showLabelExpenseTab && <Radio value={'expense'}>Expense</Radio>}
@@ -498,7 +509,6 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             {showLabelExpenseTab || showLabelIncomeTab ? (
               <ResponsiveContainer>
                 <PieChart>
-                  {/* expense */}
                   <Pie
                     dataKey={graphCate}
                     isAnimationActive={false}
@@ -508,10 +518,25 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                         : labelIncomeData
                     }
                     outerRadius={60}
-                    fill='#8884d8'
                     labelLine={false}
+                    fill='#8884d8'
                   />
-                  <HoverHint />
+                  <Cell key={0} fill='#0088FE' />
+                  {/* {graphCate === 'expense'
+                    ? labelExpenseData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))
+                    : labelIncomeData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))} */}
+
+                  <HoverHint content={<PieTooltipContent />} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -520,7 +545,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </div>
         </div>
       )}
-
+      {/* payer pie graph */}
       {ledgerSummaryType === LedgerSummaryType.PAYER && (
         <div className='transaction-visual'>
           <Radio.Group
@@ -535,7 +560,6 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             {showPayerExpenseTab || showPayerIncomeTab ? (
               <ResponsiveContainer>
                 <PieChart width={200} height={200}>
-                  {/* expense */}
                   <HoverHint content={<PieTooltipContent />} />
                   <Pie
                     dataKey={graphCate}
@@ -547,7 +571,6 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                     }
                     outerRadius={60}
                     fill='#8884d8'
-                    label
                   />
                 </PieChart>
               </ResponsiveContainer>
