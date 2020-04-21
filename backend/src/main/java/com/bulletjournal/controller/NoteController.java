@@ -200,7 +200,7 @@ public class NoteController {
     }
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
-    public String getContentRevision(
+    public Revision getContentRevision(
             @NotNull @PathVariable Long noteId,
             @NotNull @PathVariable Long contentId,
             @NotNull @PathVariable Long revisionId) {

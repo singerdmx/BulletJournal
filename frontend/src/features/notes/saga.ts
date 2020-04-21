@@ -79,13 +79,15 @@ function* noteContentRevisionUpdate(action: PayloadAction<UpdateNoteContentRevis
     const { noteId, contentId, revisionId } = action.payload;
     const state: IState = yield select();
 
-    const contents : Content[] = state.note.contents;
+    const contents : Content[] = [];
+    state.note.contents.forEach(c => contents.push(Object.assign({}, c)));
     const targetContent : Content = contents.filter(c => c.id === contentId)[0];
+    const revisions : Revision[] = [];
     const revision: Revision = targetContent.revisions.filter(r => r.id === revisionId)[0];
 
     if (!revision.content) {
-      const content = yield call(getContentRevision, noteId, contentId, revisionId);
-      revision.content = content;
+      const data = yield call(getContentRevision, noteId, contentId, revisionId);
+      revision.content = data.content;
 
       yield put(
           notesActions.noteContentsReceived({
