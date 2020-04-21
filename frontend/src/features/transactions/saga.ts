@@ -257,26 +257,30 @@ function* transactionContentRevisionUpdate(
     const { transactionId, contentId, revisionId } = action.payload;
     const state: IState = yield select();
 
-    const contents: Content[] = state.transaction.contents;
-    const targetContent: Content = contents.filter(
-      (c) => c.id === contentId
-    )[0];
-    const revision: Revision = targetContent.revisions.filter(
-      (r) => r.id === revisionId
-    )[0];
+    const targetContent : Content = state.transaction.contents.find(c => c.id === contentId)!;
+    const revision: Revision = targetContent.revisions.find(r => r.id === revisionId)!;
 
     if (!revision.content) {
-      const content = yield call(
-        getContentRevision,
-        transactionId,
-        contentId,
-        revisionId
-      );
-      revision.content = content;
+      const data = yield call(getContentRevision, transactionId, contentId, revisionId);
+
+      const transactionContents : Content[] = [];
+      state.transaction.contents.forEach((transactionContent) => {
+        if (transactionContent.id === contentId) {
+          const newRevisions : Revision[] = [];
+          transactionContent.revisions.forEach((revision) => {
+            if (revision.id === revisionId) {
+              revision = { ...revision, content: data.content };
+            }
+            newRevisions.push(revision);
+          });
+          transactionContent = { ...transactionContent, revisions: newRevisions };
+        }
+        transactionContents.push(transactionContent);
+      });
 
       yield put(
         transactionsActions.transactionContentsReceived({
-          contents: contents,
+          contents: transactionContents,
         })
       );
     }
