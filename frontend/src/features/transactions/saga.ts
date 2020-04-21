@@ -100,6 +100,23 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       timezone,
       time
     );
+
+    const state: IState = yield select();
+    const data = yield call(
+      fetchTransactions,
+      projectId,
+      state.transaction.timezone,
+      state.transaction.ledgerSummaryType,
+      state.transaction.frequencyType,
+      state.transaction.startDate,
+      state.transaction.endDate
+    );
+    const ledgerSummary: LedgerSummary = yield data.json();
+    yield put(
+      transactionsActions.transactionsReceived({
+        ledgerSummary: ledgerSummary,
+      })
+    );
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
   }
@@ -149,9 +166,26 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
 function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
   try {
     const { transactionId } = action.payload;
+    const state: IState = yield select();
+    const transaction = yield call(getTransactionById, transactionId);
+
     yield call(deleteTransactionById, transactionId);
 
-    const state: IState = yield select();
+    const data = yield call(
+      fetchTransactions,
+      transaction.projectId,
+      state.transaction.timezone,
+      state.transaction.ledgerSummaryType,
+      state.transaction.frequencyType,
+      state.transaction.startDate,
+      state.transaction.endDate
+    );
+    const ledgerSummary: LedgerSummary = yield data.json();
+    yield put(
+      transactionsActions.transactionsReceived({
+        ledgerSummary: ledgerSummary,
+      })
+    );
 
     yield put(
       getProjectItemsAfterUpdateSelect(
@@ -188,14 +222,29 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       time,
       timezone
     );
+    const projectId = data.projectId;
+    const state: IState = yield select();
+    const updateData = yield call(
+      fetchTransactions,
+      projectId,
+      state.transaction.timezone,
+      state.transaction.ledgerSummaryType,
+      state.transaction.frequencyType,
+      state.transaction.startDate,
+      state.transaction.endDate
+    );
+    const ledgerSummary: LedgerSummary = yield updateData.json();
+    yield put(
+      transactionsActions.transactionsReceived({
+        ledgerSummary: ledgerSummary,
+      })
+    );
 
     yield put(
       transactionsActions.transactionReceived({
         transaction: data,
       })
     );
-
-    const state: IState = yield select();
 
     yield put(
       getProjectItemsAfterUpdateSelect(
@@ -257,23 +306,35 @@ function* transactionContentRevisionUpdate(
     const { transactionId, contentId, revisionId } = action.payload;
     const state: IState = yield select();
 
-    const targetContent : Content = state.transaction.contents.find(c => c.id === contentId)!;
-    const revision: Revision = targetContent.revisions.find(r => r.id === revisionId)!;
+    const targetContent: Content = state.transaction.contents.find(
+      (c) => c.id === contentId
+    )!;
+    const revision: Revision = targetContent.revisions.find(
+      (r) => r.id === revisionId
+    )!;
 
     if (!revision.content) {
-      const data = yield call(getContentRevision, transactionId, contentId, revisionId);
+      const data = yield call(
+        getContentRevision,
+        transactionId,
+        contentId,
+        revisionId
+      );
 
-      const transactionContents : Content[] = [];
+      const transactionContents: Content[] = [];
       state.transaction.contents.forEach((transactionContent) => {
         if (transactionContent.id === contentId) {
-          const newRevisions : Revision[] = [];
+          const newRevisions: Revision[] = [];
           transactionContent.revisions.forEach((revision) => {
             if (revision.id === revisionId) {
               revision = { ...revision, content: data.content };
             }
             newRevisions.push(revision);
           });
-          transactionContent = { ...transactionContent, revisions: newRevisions };
+          transactionContent = {
+            ...transactionContent,
+            revisions: newRevisions,
+          };
         }
         transactionContents.push(transactionContent);
       });
