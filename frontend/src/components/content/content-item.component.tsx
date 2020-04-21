@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { List, Avatar, Tooltip } from 'antd';
-import { Content, ProjectItem } from '../../features/myBuJo/interface';
-import BraftEditor from 'braft-editor';
-import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
-import { HighlightOutlined, FullscreenOutlined } from '@ant-design/icons';
-import moment from 'moment';
-import './content-item.styles.less';
+import React, { useState } from "react";
+import { List, Avatar, Tooltip } from "antd";
+import { Content, ProjectItem } from "../../features/myBuJo/interface";
+import BraftEditor from "braft-editor";
+import ContentEditorDrawer from "../content-editor/content-editor-drawer.component";
+import RevisionDrawer from "../revision/revision-drawer.component";
+import { HighlightOutlined, FullscreenOutlined } from "@ant-design/icons";
+import moment from "moment";
+import "./content-item.styles.less";
 
 type ContentProps = {
   contentEditable?: boolean;
@@ -17,16 +18,24 @@ const ContentItem: React.FC<ContentProps> = ({
   content,
   projectItem,
   contentEditable,
+  noteId,
 }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
+  const [displayRevision, setDisplayRevision] = useState(false);
   const createdTime = moment(content.createdAt).fromNow();
-  const updateTime = moment(content.updatedAt).format('MMM Do YYYY');
+  const updateTime = moment(content.updatedAt).format("MMM Do YYYY");
   const handleOpen = () => {
     setDisplayMore(true);
   };
-  const handleOpenRevisions = () => {};
+  const handleOpenRevisions = () => {
+    setDisplayRevision(true);
+  };
+
+  const handleRevisionClose = () => {
+    setDisplayRevision(false);
+  };
 
   const handleClose = () => {
     setDisplayMore(false);
@@ -34,18 +43,18 @@ const ContentItem: React.FC<ContentProps> = ({
 
   const getActions = () => {
     const actions = [
-      <Tooltip title='Click to view'>
+      <Tooltip title="Click to view">
         <FullscreenOutlined onClick={handleOpen} />
       </Tooltip>,
-      <Tooltip title='View revision history'>
-        <span className='open-revisions-button' onClick={handleOpenRevisions}>
+      <Tooltip title="View revision history">
+        <span className="open-revisions-button" onClick={handleOpenRevisions}>
           <HighlightOutlined />
           &nbsp;
           {content.revisions.length}
         </span>
       </Tooltip>,
       <Tooltip title={`${content.owner} created ${createdTime}`}>
-        <Avatar src={content.ownerAvatar} size='small' />
+        <Avatar src={content.ownerAvatar} size="small" />
       </Tooltip>,
     ];
 
@@ -71,6 +80,13 @@ const ContentItem: React.FC<ContentProps> = ({
         visible={displayMore}
         onClose={handleClose}
         projectItem={projectItem}
+      />
+      <RevisionDrawer
+        revisionDisplay={displayRevision}
+        onClose={handleRevisionClose}
+        revisions={content.revisions}
+        noteId={projectItem.id}
+        contentId={content.id}
       />
     </List.Item>
   );
