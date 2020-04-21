@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Transaction, LedgerSummary } from './interface';
+import {
+  Transaction,
+  LedgerSummary,
+  FrequencyType,
+  LedgerSummaryType,
+} from './interface';
 import { History } from 'history';
 import { Content } from '../myBuJo/interface';
 
@@ -109,12 +114,25 @@ export type SetTransactionLabels = {
   transactionId: number;
   labels: number[];
 };
+export type UpdateForm = {
+  startDate?: string;
+  endDate?: string;
+  frequencyType?: FrequencyType;
+  ledgerSummaryType?: LedgerSummaryType;
+  timezone?: string;
+};
 
 let initialState = {
   contents: [] as Array<Content>,
   transaction: {} as Transaction,
   ledgerSummary: {} as LedgerSummary,
   addTransactionVisible: false,
+  //used for form
+  startDate: '',
+  endDate: '',
+  frequencyType: FrequencyType.MONTHLY,
+  ledgerSummaryType: LedgerSummaryType.DEFAULT,
+  timezone: '',
 };
 
 const slice = createSlice({
@@ -178,6 +196,30 @@ const slice = createSlice({
       state,
     TransactionContentPatch: (state, action: PayloadAction<PatchContent>) =>
       state,
+    TransactionFormUpdate: (state, action: PayloadAction<UpdateForm>) => {
+      const {
+        startDate,
+        endDate,
+        frequencyType,
+        ledgerSummaryType,
+        timezone,
+      } = action.payload;
+      if (startDate) {
+        state.startDate = startDate;
+      }
+      if (endDate) {
+        state.endDate = endDate;
+      }
+      if (frequencyType) {
+        state.frequencyType = frequencyType;
+      }
+      if (ledgerSummaryType) {
+        state.ledgerSummaryType = ledgerSummaryType;
+      }
+      if (timezone) {
+        state.timezone = timezone;
+      }
+    },
   },
 });
 

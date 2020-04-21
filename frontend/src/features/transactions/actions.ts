@@ -1,5 +1,6 @@
 import { actions } from './reducer';
 import { History } from 'history';
+import { FrequencyType, LedgerSummaryType } from './interface';
 
 export const updateTransactions = (
   projectId: number,
@@ -127,4 +128,19 @@ export const patchContent = (
     transactionId: transactionId,
     contentId: contentId,
     text: text,
+  });
+
+export const updateTransactionForm = (
+  startDate?: string,
+  endDate?: string,
+  frequencyType?: FrequencyType,
+  ledgerSummaryType?: LedgerSummaryType,
+  timezone?: string
+) =>
+  actions.TransactionFormUpdate({
+    startDate,
+    endDate,
+    frequencyType,
+    ledgerSummaryType,
+    timezone,
   });

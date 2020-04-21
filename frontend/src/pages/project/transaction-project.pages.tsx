@@ -26,7 +26,10 @@ import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
 import { zones } from '../../components/settings/constants';
-import { updateTransactions } from '../../features/transactions/actions';
+import {
+  updateTransactions,
+  updateTransactionForm,
+} from '../../features/transactions/actions';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import {
   LedgerSummary,
@@ -76,6 +79,13 @@ type TransactionProps = {
     startDate?: string,
     endDate?: string
   ) => void;
+  updateTransactionForm: (
+    startDate?: string,
+    endDate?: string,
+    frequencyType?: FrequencyType,
+    ledgerSummaryType?: LedgerSummaryType,
+    timezone?: string
+  ) => void;
 };
 
 const TransactionProject: React.FC<TransactionProps> = (props) => {
@@ -96,6 +106,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [payerIncomeData, setPayerIncomeData] = useState([{}]);
   const [showPayerExpenseTab, setShowPayerExpenseTab] = useState(false);
   const [showPayerIncomeTab, setShowPayerIncomeTab] = useState(false);
+
   const {
     balance,
     income,
@@ -133,6 +144,14 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   useEffect(() => {
     const startDate = moment().startOf('month').format(dateFormat);
     const endDate = moment().endOf('month').format(dateFormat);
+    //update form initial data
+    props.updateTransactionForm(
+      startDate,
+      endDate,
+      FrequencyType.MONTHLY,
+      LedgerSummaryType.DEFAULT,
+      currentZone
+    );
     props.updateExpandedMyself(true);
     props.updateTransactions(
       props.projectId,
@@ -280,13 +299,17 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       .catch((info) => console.log(info));
   };
 
+  const PieTooltipContent = (props: any) => {
+    return <div>ssssss</div>;
+  };
+
   return (
-    <div className="transaction-page">
-      <div className="transaction-control">
+    <div className='transaction-page'>
+      <div className='transaction-control'>
         <Form
           form={form}
           onValuesChange={handleFilterChange}
-          layout="inline"
+          layout='inline'
           initialValues={{
             frequencyType: 'MONTHLY',
             timezone: props.timezone ? props.timezone : currentZone,
@@ -294,23 +317,53 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           }}
         >
           {ledgerSummaryType === 'DEFAULT' && (
-            <Form.Item name="frequencyType">
-              <Radio.Group value="YEARLY" size="small" buttonStyle="solid">
-                <Tooltip title="WEEKLY">
-                  <Radio.Button value="WEEKLY">W</Radio.Button>
+            <Form.Item name='frequencyType'>
+              <Radio.Group
+                value='YEARLY'
+                size='small'
+                buttonStyle='solid'
+                onChange={(e: any) => {
+                  let updateType = undefined;
+                  if (e.target.value === 'MONTHLY') {
+                    updateType = FrequencyType.MONTHLY;
+                  } else if (e.target.value === 'YEARLY') {
+                    updateType = FrequencyType.YEARLY;
+                  } else {
+                    updateType = FrequencyType.WEEKLY;
+                  }
+                  props.updateTransactionForm(
+                    undefined,
+                    undefined,
+                    updateType,
+                    undefined,
+                    undefined
+                  );
+                }}
+              >
+                <Tooltip title='WEEKLY'>
+                  <Radio.Button value='WEEKLY'>W</Radio.Button>
                 </Tooltip>
-                <Tooltip title="MONTHLY">
-                  <Radio.Button value="MONTHLY">M</Radio.Button>
+                <Tooltip title='MONTHLY'>
+                  <Radio.Button value='MONTHLY'>M</Radio.Button>
                 </Tooltip>
-                <Tooltip title="YEARLY">
-                  <Radio.Button value="YEARLY">Y</Radio.Button>
+                <Tooltip title='YEARLY'>
+                  <Radio.Button value='YEARLY'>Y</Radio.Button>
                 </Tooltip>
               </Radio.Group>
             </Form.Item>
           )}
 
-          <Form.Item name="date">
+          <Form.Item name='date'>
             <RangePicker
+              onChange={(dates: any, dateStrings: string[]) => {
+                props.updateTransactionForm(
+                  dateStrings[0],
+                  dateStrings[1],
+                  undefined,
+                  undefined,
+                  undefined
+                );
+              }}
               ranges={{
                 Today: [moment(), moment()],
                 'This Week': [moment().startOf('week'), moment().endOf('week')],
@@ -319,25 +372,34 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   moment().endOf('month'),
                 ],
               }}
-              size="small"
+              size='small'
               allowClear={true}
               format={dateFormat}
               placeholder={['Start Date', 'End Date']}
             />
           </Form.Item>
 
-          <Tooltip title="Time Zone">
-            <Form.Item name="timezone">
+          <Tooltip title='Time Zone'>
+            <Form.Item name='timezone'>
               <Select
-                size="small"
+                size='small'
                 style={{ maxWidth: 100 }}
                 dropdownMatchSelectWidth={200}
                 showSearch={true}
-                placeholder="Select Time Zone"
+                placeholder='Select Time Zone'
+                onChange={(value: string) => {
+                  props.updateTransactionForm(
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    value
+                  );
+                }}
               >
                 {zones.map((zone: string, index: number) => (
                   <Option key={zone} value={zone}>
-                    <Tooltip title={zone} placement="right">
+                    <Tooltip title={zone} placement='right'>
                       {<span>{zone}</span>}
                     </Tooltip>
                   </Option>
@@ -347,11 +409,18 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </Tooltip>
         </Form>
       </div>
-      <div className="transaction-display">
+      <div className='transaction-display'>
         <Carousel
-          dotPosition="top"
+          dotPosition='top'
           afterChange={(current: number) => {
             setLedgerSummaryType(LedgerSummaryTypeMap[current]);
+            props.updateTransactionForm(
+              undefined,
+              undefined,
+              undefined,
+              LedgerSummaryTypeMap[current],
+              undefined
+            );
             form
               .validateFields()
               .then((values) => {
@@ -360,23 +429,23 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               .catch((info) => console.log(info));
           }}
         >
-          <div className="transaction-summary">{getDefault()}</div>
-          <div className="transaction-payer">{getPayer()}</div>
-          <div className="transaction-label">{getLabel()}</div>
+          <div className='transaction-summary'>{getDefault()}</div>
+          <div className='transaction-payer'>{getPayer()}</div>
+          <div className='transaction-label'>{getLabel()}</div>
           {/* maybe others? */}
         </Carousel>
       </div>
 
-      <div className="transaction-display-mini">
-        <Carousel dotPosition="left" autoplay>
+      <div className='transaction-display-mini'>
+        <Carousel dotPosition='left' autoplay>
           {transactionsSummaries ? (
             transactionsSummaries.map(
               (transactionsSummary: TransactionsSummary, index: number) => (
                 <div
                   key={`${transactionsSummary.name}-${index}`}
-                  className="transaction-display-mini-content"
+                  className='transaction-display-mini-content'
                 >
-                  <span className="title">{transactionsSummary.name}</span>
+                  <span className='title'>{transactionsSummary.name}</span>
                   <span>
                     Expense: {transactionsSummary.expensePercentage}%,
                   </span>
@@ -391,8 +460,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       </div>
 
       {ledgerSummaryType === LedgerSummaryType.DEFAULT && (
-        <div className="transaction-visual">
-          <div className="transaction-graph">
+        <div className='transaction-visual'>
+          <div className='transaction-graph'>
             {transactionsSummaries ? (
               <ResponsiveContainer>
                 <LineChart
@@ -400,12 +469,12 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   height={200}
                   margin={{ left: 5, bottom: 5, right: 50, top: 20 }}
                 >
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey='name' />
                   <YAxis />
                   <Legend />
-                  <Line type="monotone" dataKey="expense" stroke="#8884d8" />
-                  <Line type="monotone" dataKey="income" stroke="#82ca9d" />
-                  <Line type="monotone" dataKey="balance" stroke="#3437eb" />
+                  <Line type='monotone' dataKey='expense' stroke='#8884d8' />
+                  <Line type='monotone' dataKey='income' stroke='#82ca9d' />
+                  <Line type='monotone' dataKey='balance' stroke='#3437eb' />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -417,15 +486,15 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
       {/* label pie graph */}
       {ledgerSummaryType === LedgerSummaryType.LABEL && (
-        <div className="transaction-visual">
+        <div className='transaction-visual'>
           <Radio.Group
-            defaultValue="expense"
+            defaultValue='expense'
             onChange={(e: RadioChangeEvent) => setGraphCate(e.target.value)}
           >
             {showLabelExpenseTab && <Radio value={'expense'}>Expense</Radio>}
             {showLabelIncomeTab && <Radio value={'income'}>Income</Radio>}
           </Radio.Group>
-          <div className="transaction-graph">
+          <div className='transaction-graph'>
             {showLabelExpenseTab || showLabelIncomeTab ? (
               <ResponsiveContainer>
                 <PieChart>
@@ -439,7 +508,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                         : labelIncomeData
                     }
                     outerRadius={60}
-                    fill="#8884d8"
+                    fill='#8884d8'
                     labelLine={false}
                   />
                   <HoverHint />
@@ -453,7 +522,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       )}
 
       {ledgerSummaryType === LedgerSummaryType.PAYER && (
-        <div className="transaction-visual">
+        <div className='transaction-visual'>
           <Radio.Group
             defaultValue={graphCate}
             value={graphCate}
@@ -462,11 +531,12 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             {showPayerExpenseTab && <Radio value={'expense'}>Expense</Radio>}
             {showPayerIncomeTab && <Radio value={'income'}>Income</Radio>}
           </Radio.Group>
-          <div className="transaction-graph">
+          <div className='transaction-graph'>
             {showPayerExpenseTab || showPayerIncomeTab ? (
               <ResponsiveContainer>
                 <PieChart width={200} height={200}>
                   {/* expense */}
+                  <HoverHint content={<PieTooltipContent />} />
                   <Pie
                     dataKey={graphCate}
                     isAnimationActive={false}
@@ -476,10 +546,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                         : payerIncomeData
                     }
                     outerRadius={60}
-                    fill="#8884d8"
+                    fill='#8884d8'
                     label
                   />
-                  <HoverHint />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -488,9 +557,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </div>
         </div>
       )}
-      <List className="transaction-list">
+      <List className='transaction-list'>
         {transactions.map((item) => (
-          <List.Item className="transaction-list-item">
+          <List.Item className='transaction-list-item'>
             <TransactionItem transaction={item} />
           </List.Item>
         ))}
@@ -508,4 +577,5 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   updateTransactions,
   updateExpandedMyself,
+  updateTransactionForm,
 })(TransactionProject);
