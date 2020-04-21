@@ -21,7 +21,7 @@ public class UpdateTaskParams {
 
     private String recurrenceRule;
 
-    private List<User> assignees;
+    private List<String> assignees;
 
     public UpdateTaskParams() {
     }
@@ -135,11 +135,11 @@ public class UpdateTaskParams {
         return this.recurrenceRule != null;
     }
 
-    public List<User> getAssignees() {
+    public List<String> getAssignees() {
         return assignees;
     }
 
-    public void setAssignees(List<User> assignees) {
+    public void setAssignees(List<String> assignees) {
         this.assignees = assignees;
     }
 }
