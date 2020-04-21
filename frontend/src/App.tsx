@@ -56,6 +56,7 @@ const App: React.FC<RootProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
+  loading: state.myself.loading,
 });
 
-export default connect(mapStateToProps, {updateTheme})(App);
+export default connect(mapStateToProps, { updateTheme })(App);

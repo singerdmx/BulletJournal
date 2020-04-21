@@ -81,6 +81,7 @@ const ContentItem: React.FC<ContentProps> = ({
         projectItem={projectItem}
       />
       <RevisionDrawer
+        content={content.text}
         revisionDisplay={displayRevision}
         onClose={handleRevisionClose}
         revisions={content.revisions}

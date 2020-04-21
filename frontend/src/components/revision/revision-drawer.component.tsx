@@ -1,64 +1,72 @@
-import React, { useState, useEffect } from "react";
-import { Drawer, Pagination } from "antd";
-import { connect } from "react-redux";
-import { updateNoteContentRevision } from "../../features/notes/actions";
-import RevisionCompare from "./revision-compare.component";
-import { Revision } from "../../features/myBuJo/interface";
+import React, { useState } from 'react';
+import { Drawer, Pagination, Empty } from 'antd';
+import RevisionContent from './revision-content.component';
+import { Revision } from '../../features/myBuJo/interface';
 
+declare global {
+  namespace NodeJS {
+    interface Global {
+      document: Document;
+      window: Window;
+      navigator: Navigator;
+    }
+  }
+}
 type RevisionDrawerProps = {
   revisions: Revision[];
+  content: string;
   noteId: number;
   contentId: number;
-  onClose:Function;
-  revisionDisplay : boolean;
+  onClose: Function;
+  revisionDisplay: boolean;
 };
 
-interface RevisionDrawerHandler {
-  updateNoteContentRevision: (
-    noteId: number,
-    contentId: number,
-    revisionId: number
-  ) => void;
-}
-
-const RevisionDrawer: React.FC<RevisionDrawerProps & RevisionDrawerHandler> = ({
+const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
   revisions,
   noteId,
+  content,
   contentId,
   onClose,
   revisionDisplay,
-  updateNoteContentRevision,
 }) => {
-  const [page, setPage] = useState(revisions.length - 1);
-
+  const [revisionIndex, setRevisionIndex] = useState(revisions.length - 1);
   const handlePageChange = (page: number) => {
-    setPage(page);
+    setRevisionIndex(page);
   };
 
   const handleClose = () => {
-      onClose()
-  }
-
-  useEffect(() => {
-    updateNoteContentRevision(noteId, contentId, revisions[page].id);
-  }, []);
-  
+    onClose();
+  };
+  const fullWidth = global.window.innerWidth;
   return (
     <Drawer
       closable
       onClose={handleClose}
       visible={revisionDisplay}
+      destroyOnClose
+      width={fullWidth}
       footer={
         <Pagination
-          current={page}
+          pageSize={1}
+          current={revisionIndex}
           onChange={handlePageChange}
-          total={revisions.length}
+          total={revisions.length - 1}
         />
       }
     >
-      
+      {revisions.length > 1 ? (
+        <RevisionContent
+          contentId={contentId}
+          noteId={noteId}
+          revisionIndex={revisionIndex}
+          revisions={revisions}
+          curContent={content}
+        />
+      ) : (
+        <Empty />
+      )}
     </Drawer>
   );
 };
 
-export default connect(null, { updateNoteContentRevision })(RevisionDrawer);
+export default RevisionDrawer;
