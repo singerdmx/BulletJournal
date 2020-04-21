@@ -1,47 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  Pie,
-  PieChart,
-  Tooltip as HoverHint,
-  LineChart,
-  XAxis,
+  Cell,
   Legend,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
+  Tooltip as HoverHint,
+  XAxis,
   YAxis,
-  Cell,
 } from 'recharts';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import {
-  Carousel,
-  DatePicker,
-  Form,
-  List,
-  Radio,
-  Select,
-  Tooltip,
-  Empty,
-} from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {Carousel, DatePicker, Empty, Form, List, Radio, Select, Tooltip,} from 'antd';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 import './project.styles.less';
-import { zones } from '../../components/settings/constants';
+import {zones} from '../../components/settings/constants';
+import {updateTransactionForm, updateTransactions,} from '../../features/transactions/actions';
+import {updateExpandedMyself} from '../../features/myself/actions';
 import {
-  updateTransactions,
-  updateTransactionForm,
-} from '../../features/transactions/actions';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import {
+  FrequencyType,
   LedgerSummary,
   LedgerSummaryType,
   TransactionsSummary,
-  FrequencyType,
 } from '../../features/transactions/interface';
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
-import { RadioChangeEvent } from 'antd/lib/radio';
+import {RadioChangeEvent} from 'antd/lib/radio';
+
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -316,7 +305,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     );
   };
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF5733'];
 
   return (
     <div className='transaction-page'>
@@ -513,33 +502,30 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
               <ResponsiveContainer>
                 <PieChart>
                   <Pie
-                    dataKey={graphCate}
-                    isAnimationActive={false}
-                    data={
-                      graphCate === 'expense'
-                        ? labelExpenseData
-                        : labelIncomeData
-                    }
-                    outerRadius={60}
-                    labelLine={false}
-                    fill='#8884d8'
-                  />
-                  <Cell key={0} fill='#0088FE' />
-                  <Cell key={1} fill='#1081FE' />
-                  {/* {graphCate === 'expense'
-                    ? labelExpenseData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))
-                    : labelIncomeData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))} */}
-
+                      dataKey={graphCate}
+                      isAnimationActive={true}
+                      data={
+                        graphCate === 'expense'
+                            ? labelExpenseData
+                            : labelIncomeData
+                      }
+                      outerRadius={60}
+                      labelLine={true}
+                  >
+                    {graphCate === 'expense'
+                        ? labelExpenseData.map((entry, index) => (
+                            <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index]}
+                            />
+                        ))
+                        : labelIncomeData.map((entry, index) => (
+                            <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index]}
+                            />
+                        ))}
+                  </Pie>
                   <HoverHint content={<PieTooltipContent />} />
                 </PieChart>
               </ResponsiveContainer>
