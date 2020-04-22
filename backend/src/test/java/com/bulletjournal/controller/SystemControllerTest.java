@@ -116,6 +116,10 @@ public class SystemControllerTest {
         assertNotEquals(0, recurringRemindingTaskList.size());
 
         deleteTask(recurringRemindingTask);
+        deleteTask(t2);
+        deleteTask(t3);
+        deleteTask(t4);
+        deleteTask(t5);
     }
 
     private Task addRecurringRemindingTasks(Project project, Integer before, String date, String time) {
