@@ -188,6 +188,7 @@ public class SystemController {
                 throw new IllegalArgumentException();
         }
 
+        contents.forEach(content -> content.setRevisions(new Revision[0])); // clear revisions
         return new PublicProjectItem(contentType, contents, projectItem);
     }
 
