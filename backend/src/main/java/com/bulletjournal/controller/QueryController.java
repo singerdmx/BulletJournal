@@ -2,7 +2,6 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.es.SearchService;
-import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.repository.UserGroupRepository;
 import com.bulletjournal.repository.UserRepository;
 import com.bulletjournal.repository.models.Group;
@@ -36,16 +35,12 @@ public class QueryController {
     protected static final String SEARCH_ROUTE = "/api/query";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
-
-    @Autowired
-    private GroupDaoJpa groupDaoJpa;
-
-    @Autowired
-    private UserRepository userRepository;
-
     @Autowired
     UserGroupRepository userGroupRepository;
-
+    //    @Autowired
+//    ProjectItemEsDaoJpa projectItemESDaoJpa;
+    @Autowired
+    private UserRepository userRepository;
     @Qualifier("client")
     @Autowired(required = false)
     private RestHighLevelClient highLevelClient;
@@ -82,4 +77,11 @@ public class QueryController {
         LOGGER.info(response.toString());
         return response;
     }
+
+//    @GetMapping(SEARCH_ROUTE)
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<ProjectItem> search(@Valid @RequestParam @NotBlank String term) throws IOException {
+//        return projectItemESDaoJpa.search(term);
+//    }
+
 }

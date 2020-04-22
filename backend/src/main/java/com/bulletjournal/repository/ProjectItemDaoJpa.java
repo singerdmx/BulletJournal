@@ -203,7 +203,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> String getContentRevision(
+    public <T extends ProjectItemModel> Revision getContentRevision(
         String requester, Long projectItemId, Long contentId, Long revisionId) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
@@ -219,14 +219,16 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         if (revisionId.equals(revisions[revisions.length - 1].getId())) {
-            return content.getText();
+            revisions[revisions.length - 1].setContent(content.getText());
+            return revisions[revisions.length - 1];
         }
 
         String ret = content.getBaseText();
         for (Revision revision : revisions) {
             ret = contentDiffTool.applyDiff(ret, revision.getDiff());
             if (revision.getId().equals(revisionId)) {
-                return ret;
+                revision.setContent(ret);
+                return revision;
             }
         }
         throw new IllegalStateException("Cannot reach here");

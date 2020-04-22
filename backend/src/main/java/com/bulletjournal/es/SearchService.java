@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +38,16 @@ public class SearchService {
     @Autowired
     private GroupDaoJpa groupDaoJpa;
 
+//    @Autowired
+//    private ProjectItemEsDaoJpa projectItemEsDaoJpa;
+
     public void saveToES(ProjectItem projectItem) {
         if (highLevelClient == null) {
             return;
         }
 
-        List<Long> relatedGroupIds = groupDaoJpa.getProjectItemGroups(projectItem.getOwner()).stream()
+        List<Long> relatedGroupIds = groupDaoJpa.getProjectItemGroups(projectItem.getOwner())
+                .stream()
                 .map(Group::getId)
                 .collect(Collectors.toList());
         BulkRequest bulkRequest = new BulkRequest(PROJECT_ITEM, "default");
@@ -65,38 +68,17 @@ public class SearchService {
         }
     }
 
-    public void saveToESBatch(ProjectItem projectItem, String username) {
-        if (highLevelClient == null) {
-            return;
-        }
-
-        List<String> users = getRelatedUsers(projectItem);
-        BulkRequest bulkRequest = new BulkRequest(PROJECT_ITEM, "default");
-        for (String user : users) {
-
-            Map<String, Object> json = new HashMap<>();
-            json.put("name", projectItem.getName());
-            json.put("user", user);
-
-            String index = projectItem.getClass().getSimpleName() + "@" + projectItem.getId();
-            IndexRequest request = new IndexRequest(PROJECT_ITEM, "default", index)
-                    .source(json)
-                    .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-
-            bulkRequest.add(request);
-        }
-        try {
-            highLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            LOGGER.error("SaveToESBatch fail", e);
-        }
-    }
-
-    public List<String> getRelatedUsers(ProjectItem projectItem) {
-        List<Group> groupList = groupDaoJpa.getProjectItemGroups(projectItem.getOwner());
-        List<String> relatedUsers = new ArrayList<>();
-        groupList.forEach(g -> g.getUsers()
-                .forEach(userGroup -> relatedUsers.add(userGroup.getUser().getName())));
-        return relatedUsers;
-    }
+//    public Long save(ProjectItem projectItem) {
+//        if (highLevelClient == null) {
+//            LOGGER.error("Missing HighLevelClient");
+//            throw new IllegalStateException("Missing Elastic Search HigH Level Client");
+//        }
+//
+//        List<Long> relatedGroupIds = groupDaoJpa.getProjectItemGroups(projectItem.getOwner())
+//                .stream()
+//                .map(Group::getId)
+//                .collect(Collectors.toList());
+//
+//        return projectItemEsDaoJpa.create(projectItem);
+//    }
 }

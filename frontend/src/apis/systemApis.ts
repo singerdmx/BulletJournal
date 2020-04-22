@@ -1,6 +1,6 @@
 import {doFetch} from './api-helper';
 
-export const fetchSystemUpdates = (targets = '', projectId = undefined) => {
+export const fetchSystemUpdates = (targets = '', projectId = undefined, remindingTaskEtag = undefined) => {
     let endpoint = '/api/system/updates';
     if (targets && projectId) {
         endpoint += `?targets=${targets}&projectId=${projectId}`;
@@ -9,7 +9,7 @@ export const fetchSystemUpdates = (targets = '', projectId = undefined) => {
     } else if (projectId) {
         endpoint += `?projectId=${projectId}`;
     }
-    return doFetch(endpoint)
+    return doFetch(endpoint, remindingTaskEtag)
         .then(res => res.json())
         .catch(err => {
             throw Error(err.message);

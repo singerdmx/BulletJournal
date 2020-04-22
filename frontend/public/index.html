@@ -26,10 +26,15 @@
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
     ></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163355828-1"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-163355828-1"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag() {
+        dataLayer.push(arguments);
+      }
       gtag('js', new Date());
 
       gtag('config', 'UA-163355828-1');
@@ -46,14 +51,6 @@
     <title>Bullet Journal</title>
   </head>
   <body>
-    <link rel="stylesheet/less" type="text/css" href="/color.less" />
-    <script>
-      window.less = {
-        async: false,
-        env: 'production'
-      };
-    </script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--
@@ -65,6 +62,17 @@
 
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+      -->
+    <link rel="stylesheet/less" type="text/css" href="/color.less" />
+    <script>
+      window.less = {
+        async: false,
+        env: 'production',
+      };
+    </script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"
+    ></script>
   </body>
 </html>

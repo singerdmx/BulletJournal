@@ -15,9 +15,15 @@ export type MyselfApiErrorAction = {
 
 export type UpdateMyself = {};
 
+export type ThemeUpdate = {};
+
 export type UpdateExpandedMyself = {
   updateSettings: boolean;
 };
+
+export type ExpandedMyselfLoading = {
+  loading: boolean;
+}
 
 export type PatchMyself = {
   timezone?: string;
@@ -33,6 +39,7 @@ let initialState = {
   before: 0,
   currency: '',
   theme: 'LIGHT',
+  loading: false
 };
 
 const slice = createSlice({
@@ -52,8 +59,13 @@ const slice = createSlice({
       state,
       action: PayloadAction<MyselfApiErrorAction>
     ) => state,
+    themeUpdate: (state, action: PayloadAction<ThemeUpdate>) => state,
     myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state,
     patchMyself: (state, action: PayloadAction<PatchMyself>) => state,
+    expandedMyselfLoading: (state, action: PayloadAction<ExpandedMyselfLoading>) => {
+      const { loading } = action.payload;
+      state.loading = loading;
+    },
     expandedMyselfUpdate: (
       state,
       action: PayloadAction<UpdateExpandedMyself>

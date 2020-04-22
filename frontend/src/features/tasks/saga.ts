@@ -439,26 +439,30 @@ function* taskContentRevisionUpdate(
     const { taskId, contentId, revisionId } = action.payload;
     const state: IState = yield select();
 
-    const contents: Content[] = state.task.contents;
-    const targetContent: Content = contents.filter(
-      (c) => c.id === contentId
-    )[0];
-    const revision: Revision = targetContent.revisions.filter(
-      (r) => r.id === revisionId
-    )[0];
+    const targetContent : Content = state.task.contents.find(c => c.id === contentId)!;
+    const revision: Revision = targetContent.revisions.find(r => r.id === revisionId)!;
 
     if (!revision.content) {
-      const content = yield call(
-        getContentRevision,
-        taskId,
-        contentId,
-        revisionId
-      );
-      revision.content = content;
+      const data = yield call(getContentRevision, taskId, contentId, revisionId);
+
+      const taskContents : Content[] = [];
+      state.task.contents.forEach((taskContent) => {
+        if (taskContent.id === contentId) {
+          const newRevisions : Revision[] = [];
+          taskContent.revisions.forEach((revision) => {
+            if (revision.id === revisionId) {
+              revision = { ...revision, content: data.content };
+            }
+            newRevisions.push(revision);
+          });
+          taskContent = { ...taskContent, revisions: newRevisions };
+        }
+        taskContents.push(taskContent);
+      });
 
       yield put(
         tasksActions.taskContentsReceived({
-          contents: contents,
+          contents: taskContents,
         })
       );
     }

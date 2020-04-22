@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { List } from 'antd';
 import { ProjectItem } from '../../features/myBuJo/interface';
 import { Content } from '../../features/myBuJo/interface';

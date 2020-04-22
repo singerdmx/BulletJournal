@@ -9,12 +9,8 @@ import {updateGroups} from '../group/actions';
 import {updateNotifications} from '../notification/actions';
 import {ProjectType} from "../project/constants";
 import {Task} from '../tasks/interface';
-
-const removeTasksFromLocal = (tasks: Task[]) => {
-    tasks.forEach((task: Task) => {
-        localStorage.removeItem(task.name);
-    });
-};
+import moment from 'moment-timezone';
+import { ArgsProps } from 'antd/lib/notification';
 
 const fetchReminderFromLocal = () => {
     const defaultReminders = [] as Task[];
@@ -26,11 +22,10 @@ const fetchReminderFromLocal = () => {
     return JSON.parse(reminders);
 };
 
-const taskNameMapper = (item: any) => ({
-    name: item.name,
-});
+const taskNameMapper = (item: any) => item.id;
 
 const saveTasksIntoLocal = (tasks: Task[]) => {
+    localStorage.clear();
     localStorage.setItem('reminders', JSON.stringify(tasks));
 };
 
@@ -42,12 +37,11 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     try {
         const state = yield select();
         const selectedProject = state.project.project;
-        const remindingTasks = state.system.reminders;
+        const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag, remindingTaskEtag} = state.system;
 
         const data = yield call(fetchSystemUpdates, '',
-            selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined);
+            selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined, remindingTaskEtag);
 
-        const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag, remindingTaskEtag} = state.system;
         if (ownedProjectsEtag !== data.ownedProjectsEtag || sharedProjectsEtag !== data.sharedProjectsEtag) {
             yield put(updateProjects());
         }
@@ -61,27 +55,34 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         }
 
         let newComingTasks = [] as Task[];
-        let endTasks = [] as Task[];
-        const localReminders = fetchReminderFromLocal();
-        if (remindingTaskEtag !== data.remindingTaskEtag) {
-            newComingTasks = data.reminders.map(taskNameMapper).filter((task: any) => !localReminders.map(taskNameMapper).includes(task)).map((item: any) => ({
-                name: item.name,
-                time: new Date().valueOf()
+        var now = new Date().getTime();
+        let localReminders = fetchReminderFromLocal();
+        let unExpiredLocalReminders = localReminders.filter((reminder: any)=>{
+            return now - reminder.time < 2 * 60 * 60 * 1000;
+        })
+        
+        if(remindingTaskEtag !== data.remindingTaskEtag){
+            newComingTasks = data.reminders.map(taskNameMapper).filter((task: any)=>!localReminders.map(taskNameMapper).includes(task)).map((item: any)=>({
+                id: item,
+                time: now
             }));
             yield all(
-                [...newComingTasks.map(item => {
-                    const args = {
-                        message: item.name,
-                        description: 'task due time',
-                        duration: 100
+                [...newComingTasks.map(t => {
+                    return data.reminders.find((reminder: any)=>reminder.id===t.id);
+                }).map((element: Task) =>{
+                    const targetTime = element.dueDate + ' ' + (element.dueTime ? element.dueTime : "00:00");
+                    const leftTime = moment.tz(targetTime, element.timezone);
+                    const args: ArgsProps = {
+                        message: `Task "${element.name}" due ${leftTime.fromNow()}`,
+                        description: `Due: ${element.dueDate} ${element.dueTime}`,
+                        duration: 99999,
+                        placement: 'topLeft'
                     };
                     return call(notification.open, args)
                 })]
             );
-            saveTasksIntoLocal([...newComingTasks, ...localReminders]);
+            saveTasksIntoLocal([...newComingTasks, ...unExpiredLocalReminders]);
         }
-
-        removeTasksFromLocal(endTasks);
 
         let tasksEtag = state.system.tasksEtag;
         let notesEtag = state.system.notesEtag;
@@ -101,8 +102,10 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
                 break;
             default:
         }
-        // notification etag
-        // yield call(message.info, "You've got new notifications");
+
+        if (notificationsEtag !== data.notificationsEtag) {
+            yield call(message.info, "You've got new notifications");
+        }
 
         yield put(
             systemActions.systemUpdateReceived({

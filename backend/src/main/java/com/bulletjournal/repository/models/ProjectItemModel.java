@@ -2,9 +2,9 @@ package com.bulletjournal.repository.models;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectItem;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Type;
+import com.bulletjournal.repository.utils.LongArrayType;
+import com.bulletjournal.repository.utils.StringArrayType;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -19,6 +19,16 @@ import java.util.Objects;
  * {@link Note}: for ProjectType.NOTE
  * {@link Transaction}: for ProjectType.LEDGER
  */
+@TypeDefs({
+        @TypeDef(
+                name = "long-array",
+                typeClass = LongArrayType.class
+        ),
+        @TypeDef(
+                name = "string-array",
+                typeClass = StringArrayType.class
+        ),
+})
 @MappedSuperclass
 public abstract class ProjectItemModel extends OwnedModel {
 

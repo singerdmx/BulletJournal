@@ -43,7 +43,6 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
     const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.stopPropagation();
         calendar && calendar.id && props.updateWatchedProject(calendar.id);
-        // calendar && calendar.id && props.googleCalendarEventListUpdate(calendar.id, calendar.timeZone);
         setVisible(true);
     };
 
@@ -66,6 +65,8 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
         e.stopPropagation();
         form.validateFields().then(values => {
             console.log(values);
+            props.googleCalendarEventListUpdate(
+                calendar.id, calendar.timeZone, "2019-01-01", "2020-08-08");
         }).catch((info) => console.log(info));
     };
 

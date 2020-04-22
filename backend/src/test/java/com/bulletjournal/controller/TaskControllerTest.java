@@ -175,17 +175,17 @@ public class TaskControllerTest {
     }
 
     private String getContentRevision(Long taskId, Long contentId, Long revisionId) {
-        ResponseEntity<String> response = this.restTemplate.exchange(
+        ResponseEntity<Revision> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.CONTENT_REVISIONS_ROUTE,
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, USER),
-                String.class,
+                Revision.class,
                 taskId,
                 contentId,
                 revisionId
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        String text = response.getBody();
+        String text = response.getBody().getContent();
         return text;
     }
 

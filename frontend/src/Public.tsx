@@ -8,7 +8,7 @@ import { ContentType } from './features/myBuJo/constants';
 import { Content } from './features/myBuJo/interface';
 import { getPublicItem } from './features/system/actions';
 
-import './App.less';
+import './styles/main.less';
 import TaskDetailPage from './pages/task/task-detail.pages';
 import NoteDetailPage from './pages/note/note-detail.pages';
 

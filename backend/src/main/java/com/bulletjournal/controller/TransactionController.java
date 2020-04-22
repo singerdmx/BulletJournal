@@ -208,7 +208,7 @@ public class TransactionController {
     }
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
-    public String getContentRevision(
+    public Revision getContentRevision(
         @NotNull @PathVariable Long transactionId,
         @NotNull @PathVariable Long contentId,
         @NotNull @PathVariable Long revisionId) {
