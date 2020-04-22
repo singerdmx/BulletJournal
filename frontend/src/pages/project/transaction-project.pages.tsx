@@ -290,20 +290,24 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       .catch((info) => console.log(info));
   };
 
-  const PieTooltipContent = (input: any) => {
-    if (!input.payload.length) return null;
-
-    const currency = props.currency
+  const currency = props.currency
       ? LocaleCurrency.getCurrency(props.currency)
       : '';
+
+  const PieTooltipContent = (input: any) => {
+    if (!input.payload.length) return null;
+    const count = graphCate === 'expense'
+        ? input.payload[0].payload.payload.expenseCount
+        : input.payload[0].payload.payload.incomeCount;
     return (
       <div style={{ background: '#fffffe', padding: '1px 3px' }}>
-        [{input.payload[0].name}]&nbsp;{`${input.payload[0].value} ${currency}`}{' '}
+        【{input.payload[0].name}】&nbsp;{`${input.payload[0].value} ${currency}`}{' '}
         (
         {graphCate === 'expense'
           ? `${input.payload[0].payload.payload.expensePercentage}%`
           : `${input.payload[0].payload.payload.incomePercentage}%`}
         )
+        &nbsp;{count} time(s)
       </div>
     );
   };
@@ -438,7 +442,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
       {transactionsSummaries && transactionsSummaries.length > 0 && (
         <div className="transaction-display-mini">
-          <Carousel dotPosition="left" autoplay>
+          <Carousel dotPosition="left" autoplay autoplaySpeed={1500}>
             {transactionsSummaries ? (
               transactionsSummaries.map(
                 (transactionsSummary: TransactionsSummary, index: number) => (
@@ -446,11 +450,11 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                     key={`${transactionsSummary.name}-${index}`}
                     className="transaction-display-mini-content"
                   >
-                    <span className="title">{transactionsSummary.name}</span>
+                    <span className="title">{transactionsSummary.name}&nbsp;({transactionsSummary.expenseCount + transactionsSummary.incomeCount})</span>
                     <span>
-                      Expense: {transactionsSummary.expensePercentage}%
+                      Expense: {transactionsSummary.expense} {currency} ({transactionsSummary.expensePercentage}%)
                     </span>
-                    <span>Income: {transactionsSummary.incomePercentage}%</span>
+                    <span>Income: {transactionsSummary.income} {currency} ({transactionsSummary.incomePercentage}%)</span>
                   </div>
                 )
               )
@@ -499,7 +503,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 <PieChart>
                   <Pie
                     dataKey={graphCate}
-                    isAnimationActive={true}
+                    isAnimationActive={false}
                     data={
                       graphCate === 'expense'
                         ? labelExpenseData
@@ -507,6 +511,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                     }
                     outerRadius={60}
                     labelLine={true}
+                    label={(entry) => entry.name}
                   >
                     {graphCate === 'expense'
                       ? labelExpenseData.map((entry, index) => (
@@ -554,6 +559,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                     }
                     outerRadius={60}
                     fill="#8884d8"
+                    label={(entry) => entry.name}
                   >
                     {graphCate === 'expense'
                       ? labelExpenseData.map((entry, index) => (
