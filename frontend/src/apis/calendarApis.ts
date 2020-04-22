@@ -31,7 +31,7 @@ export const getGoogleCalendarEventList = (calendarId: string, timezone: string,
         endpoint += `&startDate=${startDate}`;
     }
     if (endDate) {
-        endpoint += `&startDate=${endDate}`;
+        endpoint += `&endDate=${endDate}`;
     }
     return doFetch(endpoint)
         .then(res => res.json())
