@@ -452,9 +452,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   >
                     <span className="title">{transactionsSummary.name}&nbsp;({transactionsSummary.expenseCount + transactionsSummary.incomeCount})</span>
                     <span>
-                      Expense: {transactionsSummary.expense} {currency} ({transactionsSummary.expensePercentage}%)
+                      Expense({transactionsSummary.expenseCount}) {transactionsSummary.expense} {currency} ({transactionsSummary.expensePercentage}%)
                     </span>
-                    <span>Income: {transactionsSummary.income} {currency} ({transactionsSummary.incomePercentage}%)</span>
+                    <span>Income({transactionsSummary.incomeCount}) {transactionsSummary.income} {currency} ({transactionsSummary.incomePercentage}%)</span>
                   </div>
                 )
               )
