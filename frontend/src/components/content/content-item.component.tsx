@@ -55,7 +55,7 @@ const ContentItem: React.FC<ContentProps> = ({
         </span>
           </Tooltip>);
     }
-    actions.push(<Tooltip title={`${content.owner} created ${createdTime}`}>
+    actions.push(<Tooltip title={`Created by ${content.owner} ${createdTime}`}>
       <Avatar src={content.ownerAvatar} size="small"/>
     </Tooltip>);
 
