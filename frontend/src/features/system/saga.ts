@@ -9,6 +9,7 @@ import {updateGroups} from '../group/actions';
 import {updateNotifications} from '../notification/actions';
 import {ProjectType} from "../project/constants";
 import {Task} from '../tasks/interface';
+import moment from 'moment';
 
 const fetchReminderFromLocal = () => {
     const defaultReminders = [] as Task[];
@@ -35,11 +36,11 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     try {
         const state = yield select();
         const selectedProject = state.project.project;
+        const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag, remindingTaskEtag} = state.system;
 
         const data = yield call(fetchSystemUpdates, '',
-            selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined);
+            selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined, remindingTaskEtag);
 
-        const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag, remindingTaskEtag} = state.system;
         if (ownedProjectsEtag !== data.ownedProjectsEtag || sharedProjectsEtag !== data.sharedProjectsEtag) {
             yield put(updateProjects());
         }
@@ -58,16 +59,20 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         let unExpiredLocalReminders = localReminders.filter((reminder: any)=>{
             return now - reminder.time < 2 * 60 * 60 * 1000;
         })
+        
         if(remindingTaskEtag !== data.remindingTaskEtag){
             newComingTasks = data.reminders.map(taskNameMapper).filter((task: any)=>!localReminders.map(taskNameMapper).includes(task)).map((item: any)=>({
                 name: item,
                 time: now
             }));
             yield all(
-                [...newComingTasks.map(item => {
+                [...newComingTasks.map(item1 => {
+                    return data.reminders.find((reminder: any)=>reminder.name===item1.name);
+                }).map((element: any) =>{
+                    const leftTime = moment(element.dueDate).valueOf() - moment().valueOf();
                     const args = {
-                        message: item.name,
-                        description: 'task due time',
+                        message: `${element.name} Due Date: ${element.dueDate}`,
+                        description: `${leftTime/3600000} Hours Due`,
                         duration: 30
                     };
                     return call(notification.open, args)

@@ -1,12 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export function doFetch(endpoint: string) {
+export function doFetch(endpoint: string, etag: any = undefined) {
   if (process.env.REACT_APP_ENV === 'debug') {
     console.log(endpoint);
   }
-  return fetch(endpoint, {
-    headers: { 'request-id': uuidv4() }
-  }).then(res => {
+
+  let headers = {} as any;
+
+  if(etag){
+    headers = { headers: { 'request-id': uuidv4(), 'IF_NONE_MATCH': etag } }
+  }else{
+    headers = { headers: { 'request-id': uuidv4() }}
+  }
+  return fetch(endpoint, headers).then(res => {
     if (!res.ok) {
       throw Error(res.status.toString());
     }
