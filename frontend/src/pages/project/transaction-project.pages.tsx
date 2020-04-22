@@ -296,15 +296,18 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
   const PieTooltipContent = (input: any) => {
     if (!input.payload.length) return null;
-
+    const count = graphCate === 'expense'
+        ? input.payload[0].payload.payload.expenseCount
+        : input.payload[0].payload.payload.incomeCount;
     return (
       <div style={{ background: '#fffffe', padding: '1px 3px' }}>
-        [{input.payload[0].name}]&nbsp;{`${input.payload[0].value} ${currency}`}{' '}
+        【{input.payload[0].name}】&nbsp;{`${input.payload[0].value} ${currency}`}{' '}
         (
         {graphCate === 'expense'
           ? `${input.payload[0].payload.payload.expensePercentage}%`
           : `${input.payload[0].payload.payload.incomePercentage}%`}
         )
+        &nbsp;{count} time(s)
       </div>
     );
   };
@@ -439,7 +442,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
       {transactionsSummaries && transactionsSummaries.length > 0 && (
         <div className="transaction-display-mini">
-          <Carousel dotPosition="left" autoplay>
+          <Carousel dotPosition="left" autoplay speed={1}>
             {transactionsSummaries ? (
               transactionsSummaries.map(
                 (transactionsSummary: TransactionsSummary, index: number) => (
@@ -447,11 +450,11 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                     key={`${transactionsSummary.name}-${index}`}
                     className="transaction-display-mini-content"
                   >
-                    <span className="title">{transactionsSummary.name}</span>
+                    <span className="title">{transactionsSummary.name}&nbsp;({transactionsSummary.expenseCount + transactionsSummary.incomeCount})</span>
                     <span>
-                      Expense: {transactionsSummary.expensePercentage}%
+                      Expense: {transactionsSummary.expense} {currency} ({transactionsSummary.expensePercentage}%)
                     </span>
-                    <span>Income: {transactionsSummary.incomePercentage}%</span>
+                    <span>Income: {transactionsSummary.income} {currency} ({transactionsSummary.incomePercentage}%)</span>
                   </div>
                 )
               )
