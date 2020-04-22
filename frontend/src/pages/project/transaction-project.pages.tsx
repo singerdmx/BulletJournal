@@ -309,7 +309,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       ? LocaleCurrency.getCurrency(props.currency)
       : '';
     return (
-      <div>
+      <div style={{ background: '#fffffe', padding: '1px 3px' }}>
         [{input.payload[0].name}]&nbsp;{`${input.payload[0].value} ${currency}`}{' '}
         (
         {graphCate === 'expense'
