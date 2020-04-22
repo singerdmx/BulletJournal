@@ -9,7 +9,8 @@ import {updateGroups} from '../group/actions';
 import {updateNotifications} from '../notification/actions';
 import {ProjectType} from "../project/constants";
 import {Task} from '../tasks/interface';
-import moment from 'moment';
+import moment from 'moment-timezone';
+import { ArgsProps } from 'antd/lib/notification';
 
 const fetchReminderFromLocal = () => {
     const defaultReminders = [] as Task[];
@@ -21,7 +22,7 @@ const fetchReminderFromLocal = () => {
     return JSON.parse(reminders);
 };
 
-const taskNameMapper = (item: any) => item.name;
+const taskNameMapper = (item: any) => item.id;
 
 const saveTasksIntoLocal = (tasks: Task[]) => {
     localStorage.clear();
@@ -62,18 +63,20 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         
         if(remindingTaskEtag !== data.remindingTaskEtag){
             newComingTasks = data.reminders.map(taskNameMapper).filter((task: any)=>!localReminders.map(taskNameMapper).includes(task)).map((item: any)=>({
-                name: item,
+                id: item,
                 time: now
             }));
             yield all(
-                [...newComingTasks.map(item1 => {
-                    return data.reminders.find((reminder: any)=>reminder.name===item1.name);
-                }).map((element: any) =>{
-                    const leftTime = moment(element.dueDate).valueOf() - moment().valueOf();
-                    const args = {
-                        message: `${element.name} Due Date: ${element.dueDate}`,
-                        description: `${leftTime/3600000} Hours Due`,
-                        duration: 30
+                [...newComingTasks.map(t => {
+                    return data.reminders.find((reminder: any)=>reminder.id===t.id);
+                }).map((element: Task) =>{
+                    const targetTime = element.dueDate + ' ' + (element.dueTime ? element.dueTime : "00:00");
+                    const leftTime = moment.tz(targetTime, element.timezone);
+                    const args: ArgsProps = {
+                        message: `Task "${element.name}" due ${leftTime.fromNow()}`,
+                        description: `Due: ${element.dueDate} ${element.dueTime}`,
+                        duration: 99999,
+                        placement: 'topLeft'
                     };
                     return call(notification.open, args)
                 })]
