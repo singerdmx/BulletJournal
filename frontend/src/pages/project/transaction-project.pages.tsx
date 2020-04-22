@@ -442,7 +442,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
       {transactionsSummaries && transactionsSummaries.length > 0 && (
         <div className="transaction-display-mini">
-          <Carousel dotPosition="left" autoplay speed={1}>
+          <Carousel dotPosition="left" autoplay autoplaySpeed={1500}>
             {transactionsSummaries ? (
               transactionsSummaries.map(
                 (transactionsSummary: TransactionsSummary, index: number) => (
