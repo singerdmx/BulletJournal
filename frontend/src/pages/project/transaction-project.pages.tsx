@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Cell,
   Legend,
@@ -11,27 +11,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import {
-  Carousel,
-  DatePicker,
-  Empty,
-  Form,
-  List,
-  Radio,
-  Select,
-  Tooltip,
-} from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {Carousel, DatePicker, Form, List, Radio, Select, Tooltip,} from 'antd';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 import './project.styles.less';
-import { zones } from '../../components/settings/constants';
-import {
-  updateTransactionForm,
-  updateTransactions,
-} from '../../features/transactions/actions';
-import { updateExpandedMyself } from '../../features/myself/actions';
+import {zones} from '../../components/settings/constants';
+import {updateTransactionForm, updateTransactions,} from '../../features/transactions/actions';
+import {updateExpandedMyself} from '../../features/myself/actions';
 import {
   FrequencyType,
   LedgerSummary,
@@ -41,7 +29,7 @@ import {
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
-import { RadioChangeEvent } from 'antd/lib/radio';
+import {RadioChangeEvent} from 'antd/lib/radio';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -320,7 +308,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     );
   };
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF5733'];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF5733', '#FFBD33', '#DBFF33', '#75FF33',
+    '#33FF57', '#33FFBD', '#33CAFF', '#FF33EC', '#FF334F'];
 
   return (
     <div className="transaction-page">
@@ -330,34 +319,26 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           onValuesChange={handleFilterChange}
           layout="inline"
           initialValues={{
-            frequencyType: 'MONTHLY',
+            frequencyType: FrequencyType.MONTHLY,
             timezone: props.timezone ? props.timezone : currentZone,
             date: [moment().startOf('month'), moment().endOf('month')],
           }}
         >
-          {ledgerSummaryType === 'DEFAULT' && (
+          {ledgerSummaryType === LedgerSummaryType.DEFAULT && (
             <Form.Item name="frequencyType">
               <Radio.Group
-                value="YEARLY"
-                size="small"
-                buttonStyle="solid"
-                onChange={(e: any) => {
-                  let updateType = undefined;
-                  if (e.target.value === 'MONTHLY') {
-                    updateType = FrequencyType.MONTHLY;
-                  } else if (e.target.value === 'YEARLY') {
-                    updateType = FrequencyType.YEARLY;
-                  } else {
-                    updateType = FrequencyType.WEEKLY;
-                  }
-                  props.updateTransactionForm(
-                    undefined,
-                    undefined,
-                    updateType,
-                    undefined,
-                    undefined
-                  );
-                }}
+                  value={FrequencyType.YEARLY}
+                  size="small"
+                  buttonStyle="solid"
+                  onChange={(e: any) => {
+                    props.updateTransactionForm(
+                        undefined,
+                        undefined,
+                        e.target.value,
+                        undefined,
+                        undefined
+                    );
+                  }}
               >
                 <Tooltip title="WEEKLY">
                   <Radio.Button value="WEEKLY">W</Radio.Button>
