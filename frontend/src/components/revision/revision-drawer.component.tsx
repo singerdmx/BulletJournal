@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Drawer, Pagination, Empty } from 'antd';
 import RevisionContent from './revision-content.component';
-import { Revision } from '../../features/myBuJo/interface';
+import {Content, ProjectItem, Revision} from '../../features/myBuJo/interface';
 
 declare global {
   namespace NodeJS {
@@ -14,18 +14,16 @@ declare global {
 }
 type RevisionDrawerProps = {
   revisions: Revision[];
-  content: string;
-  noteId: number;
-  contentId: number;
+  content: Content;
+  projectItem: ProjectItem;
   onClose: Function;
   revisionDisplay: boolean;
 };
 
 const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
   revisions,
-  noteId,
+  projectItem,
   content,
-  contentId,
   onClose,
   revisionDisplay,
 }) => {
@@ -56,11 +54,10 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
     >
       {revisions.length > 1 ? (
         <RevisionContent
-          contentId={contentId}
-          noteId={noteId}
+          content={content}
+          projectItem={projectItem}
           revisionIndex={revisionIndex}
           revisions={revisions}
-          curContent={content}
         />
       ) : (
         <Empty />

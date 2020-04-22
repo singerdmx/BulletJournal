@@ -4,14 +4,13 @@ import { connect } from 'react-redux';
 import { updateNoteContentRevision } from '../../features/notes/actions';
 import ReactDiffViewer from 'react-diff-viewer';
 import './revision.styles.less';
-import { Revision } from '../../features/myBuJo/interface';
+import {Content, ProjectItem, Revision} from '../../features/myBuJo/interface';
 
 type RevisionProps = {
   revisionIndex: number;
   revisions: Revision[];
-  curContent: string;
-  contentId: number;
-  noteId: number;
+  content: Content;
+  projectItem: ProjectItem;
 };
 
 interface RevisionContentHandler {
@@ -25,24 +24,23 @@ interface RevisionContentHandler {
 const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   revisionIndex,
   revisions,
-  curContent,
-  contentId,
-  noteId,
+  content,
+  projectItem,
   updateNoteContentRevision,
 }) => {
-  const latestContent = BraftEditor.createEditorState(curContent);
+  const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
-  const historyContet = revisions[revisionIndex - 1].content;
+  const historyContent = revisions[revisionIndex - 1].content;
   useEffect(() => {
     const historyId = revisions[revisionIndex - 1].id;
-    updateNoteContentRevision(noteId, contentId, historyId);
+    updateNoteContentRevision(projectItem.id, content.id, historyId);
   }, [revisionIndex]);
 
   useEffect(() => {
     setHistory(
       BraftEditor.createEditorState(revisions[revisionIndex - 1].content)
     );
-  }, [historyContet]);
+  }, [historyContent]);
 
   const highlightSyntax = (str: string) => (
     <div

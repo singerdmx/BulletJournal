@@ -83,12 +83,11 @@ const ContentItem: React.FC<ContentProps> = ({
         projectItem={projectItem}
       />
       <RevisionDrawer
-        content={content.text}
         revisionDisplay={displayRevision}
         onClose={handleRevisionClose}
         revisions={content.revisions}
-        noteId={projectItem.id}
-        contentId={content.id}
+        projectItem={projectItem}
+        content={content}
       />
     </List.Item>
   );
