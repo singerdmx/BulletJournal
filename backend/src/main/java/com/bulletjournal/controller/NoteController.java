@@ -177,6 +177,9 @@ public class NoteController {
                 .map(t -> {
                     Content content = t.toPresentationModel();
                     content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
+                    for (Revision revision : content.getRevisions()) {
+                        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
+                    }
                     return content;
                 })
                 .collect(Collectors.toList());
