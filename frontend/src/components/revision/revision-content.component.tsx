@@ -15,6 +15,7 @@ import {
 } from '../../features/myBuJo/interface';
 import { Button, message, Avatar } from 'antd';
 import { RollbackOutlined } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 
 type RevisionProps = {
   revisionIndex: number;
@@ -42,7 +43,6 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   patchContent,
   handleClose,
 }) => {
-  console.log('revisionindex', revisionIndex);
   const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
   const historyContent = revisions[revisionIndex - 1].content;
@@ -77,16 +77,18 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       <div className="revision-content">
         <div className="revision-header">
           <div>
-            <Button onClick={handleRevert} size="small" shape="round">
+            <Button onClick={handleRevert} size="small" shape="circle">
               <RollbackOutlined />
             </Button>{' '}
             Revision {revisionIndex}{' '}
             {revisions[revisionIndex].userAvatar && (
-              <Avatar
-                src={revisions[revisionIndex].userAvatar}
-                style={{ marginRight: '1rem' }}
-                size="small"
-              />
+              <Tooltip title={`Editted by ${revisions[revisionIndex].user}`}>
+                <Avatar
+                  src={revisions[revisionIndex].userAvatar}
+                  style={{ marginRight: '1rem' }}
+                  size="small"
+                />
+              </Tooltip>
             )}
           </div>
           <span>
@@ -94,9 +96,6 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
           </span>
         </div>
         <div dangerouslySetInnerHTML={{ __html: history.toHTML() }}></div>
-        <div className="revision-info">
-          Edit by {revisions[revisionIndex].user}
-        </div>
       </div>
       <div className="revision-content">
         <div className="revision-header">
