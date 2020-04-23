@@ -60,7 +60,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   }, [historyContent]);
 
   const handleRevert = () => {
-    if (!revisions[revisionIndex].content) {
+    if (!revisions[revisionIndex - 1].content) {
       message.info('Revert Not Work');
       return;
     }
@@ -76,22 +76,26 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     <div className="revision-container">
       <div className="revision-content">
         <div className="revision-header">
-          Revision {revisionIndex}
-          <Button onClick={handleRevert} size="small" shape="round">
-            <RollbackOutlined />
-            Revert to this version
-          </Button>
+          <div>
+            <Button onClick={handleRevert} size="small" shape="round">
+              <RollbackOutlined />
+            </Button>{' '}
+            Revision {revisionIndex}{' '}
+            {revisions[revisionIndex].userAvatar && (
+              <Avatar
+                src={revisions[revisionIndex].userAvatar}
+                style={{ marginRight: '1rem' }}
+                size="small"
+              />
+            )}
+          </div>
+          <span>
+            {moment(revisions[revisionIndex - 1].createdAt).fromNow()}
+          </span>
         </div>
         <div dangerouslySetInnerHTML={{ __html: history.toHTML() }}></div>
         <div className="revision-info">
-          Edit by{' '}
-          {revisions[revisionIndex].userAvatar && (
-            <Avatar
-              src={revisions[revisionIndex].userAvatar}
-              style={{ marginRight: '1rem' }}
-            />
-          )}
-          {revisions[revisionIndex].user}
+          Edit by {revisions[revisionIndex].user}
         </div>
       </div>
       <div className="revision-content">
