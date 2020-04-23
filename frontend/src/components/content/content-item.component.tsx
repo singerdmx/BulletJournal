@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
-import {Avatar, List, Tooltip} from 'antd';
-import {Content, ProjectItem} from '../../features/myBuJo/interface';
+import React, { useState } from 'react';
+import { Avatar, List, Tooltip } from 'antd';
+import { Content, ProjectItem } from '../../features/myBuJo/interface';
 import BraftEditor from 'braft-editor';
 import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import RevisionDrawer from '../revision/revision-drawer.component';
-import {FullscreenOutlined, HighlightOutlined} from '@ant-design/icons';
+import { FullscreenOutlined, HighlightOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import './content-item.styles.less';
 
@@ -23,8 +23,12 @@ const ContentItem: React.FC<ContentProps> = ({
   const contentText = contentState.toText();
   const [displayMore, setDisplayMore] = useState(false);
   const [displayRevision, setDisplayRevision] = useState(false);
-  const createdTime = content.createdAt ? moment(content.createdAt).fromNow() : '';
-  const updateTime = content.updatedAt ? moment(content.updatedAt).format('MMM Do YYYY') : '';
+  const createdTime = content.createdAt
+    ? moment(content.createdAt).fromNow()
+    : '';
+  const updateTime = content.updatedAt
+    ? moment(content.updatedAt).format('MMM Do YYYY')
+    : '';
   const handleOpen = () => {
     setDisplayMore(true);
   };
@@ -43,27 +47,31 @@ const ContentItem: React.FC<ContentProps> = ({
   const getActions = () => {
     const actions = [
       <Tooltip title="Click to view">
-        <FullscreenOutlined onClick={handleOpen}/>
-      </Tooltip>];
+        <FullscreenOutlined onClick={handleOpen} />
+      </Tooltip>,
+    ];
     if (content.revisions && content.revisions.length > 0) {
       actions.push(
-          <Tooltip title="View revision history">
-        <span className="open-revisions-button" onClick={handleOpenRevisions}>
-          <HighlightOutlined/>
-          &nbsp;
-          {content.revisions.length}
-        </span>
-          </Tooltip>);
+        <Tooltip title="View revision history">
+          <span className="open-revisions-button" onClick={handleOpenRevisions}>
+            <HighlightOutlined />
+            &nbsp;
+            {content.revisions.length}
+          </span>
+        </Tooltip>
+      );
     }
-    actions.push(<Tooltip title={`Created by ${content.owner} ${createdTime}`}>
-      <Avatar src={content.ownerAvatar} size="small"/>
-    </Tooltip>);
+    actions.push(
+      <Tooltip title={`Created by ${content.owner} ${createdTime}`}>
+        <Avatar src={content.ownerAvatar} size="small" />
+      </Tooltip>
+    );
 
     if (content.updatedAt) {
       actions.push(
-          <Tooltip title={`Updated ${moment(content.updatedAt).fromNow()}`}>
-            <span>{updateTime}</span>
-          </Tooltip>
+        <Tooltip title={`Updated ${moment(content.updatedAt).fromNow()}`}>
+          <span>{updateTime}</span>
+        </Tooltip>
       );
     }
 

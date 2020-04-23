@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Drawer, Pagination, Empty } from 'antd';
 import RevisionContent from './revision-content.component';
-import {Content, ProjectItem, Revision} from '../../features/myBuJo/interface';
+import {
+  Content,
+  ProjectItem,
+  Revision,
+} from '../../features/myBuJo/interface';
 
 declare global {
   namespace NodeJS {
@@ -42,9 +46,10 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
       onClose={handleClose}
       visible={revisionDisplay}
       destroyOnClose
-      width={fullWidth}
+      width={fullWidth * 0.9}
       footer={
         <Pagination
+          style={{ marginLeft: '5%' }}
           pageSize={1}
           current={revisionIndex}
           onChange={handlePageChange}
