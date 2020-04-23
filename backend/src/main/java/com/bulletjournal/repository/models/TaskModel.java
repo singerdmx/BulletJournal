@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -184,12 +185,15 @@ public abstract class TaskModel extends ProjectItemModel {
         this.googleCalendarEventId = googleCalendarEventId;
     }
 
-    public String[] getAssignees() {
-        return assignees;
+    public List<String> getAssignees() {
+        if (this.assignees == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(this.assignees);
     }
 
-    public void setAssignees(String[] assignees) {
-        this.assignees = assignees;
+    public void setAssignees(List<String> assignees) {
+        this.assignees = assignees == null ? null : assignees.stream().toArray(String[]::new);
     }
 
     public void setReminderSetting(ReminderSetting reminderSetting) {
