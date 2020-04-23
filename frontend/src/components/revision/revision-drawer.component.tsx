@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Drawer, Pagination, Empty } from 'antd';
 import RevisionContent from './revision-content.component';
 import {
@@ -35,6 +35,7 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
   const handlePageChange = (page: number) => {
     setRevisionIndex(page);
   };
+  useEffect(() => setRevisionIndex(revisions.length - 1), [revisions.length]);
 
   const handleClose = () => {
     onClose();
@@ -47,6 +48,7 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
       visible={revisionDisplay}
       destroyOnClose
       width={fullWidth * 0.9}
+      placement="left"
       footer={
         <Pagination
           style={{ marginLeft: '5%' }}

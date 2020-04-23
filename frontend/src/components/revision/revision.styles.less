@@ -3,10 +3,12 @@
   padding: 80px 10px;
   .revision-content {
     padding: 0 5%;
+    width: 50%;
 
     .revision-header {
       display: flex;
       justify-content: space-between;
+      align-items: baseline;
       font-size: 1.1rem;
       margin-bottom: 0.5rem;
       padding-bottom: 0.5rem;
@@ -15,8 +17,15 @@
 
       & > span {
         font-size: 0.9rem;
-        color: rgba(0, 0, 0, 0.2);
+        color: rgba(0, 0, 0, 0.4);
       }
+    }
+
+    .revision-info {
+      padding: 1px 2px;
+      color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      justify-content: flex-end;
     }
   }
   .revision-control {
