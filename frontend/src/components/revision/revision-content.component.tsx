@@ -77,7 +77,13 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       <div className="revision-content">
         <div className="revision-header">
           <div>
-            <Button onClick={handleRevert} size="small" shape="circle">
+            <Button
+              onClick={handleRevert}
+              size="small"
+              shape="circle"
+              type="primary"
+              style={{ marginRight: '0.5rem' }}
+            >
               <RollbackOutlined />
             </Button>{' '}
             Revision {revisionIndex}{' '}
