@@ -26,6 +26,9 @@ import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
+import {
+  getProjectItemsAfterUpdateSelect,
+} from '../../features/myBuJo/actions';
 
 const { SubMenu } = Menu;
 //props of groups
@@ -38,6 +41,13 @@ type ProjectProps = {
   ownProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
   updateProjects: () => void;
+  todoSelected: boolean;
+  ledgerSelected: boolean;
+  getProjectItemsAfterUpdateSelect: (
+      todoSelected: boolean,
+      ledgerSelected: boolean,
+      category: string
+  ) => void;
 };
 
 export const iconMapper = {
@@ -79,6 +89,15 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     (window.adsbygoogle = window.adsbygoogle || []).push({});
   }
 
+  handleClickToday = (category: string) => {
+    let { ledgerSelected, todoSelected } = this.props;
+    this.props.getProjectItemsAfterUpdateSelect(
+        todoSelected,
+        ledgerSelected,
+        category
+    );
+  };
+
   render() {
     const { groups: groupsByOwner, ownProjects } = this.props;
     return (
@@ -97,11 +116,11 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
             </span>
           }
         >
-          <Menu.Item key="today">
+          <Menu.Item key="today" onClick={() => this.handleClickToday('today')}>
             <BellOutlined />
             Today
           </Menu.Item>
-          <Menu.Item key="calendar">
+          <Menu.Item key="calendar" onClick={() => this.handleClickToday('calendar')}>
             <CalendarOutlined />
             Calendar
           </Menu.Item>
@@ -208,10 +227,13 @@ const mapStateToProps = (state: IState) => ({
   timezone: state.myself.timezone,
   ownProjects: state.project.owned,
   sharedProjects: state.project.shared,
+  todoSelected: state.myBuJo.todoSelected,
+  ledgerSelected: state.myBuJo.ledgerSelected,
 });
 
 export default connect(mapStateToProps, {
   updateGroups,
   createGroupByName,
   updateProjects,
+  getProjectItemsAfterUpdateSelect
 })(withRouter(SideMenu));
