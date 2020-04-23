@@ -50,6 +50,7 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
       visible={revisionDisplay}
       destroyOnClose
       width={fullWidth * 0.9}
+      placement="left"
       footer={
         <Pagination
           style={{ marginLeft: '5%' }}
