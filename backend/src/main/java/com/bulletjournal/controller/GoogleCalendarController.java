@@ -45,6 +45,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,12 +138,13 @@ public class GoogleCalendarController {
         Calendar.Events.List list = service.events().list(calendarId);
         //        2002-10-02T10:00:00-05:00
         //        2002-10-02T10:00:00+05:00
+        OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
         if (StringUtils.isNotBlank(startDate)) {
-            //            startDate += "T00:00:00" + ZoneId.of(timezone);
+            startDate += "T00:00:00" + ZoneId.of(timezone).getRules().getStandardOffset(utc.toInstant());
             list.setTimeMin(DateTime.parseRfc3339(startDate));
         }
         if (StringUtils.isNotBlank(endDate)) {
-            //            endDate += "T23:59:59" + ZoneId.of(timezone);
+            endDate += "T23:59:59" + ZoneId.of(timezone).getRules().getStandardOffset(utc.toInstant());
             list.setTimeMax(DateTime.parseRfc3339(endDate));
         }
         List<Event> events = list.execute().getItems();
