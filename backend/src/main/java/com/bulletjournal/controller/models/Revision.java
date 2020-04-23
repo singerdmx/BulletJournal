@@ -21,6 +21,8 @@ public class Revision {
     @NotNull
     private String user;
 
+    private String userAvatar;
+
     public Revision() {
 
     }
@@ -70,5 +72,13 @@ public class Revision {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getUserAvatar() {
+        return userAvatar;
+    }
+
+    public void setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
     }
 }
