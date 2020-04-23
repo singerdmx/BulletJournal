@@ -1,5 +1,6 @@
 import { ProjectItem } from '../myBuJo/interface';
 import {ReminderBeforeTaskText} from "../../components/settings/reducer";
+import {User} from "../group/interface";
 
 export interface ReminderSetting {
   date?: string;
@@ -10,6 +11,7 @@ export interface ReminderSetting {
 export interface Task extends ProjectItem {
   subTasks: Task[];
   assignedTo: string;
+  assignees: User[];
   assignedToAvatar?: string;
   dueDate?: string;
   dueTime?: string;

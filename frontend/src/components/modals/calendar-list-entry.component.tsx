@@ -33,7 +33,7 @@ type ModalProps = {
 }
 
 const CalendarListEntryModal: React.FC<ModalProps> = props => {
-    const {calendar, watchedProject, projects} = props;
+    const {calendar, watchedProject, projects, eventList} = props;
     const [visible, setVisible] = useState(false);
     const history = useHistory();
     const [form] = Form.useForm();
@@ -153,7 +153,20 @@ const CalendarListEntryModal: React.FC<ModalProps> = props => {
                     <Button onClick={(e) => handlePullEvents(e)}>Pull</Button>
                 </Form.Item>
                 <Form.Item
-                    name='project'
+                    name='eventList'
+                >
+                    <Select
+                        mode="multiple" style={{ width: '100%' }}
+                    >
+                        {/* https://github.com/ant-design/ant-design/issues/7155 */}
+                        <Option value="all">Select All</Option>
+                        {eventList && eventList.map((event, index) => {
+                            return <Option value={event.iCalUID}>{event.task.name}</Option>
+                        })}
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    name='eventList'
                     label='Target BuJo'
                     labelCol={{span: 5}}
                     wrapperCol={{span: 19}}

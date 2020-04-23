@@ -128,14 +128,19 @@ public class GoogleCalendarController {
     public List<GoogleCalendarEvent> getEventList(
             @NotNull @PathVariable String calendarId,
             @NotBlank @RequestParam String timezone,
-            @RequestParam(name = "startDate", required = false) String startDate,
-            @RequestParam(name = "endDate", required = false) String endDate) throws IOException {
+            @RequestParam(name = "startDate", required = false) String startDate, // yyyy-MM-dd
+            @RequestParam(name = "endDate", required = false) String endDate)
+            throws IOException {
         Calendar service = getCalendarService();
         Calendar.Events.List list = service.events().list(calendarId);
+        //        2002-10-02T10:00:00-05:00
+        //        2002-10-02T10:00:00+05:00
         if (StringUtils.isNotBlank(startDate)) {
+            //            startDate += "T00:00:00" + ZoneId.of(timezone);
             list.setTimeMin(DateTime.parseRfc3339(startDate));
         }
         if (StringUtils.isNotBlank(endDate)) {
+            //            endDate += "T23:59:59" + ZoneId.of(timezone);
             list.setTimeMax(DateTime.parseRfc3339(endDate));
         }
         List<Event> events = list.execute().getItems();
