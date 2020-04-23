@@ -1,21 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import BraftEditor from 'braft-editor';
-import { connect } from 'react-redux';
-import {
-  updateNoteContentRevision,
-  patchContent,
-} from '../../features/notes/actions';
+import {connect} from 'react-redux';
+import {patchContent, updateNoteContentRevision,} from '../../features/notes/actions';
 // import ReactDiffViewer from 'react-diff-viewer';
 import moment from 'moment';
 import './revision.styles.less';
-import {
-  Content,
-  ProjectItem,
-  Revision,
-} from '../../features/myBuJo/interface';
-import { Button, message, Avatar } from 'antd';
-import { RollbackOutlined } from '@ant-design/icons';
-import { Tooltip } from 'antd';
+import {Content, ProjectItem, Revision,} from '../../features/myBuJo/interface';
+import {Avatar, Button, message, Tooltip} from 'antd';
+import {RollbackOutlined} from '@ant-design/icons';
 
 type RevisionProps = {
   revisionIndex: number;
@@ -77,15 +69,18 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       <div className="revision-content">
         <div className="revision-header">
           <div>
-            <Button
-              onClick={handleRevert}
-              size="small"
-              shape="circle"
-              type="primary"
-              style={{ marginRight: '0.5rem' }}
-            >
-              <RollbackOutlined />
-            </Button>{' '}
+            <Tooltip title='Revert to this version'>
+              <Button
+                  onClick={handleRevert}
+                  size="small"
+                  shape="circle"
+                  type="primary"
+                  style={{marginRight: '0.5rem'}}
+              >
+                <RollbackOutlined/>
+              </Button>
+            </Tooltip>
+              {' '}
             Revision {revisionIndex}{' '}
             {revisions[revisionIndex].userAvatar && (
               <Tooltip title={`Editted by ${revisions[revisionIndex].user}`}>
