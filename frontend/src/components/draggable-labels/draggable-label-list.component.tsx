@@ -91,13 +91,13 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
     if (!result.destination) {
       return;
     }
-    console.log(labels);
+
     const newLabels = reorder(
       labelsId,
       result.source.index,
       result.destination.index
     );
-    console.log(newLabels);
+
     shareFunction(itemId, newLabels);
   };
 

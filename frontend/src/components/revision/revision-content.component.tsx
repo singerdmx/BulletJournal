@@ -8,12 +8,16 @@ import './revision.styles.less';
 import {Content, ProjectItem, Revision,} from '../../features/myBuJo/interface';
 import {Avatar, Button, message, Tooltip} from 'antd';
 import {RollbackOutlined} from '@ant-design/icons';
+import {IState} from "../../store";
+import {Project} from "../../features/project/interface";
 
 type RevisionProps = {
   revisionIndex: number;
   revisions: Revision[];
   content: Content;
   projectItem: ProjectItem;
+  project: Project;
+  myself: string;
 };
 
 interface RevisionContentHandler {
@@ -34,13 +38,14 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   updateNoteContentRevision,
   patchContent,
   handleClose,
+  project,
+  myself
 }) => {
   const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
   const historyContent = revisions[revisionIndex - 1].content;
 
   useEffect(() => {
-    console.log('revisionindex2', revisionIndex);
     const historyId = revisions[revisionIndex - 1].id;
     updateNoteContentRevision(projectItem.id, content.id, historyId);
   }, [revisionIndex]);
@@ -64,26 +69,38 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     handleClose();
   };
 
+  const getRollbackButton = () => {
+    if (
+        project.owner === myself ||
+        projectItem.owner === myself ||
+        (content && content.owner === myself)
+    ) {
+      return <Tooltip title='Revert to this version'>
+        <Button
+            onClick={handleRevert}
+            size="small"
+            shape="circle"
+            type="primary"
+            style={{marginRight: '0.5rem'}}
+        >
+          <RollbackOutlined/>
+        </Button>
+      </Tooltip>
+    }
+
+    return null;
+  };
+
   return (
     <div className="revision-container">
       <div className="revision-content">
         <div className="revision-header">
           <div>
-            <Tooltip title='Revert to this version'>
-              <Button
-                  onClick={handleRevert}
-                  size="small"
-                  shape="circle"
-                  type="primary"
-                  style={{marginRight: '0.5rem'}}
-              >
-                <RollbackOutlined/>
-              </Button>
-            </Tooltip>
+              {getRollbackButton()}
               {' '}
             Revision {revisionIndex}{' '}
             {revisions[revisionIndex].userAvatar && (
-              <Tooltip title={`Editted by ${revisions[revisionIndex].user}`}>
+              <Tooltip title={`Edited by ${revisions[revisionIndex].user}`}>
                 <Avatar
                   src={revisions[revisionIndex].userAvatar}
                   style={{ marginRight: '1rem' }}
@@ -101,6 +118,15 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       <div className="revision-content">
         <div className="revision-header">
           Current version <span>{moment(content.updatedAt).fromNow()}</span>
+          {content.ownerAvatar && (
+              <Tooltip title={`Edited by ${content.owner}`}>
+                <Avatar
+                    src={content.ownerAvatar}
+                    style={{ marginRight: '1rem' }}
+                    size="small"
+                />
+              </Tooltip>
+          )}
         </div>
         <div dangerouslySetInnerHTML={{ __html: latestContent.toHTML() }}></div>
       </div>
@@ -108,6 +134,11 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   );
 };
 
-export default connect(null, { updateNoteContentRevision, patchContent })(
+const mapStateToProps = (state: IState) => ({
+  project: state.project.project,
+  myself: state.myself.username,
+});
+
+export default connect(mapStateToProps, { updateNoteContentRevision, patchContent })(
   RevisionContent
 );
