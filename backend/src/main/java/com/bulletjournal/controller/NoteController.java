@@ -205,6 +205,8 @@ public class NoteController {
             @NotNull @PathVariable Long contentId,
             @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
+        Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
+        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
+        return revision;
     }
 }

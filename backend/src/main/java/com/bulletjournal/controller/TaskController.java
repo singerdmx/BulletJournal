@@ -266,6 +266,8 @@ public class TaskController {
             @NotNull @PathVariable Long contentId,
             @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
+        Revision revision = this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
+        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
+        return revision;
     }
 }

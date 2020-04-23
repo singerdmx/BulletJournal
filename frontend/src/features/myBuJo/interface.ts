@@ -37,4 +37,5 @@ export interface Revision {
   createdAt: number;
   user: string;
   content?: string;
+  userAvatar?: string;
 }

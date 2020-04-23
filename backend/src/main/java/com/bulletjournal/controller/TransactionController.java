@@ -213,6 +213,8 @@ public class TransactionController {
         @NotNull @PathVariable Long contentId,
         @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.transactionDaoJpa.getContentRevision(username, transactionId, contentId, revisionId);
+        Revision revision = this.transactionDaoJpa.getContentRevision(username, transactionId, contentId, revisionId);
+        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
+        return revision;
     }
 }
