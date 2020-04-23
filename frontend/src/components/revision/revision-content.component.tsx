@@ -14,6 +14,7 @@ import {
   Revision,
 } from '../../features/myBuJo/interface';
 import { Button, message } from 'antd';
+import { RollbackOutlined } from '@ant-design/icons';
 
 type RevisionProps = {
   revisionIndex: number;
@@ -29,6 +30,7 @@ interface RevisionContentHandler {
     revisionId: number
   ) => void;
   patchContent: (noteId: number, contentId: number, text: string) => void;
+  handleClose: () => void;
 }
 
 const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
@@ -38,6 +40,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   projectItem,
   updateNoteContentRevision,
   patchContent,
+  handleClose,
 }) => {
   const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
@@ -64,23 +67,24 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       content.id,
       revisions[revisionIndex - 1].content!
     );
+    handleClose();
   };
 
   return (
     <div className="revision-container">
       <div className="revision-content">
         <div className="revision-header">
-          History Created At{' '}
-          {moment(revisions[revisionIndex - 1].createdAt).fromNow()}
+          Revision {revisionIndex}
+          <Button onClick={handleRevert} size="small" shape="round">
+            <RollbackOutlined />
+            Revert to this version
+          </Button>
         </div>
         <div dangerouslySetInnerHTML={{ __html: history.toHTML() }}></div>
       </div>
-      <div className="revision-control">
-        <Button onClick={handleRevert}>Revert</Button>
-      </div>
       <div className="revision-content">
         <div className="revision-header">
-          Latest Updated At {moment(content.updatedAt).fromNow()}
+          Current version <span>{moment(content.updatedAt).fromNow()}</span>
         </div>
         <div dangerouslySetInnerHTML={{ __html: latestContent.toHTML() }}></div>
       </div>

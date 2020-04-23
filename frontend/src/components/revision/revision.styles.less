@@ -5,9 +5,18 @@
     padding: 0 5%;
 
     .revision-header {
-      font-size: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.1rem;
       margin-bottom: 0.5rem;
-      font-weight: 500;
+      padding-bottom: 0.5rem;
+      font-weight: 400;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+      & > span {
+        font-size: 0.9rem;
+        color: rgba(0, 0, 0, 0.2);
+      }
     }
   }
   .revision-control {
