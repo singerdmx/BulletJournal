@@ -13,7 +13,7 @@ import {
   ProjectItem,
   Revision,
 } from '../../features/myBuJo/interface';
-import { Button, message } from 'antd';
+import { Button, message, Avatar } from 'antd';
 import { RollbackOutlined } from '@ant-design/icons';
 
 type RevisionProps = {
@@ -83,6 +83,16 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
           </Button>
         </div>
         <div dangerouslySetInnerHTML={{ __html: history.toHTML() }}></div>
+        <div className="revision-info">
+          Edit by{' '}
+          {revisions[revisionIndex].userAvatar && (
+            <Avatar
+              src={revisions[revisionIndex].userAvatar}
+              style={{ marginRight: '1rem' }}
+            />
+          )}
+          {revisions[revisionIndex].user}
+        </div>
       </div>
       <div className="revision-content">
         <div className="revision-header">
