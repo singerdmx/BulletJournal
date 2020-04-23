@@ -14,6 +14,7 @@ import java.util.Objects;
 
 public class Task extends ProjectItem {
 
+    @Deprecated
     @NotBlank
     @Size(min = 1, max = 100)
     private String assignedTo;
