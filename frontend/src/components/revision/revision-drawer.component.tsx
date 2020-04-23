@@ -59,6 +59,7 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
     >
       {revisions.length > 1 ? (
         <RevisionContent
+          handleClose={handleClose}
           content={content}
           projectItem={projectItem}
           revisionIndex={revisionIndex}
