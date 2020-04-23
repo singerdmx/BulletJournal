@@ -42,11 +42,13 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   patchContent,
   handleClose,
 }) => {
+  console.log('revisionindex', revisionIndex);
   const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
   const historyContent = revisions[revisionIndex - 1].content;
 
   useEffect(() => {
+    console.log('revisionindex2', revisionIndex);
     const historyId = revisions[revisionIndex - 1].id;
     updateNoteContentRevision(projectItem.id, content.id, historyId);
   }, [revisionIndex]);

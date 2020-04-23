@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Drawer, Pagination, Empty } from 'antd';
 import RevisionContent from './revision-content.component';
 import {
@@ -32,9 +32,12 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
   revisionDisplay,
 }) => {
   const [revisionIndex, setRevisionIndex] = useState(revisions.length - 1);
+  console.log(revisions.length, 'length revision');
+  console.log(revisionIndex, 'index in drawer');
   const handlePageChange = (page: number) => {
     setRevisionIndex(page);
   };
+  useEffect(() => setRevisionIndex(revisions.length - 1), [revisions.length]);
 
   const handleClose = () => {
     onClose();
