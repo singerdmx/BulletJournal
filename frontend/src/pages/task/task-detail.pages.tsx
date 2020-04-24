@@ -3,22 +3,18 @@
 import React from 'react';
 // features
 //actions
-import { getReminderSettingString, Task } from '../../features/tasks/interface';
+import {getReminderSettingString, Task} from '../../features/tasks/interface';
 // antd imports
-import { Avatar, Card, Col, Divider, Row, Statistic, Tooltip } from 'antd';
-import {
-  AlertOutlined,
-  FileDoneOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
+import {Avatar, Card, Col, Divider, Popover, Row, Statistic, Tooltip} from 'antd';
+import {AlertOutlined, ClockCircleOutlined, FileDoneOutlined,} from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
-import { ProjectType } from '../../features/project/constants';
-import { convertToTextWithRRule } from '../../features/recurrence/actions';
+import {ProjectType} from '../../features/project/constants';
+import {convertToTextWithRRule} from '../../features/recurrence/actions';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
-import { Content } from '../../features/myBuJo/interface';
+import {Content} from '../../features/myBuJo/interface';
 // components
 import TaskContentList from '../../components/content/content-list.component';
 
@@ -86,12 +82,12 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   return (
     <div className='task-page'>
       <Tooltip
-        placement='top'
-        title={`Assignee ${task.assignedTo}`}
-        className='task-avatar'
+          placement='top'
+          title={`Created by ${task.owner}`}
+          className='task-avatar'
       >
         <span>
-          <Avatar size='large' src={task.assignedToAvatar} />
+          <Avatar size='large' src={task.ownerAvatar} />
         </span>
       </Tooltip>
       <div className='task-title'>

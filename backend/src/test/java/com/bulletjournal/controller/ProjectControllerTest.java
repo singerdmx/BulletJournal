@@ -516,7 +516,7 @@ public class ProjectControllerTest {
         Task completedTask = completeTaskResponse.getBody();
         assertEquals(t1.getName(), completedTask.getName());
         assertEquals(t1.getTimezone(), completedTask.getTimezone());
-        assertEquals(t1.getAssignedTo(), completedTask.getAssignedTo());
+        assertEquals(t1.getAssignees(), completedTask.getAssignees());
         assertEquals(t1.getDueDate(), completedTask.getDueDate());
         assertEquals(t1.getDueTime(), completedTask.getDueTime());
 
@@ -546,7 +546,7 @@ public class ProjectControllerTest {
         Task uncompletedTask = uncompleteTaskResponse.getBody();
         assertEquals(t1.getName(), uncompletedTask.getName());
         assertEquals(t1.getTimezone(), uncompletedTask.getTimezone());
-        assertEquals(t1.getAssignedTo(), uncompletedTask.getAssignedTo());
+        assertEquals(t1.getAssignees(), uncompletedTask.getAssignees());
         assertEquals(t1.getDueDate(), uncompletedTask.getDueDate());
         assertEquals(t1.getDueTime(), uncompletedTask.getDueTime());
 
@@ -578,7 +578,7 @@ public class ProjectControllerTest {
         completedTask = completeTaskResponse.getBody();
         assertEquals(recurTask.getName(), completedTask.getName());
         assertEquals(recurTask.getTimezone(), completedTask.getTimezone());
-        assertEquals(recurTask.getAssignedTo(), completedTask.getAssignedTo());
+        assertEquals(recurTask.getAssignees(), completedTask.getAssignees());
 
         deleteTask(recurTask);
     }
@@ -600,7 +600,7 @@ public class ProjectControllerTest {
         assertEquals(taskName, createdTask.getName());
         assertEquals(project.getId(), createdTask.getProjectId());
         assertEquals(TIMEZONE, createdTask.getTimezone());
-        assertEquals(sampleUsers[0], createdTask.getAssignedTo());
+        assertEquals(sampleUsers[0], createdTask.getAssignees().get(0).getName());
         assertEquals(recurrenceRule, createdTask.getRecurrenceRule());
 
         return createdTask;
@@ -976,7 +976,7 @@ public class ProjectControllerTest {
         Task updated = Arrays.asList(response.getBody()).stream()
                 .filter(t -> task.getId().equals(t.getId())).findFirst().orElse(null);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedOwner, updated.getAssignedTo());
+        assertEquals(expectedOwner, updated.getAssignees().get(0).getName());
         assertEquals(dueDate, updated.getDueDate());
         assertEquals(dueTime, updated.getDueTime());
         assertEquals(expectedName, updated.getName());

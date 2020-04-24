@@ -7,19 +7,11 @@ import com.google.gson.annotations.Expose;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Task extends ProjectItem {
-
-    @Deprecated
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String assignedTo;
-
-    private String assignedToAvatar;
 
     private List<User> assignees = new ArrayList<>();
 
@@ -51,7 +43,6 @@ public class Task extends ProjectItem {
 
     public Task(Long id,
                 @NotBlank String owner,
-                @NotBlank @Size(min = 1, max = 100) String assignedTo,
                 List<User> assignees,
                 String dueDate,
                 String dueTime,
@@ -63,7 +54,6 @@ public class Task extends ProjectItem {
                 ReminderSetting reminderSetting,
                 String recurrenceRule) {
         super(id, name, owner, project, labels);
-        this.assignedTo = assignedTo;
         this.assignees = assignees;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -73,22 +63,6 @@ public class Task extends ProjectItem {
             this.reminderSetting = reminderSetting;
         }
         this.recurrenceRule = recurrenceRule;
-    }
-
-    public String getAssignedTo() {
-        return assignedTo;
-    }
-
-    public void setAssignedTo(String assignedTo) {
-        this.assignedTo = assignedTo;
-    }
-
-    public String getAssignedToAvatar() {
-        return assignedToAvatar;
-    }
-
-    public void setAssignedToAvatar(String assignedToAvatar) {
-        this.assignedToAvatar = assignedToAvatar;
     }
 
     public String getDueDate() {
@@ -169,7 +143,7 @@ public class Task extends ProjectItem {
         if (!(o instanceof Task)) return false;
         if (!super.equals(o)) return false;
         Task task = (Task) o;
-        return Objects.equals(getAssignedTo(), task.getAssignedTo()) &&
+        return Objects.equals(getAssignees(), task.getAssignees()) &&
                 Objects.equals(getDueDate(), task.getDueDate()) &&
                 Objects.equals(getDueTime(), task.getDueTime()) &&
                 Objects.equals(getTimezone(), task.getTimezone()) &&
@@ -181,12 +155,11 @@ public class Task extends ProjectItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getAssignedTo(), getDueDate(), getDueTime(), getTimezone(), getDuration(), getReminderSetting(), getRecurrenceRule(), getSubTasks());
+        return Objects.hash(super.hashCode(), getAssignees(), getDueDate(), getDueTime(), getTimezone(), getDuration(), getReminderSetting(), getRecurrenceRule(), getSubTasks());
     }
 
     public void clone(Task task) {
         super.clone(task);
-        this.setAssignedTo(task.getAssignedTo());
         this.setDueDate(task.getDueDate());
         this.setDueTime(task.getDueTime());
         this.setTimezone(task.getTimezone());

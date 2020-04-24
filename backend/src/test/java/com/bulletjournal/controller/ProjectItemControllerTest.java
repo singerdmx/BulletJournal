@@ -313,7 +313,7 @@ public class ProjectItemControllerTest {
         assertEquals(taskName, createdTask.getName());
         assertEquals(project.getId(), createdTask.getProjectId());
         assertEquals(TIMEZONE, createdTask.getTimezone());
-        assertEquals(sampleUsers[0], createdTask.getAssignedTo());
+        assertEquals(sampleUsers[0], createdTask.getAssignees().get(0).getName());
         assertEquals(recurrenceRule, createdTask.getRecurrenceRule());
 
         return createdTask;

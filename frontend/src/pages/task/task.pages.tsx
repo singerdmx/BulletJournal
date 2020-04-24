@@ -14,7 +14,7 @@ import { Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 // antd imports
-import { Avatar, Popconfirm, Tooltip, Button } from 'antd';
+import {Avatar, Popconfirm, Tooltip, Button, Popover} from 'antd';
 import {
   DeleteTwoTone,
   TagOutlined,
@@ -88,14 +88,38 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     </div>
   );
 
+    const getAssignees = () => {
+        if (!task.assignees || task.assignees.length === 0) {
+            return null;
+        }
+
+        if (task.assignees.length === 1) {
+            return         <Tooltip title={`Assignee ${task.assignees[0].name}`}>
+                <div className='task-owner'>
+                    <Avatar src={task.assignees[0].avatar} />
+                </div>
+            </Tooltip>
+        }
+
+        return  <Popover
+            title='Assignees'
+            placement='bottom'
+            content={
+                <div>
+                    {task.assignees.map((u, index) => <p key={index}><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
+                </div>
+            }
+        >
+            <div className='task-owner'>
+                <Avatar src={task.assignees[0].avatar} />
+            </div>
+        </Popover>
+    };
+
   const taskOperation = () => {
     return (
       <div className='task-operation'>
-        <Tooltip title={`Created by ${task.owner}`}>
-          <div className='task-owner'>
-            <Avatar src={task.ownerAvatar} />
-          </div>
-        </Tooltip>
+        {getAssignees()}
 
         <Tooltip title='Manage Labels'>
           <div>

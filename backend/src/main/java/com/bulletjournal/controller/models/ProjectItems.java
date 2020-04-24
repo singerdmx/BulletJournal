@@ -47,7 +47,9 @@ public class ProjectItems {
             transaction.setPayerAvatar(userClient.getUser(transaction.getPayer()).getAvatar());
         } else if (projectItem instanceof Task) {
             Task task = ((Task) projectItem);
-            task.setAssignedToAvatar(userClient.getUser(task.getAssignedTo()).getAvatar());
+            task.getAssignees().forEach((assignee) -> {
+                assignee.setAvatar(userClient.getUser(assignee.getName()).getAvatar());
+            });
         }
     }
 

@@ -248,7 +248,7 @@ const EditTask: React.FC<
             {props.group.users && (
               <Select
                 mode='multiple'
-                defaultValue={task.assignedTo ? task.assignedTo : ''}
+                defaultValue={task.assignees ? task.assignees.map(u => u.name) : []}
                 style={{ width: '100%' }}
               >
                 {props.group.users.map((user) => {
