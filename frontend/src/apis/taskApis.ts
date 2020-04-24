@@ -60,9 +60,11 @@ export const createTask = (
   duration?: number,
   recurrenceRule?: string
 ) => {
+  const assignees = [assignedTo];
   const postBody = JSON.stringify({
     name: name,
     assignedTo: assignedTo,
+    assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,
     duration: duration,
@@ -95,9 +97,11 @@ export const updateTask = (
   reminderSetting?: ReminderSetting,
   recurrenceRule?: string
 ) => {
+  const assignees = [assignedTo];
   const patchBody = JSON.stringify({
     name: name,
     assignedTo: assignedTo,
+    assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,
     duration: duration,
