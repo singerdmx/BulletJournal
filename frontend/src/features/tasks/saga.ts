@@ -50,7 +50,8 @@ import {
 import { updateTasks, updateTaskContents } from './actions';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { IState } from '../../store';
-import { Content, Revision } from '../myBuJo/interface';
+import { Content, Revision, ProjectItems } from '../myBuJo/interface';
+import { updateItemsByLabels } from '../label/actions';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -286,6 +287,18 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
         'today'
       )
     );
+
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.tasks) {
+        projectItem.tasks = projectItem.tasks.filter(
+          (task) => task.id !== taskId
+        );
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
@@ -439,16 +452,25 @@ function* taskContentRevisionUpdate(
     const { taskId, contentId, revisionId } = action.payload;
     const state: IState = yield select();
 
-    const targetContent : Content = state.task.contents.find(c => c.id === contentId)!;
-    const revision: Revision = targetContent.revisions.find(r => r.id === revisionId)!;
+    const targetContent: Content = state.task.contents.find(
+      (c) => c.id === contentId
+    )!;
+    const revision: Revision = targetContent.revisions.find(
+      (r) => r.id === revisionId
+    )!;
 
     if (!revision.content) {
-      const data = yield call(getContentRevision, taskId, contentId, revisionId);
+      const data = yield call(
+        getContentRevision,
+        taskId,
+        contentId,
+        revisionId
+      );
 
-      const taskContents : Content[] = [];
+      const taskContents: Content[] = [];
       state.task.contents.forEach((taskContent) => {
         if (taskContent.id === contentId) {
-          const newRevisions : Revision[] = [];
+          const newRevisions: Revision[] = [];
           taskContent.revisions.forEach((revision) => {
             if (revision.id === revisionId) {
               revision = { ...revision, content: data.content };

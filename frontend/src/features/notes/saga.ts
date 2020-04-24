@@ -1,4 +1,4 @@
-import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as notesActions,
@@ -18,7 +18,7 @@ import {
   PatchContent,
   GetSharables,
   RevokeSharable,
-  UpdateNoteContentRevision
+  UpdateNoteContentRevision,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -37,11 +37,12 @@ import {
   updateContent,
   getSharables,
   revokeSharable,
-  getContentRevision
+  getContentRevision,
 } from '../../apis/noteApis';
 import { IState } from '../../store';
 import { updateNoteContents, updateNotes } from './actions';
-import {Content, Revision} from "../myBuJo/interface";
+import { Content, Revision, ProjectItems } from '../myBuJo/interface';
+import { updateItemsByLabels } from '../label/actions';
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -74,21 +75,32 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
   }
 }
 
-function* noteContentRevisionUpdate(action: PayloadAction<UpdateNoteContentRevision>) {
+function* noteContentRevisionUpdate(
+  action: PayloadAction<UpdateNoteContentRevision>
+) {
   try {
     const { noteId, contentId, revisionId } = action.payload;
     const state: IState = yield select();
 
-    const targetContent : Content = state.note.contents.find(c => c.id === contentId)!;
-    const revision: Revision = targetContent.revisions.find(r => r.id === revisionId)!;
+    const targetContent: Content = state.note.contents.find(
+      (c) => c.id === contentId
+    )!;
+    const revision: Revision = targetContent.revisions.find(
+      (r) => r.id === revisionId
+    )!;
 
     if (!revision.content) {
-      const data = yield call(getContentRevision, noteId, contentId, revisionId);
+      const data = yield call(
+        getContentRevision,
+        noteId,
+        contentId,
+        revisionId
+      );
 
-      const noteContents : Content[] = [];
+      const noteContents: Content[] = [];
       state.note.contents.forEach((noteContent) => {
         if (noteContent.id === contentId) {
-          const newRevisions : Revision[] = [];
+          const newRevisions: Revision[] = [];
           noteContent.revisions.forEach((revision) => {
             if (revision.id === revisionId) {
               revision = { ...revision, content: data.content };
@@ -100,13 +112,16 @@ function* noteContentRevisionUpdate(action: PayloadAction<UpdateNoteContentRevis
         noteContents.push(noteContent);
       });
       yield put(
-          notesActions.noteContentsReceived({
-            contents: noteContents,
-          })
+        notesActions.noteContentsReceived({
+          contents: noteContents,
+        })
       );
     }
   } catch (error) {
-    yield call(message.error, `noteContentRevisionUpdate Error Received: ${error}`);
+    yield call(
+      message.error,
+      `noteContentRevisionUpdate Error Received: ${error}`
+    );
   }
 }
 
@@ -187,7 +202,7 @@ function* noteSetLabels(action: PayloadAction<SetNoteLabels>) {
   try {
     const { noteId, labels } = action.payload;
     const data = yield call(setNoteLabels, noteId, labels);
-    yield put(notesActions.noteReceived({note: data}));
+    yield put(notesActions.noteReceived({ note: data }));
     yield put(updateNotes(data.projectId));
   } catch (error) {
     yield call(message.error, `noteSetLabels Error Received: ${error}`);
@@ -204,6 +219,18 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
         notes: notes,
       })
     );
+    const state: IState = yield select();
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.notes) {
+        projectItem.notes = projectItem.notes.filter(
+          (note) => note.id !== noteId
+        );
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
   }
@@ -240,7 +267,13 @@ function* noteMove(action: PayloadAction<MoveNote>) {
 
 function* shareNote(action: PayloadAction<ShareNote>) {
   try {
-    const { noteId, targetUser, targetGroup, generateLink, ttl } = action.payload;
+    const {
+      noteId,
+      targetUser,
+      targetGroup,
+      generateLink,
+      ttl,
+    } = action.payload;
     const data = yield call(
       shareNoteWithOther,
       noteId,
@@ -250,7 +283,7 @@ function* shareNote(action: PayloadAction<ShareNote>) {
       ttl
     );
     if (generateLink) {
-      yield put(notesActions.sharedLinkReceived({link: data.link}));
+      yield put(notesActions.sharedLinkReceived({ link: data.link }));
     }
     yield call(message.success, 'Note shared successfully');
   } catch (error) {
@@ -261,15 +294,14 @@ function* shareNote(action: PayloadAction<ShareNote>) {
 function* getNoteSharables(action: PayloadAction<GetSharables>) {
   try {
     const { noteId } = action.payload;
-    const data = yield call(
-        getSharables,
-        noteId,
-    );
+    const data = yield call(getSharables, noteId);
 
-    yield put(notesActions.noteSharablesReceived({
-      users: data.users,
-      links: data.links
-    }));
+    yield put(
+      notesActions.noteSharablesReceived({
+        users: data.users,
+        links: data.links,
+      })
+    );
   } catch (error) {
     yield call(message.error, `getNoteSharables Error Received: ${error}`);
   }
@@ -278,12 +310,7 @@ function* getNoteSharables(action: PayloadAction<GetSharables>) {
 function* revokeNoteSharable(action: PayloadAction<RevokeSharable>) {
   try {
     const { noteId, user, link } = action.payload;
-    yield call(
-        revokeSharable,
-        noteId,
-        user,
-        link
-    );
+    yield call(revokeSharable, noteId, user, link);
 
     const state: IState = yield select();
 
@@ -291,17 +318,19 @@ function* revokeNoteSharable(action: PayloadAction<RevokeSharable>) {
     let sharedLinks = state.note.sharedLinks;
 
     if (user) {
-      sharedUsers = sharedUsers.filter(u => u.name !== user);
+      sharedUsers = sharedUsers.filter((u) => u.name !== user);
     }
 
     if (link) {
-      sharedLinks = sharedLinks.filter(l => l.link !== link);
+      sharedLinks = sharedLinks.filter((l) => l.link !== link);
     }
 
-    yield put(notesActions.noteSharablesReceived({
-      users: sharedUsers,
-      links: sharedLinks
-    }));
+    yield put(
+      notesActions.noteSharablesReceived({
+        users: sharedUsers,
+        links: sharedLinks,
+      })
+    );
   } catch (error) {
     yield call(message.error, `revokeNoteSharable Error Received: ${error}`);
   }
@@ -315,7 +344,10 @@ export default function* noteSagas() {
     ),
     yield takeLatest(notesActions.NotesUpdate.type, notesUpdate),
     yield takeLatest(notesActions.NoteContentsUpdate.type, noteContentsUpdate),
-    yield takeLatest(notesActions.NoteContentRevisionUpdate.type, noteContentRevisionUpdate),
+    yield takeLatest(
+      notesActions.NoteContentRevisionUpdate.type,
+      noteContentRevisionUpdate
+    ),
     yield takeLatest(notesActions.NotesCreate.type, noteCreate),
     yield takeLatest(notesActions.NoteContentCreate.type, createNoteContent),
     yield takeLatest(notesActions.NotePut.type, notePut),

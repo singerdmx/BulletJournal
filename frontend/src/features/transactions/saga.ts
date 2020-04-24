@@ -37,7 +37,8 @@ import {
 import { LedgerSummary } from './interface';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { updateTransactionContents } from './actions';
-import { Content, Revision } from '../myBuJo/interface';
+import { Content, Revision, ProjectItems } from '../myBuJo/interface';
+import { updateItemsByLabels } from '../label/actions';
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -194,6 +195,17 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
         'today'
       )
     );
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.transactions) {
+        projectItem.transactions = projectItem.transactions.filter(
+          (transaction) => transaction.id !== transactionId
+        );
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
