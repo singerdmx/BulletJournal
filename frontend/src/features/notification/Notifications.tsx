@@ -3,7 +3,7 @@ import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {Notification} from './interface';
 import {BellFilled} from '@ant-design/icons';
-import {Badge, List, Popover, Tooltip} from 'antd';
+import {Badge, List, Popover, Result, Tooltip} from 'antd';
 import TitleAvatar from '../../components/notification/avatar.compoennt';
 import Actions from '../../components/notification/action.component';
 import ListTitle from '../../components/notification/list-title.component';
@@ -61,7 +61,11 @@ const NotificationList = ({ notifications }: NotificationsProps) => {
       renderItem={item => getNotification(item)}
     />
   ) : (
-    <div className='no-data'>No Notifications</div>
+      <div className='no-data'>
+          <Result
+              title="No Notifications"
+          />
+      </div>
   );
 };
 
