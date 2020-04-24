@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.google.common.collect.ImmutableList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -300,7 +301,7 @@ public class ProjectItemControllerTest {
         String taskName = "rt1";
 
         CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
-                null, null, new ReminderSetting(), TIMEZONE, recurrenceRule);
+                null, null, new ReminderSetting(), ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
@@ -340,7 +341,7 @@ public class ProjectItemControllerTest {
     private Task createTask(Project project, String name, String date) {
         CreateTaskParams task =
                 new CreateTaskParams(name, sampleUsers[0], date, null, 10,
-                        new ReminderSetting(), TIMEZONE, null);
+                        new ReminderSetting(), ImmutableList.of(sampleUsers[0]), TIMEZONE, null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,

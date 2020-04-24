@@ -715,7 +715,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
         return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
-                task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getTimezone(), task.getRecurrenceRule());
+                task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule());
     }
 
     /**

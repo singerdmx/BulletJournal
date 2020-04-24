@@ -35,28 +35,9 @@ public class CreateTaskParams {
     public CreateTaskParams() {
     }
 
-    @Deprecated
-    public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
-                            @NotBlank @Size(min = 1, max = 100) String assignedTo,
-                            String dueDate,
-                            String dueTime,
-                            Integer duration,
-                            ReminderSetting reminderSetting,
-                            @NotBlank @Size(min = 1, max = 100) String timezone,
-                            String recurrenceRule) {
-        this.name = name;
-        this.assignedTo = assignedTo;
-        this.dueDate = dueDate;
-        this.dueTime = dueTime;
-        this.duration = duration;
-        this.reminderSetting = reminderSetting;
-        this.timezone = timezone;
-        this.recurrenceRule = recurrenceRule;
-    }
-
     public CreateTaskParams(
             @NotBlank @Size(min = 1, max = 100) String name,
-            @NotBlank @Size(min = 1, max = 1_000_000) String assignedTo,
+            @NotBlank @Size(min = 1, max = 100) String assignedTo,
             String dueDate,
             String dueTime,
             Integer duration,

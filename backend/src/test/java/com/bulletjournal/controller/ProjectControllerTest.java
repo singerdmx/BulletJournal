@@ -588,7 +588,7 @@ public class ProjectControllerTest {
         String taskName = "rt1";
 
         CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
-                null, null, null, TIMEZONE, recurrenceRule);
+                null, null, null, ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,

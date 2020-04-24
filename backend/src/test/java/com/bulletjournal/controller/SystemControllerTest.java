@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.google.common.collect.ImmutableList;
 import org.dmfs.rfc5545.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -129,7 +130,7 @@ public class SystemControllerTest {
         ReminderSetting reminderSetting = new ReminderSetting(date, time, before);
 
         CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
-                null, null, reminderSetting, TIMEZONE, recurrenceRule);
+                null, null, reminderSetting, ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
@@ -207,7 +208,7 @@ public class SystemControllerTest {
         ReminderSetting reminderSetting = new ReminderSetting(remindingDate, remindingTime, before);
 
         CreateTaskParams task =
-                new CreateTaskParams(name, "Michael_Zhou", dueDate, dueTime, 10, reminderSetting, "America/Los_Angeles", null);
+                new CreateTaskParams(name, "Michael_Zhou", dueDate, dueTime, 10, reminderSetting, ImmutableList.of("Michael_Zhou"), "America/Los_Angeles", null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
