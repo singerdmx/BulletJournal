@@ -1,15 +1,31 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import BraftEditor from 'braft-editor';
-import {connect} from 'react-redux';
-import {patchContent, updateNoteContentRevision,} from '../../features/notes/actions';
+import { connect } from 'react-redux';
+import {
+  patchContent as patchNoteContent,
+  updateNoteContentRevision,
+} from '../../features/notes/actions';
+import {
+  patchContent as patchTaskContent,
+  updateTaskContentRevision,
+} from '../../features/tasks/actions';
+import {
+  patchContent as patchTransactionContent,
+  updateTransactionContentRevision,
+} from '../../features/transactions/actions';
 // import ReactDiffViewer from 'react-diff-viewer';
 import moment from 'moment';
 import './revision.styles.less';
-import {Content, ProjectItem, Revision,} from '../../features/myBuJo/interface';
-import {Avatar, Button, message, Tooltip} from 'antd';
-import {RollbackOutlined} from '@ant-design/icons';
-import {IState} from "../../store";
-import {Project} from "../../features/project/interface";
+import {
+  Content,
+  ProjectItem,
+  Revision,
+} from '../../features/myBuJo/interface';
+import { Avatar, Button, message, Tooltip } from 'antd';
+import { RollbackOutlined } from '@ant-design/icons';
+import { IState } from '../../store';
+import { Project } from '../../features/project/interface';
+import { ContentType } from '../../features/myBuJo/constants';
 
 type RevisionProps = {
   revisionIndex: number;
@@ -26,7 +42,23 @@ interface RevisionContentHandler {
     contentId: number,
     revisionId: number
   ) => void;
-  patchContent: (noteId: number, contentId: number, text: string) => void;
+  patchNoteContent: (noteId: number, contentId: number, text: string) => void;
+  updateTaskContentRevision: (
+    taskId: number,
+    contentId: number,
+    revisionId: number
+  ) => void;
+  patchTaskContent: (taskId: number, contentId: number, text: string) => void;
+  updateTransactionContentRevision: (
+    transactionId: number,
+    contentId: number,
+    revisionId: number
+  ) => void;
+  patchTransactionContent: (
+    transactionId: number,
+    contentId: number,
+    text: string
+  ) => void;
   handleClose: () => void;
 }
 
@@ -36,18 +68,46 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   content,
   projectItem,
   updateNoteContentRevision,
-  patchContent,
+  updateTaskContentRevision,
+  updateTransactionContentRevision,
+  patchNoteContent,
+  patchTaskContent,
+  patchTransactionContent,
   handleClose,
   project,
-  myself
+  myself,
 }) => {
+  //reusable update revision function
+  const updateContentRevision: { [key in ContentType]: Function } = {
+    [ContentType.NOTE]: updateNoteContentRevision,
+    [ContentType.TASK]: updateTaskContentRevision,
+    [ContentType.TRANSACTION]: updateTransactionContentRevision,
+    [ContentType.PROJECT]: () => {},
+    [ContentType.GROUP]: () => {},
+    [ContentType.LABEL]: () => {},
+    [ContentType.CONTENT]: () => {},
+  };
+  const updateRevisionFunction = updateContentRevision[projectItem.contentType];
+
+  //reusable patch content function
+  const patchProjectContent: { [key in ContentType]: Function } = {
+    [ContentType.NOTE]: patchNoteContent,
+    [ContentType.TASK]: patchTaskContent,
+    [ContentType.TRANSACTION]: patchTransactionContent,
+    [ContentType.PROJECT]: () => {},
+    [ContentType.GROUP]: () => {},
+    [ContentType.LABEL]: () => {},
+    [ContentType.CONTENT]: () => {},
+  };
+  const patchContentFunction = patchProjectContent[projectItem.contentType];
+
   const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
   const historyContent = revisions[revisionIndex - 1].content;
 
   useEffect(() => {
     const historyId = revisions[revisionIndex - 1].id;
-    updateNoteContentRevision(projectItem.id, content.id, historyId);
+    updateRevisionFunction(projectItem.id, content.id, historyId);
   }, [revisionIndex]);
 
   useEffect(() => {
@@ -61,7 +121,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       message.info('Revert Not Work');
       return;
     }
-    patchContent(
+    patchContentFunction(
       projectItem.id,
       content.id,
       revisions[revisionIndex - 1].content!
@@ -71,40 +131,40 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
 
   const getRollbackButton = () => {
     if (
-        project.owner === myself ||
-        projectItem.owner === myself ||
-        (content && content.owner === myself)
+      project.owner === myself ||
+      projectItem.owner === myself ||
+      (content && content.owner === myself)
     ) {
-      return <Tooltip title='Revert to this version'>
-        <Button
+      return (
+        <Tooltip title='Revert to this version'>
+          <Button
             onClick={handleRevert}
-            size="small"
-            shape="circle"
-            type="primary"
-            style={{marginRight: '0.5rem'}}
-        >
-          <RollbackOutlined/>
-        </Button>
-      </Tooltip>
+            size='small'
+            shape='circle'
+            type='primary'
+            style={{ marginRight: '0.5rem' }}
+          >
+            <RollbackOutlined />
+          </Button>
+        </Tooltip>
+      );
     }
 
     return null;
   };
 
   return (
-    <div className="revision-container">
-      <div className="revision-content">
-        <div className="revision-header">
+    <div className='revision-container'>
+      <div className='revision-content'>
+        <div className='revision-header'>
           <div>
-              {getRollbackButton()}
-              {' '}
-            Revision {revisionIndex}{' '}
+            {getRollbackButton()} Revision {revisionIndex}{' '}
             {revisions[revisionIndex].userAvatar && (
               <Tooltip title={`Edited by ${revisions[revisionIndex].user}`}>
                 <Avatar
                   src={revisions[revisionIndex].userAvatar}
                   style={{ marginRight: '1rem' }}
-                  size="small"
+                  size='small'
                 />
               </Tooltip>
             )}
@@ -115,18 +175,18 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
         </div>
         <div dangerouslySetInnerHTML={{ __html: history.toHTML() }}></div>
       </div>
-      <div className="revision-content">
-        <div className="revision-header">
+      <div className='revision-content'>
+        <div className='revision-header'>
           <div>
-            Current version {' '}
+            Current version{' '}
             {content.ownerAvatar && (
-                <Tooltip title={`Edited by ${content.owner}`}>
-                  <Avatar
-                      src={content.ownerAvatar}
-                      style={{ marginRight: '1rem' }}
-                      size="small"
-                  />
-                </Tooltip>
+              <Tooltip title={`Edited by ${content.owner}`}>
+                <Avatar
+                  src={content.ownerAvatar}
+                  style={{ marginRight: '1rem' }}
+                  size='small'
+                />
+              </Tooltip>
             )}
           </div>
           <span>{moment(content.updatedAt).fromNow()}</span>
@@ -142,6 +202,11 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself.username,
 });
 
-export default connect(mapStateToProps, { updateNoteContentRevision, patchContent })(
-  RevisionContent
-);
+export default connect(mapStateToProps, {
+  updateNoteContentRevision,
+  patchNoteContent,
+  updateTaskContentRevision,
+  patchTaskContent,
+  updateTransactionContentRevision,
+  patchTransactionContent,
+})(RevisionContent);
