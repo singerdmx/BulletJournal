@@ -13,7 +13,7 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd';
-import { EditTwoTone } from '@ant-design/icons';
+import { EditTwoTone, CheckSquareTwoTone } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { patchTask } from '../../features/tasks/actions';
@@ -129,7 +129,7 @@ const EditTask: React.FC<
     } else {
       recurrence = undefined;
     }
-    const assignee = values.assignee ? values.assignee : undefined;
+    const assignees = values.assignees ? values.assignees : undefined;
     const timezone = values.timezone ? values.timezone : task.timezone;
     let reminderSetting = {
       date: values.reminderDate
@@ -152,8 +152,8 @@ const EditTask: React.FC<
       task.id,
       timezone,
       values.taskName,
-      assignee,
-      [assignee],
+      assignees[0],
+      assignees,
       dueDate,
       dueTime,
       values.duration,
@@ -169,6 +169,10 @@ const EditTask: React.FC<
 
   const openModal = () => {
     setVisible(true);
+  };
+
+  const selectAll = () => {
+    form.setFields([{name: 'assignees', value:props.group.users.map((user) => user.name)}]);
   };
 
   useEffect(() => {
@@ -233,10 +237,19 @@ const EditTask: React.FC<
               defaultValue={task.name ? task.name : ''}
             />
           </Form.Item>
-          {/* form for Assignee */}
-          <Form.Item name='assignee' label='Assignee'>
+          {/* form for Assignees */}
+          <Form.Item name='assignees' label={
+            <span>Assignees{' '}
+              <Tooltip title='Select All'>
+                <CheckSquareTwoTone
+                    onClick={selectAll}
+                    style={{cursor: 'pointer'}}/>
+              </Tooltip>
+              </span>
+          }>
             {props.group.users && (
               <Select
+                mode='multiple'
                 defaultValue={task.assignedTo ? task.assignedTo : ''}
                 style={{ width: '100%' }}
               >

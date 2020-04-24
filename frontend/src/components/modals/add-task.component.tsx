@@ -139,7 +139,6 @@ const AddTask: React.FC<
     props.updateTaskVisible(true);
   };
   const selectAll = () => {
-    console.log(props.group.users.map((user) => user.name))
     form.setFields([{name: 'assignees', value:props.group.users.map((user) => user.name)}]);
   };
   useEffect(() => {
