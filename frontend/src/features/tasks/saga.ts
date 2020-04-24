@@ -211,6 +211,20 @@ function* patchTask(action: PayloadAction<PatchTask>) {
         task: task,
       })
     );
+
+    //update label search page
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.tasks) {
+        projectItem.tasks = projectItem.tasks.map((eachTask) => {
+          if (eachTask.id === taskId) return task;
+          else return eachTask;
+        });
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `Patch Task Error Received: ${error}`);
   }

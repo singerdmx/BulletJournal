@@ -179,6 +179,21 @@ function* patchNote(action: PayloadAction<PatchNote>) {
         note: note,
       })
     );
+
+    const state: IState = yield select();
+    const labelItems: ProjectItems[] = [];
+
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.notes) {
+        projectItem.notes = projectItem.notes.map((eachNote) => {
+          if (eachNote.id === noteId) return note;
+          else return eachNote;
+        });
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `Patch Note Error Received: ${error}`);
   }
