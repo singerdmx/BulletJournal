@@ -6,7 +6,6 @@ import {
   ProjectItem,
   Revision,
 } from '../../features/myBuJo/interface';
-import { ContentType } from '../../features/myBuJo/constants';
 
 declare global {
   namespace NodeJS {
