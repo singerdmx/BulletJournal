@@ -10,7 +10,7 @@ services:
       - frontend
 
   frontend:
-    image: mwangxx/bulletjournal-frontend:1.1.8
+    image: mwangxx/bulletjournal-frontend:1.1.9
     container_name: react_app
     ports:
       - "3000:3000"
@@ -18,7 +18,7 @@ services:
       - controller
 
   controller:
-    image: mwangxx/bulletjournal-backend:1.1.8
+    image: mwangxx/bulletjournal-backend:1.1.9
     container_name: springboot_app
     ports:
       - "8080:8080"
