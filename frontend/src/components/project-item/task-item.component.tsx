@@ -204,6 +204,31 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
   } else if (isComplete) {
     taskLink = `/completedTask/${task.id}`;
   }
+
+  const getAssignees = () => {
+    if (!task.assignees || task.assignees.length === 0) {
+      return null;
+    }
+
+    if (task.assignees.length === 1) {
+      return <Tooltip title={`Assignee ${task.assignees[0].name}`}>
+        <Avatar src={task.assignees[0].avatar} size="small"/>
+      </Tooltip>
+    }
+
+    return  <Popover
+        title='Assignees'
+        placement='bottom'
+        content={
+          <div>
+            {task.assignees.map((u, index) => <p key={index}><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
+          </div>
+        }
+    >
+      <Avatar src={task.assignees[0].avatar} size="small"/>
+    </Popover>
+  };
+
   return (
     <div className="project-item">
       <div className="project-item-content">
@@ -242,9 +267,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
           </Tooltip>
         </div>
         <div className="project-item-assignee">
-          <Tooltip title={`Assignee ${task.assignedTo}`}>
-            <Avatar src={task.assignedToAvatar} size="small" />
-          </Tooltip>
+          {getAssignees()}
         </div>
         <div className="project-item-assignee">
           <Tooltip title={getReminderSettingString(task.reminderSetting)}>

@@ -67,6 +67,9 @@ public class TaskController {
     private Task addAvatar(Task task) {
         task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
         task.setAssignedToAvatar(this.userClient.getUser(task.getAssignedTo()).getAvatar());
+        task.getAssignees().forEach((assignee) -> {
+            assignee.setAvatar(this.userClient.getUser(assignee.getName()).getAvatar());
+        });
         if (task.getSubTasks() != null) {
             for (Task subTask : task.getSubTasks()) {
                 addAvatar(subTask);

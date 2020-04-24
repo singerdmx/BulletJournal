@@ -2,6 +2,7 @@ package com.bulletjournal.repository.models;
 
 import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.google.common.base.Preconditions;
 import org.hibernate.annotations.Type;
@@ -19,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
@@ -287,6 +289,7 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getId(),
                 this.getOwner(),
                 this.getAssignedTo(),
+                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
                 this.getDueDate(),
                 this.getDueTime(),
                 this.getTimezone(),

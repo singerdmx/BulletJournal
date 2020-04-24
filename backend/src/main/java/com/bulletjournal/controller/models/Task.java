@@ -21,7 +21,7 @@ public class Task extends ProjectItem {
 
     private String assignedToAvatar;
 
-    private List<User> assignees;
+    private List<User> assignees = new ArrayList<>();
 
     private String dueDate;
 
@@ -52,6 +52,7 @@ public class Task extends ProjectItem {
     public Task(Long id,
                 @NotBlank String owner,
                 @NotBlank @Size(min = 1, max = 100) String assignedTo,
+                List<User> assignees,
                 String dueDate,
                 String dueTime,
                 @NotBlank String timezone,
@@ -63,6 +64,7 @@ public class Task extends ProjectItem {
                 String recurrenceRule) {
         super(id, name, owner, project, labels);
         this.assignedTo = assignedTo;
+        this.assignees = assignees;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.timezone = timezone;
@@ -194,5 +196,6 @@ public class Task extends ProjectItem {
             this.setReminderSetting(task.getReminderSetting());
         }
         this.setRecurrenceRule(task.getRecurrenceRule());
+        this.setAssignees(task.getAssignees());
     }
 }
