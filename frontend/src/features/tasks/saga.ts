@@ -92,7 +92,6 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
     const {
       projectId,
       name,
-      assignedTo,
       assignees,
       dueDate,
       dueTime,
@@ -105,7 +104,6 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       createTask,
       projectId,
       name,
-      assignedTo,
       assignees,
       reminderSetting,
       timezone,
@@ -169,7 +167,6 @@ function* patchTask(action: PayloadAction<PatchTask>) {
     const {
       taskId,
       name,
-      assignedTo,
       assignees,
       dueDate,
       dueTime,
@@ -183,7 +180,6 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       updateTask,
       taskId,
       name,
-      assignedTo,
       assignees,
       dueDate,
       dueTime,

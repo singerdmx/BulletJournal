@@ -53,7 +53,6 @@ interface TaskCreateFormProps {
   createTask: (
     projectId: number,
     name: string,
-    assignedTo: string,
     assignees: string[],
     dueDate: string,
     dueTime: string,
@@ -123,7 +122,6 @@ const AddTask: React.FC<
     props.createTask(
       props.projectId,
       values.taskName,
-        assignees[0],
       assignees,
       dueDate,
       dueTime,

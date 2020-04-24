@@ -9,7 +9,6 @@ export const updateCompletedTasks = (projectId: number) =>
 export const createTask = (
   projectId: number,
   name: string,
-  assignedTo: string,
   assignees: string[],
   dueDate: string,
   dueTime: string,
@@ -21,7 +20,6 @@ export const createTask = (
   actions.TasksCreate({
     projectId: projectId,
     name: name,
-    assignedTo: assignedTo,
     assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,
@@ -43,7 +41,6 @@ export const patchTask = (
   taskId: number,
   timezone: string,
   name?: string,
-  assignedTo?: string,
   assignees?: string[],
   dueDate?: string,
   dueTime?: string,
@@ -55,7 +52,6 @@ export const patchTask = (
     taskId: taskId,
     timezone: timezone,
     name: name,
-    assignedTo: assignedTo,
     assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,

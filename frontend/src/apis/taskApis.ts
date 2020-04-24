@@ -52,7 +52,6 @@ export const deleteCompletedTaskById = (taskId: number) => {
 export const createTask = (
   projectId: number,
   name: string,
-  assignedTo: string,
   assignees: string[],
   reminderSetting: ReminderSetting,
   timezone: string,
@@ -63,7 +62,7 @@ export const createTask = (
 ) => {
   const postBody = JSON.stringify({
     name: name,
-    assignedTo: assignedTo,
+    assignedTo: assignees[0],
     assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,
@@ -89,7 +88,6 @@ export const putTasks = (projectId: number, tasks: Task[]) => {
 export const updateTask = (
   taskId: number,
   name?: string,
-  assignedTo?: string,
   assignees?: string[],
   dueDate?: string,
   dueTime?: string,
@@ -100,7 +98,7 @@ export const updateTask = (
 ) => {
   const patchBody = JSON.stringify({
     name: name,
-    assignedTo: assignedTo,
+    assignedTo: assignees ? assignees[0] : undefined,
     assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,
