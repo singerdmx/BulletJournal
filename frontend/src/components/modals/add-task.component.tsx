@@ -11,9 +11,9 @@ import {
   AutoComplete,
   Radio,
   Popover,
-  Button,
+  Button
 } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, CheckSquareTwoTone } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { createTask, updateTaskVisible } from '../../features/tasks/actions';
@@ -53,7 +53,7 @@ interface TaskCreateFormProps {
   createTask: (
     projectId: number,
     name: string,
-    assignedTo: string,
+    assignees: string[],
     dueDate: string,
     dueTime: string,
     duration: number,
@@ -100,7 +100,7 @@ const AddTask: React.FC<
       recurrence = undefined;
     }
 
-    const assignee = values.assignee ? values.assignee : props.myself;
+    const assignees = values.assignees ? values.assignees : [props.myself];
     const timezone = values.timezone ? values.timezone : props.timezone;
 
     let reminderSetting = {
@@ -122,7 +122,7 @@ const AddTask: React.FC<
     props.createTask(
       props.projectId,
       values.taskName,
-      assignee,
+      assignees,
       dueDate,
       dueTime,
       values.duration,
@@ -135,6 +135,9 @@ const AddTask: React.FC<
   const onCancel = () => props.updateTaskVisible(false);
   const openModal = () => {
     props.updateTaskVisible(true);
+  };
+  const selectAll = () => {
+    form.setFields([{name: 'assignees', value:props.group.users.map((user) => user.name)}]);
   };
   useEffect(() => {
     props.updateExpandedMyself(true);
@@ -187,10 +190,18 @@ const AddTask: React.FC<
             >
               <Input placeholder='Enter Task Name' allowClear />
             </Form.Item>
-            {/* form for Assignee */}
-            <Form.Item name='assignee' label='Assignee'>
+            {/* form for Assignees */}
+            <Form.Item name='assignees' label={
+              <span>Assignees{' '}
+              <Tooltip title='Select All'>
+                <CheckSquareTwoTone
+                    onClick={selectAll}
+                    style={{cursor: 'pointer'}}/>
+              </Tooltip>
+              </span>
+            }>
               {props.group.users && (
-                <Select defaultValue={props.myself} style={{ width: '100%' }}>
+                <Select mode="multiple" defaultValue={props.myself} style={{ width: '100%' }}>
                   {props.group.users.map((user) => {
                     return (
                       <Option value={user.name} key={user.name}>

@@ -13,7 +13,7 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd';
-import { EditTwoTone } from '@ant-design/icons';
+import { EditTwoTone, CheckSquareTwoTone } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { patchTask } from '../../features/tasks/actions';
@@ -61,7 +61,7 @@ interface TaskEditFormProps {
     taskId: number,
     timezone: string,
     name?: string,
-    assignedTo?: string,
+    assignees?: string[],
     dueDate?: string,
     dueTime?: string,
     duration?: number,
@@ -128,7 +128,7 @@ const EditTask: React.FC<
     } else {
       recurrence = undefined;
     }
-    const assignee = values.assignee ? values.assignee : undefined;
+    const assignees = values.assignees ? values.assignees : undefined;
     const timezone = values.timezone ? values.timezone : task.timezone;
     let reminderSetting = {
       date: values.reminderDate
@@ -151,7 +151,7 @@ const EditTask: React.FC<
       task.id,
       timezone,
       values.taskName,
-      assignee,
+      assignees,
       dueDate,
       dueTime,
       values.duration,
@@ -167,6 +167,10 @@ const EditTask: React.FC<
 
   const openModal = () => {
     setVisible(true);
+  };
+
+  const selectAll = () => {
+    form.setFields([{name: 'assignees', value:props.group.users.map((user) => user.name)}]);
   };
 
   useEffect(() => {
@@ -231,11 +235,20 @@ const EditTask: React.FC<
               defaultValue={task.name ? task.name : ''}
             />
           </Form.Item>
-          {/* form for Assignee */}
-          <Form.Item name='assignee' label='Assignee'>
+          {/* form for Assignees */}
+          <Form.Item name='assignees' label={
+            <span>Assignees{' '}
+              <Tooltip title='Select All'>
+                <CheckSquareTwoTone
+                    onClick={selectAll}
+                    style={{cursor: 'pointer'}}/>
+              </Tooltip>
+              </span>
+          }>
             {props.group.users && (
               <Select
-                defaultValue={task.assignedTo ? task.assignedTo : ''}
+                mode='multiple'
+                defaultValue={task.assignees ? task.assignees.map(u => u.name) : []}
                 style={{ width: '100%' }}
               >
                 {props.group.users.map((user) => {

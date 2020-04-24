@@ -308,6 +308,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
         task.setAssignedTo(createTaskParams.getAssignedTo());
+        task.setAssignees(createTaskParams.getAssignees());
         task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
 
         String date = createTaskParams.getDueDate();
@@ -384,6 +385,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
 
         updateAssignee(requester, taskId, updateTaskParams, task, events);
+        updateAssignees(requester, taskId, updateTaskParams, task, events);
 
         String date = updateTaskParams.getDueDate();
         String time = updateTaskParams.getDueTime();
@@ -444,6 +446,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 events.add(new Event(oldAssignee, taskId, task.getName()));
             }
         }
+        return events;
+    }
+
+    private List<Event> updateAssignees(String requester, Long taskId, UpdateTaskParams updateTaskParams,
+                                       Task task, List<Event> events) {
+        List<String> newAssignees = updateTaskParams.getAssignees();
+        List<String> oldAssignees = task.getAssignees();
+        // TODO: generate events
+        task.setAssignees(newAssignees);
         return events;
     }
 
@@ -704,7 +715,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
         return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
-                task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getTimezone(), task.getRecurrenceRule());
+                task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule());
     }
 
     /**

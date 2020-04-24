@@ -10,6 +10,7 @@ public class CreateTaskParams {
     @Size(min = 1, max = 100)
     private String name;
 
+    @Deprecated
     @NotBlank
     @Size(min = 1, max = 1_000_000)
     private String assignedTo;
@@ -34,20 +35,23 @@ public class CreateTaskParams {
     public CreateTaskParams() {
     }
 
-    public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name,
-                            @NotBlank @Size(min = 1, max = 100) String assignedTo,
-                            String dueDate,
-                            String dueTime,
-                            Integer duration,
-                            ReminderSetting reminderSetting,
-                            @NotBlank @Size(min = 1, max = 100) String timezone,
-                            String recurrenceRule) {
+    public CreateTaskParams(
+            @NotBlank @Size(min = 1, max = 100) String name,
+            @NotBlank @Size(min = 1, max = 100) String assignedTo,
+            String dueDate,
+            String dueTime,
+            Integer duration,
+            ReminderSetting reminderSetting,
+            List<String> assignees,
+            @NotBlank @Size(min = 1, max = 100) String timezone,
+            String recurrenceRule) {
         this.name = name;
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.duration = duration;
         this.reminderSetting = reminderSetting;
+        this.assignees = assignees;
         this.timezone = timezone;
         this.recurrenceRule = recurrenceRule;
     }

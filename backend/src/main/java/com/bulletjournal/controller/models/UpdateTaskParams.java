@@ -28,13 +28,14 @@ public class UpdateTaskParams {
 
     public UpdateTaskParams(
             String assignedTo, String dueDate, String dueTime, String name, Integer duration,
-            ReminderSetting reminderSetting, String timezone, String recurrenceRule) {
+            ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule) {
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;
         this.duration = duration;
         this.reminderSetting = reminderSetting;
+        this.assignees = assignees;
         this.timezone = timezone;
         this.recurrenceRule = recurrenceRule;
     }

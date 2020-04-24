@@ -153,7 +153,9 @@ public class GoogleCalendarController {
                     GoogleCalendarEvent event = Converter.toTask(e, timezone);
                     Task task = event.getTask();
                     task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
-                    task.setAssignedToAvatar(this.userClient.getUser(task.getAssignedTo()).getAvatar());
+                    task.getAssignees().forEach((assignee) -> {
+                        assignee.setAvatar(this.userClient.getUser(assignee.getName()).getAvatar());
+                    });
                     return event;
                 })
                 .collect(Collectors.toList());

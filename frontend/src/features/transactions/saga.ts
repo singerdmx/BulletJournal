@@ -37,7 +37,8 @@ import {
 import { LedgerSummary } from './interface';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { updateTransactionContents } from './actions';
-import { Content, Revision } from '../myBuJo/interface';
+import { Content, Revision, ProjectItems } from '../myBuJo/interface';
+import { updateItemsByLabels } from '../label/actions';
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -194,6 +195,17 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
         'today'
       )
     );
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.transactions) {
+        projectItem.transactions = projectItem.transactions.filter(
+          (transaction) => transaction.id !== transactionId
+        );
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
@@ -224,28 +236,30 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
     );
     const projectId = data.projectId;
     const state: IState = yield select();
-    const updateData = yield call(
-      fetchTransactions,
-      projectId,
-      state.transaction.timezone,
-      state.transaction.ledgerSummaryType,
-      state.transaction.frequencyType,
-      state.transaction.startDate,
-      state.transaction.endDate
-    );
-    const ledgerSummary: LedgerSummary = yield updateData.json();
-    yield put(
-      transactionsActions.transactionsReceived({
-        ledgerSummary: ledgerSummary,
-      })
-    );
+    //update transaciton project page's detail transaction
+    if (state.transaction.timezone) {
+      const updateData = yield call(
+        fetchTransactions,
+        projectId,
+        state.transaction.timezone,
+        state.transaction.ledgerSummaryType,
+        state.transaction.frequencyType,
+        state.transaction.startDate,
+        state.transaction.endDate
+      );
+      const ledgerSummary: LedgerSummary = yield updateData.json();
+      yield put(
+        transactionsActions.transactionsReceived({
+          ledgerSummary: ledgerSummary,
+        })
+      );
+    }
 
     yield put(
       transactionsActions.transactionReceived({
         transaction: data,
       })
     );
-
     yield put(
       getProjectItemsAfterUpdateSelect(
         state.myBuJo.todoSelected,
@@ -253,6 +267,23 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
         'today'
       )
     );
+
+    //update transaction label search page
+    const transaction = yield call(getTransactionById, transactionId);
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.transactions) {
+        projectItem.transactions = projectItem.transactions.map(
+          (eachTransaction) => {
+            if (eachTransaction.id === transactionId) return transaction;
+            else return eachTransaction;
+          }
+        );
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `Patch Transaction Error Received: ${error}`);
   }

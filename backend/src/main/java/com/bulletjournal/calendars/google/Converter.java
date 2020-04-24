@@ -1,15 +1,13 @@
 package com.bulletjournal.calendars.google;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.Content;
-import com.bulletjournal.controller.models.CreateTaskParams;
-import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.controller.models.Task;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
+import com.google.common.collect.ImmutableList;
 import org.dmfs.rfc5545.DateTime;
 import org.slf4j.MDC;
 
@@ -24,7 +22,7 @@ public class Converter {
 
         Task task = new Task();
         task.setOwner(username);
-        task.setAssignedTo(username);
+        task.setAssignees(ImmutableList.of(new User(username)));
         task.setName(event.getSummary());
         task.setTimezone(timezone);
 
@@ -60,8 +58,6 @@ public class Converter {
                 text.append(System.lineSeparator());
             }
         }
-
-        task.setAssignedTo(username);
 
         Content content = new Content();
         content.setText(text.toString());

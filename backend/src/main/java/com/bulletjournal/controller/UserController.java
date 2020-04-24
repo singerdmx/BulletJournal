@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.redis.RedisUserRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 public class UserController {
     public static final String MYSELF_ROUTE = "/api/myself";
     public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
+    public static final String CLEAR_MYSELF_ROUTE = "/api/myself/clear";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
 
@@ -26,6 +29,9 @@ public class UserController {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private RedisUserRepository redisUserRepository;
 
     @GetMapping("/api/users/{username}")
     public User getUser(@NotNull @PathVariable String username) {
@@ -64,6 +70,18 @@ public class UserController {
         LOGGER.info("Logging out " + username);
         this.userClient.logout(username);
         LOGGER.info(username + " is logged out, redirecting");
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(CLEAR_MYSELF_ROUTE)
+    public ResponseEntity<?> clear() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        LOGGER.info("Clearing " + username + " cache");
+        Optional<User> userOptional = redisUserRepository.findById(username);
+        if (userOptional.isPresent()) {
+            this.redisUserRepository.delete(userOptional.get());
+        }
+
         return ResponseEntity.ok().build();
     }
 }

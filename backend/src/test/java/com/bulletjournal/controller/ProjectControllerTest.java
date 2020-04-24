@@ -447,7 +447,7 @@ public class ProjectControllerTest {
         Task t2 = createTask(project, "t2");
         Task t3 = createTask(project, "t3");
         updateTaskRelations(project, t1, t2, t3);
-        t1 = updateTask(t1, expectedOwner, "2020-02-27", null, null, new ReminderSetting(), t1.getName());
+        t1 = updateTask(t1, expectedOwner, "2020-02-27", null, null, new ReminderSetting(), ImmutableList.of(expectedOwner), t1.getName());
 
         // Attach Labels to tasks
         ResponseEntity<Task> setLabelResponse = this.restTemplate.exchange(
@@ -516,7 +516,7 @@ public class ProjectControllerTest {
         Task completedTask = completeTaskResponse.getBody();
         assertEquals(t1.getName(), completedTask.getName());
         assertEquals(t1.getTimezone(), completedTask.getTimezone());
-        assertEquals(t1.getAssignedTo(), completedTask.getAssignedTo());
+        assertEquals(t1.getAssignees(), completedTask.getAssignees());
         assertEquals(t1.getDueDate(), completedTask.getDueDate());
         assertEquals(t1.getDueTime(), completedTask.getDueTime());
 
@@ -546,7 +546,7 @@ public class ProjectControllerTest {
         Task uncompletedTask = uncompleteTaskResponse.getBody();
         assertEquals(t1.getName(), uncompletedTask.getName());
         assertEquals(t1.getTimezone(), uncompletedTask.getTimezone());
-        assertEquals(t1.getAssignedTo(), uncompletedTask.getAssignedTo());
+        assertEquals(t1.getAssignees(), uncompletedTask.getAssignees());
         assertEquals(t1.getDueDate(), uncompletedTask.getDueDate());
         assertEquals(t1.getDueTime(), uncompletedTask.getDueTime());
 
@@ -578,7 +578,7 @@ public class ProjectControllerTest {
         completedTask = completeTaskResponse.getBody();
         assertEquals(recurTask.getName(), completedTask.getName());
         assertEquals(recurTask.getTimezone(), completedTask.getTimezone());
-        assertEquals(recurTask.getAssignedTo(), completedTask.getAssignedTo());
+        assertEquals(recurTask.getAssignees(), completedTask.getAssignees());
 
         deleteTask(recurTask);
     }
@@ -588,7 +588,7 @@ public class ProjectControllerTest {
         String taskName = "rt1";
 
         CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
-                null, null, null, TIMEZONE, recurrenceRule);
+                null, null, null, ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
@@ -600,7 +600,7 @@ public class ProjectControllerTest {
         assertEquals(taskName, createdTask.getName());
         assertEquals(project.getId(), createdTask.getProjectId());
         assertEquals(TIMEZONE, createdTask.getTimezone());
-        assertEquals(sampleUsers[0], createdTask.getAssignedTo());
+        assertEquals(sampleUsers[0], createdTask.getAssignees().get(0).getName());
         assertEquals(recurrenceRule, createdTask.getRecurrenceRule());
 
         return createdTask;
@@ -701,7 +701,7 @@ public class ProjectControllerTest {
 
     private Task createTask(Project project, String taskName) {
         CreateTaskParams task = new CreateTaskParams(taskName, expectedOwner, "2020-02-27",
-                null, null, new ReminderSetting(), TIMEZONE, null);
+                null, null, new ReminderSetting(), ImmutableList.of(expectedOwner), TIMEZONE, null);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
@@ -963,10 +963,10 @@ public class ProjectControllerTest {
     }
 
     private Task updateTask(Task task, String assignedTo, String dueDate,
-                            String dueTime, String name, ReminderSetting reminderSetting, String expectedName) {
+                            String dueTime, String name, ReminderSetting reminderSetting, List<String> assignees, String expectedName) {
         //update task parameter
         UpdateTaskParams updateTaskParams = new UpdateTaskParams(
-                assignedTo, dueDate, dueTime, name, null, reminderSetting, TIMEZONE, null);
+                assignedTo, dueDate, dueTime, name, null, reminderSetting, assignees, TIMEZONE, null);
         ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,
@@ -976,7 +976,7 @@ public class ProjectControllerTest {
         Task updated = Arrays.asList(response.getBody()).stream()
                 .filter(t -> task.getId().equals(t.getId())).findFirst().orElse(null);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedOwner, updated.getAssignedTo());
+        assertEquals(expectedOwner, updated.getAssignees().get(0).getName());
         assertEquals(dueDate, updated.getDueDate());
         assertEquals(dueTime, updated.getDueTime());
         assertEquals(expectedName, updated.getName());
