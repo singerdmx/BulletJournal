@@ -1,19 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import {Label, stringToRGB} from '../../features/label/interface';
-import {Select, Tag} from 'antd';
-import {useHistory} from 'react-router-dom';
-import {PlusOutlined, TagOutlined} from '@ant-design/icons';
-import {connect} from 'react-redux';
-import {addSelectedLabel, labelsUpdate} from '../../features/label/actions';
-import {setNoteLabels} from '../../features/notes/actions';
-import {setTaskLabels} from '../../features/tasks/actions';
-import {setTransactionLabels} from '../../features/transactions/actions';
-import {ProjectType} from '../../features/project/constants';
+import React, { useEffect, useState } from 'react';
+import { Label, stringToRGB } from '../../features/label/interface';
+import { Select, Tag } from 'antd';
+import { useHistory } from 'react-router-dom';
+import { PlusOutlined, TagOutlined } from '@ant-design/icons';
+import { connect } from 'react-redux';
+import { addSelectedLabel, labelsUpdate } from '../../features/label/actions';
+import { setNoteLabels } from '../../features/notes/actions';
+import { setTaskLabels } from '../../features/tasks/actions';
+import { setTransactionLabels } from '../../features/transactions/actions';
+import { ProjectType } from '../../features/project/constants';
 
-import {icons} from '../../assets/icons/index';
-import {DragDropContext, Draggable, Droppable, DropResult,} from 'react-beautiful-dnd';
-import {IState} from '../../store';
-import {ProjectItem} from "../../features/myBuJo/interface";
+import { icons } from '../../assets/icons/index';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from 'react-beautiful-dnd';
+import { IState } from '../../store';
+import { ProjectItem } from '../../features/myBuJo/interface';
 
 type DraggableLabelsProps = {
   mode: ProjectType;
@@ -33,7 +38,10 @@ export const getIcon = (icon: string) => {
   return res.length > 0 ? res[0].icon : <TagOutlined />;
 };
 
-export const getItemIcon = (item: ProjectItem, defaultElem: React.ReactNode) => {
+export const getItemIcon = (
+  item: ProjectItem,
+  defaultElem: React.ReactNode
+) => {
   if (item.labels && item.labels[0]) {
     const icon = item.labels[0].icon;
     return getIcon(icon);
@@ -80,9 +88,12 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   useEffect(() => {
     labelsUpdate();
   }, []);
+
+  useEffect(() => {
+    setSelectedLabels([]);
+  }, [labels]);
   // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
-    console.log(label);
     addSelectedLabel(label);
     history.push('/labels/search');
   };
@@ -91,13 +102,11 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
     if (!result.destination) {
       return;
     }
-    console.log(labels);
     const newLabels = reorder(
       labelsId,
       result.source.index,
       result.destination.index
     );
-    console.log(newLabels);
     shareFunction(itemId, newLabels);
   };
 
@@ -123,9 +132,9 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   };
 
   return (
-    <div className='note-labels'>
+    <div className="note-labels">
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId='droppable' direction='horizontal'>
+        <Droppable droppableId="droppable" direction="horizontal">
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -148,7 +157,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                       >
                         <Tag
                           key={label.id}
-                          className='labels'
+                          className="labels"
                           color={stringToRGB(label.value)}
                           closable={editable}
                           onClose={() => handleLabelDelete(label.id)}
@@ -176,10 +185,10 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
               {editable ? (
                 showAdd ? (
                   <Select
-                    mode='multiple'
+                    mode="multiple"
                     style={{ height: '70%', width: 100 }}
                     value={selectedLabels}
-                    size='small'
+                    size="small"
                     onBlur={handleSubmit}
                     onChange={handleChange}
                   >
@@ -196,7 +205,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                   </Select>
                 ) : (
                   <Tag
-                    className='site-tag-plus'
+                    className="site-tag-plus"
                     style={{ height: '70%' }}
                     onClick={() => setShowAdd(true)}
                   >
