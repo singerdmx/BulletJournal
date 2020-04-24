@@ -27,6 +27,7 @@ export type CreateTask = {
   projectId: number;
   name: string;
   assignedTo: string;
+  assignees: string[],
   reminderSetting: ReminderSetting;
   timezone: string;
   dueDate?: string;
@@ -105,6 +106,7 @@ export type PatchTask = {
   timezone: string;
   name?: string;
   assignedTo?: string;
+  assignees?: string[],
   dueDate?: string;
   dueTime?: string;
   duration?: number;
