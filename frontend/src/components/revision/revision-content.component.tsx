@@ -117,16 +117,19 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       </div>
       <div className="revision-content">
         <div className="revision-header">
-          Current version <span>{moment(content.updatedAt).fromNow()}</span>
-          {content.ownerAvatar && (
-              <Tooltip title={`Edited by ${content.owner}`}>
-                <Avatar
-                    src={content.ownerAvatar}
-                    style={{ marginRight: '1rem' }}
-                    size="small"
-                />
-              </Tooltip>
-          )}
+          <div>
+            Current version {' '}
+            {content.ownerAvatar && (
+                <Tooltip title={`Edited by ${content.owner}`}>
+                  <Avatar
+                      src={content.ownerAvatar}
+                      style={{ marginRight: '1rem' }}
+                      size="small"
+                  />
+                </Tooltip>
+            )}
+          </div>
+          <span>{moment(content.updatedAt).fromNow()}</span>
         </div>
         <div dangerouslySetInnerHTML={{ __html: latestContent.toHTML() }}></div>
       </div>
