@@ -81,6 +81,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const taskEditorElem = (
     <div className='task-drawer'>
       <ContentEditorDrawer
+        readMode={false}
         projectItem={task}
         visible={showEditor}
         onClose={handleClose}

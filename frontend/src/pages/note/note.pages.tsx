@@ -82,6 +82,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   const noteEditorElem = (
     <div className='note-drawer'>
       <ContentEditorDrawer
+        readMode={false}
         projectItem={note}
         visible={showEditor}
         onClose={handleClose}

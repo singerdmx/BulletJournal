@@ -38,7 +38,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
     this.props.updateMyself();
     this.interval = setInterval(() => {
       this.props.updateSystem();
-    }, 8000);
+    }, 50000);
   }
 
   componentWillUnmount() {

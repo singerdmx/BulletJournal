@@ -5,7 +5,7 @@ import React from 'react';
 //actions
 import {getReminderSettingString, Task} from '../../features/tasks/interface';
 // antd imports
-import {Avatar, Card, Col, Divider, Popover, Row, Statistic, Tooltip} from 'antd';
+import {Avatar, Card, Col, Divider, Row, Statistic, Tooltip} from 'antd';
 import {AlertOutlined, ClockCircleOutlined, FileDoneOutlined,} from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';

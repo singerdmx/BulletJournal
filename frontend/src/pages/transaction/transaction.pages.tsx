@@ -221,6 +221,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       </div>
       <div className='transaction-drawer'>
         <ContentEditorDrawer
+          readMode={false}
           projectItem={transaction}
           visible={showEditor}
           onClose={handleClose}

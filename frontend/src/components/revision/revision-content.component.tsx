@@ -26,6 +26,7 @@ import { RollbackOutlined } from '@ant-design/icons';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { ContentType } from '../../features/myBuJo/constants';
+import {isContentEditable} from "../content/content-item.component";
 
 type RevisionProps = {
   revisionIndex: number;
@@ -130,11 +131,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
 
   const getRollbackButton = () => {
-    if (
-      project.owner === myself ||
-      projectItem.owner === myself ||
-      (content && content.owner === myself)
-    ) {
+    if (isContentEditable(project, projectItem, content, myself)) {
       return (
         <Tooltip title='Revert to this version'>
           <Button
