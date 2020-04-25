@@ -75,7 +75,7 @@ public class Converter {
             DateTime reminderDateTime = ZonedDateTimeHelper.getDateTime(startDateTimeValue - TimeUnit.MINUTES.toMillis(DEFAULT_REMINDER_SETTING), timezone);
             reminderSetting.setDate(ZonedDateTimeHelper.getDate(reminderDateTime));
             reminderSetting.setTime(ZonedDateTimeHelper.getTime(reminderDateTime));
-        } else {
+        } else if (reminders.getOverrides() != null && !reminders.getOverrides().isEmpty()) {
             List<EventReminder> eventReminderList = reminders.getOverrides();
             int minutes = 0;
             for (EventReminder eventReminder : eventReminderList) {

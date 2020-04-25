@@ -17,7 +17,6 @@ import { IState } from '../../store';
 import {Avatar, Popconfirm, Tooltip, Button, Popover} from 'antd';
 import {
   DeleteTwoTone,
-  TagOutlined,
   UpSquareOutlined,
   PlusCircleTwoTone,
 } from '@ant-design/icons';
