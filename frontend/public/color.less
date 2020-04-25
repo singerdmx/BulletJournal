@@ -1,4 +1,5 @@
 @primary-color: #1890ff;
+@layout-header-background: #001529;
 // This file will contain all varibales, our custom varibales and
 //those from Ant Design which we want to override.
 /* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
@@ -1804,7 +1805,7 @@ this.tinycolor = tinycolor;
 
 // Layout
 @layout-body-background: #f0f2f5;
-@layout-header-background: #001529;
+
 @layout-header-height: 64px;
 @layout-header-padding: 0 50px;
 @layout-header-color: @text-color;
@@ -5199,7 +5200,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-dropdown-menu-dark,
 .ant-dropdown-menu-dark .ant-dropdown-menu {
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-dropdown-menu-dark .ant-dropdown-menu-item,
 .ant-dropdown-menu-dark .ant-dropdown-menu-submenu-title,
@@ -5894,14 +5895,14 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-layout-header {
   color: rgba(0, 0, 0, 0.65);
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-layout-footer {
   color: rgba(0, 0, 0, 0.65);
   background: #f0f2f5;
 }
 .ant-layout-sider {
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-layout-sider-trigger {
   color: #fff;
@@ -5909,7 +5910,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-layout-sider-zero-width-trigger {
   color: #fff;
-  background: #001529;
+  background: @layout-header-background;
   border-radius: 0 2px 2px 0;
 }
 .ant-layout-sider-zero-width-trigger:hover {
@@ -6284,7 +6285,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 .ant-menu-dark,
 .ant-menu-dark .ant-menu-sub {
   color: rgba(255, 255, 255, 0.65);
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-menu-dark .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
 .ant-menu-dark .ant-menu-sub .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
@@ -6303,7 +6304,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-menu-dark.ant-menu-horizontal > .ant-menu-item,
 .ant-menu-dark.ant-menu-horizontal > .ant-menu-submenu {
-  border-color: #001529;
+  border-color: @layout-header-background;
   border-bottom: 0;
 }
 .ant-menu-dark .ant-menu-item,
@@ -8637,7 +8638,7 @@ h4.ant-typography,
   background: white;
 }
 .sider {
-  background: #fff !important;
+  background: @layout-header-background;
   box-shadow: 5px 0px 6px -6px #686767;
 }
 .sider .sider-header .title h2 {
@@ -11497,7 +11498,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-dropdown-menu-dark,
 .ant-dropdown-menu-dark .ant-dropdown-menu {
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-dropdown-menu-dark .ant-dropdown-menu-item,
 .ant-dropdown-menu-dark .ant-dropdown-menu-submenu-title,
@@ -12192,14 +12193,14 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-layout-header {
   color: rgba(0, 0, 0, 0.65);
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-layout-footer {
   color: rgba(0, 0, 0, 0.65);
   background: #f0f2f5;
 }
 .ant-layout-sider {
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-layout-sider-trigger {
   color: #fff;
@@ -12207,7 +12208,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-layout-sider-zero-width-trigger {
   color: #fff;
-  background: #001529;
+  background: @layout-header-background;
   border-radius: 0 2px 2px 0;
 }
 .ant-layout-sider-zero-width-trigger:hover {
@@ -12582,7 +12583,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 .ant-menu-dark,
 .ant-menu-dark .ant-menu-sub {
   color: rgba(255, 255, 255, 0.65);
-  background: #001529;
+  background: @layout-header-background;
 }
 .ant-menu-dark .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
 .ant-menu-dark .ant-menu-sub .ant-menu-submenu-title .ant-menu-submenu-arrow::after,
@@ -12601,7 +12602,7 @@ tr > .ant-picker-cell-in-view.ant-picker-cell-range-hover-start:last-child::afte
 }
 .ant-menu-dark.ant-menu-horizontal > .ant-menu-item,
 .ant-menu-dark.ant-menu-horizontal > .ant-menu-submenu {
-  border-color: #001529;
+  border-color: @layout-header-background;
   border-bottom: 0;
 }
 .ant-menu-dark .ant-menu-item,
@@ -14935,7 +14936,7 @@ h4.ant-typography,
   background: white;
 }
 .sider {
-  background: #fff !important;
+  background: @layout-header-background;
   box-shadow: 5px 0px 6px -6px #686767;
 }
 .sider .sider-header .title h2 {
@@ -14944,4 +14945,5 @@ h4.ant-typography,
 .sider::-webkit-scrollbar-thumb {
   background-color: @primary-color;
 }
+
 
