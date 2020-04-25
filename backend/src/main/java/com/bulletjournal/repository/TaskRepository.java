@@ -19,10 +19,9 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
 
     Optional<Task> findTaskByGoogleCalendarEventId(String googleCalendarEventId);
 
-    @Query("SELECT task FROM Task task WHERE task.assignedTo = :assignee AND task.startTime IS NOT NULL AND " +
-            "task.reminderDateTime IS NOT NULL AND " +
-            "task.startTime >= :now AND task.reminderDateTime <= :now")
-    List<Task> findRemindingTasks(@Param("assignee") String assignee, @Param("now") Timestamp now);
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND tasks.reminder_date_time IS NOT NULL" +
+            " AND tasks.start_time >= ':now' AND tasks.reminder_date_time <= ':now'", nativeQuery = true)
+    List<Task> findRemindingTasks(@Param("assignee") String assignee, @Param("now") String now);
 
     @Query("SELECT task FROM Task task WHERE task.assignedTo = :assignee AND task.startTime IS NOT NULL AND " +
             "task.endTime IS NOT NULL AND " +

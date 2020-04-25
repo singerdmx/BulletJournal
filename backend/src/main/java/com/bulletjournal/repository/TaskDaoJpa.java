@@ -167,7 +167,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         // Fetch regular reminding tasks
         List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
-                .findRemindingTasks(assignee, currentTime)
+                .findRemindingTasks(assignee, currentTime.toString())
                 .stream()
                 .map(TaskModel::toPresentationModel)
                 .collect(Collectors.toList());
