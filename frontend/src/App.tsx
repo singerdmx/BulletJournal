@@ -1,18 +1,26 @@
 import React, { useEffect } from 'react';
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 import SideLayout from './layouts/side/side.layout';
 import HeaderLayout from './layouts/header/header.layout';
 import ContentLayout from './layouts/content/content.layout';
 import FooterLayout from './layouts/footer/footer.layout';
 import { updateTheme } from './features/myself/actions';
+import ReactLoading from 'react-loading';
 
 import './styles/main.less';
 import { connect } from 'react-redux';
 import { IState } from './store';
 
+const Loading = () => (
+  <div className="loading">
+    <ReactLoading type="bubbles" color="#0984e3" height="75" width="75" />
+  </div>
+);
+
 type RootProps = {
   updateTheme: () => void;
   theme: string;
+  loading: boolean;
 };
 
 const App: React.FC<RootProps> = (props) => {
@@ -40,7 +48,9 @@ const App: React.FC<RootProps> = (props) => {
     });
   }, [props.theme]);
 
-  return (
+  return props.loading ? (
+    <Loading />
+  ) : (
     <div className="App">
       <Layout className="layout">
         <SideLayout />
