@@ -192,8 +192,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
                 assignee,
-                Timestamp.from(startTime.toInstant()).toString(),
-                Timestamp.from(endTime.toInstant()).toString());
+                ZonedDateTimeHelper.toDBTimestamp(startTime),
+                ZonedDateTimeHelper.toDBTimestamp(endTime));
 
         List<Task> recurrentTasks = this.getRecurringTasks(assignee, startTime, endTime);
 

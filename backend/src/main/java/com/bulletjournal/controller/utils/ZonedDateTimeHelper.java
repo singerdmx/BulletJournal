@@ -25,6 +25,11 @@ public class ZonedDateTimeHelper {
     private static final String MIN_TIME = "00:00";
     private static final String MAX_TIME = "23:59";
 
+    public static String toDBTimestamp(ZonedDateTime zonedDateTime) {
+        String res = Timestamp.from(zonedDateTime.toInstant()).toString();
+        return res.substring(0, res.lastIndexOf('.'));
+    }
+
     /**
      * Aggregate hour and time to a single string
      */
