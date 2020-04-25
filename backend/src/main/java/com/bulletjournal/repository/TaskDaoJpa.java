@@ -190,9 +190,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
-
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
-                assignee, startTime.toString(), endTime.toString());
+                assignee,
+                Timestamp.from(startTime.toInstant()).toString(),
+                Timestamp.from(endTime.toInstant()).toString());
 
         List<Task> recurrentTasks = this.getRecurringTasks(assignee, startTime, endTime);
 
