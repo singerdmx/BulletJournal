@@ -28,17 +28,20 @@ public class Converter {
 
         EventDateTime startEventDateTime = event.getStart();
         EventDateTime endEventDateTime = event.getEnd();
-        if (startEventDateTime != null && endEventDateTime != null) {
+        if (startEventDateTime != null && startEventDateTime.getDateTime() != null &&
+                endEventDateTime != null) {
 
-            long endDateTimeValue = endEventDateTime.getDateTime().getValue();
             long startDateTimeValue = startEventDateTime.getDateTime().getValue();
-
             setTaskRecurrence(task, timezone, event.getRecurrence(), startDateTimeValue);
 
-            task.setDuration((int) TimeUnit.MILLISECONDS.toMinutes(endDateTimeValue - startDateTimeValue));
-            DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endDateTimeValue, timezone);
-            task.setDueDate(ZonedDateTimeHelper.getDate(endDateTime));
-            task.setDueTime(ZonedDateTimeHelper.getTime(endDateTime));
+            if (endEventDateTime.getDateTime() != null) {
+                long endDateTimeValue = endEventDateTime.getDateTime().getValue();
+                task.setDuration((int) TimeUnit.MILLISECONDS.toMinutes(endDateTimeValue - startDateTimeValue));
+            }
+
+            DateTime dueDateTime = ZonedDateTimeHelper.getDateTime(startDateTimeValue, timezone);
+            task.setDueDate(ZonedDateTimeHelper.getDate(dueDateTime));
+            task.setDueTime(ZonedDateTimeHelper.getTime(dueDateTime));
 
             setTaskReminder(task, timezone, event.getReminders(), startDateTimeValue);
         }

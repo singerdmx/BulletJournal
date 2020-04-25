@@ -167,7 +167,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         // Fetch regular reminding tasks
         List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
-                .findRemindingTasks(assignee, currentTime)
+                .findRemindingTasks(assignee, currentTime.toString())
                 .stream()
                 .map(TaskModel::toPresentationModel)
                 .collect(Collectors.toList());
@@ -190,9 +190,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
-
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
-                assignee, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+                assignee,
+                ZonedDateTimeHelper.toDBTimestamp(startTime),
+                ZonedDateTimeHelper.toDBTimestamp(endTime));
 
         List<Task> recurrentTasks = this.getRecurringTasks(assignee, startTime, endTime);
 
@@ -239,7 +240,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecurringTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasksBetween = new ArrayList<>();
-        List<Task> recurrentTasks = this.taskRepository.findTasksByAssignedToAndRecurrenceRuleNotNull(assignee);
+        List<Task> recurrentTasks = this.taskRepository.findTasksByAssigneesAndRecurrenceRuleNotNull(assignee);
         DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
         DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
 
@@ -300,14 +301,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         Task task = new Task();
         task.setProject(project);
-        task.setAssignedTo(owner);
         task.setDueDate(createTaskParams.getDueDate());
         task.setDueTime(createTaskParams.getDueTime());
         task.setOwner(owner);
         task.setName(createTaskParams.getName());
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
-        task.setAssignedTo(createTaskParams.getAssignedTo());
         task.setAssignees(createTaskParams.getAssignees());
         task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
 
@@ -435,10 +434,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams,
                                        Task task, List<Event> events) {
-        String newAssignee = updateTaskParams.getAssignedTo();
-        String oldAssignee = task.getAssignedTo();
+        String newAssignee = updateTaskParams.getAssignees().get(0);
+        String oldAssignee = task.getAssignees().get(0);
         if (newAssignee != null && !Objects.equals(newAssignee, oldAssignee)) {
-            task.setAssignedTo(newAssignee);
             if (!Objects.equals(newAssignee, requester)) {
                 events.add(new Event(newAssignee, taskId, task.getName()));
             }
@@ -714,7 +712,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return CreateTaskParams - a create task parameter object contains completed task creation information
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
-        return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
+        return new CreateTaskParams(task.getName(), task.getDueDate(),
                 task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule());
     }
 

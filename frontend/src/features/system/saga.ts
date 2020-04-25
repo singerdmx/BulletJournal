@@ -10,7 +10,7 @@ import {updateNotifications} from '../notification/actions';
 import {ProjectType} from "../project/constants";
 import {Task} from '../tasks/interface';
 import moment from 'moment-timezone';
-import { ArgsProps } from 'antd/lib/notification';
+import {ArgsProps} from 'antd/lib/notification';
 
 const fetchReminderFromLocal = () => {
     const defaultReminders = [] as Task[];
@@ -57,19 +57,19 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         let newComingTasks = [] as Task[];
         var now = new Date().getTime();
         let localReminders = fetchReminderFromLocal();
-        let unExpiredLocalReminders = localReminders.filter((reminder: any)=>{
+        let unExpiredLocalReminders = localReminders.filter((reminder: any) => {
             return now - reminder.time < 2 * 60 * 60 * 1000;
         })
-        
-        if(remindingTaskEtag !== data.remindingTaskEtag){
-            newComingTasks = data.reminders.map(taskNameMapper).filter((task: any)=>!localReminders.map(taskNameMapper).includes(task)).map((item: any)=>({
+
+        if (remindingTaskEtag !== data.remindingTaskEtag) {
+            newComingTasks = data.reminders.map(taskNameMapper).filter((task: any) => !localReminders.map(taskNameMapper).includes(task)).map((item: any) => ({
                 id: item,
                 time: now
             }));
             yield all(
                 [...newComingTasks.map(t => {
-                    return data.reminders.find((reminder: any)=>reminder.id===t.id);
-                }).map((element: Task) =>{
+                    return data.reminders.find((reminder: any) => reminder.id === t.id);
+                }).map((element: Task) => {
                     const targetTime = element.dueDate + ' ' + (element.dueTime ? element.dueTime : "00:00");
                     const leftTime = moment.tz(targetTime, element.timezone);
                     const args: ArgsProps = {

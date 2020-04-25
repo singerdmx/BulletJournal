@@ -11,6 +11,7 @@ import {
 } from '../../features/myself/actions';
 import { updateTheme } from './actions';
 import './account.styles.less';
+import getThemeColorVars from '../../utils/theme';
 import { Select, Tooltip } from 'antd';
 
 const { Option } = Select;
@@ -64,22 +65,9 @@ class Account extends React.Component<AccountProps> {
   };
 
   loadUpdatedTheme = (theme: string) => {
-    let color = '';
-    switch (theme) {
-      case 'LIGHT': {
-        color = '#1890ff'
-        break;
-      }
-      case 'PINK': {
-        color = '#f5aac9';
-        break;
-      }
-      case 'DARK': {
-        break;
-      }
-    }
-    window.less.modifyVars({ '@primary-color': color }).then(() => {
-      console.log('Theme updated successfully');
+    const vars = getThemeColorVars(theme);
+    window.less.modifyVars(vars).then(() => {
+      console.log('Theme updated successfully', vars);
     });
   };
 

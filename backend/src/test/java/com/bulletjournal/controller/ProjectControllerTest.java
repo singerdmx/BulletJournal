@@ -587,7 +587,7 @@ public class ProjectControllerTest {
         String recurrenceRule = "DTSTART:20200420T000000Z RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20200520T000000Z";
         String taskName = "rt1";
 
-        CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
+        CreateTaskParams task = new CreateTaskParams(taskName, null,
                 null, null, null, ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
@@ -700,7 +700,7 @@ public class ProjectControllerTest {
     }
 
     private Task createTask(Project project, String taskName) {
-        CreateTaskParams task = new CreateTaskParams(taskName, expectedOwner, "2020-02-27",
+        CreateTaskParams task = new CreateTaskParams(taskName, "2020-02-27",
                 null, null, new ReminderSetting(), ImmutableList.of(expectedOwner), TIMEZONE, null);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
@@ -966,7 +966,7 @@ public class ProjectControllerTest {
                             String dueTime, String name, ReminderSetting reminderSetting, List<String> assignees, String expectedName) {
         //update task parameter
         UpdateTaskParams updateTaskParams = new UpdateTaskParams(
-                assignedTo, dueDate, dueTime, name, null, reminderSetting, assignees, TIMEZONE, null);
+                dueDate, dueTime, name, null, reminderSetting, assignees, TIMEZONE, null);
         ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,

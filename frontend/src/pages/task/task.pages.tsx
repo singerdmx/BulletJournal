@@ -32,6 +32,7 @@ import { ProjectType } from '../../features/project/constants';
 // components
 import TaskDetailPage, { TaskProps } from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
+import LabelManagement from "../project/label-management.compoent";
 
 interface TaskPageHandler {
   getTask: (taskId: number) => void;
@@ -81,6 +82,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const taskEditorElem = (
     <div className='task-drawer'>
       <ContentEditorDrawer
+        readMode={false}
         projectItem={task}
         visible={showEditor}
         onClose={handleClose}
@@ -121,11 +123,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
       <div className='task-operation'>
         {getAssignees()}
 
-        <Tooltip title='Manage Labels'>
-          <div>
-            <TagOutlined onClick={labelEditableHandler} />
-          </div>
-        </Tooltip>
+        <LabelManagement labelEditableHandler={labelEditableHandler} labelEditable={labelEditable}/>
         <EditTask task={task} mode='icon' />
         <MoveProjectItem
           type={ProjectType.TODO}

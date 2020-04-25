@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -25,10 +23,6 @@ import java.util.stream.Collectors;
 @MappedSuperclass
 public abstract class TaskModel extends ProjectItemModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskModel.class);
-    @NotBlank
-    @Size(min = 2, max = 1_000_000)
-    @Column(name = "assigned_to", length = 1_000_000)
-    private String assignedTo;
 
     @Column(name = "due_date", length = 15)
     private String dueDate; // "yyyy-MM-dd"
@@ -89,14 +83,6 @@ public abstract class TaskModel extends ProjectItemModel {
 
     public void setEndTime(Timestamp endTime) {
         this.endTime = endTime;
-    }
-
-    public String getAssignedTo() {
-        return assignedTo;
-    }
-
-    public void setAssignedTo(String assignedTo) {
-        this.assignedTo = assignedTo;
     }
 
     public String getDueDate() {

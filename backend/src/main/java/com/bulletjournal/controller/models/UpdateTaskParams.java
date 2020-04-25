@@ -4,8 +4,6 @@ import java.util.List;
 
 public class UpdateTaskParams {
 
-    private String assignedTo;
-
     private String dueDate;
 
     private String dueTime;
@@ -26,10 +24,8 @@ public class UpdateTaskParams {
     public UpdateTaskParams() {
     }
 
-    public UpdateTaskParams(
-            String assignedTo, String dueDate, String dueTime, String name, Integer duration,
+    public UpdateTaskParams(String dueDate, String dueTime, String name, Integer duration,
             ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule) {
-        this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;
@@ -38,18 +34,6 @@ public class UpdateTaskParams {
         this.assignees = assignees;
         this.timezone = timezone;
         this.recurrenceRule = recurrenceRule;
-    }
-
-    public String getAssignedTo() {
-        return assignedTo;
-    }
-
-    public void setAssignedTo(String assignedTo) {
-        this.assignedTo = assignedTo;
-    }
-
-    public boolean hasAssignedTo() {
-        return this.assignedTo != null;
     }
 
     public String getDueDate() {
