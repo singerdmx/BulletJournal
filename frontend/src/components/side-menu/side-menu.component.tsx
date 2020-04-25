@@ -29,6 +29,7 @@ import { IState } from '../../store';
 import {
   getProjectItemsAfterUpdateSelect,
 } from '../../features/myBuJo/actions';
+import { updateTheme } from '../../features/myself/actions';
 
 const { SubMenu } = Menu;
 //props of groups
@@ -44,10 +45,15 @@ type ProjectProps = {
   todoSelected: boolean;
   ledgerSelected: boolean;
   getProjectItemsAfterUpdateSelect: (
-      todoSelected: boolean,
-      ledgerSelected: boolean,
-      category: string
+    todoSelected: boolean,
+    ledgerSelected: boolean,
+    category: string
   ) => void;
+};
+// props of account
+type AccountProps = {
+  updateTheme: () => void;
+  theme: string;
 };
 
 export const iconMapper = {
@@ -67,7 +73,7 @@ declare global {
 }
 
 // class component
-class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
+class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps & AccountProps> {
   // click handler when click menu item
   onClick = (menu: any) => {
     const path = menu.keyPath.reverse().join('/');
@@ -92,9 +98,9 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   handleClickToday = (category: string) => {
     let { ledgerSelected, todoSelected } = this.props;
     this.props.getProjectItemsAfterUpdateSelect(
-        todoSelected,
-        ledgerSelected,
-        category
+      todoSelected,
+      ledgerSelected,
+      category
     );
   };
 
@@ -102,6 +108,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
     const { groups: groupsByOwner, ownProjects } = this.props;
     return (
       <Menu
+        theme={this.props.theme === 'DARK' ? 'dark' : 'light'}
         mode="inline"
         defaultOpenKeys={['todo']}
         style={{ height: '100%', fontWeight: 500 }}
@@ -225,6 +232,7 @@ const mapStateToProps = (state: IState) => ({
   id: state.user.id,
   groups: state.group.groups,
   timezone: state.myself.timezone,
+  theme: state.settings.theme,
   ownProjects: state.project.owned,
   sharedProjects: state.project.shared,
   todoSelected: state.myBuJo.todoSelected,
@@ -232,6 +240,7 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
+  updateTheme,
   updateGroups,
   createGroupByName,
   updateProjects,
