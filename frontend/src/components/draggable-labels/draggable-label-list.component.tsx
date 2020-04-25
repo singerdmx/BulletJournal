@@ -128,7 +128,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   };
   // when change in selections
   const handleChange = (newlabels: number[]) => {
-    setSelectedLabels((selectedLabels) => [...selectedLabels, ...newlabels]);
+    setSelectedLabels([...newlabels]);
   };
 
   return (
