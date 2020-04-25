@@ -307,7 +307,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         task.setName(createTaskParams.getName());
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
-        task.setAssignedTo(createTaskParams.getAssignedTo());
+        task.setAssignedTo(createTaskParams.getAssignees().get(0));
         task.setAssignees(createTaskParams.getAssignees());
         task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
 
@@ -435,7 +435,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams,
                                        Task task, List<Event> events) {
-        String newAssignee = updateTaskParams.getAssignedTo();
+        String newAssignee = updateTaskParams.getAssignees().get(0);
         String oldAssignee = task.getAssignedTo();
         if (newAssignee != null && !Objects.equals(newAssignee, oldAssignee)) {
             task.setAssignedTo(newAssignee);
@@ -714,7 +714,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return CreateTaskParams - a create task parameter object contains completed task creation information
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
-        return new CreateTaskParams(task.getName(), task.getAssignedTo(), task.getDueDate(),
+        return new CreateTaskParams(task.getName(), task.getDueDate(),
                 task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule());
     }
 

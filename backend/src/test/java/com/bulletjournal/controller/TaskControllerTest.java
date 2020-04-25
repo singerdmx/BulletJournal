@@ -73,7 +73,7 @@ public class TaskControllerTest {
         Project p1 = createProject("task_project_1", group, ProjectType.TODO);
         Task task1 = createTask(
                 p1,
-                new CreateTaskParams("task_1", USER, "2021-01-01", "01:01", 3, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, RECURRENCERULE));
+                new CreateTaskParams("task_1", "2021-01-01", "01:01", 3, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, RECURRENCERULE));
         Content content1 = addContent(task1, testContent1);
         List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testContent2);
         List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testContent3);
@@ -92,13 +92,13 @@ public class TaskControllerTest {
 
 
         // borrowing test for testing task pagination
-        Task task2 = createTask(p1, new CreateTaskParams("task2", USER, "2020-02-27",
+        Task task2 = createTask(p1, new CreateTaskParams("task2", "2020-02-27",
                 null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
-        Task task3 = createTask(p1, new CreateTaskParams("task3", USER, "2020-02-27",
+        Task task3 = createTask(p1, new CreateTaskParams("task3", "2020-02-27",
                 null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
-        Task task4 = createTask(p1, new CreateTaskParams("task4", USER, "2020-02-27",
+        Task task4 = createTask(p1, new CreateTaskParams("task4", "2020-02-27",
                 null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
-        Task task5 = createTask(p1, new CreateTaskParams("task5", USER, "2020-02-27",
+        Task task5 = createTask(p1, new CreateTaskParams("task5", "2020-02-27",
                 null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
 
 

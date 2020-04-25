@@ -62,7 +62,6 @@ export const createTask = (
 ) => {
   const postBody = JSON.stringify({
     name: name,
-    assignedTo: assignees[0],
     assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,
@@ -98,7 +97,6 @@ export const updateTask = (
 ) => {
   const patchBody = JSON.stringify({
     name: name,
-    assignedTo: assignees ? assignees[0] : undefined,
     assignees: assignees,
     dueDate: dueDate,
     dueTime: dueTime,

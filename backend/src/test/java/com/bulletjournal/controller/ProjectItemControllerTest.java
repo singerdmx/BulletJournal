@@ -300,7 +300,7 @@ public class ProjectItemControllerTest {
         String recurrenceRule = "DTSTART:20200420T070000Z RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20200520T070000Z";
         String taskName = "rt1";
 
-        CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
+        CreateTaskParams task = new CreateTaskParams(taskName, null,
                 null, null, new ReminderSetting(), ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
@@ -340,7 +340,7 @@ public class ProjectItemControllerTest {
 
     private Task createTask(Project project, String name, String date) {
         CreateTaskParams task =
-                new CreateTaskParams(name, sampleUsers[0], date, null, 10,
+                new CreateTaskParams(name, date, null, 10,
                         new ReminderSetting(), ImmutableList.of(sampleUsers[0]), TIMEZONE, null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(

@@ -129,7 +129,7 @@ public class SystemControllerTest {
         String taskName = "rt1";
         ReminderSetting reminderSetting = new ReminderSetting(date, time, before);
 
-        CreateTaskParams task = new CreateTaskParams(taskName, sampleUsers[0], null,
+        CreateTaskParams task = new CreateTaskParams(taskName, null,
                 null, null, reminderSetting, ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
@@ -207,8 +207,8 @@ public class SystemControllerTest {
 
         ReminderSetting reminderSetting = new ReminderSetting(remindingDate, remindingTime, before);
 
-        CreateTaskParams task =
-                new CreateTaskParams(name, "Michael_Zhou", dueDate, dueTime, 10, reminderSetting, ImmutableList.of("Michael_Zhou"), "America/Los_Angeles", null);
+        CreateTaskParams task = new CreateTaskParams(
+                name, dueDate, dueTime, 10, reminderSetting, ImmutableList.of("Michael_Zhou"), "America/Los_Angeles", null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,

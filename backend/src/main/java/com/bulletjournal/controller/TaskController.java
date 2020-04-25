@@ -106,7 +106,7 @@ public class TaskController {
         Task task = this.taskDaoJpa.partialUpdate(
                 username, taskId, updateTaskParams, events).toPresentationModel();
         if (!events.isEmpty()) {
-            notificationService.inform(new UpdateTaskAssigneeEvent(events, username, updateTaskParams.getAssignedTo()));
+            notificationService.inform(new UpdateTaskAssigneeEvent(events, username, updateTaskParams.getAssignees().get(0)));
         }
         return getTasks(task.getProjectId());
     }
