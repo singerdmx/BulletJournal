@@ -19,7 +19,6 @@ import { Button, Popconfirm, Tooltip } from 'antd';
 import {
   DeleteTwoTone,
   PlusCircleTwoTone,
-  TagOutlined,
   UpSquareOutlined,
 } from '@ant-design/icons';
 // modals import
@@ -31,6 +30,7 @@ import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import NoteDetailPage, { NoteProps } from './note-detail.pages';
+import LabelManagement from "../project/label-management.compoent";
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
@@ -93,11 +93,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   const noteOperation = () => {
     return (
       <div className='note-operation'>
-        <Tooltip title='Manage Labels'>
-          <div>
-            <TagOutlined onClick={labelEditableHandler} />
-          </div>
-        </Tooltip>
+        <LabelManagement labelEditableHandler={labelEditableHandler} labelEditable={labelEditable}/>
         <EditNote note={note} mode='icon' />
         <MoveProjectItem
           type={ProjectType.NOTE}

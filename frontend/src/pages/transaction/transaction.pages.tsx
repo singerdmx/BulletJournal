@@ -31,7 +31,6 @@ import {
   Statistic,
 } from 'antd';
 import {
-  TagOutlined,
   DeleteTwoTone,
   PlusCircleTwoTone,
   AccountBookOutlined,
@@ -45,6 +44,7 @@ import { Content } from '../../features/myBuJo/interface';
 import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
+import LabelManagement from "../project/label-management.compoent";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -149,11 +149,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               <Avatar src={transaction.ownerAvatar} />
             </div>
           </Tooltip>
-          <Tooltip title='Manage Labels'>
-            <div>
-              <TagOutlined onClick={labelEditableHandler} />
-            </div>
-          </Tooltip>
+          <LabelManagement labelEditableHandler={labelEditableHandler} labelEditable={labelEditable}/>
           <EditTransaction transaction={transaction} mode='icon' />
           <MoveProjectItem
             type={ProjectType.LEDGER}
