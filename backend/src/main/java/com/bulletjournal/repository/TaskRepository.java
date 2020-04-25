@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,8 @@ import java.util.Optional;
 public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositoryCustom {
     List<Task> findTaskByProject(Project project);
 
-    List<Task> findTasksByAssignedToAndRecurrenceRuleNotNull(String assignedTo);
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees)", nativeQuery = true)
+    List<Task> findTasksByAssigneesAndRecurrenceRuleNotNull(String assignee);
 
     Optional<Task> findTaskByGoogleCalendarEventId(String googleCalendarEventId);
 
@@ -23,11 +23,11 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
             " AND tasks.start_time >= ':now' AND tasks.reminder_date_time <= ':now'", nativeQuery = true)
     List<Task> findRemindingTasks(@Param("assignee") String assignee, @Param("now") String now);
 
-    @Query("SELECT task FROM Task task WHERE task.assignedTo = :assignee AND task.startTime IS NOT NULL AND " +
-            "task.endTime IS NOT NULL AND " +
-            "((task.startTime >= :startTime AND task.startTime <= :endTime) OR " +
-            "(task.endTime >= :startTime AND task.endTime <= :endTime))")
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.startTime IS NOT NULL AND " +
+            "tasks.endTime IS NOT NULL AND " +
+            "((tasks.startTime >= :startTime AND tasks.startTime <= :endTime) OR " +
+            "(tasks.endTime >= :startTime AND tasks.endTime <= :endTime))", nativeQuery = true)
     List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee,
-                                          @Param("startTime") Timestamp startTime,
-                                          @Param("endTime") Timestamp endTime);
+                                          @Param("startTime") String startTime,
+                                          @Param("endTime") String endTime);
 }

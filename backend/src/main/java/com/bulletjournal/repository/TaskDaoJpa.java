@@ -192,7 +192,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
 
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
-                assignee, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+                assignee, startTime.toString(), endTime.toString());
 
         List<Task> recurrentTasks = this.getRecurringTasks(assignee, startTime, endTime);
 
@@ -239,7 +239,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecurringTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasksBetween = new ArrayList<>();
-        List<Task> recurrentTasks = this.taskRepository.findTasksByAssignedToAndRecurrenceRuleNotNull(assignee);
+        List<Task> recurrentTasks = this.taskRepository.findTasksByAssigneesAndRecurrenceRuleNotNull(assignee);
         DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
         DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
 
@@ -300,14 +300,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         Task task = new Task();
         task.setProject(project);
-        task.setAssignedTo(owner);
         task.setDueDate(createTaskParams.getDueDate());
         task.setDueTime(createTaskParams.getDueTime());
         task.setOwner(owner);
         task.setName(createTaskParams.getName());
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
-        task.setAssignedTo(createTaskParams.getAssignees().get(0));
         task.setAssignees(createTaskParams.getAssignees());
         task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
 
@@ -436,9 +434,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams,
                                        Task task, List<Event> events) {
         String newAssignee = updateTaskParams.getAssignees().get(0);
-        String oldAssignee = task.getAssignedTo();
+        String oldAssignee = task.getAssignees().get(0);
         if (newAssignee != null && !Objects.equals(newAssignee, oldAssignee)) {
-            task.setAssignedTo(newAssignee);
             if (!Objects.equals(newAssignee, requester)) {
                 events.add(new Event(newAssignee, taskId, task.getName()));
             }

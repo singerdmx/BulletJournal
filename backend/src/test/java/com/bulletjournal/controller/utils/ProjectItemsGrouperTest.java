@@ -6,6 +6,7 @@ import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -221,11 +222,11 @@ public class ProjectItemsGrouperTest {
         return transaction;
     }
 
-    private Task getTask(Long id, String assignedTo, String dueDate, String dueTime, String timezone, String name,
+    private Task getTask(Long id, String assignee, String dueDate, String dueTime, String timezone, String name,
                          Integer duration, Project project, List<Long> labels, ReminderSetting reminderSetting) {
         Task task = new Task();
         task.setId(id);
-        task.setAssignedTo(assignedTo);
+        task.setAssignees(ImmutableList.of(assignee));
         task.setDueDate(dueDate);
         task.setDueTime(dueTime);
         task.setTimezone(timezone);

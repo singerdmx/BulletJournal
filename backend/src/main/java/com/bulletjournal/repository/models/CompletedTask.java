@@ -29,7 +29,6 @@ public class CompletedTask extends TaskModel {
         this.setName(task.getName());
         this.setOwner(task.getOwner());
         this.setProject(task.getProject());
-        this.setAssignedTo(task.getAssignedTo());
         this.setDueDate(task.getDueDate());
         this.setDueTime(task.getDueTime());
         this.setDuration(task.getDuration());
