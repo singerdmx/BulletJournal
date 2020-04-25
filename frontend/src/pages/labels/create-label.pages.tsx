@@ -5,7 +5,7 @@ import {
   labelsUpdate,
   deleteLabel,
   patchLabel,
-  createLabel
+  createLabel,
 } from '../../features/label/actions';
 import {
   Input,
@@ -15,15 +15,20 @@ import {
   Modal,
   Select,
   message,
-  Tooltip
+  Tooltip,
+  Row,
+  Col,
+  Popover,
 } from 'antd';
-import { iconOptions } from '../../assets/icons/index';
 import {
   SearchOutlined,
   PlusCircleOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  TagOutlined,
 } from '@ant-design/icons';
-import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
+import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
+import { icons } from '../../assets/icons/index';
+import './labels.styles.less';
 
 type LabelsProps = {
   labels: Label[];
@@ -39,24 +44,24 @@ type titleProps = {
   deleteHelper: (labelId: number, name: string) => void;
 };
 
-const EditorTitle: React.FC<titleProps> = props => {
+const EditorTitle: React.FC<titleProps> = (props) => {
   const { labelId, labelName, deleteHelper } = props;
   return (
     <span
       style={{
         display: 'flex',
         justifyContent: 'space-between',
-        paddingRight: 20
+        paddingRight: 20,
       }}
     >
       <span>Edit</span>
-      <Tooltip title="Delete Label">
+      <Tooltip title='Delete Label'>
         <Button
-          type="link"
+          type='link'
           danger
           onClick={() => deleteHelper(labelId, labelName)}
           style={{ padding: 0, fontWeight: 500, marginTop: '-4px' }}
-          shape="circle"
+          shape='circle'
           icon={<DeleteOutlined />}
         />
       </Tooltip>
@@ -64,23 +69,65 @@ const EditorTitle: React.FC<titleProps> = props => {
   );
 };
 
-const Labels: React.FC<LabelsProps> = props => {
+const Labels: React.FC<LabelsProps> = (props) => {
   let initialLabel: Label = {} as Label;
   const [createForm] = Form.useForm();
   const [editFrom] = Form.useForm();
   const [editable, setEditable] = useState(false);
   const [currentLabel, setCurrentLabel] = useState(initialLabel);
   const [inputFocus, setFocus] = useState(false);
+  //label form state
+  const [formCreateLabelIcon, setFormCreateLabelIcon] = useState(
+    <TagOutlined />
+  );
+  const [formCreateLabelIconString, setCreateFormLabelIconString] = useState(
+    'TagOutlined'
+  );
+  const [formUpdateLabelIcon, setFormUpdateLabelIcon] = useState(
+    <TagOutlined />
+  );
+  const [formUpdateLabelIconString, setFormUpdateLabelIconString] = useState(
+    'TagOutlined'
+  );
+
+  const IconsSelector = (mode: any) => {
+    return (
+      <div className='label-icon-selector'>
+        <Row>
+          {icons.map((icon: any) => {
+            return (
+              <Col span={2} key={icon.name}>
+                <span
+                  title={icon.name}
+                  onClick={() => {
+                    if (mode.mode === 'Create') {
+                      setFormCreateLabelIcon(icon.icon);
+                      setCreateFormLabelIconString(icon.name);
+                    } else if (mode.mode === 'Update') {
+                      setFormUpdateLabelIcon(icon.icon);
+                      setFormUpdateLabelIconString(icon.name);
+                    }
+                  }}
+                >
+                  {icon.icon}
+                </span>
+              </Col>
+            );
+          })}
+        </Row>
+      </div>
+    );
+  };
 
   const handleCreate = () => {
     createForm
       .validateFields()
-      .then(values => {
+      .then((values) => {
         console.log(values);
-        props.createLabel(values.labelName, values.labelIcon);
+        props.createLabel(values.labelName, formCreateLabelIconString);
         createForm.resetFields();
       })
-      .catch(info => {
+      .catch((info) => {
         message.error(info);
       });
   };
@@ -91,6 +138,8 @@ const Labels: React.FC<LabelsProps> = props => {
   };
 
   const handleEditModal = (label: Label) => {
+    setFormUpdateLabelIcon(getIcon(label.icon));
+    setFormUpdateLabelIconString(label.icon);
     setEditable(true);
     setCurrentLabel(label);
   };
@@ -98,76 +147,71 @@ const Labels: React.FC<LabelsProps> = props => {
   const handleUpdate = (labelId: number, name: string) => {
     editFrom
       .validateFields()
-      .then(values => {
-        props.patchLabel(labelId, values.labelValue, values.labelIcon);
+      .then((values) => {
+        props.patchLabel(labelId, values.labelValue, formUpdateLabelIconString);
         editFrom.resetFields();
         setEditable(false);
       })
-      .catch(err => {
+      .catch((err) => {
         message.error(err);
       });
   };
 
   return (
-    <div className="labels-create-page">
-      <div className="labels-create">
-        <Form form={createForm} layout="inline" onFinish={handleCreate}>
-          <Form.Item
-            style={{ flex: 1 }}
-            name="labelIcon"
-            rules={[{ required: true, message: 'Missing Icon' }]}
+    <div className='labels-create-page'>
+      <div className='labels-create'>
+        <Form form={createForm} layout='inline' onFinish={handleCreate}>
+          <Popover
+            title='Select an icon for your label'
+            placement='bottom'
+            content={<IconsSelector mode='Create' />}
+            style={{ width: '800px' }}
           >
-            <Select
-              bordered={false}
-              onSelect={() => setFocus(true)}
-              style={{ width: '58px' }}
-            >
-              {iconOptions}
-            </Select>
-          </Form.Item>
+            <div className='label-icon'>{formCreateLabelIcon}</div>
+          </Popover>
           <Form.Item
-            name="labelName"
+            name='labelName'
             rules={[{ required: true, message: 'Missing Label Name' }]}
             style={{ flex: 7 }}
           >
             <Input
-              placeholder="Input Label Name"
-              className="labels-create-input"
+              placeholder='Input Label Name'
+              className='labels-create-input'
               autoFocus={inputFocus}
               onBlur={() => setFocus(false)}
             />
           </Form.Item>
           <Form.Item style={{ flex: 1 }}>
-            <Tooltip title="Click to create label">
-              <Button type="link" htmlType="submit">
+            <Tooltip title='Click to create label'>
+              <Button type='link' htmlType='submit'>
                 <PlusCircleOutlined />
               </Button>
             </Tooltip>
           </Form.Item>
         </Form>
       </div>
-      <div className="labels-container">
-        <div className="labels-control">
-          <div className="label-search">
-            <Tooltip placement="top" title="Click to search by label(s)">
+      <div className='labels-container'>
+        <div className='labels-control'>
+          <div className='label-search'>
+            <Tooltip placement='top' title='Click to search by label(s)'>
               <Button
-                shape="circle"
+                shape='circle'
                 icon={<SearchOutlined />}
                 onClick={props.startSearching}
               />
             </Tooltip>
           </div>
         </div>
-        <div className="labels-list">
-          {props.labels.map(label => {
+        <div className='labels-list'>
+          {props.labels.map((label) => {
             return (
               <Tooltip
-                placement="top"
-                title="Click to edit or delete label"
+                placement='top'
+                title='Click to edit or delete label'
                 key={label.id}
               >
                 <Tag
-                  className="labels"
+                  className='labels'
                   color={stringToRGB(label.value)}
                   onClick={() => handleEditModal(label)}
                   style={{ cursor: 'pointer' }}
@@ -194,31 +238,31 @@ const Labels: React.FC<LabelsProps> = props => {
         centered
         footer={[
           <Button
-            key="cancel"
+            key='cancel'
             onClick={() => setEditable(false)}
-            type="default"
+            type='default'
           >
             Cancel
           </Button>,
           <Button
             onClick={() => handleUpdate(currentLabel.id, currentLabel.value)}
-            type="primary"
-            key="update"
+            type='primary'
+            key='update'
           >
             Update
-          </Button>
+          </Button>,
         ]}
       >
-        <Form form={editFrom} layout="inline">
-          <Form.Item name="labelIcon">
-            <Select
-              onSelect={() => setFocus(true)}
-              defaultValue={currentLabel.icon}
-            >
-              {iconOptions}
-            </Select>
-          </Form.Item>
-          <Form.Item label="Name" name="labelValue">
+        <Form form={editFrom} layout='inline'>
+          <Popover
+            title='Select an icon for your label'
+            placement='right'
+            content={<IconsSelector mode='Update' />}
+            style={{ width: '800px' }}
+          >
+            <div className='label-icon'>{formUpdateLabelIcon}</div>
+          </Popover>
+          <Form.Item label='Name' name='labelValue'>
             <Input
               defaultValue={currentLabel.value}
               value={currentLabel.value}
@@ -234,5 +278,5 @@ export default connect(null, {
   labelsUpdate,
   deleteLabel,
   createLabel,
-  patchLabel
+  patchLabel,
 })(Labels);
