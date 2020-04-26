@@ -13,6 +13,7 @@ import org.slf4j.MDC;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Converter {
     private static final int DEFAULT_REMINDER_SETTING = 30;
@@ -101,6 +102,10 @@ public class Converter {
     }
 
     public static CreateTaskParams toCreateTaskParams(GoogleCalendarEvent event) {
-        return new CreateTaskParams();
+        Task task = event.getTask();
+        return new CreateTaskParams(task.getName(), task.getDueDate(),
+                task.getDueTime(), task.getDuration(), task.getReminderSetting(),
+                task.getAssignees().stream().map(a -> a.getName()).collect(Collectors.toList()),
+                task.getTimezone(), task.getRecurrenceRule());
     }
 }
