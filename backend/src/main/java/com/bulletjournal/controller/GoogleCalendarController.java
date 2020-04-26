@@ -20,6 +20,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
@@ -28,7 +29,6 @@ import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Channel;
 import com.google.api.services.calendar.model.Event;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 @RestController
 public class GoogleCalendarController {
 
-    private static final Gson GSON = new Gson();
+    private static final GsonFactory GSON = new GsonFactory();
     private static final String WATCH_CHANNEL_TOKEN = "BuJo";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
@@ -206,7 +206,7 @@ public class GoogleCalendarController {
         Channel createdChannel = watch.execute();
         LOGGER.info("Created channel {}", createdChannel);
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
-                calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toJson(createdChannel), username);
+                calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toString(createdChannel), username);
         LOGGER.info("Created GoogleCalendarProject {}", googleCalendarProject);
         return googleCalendarProject.getProject().toPresentationModel();
     }
@@ -242,8 +242,9 @@ public class GoogleCalendarController {
         Calendar service = getCalendarService();
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.get(calendarId);
         // https://developers.google.com/calendar/v3/reference/channels/stop
-        Channel channel = GSON.fromJson(googleCalendarProject.getChannel(), Channel.class);
-        LOGGER.info("Stopping channel {}", channel);
+        LOGGER.info("Stopping channel {}", googleCalendarProject.getChannel());
+        Channel channel = GSON.fromString(googleCalendarProject.getChannel(), Channel.class);
+        LOGGER.info("Retrieved channel {}", channel);
         service.channels().stop(channel).execute();
         this.googleCalendarProjectDaoJpa.delete(calendarId);
         return googleCalendarProject.getProject().toPresentationModel();
