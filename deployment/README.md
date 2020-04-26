@@ -91,7 +91,9 @@ docker push mwangxx/bulletjournal-frontend
 
 To create a backup for the current db status, run "db_backup.sh", it will create a backup file named as `db_yyyy-mm-dd-hh:mm:ss.gz` at path `/var/db_backup` directory in db docker container. 
 
-To restore from a database backup, use the following command:
+To restore from a database backup:
 ```sh
+docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "DROP SCHEMA public CASCADE;"
+docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "CREATE SCHEMA public;"
 docker exec $(sudo docker ps -aqf "name=db") sh -c "gunzip -c /var/db_backup/ReplaceWithBackupFileName | psql  --dbname=postgresql://postgres:docker@localhost:5432/postgres"
 ```
