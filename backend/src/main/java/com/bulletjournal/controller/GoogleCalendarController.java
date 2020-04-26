@@ -99,11 +99,15 @@ public class GoogleCalendarController {
             throw new IllegalStateException(ex);
         }
 
-        if (Arrays.asList(this.env.getActiveProfiles()).contains("prod")) {
+        if (isProd()) {
             return new RedirectView("https://bulletjournal.us/settings#google");
         }
 
         return new RedirectView(GOOGLE_CALENDAR_PAGE_PATH);
+    }
+
+    private boolean isProd() {
+        return Arrays.asList(this.env.getActiveProfiles()).contains("prod");
     }
 
     @PostMapping(value = "/api/calendar/google/logout")
@@ -196,14 +200,19 @@ public class GoogleCalendarController {
             @Valid @RequestBody @NotNull WatchCalendarParams watchCalendarParams) throws IOException {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String channelId = UUID.randomUUID().toString();
-
-        Calendar service = getCalendarService();
+        Channel createdChannel;
         Channel channel = getChannel(channelId);
-        // https://developers.google.com/calendar/v3/push
-        // https://developers.google.com/calendar/v3/reference/events/watch
-        Calendar.Events.Watch watch = service.events().watch(calendarId, channel);
-        LOGGER.info("Created watch {}", watch);
-        Channel createdChannel = watch.execute();
+
+        if (isProd()) {
+            Calendar service = getCalendarService();
+            // https://developers.google.com/calendar/v3/push
+            // https://developers.google.com/calendar/v3/reference/events/watch
+            Calendar.Events.Watch watch = service.events().watch(calendarId, channel);
+            LOGGER.info("Created watch {}", watch);
+            createdChannel = watch.execute();
+        } else {
+            createdChannel = channel;
+        }
         LOGGER.info("Created channel {}", createdChannel);
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
                 calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toString(createdChannel), username);
@@ -239,13 +248,15 @@ public class GoogleCalendarController {
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")
     public Project unwatchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
-        Calendar service = getCalendarService();
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.get(calendarId);
         // https://developers.google.com/calendar/v3/reference/channels/stop
         LOGGER.info("Stopping channel {}", googleCalendarProject.getChannel());
         Channel channel = GSON.fromString(googleCalendarProject.getChannel(), Channel.class);
         LOGGER.info("Retrieved channel {}", channel);
-        service.channels().stop(channel).execute();
+        if (isProd()) {
+            Calendar service = getCalendarService();
+            service.channels().stop(channel).execute();
+        }
         this.googleCalendarProjectDaoJpa.delete(calendarId);
         return googleCalendarProject.getProject().toPresentationModel();
     }
