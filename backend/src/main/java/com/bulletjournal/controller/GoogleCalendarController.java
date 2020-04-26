@@ -191,7 +191,7 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/watch")
-    public void watchCalendar(
+    public Project watchCalendar(
             @NotNull @PathVariable String calendarId,
             @Valid @RequestBody @NotNull WatchCalendarParams watchCalendarParams) throws IOException {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -208,6 +208,7 @@ public class GoogleCalendarController {
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
                 calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toJson(createdChannel), username);
         LOGGER.info("Created GoogleCalendarProject {}", googleCalendarProject);
+        return googleCalendarProject.getProject().toPresentationModel();
     }
 
     private Channel getChannel(String channelId) {

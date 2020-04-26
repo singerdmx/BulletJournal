@@ -71,11 +71,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     e: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     e.stopPropagation();
-    console.log(calendar);
-    console.log(calendar.id);
-    console.log(projects);
-    console.log(projects[0]);
-    console.log(projects[0].id);
+    // TODO: check projects.length
     props.watchCalendar(calendar.id, projects[0].id);
   };
 
