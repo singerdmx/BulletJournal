@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
 export function doFetch(endpoint: string, etag: any = undefined) {
   if (process.env.REACT_APP_ENV === 'debug') {
@@ -7,10 +7,10 @@ export function doFetch(endpoint: string, etag: any = undefined) {
 
   let headers = {} as any;
 
-  if(etag){
-    headers = { headers: { 'request-id': uuidv4(), 'IF_NONE_MATCH': etag } }
-  }else{
-    headers = { headers: { 'request-id': uuidv4() }}
+  if (etag) {
+    headers = {headers: {'request-id': uuidv4(), 'IF_NONE_MATCH': etag}}
+  } else {
+    headers = {headers: {'request-id': uuidv4()}}
   }
   return fetch(endpoint, headers).then(res => {
     if (!res.ok) {
@@ -25,7 +25,7 @@ export function doPost(endpoint: string, body?: string) {
     console.log(endpoint);
   }
   return fetch(endpoint, {
-    headers: { 'Content-Type': 'application/json', 'request-id': uuidv4() },
+    headers: {'Content-Type': 'application/json', 'request-id': uuidv4()},
     method: 'POST',
     body: body
   }).then(res => {
@@ -41,7 +41,7 @@ export function doDelete(endpoint: string, returnError = false) {
     console.log(endpoint);
   }
   return fetch(endpoint, {
-    headers: { 'request-id': uuidv4() },
+    headers: {'request-id': uuidv4()},
     method: 'DELETE'
   }).then(res => {
     if (!res.ok && !returnError) {
@@ -56,7 +56,7 @@ export function doPut(endpoint: string, body: string) {
     console.log(endpoint);
   }
   return fetch(endpoint, {
-    headers: { 'Content-Type': 'application/json', 'request-id': uuidv4() },
+    headers: {'Content-Type': 'application/json', 'request-id': uuidv4()},
     method: 'PUT',
     body: body
   }).then(res => {
@@ -72,7 +72,7 @@ export function doPatch(endpoint: string, body: string) {
     console.log(endpoint);
   }
   return fetch(endpoint, {
-    headers: { 'Content-Type': 'application/json', 'request-id': uuidv4() },
+    headers: {'Content-Type': 'application/json', 'request-id': uuidv4()},
     method: 'PATCH',
     body: body
   }).then(res => {
