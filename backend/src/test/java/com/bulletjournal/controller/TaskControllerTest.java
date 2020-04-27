@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,10 +71,19 @@ public class TaskControllerTest {
         String testContent4 = "Test content 4.";
 
         Group group = createGroup();
+        List<String> users = new ArrayList<>();
+        users.add("xlf");
+        users.add("ccc");
+        users.add("Joker");
+        int count = 1;
+        for (String username : users) {
+            group = addUserToGroup(group, username, ++count);
+        }
+        users.add(USER);
         Project p1 = createProject("task_project_1", group, ProjectType.TODO);
         Task task1 = createTask(
                 p1,
-                new CreateTaskParams("task_1", "2021-01-01", "01:01", 3, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, RECURRENCERULE));
+                new CreateTaskParams("task_1", "2021-01-01", "01:01", 3, new ReminderSetting(), users, TIMEZONE, RECURRENCERULE));
         Content content1 = addContent(task1, testContent1);
         List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testContent2);
         List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testContent3);
@@ -82,7 +92,7 @@ public class TaskControllerTest {
         assertEquals(testContent2, getContentRevision(task1.getId(), content1.getId(), 2L));
         assertEquals(testContent3, getContentRevision(task1.getId(), content1.getId(), 3L));
         assertEquals(testContent4, getContentRevision(task1.getId(), content1.getId(), 4L));
-
+        testOtherAssignees(p1, task1, users);
         int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
         for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
             contents1 = updateContent(task1.getId(), content1.getId(), testContent1 + String.valueOf(i));
@@ -160,6 +170,19 @@ public class TaskControllerTest {
         completedTasks = Arrays.asList(completedTasksResponse.getBody());
         assertEquals(4, completedTasks.size());
 
+    }
+
+    private void testOtherAssignees(Project p1, Task task1, List<String> users) {
+        for (String user : users) {
+            ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
+                    ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                    HttpMethod.GET,
+                    TestHelpers.actAsOtherUser(null, USER),
+                    Task[].class,
+                    p1.getId());
+            List<Task> tasks = Arrays.asList(tasksResponse.getBody());
+            assertEquals(task1, tasks.get(0));
+        }
     }
 
     private Task completeTask(long taskId) {
@@ -274,5 +297,17 @@ public class TaskControllerTest {
         assertEquals(USER, created.getGroup().getOwner());
         assertEquals(project.getDescription(), created.getDescription());
         return created;
+    }
+
+    private Group addUserToGroup(Group group, String username, int expectedSize) {
+        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
+        ResponseEntity<Group> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUP_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(addUserGroupParams, USER),
+                Group.class);
+        Group updated = groupsResponse.getBody();
+        assertEquals(expectedSize, updated.getUsers().size());
+        return updated;
     }
 }
