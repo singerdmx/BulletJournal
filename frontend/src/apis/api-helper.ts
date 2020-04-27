@@ -51,12 +51,20 @@ export function doDelete(endpoint: string, returnError = false) {
   });
 }
 
-export function doPut(endpoint: string, body: string) {
+export function doPut(endpoint: string, body: string, etag?: string) {
   if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }
+
+  let headers = {} as any;
+  if (etag) {
+    headers = {'Content-Type': 'application/json', 'request-id': uuidv4(), 'IF_NONE_MATCH': etag};
+  } else {
+    headers = {'Content-Type': 'application/json', 'request-id': uuidv4()};
+  }
+
   return fetch(endpoint, {
-    headers: {'Content-Type': 'application/json', 'request-id': uuidv4()},
+    headers: headers,
     method: 'PUT',
     body: body
   }).then(res => {

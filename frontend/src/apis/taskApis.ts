@@ -3,7 +3,7 @@ import { Task, ReminderSetting } from '../features/tasks/interface';
 
 export const fetchTasks = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/tasks`)
-    .then((res) => res.json())
+    .then((res) => res)
     .catch((err) => {
       throw Error(err.message);
     });
@@ -77,9 +77,9 @@ export const createTask = (
     });
 };
 
-export const putTasks = (projectId: number, tasks: Task[]) => {
+export const putTasks = (projectId: number, tasks: Task[], etag: string) => {
   const putBody = JSON.stringify(tasks);
-  return doPut(`/api/projects/${projectId}/tasks`, putBody).catch((err) => {
+  return doPut(`/api/projects/${projectId}/tasks`, putBody, etag).catch((err) => {
     throw Error(err.message);
   });
 };

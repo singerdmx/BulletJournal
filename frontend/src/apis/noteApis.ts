@@ -36,9 +36,9 @@ export const createNote = (projectId: number, name: string) => {
     });
 };
 
-export const putNotes = (projectId: number, notes: Note[]) => {
+export const putNotes = (projectId: number, notes: Note[], etag: string) => {
   const putBody = JSON.stringify(notes);
-  return doPut(`/api/projects/${projectId}/notes`, putBody)
+  return doPut(`/api/projects/${projectId}/notes`, putBody, etag)
     .catch(err => {
       throw Error(err.message);
     });

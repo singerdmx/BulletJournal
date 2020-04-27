@@ -52,6 +52,7 @@ import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { IState } from '../../store';
 import { Content, Revision, ProjectItems } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
+import {actions as SystemActions} from "../system/reducer";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -60,13 +61,25 @@ function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
 function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
     const { projectId } = action.payload;
-    const tasks = yield call(fetchTasks, projectId);
-
+    const data = yield call(fetchTasks, projectId);
+    const tasks = yield data.json();
     yield put(
       tasksActions.tasksReceived({
         tasks: tasks,
       })
     );
+
+    const etag = data.headers.get('Etag')!;
+    //get etag from header
+
+    const state = yield select();
+    const systemState = state.system;
+    yield put(
+        SystemActions.systemUpdateReceived({
+          tasksEtag: etag,
+          ...systemState
+        })
+    )
   } catch (error) {
     yield call(message.error, `tasksUpdate Error Received: ${error}`);
   }
@@ -121,7 +134,8 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
 function* taskPut(action: PayloadAction<PutTask>) {
   try {
     const { projectId, tasks } = action.payload;
-    const data = yield call(putTasks, projectId, tasks);
+    const state: IState = yield select();
+    const data = yield call(putTasks, projectId, tasks, state.system.tasksEtag);
     const updatedTasks = yield data.json();
     yield put(
       tasksActions.tasksReceived({
