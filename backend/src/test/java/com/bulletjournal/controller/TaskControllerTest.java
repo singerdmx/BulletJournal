@@ -93,6 +93,7 @@ public class TaskControllerTest {
         assertEquals(testContent3, getContentRevision(task1.getId(), content1.getId(), 3L));
         assertEquals(testContent4, getContentRevision(task1.getId(), content1.getId(), 4L));
         testOtherAssignees(p1, task1, users);
+        testUpdateAssignees(p1, task1, users);
         int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
         for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
             contents1 = updateContent(task1.getId(), content1.getId(), testContent1 + String.valueOf(i));
@@ -170,6 +171,53 @@ public class TaskControllerTest {
         completedTasks = Arrays.asList(completedTasksResponse.getBody());
         assertEquals(4, completedTasks.size());
 
+    }
+
+    private void testUpdateAssignees(Project p1, Task task, List<String> users) {
+        users.remove("xlf");
+        UpdateTaskParams updateTaskParams = new UpdateTaskParams(
+                task.getDueDate(), task.getDueTime(), task.getName(), null, task.getReminderSetting(), users, TIMEZONE, null);
+        ResponseEntity<Task[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
+                HttpMethod.PATCH,
+                TestHelpers.actAsOtherUser(updateTaskParams, USER),
+                Task[].class,
+                task.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        ResponseEntity<Notification[]> notificationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, "xlf"),
+                Notification[].class);
+        assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
+        Notification[] body = notificationsResponse.getBody();
+        Notification notification = Arrays.asList(body).stream().filter(n -> n.getType().equals("UpdateTaskAssigneeEvent") && n.getTitle().equals("Task task_1 is unassigned by 999999")).findAny().get();
+        assertNotNull(notification);
+        assertEquals(USER, notification.getOriginator().getName());
+        assertEquals("Task task_1 is unassigned by 999999", notification.getTitle());
+
+        users.add("xlf");
+        updateTaskParams = new UpdateTaskParams(
+                task.getDueDate(), task.getDueTime(), task.getName(), null, task.getReminderSetting(), users, TIMEZONE, null);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
+                HttpMethod.PATCH,
+                TestHelpers.actAsOtherUser(updateTaskParams, USER),
+                Task[].class,
+                task.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        notificationsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, "xlf"),
+                Notification[].class);
+        assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
+        body = notificationsResponse.getBody();
+        notification = Arrays.asList(body).stream().filter(n -> n.getType().equals("UpdateTaskAssigneeEvent") && n.getTitle().equals("Task task_1 is assigned to xlf by 999999")).findAny().get();
+        assertNotNull(notification);
+        assertEquals(USER, notification.getOriginator().getName());
+        assertEquals("Task task_1 is assigned to xlf by 999999", notification.getTitle());
     }
 
     private void testOtherAssignees(Project p1, Task task1, List<String> users) {

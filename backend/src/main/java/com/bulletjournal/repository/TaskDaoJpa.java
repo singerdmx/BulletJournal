@@ -11,6 +11,7 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
@@ -372,7 +373,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<Event> - a list of events for users notification
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams, List<Event> events) {
+    public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams, List<UpdateTaskAssigneeEvent> events) {
 
         Task task = this.getProjectItem(taskId, requester);
 
@@ -383,8 +384,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         DaoHelper.updateIfPresent(
                 updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
 
-        updateAssignee(requester, taskId, updateTaskParams, task, events);
-        updateAssignees(requester, taskId, updateTaskParams, task, events);
+        updateAssignees(requester, updateTaskParams, task, events);
 
         String date = updateTaskParams.getDueDate();
         String time = updateTaskParams.getDueTime();
@@ -424,35 +424,35 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Add assignee change event to notification
+     * Add assignees change event to notification
      *
      * @param requester        the username of action requester
-     * @param taskId           the task id
      * @param updateTaskParams the update task param object contains task fields update information
      * @param task             the task object gets updated
      * @return List<Event> - a list of events for users notification
      */
-    private List<Event> updateAssignee(String requester, Long taskId, UpdateTaskParams updateTaskParams,
-                                       Task task, List<Event> events) {
-        String newAssignee = updateTaskParams.getAssignees().get(0);
-        String oldAssignee = task.getAssignees().get(0);
-        if (newAssignee != null && !Objects.equals(newAssignee, oldAssignee)) {
-            if (!Objects.equals(newAssignee, requester)) {
-                events.add(new Event(newAssignee, taskId, task.getName()));
-            }
-            if (!Objects.equals(oldAssignee, requester)) {
-                events.add(new Event(oldAssignee, taskId, task.getName()));
+    private List<UpdateTaskAssigneeEvent> updateAssignees(String requester, UpdateTaskParams updateTaskParams,
+                                       Task task, List<UpdateTaskAssigneeEvent> events) {
+        Set<String> newAssignees = new HashSet<>(updateTaskParams.getAssignees());
+        Set<String> oldAssignees = new HashSet<>(task.getAssignees());
+
+        Set<String> assigneesOverlap = new HashSet<>(newAssignees);
+        assigneesOverlap.retainAll(oldAssignees);
+        String taskName = updateTaskParams.getName() == null ? task.getName() : updateTaskParams.getName();
+        for (String user : oldAssignees) {
+            if (!assigneesOverlap.contains(user)) {
+                Event event = new Event(user, task.getId(), taskName);
+                events.add(new UpdateTaskAssigneeEvent(event, requester, null));
+
             }
         }
-        return events;
-    }
-
-    private List<Event> updateAssignees(String requester, Long taskId, UpdateTaskParams updateTaskParams,
-                                       Task task, List<Event> events) {
-        List<String> newAssignees = updateTaskParams.getAssignees();
-        List<String> oldAssignees = task.getAssignees();
-        // TODO: generate events
-        task.setAssignees(newAssignees);
+        for (String user : newAssignees) {
+            if (!assigneesOverlap.contains(user)) {
+                Event event = new Event(user, task.getId(), taskName);
+                events.add(new UpdateTaskAssigneeEvent(event, requester, user));
+            }
+        }
+        task.setAssignees(updateTaskParams.getAssignees());
         return events;
     }
 

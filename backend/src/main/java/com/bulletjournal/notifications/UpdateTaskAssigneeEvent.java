@@ -2,14 +2,13 @@ package com.bulletjournal.notifications;
 
 import com.bulletjournal.contents.ContentType;
 
-import java.util.List;
 
 public class UpdateTaskAssigneeEvent extends Informed {
 
     private final String assignedTo;
 
-    public UpdateTaskAssigneeEvent(List<Event> events, String originator, String assignedTo) {
-        super(events, originator);
+    public UpdateTaskAssigneeEvent(Event event, String originator, String assignedTo) {
+        super(event, originator);
         this.assignedTo = assignedTo;
     }
 
@@ -28,9 +27,6 @@ public class UpdateTaskAssigneeEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        if (assignedTo != null) {
-            return String.format("/task/%d", contentId);
-        }
-        return null;
+        return String.format("/task/%d", contentId);
     }
 }

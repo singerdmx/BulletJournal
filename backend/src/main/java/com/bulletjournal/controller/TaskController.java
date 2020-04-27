@@ -102,11 +102,11 @@ public class TaskController {
     public ResponseEntity<List<Task>> updateTask(@NotNull @PathVariable Long taskId,
                                                  @Valid @RequestBody UpdateTaskParams updateTaskParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Event> events = new ArrayList<>();
+        List<UpdateTaskAssigneeEvent> events = new ArrayList<>();
         Task task = this.taskDaoJpa.partialUpdate(
                 username, taskId, updateTaskParams, events).toPresentationModel();
         if (!events.isEmpty()) {
-            notificationService.inform(new UpdateTaskAssigneeEvent(events, username, updateTaskParams.getAssignees().get(0)));
+            events.forEach((event) -> notificationService.inform(event));
         }
         return getTasks(task.getProjectId());
     }
