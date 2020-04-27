@@ -32,14 +32,14 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     const systemState = state.system;
 
     if (etag && state.system.notificationsEtag && state.system.notificationsEtag !== etag) {
-      yield put(
+      yield call(message.info, "You've got new notifications");
+    }
+    yield put(
         SystemActions.systemUpdateReceived({
           ...systemState,
           notificationsEtag: etag
         })
-      );
-      yield call(message.info, "You've got new notifications");
-    }
+    );
     yield put(
       notificationsActions.notificationsReceived({ notifications: notifications })
     );
