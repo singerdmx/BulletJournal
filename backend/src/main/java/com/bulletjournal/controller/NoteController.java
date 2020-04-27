@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.SearchService;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.NotificationService;
@@ -20,7 +21,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class NoteController {
@@ -52,15 +57,15 @@ public class NoteController {
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Note> notes = this.noteDaoJpa.getNotes(projectId, username)
-                .stream().map(n -> addAvatar(n)).collect(Collectors.toList());
+        List<Note> notes = this.noteDaoJpa.getNotes(projectId, username);
         String notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, notes);
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(notesEtag);
 
-        return ResponseEntity.ok().headers(responseHeader).body(notes);
+        return ResponseEntity.ok().headers(responseHeader).body(notes
+                .stream().map(n -> addAvatar(n)).collect(Collectors.toList()));
     }
 
     private Note addAvatar(Note note) {
@@ -109,7 +114,19 @@ public class NoteController {
     }
 
     @PutMapping(NOTES_ROUTE)
-    public ResponseEntity<List<Note>> updateNoteRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
+    public ResponseEntity<List<Note>> updateNoteRelations(
+            @NotNull @PathVariable Long projectId,
+            @Valid @RequestBody List<Note> notes,
+            @RequestHeader(IF_NONE_MATCH) Optional<String> notesEtag) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        if (notesEtag.isPresent()) {
+            List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
+            String expectedEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE, noteList);
+            if (!Objects.equals(expectedEtag, notesEtag.get())) {
+                throw new BadRequestException("Invalid Etag");
+            }
+        }
         this.noteDaoJpa.updateUserNotes(projectId, notes);
         return getNotes(projectId);
     }

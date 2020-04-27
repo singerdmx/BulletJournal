@@ -55,11 +55,11 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         }
 
         let newComingTasks = [] as Task[];
-        var now = new Date().getTime();
+        const now = new Date().getTime();
         let localReminders = fetchReminderFromLocal();
         let unExpiredLocalReminders = localReminders.filter((reminder: any) => {
             return now - reminder.time < 2 * 60 * 60 * 1000;
-        })
+        });
 
         if (remindingTaskEtag !== data.remindingTaskEtag) {
             newComingTasks = data.reminders.map(taskNameMapper).filter((task: any) => !localReminders.map(taskNameMapper).includes(task)).map((item: any) => ({

@@ -44,10 +44,9 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
       const etags = data.headers.get('Etag').split('|');
       yield put(
         SystemActions.systemUpdateReceived({
-          
+          ...systemState,
           ownedProjectsEtag: etags[0],
-          sharedProjectsEtag: etags[1],
-          ...systemState
+          sharedProjectsEtag: etags[1]
         })
       )
     }

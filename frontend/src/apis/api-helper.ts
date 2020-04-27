@@ -8,7 +8,7 @@ export function doFetch(endpoint: string, etag: any = undefined) {
   let headers = {} as any;
 
   if (etag) {
-    headers = {headers: {'request-id': uuidv4(), 'IF_NONE_MATCH': etag}}
+    headers = {headers: {'request-id': uuidv4(), 'If-None-Match': etag}}
   } else {
     headers = {headers: {'request-id': uuidv4()}}
   }
@@ -58,7 +58,7 @@ export function doPut(endpoint: string, body: string, etag?: string) {
 
   let headers = {} as any;
   if (etag) {
-    headers = {'Content-Type': 'application/json', 'request-id': uuidv4(), 'IF_NONE_MATCH': etag};
+    headers = {'Content-Type': 'application/json', 'request-id': uuidv4(), 'If-None-Match': etag};
   } else {
     headers = {'Content-Type': 'application/json', 'request-id': uuidv4()};
   }

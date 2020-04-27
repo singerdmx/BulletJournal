@@ -66,8 +66,8 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
     const systemState = state.system;
     yield put(
         SystemActions.systemUpdateReceived({
-          notesEtag: etag,
-          ...systemState
+          ...systemState,
+          notesEtag: etag
         })
     )
   } catch (error) {
@@ -162,8 +162,19 @@ function* notePut(action: PayloadAction<PutNote>) {
   try {
     const {projectId, notes} = action.payload;
     const state: IState = yield select();
-    yield call(putNotes, projectId, notes, state.system.notesEtag);
-    yield put(updateNotes(projectId));
+    const data = yield call(putNotes, projectId, notes, state.system.notesEtag);
+    const updatedNotes = yield data.json();
+    yield put(notesActions.notesReceived({notes: updatedNotes}));
+
+    const etag = data.headers.get('Etag')!;
+    //get etag from header
+    const systemState = state.system;
+    yield put(
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          notesEtag: etag
+        })
+    )
   } catch (error) {
     yield call(message.error, `Put Note Error Received: ${error}`);
   }

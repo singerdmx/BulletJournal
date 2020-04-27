@@ -48,8 +48,8 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
     if (etag) {
       yield put(
           SystemActions.systemUpdateReceived({
-            groupsEtag: etag,
-            ...systemState
+            ...systemState,
+            groupsEtag: etag
           })
       )
     }
@@ -148,7 +148,6 @@ function* getUserGroup(action: PayloadAction<GetGroupAction>) {
 
   try {
     const data = yield call(getGroup, groupId);
-    console.log(data);
     yield put(groupsActions.groupReceived({group: data}));
   } catch (error) {
     if (hideError) {

@@ -62,14 +62,30 @@ const slice = createSlice({
         remindingTaskEtag,
         reminders
       } = action.payload;
-      state.tasksEtag = tasksEtag;
-      state.notesEtag = notesEtag;
-      state.groupsEtag = groupsEtag;
-      state.notificationsEtag = notificationsEtag;
-      state.ownedProjectsEtag = ownedProjectsEtag;
-      state.sharedProjectsEtag = sharedProjectsEtag;
-      state.remindingTaskEtag = remindingTaskEtag;
-      state.reminders = reminders
+      if (tasksEtag) {
+        state.tasksEtag = tasksEtag;
+      }
+      if (notesEtag) {
+        state.notesEtag = notesEtag;
+      }
+      if (groupsEtag) {
+        state.groupsEtag = groupsEtag;
+      }
+      if (notificationsEtag) {
+        state.notificationsEtag = notificationsEtag;
+      }
+      if (ownedProjectsEtag) {
+        state.ownedProjectsEtag = ownedProjectsEtag;
+      }
+      if (sharedProjectsEtag) {
+        state.sharedProjectsEtag = sharedProjectsEtag;
+      }
+      if (remindingTaskEtag) {
+        state.remindingTaskEtag = remindingTaskEtag;
+      }
+      if (reminders && reminders.length > 0) {
+        state.reminders = reminders
+      }
     },
     systemApiErrorReceived: (
       state,

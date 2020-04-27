@@ -34,8 +34,8 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     if (etag && state.system.notificationsEtag && state.system.notificationsEtag !== etag) {
       yield put(
         SystemActions.systemUpdateReceived({
-          notificationsEtag: etag,
-          ...systemState
+          ...systemState,
+          notificationsEtag: etag
         })
       );
       yield call(message.info, "You've got new notifications");

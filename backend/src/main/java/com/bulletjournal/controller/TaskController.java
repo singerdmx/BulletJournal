@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
@@ -18,8 +19,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class TaskController {
@@ -53,15 +57,15 @@ public class TaskController {
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Task> tasks = this.taskDaoJpa.getTasks(projectId, username)
-                .stream().map(t -> addAvatar(t)).collect(Collectors.toList());
+        List<Task> tasks = this.taskDaoJpa.getTasks(projectId, username);
         String tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, tasks);
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(tasksEtag);
 
-        return ResponseEntity.ok().headers(responseHeader).body(tasks);
+        return ResponseEntity.ok().headers(responseHeader).body(
+                tasks.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
     }
 
     private Task addAvatar(Task task) {
@@ -112,7 +116,18 @@ public class TaskController {
     }
 
     @PutMapping(TASKS_ROUTE)
-    public ResponseEntity<List<Task>> updateTaskRelations(@NotNull @PathVariable Long projectId, @Valid @RequestBody List<Task> tasks) {
+    public ResponseEntity<List<Task>> updateTaskRelations(
+            @NotNull @PathVariable Long projectId, @Valid @RequestBody List<Task> tasks,
+            @RequestHeader(IF_NONE_MATCH) Optional<String> tasksEtag) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        if (tasksEtag.isPresent()) {
+            List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
+            String expectedEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE, taskList);
+            if (!Objects.equals(expectedEtag, tasksEtag.get())) {
+                throw new BadRequestException("Invalid Etag");
+            }
+        }
         this.taskDaoJpa.updateUserTasks(projectId, tasks);
         return getTasks(projectId);
     }

@@ -69,15 +69,14 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
       })
     );
 
-    const etag = data.headers.get('Etag')!;
     //get etag from header
-
+    const etag = data.headers.get('Etag')!;
     const state = yield select();
     const systemState = state.system;
     yield put(
         SystemActions.systemUpdateReceived({
-          tasksEtag: etag,
-          ...systemState
+          ...systemState,
+          tasksEtag: etag
         })
     )
   } catch (error) {
@@ -142,6 +141,16 @@ function* taskPut(action: PayloadAction<PutTask>) {
         tasks: updatedTasks,
       })
     );
+
+    //get etag from header
+    const etag = data.headers.get('Etag')!;
+    const systemState = state.system;
+    yield put(
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag
+        })
+    )
   } catch (error) {
     yield call(message.error, `Put Task Error Received: ${error}`);
   }

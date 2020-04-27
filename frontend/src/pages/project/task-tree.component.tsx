@@ -40,7 +40,6 @@ const getTree = (data: Task[], readOnly: boolean): TreeNodeNormal[] => {
 };
 
 const onDragEnter = (info: any) => {
-  console.log(info.node);
   // expandedKeys 需要受控时设置
   // setState({
   //   expendKey: info.expandedKeys,
