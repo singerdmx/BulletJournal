@@ -88,7 +88,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       form
         .validateFields()
         .then(async (values) => {
-          await createContentFunction(projectItemId, values.content.toRAW());
+          await createContentFunction(projectItemId, values.content.toHTML());
           afterFinish();
         })
         .catch((err) => message.error(err));
@@ -100,7 +100,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
             await patchContentFunction(
               projectItemId,
               content.id,
-              values.content.toRAW()
+              values.content.toHTML()
             );
             afterFinish();
           })
@@ -157,16 +157,16 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       onFinish={handleFormSubmit}
       initialValues={{ content: editorState }}
     >
-      <Form.Item name='content'>
+      <Form.Item name="content">
         <BraftEditor
-          language='en'
-          className='content-editor'
+          language="en"
+          className="content-editor"
           value={editorState}
           media={{ uploadFn: handleUpload, validateFn: validateFile }}
         />
       </Form.Item>
       <Form.Item>
-        <Button type='primary' htmlType='submit'>
+        <Button type="primary" htmlType="submit">
           {isEdit ? 'Update' : 'Create'}
         </Button>
       </Form.Item>

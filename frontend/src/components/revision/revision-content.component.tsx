@@ -26,7 +26,7 @@ import { RollbackOutlined } from '@ant-design/icons';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { ContentType } from '../../features/myBuJo/constants';
-import {isContentEditable} from "../content/content-item.component";
+import { isContentEditable } from '../content/content-item.component';
 
 type RevisionProps = {
   revisionIndex: number;
@@ -133,12 +133,12 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   const getRollbackButton = () => {
     if (isContentEditable(project, projectItem, content, myself)) {
       return (
-        <Tooltip title='Revert to this version'>
+        <Tooltip title="Revert to this version">
           <Button
             onClick={handleRevert}
-            size='small'
-            shape='circle'
-            type='primary'
+            size="small"
+            shape="circle"
+            type="primary"
             style={{ marginRight: '0.5rem' }}
           >
             <RollbackOutlined />
@@ -151,9 +151,9 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
 
   return (
-    <div className='revision-container'>
-      <div className='revision-content'>
-        <div className='revision-header'>
+    <div className="revision-container">
+      <div className="revision-content">
+        <div className="revision-header">
           <div>
             {getRollbackButton()} Revision {revisionIndex}{' '}
             {revisions[revisionIndex].userAvatar && (
@@ -161,7 +161,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
                 <Avatar
                   src={revisions[revisionIndex].userAvatar}
                   style={{ marginRight: '1rem' }}
-                  size='small'
+                  size="small"
                 />
               </Tooltip>
             )}
@@ -172,8 +172,8 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
         </div>
         <div dangerouslySetInnerHTML={{ __html: history.toHTML() }}></div>
       </div>
-      <div className='revision-content'>
-        <div className='revision-header'>
+      <div className="revision-content">
+        <div className="revision-header">
           <div>
             Current version{' '}
             {content.ownerAvatar && (
@@ -181,14 +181,14 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
                 <Avatar
                   src={content.ownerAvatar}
                   style={{ marginRight: '1rem' }}
-                  size='small'
+                  size="small"
                 />
               </Tooltip>
             )}
           </div>
           <span>{moment(content.updatedAt).fromNow()}</span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: latestContent.toHTML() }}></div>
+        <div dangerouslySetInnerHTML={{ __html: content.text }}></div>
       </div>
     </div>
   );

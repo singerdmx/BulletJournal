@@ -8,11 +8,9 @@ type ContentReaderProps = {
 };
 
 const ContentReader: React.FC<ContentReaderProps> = ({ content }) => {
-  const contentState = BraftEditor.createEditorState(content.text);
-  const contentDisplay = contentState.toHTML();
   return (
-    <div className='content-in-drawer'>
-      <div dangerouslySetInnerHTML={{ __html: contentDisplay }} />
+    <div className="content-in-drawer">
+      <div dangerouslySetInnerHTML={{ __html: content.text }} />
     </div>
   );
 };
