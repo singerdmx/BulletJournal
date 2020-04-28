@@ -433,6 +433,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     private List<UpdateTaskAssigneeEvent> updateAssignees(String requester, UpdateTaskParams updateTaskParams,
                                        Task task, List<UpdateTaskAssigneeEvent> events) {
+        if (updateTaskParams.getAssignees() == null) {
+            return events;
+        }
         Set<String> newAssignees = new HashSet<>(updateTaskParams.getAssignees());
         Set<String> oldAssignees = new HashSet<>(task.getAssignees());
 
