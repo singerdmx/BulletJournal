@@ -8,6 +8,7 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
 import org.slf4j.MDC;
 
@@ -60,7 +61,13 @@ public class Converter {
         if (attendeeList != null && !attendeeList.isEmpty()) {
             text.append(System.lineSeparator()).append("Attendees:").append(System.lineSeparator());
             for (EventAttendee attendee : attendeeList) {
-                text.append(attendee.getDisplayName()).append(" ").append(attendee.getEmail());
+                if (StringUtils.isBlank(attendee.getDisplayName())) {
+                    continue;
+                }
+                text.append(attendee.getDisplayName());
+                if (StringUtils.isNotBlank(attendee.getEmail())) {
+                    text.append(" ").append(attendee.getEmail());
+                }
                 text.append(System.lineSeparator());
             }
         }
