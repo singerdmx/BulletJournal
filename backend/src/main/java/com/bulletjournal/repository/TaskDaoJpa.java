@@ -330,7 +330,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(Long projectId, String owner, CreateTaskParams createTaskParams,
-                       String iCalUID, Content content) {
+                       String iCalUID, String text) {
         // Skip duplicated iCalUID
         if (this.taskRepository.findTaskByGoogleCalendarEventId(iCalUID).isPresent()) {
             LOGGER.info("Task with iCalUID {} already exists", iCalUID);
@@ -340,7 +340,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Task task = create(projectId, owner, createTaskParams);
         task.setGoogleCalendarEventId(iCalUID);
         task = this.taskRepository.save(task);
-        addContent(task.getId(), owner, new TaskContent(content.getText()));
+        addContent(task.getId(), owner, new TaskContent(text));
     }
 
     private ReminderSetting getReminderSetting(
