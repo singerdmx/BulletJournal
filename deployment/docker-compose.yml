@@ -6,6 +6,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - $HOME/docker/auth_proxy/bin:/bin
     depends_on:
       - frontend
 
