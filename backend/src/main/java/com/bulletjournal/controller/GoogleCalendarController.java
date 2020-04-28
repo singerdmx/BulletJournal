@@ -170,8 +170,14 @@ public class GoogleCalendarController {
             @Valid @RequestBody @NotNull CreateGoogleCalendarEventsParams createGoogleCalendarEventsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         createGoogleCalendarEventsParams.getEvents().forEach((e -> {
+            String text = "{\"blocks\":[{\"key\":\"d9cis\",\"text\":\"" + e.getContent().getText() +
+                    "\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[]," +
+                    "\"entityRanges\":[],\"data\":{}},{\"key\":\"9nvem\",\"text\":\"\",\"type\":\"unstyled\"," +
+                    "\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"dg3gl\"," +
+                    "\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[]," +
+                    "\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}";
             taskDaoJpa.create(createGoogleCalendarEventsParams.getProjectId(), username,
-                    Converter.toCreateTaskParams(e), e.getiCalUID(), e.getContent());
+                    Converter.toCreateTaskParams(e), e.getiCalUID(), text);
         }));
     }
 

@@ -11,10 +11,7 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.models.TransactionContent;
-import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -242,13 +238,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<TransactionContent> getContents(Long projectItemId, String requester) {
-        Transaction transaction = this.getProjectItem(projectItemId, requester);
-        List<TransactionContent> contents = this.transactionContentRepository
-                .findTransactionContentByTransaction(transaction)
-                .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
-                .collect(Collectors.toList());
-        return contents;
+    public <T extends ProjectItemModel> List<TransactionContent> findContents(T projectItem) {
+        return this.transactionContentRepository
+                .findTransactionContentByTransaction((Transaction) projectItem);
     }
 }

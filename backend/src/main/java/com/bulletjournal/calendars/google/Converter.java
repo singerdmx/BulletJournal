@@ -8,9 +8,11 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
 import org.slf4j.MDC;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -29,20 +31,21 @@ public class Converter {
 
         EventDateTime startEventDateTime = event.getStart();
         EventDateTime endEventDateTime = event.getEnd();
-        if (startEventDateTime != null && startEventDateTime.getDateTime() != null &&
-                endEventDateTime != null) {
-
-            long startDateTimeValue = startEventDateTime.getDateTime().getValue();
+        Long startDateTimeValue = getValue(startEventDateTime);
+        if (startDateTimeValue != null) {
             setTaskRecurrence(task, timezone, event.getRecurrence(), startDateTimeValue);
 
-            if (endEventDateTime.getDateTime() != null) {
-                long endDateTimeValue = endEventDateTime.getDateTime().getValue();
+            Long endDateTimeValue = getValue(endEventDateTime);
+            if (endDateTimeValue != null) {
                 task.setDuration((int) TimeUnit.MILLISECONDS.toMinutes(endDateTimeValue - startDateTimeValue));
             }
 
-            DateTime dueDateTime = ZonedDateTimeHelper.getDateTime(startDateTimeValue, timezone);
-            task.setDueDate(ZonedDateTimeHelper.getDate(dueDateTime));
-            task.setDueTime(ZonedDateTimeHelper.getTime(dueDateTime));
+            if (startEventDateTime.getDate() != null) {
+                task.setDueDate(startEventDateTime.getDate().toString());
+            } else if (startEventDateTime.getDateTime() != null) {
+                task.setDueDate(startEventDateTime.getDateTime().toString().substring(0, 10));
+                task.setDueTime(startEventDateTime.getDateTime().toString().substring(11, 16));
+            }
 
             setTaskReminder(task, timezone, event.getReminders(), startDateTimeValue);
         }
@@ -52,14 +55,21 @@ public class Converter {
             text.append(event.getDescription()).append(System.lineSeparator());
         }
         if (event.getLocation() != null) {
-            text.append("Location: ").append(event.getLocation()).append(System.lineSeparator());
+            text.append(System.lineSeparator())
+                    .append("Location: ").append(event.getLocation()).append(System.lineSeparator());
         }
         List<EventAttendee> attendeeList = event.getAttendees();
-        if (attendeeList != null && !attendeeList.isEmpty()) {
-            text.append("Attendees:").append(System.lineSeparator());
+        attendeeList = attendeeList != null ?
+                attendeeList.stream().filter((a) -> StringUtils.isNotBlank(a.getDisplayName()))
+                        .collect(Collectors.toList()) : Collections.emptyList();
+        if (!attendeeList.isEmpty()) {
+            text.append(System.lineSeparator()).append("Attendees:").append(System.lineSeparator());
             for (EventAttendee attendee : attendeeList) {
-                text.append(attendee.getDisplayName()).append(" ").append(attendee.getEmail());
-                text.append(System.lineSeparator());
+                text.append(" [").append(attendee.getDisplayName());
+                if (StringUtils.isNotBlank(attendee.getEmail())) {
+                    text.append(" ").append(attendee.getEmail());
+                }
+                text.append("]").append(System.lineSeparator());
             }
         }
 
@@ -70,7 +80,26 @@ public class Converter {
         return new GoogleCalendarEvent(task, content, event.getICalUID());
     }
 
+    private static Long getValue(EventDateTime eventDateTime) {
+        if (eventDateTime == null) {
+            return null;
+        }
+
+        if (eventDateTime.getDateTime() != null) {
+            return eventDateTime.getDateTime().getValue();
+        }
+
+        if (eventDateTime.getDate() != null) {
+            return eventDateTime.getDate().getValue();
+        }
+
+        return null;
+    }
+
     private static void setTaskReminder(Task task, String timezone, Event.Reminders reminders, long startDateTimeValue) {
+        if (reminders == null) {
+            return;
+        }
         ReminderSetting reminderSetting = new ReminderSetting();
         if (reminders.getUseDefault()) {
             DateTime reminderDateTime = ZonedDateTimeHelper.getDateTime(startDateTimeValue - TimeUnit.MINUTES.toMillis(DEFAULT_REMINDER_SETTING), timezone);

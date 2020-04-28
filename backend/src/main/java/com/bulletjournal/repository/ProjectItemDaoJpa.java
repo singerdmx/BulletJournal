@@ -54,7 +54,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     abstract JpaRepository<K, Long> getContentJpaRepository();
 
-    abstract List<K> getContents(Long projectItemId, String requester);
+    abstract <T extends ProjectItemModel> List<K> findContents(T projectItem);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> SharableLink generatePublicItemLink(
@@ -258,6 +258,20 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         Revision newRevision = new Revision(nextRevisionId, diff, Instant.now().toEpochMilli(), requester);
         revisionList.offerLast(newRevision);
         content.setRevisions(GSON.toJson(revisionList));
+    }
+
+    /**
+     * Get Contents for project
+     *
+     * @param projectItemId the project item id
+     * @param requester     the username of action requester
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> List<K> getContents(Long projectItemId, String requester) {
+        T projectItem = getProjectItem(projectItemId, requester);
+        return this.findContents(projectItem).stream()
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                .collect(Collectors.toList());
     }
 
 }

@@ -20,6 +20,7 @@ import {
   GoogleCalendarEvent,
 } from '../../features/calendarSync/interface';
 import {
+  googleCalendarEventListReceived,
   googleCalendarEventListUpdate,
   unwatchCalendar,
   updateWatchedProject,
@@ -29,6 +30,9 @@ import {
 import './modals.styles.less';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
+import { Task, getReminderSettingString } from '../../features/tasks/interface';
+import { getDueDateTime } from '../project-item/task-item.component';
+import { AlertOutlined, CheckSquareTwoTone } from '@ant-design/icons';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -46,10 +50,19 @@ type ModalProps = {
     startDate?: string,
     endDate?: string
   ) => void;
+  googleCalendarEventListReceived: (
+    googleCalendarEventList: GoogleCalendarEvent[]
+  ) => void;
 };
 
 const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
-  const { calendar, watchedProject, projects, eventList } = props;
+  const {
+    calendar,
+    watchedProject,
+    projects,
+    eventList,
+    googleCalendarEventListReceived,
+  } = props;
   const [visible, setVisible] = useState(false);
   const history = useHistory();
   const [form] = Form.useForm();
@@ -64,6 +77,13 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
 
   const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
+    googleCalendarEventListReceived([] as GoogleCalendarEvent[]);
+    form.setFields([
+      {
+        name: 'eventList',
+        value: [] as GoogleCalendarEvent[],
+      },
+    ]);
     setVisible(false);
   };
 
@@ -87,12 +107,18 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     form
       .validateFields()
       .then((values) => {
+        const startDate = values.startEndDates
+          ? values.startEndDates[0].format('YYYY-MM-DD')
+          : null;
+        const endDate = values.startEndDates
+          ? values.startEndDates[1].format('YYYY-MM-DD')
+          : null;
         console.log(values);
         props.googleCalendarEventListUpdate(
           calendar.id,
           calendar.timeZone,
-          '2019-01-01',
-          '2020-08-08'
+          startDate,
+          endDate
         );
       })
       .catch((info) => console.log(info));
@@ -145,6 +171,15 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     );
   };
 
+  const selectAll = () => {
+    form.setFields([
+      {
+        name: 'eventList',
+        value: props.eventList.map((event) => event.iCalUID),
+      },
+    ]);
+  };
+
   return (
     <Card
       key={calendar.id}
@@ -189,14 +224,51 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
             </Form.Item>
             <Button onClick={(e) => handlePullEvents(e)}>Pull</Button>
           </div>
-          <Form.Item name='eventList'>
+          <Form.Item
+            name='eventList'
+            label={
+              <span>
+                Event
+                <Tooltip title='Select All'>
+                  <CheckSquareTwoTone
+                    onClick={selectAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Tooltip>
+              </span>
+            }
+          >
             <Select mode='multiple' style={{ width: '100%' }}>
-              {/* https://github.com/ant-design/ant-design/issues/7155 */}
-              <Option value='all'>Select All</Option>
               {eventList &&
                 eventList.map((event, index) => {
                   return (
-                    <Option value={event.iCalUID}>{event.task.name}</Option>
+                    <Option value={event.iCalUID}>
+                      <div>
+                        <div className='name-container'>
+                          <div className='reminder'>
+                            <Tooltip
+                              title={getReminderSettingString(
+                                event.task.reminderSetting
+                              )}
+                            >
+                              <AlertOutlined />
+                            </Tooltip>
+                          </div>
+                          <div className='name'>
+                            <Tooltip
+                              title={event.content && event.content.text}
+                            >
+                              <div>{event.task.name}</div>
+                            </Tooltip>
+                          </div>
+                        </div>
+                        <div className='time-container'>
+                          <div className='due-time'>
+                            {getDueDateTime(event.task)}
+                          </div>
+                        </div>
+                      </div>
+                    </Option>
                   );
                 })}
             </Select>
@@ -225,4 +297,5 @@ export default connect(mapStateToProps, {
   googleCalendarEventListUpdate,
   watchCalendar,
   unwatchCalendar,
+  googleCalendarEventListReceived,
 })(CalendarListEntryModal);
