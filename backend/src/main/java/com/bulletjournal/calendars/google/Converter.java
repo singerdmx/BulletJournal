@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
 import org.slf4j.MDC;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -58,17 +59,17 @@ public class Converter {
                     .append("Location: ").append(event.getLocation()).append(System.lineSeparator());
         }
         List<EventAttendee> attendeeList = event.getAttendees();
-        if (attendeeList != null && !attendeeList.isEmpty()) {
+        attendeeList = attendeeList != null ?
+                attendeeList.stream().filter((a) -> StringUtils.isNotBlank(a.getDisplayName()))
+                        .collect(Collectors.toList()) : Collections.emptyList();
+        if (!attendeeList.isEmpty()) {
             text.append(System.lineSeparator()).append("Attendees:").append(System.lineSeparator());
             for (EventAttendee attendee : attendeeList) {
-                if (StringUtils.isBlank(attendee.getDisplayName())) {
-                    continue;
-                }
-                text.append(attendee.getDisplayName());
+                text.append(" [").append(attendee.getDisplayName());
                 if (StringUtils.isNotBlank(attendee.getEmail())) {
                     text.append(" ").append(attendee.getEmail());
                 }
-                text.append(System.lineSeparator());
+                text.append("]").append(System.lineSeparator());
             }
         }
 
