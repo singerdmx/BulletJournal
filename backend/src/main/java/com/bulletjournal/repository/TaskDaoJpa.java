@@ -477,7 +477,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
 
         // clone its contents
-        String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(task)
+        String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.getContents(taskId, requester)
                 .stream().collect(Collectors.toList()));
 
         if (dateTime != null) {
@@ -699,6 +699,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<TaskContent> contents = getCompletedTaskContents(taskId, requester);
         this.completedTaskRepository.delete(task);
         Long newId = create(projectId, task.getOwner(), getCreateTaskParams(task)).getId();
+        Collections.reverse(contents);
+        // we order contents by getUpdatedAt in descending order
         for (TaskContent content : contents) {
             this.addContent(newId, content.getOwner(), content);
         }
@@ -762,21 +764,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskContentRepository;
     }
 
-    /**
-     * Get Contents for project
-     *
-     * @param projectItemId the project item id
-     * @param requester     the username of action requester
-     * @return List<TaskContent>
-     */
     @Override
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<TaskContent> getContents(Long projectItemId, String requester) {
-        Task task = this.getProjectItem(projectItemId, requester);
-        List<TaskContent> contents = this.taskContentRepository.findTaskContentByTask(task)
-                .stream().sorted(Comparator.comparingLong(a -> a.getCreatedAt().getTime()))
-                .collect(Collectors.toList());
-        return contents;
+    public <T extends ProjectItemModel> List<TaskContent> findContents(T projectItem) {
+        return this.taskContentRepository.findTaskContentByTask((Task) projectItem);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
