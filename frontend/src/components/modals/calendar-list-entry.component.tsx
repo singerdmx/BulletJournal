@@ -103,7 +103,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   ) => {
     e.stopPropagation();
     // TODO: check projects.length
-    props.watchCalendar(calendar.id, projects[0].id);
+    props.watchCalendar(calendar.id, projectId);
   };
 
   const handleUnwatchCalendar = (
