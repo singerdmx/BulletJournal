@@ -183,7 +183,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
       },
     ]);
   };
-  const deleteAll = () => {
+  const clearAll = () => {
     form.setFields([
       {
         name: 'eventList',
@@ -247,9 +247,9 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                     style={{ cursor: 'pointer' }}
                   />
                 </Tooltip>
-                <Tooltip title='Delect All'>
+                <Tooltip title='Clear All'>
                   <CloseSquareTwoTone
-                    onClick={deleteAll}
+                    onClick={clearAll}
                     style={{ cursor: 'pointer' }}
                   />
                 </Tooltip>

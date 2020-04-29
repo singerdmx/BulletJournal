@@ -179,7 +179,7 @@ const EditTask: React.FC<
     ]);
   };
 
-  const deleteAll = () => {
+  const clearAll = () => {
     form.setFields([{ name: 'assignees', value: [] }]);
   };
 
@@ -257,9 +257,9 @@ const EditTask: React.FC<
                     style={{ cursor: 'pointer' }}
                   />
                 </Tooltip>
-                <Tooltip title='Delete All'>
+                <Tooltip title='Clear All'>
                   <CloseSquareTwoTone
-                    onClick={deleteAll}
+                    onClick={clearAll}
                     style={{ cursor: 'pointer' }}
                   />
                 </Tooltip>

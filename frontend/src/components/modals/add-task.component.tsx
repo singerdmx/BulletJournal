@@ -146,7 +146,7 @@ const AddTask: React.FC<
       { name: 'assignees', value: props.group.users.map((user) => user.name) },
     ]);
   };
-  const delectAll = () => {
+  const clearAll = () => {
     form.setFields([{ name: 'assignees', value: [] }]);
   };
   useEffect(() => {
@@ -212,9 +212,9 @@ const AddTask: React.FC<
                       style={{ cursor: 'pointer' }}
                     />
                   </Tooltip>
-                  <Tooltip title='Delect All'>
+                  <Tooltip title='Clear All'>
                     <CloseSquareTwoTone
-                      onClick={delectAll}
+                      onClick={clearAll}
                       style={{ cursor: 'pointer' }}
                     />
                   </Tooltip>
