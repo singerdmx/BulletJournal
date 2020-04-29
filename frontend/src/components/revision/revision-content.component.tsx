@@ -102,7 +102,6 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
   const patchContentFunction = patchProjectContent[projectItem.contentType];
 
-  const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
   const historyContent = revisions[revisionIndex - 1].content;
 
