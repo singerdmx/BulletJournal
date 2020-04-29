@@ -247,7 +247,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                     style={{ cursor: 'pointer' }}
                   />
                 </Tooltip>
-                <Tooltip title='Select All'>
+                <Tooltip title='Delect All'>
                   <CloseSquareTwoTone
                     onClick={deleteAll}
                     style={{ cursor: 'pointer' }}

@@ -13,7 +13,11 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd';
-import { EditTwoTone, CheckSquareTwoTone } from '@ant-design/icons';
+import {
+  EditTwoTone,
+  CheckSquareTwoTone,
+  CloseSquareTwoTone,
+} from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { patchTask } from '../../features/tasks/actions';
@@ -170,7 +174,13 @@ const EditTask: React.FC<
   };
 
   const selectAll = () => {
-    form.setFields([{name: 'assignees', value:props.group.users.map((user) => user.name)}]);
+    form.setFields([
+      { name: 'assignees', value: props.group.users.map((user) => user.name) },
+    ]);
+  };
+
+  const deleteAll = () => {
+    form.setFields([{ name: 'assignees', value: [] }]);
   };
 
   useEffect(() => {
@@ -236,19 +246,32 @@ const EditTask: React.FC<
             />
           </Form.Item>
           {/* form for Assignees */}
-          <Form.Item name='assignees' label={
-            <span>Assignees{' '}
-              <Tooltip title='Select All'>
-                <CheckSquareTwoTone
+          <Form.Item
+            name='assignees'
+            label={
+              <span>
+                Assignees{' '}
+                <Tooltip title='Select All'>
+                  <CheckSquareTwoTone
                     onClick={selectAll}
-                    style={{cursor: 'pointer'}}/>
-              </Tooltip>
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Tooltip>
+                <Tooltip title='Delete All'>
+                  <CloseSquareTwoTone
+                    onClick={deleteAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Tooltip>
               </span>
-          }>
+            }
+          >
             {props.group.users && (
               <Select
                 mode='multiple'
-                defaultValue={task.assignees ? task.assignees.map(u => u.name) : []}
+                defaultValue={
+                  task.assignees ? task.assignees.map((u) => u.name) : []
+                }
                 style={{ width: '100%' }}
               >
                 {props.group.users.map((user) => {

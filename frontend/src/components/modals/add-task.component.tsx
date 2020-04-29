@@ -11,9 +11,13 @@ import {
   AutoComplete,
   Radio,
   Popover,
-  Button
+  Button,
 } from 'antd';
-import { PlusOutlined, CheckSquareTwoTone } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  CheckSquareTwoTone,
+  CloseSquareTwoTone,
+} from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { createTask, updateTaskVisible } from '../../features/tasks/actions';
@@ -110,7 +114,8 @@ const AddTask: React.FC<
       time: values.reminderTime
         ? values.reminderTime.format('HH:mm')
         : undefined,
-      before: values.remindBefore === undefined ? props.before : values.remindBefore,
+      before:
+        values.remindBefore === undefined ? props.before : values.remindBefore,
     } as ReminderSetting;
     if (reminderType === 'remindBefore') {
       reminderSetting.date = undefined;
@@ -137,7 +142,12 @@ const AddTask: React.FC<
     props.updateTaskVisible(true);
   };
   const selectAll = () => {
-    form.setFields([{name: 'assignees', value:props.group.users.map((user) => user.name)}]);
+    form.setFields([
+      { name: 'assignees', value: props.group.users.map((user) => user.name) },
+    ]);
+  };
+  const delectAll = () => {
+    form.setFields([{ name: 'assignees', value: [] }]);
   };
   useEffect(() => {
     props.updateExpandedMyself(true);
@@ -191,17 +201,32 @@ const AddTask: React.FC<
               <Input placeholder='Enter Task Name' allowClear />
             </Form.Item>
             {/* form for Assignees */}
-            <Form.Item name='assignees' label={
-              <span>Assignees{' '}
-              <Tooltip title='Select All'>
-                <CheckSquareTwoTone
-                    onClick={selectAll}
-                    style={{cursor: 'pointer'}}/>
-              </Tooltip>
-              </span>
-            }>
+            <Form.Item
+              name='assignees'
+              label={
+                <span>
+                  Assignees{' '}
+                  <Tooltip title='Select All'>
+                    <CheckSquareTwoTone
+                      onClick={selectAll}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </Tooltip>
+                  <Tooltip title='Delect All'>
+                    <CloseSquareTwoTone
+                      onClick={delectAll}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </Tooltip>
+                </span>
+              }
+            >
               {props.group.users && (
-                <Select mode="multiple" defaultValue={props.myself} style={{ width: '100%' }}>
+                <Select
+                  mode='multiple'
+                  defaultValue={props.myself}
+                  style={{ width: '100%' }}
+                >
                   {props.group.users.map((user) => {
                     return (
                       <Option value={user.name} key={user.name}>
@@ -280,7 +305,9 @@ const AddTask: React.FC<
                             rRuleTextList.length > 1 &&
                             rRuleTextList
                               .slice(1)
-                              .map((text, index) => <div key={index}>{text}</div>)}
+                              .map((text, index) => (
+                                <div key={index}>{text}</div>
+                              ))}
                         </div>
                         <Button
                           onClick={() => setRecurrenceVisible(false)}
