@@ -32,7 +32,11 @@ import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import { Task, getReminderSettingString } from '../../features/tasks/interface';
 import { getDueDateTime } from '../project-item/task-item.component';
-import { AlertOutlined, CheckSquareTwoTone } from '@ant-design/icons';
+import {
+  AlertOutlined,
+  CheckSquareTwoTone,
+  CloseSquareTwoTone,
+} from '@ant-design/icons';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -179,6 +183,14 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
       },
     ]);
   };
+  const deleteAll = () => {
+    form.setFields([
+      {
+        name: 'eventList',
+        value: [],
+      },
+    ]);
+  };
 
   return (
     <Card
@@ -232,6 +244,12 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                 <Tooltip title='Select All'>
                   <CheckSquareTwoTone
                     onClick={selectAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Tooltip>
+                <Tooltip title='Select All'>
+                  <CloseSquareTwoTone
+                    onClick={deleteAll}
                     style={{ cursor: 'pointer' }}
                   />
                 </Tooltip>
