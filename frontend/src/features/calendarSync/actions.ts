@@ -32,3 +32,6 @@ export const googleCalendarEventListReceived = (
   actions.googleCalendarEventListReceived({
     googleCalendarEventList: googleCalendarEventList,
   });
+
+export const importEventsToProject = (eventList: string[], projectId: number) =>
+  actions.importEventsToProject({ eventList: eventList, projectId: projectId });
