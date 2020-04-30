@@ -10,7 +10,7 @@ import {
   patchGroup
 } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interface';
-import { MyselfWithAvatar, actions } from '../../features/myself/reducer';
+import { MyselfWithAvatar } from '../../features/myself/reducer';
 import { updateTheme } from '../../features/myself/actions';
 import { IState } from '../../store';
 
