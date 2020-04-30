@@ -30,6 +30,7 @@ import TransactionItem from '../../components/project-item/transaction-item.comp
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
 import {RadioChangeEvent} from 'antd/lib/radio';
+import {Project} from "../../features/project/interface";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -57,7 +58,7 @@ const LedgerSummaryTypeMap = [
 
 type TransactionProps = {
   currency: string;
-  projectId: number;
+  project: Project | undefined;
   timezone: string;
   ledgerSummary: LedgerSummary;
 
@@ -122,14 +123,16 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     const endDate = values.date[1].format(dateFormat);
     const frequencyType = values.frequencyType || FrequencyType.MONTHLY;
 
-    props.updateTransactions(
-      props.projectId,
-      values.timezone,
-      currentLedgerSummaryType,
-      frequencyType,
-      startDate,
-      endDate
-    );
+    if (props.project) {
+      props.updateTransactions(
+          props.project.id,
+          values.timezone,
+          currentLedgerSummaryType,
+          frequencyType,
+          startDate,
+          endDate
+      );
+    }
   };
 
   useEffect(() => {
@@ -144,14 +147,16 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       currentZone
     );
     props.updateExpandedMyself(true);
-    props.updateTransactions(
-      props.projectId,
-      currentZone,
-      ledgerSummaryType,
-      'MONTHLY',
-      startDate,
-      endDate
-    );
+    if (props.project) {
+      props.updateTransactions(
+          props.project.id,
+          currentZone,
+          ledgerSummaryType,
+          'MONTHLY',
+          startDate,
+          endDate
+      );
+    }
   }, []);
 
   useEffect(() => {
@@ -592,7 +597,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  projectId: state.project.project.id,
+  project: state.project.project,
   timezone: state.settings.timezone,
   ledgerSummary: state.transaction.ledgerSummary,
   currency: state.myself.currency,

@@ -47,8 +47,8 @@ const LocaleCurrency = require('locale-currency'); //currency code
 type TransactionProps = {
   mode: string;
   transaction: Transaction;
-  project: Project;
-  group: Group;
+  project: Project | undefined;
+  group: Group | undefined;
 };
 
 interface TransactionEditFormProps {
@@ -123,6 +123,28 @@ const EditTransaction: React.FC<
     setPayerName(props.transaction.payer);
   }, [props.transaction]);
 
+  const getSelections = () => {
+    if (!props.group || !props.group.users) {
+      return null;
+    }
+    return (
+        <Select
+            style={{ marginLeft: '-8px' }}
+            value={payerName}
+            onChange={(e: any) => setPayerName(e)}
+        >
+          {props.group.users.map((user) => {
+            return (
+                <Option value={user.name} key={user.name}>
+                  <Avatar size='small' src={user.avatar} />
+                  &nbsp;&nbsp; <strong>{user.name}</strong>
+                </Option>
+            );
+          })}
+        </Select>
+    )
+  };
+
   const getModal = () => {
     const { transaction } = props;
     return (
@@ -176,22 +198,7 @@ const EditTransaction: React.FC<
             style={{ marginLeft: '10px' }}
             wrapperCol={{ span: 20 }}
           >
-            {props.group.users && (
-              <Select
-                style={{ marginLeft: '-8px' }}
-                value={payerName}
-                onChange={(e: any) => setPayerName(e)}
-              >
-                {props.group.users.map((user) => {
-                  return (
-                    <Option value={user.name} key={user.name}>
-                      <Avatar size='small' src={user.avatar} />
-                      &nbsp;&nbsp; <strong>{user.name}</strong>
-                    </Option>
-                  );
-                })}
-              </Select>
-            )}
+            {getSelections()}
             {/* amount */}
           </Form.Item>
           <div style={{ display: 'flex' }}>

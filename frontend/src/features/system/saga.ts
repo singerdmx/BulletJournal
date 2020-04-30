@@ -36,8 +36,9 @@ function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
 function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     try {
         const state = yield select();
-        const selectedProject = state.project.project;
         const {groupsEtag, notificationsEtag, ownedProjectsEtag, sharedProjectsEtag, remindingTaskEtag} = state.system;
+
+        const selectedProject = state.project.project;
 
         const data = yield call(fetchSystemUpdates, '',
             selectedProject && selectedProject.projectType !== ProjectType.LEDGER ? selectedProject.id : undefined, remindingTaskEtag);
@@ -87,20 +88,22 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         let tasksEtag = state.system.tasksEtag;
         let notesEtag = state.system.notesEtag;
 
-        switch (selectedProject.projectType) {
-            case ProjectType.TODO:
-                if (data.tasksEtag !== tasksEtag) {
-                    tasksEtag = data.tasksEtag;
-                    yield put(getProject(selectedProject.id))
-                }
-                break;
-            case ProjectType.NOTE:
-                if (data.notesEtag !== notesEtag) {
-                    notesEtag = data.notesEtag;
-                    yield put(getProject(selectedProject.id))
-                }
-                break;
-            default:
+        if (selectedProject) {
+            switch (selectedProject.projectType) {
+                case ProjectType.TODO:
+                    if (data.tasksEtag !== tasksEtag) {
+                        tasksEtag = data.tasksEtag;
+                        yield put(getProject(selectedProject.id))
+                    }
+                    break;
+                case ProjectType.NOTE:
+                    if (data.notesEtag !== notesEtag) {
+                        notesEtag = data.notesEtag;
+                        yield put(getProject(selectedProject.id))
+                    }
+                    break;
+                default:
+            }
         }
 
         if (notificationsEtag !== data.notificationsEtag) {
@@ -120,7 +123,7 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
             })
         );
     } catch (error) {
-        yield call(message.error, `System Error Received: ${error}`);
+        yield call(message.error, `SystemUpdate Error Received: ${error}`);
     }
 }
 

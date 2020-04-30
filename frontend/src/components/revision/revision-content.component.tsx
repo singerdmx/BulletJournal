@@ -33,7 +33,7 @@ type RevisionProps = {
   revisions: Revision[];
   content: Content;
   projectItem: ProjectItem;
-  project: Project;
+  project: Project | undefined;
   myself: string;
 };
 
@@ -130,7 +130,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
 
   const getRollbackButton = () => {
-    if (isContentEditable(project, projectItem, content, myself)) {
+    if (project && isContentEditable(project, projectItem, content, myself)) {
       return (
         <Tooltip title="Revert to this version">
           <Button

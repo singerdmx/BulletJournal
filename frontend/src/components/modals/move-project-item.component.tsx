@@ -23,7 +23,7 @@ type ProjectItemProps = {
   mode: string;
   type: ProjectType;
   projectItemId: number;
-  project: Project;
+  project: Project | undefined;
   ownedProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
 };
@@ -67,6 +67,9 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
     setProjects(flattenSharedProject(props.sharedProjects, projects));
     setProjects(
       projects.filter(p => {
+        if (!props.project) {
+          return true;
+        }
         return (
           p.projectType === props.type && p.id !== props.project.id && !p.shared
         );

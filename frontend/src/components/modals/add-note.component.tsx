@@ -7,9 +7,10 @@ import { createNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { updateNoteVisible } from '../../features/notes/actions';
 import './modals.styles.less';
+import {Project} from "../../features/project/interface";
 
 type NoteProps = {
-  projectId: number;
+  project: Project | undefined;
 };
 
 interface NoteCreateFormProps {
@@ -21,9 +22,12 @@ interface NoteCreateFormProps {
 const AddNote: React.FC<RouteComponentProps &
   NoteProps &
   NoteCreateFormProps> = props => {
+  const {project} = props;
   const [form] = Form.useForm();
   const addNote = (values: any) => {
-    props.createNote(props.projectId, values.noteName);
+    if (project) {
+      props.createNote(project.id, values.noteName);
+    }
     props.updateNoteVisible(false);
   };
   const onCancel = () => props.updateNoteVisible(false);
@@ -67,7 +71,7 @@ const AddNote: React.FC<RouteComponentProps &
 };
 
 const mapStateToProps = (state: IState) => ({
-  projectId: state.project.project.id,
+  project: state.project.project,
   addNoteVisible: state.note.addNoteVisible
 });
 

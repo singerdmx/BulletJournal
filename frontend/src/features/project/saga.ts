@@ -39,7 +39,6 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
     const state = yield select();
     const systemState = state.system;
 
-    const selectedProject = state.project.project;
     if (data.headers.get('Etag')) {
       const etags = data.headers.get('Etag').split('|');
       yield put(
@@ -55,13 +54,6 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
 
     flattenOwnedProject(projects.owned, flattenedProjects);
     flattenSharedProject(projects.shared, flattenedProjects);
-    const renewedProject = flattenedProjects.find((prj: any) => prj.id === selectedProject.id);
-
-    if (renewedProject) {
-      yield put(projectActions.projectReceived({
-        project: renewedProject
-      }));
-    }
 
     yield put(
         projectActions.projectsReceived({
@@ -69,8 +61,19 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
           shared: projects.shared
         })
     );
+
+    const selectedProject = state.project.project;
+
+    if (selectedProject) {
+      const renewedProject = flattenedProjects.find((prj: any) => prj.id === selectedProject.id);
+      if (renewedProject) {
+        yield put(projectActions.projectReceived({
+          project: renewedProject
+        }));
+      }
+    }
   } catch (error) {
-    yield call(message.error, `Project Error Received: ${error}`);
+    yield call(message.error, `projectsUpdate Error Received: ${error}`);
   }
 }
 
@@ -137,6 +140,7 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
     yield call(deleteProject, projectId);
     history.goBack();
     yield put(projectActions.projectsUpdate({}));
+    yield put(projectActions.projectReceived({project: undefined}));
     yield call(message.success, `BuJo ${name} deleted`);
     history.push('/projects');
   } catch (error) {

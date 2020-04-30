@@ -35,6 +35,7 @@ import {
 import { ReminderSetting, Task } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
 import moment from 'moment';
+import {Project} from "../../features/project/interface";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -56,8 +57,8 @@ zones.sort((a, b) => {
 type TaskProps = {
   mode: string;
   task: Task;
-  projectId: number;
-  group: Group;
+  project: Project | undefined;
+  group: Group | undefined;
 };
 
 interface TaskEditFormProps {
@@ -79,7 +80,6 @@ interface TaskEditFormProps {
   repeat: any;
   end: any;
   myself: any;
-  projectId: number;
   before: number;
   startTime: string;
   startDate: string;
@@ -174,9 +174,11 @@ const EditTask: React.FC<
   };
 
   const selectAll = () => {
-    form.setFields([
-      { name: 'assignees', value: props.group.users.map((user) => user.name) },
-    ]);
+    if (props.group) {
+      form.setFields([
+        {name: 'assignees', value: props.group.users.map((user) => user.name)},
+      ]);
+    }
   };
 
   const clearAll = () => {
@@ -213,6 +215,30 @@ const EditTask: React.FC<
 
   const onClickRecurrenceButton = () => {
     setUseTaskRecurrenceRule(false);
+  };
+
+  const getSelections = (task: Task) => {
+    if (!props.group || !props.group.users) {
+      return null;
+    }
+    return (
+        <Select
+            mode='multiple'
+            defaultValue={
+              task.assignees ? task.assignees.map((u) => u.name) : []
+            }
+            style={{ width: '100%' }}
+        >
+          {props.group.users.map((user) => {
+            return (
+                <Option value={user.name} key={user.name}>
+                  <Avatar size='small' src={user.avatar} />
+                  &nbsp;&nbsp; <strong>{user.name}</strong>
+                </Option>
+            );
+          })}
+        </Select>
+    )
   };
 
   const getModal = () => {
@@ -266,24 +292,7 @@ const EditTask: React.FC<
               </span>
             }
           >
-            {props.group.users && (
-              <Select
-                mode='multiple'
-                defaultValue={
-                  task.assignees ? task.assignees.map((u) => u.name) : []
-                }
-                style={{ width: '100%' }}
-              >
-                {props.group.users.map((user) => {
-                  return (
-                    <Option value={user.name} key={user.name}>
-                      <Avatar size='small' src={user.avatar} />
-                      &nbsp;&nbsp; <strong>{user.name}</strong>
-                    </Option>
-                  );
-                })}
-              </Select>
-            )}
+            {getSelections(task)}
           </Form.Item>
           {/* due type */}
           <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Due&nbsp;&nbsp;</span>
@@ -537,7 +546,7 @@ const mapStateToProps = (state: IState) => ({
   startTime: state.rRule.startTime,
   startDate: state.rRule.startDate,
   timezone: state.settings.timezone,
-  projectId: state.project.project.id,
+  project: state.project.project,
   before: state.settings.before,
   group: state.group.group,
   myself: state.myself.username,

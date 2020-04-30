@@ -53,16 +53,18 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
           })
       )
     }
-    const selectedGroup = state.group.group;
     const groups = yield data.json();
     const allGroups = flattenGroup(groups);
-    const findGroup = allGroups.find((item: any) => item.id === selectedGroup.id);
-    if (findGroup) {
-      yield put(groupsActions.groupReceived({group: findGroup}));
-    }
     yield put(groupsActions.groupsReceived({groups: groups}));
+    const selectedGroup = state.group.group;
+    if (selectedGroup) {
+      const findGroup = allGroups.find((item: any) => item.id === selectedGroup.id);
+      if (findGroup) {
+        yield put(groupsActions.groupReceived({group: findGroup}));
+      }
+    }
   } catch (error) {
-    yield call(message.error, `Group Error Received: ${error}`);
+    yield call(message.error, `groupsUpdate Error Received: ${error}`);
   }
 }
 
@@ -135,6 +137,7 @@ function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
       return;
     }
     history.goBack();
+    yield put(groupsActions.groupReceived({group: undefined}));
     yield put(groupsActions.groupsUpdate({}));
     yield call(message.success, `Group "${groupName}" deleted`);
     history.push('/groups');

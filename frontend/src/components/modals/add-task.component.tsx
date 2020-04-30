@@ -31,6 +31,7 @@ import { ReminderBeforeTaskText } from '../settings/reducer';
 import { convertToTextWithTime } from '../../features/recurrence/actions';
 import { ReminderSetting } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
+import {Project} from "../../features/project/interface";
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -49,8 +50,8 @@ zones.sort((a, b) => {
 });
 
 type TaskProps = {
-  projectId: number;
-  group: Group;
+  project: Project | undefined;
+  group: Group | undefined;
 };
 
 interface TaskCreateFormProps {
@@ -124,17 +125,19 @@ const AddTask: React.FC<
       reminderSetting.before = undefined;
     }
 
-    props.createTask(
-      props.projectId,
-      values.taskName,
-      assignees,
-      dueDate,
-      dueTime,
-      values.duration,
-      reminderSetting,
-      recurrence,
-      timezone
-    );
+    if (props.project) {
+      props.createTask(
+          props.project.id,
+          values.taskName,
+          assignees,
+          dueDate,
+          dueTime,
+          values.duration,
+          reminderSetting,
+          recurrence,
+          timezone
+      );
+    }
     props.updateTaskVisible(false);
   };
   const onCancel = () => props.updateTaskVisible(false);
@@ -142,9 +145,11 @@ const AddTask: React.FC<
     props.updateTaskVisible(true);
   };
   const selectAll = () => {
-    form.setFields([
-      { name: 'assignees', value: props.group.users.map((user) => user.name) },
-    ]);
+    if (props.group) {
+      form.setFields([
+        {name: 'assignees', value: props.group.users.map((user) => user.name)},
+      ]);
+    }
   };
   const clearAll = () => {
     form.setFields([{ name: 'assignees', value: [] }]);
@@ -167,6 +172,27 @@ const AddTask: React.FC<
   const rRuleTextList = rRuleText.match(
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
+  const getSelections = () => {
+    if (!props.group || !props.group.users) {
+      return null;
+    }
+    return (
+        <Select
+            mode='multiple'
+            defaultValue={props.myself}
+            style={{ width: '100%' }}
+        >
+          {props.group.users.map((user) => {
+            return (
+                <Option value={user.name} key={user.name}>
+                  <Avatar size='small' src={user.avatar} />
+                  &nbsp;&nbsp; <strong>{user.name}</strong>
+                </Option>
+            );
+          })}
+        </Select>
+    )
+  };
   return (
     <Tooltip placement='top' title='Create New Task'>
       <div className='add-task'>
@@ -221,22 +247,7 @@ const AddTask: React.FC<
                 </span>
               }
             >
-              {props.group.users && (
-                <Select
-                  mode='multiple'
-                  defaultValue={props.myself}
-                  style={{ width: '100%' }}
-                >
-                  {props.group.users.map((user) => {
-                    return (
-                      <Option value={user.name} key={user.name}>
-                        <Avatar size='small' src={user.avatar} />
-                        &nbsp;&nbsp; <strong>{user.name}</strong>
-                      </Option>
-                    );
-                  })}
-                </Select>
-              )}
+              {getSelections()}
             </Form.Item>
             {/* due type */}
             <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
@@ -445,7 +456,7 @@ const AddTask: React.FC<
 const mapStateToProps = (state: IState) => ({
   startTime: state.rRule.startTime,
   startDate: state.rRule.startDate,
-  projectId: state.project.project.id,
+  project: state.project.project,
   timezone: state.settings.timezone,
   group: state.group.group,
   myself: state.myself.username,

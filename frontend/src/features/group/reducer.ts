@@ -15,7 +15,7 @@ export type GroupsAction = {
 export type GroupUpdateAction = {};
 
 export type GroupAction = {
-  group: Group;
+  group?: Group;
 };
 
 export type GroupCreateAction = {
@@ -52,7 +52,7 @@ export type PatchGroupAction = {
 
 let initialState = {
   groups: [] as GroupsWithOwner[],
-  group: {} as Group
+  group: undefined as Group | undefined
 };
 
 const slice = createSlice({
