@@ -13,6 +13,7 @@ const handleLogout = () => {
 };
 
 type menuProps = {
+  theme: string;
   username: string;
   history: History<History.PoorMansUnknown>;
 };
@@ -21,9 +22,9 @@ const onClickSetting = (history: History<History.PoorMansUnknown>) => {
   history.push('/settings');
 };
 
-const DropdownMenu = ({ username, history }: menuProps) => (
-  <Menu selectable={false}>
-    <Menu.Item className='modified-item' style={{cursor: 'default'}}>{username}</Menu.Item>
+const DropdownMenu = ({ username, history, theme }: menuProps) => (
+  <Menu theme={theme === 'DARK' ? 'dark' : 'light'} selectable={false}>
+    <Menu.Item className='modified-item' style={{ cursor: 'default' }}>{username}</Menu.Item>
     <Menu.Item className='modified-item' onClick={() => onClickSetting(history)}>
       <SettingOutlined />
       Settings
