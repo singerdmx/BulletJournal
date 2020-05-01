@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Note } from './interface';
 import { History } from 'history';
-import {Content} from "../myBuJo/interface";
-import {ProjectItemSharables, SharableLink} from "../system/interface";
-import {User} from "../group/interface";
+import { Content } from '../myBuJo/interface';
+import { ProjectItemSharables, SharableLink } from '../system/interface';
+import { User } from '../group/interface';
 
 export type NoteApiErrorAction = {
   error: string;
@@ -21,7 +21,7 @@ export type UpdateNoteContentRevision = {
   noteId: number;
   contentId: number;
   revisionId: number;
-}
+};
 
 export type updateVisibleAction = {
   visible: boolean;
@@ -46,7 +46,7 @@ export type NotesAction = {
 };
 
 export type NoteAction = {
-  note: Note;
+  note?: Note;
 };
 
 export type PutNote = {
@@ -72,7 +72,7 @@ export type PatchContent = {
   noteId: number;
   contentId: number;
   text: string;
-}
+};
 
 export type SetNoteLabels = {
   noteId: number;
@@ -95,31 +95,31 @@ export type ShareNote = {
 
 export type GetSharables = {
   noteId: number;
-}
+};
 
 export type RevokeSharable = {
   noteId: number;
   user?: string;
   link?: string;
-}
+};
 
 export type ContentsAction = {
   contents: Content[];
-}
+};
 
 export type ShareLinkAction = {
   link: string;
-}
+};
 
 let initialState = {
-  note: {} as Note,
+  note: undefined as Note | undefined,
   contents: [] as Array<Content>,
   notes: [] as Array<Note>,
   addNoteVisible: false,
   patchLoading: true,
   sharedUsers: [] as User[],
   sharedLinks: [] as SharableLink[],
-  sharedLink: ''
+  sharedLink: '',
 };
 
 const slice = createSlice({
@@ -139,7 +139,10 @@ const slice = createSlice({
       const { contents } = action.payload;
       state.contents = contents;
     },
-    noteSharablesReceived: (state, action: PayloadAction<ProjectItemSharables>) => {
+    noteSharablesReceived: (
+      state,
+      action: PayloadAction<ProjectItemSharables>
+    ) => {
       const { users, links } = action.payload;
       state.sharedUsers = users;
       state.sharedLinks = links;
@@ -158,8 +161,12 @@ const slice = createSlice({
     noteApiErrorReceived: (state, action: PayloadAction<NoteApiErrorAction>) =>
       state,
     NotesUpdate: (state, action: PayloadAction<UpdateNotes>) => state,
-    NoteContentsUpdate: (state, action: PayloadAction<UpdateNoteContents>) => state,
-    NoteContentRevisionUpdate: (state, action: PayloadAction<UpdateNoteContentRevision>) => state,
+    NoteContentsUpdate: (state, action: PayloadAction<UpdateNoteContents>) =>
+      state,
+    NoteContentRevisionUpdate: (
+      state,
+      action: PayloadAction<UpdateNoteContentRevision>
+    ) => state,
     NotesCreate: (state, action: PayloadAction<CreateNote>) => state,
     NoteContentCreate: (state, action: PayloadAction<CreateContent>) => state,
     NotePut: (state, action: PayloadAction<PutNote>) => state,
@@ -167,14 +174,15 @@ const slice = createSlice({
     NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
     NoteContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
     NotePatch: (state, action: PayloadAction<PatchNote>) => {
-      state.patchLoading = false },
+      state.patchLoading = false;
+    },
     NoteContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     NoteSetLabels: (state, action: PayloadAction<SetNoteLabels>) => state,
     NoteMove: (state, action: PayloadAction<MoveNote>) => state,
     NoteShare: (state, action: PayloadAction<ShareNote>) => state,
     NoteSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
     NoteRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
-  }
+  },
 });
 
 export const reducer = slice.reducer;

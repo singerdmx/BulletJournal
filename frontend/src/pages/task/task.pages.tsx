@@ -14,7 +14,7 @@ import { Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 // antd imports
-import {Avatar, Popconfirm, Tooltip, Button, Popover} from 'antd';
+import { Avatar, Popconfirm, Tooltip, Button, Popover } from 'antd';
 import {
   DeleteTwoTone,
   UpSquareOutlined,
@@ -31,7 +31,7 @@ import { ProjectType } from '../../features/project/constants';
 // components
 import TaskDetailPage, { TaskProps } from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
-import LabelManagement from "../project/label-management.compoent";
+import LabelManagement from '../project/label-management.compoent';
 
 interface TaskPageHandler {
   getTask: (taskId: number) => void;
@@ -58,6 +58,8 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   React.useEffect(() => {
     task && task.id && updateTaskContents(task.id);
   }, [task]);
+
+  if (!task) return null;
   // show drawer
   const createHandler = () => {
     setEditorShow(true);
@@ -89,40 +91,52 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     </div>
   );
 
-    const getAssignees = () => {
-        if (!task.assignees || task.assignees.length === 0) {
-            return null;
-        }
+  const getAssignees = () => {
+    if (!task.assignees || task.assignees.length === 0) {
+      return null;
+    }
 
-        if (task.assignees.length === 1) {
-            return         <Tooltip title={`Assignee ${task.assignees[0].name}`}>
-                <div className='task-owner'>
-                    <Avatar src={task.assignees[0].avatar} />
-                </div>
-            </Tooltip>
-        }
+    if (task.assignees.length === 1) {
+      return (
+        <Tooltip title={`Assignee ${task.assignees[0].name}`}>
+          <div className='task-owner'>
+            <Avatar src={task.assignees[0].avatar} />
+          </div>
+        </Tooltip>
+      );
+    }
 
-        return  <Popover
-            title='Assignees'
-            placement='bottom'
-            content={
-                <div>
-                    {task.assignees.map((u, index) => <p key={index}><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
-                </div>
-            }
-        >
-            <div className='task-owner'>
-                <Avatar src={task.assignees[0].avatar} />
-            </div>
-        </Popover>
-    };
+    return (
+      <Popover
+        title='Assignees'
+        placement='bottom'
+        content={
+          <div>
+            {task.assignees.map((u, index) => (
+              <p key={index}>
+                <Avatar size='small' src={u.avatar} />
+                &nbsp;{u.name}
+              </p>
+            ))}
+          </div>
+        }
+      >
+        <div className='task-owner'>
+          <Avatar src={task.assignees[0].avatar} />
+        </div>
+      </Popover>
+    );
+  };
 
   const taskOperation = () => {
     return (
       <div className='task-operation'>
         {getAssignees()}
 
-        <LabelManagement labelEditableHandler={labelEditableHandler} labelEditable={labelEditable}/>
+        <LabelManagement
+          labelEditableHandler={labelEditableHandler}
+          labelEditable={labelEditable}
+        />
         <EditTask task={task} mode='icon' />
         <MoveProjectItem
           type={ProjectType.TODO}

@@ -52,7 +52,7 @@ import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { IState } from '../../store';
 import { Content, Revision, ProjectItems } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
-import {actions as SystemActions} from "../system/reducer";
+import { actions as SystemActions } from '../system/reducer';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -74,11 +74,11 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
     const state = yield select();
     const systemState = state.system;
     yield put(
-        SystemActions.systemUpdateReceived({
-          ...systemState,
-          tasksEtag: etag
-        })
-    )
+      SystemActions.systemUpdateReceived({
+        ...systemState,
+        tasksEtag: etag,
+      })
+    );
   } catch (error) {
     yield call(message.error, `tasksUpdate Error Received: ${error}`);
   }
@@ -146,11 +146,11 @@ function* taskPut(action: PayloadAction<PutTask>) {
     const etag = data.headers.get('Etag')!;
     const systemState = state.system;
     yield put(
-        SystemActions.systemUpdateReceived({
-          ...systemState,
-          tasksEtag: etag
-        })
-    )
+      SystemActions.systemUpdateReceived({
+        ...systemState,
+        tasksEtag: etag,
+      })
+    );
   } catch (error) {
     yield call(message.error, `Put Task Error Received: ${error}`);
   }
@@ -314,7 +314,7 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
         tasks: updatedTasks,
       })
     );
-
+    yield put(tasksActions.taskReceived({ task: undefined }));
     const state: IState = yield select();
 
     yield put(

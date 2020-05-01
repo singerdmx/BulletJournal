@@ -170,6 +170,9 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     const state: IState = yield select();
     const transaction = yield call(getTransactionById, transactionId);
 
+    yield put(
+      transactionsActions.transactionReceived({ transaction: undefined })
+    );
     yield call(deleteTransactionById, transactionId);
 
     const data = yield call(

@@ -44,13 +44,13 @@ import { Content } from '../../features/myBuJo/interface';
 import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
-import LabelManagement from "../project/label-management.compoent";
+import LabelManagement from '../project/label-management.compoent';
 
 const LocaleCurrency = require('locale-currency');
 
 type TransactionProps = {
   currency: string;
-  transaction: Transaction;
+  transaction: Transaction | undefined;
   contents: Content[];
   deleteTransaction: (transactionId: number) => void;
   updateTransactionContents: (transactionId: number) => void;
@@ -89,6 +89,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   React.useEffect(() => {
     transaction && transaction.id && updateTransactionContents(transaction.id);
   }, [transaction]);
+
+  if (!transaction) return null;
   // show drawer
   const createHandler = () => {
     setEditorShow(true);
@@ -149,7 +151,10 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               <Avatar src={transaction.ownerAvatar} />
             </div>
           </Tooltip>
-          <LabelManagement labelEditableHandler={labelEditableHandler} labelEditable={labelEditable}/>
+          <LabelManagement
+            labelEditableHandler={labelEditableHandler}
+            labelEditable={labelEditable}
+          />
           <EditTransaction transaction={transaction} mode='icon' />
           <MoveProjectItem
             type={ProjectType.LEDGER}

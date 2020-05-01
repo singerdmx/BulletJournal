@@ -30,7 +30,7 @@ import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import NoteDetailPage, { NoteProps } from './note-detail.pages';
-import LabelManagement from "../project/label-management.compoent";
+import LabelManagement from '../project/label-management.compoent';
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
@@ -71,6 +71,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   const labelEditableHandler = () => {
     setLabelEditable((labelEditable) => !labelEditable);
   };
+  if (!note) return null;
 
   const createContentElem = (
     <Button onClick={createHandler}>
@@ -93,7 +94,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   const noteOperation = () => {
     return (
       <div className='note-operation'>
-        <LabelManagement labelEditableHandler={labelEditableHandler} labelEditable={labelEditable}/>
+        <LabelManagement
+          labelEditableHandler={labelEditableHandler}
+          labelEditable={labelEditable}
+        />
         <EditNote note={note} mode='icon' />
         <MoveProjectItem
           type={ProjectType.NOTE}

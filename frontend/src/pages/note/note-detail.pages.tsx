@@ -15,7 +15,7 @@ import DraggableLabelsList from '../../components/draggable-labels/draggable-lab
 import { Content } from '../../features/myBuJo/interface';
 
 export type NoteProps = {
-  note: Note;
+  note: Note | undefined;
   contents: Content[];
 };
 
@@ -35,7 +35,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     createContentElem,
     contents,
   } = props;
-
+  if (!note) return null;
   return (
     <div className='note-page'>
       <Tooltip placement='top' title={note.owner} className='note-avatar'>

@@ -75,7 +75,7 @@ export type TransactionsAction = {
 };
 
 export type TransactionAction = {
-  transaction: Transaction;
+  transaction?: Transaction;
 };
 
 export type DeleteTransaction = {
@@ -124,7 +124,7 @@ export type UpdateForm = {
 
 let initialState = {
   contents: [] as Array<Content>,
-  transaction: {} as Transaction,
+  transaction: undefined as Transaction | undefined,
   ledgerSummary: {} as LedgerSummary,
   addTransactionVisible: false,
   //used for form

@@ -26,7 +26,7 @@ export type UpdateTasks = {
 export type CreateTask = {
   projectId: number;
   name: string;
-  assignees: string[],
+  assignees: string[];
   reminderSetting: ReminderSetting;
   timezone: string;
   dueDate?: string;
@@ -53,7 +53,7 @@ export type TasksAction = {
 };
 
 export type TaskAction = {
-  task: Task;
+  task: Task | undefined;
 };
 
 export type CreateContent = {
@@ -104,7 +104,7 @@ export type PatchTask = {
   taskId: number;
   timezone: string;
   name?: string;
-  assignees?: string[],
+  assignees?: string[];
   dueDate?: string;
   dueTime?: string;
   duration?: number;
@@ -141,7 +141,7 @@ export type GetCompletedTasks = {
 let initialState = {
   addTaskVisible: false,
   contents: [] as Array<Content>,
-  task: {} as Task,
+  task: undefined as Task | undefined,
   tasks: [] as Array<Task>,
   completedTasks: [] as Array<Task>,
   sharedUsers: [] as User[],

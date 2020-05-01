@@ -2,41 +2,30 @@ import React from 'react';
 
 import { Drawer } from 'antd';
 
-import {Content, ProjectItem} from '../../features/myBuJo/interface';
+import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
 import ContentEditor from './content-editor.component';
 import ContentReader from './content-reader.component';
 
 type ContentEditorDrawerProps = {
   content?: Content;
-  projectItem: ProjectItem;
+  projectItem?: ProjectItem;
   visible: boolean;
   readMode: boolean;
   onClose: Function;
 };
 
-interface ContentEditorDrawerHandler {
-}
+interface ContentEditorDrawerHandler {}
 
 const ContentEditorDrawer: React.FC<
   ContentEditorDrawerProps & ContentEditorDrawerHandler
-> = ({
-  content,
-  projectItem,
-  visible,
-  readMode,
-  onClose,
-}) => {
+> = ({ content, projectItem, visible, readMode, onClose }) => {
   const handleClose = () => {
     onClose();
   };
+  if (!projectItem) return null;
   return (
-    <Drawer
-      onClose={handleClose}
-      visible={visible}
-      width='700'
-      destroyOnClose
-    >
+    <Drawer onClose={handleClose} visible={visible} width='700' destroyOnClose>
       {readMode && content ? (
         <div>
           <ContentReader content={content} />

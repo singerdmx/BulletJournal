@@ -39,7 +39,7 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   React.useEffect(() => {
     taskId && props.updateCompleteTaskContents(parseInt(taskId));
   }, [taskId]);
-
+  if (!task) return null;
   const taskOperation = () => {
     return (
       <div className='task-operation'>

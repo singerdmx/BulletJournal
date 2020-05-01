@@ -3,23 +3,27 @@
 import React from 'react';
 // features
 //actions
-import {getReminderSettingString, Task} from '../../features/tasks/interface';
+import { getReminderSettingString, Task } from '../../features/tasks/interface';
 // antd imports
-import {Avatar, Card, Col, Divider, Row, Statistic, Tooltip} from 'antd';
-import {AlertOutlined, ClockCircleOutlined, FileDoneOutlined,} from '@ant-design/icons';
+import { Avatar, Card, Col, Divider, Row, Statistic, Tooltip } from 'antd';
+import {
+  AlertOutlined,
+  ClockCircleOutlined,
+  FileDoneOutlined,
+} from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
-import {ProjectType} from '../../features/project/constants';
-import {convertToTextWithRRule} from '../../features/recurrence/actions';
+import { ProjectType } from '../../features/project/constants';
+import { convertToTextWithRRule } from '../../features/recurrence/actions';
 import moment from 'moment';
-import {dateFormat} from '../../features/myBuJo/constants';
+import { dateFormat } from '../../features/myBuJo/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
-import {Content} from '../../features/myBuJo/interface';
+import { Content } from '../../features/myBuJo/interface';
 // components
 import TaskContentList from '../../components/content/content-list.component';
 
 export type TaskProps = {
-  task: Task;
+  task: Task | undefined;
   contents: Content[];
   contentEditable?: boolean;
 };
@@ -41,7 +45,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     contents,
     contentEditable,
   } = props;
-
+  if (!task) return null;
   const getDueDateTime = (task: Task) => {
     if (task.recurrenceRule) {
       return (
@@ -82,9 +86,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   return (
     <div className='task-page'>
       <Tooltip
-          placement='top'
-          title={`Created by ${task.owner}`}
-          className='task-avatar'
+        placement='top'
+        title={`Created by ${task.owner}`}
+        className='task-avatar'
       >
         <span>
           <Avatar size='large' src={task.ownerAvatar} />
