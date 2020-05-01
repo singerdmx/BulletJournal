@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { Project } from '../../features/project/interface';
@@ -25,14 +25,19 @@ import {
   unwatchCalendar,
   updateWatchedProject,
   watchCalendar,
+  importEventsToProject,
 } from '../../features/calendarSync/actions';
 
 import './modals.styles.less';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
-import { Task, getReminderSettingString } from '../../features/tasks/interface';
+import { getReminderSettingString } from '../../features/tasks/interface';
 import { getDueDateTime } from '../project-item/task-item.component';
-import { AlertOutlined, CheckSquareTwoTone } from '@ant-design/icons';
+import {
+  AlertOutlined,
+  CheckSquareTwoTone,
+  CloseSquareTwoTone,
+} from '@ant-design/icons';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -53,6 +58,7 @@ type ModalProps = {
   googleCalendarEventListReceived: (
     googleCalendarEventList: GoogleCalendarEvent[]
   ) => void;
+  importEventsToProject: (eventList: string[], projectId: number) => void;
 };
 
 const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
@@ -62,12 +68,17 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     projects,
     eventList,
     googleCalendarEventListReceived,
+    importEventsToProject,
   } = props;
   const [visible, setVisible] = useState(false);
   const history = useHistory();
   const [form] = Form.useForm();
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [projectId, setProjectId] = useState(-1);
+
+  useEffect(() => {
+    if (projects && projects[0]) setProjectId(projects[0].id);
+    else setProjectId(-1);
+  }, [projects]);
 
   const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
@@ -92,7 +103,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   ) => {
     e.stopPropagation();
     // TODO: check projects.length
-    props.watchCalendar(calendar.id, projects[0].id);
+    props.watchCalendar(calendar.id, projectId);
   };
 
   const handleUnwatchCalendar = (
@@ -113,7 +124,6 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
         const endDate = values.startEndDates
           ? values.startEndDates[1].format('YYYY-MM-DD')
           : null;
-        console.log(values);
         props.googleCalendarEventListUpdate(
           calendar.id,
           calendar.timeZone,
@@ -131,7 +141,11 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
           <Select
             placeholder='Choose BuJo'
             style={{ width: '100%' }}
-            defaultValue={projects[0].id}
+            value={projectId}
+            onChange={(value: any) => {
+              console.log(value);
+              setProjectId(value);
+            }}
           >
             {projects.map((project) => {
               return (
@@ -179,6 +193,27 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
       },
     ]);
   };
+  const clearAll = () => {
+    form.setFields([
+      {
+        name: 'eventList',
+        value: [],
+      },
+    ]);
+  };
+
+  const importTask = (eventList: string[], projectId: number) => {
+    importEventsToProject(eventList, projectId);
+
+    googleCalendarEventListReceived([] as GoogleCalendarEvent[]);
+    form.setFields([
+      {
+        name: 'eventList',
+        value: [] as GoogleCalendarEvent[],
+      },
+    ]);
+    setVisible(false);
+  };
 
   return (
     <Card
@@ -196,9 +231,17 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
         centered
         title={`Sync Calendar "${calendar.summary}"`}
         visible={visible}
-        okText='Confirm'
         onCancel={(e) => handleCancel(e)}
-        footer={false}
+        okText='Import'
+        onOk={() => {
+          form
+            .validateFields()
+            .then((values) => {
+              console.log(values);
+              importTask(values.eventList, projectId);
+            })
+            .catch((info) => console.log(info));
+        }}
       >
         <Form form={form} labelAlign='left'>
           {projectKeepInSync()}
@@ -235,6 +278,12 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                     style={{ cursor: 'pointer' }}
                   />
                 </Tooltip>
+                <Tooltip title='Clear All'>
+                  <CloseSquareTwoTone
+                    onClick={clearAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Tooltip>
               </span>
             }
           >
@@ -242,7 +291,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
               {eventList &&
                 eventList.map((event, index) => {
                   return (
-                    <Option value={event.iCalUID}>
+                    <Option value={event.iCalUID} key={index}>
                       <div>
                         <div className='name-container'>
                           <div className='reminder'>
@@ -274,7 +323,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
             </Select>
           </Form.Item>
           <Form.Item
-            name='eventList'
+            name='project'
             label='Target BuJo'
             labelCol={{ span: 5 }}
             wrapperCol={{ span: 19 }}
@@ -298,4 +347,5 @@ export default connect(mapStateToProps, {
   watchCalendar,
   unwatchCalendar,
   googleCalendarEventListReceived,
+  importEventsToProject,
 })(CalendarListEntryModal);

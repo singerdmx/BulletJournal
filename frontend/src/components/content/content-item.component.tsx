@@ -20,7 +20,7 @@ type ContentProps = {
   contentEditable?: boolean;
   content: Content;
   projectItem: ProjectItem;
-  project: Project;
+  project: Project | undefined;
   myself: string;
   deleteNoteContent: (noteId: number, contentId: number) => void;
   deleteTaskContent: (taskId: number, contentId: number) => void;
@@ -104,7 +104,7 @@ const ContentItem: React.FC<ContentProps> = ({
         <ZoomInOutlined onClick={handleOpen} />
       </Tooltip>,
     ];
-    if (contentEditable !== false && isContentEditable(project, projectItem, content, myself)) {
+    if (contentEditable !== false && project && isContentEditable(project, projectItem, content, myself)) {
       actions.push(
           <Tooltip title="Edit">
             <EditOutlined onClick={handleEdit} />

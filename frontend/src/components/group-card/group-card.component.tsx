@@ -11,11 +11,13 @@ import {
 } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interface';
 import { MyselfWithAvatar } from '../../features/myself/reducer';
+import { updateTheme } from '../../features/myself/actions';
 import { IState } from '../../store';
 
 import './group-card.styles.less';
 import AddUser from '../modals/add-user.component';
-import {History} from "history";
+import { History } from "history";
+
 
 type GroupProps = {
   group: Group;
@@ -31,6 +33,10 @@ type GroupProps = {
 };
 
 type PathProps = RouteComponentProps;
+
+type AccountProps = {
+  theme: string;
+}
 
 type GroupState = {
   showModal: boolean;
@@ -60,7 +66,7 @@ function getGroupUserSpan(item: User, group: Group): JSX.Element {
 
 const { Title } = Typography;
 
-class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
+class GroupCard extends React.Component<GroupProps & PathProps & AccountProps, GroupState> {
   state: GroupState = {
     showModal: false
   };
@@ -78,20 +84,23 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   };
 
   render() {
-    const { group } = this.props;
+    const { group, theme } = this.props;
     const isEditable = group.owner === this.props.myself.username;
     return (
       <div className="group-card">
         <div className="group-title">
           <Title
+            style={{ color: theme === 'DARK' ? 'white' : 'black' }}
             level={4}
             editable={isEditable ? { onChange: this.titleChange } : false}
           >
             {group.name}
           </Title>
           <h3 className="group-operation">
-            <UserOutlined />
-            {group.users && group.users.length}
+            <span className="group-setting">
+              <UserOutlined />
+              {group.users && group.users.length}
+            </span>
             {group.owner === this.props.myself.username && !group.default && (
               <Popconfirm
                 title="Are you sure?"
@@ -114,14 +123,14 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
               return (
                 <List.Item key={item.id}>
                   <Tooltip placement="right" title={getGroupUserTitle(item, group)}>
-                  <div
-                    className="group-user"
-                  >
-                    <Badge dot={!item.accepted}>
-                      <Avatar size={item.name === group.owner ? 'large' : 'default'} src={item.avatar} />
-                    </Badge>
-                    {getGroupUserSpan(item, group)}
-                  </div>
+                    <div
+                      className="group-user"
+                    >
+                      <Badge dot={!item.accepted}>
+                        <Avatar size={item.name === group.owner ? 'large' : 'default'} src={item.avatar} />
+                      </Badge>
+                      {getGroupUserSpan(item, group)}
+                    </div>
                   </Tooltip>
                   {item.name !== group.owner &&
                     group.owner === this.props.myself.username && (
@@ -129,7 +138,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
                         <Button
                           type="link"
                           size="small"
-                          
+
                           onClick={() =>
                             this.deleteUser(group.id, item.name, group.name)
                           }
@@ -152,10 +161,12 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  myself: state.myself
+  myself: state.myself,
+  theme: state.settings.theme,
 });
 
 export default connect(mapStateToProps, {
+  updateTheme,
   deleteGroup,
   removeUserGroupByUsername,
   getGroup,

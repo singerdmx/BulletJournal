@@ -23,7 +23,7 @@ const { Option } = Select;
 
 type ProjectProps = {
   history: History<History.PoorMansUnknown>;
-  project: Project;
+  project: Project | undefined;
   mode: string;
   createProjectByName: (
     description: string,

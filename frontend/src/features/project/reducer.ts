@@ -8,7 +8,7 @@ export type ProjectApiErrorAction = {
 };
 
 export type ProjectAction = {
-  project: Project;
+  project?: Project;
 };
 
 export type GetProjectAction = {
@@ -54,7 +54,7 @@ export type Projects = {
 let initialState = {
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
-  project: {} as Project,
+  project: undefined as Project | undefined,
 };
 
 const slice = createSlice({

@@ -16,7 +16,7 @@ import {
 } from '../../apis/labelApis';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
-  yield call(message.error, `Group Error Received: ${action.payload.error}`);
+  yield call(message.error, `Label Error Received: ${action.payload.error}`);
 }
 
 function* labelsUpdate(action: PayloadAction<UpdateLabels>) {

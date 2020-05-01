@@ -41,7 +41,7 @@ interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
 
 type ProjectPageProps = {
   history: History<History.PoorMansUnknown>;
-  project: Project;
+  project: Project | undefined;
   getProject: (projectId: number) => void;
   deleteProject: (
     projectId: number,
@@ -106,6 +106,9 @@ class ProjectPage extends React.Component<
 
   render() {
     const { project, myself, history } = this.props;
+    if (!project) {
+      return null;
+    }
 
     let createContent = null;
     let projectContent = null;
@@ -134,7 +137,7 @@ class ProjectPage extends React.Component<
 
     let editContent = null;
     let deleteContent = null;
-    if (myself === project.owner) {
+    if (project && myself === project.owner) {
       editContent = <EditProject project={project} />;
       deleteContent = (
         <Popconfirm
@@ -157,7 +160,7 @@ class ProjectPage extends React.Component<
     }
 
     let description = null;
-    if (project.description) {
+    if (project && project.description) {
       description = (
         <div className="project-description">
           {project.description.split('\n').map((s, key) => {
@@ -170,7 +173,7 @@ class ProjectPage extends React.Component<
 
     const group = getGroupByProject(this.props.groups, project);
     let groupUsers = group ? group.users : [];
-    if (project.shared) {
+    if (project && project.shared) {
       createContent = null;
       showCompletedTasks = null;
       editContent = null;

@@ -1,24 +1,25 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {SyncOutlined} from '@ant-design/icons';
-import {Avatar, Popover, Tooltip} from 'antd';
-import {RouteComponentProps, withRouter} from 'react-router';
+import { connect } from 'react-redux';
+import { SyncOutlined } from '@ant-design/icons';
+import { Avatar, Popover, Tooltip } from 'antd';
+import { RouteComponentProps, withRouter } from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
-import {IState} from '../../store/index';
+import { IState } from '../../store/index';
 import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
-import {Project, ProjectsWithOwner} from '../project/interface';
-import {updateExpandedMyself, updateMyself} from './actions';
-import {groupUpdate, updateGroups} from '../group/actions';
-import {updateNotifications} from '../notification/actions';
-import {updateSystem} from '../system/actions';
+import { Project, ProjectsWithOwner } from '../project/interface';
+import { updateExpandedMyself, updateMyself, updateTheme } from './actions';
+import { groupUpdate, updateGroups } from '../group/actions';
+import { updateNotifications } from '../notification/actions';
+import { updateSystem } from '../system/actions';
 
 import './myself.styles.less';
 
 type MyselfProps = {
   username: string;
   avatar: string;
+  theme: string;
   ownedProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
   updateMyself: () => void;
@@ -32,7 +33,7 @@ type MyselfProps = {
 type PathProps = RouteComponentProps;
 
 class Myself extends React.Component<MyselfProps & PathProps> {
-  interval:any = 0;
+  interval: any = 0;
 
   componentDidMount() {
     this.props.updateMyself();
@@ -53,9 +54,9 @@ class Myself extends React.Component<MyselfProps & PathProps> {
   render() {
     let plusIcon = null;
     if (this.props.ownedProjects.length === 0 && this.props.sharedProjects.length === 0) {
-      plusIcon = <AddProject history={this.props.history} mode={'complex'}/>
+      plusIcon = <AddProject history={this.props.history} mode={'complex'} />
     } else {
-      plusIcon = <AddProjectItem history={this.props.history} mode={'complex'}/>
+      plusIcon = <AddProjectItem history={this.props.history} mode={'complex'} />
     }
     return (
       <div className='myselfContainer'>
@@ -69,6 +70,7 @@ class Myself extends React.Component<MyselfProps & PathProps> {
         <Popover
           content={
             <DropdownMenu
+              theme={this.props.theme}
               username={this.props.username}
               history={this.props.history}
             />
@@ -92,11 +94,13 @@ class Myself extends React.Component<MyselfProps & PathProps> {
 const mapStateToProps = (state: IState) => ({
   username: state.myself.username,
   avatar: state.myself.avatar,
+  theme: state.settings.theme,
   ownedProjects: state.project.owned,
   sharedProjects: state.project.shared
 });
 
 export default connect(mapStateToProps, {
+  updateTheme,
   updateMyself,
   updateExpandedMyself,
   updateGroups,

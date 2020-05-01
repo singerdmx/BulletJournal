@@ -10,11 +10,12 @@ import {
 } from '../../features/tasks/actions';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
+import {Project} from "../../features/project/interface";
 
 type TasksProps = {
   showCompletedTask: boolean;
   readOnly: boolean;
-  projectId: number;
+  project: Project | undefined;
   tasks: Task[];
   completedTasks: Task[];
   updateTasks: (projectId: number) => void;
@@ -120,7 +121,7 @@ const onDrop = (tasks: Task[], putTask: Function, projectId: number) => (
 
 const TaskTree: React.FC<TasksProps> = props => {
   const {
-    projectId,
+    project,
     readOnly,
     tasks,
     completedTasks,
@@ -130,11 +131,11 @@ const TaskTree: React.FC<TasksProps> = props => {
   } = props;
 
   useEffect(() => {
-    if (projectId) {
-      updateTasks(projectId);
-      updateCompletedTasks(projectId);
+    if (project) {
+      updateTasks(project.id);
+      updateCompletedTasks(project.id);
     }
-  }, [projectId]);
+  }, [project]);
   let treeTask = getTree(tasks, readOnly);
 
   let completedTaskList = null;
@@ -161,6 +162,10 @@ const TaskTree: React.FC<TasksProps> = props => {
           </div>;
     }
   }
+  if (!project) {
+    return null;
+  }
+
   return (
     <div>
       <Tree
@@ -168,7 +173,7 @@ const TaskTree: React.FC<TasksProps> = props => {
         draggable
         blockNode
         onDragEnter={onDragEnter}
-        onDrop={onDrop(tasks, putTask, projectId)}
+        onDrop={onDrop(tasks, putTask, project.id)}
         treeData={treeTask}
       />
       {completedTaskList}
@@ -177,7 +182,7 @@ const TaskTree: React.FC<TasksProps> = props => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  projectId: state.project.project.id,
+  project: state.project.project,
   tasks: state.task.tasks,
   completedTasks: state.task.completedTasks
 });

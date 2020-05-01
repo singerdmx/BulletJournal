@@ -33,7 +33,7 @@ type RevisionProps = {
   revisions: Revision[];
   content: Content;
   projectItem: ProjectItem;
-  project: Project;
+  project: Project | undefined;
   myself: string;
 };
 
@@ -102,7 +102,6 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
   const patchContentFunction = patchProjectContent[projectItem.contentType];
 
-  const latestContent = BraftEditor.createEditorState(content.text);
   const [history, setHistory] = useState(BraftEditor.createEditorState(''));
   const historyContent = revisions[revisionIndex - 1].content;
 
@@ -131,7 +130,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
 
   const getRollbackButton = () => {
-    if (isContentEditable(project, projectItem, content, myself)) {
+    if (project && isContentEditable(project, projectItem, content, myself)) {
       return (
         <Tooltip title="Revert to this version">
           <Button

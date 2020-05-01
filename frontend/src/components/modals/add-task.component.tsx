@@ -11,9 +11,13 @@ import {
   AutoComplete,
   Radio,
   Popover,
-  Button
+  Button,
 } from 'antd';
-import { PlusOutlined, CheckSquareTwoTone } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  CheckSquareTwoTone,
+  CloseSquareTwoTone,
+} from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { createTask, updateTaskVisible } from '../../features/tasks/actions';
@@ -27,6 +31,7 @@ import { ReminderBeforeTaskText } from '../settings/reducer';
 import { convertToTextWithTime } from '../../features/recurrence/actions';
 import { ReminderSetting } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
+import {Project} from "../../features/project/interface";
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -45,8 +50,8 @@ zones.sort((a, b) => {
 });
 
 type TaskProps = {
-  projectId: number;
-  group: Group;
+  project: Project | undefined;
+  group: Group | undefined;
 };
 
 interface TaskCreateFormProps {
@@ -110,7 +115,8 @@ const AddTask: React.FC<
       time: values.reminderTime
         ? values.reminderTime.format('HH:mm')
         : undefined,
-      before: values.remindBefore === undefined ? props.before : values.remindBefore,
+      before:
+        values.remindBefore === undefined ? props.before : values.remindBefore,
     } as ReminderSetting;
     if (reminderType === 'remindBefore') {
       reminderSetting.date = undefined;
@@ -119,17 +125,19 @@ const AddTask: React.FC<
       reminderSetting.before = undefined;
     }
 
-    props.createTask(
-      props.projectId,
-      values.taskName,
-      assignees,
-      dueDate,
-      dueTime,
-      values.duration,
-      reminderSetting,
-      recurrence,
-      timezone
-    );
+    if (props.project) {
+      props.createTask(
+          props.project.id,
+          values.taskName,
+          assignees,
+          dueDate,
+          dueTime,
+          values.duration,
+          reminderSetting,
+          recurrence,
+          timezone
+      );
+    }
     props.updateTaskVisible(false);
   };
   const onCancel = () => props.updateTaskVisible(false);
@@ -137,7 +145,14 @@ const AddTask: React.FC<
     props.updateTaskVisible(true);
   };
   const selectAll = () => {
-    form.setFields([{name: 'assignees', value:props.group.users.map((user) => user.name)}]);
+    if (props.group) {
+      form.setFields([
+        {name: 'assignees', value: props.group.users.map((user) => user.name)},
+      ]);
+    }
+  };
+  const clearAll = () => {
+    form.setFields([{ name: 'assignees', value: [] }]);
   };
   useEffect(() => {
     props.updateExpandedMyself(true);
@@ -157,6 +172,27 @@ const AddTask: React.FC<
   const rRuleTextList = rRuleText.match(
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
+  const getSelections = () => {
+    if (!props.group || !props.group.users) {
+      return null;
+    }
+    return (
+        <Select
+            mode='multiple'
+            defaultValue={props.myself}
+            style={{ width: '100%' }}
+        >
+          {props.group.users.map((user) => {
+            return (
+                <Option value={user.name} key={user.name}>
+                  <Avatar size='small' src={user.avatar} />
+                  &nbsp;&nbsp; <strong>{user.name}</strong>
+                </Option>
+            );
+          })}
+        </Select>
+    )
+  };
   return (
     <Tooltip placement='top' title='Create New Task'>
       <div className='add-task'>
@@ -191,27 +227,27 @@ const AddTask: React.FC<
               <Input placeholder='Enter Task Name' allowClear />
             </Form.Item>
             {/* form for Assignees */}
-            <Form.Item name='assignees' label={
-              <span>Assignees{' '}
-              <Tooltip title='Select All'>
-                <CheckSquareTwoTone
-                    onClick={selectAll}
-                    style={{cursor: 'pointer'}}/>
-              </Tooltip>
-              </span>
-            }>
-              {props.group.users && (
-                <Select mode="multiple" defaultValue={props.myself} style={{ width: '100%' }}>
-                  {props.group.users.map((user) => {
-                    return (
-                      <Option value={user.name} key={user.name}>
-                        <Avatar size='small' src={user.avatar} />
-                        &nbsp;&nbsp; <strong>{user.name}</strong>
-                      </Option>
-                    );
-                  })}
-                </Select>
-              )}
+            <Form.Item
+              name='assignees'
+              label={
+                <span>
+                  Assignees{' '}
+                  <Tooltip title='Select All'>
+                    <CheckSquareTwoTone
+                      onClick={selectAll}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </Tooltip>
+                  <Tooltip title='Clear All'>
+                    <CloseSquareTwoTone
+                      onClick={clearAll}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </Tooltip>
+                </span>
+              }
+            >
+              {getSelections()}
             </Form.Item>
             {/* due type */}
             <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
@@ -280,7 +316,9 @@ const AddTask: React.FC<
                             rRuleTextList.length > 1 &&
                             rRuleTextList
                               .slice(1)
-                              .map((text, index) => <div key={index}>{text}</div>)}
+                              .map((text, index) => (
+                                <div key={index}>{text}</div>
+                              ))}
                         </div>
                         <Button
                           onClick={() => setRecurrenceVisible(false)}
@@ -418,7 +456,7 @@ const AddTask: React.FC<
 const mapStateToProps = (state: IState) => ({
   startTime: state.rRule.startTime,
   startDate: state.rRule.startDate,
-  projectId: state.project.project.id,
+  project: state.project.project,
   timezone: state.settings.timezone,
   group: state.group.group,
   myself: state.myself.username,

@@ -1,18 +1,19 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router';
-import { TreeNodeNormal } from 'antd/lib/tree/Tree';
-import { Tree } from 'antd';
+import React, {useEffect} from 'react';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {TreeNodeNormal} from 'antd/lib/tree/Tree';
+import {Tree} from 'antd';
 import TreeItem from '../project-item/note-item.component';
-import { putNote, updateNotes } from '../../features/notes/actions';
-import { Note } from '../../features/notes/interface';
-import { IState } from '../../store';
+import {putNote, updateNotes} from '../../features/notes/actions';
+import {Note} from '../../features/notes/interface';
+import {IState} from '../../store';
 import './note-tree.component.styles.less';
+import {Project} from "../../features/project/interface";
 
 type NotesProps = {
   notes: Note[];
   readOnly: boolean;
-  projectId: number;
+  project: Project | undefined;
   updateNotes: (projectId: number) => void;
   putNote: (projectId: number, notes: Note[]) => void;
 };
@@ -34,7 +35,6 @@ const getTree = (data: Note[], readOnly: boolean): TreeNodeNormal[] => {
 };
 
 const onDragEnter = (info: any) => {
-  console.log(info.node);
   // expandedKeys 需要受控时设置
   // setState({
   //   expendKey: info.expandedKeys,
@@ -62,16 +62,16 @@ const dragNoteById = (notes: Note[], noteId: number): Note[] => {
   notes.forEach((item, index) => {
     let note = {} as Note;
     const subNotes = dragNoteById(item.subNotes, noteId);
-    note = { ...item, subNotes: subNotes };
+    note = {...item, subNotes: subNotes};
     if (note.id !== noteId) res.push(note);
   });
   return res;
 };
 
 const DropNoteById = (
-  notes: Note[],
-  dropId: number,
-  dropNote: Note
+    notes: Note[],
+    dropId: number,
+    dropNote: Note
 ): Note[] => {
   let res = [] as Note[];
   notes.forEach((item, index) => {
@@ -83,14 +83,14 @@ const DropNoteById = (
     } else {
       subNotes = DropNoteById(item.subNotes, dropId, dropNote);
     }
-    note = { ...item, subNotes: subNotes };
+    note = {...item, subNotes: subNotes};
     res.push(note);
   });
   return res;
 };
 
 const onDrop = (notes: Note[], putNote: Function, projectId: number) => (
-  info: any
+    info: any
 ) => {
   const targetNote = findNoteById(notes, parseInt(info.dragNode.key));
   const dropPos = info.node.props.pos.split('-');
@@ -114,28 +114,31 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (
 };
 
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = props => {
-  const { projectId, notes, putNote, updateNotes, readOnly } = props;
+  const {project, notes, putNote, updateNotes, readOnly} = props;
   useEffect(() => {
-    if (projectId) {
-      updateNotes(projectId);
+    if (project) {
+      updateNotes(project.id);
     }
-  }, [projectId]);
+  }, [project]);
   let treeNote = getTree(notes, readOnly);
 
+  if (!project) {
+    return null;
+  }
   return (
-    <Tree
-      className="ant-tree"
-      draggable
-      blockNode
-      onDragEnter={onDragEnter}
-      onDrop={onDrop(notes, putNote, projectId)}
-      treeData={treeNote}
-    />
+      <Tree
+          className="ant-tree"
+          draggable
+          blockNode
+          onDragEnter={onDragEnter}
+          onDrop={onDrop(notes, putNote, project.id)}
+          treeData={treeNote}
+      />
   );
 };
 
 const mapStateToProps = (state: IState) => ({
-  projectId: state.project.project.id,
+  project: state.project.project,
   notes: state.note.notes
 });
 

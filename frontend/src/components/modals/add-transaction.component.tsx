@@ -1,28 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Avatar,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Radio,
-  Select,
-  TimePicker,
-  Tooltip,
-} from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router';
-import { createTransaction } from '../../features/transactions/actions';
-import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { Group } from '../../features/group/interface';
+import React, {useEffect, useState} from 'react';
+import {Avatar, DatePicker, Form, Input, InputNumber, Modal, Radio, Select, TimePicker, Tooltip,} from 'antd';
+import {PlusOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {createTransaction, updateTransactionVisible} from '../../features/transactions/actions';
+import {IState} from '../../store';
+import {Project} from '../../features/project/interface';
+import {Group} from '../../features/group/interface';
 import './modals.styles.less';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { zones } from '../settings/constants';
-import { updateTransactionVisible } from '../../features/transactions/actions';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {updateExpandedMyself} from '../../features/myself/actions';
+import {zones} from '../settings/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -44,8 +32,8 @@ zones.sort((a, b) => {
 const LocaleCurrency = require('locale-currency'); //currency code
 
 type TransactionProps = {
-  project: Project;
-  group: Group;
+  project: Project | undefined;
+  group: Group | undefined;
 };
 
 interface TransactionCreateFormProps {
@@ -78,16 +66,18 @@ const AddTransaction: React.FC<
     const time_value = values.time ? values.time.format('HH:mm') : undefined;
     const payerName = values.payerName ? values.payerName : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;
-    props.createTransaction(
-      props.project.id,
-      values.amount,
-      values.transactionName,
-      payerName,
-      date_value,
-      values.transactionType,
-      timezone,
-      time_value
-    );
+    if (props.project) {
+      props.createTransaction(
+          props.project.id,
+          values.amount,
+          values.transactionName,
+          payerName,
+          date_value,
+          values.transactionType,
+          timezone,
+          time_value
+      );
+    }
     props.updateTransactionVisible(false);
   };
   const onCancel = () => props.updateTransactionVisible(false);
@@ -99,6 +89,26 @@ const AddTransaction: React.FC<
     props.updateExpandedMyself(true);
   }, []);
 
+  const getSelections = () => {
+    if (!props.group || !props.group.users) {
+      return null;
+    }
+    return (
+        <Select
+            defaultValue={props.myself}
+            style={{marginLeft: '-8px'}}
+        >
+          {props.group.users.map((user) => {
+            return (
+                <Option value={user.name} key={user.name}>
+                  <Avatar size='small' src={user.avatar}/>
+                  &nbsp;&nbsp; <strong>{user.name}</strong>
+                </Option>
+            );
+          })}
+        </Select>
+    )
+  };
   return (
     <Tooltip placement='top' title='Create New Transaction'>
       <div className='add-transaction'>
@@ -142,21 +152,7 @@ const AddTransaction: React.FC<
               style={{ marginLeft: '10px' }}
               wrapperCol={{ span: 20 }}
             >
-              {!props.group.users ? null : (
-                <Select
-                  defaultValue={props.myself}
-                  style={{ marginLeft: '-8px' }}
-                >
-                  {props.group.users.map((user) => {
-                    return (
-                      <Option value={user.name} key={user.name}>
-                        <Avatar size='small' src={user.avatar} />
-                        &nbsp;&nbsp; <strong>{user.name}</strong>
-                      </Option>
-                    );
-                  })}
-                </Select>
-              )}
+              {getSelections()}
             </Form.Item>
             <div style={{ display: 'flex' }}>
               <Form.Item

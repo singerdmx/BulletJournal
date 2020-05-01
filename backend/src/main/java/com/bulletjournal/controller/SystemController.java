@@ -8,11 +8,16 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.filters.rate.limiting.TokenBucket;
+import com.bulletjournal.filters.rate.limiting.TokenBucketType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
@@ -22,7 +27,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class SystemController {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
     public static final String UPDATES_ROUTE = "/api/system/updates";
     public static final String PUBLIC_ITEM_ROUTE_PREFIX = "/api/public/items/";
     public static final String PUBLIC_ITEM_ROUTE = PUBLIC_ITEM_ROUTE_PREFIX + "{itemId}";
@@ -53,6 +58,9 @@ public class SystemController {
 
     @Autowired
     private TaskController taskController;
+
+    @Autowired
+    private TokenBucket tokenBucket;
 
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
@@ -137,8 +145,11 @@ public class SystemController {
     }
 
     @GetMapping(PUBLIC_ITEM_ROUTE)
-    public <T extends ProjectItemModel> PublicProjectItem getPublicProjectItem(
+    public <T extends ProjectItemModel> ResponseEntity<?> getPublicProjectItem(
             @NotNull @PathVariable String itemId) {
+        if (this.tokenBucket.isLimitExceeded(TokenBucketType.PUBLIC_ITEM)) {
+            LOGGER.error("Get PublicProjectItem limit exceeded");
+        }
         String originalUser = MDC.get(UserClient.USER_NAME_KEY);
         String username = AuthorizationService.SUPER_USER;
         MDC.put(UserClient.USER_NAME_KEY, username);
@@ -189,7 +200,7 @@ public class SystemController {
         }
 
         contents.forEach(content -> content.setRevisions(new Revision[0])); // clear revisions
-        return new PublicProjectItem(contentType, contents, projectItem);
+        return ResponseEntity.ok().body(new PublicProjectItem(contentType, contents, projectItem));
     }
 
     private boolean isUUID(String itemId) {
