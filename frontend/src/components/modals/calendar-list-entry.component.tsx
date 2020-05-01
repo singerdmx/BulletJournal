@@ -71,14 +71,20 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     importEventsToProject,
   } = props;
   const [visible, setVisible] = useState(false);
+  const [isSync, setIsSync] = useState(false);
   const history = useHistory();
   const [form] = Form.useForm();
   const [projectId, setProjectId] = useState(-1);
 
   useEffect(() => {
     if (projects && projects[0]) setProjectId(projects[0].id);
+    else if (isSync && watchedProject) setProjectId(watchedProject.id);
     else setProjectId(-1);
   }, [projects]);
+
+  useEffect(() => {
+    if (watchedProject) setIsSync(true);
+  });
 
   const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
@@ -146,6 +152,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
               console.log(value);
               setProjectId(value);
             }}
+            disabled={isSync}
           >
             {projects.map((project) => {
               return (
@@ -173,14 +180,29 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     return (
       <div>
         <div>{watchedProject ? watchedProject!.name : 'not synced'}</div>
-        <div>
-          <Button onClick={(e) => handleWatchCalendar(e)}>Keep in sync</Button>
-        </div>
-        <div>
-          <Button onClick={(e) => handleUnwatchCalendar(e)}>
-            Stop syncing
-          </Button>
-        </div>
+        {!isSync ? (
+          <div>
+            <Button
+              onClick={(e) => {
+                handleWatchCalendar(e);
+                setIsSync(true);
+              }}
+            >
+              Keep in sync
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <Button
+              onClick={(e) => {
+                handleUnwatchCalendar(e);
+                setIsSync(false);
+              }}
+            >
+              Stop syncing
+            </Button>
+          </div>
+        )}
       </div>
     );
   };
