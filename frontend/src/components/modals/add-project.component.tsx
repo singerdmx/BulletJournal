@@ -5,7 +5,7 @@ import {
   CarryOutOutlined,
   FileTextOutlined,
   FolderAddOutlined,
-  PlusOutlined
+  PlusOutlined,
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interface';
@@ -40,7 +40,7 @@ type GroupProps = {
   updateGroups: () => void;
 };
 
-const AddProject: React.FC<GroupProps & ProjectProps> = props => {
+const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [groupId, setGroupId] = useState<number>(-1);
@@ -48,7 +48,6 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
   const [visible, setVisible] = useState(false);
 
   const [form] = Form.useForm();
-
   const onCancel = () => {
     setVisible(false);
     form.resetFields();
@@ -58,8 +57,10 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
   };
 
   useEffect(() => {
-    props.updateGroups();
-  }, []);
+    if (visible) {
+      props.updateGroups();
+    }
+  }, [visible]);
 
   const addProject = (history: History<History.PoorMansUnknown>) => {
     let type: ProjectType = toProjectType(projectType);
@@ -101,12 +102,12 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
         onOk={() => {
           form
             .validateFields()
-            .then(values => {
+            .then((values) => {
               console.log(values);
               form.resetFields();
               addProject(history);
             })
-            .catch(info => console.log(info));
+            .catch((info) => console.log(info));
         }}
       >
         <Form form={form}>
@@ -119,7 +120,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
               <Select
                 placeholder="Choose Type"
                 value={projectType ? projectType : undefined}
-                onChange={e => onChangeProjectType(e)}
+                onChange={(e) => onChangeProjectType(e)}
               >
                 <Option value="TODO" title="Project Type: TODO">
                   <CarryOutOutlined />
@@ -143,7 +144,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
               <Input
                 placeholder="Enter BuJo Name"
                 value={name}
-                onChange={e => onChangeName(e.target.value)}
+                onChange={(e) => onChangeName(e.target.value)}
               />
             </Form.Item>
             <Form.Item name="projectDesp">
@@ -151,19 +152,22 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
                 placeholder="Enter Description"
                 autoSize
                 value={description}
-                onChange={e => onChangeDescription(e.target.value)}
+                onChange={(e) => onChangeDescription(e.target.value)}
               />
             </Form.Item>
-            <Form.Item name="projectGroup" rules={[{ required: true, message: 'Missing Group' }]}>
+            <Form.Item
+              name="projectGroup"
+              rules={[{ required: true, message: 'Missing Group' }]}
+            >
               <Select
                 placeholder="Choose Group"
                 style={{ width: '100%' }}
                 value={groupId < 0 ? undefined : groupId}
-                onChange={e => onChangeGroupId(e)}
+                onChange={(e) => onChangeGroupId(e)}
               >
                 {groupsWithOwner.map(
                   (groupsOwner: GroupsWithOwner, index: number) => {
-                    return groupsOwner.groups.map(group => (
+                    return groupsOwner.groups.map((group) => (
                       <Option
                         key={`group${group.id}`}
                         value={group.id}
@@ -226,7 +230,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = props => {
 
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
-  project: state.project.project
+  project: state.project.project,
 });
 
 export default connect(mapStateToProps, { updateGroups, createProjectByName })(
