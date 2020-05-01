@@ -17,12 +17,11 @@ interface GroupPathProps extends RouteComponentProps<GroupPathParams> {
 }
 
 type GroupPageProps = {
-  group: Group;
+  group: Group | undefined;
   getGroup: (groupId: number) => void;
 };
 
 class GroupPage extends React.Component<GroupPageProps & GroupPathProps> {
-
   componentDidMount() {
     const groupId = this.props.match.params.groupId.substring(5);
     this.props.getGroup(parseInt(groupId));
@@ -37,6 +36,7 @@ class GroupPage extends React.Component<GroupPageProps & GroupPathProps> {
 
   render() {
     const { group } = this.props;
+    if (!group) return null;
     return (
       <div className='group-page'>
         <GroupCard group={group} />
@@ -47,7 +47,7 @@ class GroupPage extends React.Component<GroupPageProps & GroupPathProps> {
 
 const mapStateToProps = (state: IState) => ({
   group: state.group.group,
-  myself: state.myself
+  myself: state.myself,
 });
 
 export default connect(mapStateToProps, { getGroup, deleteGroup })(GroupPage);
