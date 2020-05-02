@@ -3,8 +3,10 @@ package com.bulletjournal.filters;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.config.SSOConfig;
+import com.bulletjournal.controller.GoogleCalendarController;
 import com.bulletjournal.controller.SystemController;
 import com.bulletjournal.controller.UserController;
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -20,10 +22,13 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.List;
 
 @Component
 @Order(0)
 public class AuthFilter implements Filter {
+    private static final List<String> BYPASS_WHITE_LIST_ROUTES = ImmutableList.of(
+            SystemController.PUBLIC_ITEM_ROUTE_PREFIX, GoogleCalendarController.CHANNEL_NOTIFICATIONS_ROUTE);
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilter.class);
 
     @Autowired
@@ -55,7 +60,7 @@ public class AuthFilter implements Filter {
         }
 
         if (username == null) {
-            if (request.getRequestURI().startsWith(SystemController.PUBLIC_ITEM_ROUTE_PREFIX)) {
+            if (shouldBypass(request.getRequestURI())) {
                 LOGGER.info("Bypassing AuthFilter");
             } else if (this.authConfig.isEnableDefaultUser()) {
                 username = this.authConfig.getDefaultUsername();
@@ -79,4 +84,12 @@ public class AuthFilter implements Filter {
         chain.doFilter(req, res);
     }
 
+    private boolean shouldBypass(String requestURI) {
+        for (String route : BYPASS_WHITE_LIST_ROUTES) {
+            if (requestURI.startsWith(route)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

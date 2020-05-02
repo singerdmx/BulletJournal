@@ -60,7 +60,7 @@ public class GoogleCalendarController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
     private static final String APPLICATION_NAME = "Bullet Journal";
     private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
-    protected static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
+    public static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
 
     @Autowired
     private GoogleCalConfig googleCalConfig;
