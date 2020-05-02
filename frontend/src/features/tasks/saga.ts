@@ -257,7 +257,8 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
   try {
     const { taskId, dateTime } = action.payload;
     const task = yield call(completeTaskById, taskId, dateTime);
-    const tasks = yield call(fetchTasks, task.projectId);
+    const data = yield call(fetchTasks, task.projectId);
+    const tasks = yield data.json();
     yield put(
       tasksActions.tasksReceived({
         tasks: tasks,
@@ -287,7 +288,8 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
   try {
     const { taskId } = action.payload;
     const task = yield call(uncompleteTaskById, taskId);
-    const tasks = yield call(fetchTasks, task.projectId);
+    const data = yield call(fetchTasks, task.projectId);
+    const tasks = yield data.json();
     yield put(
       tasksActions.tasksReceived({
         tasks: tasks,
