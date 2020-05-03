@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "google_calendar_projects",
+        indexes = {@Index(name = "calendar_channel_id_index", columnList = "channel_id")},
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"channel_id"})
         })
@@ -25,14 +26,18 @@ public class GoogleCalendarProject extends AuditModel {
     @Column(length = 5000)
     private String channel;
 
+    @Column(length = 300)
+    private String token;
+
     public GoogleCalendarProject() {
     }
 
-    public GoogleCalendarProject(String id, Project project, String channelId, String channel) {
+    public GoogleCalendarProject(String id, Project project, String channelId, String channel, String token) {
         this.id = id;
         this.project = project;
         this.channelId = channelId;
         this.channel = channel;
+        this.token = token;
     }
 
     public String getId() {
@@ -67,6 +72,14 @@ public class GoogleCalendarProject extends AuditModel {
         this.channel = channel;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "GoogleCalendarProject{" +
@@ -74,6 +87,7 @@ public class GoogleCalendarProject extends AuditModel {
                 ", project=" + project +
                 ", channelId='" + channelId + '\'' +
                 ", channel='" + channel + '\'' +
+                ", token='" + token + '\'' +
                 '}';
     }
 }

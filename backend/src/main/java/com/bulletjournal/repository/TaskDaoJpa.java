@@ -340,6 +340,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Task task = create(projectId, owner, createTaskParams);
         task.setGoogleCalendarEventId(iCalUID);
         task = this.taskRepository.save(task);
+        LOGGER.info("Created task ", task);
         addContent(task.getId(), owner, new TaskContent(text));
     }
 

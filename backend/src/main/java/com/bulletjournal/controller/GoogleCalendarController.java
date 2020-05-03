@@ -24,10 +24,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.CalendarList;
-import com.google.api.services.calendar.model.CalendarListEntry;
-import com.google.api.services.calendar.model.Channel;
-import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.*;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -60,6 +57,7 @@ public class GoogleCalendarController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
     private static final String APPLICATION_NAME = "Bullet Journal";
     private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
+    private static final String GOOLGE_CHANNEL_ID_HEADER = "x-goog-channel-id";
     public static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
 
     @Autowired
@@ -170,12 +168,16 @@ public class GoogleCalendarController {
             @Valid @RequestBody @NotNull CreateGoogleCalendarEventsParams createGoogleCalendarEventsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         createGoogleCalendarEventsParams.getEvents().forEach((e -> {
-            List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
-                    .map(s -> "<p>" + s + "</p>").collect(Collectors.toList());
-
-            taskDaoJpa.create(createGoogleCalendarEventsParams.getProjectId(), username,
-                    Converter.toCreateTaskParams(e), e.getiCalUID(), StringUtils.join(l, ""));
+            createTaskFromEvent(createGoogleCalendarEventsParams.getProjectId(), username, e);
         }));
+    }
+
+    private void createTaskFromEvent(Long projectId, String username, GoogleCalendarEvent e) {
+        List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
+                .map(s -> "<p>" + s + "</p>").collect(Collectors.toList());
+
+        taskDaoJpa.create(projectId, username,
+                Converter.toCreateTaskParams(e), e.getiCalUID(), StringUtils.join(l, ""));
     }
 
     @GetMapping("/api/calendar/google/calendarList")
@@ -216,9 +218,11 @@ public class GoogleCalendarController {
         } else {
             createdChannel = channel;
         }
+
         LOGGER.info("Created channel {}", createdChannel);
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
-                calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toString(createdChannel), username);
+                calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toString(createdChannel),
+                getSyncToken(calendarId), username);
         LOGGER.info("Created GoogleCalendarProject {}", googleCalendarProject);
         return googleCalendarProject.getProject().toPresentationModel();
     }
@@ -234,10 +238,12 @@ public class GoogleCalendarController {
     }
 
     @PostMapping(CHANNEL_NOTIFICATIONS_ROUTE)
-    public void getChannelNotifications(@RequestHeader Map<String, String> headers) {
-        headers.forEach((key, value) -> {
-            LOGGER.info("Header {} = {}", key, value);
-        });
+    public void getChannelNotifications(@RequestHeader Map<String, String> headers) throws IOException {
+        String channelId = headers.get(GOOLGE_CHANNEL_ID_HEADER);
+        String token = this.googleCalendarProjectDaoJpa.getByChannelId(channelId).getToken();
+        String calendarId = this.googleCalendarProjectDaoJpa.getByChannelId(channelId).getId();
+        LOGGER.info("Notification for channelId {} token {} calendarId {}", channelId, token, calendarId);
+        incrementSync(calendarId, token);
     }
 
     @GetMapping("/api/calendar/google/calendars/{calendarId}/watchedProject")
@@ -262,6 +268,37 @@ public class GoogleCalendarController {
         }
         this.googleCalendarProjectDaoJpa.delete(calendarId);
         return googleCalendarProject.getProject().toPresentationModel();
+    }
+
+
+    private String getSyncToken(String calendarId) throws IOException {
+        Calendar service = getCalendarService();
+        Calendar.Events.List request = service.events().list(calendarId);
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.YEAR, -1);
+        request.setTimeMin(new DateTime(cal.getTime(), TimeZone.getTimeZone("UTC")));
+        Events result = request.execute();
+        String syncToken = result.getNextSyncToken();
+        return syncToken;
+    }
+
+    private void incrementSync(String calendarId, String token) throws IOException {
+        Calendar service = getCalendarService();
+        String timezone = service.calendarList().get(calendarId).execute().getTimeZone();
+        Calendar.Events.List request = service.events().list(calendarId);
+        request.setSyncToken(token);
+        Events result = request.execute();
+        String syncToken = result.getNextSyncToken();
+        GoogleCalendarProject googleCalendarProject =
+                this.googleCalendarProjectDaoJpa.setTokenByCalendarId(calendarId, syncToken);
+        List<Event> events = result.getItems();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        LOGGER.info("New events: {}", events);
+        events.stream()
+                .forEach(e -> {
+                    GoogleCalendarEvent event = Converter.toTask(e, timezone);
+                    createTaskFromEvent(googleCalendarProject.getProject().getId(), username, event);
+                });
     }
 
     private Calendar getCalendarService() throws IOException {
