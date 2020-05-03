@@ -97,3 +97,6 @@ docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "DROP SCHEMA pu
 docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "CREATE SCHEMA public;"
 docker exec $(sudo docker ps -aqf "name=db") sh -c "gunzip -c /var/db_backup/ReplaceWithBackupFileName | psql  --dbname=postgresql://postgres:docker@localhost:5432/postgres"
 ```
+
+
+## Database Migration (FlywayDB Migrate)
