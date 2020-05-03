@@ -83,13 +83,22 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   const history = useHistory();
   const [form] = Form.useForm();
   const [projectId, setProjectId] = useState(-1);
+  const [importProjectId, setImportProjectId] = useState(-1);
   const [events, setEvents] = useState([] as string[]);
 
   useEffect(() => {
     if (projects && projects[0]) setProjectId(projects[0].id);
-    else if (isSync && watchedProject) setProjectId(watchedProject.id);
     else setProjectId(-1);
   }, [projects]);
+
+  useEffect(() => {
+    if (projects && projects[0]) setImportProjectId(projects[0].id);
+    else setImportProjectId(-1);
+  }, [projects]);
+
+  useEffect(() => {
+    if (watchedProject) setProjectId(watchedProject.id);
+  }, [watchedProject]);
 
   useEffect(() => {
     let events: string[] = [];
@@ -231,6 +240,11 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     importEventsToProject(eventList, projectId);
     googleCalendarEventListReceived([] as GoogleCalendarEvent[]);
     setVisible(false);
+    history.push(`/projects/${projectId}`);
+  };
+
+  const handleOnclick = (e: any) => {
+    history.push(`/projects/${watchedProject?.id}`);
   };
 
   return (
@@ -269,7 +283,10 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                     <div>
                       <b>
                         Synced with
-                        <span>
+                        <span
+                          onClick={handleOnclick}
+                          style={{ cursor: 'pointer', color: '#2593FC' }}
+                        >
                           &nbsp;&nbsp;
                           {iconMapper[watchedProject.projectType]}
                           &nbsp; <strong>{watchedProject!.name}</strong>
@@ -307,7 +324,40 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                     </div>
                   </div>
                   <div className='pull-tab-selections'>
-                    {getProjectSelections()}
+                    {projects && projects[0] && (
+                      <Tooltip title='Choose BuJo' placement='topLeft'>
+                        <Select
+                          style={{ width: '85%' }}
+                          placeholder='Choose BuJo'
+                          value={importProjectId}
+                          onChange={(value: any) => {
+                            setImportProjectId(value);
+                          }}
+                        >
+                          {projects.map((project) => {
+                            return (
+                              <Option value={project.id} key={project.id}>
+                                <Tooltip
+                                  title={project.owner}
+                                  placement='right'
+                                >
+                                  <span>
+                                    <Avatar
+                                      size='small'
+                                      src={project.ownerAvatar}
+                                    />
+                                    &nbsp; {iconMapper[project.projectType]}
+                                    &nbsp; <strong>{project.name}</strong>
+                                    &nbsp; (Group{' '}
+                                    <strong>{project.group.name}</strong>)
+                                  </span>
+                                </Tooltip>
+                              </Option>
+                            );
+                          })}
+                        </Select>
+                      </Tooltip>
+                    )}
                     <div className='pull-tab-selections-confirm'>
                       {events.length > 0 ? (
                         <Button
@@ -317,7 +367,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                               .validateFields()
                               .then((values) => {
                                 console.log(values);
-                                importTask(events, projectId);
+                                importTask(events, importProjectId);
                               })
                               .catch((info) => console.log(info));
                           }}
