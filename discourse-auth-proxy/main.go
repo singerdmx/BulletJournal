@@ -165,6 +165,46 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 	}
 
 	if err == nil {
+		if strings.Contains(strings.ToLower(r.Header.Get("User-Agent")), "mobile") {
+			fmt.Fprintf(w, `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .login-success {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .login-success .login-title {
+        padding: 5px 15px;
+        border-radius: 15px;
+        background: #9fe481;
+        color: white;
+        font-family: 'Courier New', Courier, monospace;
+      }
+      .login-success span {
+        margin-top: 15px;
+        color: rgba(0, 0, 0, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-success">
+      <div class="login-title">
+        <h3>Login Sucess</h3>
+      </div>
+      <span>Close window</span>
+    </div>
+  </body>
+</html>`)
+			return
+		}
 		logger.Printf("%s %s, %s", r.Header.Get("request-id"), username, r.RequestURI)
 		r.Header.Set(config.UsernameHeader, username)
 		r.Header.Set(config.GroupsHeader, groups)
