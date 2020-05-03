@@ -100,3 +100,21 @@ docker exec $(sudo docker ps -aqf "name=db") sh -c "gunzip -c /var/db_backup/Rep
 
 
 ## Database Migration (FlywayDB Migrate)
+
+Migration script are just sql files with prefix name "V1, V2, V3 ...", location is "//BulletJournal/backend/src/main/resources/db/migration".
+
+1. Install flyway cli first: [doc link](https://flywaydb.org/getstarted/firststeps/commandline);
+
+2. If it's the first time to set up flyway, run following command to initialize, note that this will clear all tables and schema in db:
+   ```bash
+    flyway -url=jdbc:postgresql://localhost:5432/postgres -user=postgres -password=docker -locations=filesystem:{path to migration folder} clean
+   ```
+   After this step, **Do not** manually do anything like `DROP SCHEMA public CASCADE;` in psql cli.
+
+3. Start backend app normally.
+
+* ### Trouble Shooting:
+  1. Use following command to check migration status:
+     ```bash
+      flyway -url=jdbc:postgresql://localhost:5432/postgres -user=postgres -password=docker -locations=filesystem:{path to migration folder} info
+     ```

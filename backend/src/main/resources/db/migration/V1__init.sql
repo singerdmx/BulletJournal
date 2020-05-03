@@ -12,51 +12,19 @@ SET standard_conforming_strings = on;
 --
 
 -- CREATE ROLE postgres;
--- CREATE ROLE postgres;
 ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS PASSWORD 'md543225d7c19e7b7bd74e416fe9566a7f9';
 
-
--- Create schema
 CREATE SCHEMA IF NOT EXISTS public;
-
 
 --
 -- Databases
---
 
---
--- Database "template1" dump
---
-
--- \connect template1
-
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 12.2 (Debian 12.2-2.pgdg100+1)
--- Dumped by pg_dump version 12.2 (Debian 12.2-2.pgdg100+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- PostgreSQL database dump complete
---
 
 --
 -- Database "postgres" dump
 --
 
--- \connect postgres
+-- connect postgres
 
 --
 -- PostgreSQL database dump
@@ -75,6 +43,44 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: calendar_token_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.calendar_token_sequence
+    START WITH 100
+    INCREMENT BY 50
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.calendar_token_sequence OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: calendar_tokens; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.calendar_tokens (
+    id bigint NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    apple character varying(255),
+    apple_token_expiration_time timestamp without time zone,
+    google character varying(255),
+    google_token_expiration_time timestamp without time zone,
+    microsoft character varying(255),
+    microsoft_token_expiration_time timestamp without time zone,
+    owner character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.calendar_tokens OWNER TO postgres;
 
 --
 -- Name: completed_task_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -90,10 +96,6 @@ CREATE SEQUENCE public.completed_task_sequence
 
 ALTER TABLE public.completed_task_sequence OWNER TO postgres;
 
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
 --
 -- Name: completed_tasks; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -105,7 +107,7 @@ CREATE TABLE public.completed_tasks (
     name character varying(100) NOT NULL,
     owner character varying(100) NOT NULL,
     labels bigint[],
-    assigned_to character varying(1000000),
+    assignees text[],
     due_date character varying(15),
     due_time character varying(10),
     duration integer,
@@ -453,7 +455,7 @@ CREATE TABLE public.tasks (
     name character varying(100) NOT NULL,
     owner character varying(100) NOT NULL,
     labels bigint[],
-    assigned_to character varying(1000000),
+    assignees text[],
     due_date character varying(15),
     due_time character varying(10),
     duration integer,
