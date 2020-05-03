@@ -275,7 +275,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		// we have a valid auth
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 
-		cookieData := url.QueryEscape(username[0]) + "," + url.QueryEscape(strings.Join(groupsArray, "|"))
+		cookieData := url.QueryEscape(username[0]) + "##" + url.QueryEscape(strings.Join(groupsArray, "|"))
 		cookie := http.Cookie{Name: "__discourse_proxy", Value: signCookie(cookieData, config.CookieSecret), Expires: expiration, HttpOnly: true, Path: "/"}
 		http.SetCookie(w, &cookie)
 
@@ -312,14 +312,14 @@ func sameHost(handler http.Handler) http.Handler {
 }
 
 func signCookie(data, secret string) string {
-	return data + "," + computeHMAC(data, secret)
+	return data + "##" + computeHMAC(data, secret)
 }
 
 func parseCookie(data, secret string) (username string, groups string, err error) {
 	err = nil
 	username = ""
 	groups = ""
-	split := strings.Split(data, ",")
+	split := strings.Split(data, "##")
 
 	if len(split) < 2 {
 		err = fmt.Errorf("Expecting a semi column in cookie")
@@ -327,7 +327,7 @@ func parseCookie(data, secret string) (username string, groups string, err error
 	}
 
 	signature := split[len(split)-1]
-	parsed := strings.Join(split[:len(split)-1], ",")
+	parsed := strings.Join(split[:len(split)-1], "##")
 	expected := computeHMAC(parsed, secret)
 
 	if expected != signature {
