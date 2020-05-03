@@ -83,12 +83,21 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   const history = useHistory();
   const [form] = Form.useForm();
   const [projectId, setProjectId] = useState(-1);
+  const [events, setEvents] = useState([] as string[]);
 
   useEffect(() => {
     if (projects && projects[0]) setProjectId(projects[0].id);
     else if (isSync && watchedProject) setProjectId(watchedProject.id);
     else setProjectId(-1);
   }, [projects]);
+
+  useEffect(() => {
+    let events: string[] = [];
+    eventList.forEach((event) => {
+      events.push(event.iCalUID);
+    });
+    setEvents(events);
+  }, [eventList]);
 
   useEffect(() => {
     if (watchedProject) setIsSync(true);
@@ -104,12 +113,6 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
     googleCalendarEventListReceived([] as GoogleCalendarEvent[]);
-    form.setFields([
-      {
-        name: 'eventList',
-        value: [] as GoogleCalendarEvent[],
-      },
-    ]);
     setVisible(false);
   };
 
@@ -146,14 +149,6 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
           endDate
         );
       })
-      .then(() => {
-        form.setFields([
-          {
-            name: 'eventList',
-            value: props.eventList.map((event) => event.iCalUID),
-          },
-        ]);
-      })
       .catch((info) => console.log(info));
   };
 
@@ -166,7 +161,6 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
             placeholder='Choose BuJo'
             value={projectId}
             onChange={(value: any) => {
-              console.log(value);
               setProjectId(value);
             }}
             disabled={isSync}
@@ -222,32 +216,20 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   };
 
   const selectAll = () => {
-    form.setFields([
-      {
-        name: 'eventList',
-        value: props.eventList.map((event) => event.iCalUID),
-      },
-    ]);
+    let events: string[] = [];
+    props.eventList.forEach((event) => {
+      events.push(event.iCalUID);
+    });
+    setEvents(events);
   };
+
   const clearAll = () => {
-    form.setFields([
-      {
-        name: 'eventList',
-        value: [],
-      },
-    ]);
+    setEvents([]);
   };
 
   const importTask = (eventList: string[], projectId: number) => {
     importEventsToProject(eventList, projectId);
-
     googleCalendarEventListReceived([] as GoogleCalendarEvent[]);
-    form.setFields([
-      {
-        name: 'eventList',
-        value: [] as GoogleCalendarEvent[],
-      },
-    ]);
     setVisible(false);
   };
 
@@ -327,20 +309,22 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                   <div className='pull-tab-selections'>
                     {getProjectSelections()}
                     <div className='pull-tab-selections-confirm'>
-                      <Button
-                        type='primary'
-                        onClick={() => {
-                          form
-                            .validateFields()
-                            .then((values) => {
-                              console.log(values);
-                              importTask(values.eventList, projectId);
-                            })
-                            .catch((info) => console.log(info));
-                        }}
-                      >
-                        Import
-                      </Button>
+                      {events.length > 0 ? (
+                        <Button
+                          type='primary'
+                          onClick={() => {
+                            form
+                              .validateFields()
+                              .then((values) => {
+                                console.log(values);
+                                importTask(events, projectId);
+                              })
+                              .catch((info) => console.log(info));
+                          }}
+                        >
+                          Import
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                   <div className='pull-tab-date'>
@@ -372,67 +356,64 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                     </div>
                   </div>
                   <div className='pull-tab-eventList'>
-                    <Form.Item
-                      name='eventList'
-                      label={
-                        <span>
-                          Event
-                          <Tooltip title='Select All'>
-                            <CheckSquareTwoTone
-                              onClick={selectAll}
-                              style={{ cursor: 'pointer' }}
-                            />
-                          </Tooltip>
-                          <Tooltip title='Clear All'>
-                            <CloseSquareTwoTone
-                              onClick={clearAll}
-                              style={{ cursor: 'pointer' }}
-                            />
-                          </Tooltip>
-                        </span>
-                      }
+                    <span>
+                      Event
+                      <Tooltip title='Select All'>
+                        <CheckSquareTwoTone
+                          onClick={selectAll}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </Tooltip>
+                      <Tooltip title='Clear All'>
+                        <CloseSquareTwoTone
+                          onClick={clearAll}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </Tooltip>
+                    </span>
+                    <Select
+                      mode='multiple'
+                      style={{ width: '100%' }}
+                      value={events}
+                      onChange={(e: any) => {
+                        setEvents(e);
+                      }}
                     >
-                      <Select
-                        mode='multiple'
-                        style={{ width: '100%' }}
-                        allowClear={true}
-                      >
-                        {eventList &&
-                          eventList.map((event, index) => {
-                            return (
-                              <Option value={event.iCalUID} key={index}>
-                                <div>
-                                  <div className='name-container'>
-                                    <div className='reminder'>
-                                      <Tooltip
-                                        title={getReminderSettingString(
-                                          event.task.reminderSetting
-                                        )}
-                                      >
-                                        <AlertOutlined />
-                                      </Tooltip>
-                                    </div>
-                                    <div className='name'>
-                                      <Tooltip
-                                        title={
-                                          event.content && event.content.text
-                                        }
-                                      >
-                                        <div>{event.task.name}</div>
-                                      </Tooltip>
-                                    </div>
+                      {eventList &&
+                        eventList.map((event, index) => {
+                          return (
+                            <Option value={event.iCalUID} key={index}>
+                              <div>
+                                <div className='name-container'>
+                                  <div className='reminder'>
+                                    <Tooltip
+                                      title={getReminderSettingString(
+                                        event.task.reminderSetting
+                                      )}
+                                    >
+                                      <AlertOutlined />
+                                    </Tooltip>
                                   </div>
-                                  <div className='time-container'>
-                                    <div className='due-time'>
-                                      {getDueDateTime(event.task)}
-                                    </div>
+                                  <div className='name'>
+                                    <Tooltip
+                                      title={
+                                        event.content && event.content.text
+                                      }
+                                    >
+                                      <div>{event.task.name}</div>
+                                    </Tooltip>
                                   </div>
                                 </div>
-                              </Option>
-                            );
-                          })}
-                      </Select>
-                    </Form.Item>
+                                <div className='time-container'>
+                                  <div className='due-time'>
+                                    {getDueDateTime(event.task)}
+                                  </div>
+                                </div>
+                              </div>
+                            </Option>
+                          );
+                        })}
+                    </Select>
                   </div>
                 </div>
               </Form>
