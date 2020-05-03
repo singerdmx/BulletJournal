@@ -70,18 +70,18 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
       >
         <div>
           <Tabs
-            defaultActiveKey="Group"
+            defaultActiveKey='Group'
             tabPosition={'left'}
-            type="card"
+            type='card'
             onTabClick={(k: string, e: MouseEvent) => handleTabClick(k, e)}
           >
             <TabPane
               tab={
-                <Tooltip title="Group">
-                  <TeamOutlined className="large-icon" />
+                <Tooltip title='Group'>
+                  <TeamOutlined className='large-icon' />
                 </Tooltip>
               }
-              key="Group"
+              key='Group'
             >
               <ShareProjectItemWithGroup
                 type={props.type}
@@ -90,11 +90,11 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
             </TabPane>
             <TabPane
               tab={
-                <Tooltip title="User">
-                  <UserSwitchOutlined className="large-icon" />
+                <Tooltip title='User'>
+                  <UserSwitchOutlined className='large-icon' />
                 </Tooltip>
               }
-              key="User"
+              key='User'
             >
               <ShareProjectItemWithUser
                 type={props.type}
@@ -103,11 +103,11 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
             </TabPane>
             <TabPane
               tab={
-                <Tooltip title="Link">
-                  <LinkOutlined className="large-icon" />
+                <Tooltip title='Link'>
+                  <LinkOutlined className='large-icon' />
                 </Tooltip>
               }
-              key="Link"
+              key='Link'
             >
               <ShareProjectItemGenerateLink
                 type={props.type}
@@ -116,11 +116,11 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
             </TabPane>
             <TabPane
               tab={
-                <Tooltip title="Manage">
-                  <ToolOutlined className="large-icon" />
+                <Tooltip title='Manage'>
+                  <ToolOutlined className='large-icon' />
                 </Tooltip>
               }
-              key="Manage"
+              key='Manage'
             >
               <ShareProjectItemManagement
                 type={props.type}
@@ -136,7 +136,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
   const getDiv = () => {
     if (mode === 'div') {
       return (
-        <div onClick={openModal} className="popover-control-item">
+        <div onClick={openModal} className='popover-control-item'>
           <span>Share</span>
           <ShareAltOutlined />
           {getModal()}
