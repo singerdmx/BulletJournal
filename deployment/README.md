@@ -118,3 +118,5 @@ Migration script are just sql files with prefix name "V1, V2, V3 ...", location 
      ```bash
       flyway -url=jdbc:postgresql://localhost:5432/postgres -user=postgres -password=docker -locations=filesystem:{path to migration folder} info
      ```
+  2. Fail to start because error when executing "data.sql"
+     This is because the seed data in "data.sql" were already there when you start backend. Solution is before starting DB, run above "clean" command first to reset db or manually delete all data in each table.
