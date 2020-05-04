@@ -1035,7 +1035,7 @@ public class ProjectControllerTest {
         List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
         assertTrue(!notifications.isEmpty());
         // reject invitations to join group
-        for (int i = 1; i < notifications.size() - 1; i++) {
+        for (int i = notifications.size() - 5; i > 0; i--) {
             Notification notification = notifications.get(i);
             AnswerNotificationParams answerNotificationParams =
                     new AnswerNotificationParams(Action.DECLINE.getDescription());
@@ -1242,10 +1242,10 @@ public class ProjectControllerTest {
                 null,
                 Notification[].class);
         assertEquals(HttpStatus.OK, notificationsResponse.getStatusCode());
-        // assertNotEquals(notificationsEtag, notificationsResponse.getHeaders().getETag());
+        assertNotEquals(notificationsEtag, notificationsResponse.getHeaders().getETag());
 
-//        List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
-//        assertEquals(1, notifications.size());
+        List<Notification> notifications = Arrays.asList(notificationsResponse.getBody());
+        assertEquals(5, notifications.size());
     }
 
     private List<GroupsWithOwner> getGroups() {
@@ -1272,7 +1272,6 @@ public class ProjectControllerTest {
 
     private List<GroupsWithOwner> createGroups(String owner) {
         List<GroupsWithOwner> groups = getGroups();
-        assertEquals(10, groups.size());
         Group g = groups.get(0).getGroups().get(0);
         assertEquals(expectedOwner, g.getOwner());
         assertEquals(6, g.getUsers().size());
