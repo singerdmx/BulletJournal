@@ -31,7 +31,9 @@ export type PatchLabelAction = {
   icon?: string;
 };
 
-export type UpdateLabels = {};
+export type UpdateLabels = {
+  projectId?: number;
+};
 
 export type SelectedLabelAction = {
   label: Label;

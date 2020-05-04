@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Label, stringToRGB } from '../../features/label/interface';
 import {
-  labelsUpdate,
   deleteLabel,
   patchLabel,
   createLabel,
@@ -274,7 +273,6 @@ const Labels: React.FC<LabelsProps> = (props) => {
 };
 
 export default connect(null, {
-  labelsUpdate,
   deleteLabel,
   createLabel,
   patchLabel,

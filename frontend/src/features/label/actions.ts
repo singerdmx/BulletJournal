@@ -7,7 +7,7 @@ export const deleteLabel = (labelId: number, value: string) =>
   actions.deleteLabel({ labelId: labelId, value: value });
 export const patchLabel = (labelId: number, value?: string, icon?: string) =>
   actions.patchLabel({ labelId: labelId, value: value, icon: icon });
-export const labelsUpdate = () => actions.labelsUpdate({});
+export const labelsUpdate = (projectId: number | undefined) => actions.labelsUpdate({projectId: projectId});
 export const addSelectedLabel = (label: Label) =>
   actions.addSelectedLabel({ label: label });
 export const removeSelectedLabel = (label: Label) =>

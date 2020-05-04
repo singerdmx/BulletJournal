@@ -12,7 +12,7 @@ type LabelsPageProps = {
   labels: Label[];
   labelOptions: Label[];
   defaultLabels: Label[];
-  labelsUpdate: () => void;
+  labelsUpdate: (projectId: number | undefined) => void;
 };
 
 const LabelsPage: React.FC<LabelsPageProps> = props => {
@@ -28,7 +28,7 @@ const LabelsPage: React.FC<LabelsPageProps> = props => {
   };
 
   useEffect(() => {
-    props.labelsUpdate();
+    props.labelsUpdate(undefined);
   }, []);
 
   useEffect(() => {

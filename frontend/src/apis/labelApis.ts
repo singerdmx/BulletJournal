@@ -1,11 +1,15 @@
-import { doFetch, doPost, doDelete, doPatch } from './api-helper';
+import {doDelete, doFetch, doPatch, doPost} from './api-helper';
 
-export const fetchLabels = () => {
-  return doFetch('/api/labels')
-    .then(res => res)
-    .catch(err => {
-      throw Error(err.message);
-    });
+export const fetchLabels = (projectId: number | undefined) => {
+    let endpoint = '/api/labels';
+    if (projectId) {
+        endpoint += `?projectId=${projectId}`;
+    }
+    return doFetch(endpoint)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err.message);
+        });
 };
 
 export const addLabel = (value: string, icon: string) => {

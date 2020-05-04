@@ -19,10 +19,12 @@ import {
 } from 'react-beautiful-dnd';
 import { IState } from '../../store';
 import { ProjectItem } from '../../features/myBuJo/interface';
+import {Project} from "../../features/project/interface";
 
 type DraggableLabelsProps = {
   mode: ProjectType;
   labels: Label[];
+  project: Project | undefined;
   editable: boolean;
   labelOptions: Label[];
   itemId: number;
@@ -30,7 +32,7 @@ type DraggableLabelsProps = {
   setNoteLabels: (noteId: number, labels: number[]) => void;
   setTaskLabels: (taskId: number, labels: number[]) => void;
   setTransactionLabels: (transactionId: number, labels: number[]) => void;
-  labelsUpdate: () => void;
+  labelsUpdate: (projectId: number | undefined) => void;
 };
 
 export const getIcon = (icon: string) => {
@@ -51,7 +53,6 @@ export const getItemIcon = (
 };
 
 const reorder = (list: number[], startIndex: number, endIndex: number) => {
-  console.log(list, startIndex, endIndex);
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -62,6 +63,7 @@ const reorder = (list: number[], startIndex: number, endIndex: number) => {
 const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   mode,
   labels,
+  project,
   editable,
   itemId,
   addSelectedLabel,
@@ -86,7 +88,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   const shareFunction = shareProjectLabelUpdate[mode];
 
   useEffect(() => {
-    labelsUpdate();
+    labelsUpdate(project ? project.id : undefined);
   }, []);
 
   useEffect(() => {
@@ -226,6 +228,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
 
 const mapStateToProps = (state: IState) => ({
   labelOptions: state.label.labelOptions,
+  project: state.project.project
 });
 
 export default connect(mapStateToProps, {

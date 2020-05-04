@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,8 +70,12 @@ public class LabelController {
                 .stream().map(label -> label.toPresentationModel())
                 .collect(Collectors.toList());
         if (projectId != null) {
-            labels.addAll(this.systemDaoJpa.getProjectItems(projectId, username));
+            List<Label> labelsForProject = this.systemDaoJpa.getProjectItems(projectId, username);
+            if (labelsForProject != null) {
+                labels.addAll(labelsForProject);
+            }
         }
+        labels = new ArrayList<>(new HashSet<>(labels));
         String labelsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE,
                 labels);

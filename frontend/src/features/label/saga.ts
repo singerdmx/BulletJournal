@@ -21,11 +21,10 @@ function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
 
 function* labelsUpdate(action: PayloadAction<UpdateLabels>) {
   try {
-    //get etag from header
-    const data = yield call(fetchLabels);
+    const {projectId} = action.payload;
+    const data = yield call(fetchLabels, projectId);
     const etag = data.headers.get('Etag')!;
     const labels = yield data.json();
-    console.log(labels);
 
     yield put(labelActions.labelsReceived({ labels: labels, etag: etag }));
   } catch (error) {
