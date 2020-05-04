@@ -223,6 +223,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         if (!Objects.equals(projectItem.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
+        this.authorizationService.validateRequesterInProjectGroup(requester, project);
         this.authorizationService.checkAuthorizedToOperateOnContent(projectItem.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.UPDATE, targetProject, project.getOwner());
         projectItem.setProject(project);

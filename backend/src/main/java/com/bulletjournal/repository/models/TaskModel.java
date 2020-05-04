@@ -286,4 +286,22 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getRecurrenceRule());
     }
 
+    @Override
+    public String toString() {
+        return "TaskModel{" +
+                "dueDate='" + dueDate + '\'' +
+                ", dueTime='" + dueTime + '\'' +
+                ", timezone='" + timezone + '\'' +
+                ", duration=" + duration +
+                ", reminderDate='" + reminderDate + '\'' +
+                ", reminderTime='" + reminderTime + '\'' +
+                ", reminderBeforeTask=" + reminderBeforeTask +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", reminderDateTime=" + reminderDateTime +
+                ", recurrenceRule='" + recurrenceRule + '\'' +
+                ", googleCalendarEventId='" + googleCalendarEventId + '\'' +
+                ", assignees=" + Arrays.toString(assignees) +
+                '}';
+    }
 }

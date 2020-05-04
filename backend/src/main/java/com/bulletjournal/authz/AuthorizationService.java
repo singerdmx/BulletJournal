@@ -6,6 +6,8 @@ import com.bulletjournal.repository.SharedProjectItemDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.google.common.collect.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class AuthorizationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationService.class);
 
     public static String SUPER_USER = UUID.randomUUID().toString();
 
@@ -122,7 +126,7 @@ public class AuthorizationService {
             case DELETE:
             case UPDATE:
                 if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
-                    throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
+                    LOGGER.info("Project Item " + contentId + " is owner by " +
                             owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
                 }
                 break;

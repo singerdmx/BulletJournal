@@ -194,6 +194,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
 
+        this.authorizationService.validateRequesterInProjectGroup(requester, project);
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.UPDATE, project.getId(), project.getOwner());
 

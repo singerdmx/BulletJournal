@@ -340,7 +340,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Task task = create(projectId, owner, createTaskParams);
         task.setGoogleCalendarEventId(iCalUID);
         task = this.taskRepository.save(task);
-        LOGGER.info("Created task ", task);
+        LOGGER.info("Created task {}", task);
         addContent(task.getId(), owner, new TaskContent(text));
     }
 
@@ -693,13 +693,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public Long uncomplete(String requester, Long taskId) {
         CompletedTask task = this.completedTaskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
-        Long projectId = task.getProject().getId();
+        Project project = task.getProject();
+        this.authorizationService.validateRequesterInProjectGroup(requester, project);
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
                 requester, ContentType.TASK,
-                Operation.UPDATE, projectId, task.getProject().getOwner());
+                Operation.UPDATE, project.getId(), task.getProject().getOwner());
         List<TaskContent> contents = getCompletedTaskContents(taskId, requester);
         this.completedTaskRepository.delete(task);
-        Long newId = create(projectId, task.getOwner(), getCreateTaskParams(task)).getId();
+        Long newId = create(project.getId(), task.getOwner(), getCreateTaskParams(task)).getId();
         Collections.reverse(contents);
         // we order contents by getUpdatedAt in descending order
         for (TaskContent content : contents) {
@@ -736,6 +737,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
 
+        this.authorizationService.validateRequesterInProjectGroup(requester, project);
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.UPDATE, project.getId(), project.getOwner());
 
