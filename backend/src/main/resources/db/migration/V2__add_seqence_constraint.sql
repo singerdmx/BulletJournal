@@ -2,98 +2,98 @@
 -- Name: calendar_token_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.calendar_token_sequence', 100, false);
+SELECT pg_catalog.setval('public.calendar_token_sequence', 300, false);
 
 
 --
 -- Name: completed_task_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.completed_task_sequence', 100, false);
+SELECT pg_catalog.setval('public.completed_task_sequence', 300, false);
 
 
 --
 -- Name: group_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.group_sequence', 150, true);
+SELECT pg_catalog.setval('public.group_sequence', 350, true);
 
 
 --
 -- Name: label_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.label_sequence', 150, true);
+SELECT pg_catalog.setval('public.label_sequence', 350, true);
 
 
 --
 -- Name: note_content_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.note_content_sequence', 250, true);
+SELECT pg_catalog.setval('public.note_content_sequence', 550, true);
 
 
 --
 -- Name: note_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.note_sequence', 250, true);
+SELECT pg_catalog.setval('public.note_sequence', 550, true);
 
 
 --
 -- Name: notification_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notification_sequence', 150, true);
+SELECT pg_catalog.setval('public.notification_sequence', 600, true);
 
 
 --
 -- Name: project_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.project_sequence', 150, true);
+SELECT pg_catalog.setval('public.project_sequence', 350, true);
 
 
 --
 -- Name: shared_project_item_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.shared_project_item_sequence', 150, true);
+SELECT pg_catalog.setval('public.shared_project_item_sequence', 350, true);
 
 
 --
 -- Name: task_content_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.task_content_sequence', 250, true);
+SELECT pg_catalog.setval('public.task_content_sequence', 550, true);
 
 
 --
 -- Name: task_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.task_sequence', 150, true);
+SELECT pg_catalog.setval('public.task_sequence', 350, true);
 
 
 --
 -- Name: transaction_content_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.transaction_content_sequence', 200, false);
+SELECT pg_catalog.setval('public.transaction_content_sequence', 500, false);
 
 
 --
 -- Name: transaction_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.transaction_sequence', 100, false);
+SELECT pg_catalog.setval('public.transaction_sequence', 300, false);
 
 
 --
 -- Name: user_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_sequence', 150, true);
+SELECT pg_catalog.setval('public.user_sequence', 350, true);
 
 
 --

@@ -6,6 +6,8 @@ mkdir -p "$HOME/docker/volumes/log"
 mkdir -p "$HOME/docker/volumes/elasticsearch"
 mkdir -p "$HOME/docker/auth_proxy/bin"
 
+./db_backup.sh
+
 echo -e '\n==>step 2 / 2: docker-compose up -d'
 docker-compose -f docker-compose.yml -f ../elk/docker-compose-prod.yml up -d
 
