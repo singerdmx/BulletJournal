@@ -176,7 +176,7 @@ const EditTask: React.FC<
   const selectAll = () => {
     if (props.group) {
       form.setFields([
-        {name: 'assignees', value: props.group.users.map((user) => user.name)},
+        {name: 'assignees', value: props.group.users.filter(u => u.accepted).map((user) => user.name)},
       ]);
     }
   };
@@ -229,7 +229,7 @@ const EditTask: React.FC<
             }
             style={{ width: '100%' }}
         >
-          {props.group.users.map((user) => {
+          {props.group.users.filter(u => u.accepted).map((user) => {
             return (
                 <Option value={user.name} key={user.name}>
                   <Avatar size='small' src={user.avatar} />

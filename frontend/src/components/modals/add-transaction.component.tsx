@@ -98,7 +98,7 @@ const AddTransaction: React.FC<
             defaultValue={props.myself}
             style={{marginLeft: '-8px'}}
         >
-          {props.group.users.map((user) => {
+          {props.group.users.filter(u => u.accepted).map((user) => {
             return (
                 <Option value={user.name} key={user.name}>
                   <Avatar size='small' src={user.avatar}/>

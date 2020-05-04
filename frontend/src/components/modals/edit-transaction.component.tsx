@@ -133,7 +133,7 @@ const EditTransaction: React.FC<
             value={payerName}
             onChange={(e: any) => setPayerName(e)}
         >
-          {props.group.users.map((user) => {
+          {props.group.users.filter(u => u.accepted).map((user) => {
             return (
                 <Option value={user.name} key={user.name}>
                   <Avatar size='small' src={user.avatar} />
