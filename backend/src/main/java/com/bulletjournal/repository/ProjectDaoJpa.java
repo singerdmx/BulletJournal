@@ -151,7 +151,7 @@ public class ProjectDaoJpa {
         }
 
         newOwners.add(o);
-        List<Project> projects = this.projectRepository.findAllById(new ArrayList<>(projectsByOwner));
+        List<Project> projects = this.projectRepository.findByOwner(o);
         String projectRelationsByOwner = this.userProjectsRepository.findById(o).get().getOwnedProjects();
         List<com.bulletjournal.controller.models.Project> l = ProjectRelationsProcessor.processRelations(
                 projects.stream().collect(Collectors.toMap(Project::getId, p -> p)),
