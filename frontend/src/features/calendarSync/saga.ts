@@ -78,7 +78,7 @@ function* googleCalendarEventListUpdate(
       })
     );
     const eventsLength = data.length;
-    yield call(message.info, `${eventsLength} events pulled`);
+    yield call(message.info, `${eventsLength} event(s) pulled`);
   } catch (error) {
     yield call(
       message.error,
