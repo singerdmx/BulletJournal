@@ -40,7 +40,7 @@ public class AuthorizationService {
         }
 
         List<String> projectGroupUsers = project.getGroup()
-                .getUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toList());
+                .getAcceptedUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toList());
         if (!projectGroupUsers.stream().anyMatch(u -> Objects.equals(requester, u))) {
             throw new UnAuthorizedException("User " + requester + " not in Project "
                     + project.getName());

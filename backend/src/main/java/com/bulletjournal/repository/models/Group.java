@@ -40,6 +40,10 @@ public class Group extends OwnedModel {
         return users;
     }
 
+    public Set<UserGroup> getAcceptedUsers() {
+        return getUsers().stream().filter(u -> u.isAccepted()).collect(Collectors.toSet());
+    }
+
     public void addUser(User user) {
         UserGroup userGroup = new UserGroup(user, this);
         if (!this.users.contains(userGroup)) {

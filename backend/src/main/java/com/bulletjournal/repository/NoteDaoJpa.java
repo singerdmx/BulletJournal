@@ -173,10 +173,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     private List<Event> generateEvents(Note note, String requester, Project project) {
         List<Event> events = new ArrayList<>();
-        for (UserGroup userGroup : project.getGroup().getUsers()) {
-            if (!userGroup.isAccepted()) {
-                continue;
-            }
+        for (UserGroup userGroup : project.getGroup().getAcceptedUsers()) {
             // skip send event to self
             String username = userGroup.getUser().getName();
             if (userGroup.getUser().getName().equals(requester)) {

@@ -74,11 +74,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         if (shareProjectItemParams.getTargetGroup() != null) {
             Group group = this.groupDaoJpa.getGroup(shareProjectItemParams.getTargetGroup());
-            for (UserGroup userGroup : group.getUsers()) {
-                if (!userGroup.isAccepted()) {
-                    continue;
-                }
-
+            for (UserGroup userGroup : group.getAcceptedUsers()) {
                 users.add(userGroup.getUser().getName());
             }
         }
@@ -190,7 +186,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     public SetLabelEvent setLabels(String requester, Long projectItemId, List<Long> labels) {
         ProjectItemModel projectItem = getProjectItem(projectItemId, requester);
         projectItem.setLabels(labels);
-        Set<UserGroup> targetUsers = projectItem.getProject().getGroup().getUsers();
+        Set<UserGroup> targetUsers = projectItem.getProject().getGroup().getAcceptedUsers();
         List<Event> events = new ArrayList<>();
         for (UserGroup user : targetUsers) {
             if (!Objects.equals(user.getUser().getName(), requester)) {

@@ -205,10 +205,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     private List<Event> generateEvents(Transaction transaction, String requester, Project project) {
         List<Event> events = new ArrayList<>();
-        for (UserGroup userGroup : project.getGroup().getUsers()) {
-            if (!userGroup.isAccepted())
-                continue;
-
+        for (UserGroup userGroup : project.getGroup().getAcceptedUsers()) {
             String username = userGroup.getUser().getName();
             if (userGroup.getUser().getName().equals(requester))
                 continue;
