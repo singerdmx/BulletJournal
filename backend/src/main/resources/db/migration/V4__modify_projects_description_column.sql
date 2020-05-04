@@ -1,0 +1,1 @@
+alter table projects alter column description type varchar(90000) using description::varchar(90000);

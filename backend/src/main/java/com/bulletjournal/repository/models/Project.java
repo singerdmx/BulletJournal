@@ -34,7 +34,7 @@ public class Project extends OwnedModel {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Group group;
 
-    @Column
+    @Column(length = 90000)
     private String description;
 
     @Column(nullable = false, columnDefinition = "Boolean default 'false'")
