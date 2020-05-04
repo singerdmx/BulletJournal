@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.repository.LabelDaoJpa;
+import com.bulletjournal.repository.SystemDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
 import org.slf4j.MDC;
@@ -37,6 +38,9 @@ public class LabelController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private SystemDaoJpa systemDaoJpa;
+
     @PostMapping(LABELS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Label createLabel(@Valid @RequestBody CreateLabelParams label) {
@@ -57,11 +61,15 @@ public class LabelController {
     }
 
     @GetMapping(LABELS_ROUTE)
-    public ResponseEntity<List<Label>> getLabels() {
+    public ResponseEntity<List<Label>> getLabels(
+            @RequestParam(name = "projectId", required = false) Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Label> labels = this.labelDaoJpa.getLabels(username)
                 .stream().map(label -> label.toPresentationModel())
                 .collect(Collectors.toList());
+        if (projectId != null) {
+            labels.addAll(this.systemDaoJpa.getProjectItems(projectId, username));
+        }
         String labelsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE,
                 labels);

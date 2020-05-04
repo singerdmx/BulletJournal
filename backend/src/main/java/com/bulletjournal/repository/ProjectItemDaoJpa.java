@@ -56,6 +56,9 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     abstract <T extends ProjectItemModel> List<K> findContents(T projectItem);
 
+    abstract List<Long> findItemLabelsByProject(
+            com.bulletjournal.repository.models.Project project);
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> SharableLink generatePublicItemLink(
             Long projectItemId, String requester, Long ttl) {

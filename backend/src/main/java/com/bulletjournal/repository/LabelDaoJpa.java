@@ -196,7 +196,7 @@ public class LabelDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabels(
+    protected List<com.bulletjournal.controller.models.Label> getLabels(
             final List<Long> labels) {
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
         if (labels != null && !labels.isEmpty()) {

@@ -194,7 +194,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
 
-        this.authorizationService.validateRequesterInProjectGroup(requester, project);
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.UPDATE, project.getId(), project.getOwner());
 
@@ -222,5 +221,10 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     @Override
     public <T extends ProjectItemModel> List<NoteContent> findContents(T projectItem) {
         return this.noteContentRepository.findNoteContentByNote((Note) projectItem);
+    }
+
+    @Override
+    List<Long> findItemLabelsByProject(Project project) {
+        return null;
     }
 }
