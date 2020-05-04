@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.ProjectItems;
+import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
@@ -8,10 +9,7 @@ import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProjectItemsGrouper {
@@ -89,7 +87,7 @@ public class ProjectItemsGrouper {
                 // Sort transaction by end time
                 ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
                 ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
-                return z2.compareTo(z1);
+                return z1.compareTo(z2);
             });
             projectItem.setTransactions(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
@@ -118,7 +116,7 @@ public class ProjectItemsGrouper {
                 // Sort task by end time
                 ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
                 ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
-                return z2.compareTo(z1);
+                return z1.compareTo(z2);
             });
             projectItem.setTasks(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
@@ -144,7 +142,7 @@ public class ProjectItemsGrouper {
             List<Note> notes = notesMap.get(zonedDateTime);
 
             // Sort note by update time
-            notes.sort((t1, t2) -> t2.getUpdatedAt().compareTo(t1.getUpdatedAt()));
+            notes.sort(Comparator.comparing(AuditModel::getUpdatedAt));
             projectItem.setNotes(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
