@@ -212,10 +212,9 @@ public class GroupDaoJpa {
         User user = this.userDaoJpa.getByName(username);
         UserGroupKey key = new UserGroupKey(user.getId(), groupId);
         Optional<UserGroup> userGroup = this.userGroupRepository.findById(key);
-        if (userGroup.isPresent()) {
-            return null;
+        if (!userGroup.isPresent()) {
+            this.userGroupRepository.save(new UserGroup(user, group, false));
         }
-        this.userGroupRepository.save(new UserGroup(user, group, false));
 
         return new JoinGroupEvent(new Event(username, groupId, group.getName()), owner);
     }
