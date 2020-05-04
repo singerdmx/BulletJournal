@@ -44,8 +44,7 @@ public class ProjectItemsGrouper {
                 }
                 dueDate = ZonedDateTimeHelper.getNow(task.getTimezone()).format(ZonedDateTimeHelper.DATE_FORMATTER);
             }
-            ZonedDateTime zonedDateTime =
-                    ZonedDateTimeHelper.convertDateOnly(dueDate, task.getTimezone());
+            ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateOnly(dueDate, task.getTimezone());
             map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(task);
         }
         return map;
@@ -112,6 +111,10 @@ public class ProjectItemsGrouper {
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort((t1, t2) -> {
+                if (!t1.hasDueDate())
+                    return 1;
+                if (!t2.hasDueDate())
+                    return -1;
 
                 // Sort task by end time
                 ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());

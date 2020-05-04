@@ -85,6 +85,10 @@ public abstract class TaskModel extends ProjectItemModel {
         this.endTime = endTime;
     }
 
+    public boolean hasDueDate() {
+        return this.dueDate != null;
+    }
+
     public String getDueDate() {
         return dueDate;
     }
@@ -165,25 +169,6 @@ public abstract class TaskModel extends ProjectItemModel {
         return new ReminderSetting(this.getReminderDate(), this.getReminderTime(), this.getReminderBeforeTask());
     }
 
-    public String getGoogleCalendarEventId() {
-        return googleCalendarEventId;
-    }
-
-    public void setGoogleCalendarEventId(String googleCalendarEventId) {
-        this.googleCalendarEventId = googleCalendarEventId;
-    }
-
-    public List<String> getAssignees() {
-        if (this.assignees == null) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList(this.assignees);
-    }
-
-    public void setAssignees(List<String> assignees) {
-        this.assignees = assignees == null ? null : assignees.stream().toArray(String[]::new);
-    }
-
     public void setReminderSetting(ReminderSetting reminderSetting) {
         Preconditions.checkNotNull(reminderSetting, "ReminderSetting cannot be null");
         Preconditions.checkNotNull(this.getTimezone(), "Timezone cannot be null");
@@ -215,6 +200,25 @@ public abstract class TaskModel extends ProjectItemModel {
         ZonedDateTime reminderZonedDateTime =
                 ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
         this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
+    }
+
+    public String getGoogleCalendarEventId() {
+        return googleCalendarEventId;
+    }
+
+    public void setGoogleCalendarEventId(String googleCalendarEventId) {
+        this.googleCalendarEventId = googleCalendarEventId;
+    }
+
+    public List<String> getAssignees() {
+        if (this.assignees == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(this.assignees);
+    }
+
+    public void setAssignees(List<String> assignees) {
+        this.assignees = assignees == null ? null : assignees.stream().toArray(String[]::new);
     }
 
     public String getRecurrenceRule() {
