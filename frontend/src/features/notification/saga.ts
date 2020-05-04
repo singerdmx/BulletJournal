@@ -50,7 +50,6 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
 
 function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   const { action, notificationId, type } = act.payload;
-  console.log(type);
 
   try {
     yield call(answerNotification, notificationId, action);
@@ -64,7 +63,6 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
       }
     }
   } catch (error) {
-    console.log(error);
     if (error.message === '404') {
       yield call(message.error, 'The notification is no longer valid');
     } else {
@@ -75,12 +73,8 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
   const notifications = state.notice.notifications.filter(
     (notice: Notification) => notice.id !== notificationId
   );
-  const data = yield call(fetchSystemUpdates, 'notificationsEtag');
   yield put(
-    notificationsActions.notificationsReceived({
-      notifications: notifications,
-      etag: data.notificationsEtag
-    })
+    notificationsActions.notificationsReceived({notifications: notifications})
   );
 }
 
