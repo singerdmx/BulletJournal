@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import { getReminderSettingString, Task } from '../../features/tasks/interface';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import {
   completeTask,
   deleteCompletedTask,
@@ -19,7 +19,7 @@ import {
 } from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import { stringToRGB } from '../../features/label/interface';
+import {Label, stringToRGB} from '../../features/label/interface';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
@@ -30,9 +30,11 @@ import {
   getIcon,
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
+import {addSelectedLabel} from "../../features/label/actions";
 
 type ProjectProps = {
   readOnly: boolean;
+  addSelectedLabel: (label: Label) => void;
 };
 
 type TaskProps = {
@@ -155,6 +157,14 @@ export const getDueDateTime = (task: Task) => {
 };
 
 const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
+  // hook history in router
+  const history = useHistory();
+  // jump to label searching page by label click
+  const toLabelSearching = (label: Label) => {
+    props.addSelectedLabel(label);
+    history.push('/labels/search');
+  };
+
   const getMore = () => {
     if (props.readOnly) {
       return null;
@@ -256,8 +266,9 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
                   <Tag
                     key={`label${label.id}`}
                     className='labels'
+                    onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
-                    style={{ borderRadius: 10 }}
+                    style={{cursor: 'pointer', borderRadius: 10 }}
                   >
                     <span>
                       {getIcon(label.icon)} &nbsp;
@@ -294,4 +305,5 @@ export default connect(null, {
   uncompleteTask,
   deleteTask,
   deleteCompletedTask,
+  addSelectedLabel,
 })(TaskItem);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Avatar, Popconfirm, Popover, Tooltip, Tag } from 'antd';
 import {
@@ -9,7 +9,7 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { deleteTransaction } from '../../features/transactions/actions';
-import { stringToRGB } from '../../features/label/interface';
+import {Label, stringToRGB} from '../../features/label/interface';
 import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
 import moment from 'moment';
@@ -20,6 +20,7 @@ import { ProjectType } from '../../features/project/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
 import EditTransaction from '../modals/edit-transaction.component';
 import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
+import {addSelectedLabel} from "../../features/label/actions";
 
 const LocaleCurrency = require('locale-currency'); //currency code
 
@@ -27,6 +28,7 @@ type TransactionProps = {
   currency: string;
   transaction: Transaction;
   deleteTransaction: (transactionId: number) => void;
+  addSelectedLabel: (label: Label) => void;
 };
 
 type TransactionManageProps = {
@@ -63,6 +65,13 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
 };
 
 const TransactionItem: React.FC<TransactionProps> = (props) => {
+  // hook history in router
+  const history = useHistory();
+  // jump to label searching page by label click
+  const toLabelSearching = (label: Label) => {
+    props.addSelectedLabel(label);
+    history.push('/labels/search');
+  };
   const { transaction, deleteTransaction } = props;
 
   const getPaymentDateTime = () => {
@@ -125,8 +134,9 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
                   <Tag
                     key={`label${label.id}`}
                     className='labels'
+                    onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
-                    style={{ borderRadius: 10 }}
+                    style={{cursor: 'pointer', borderRadius: 10 }}
                   >
                     <span>
                       {getIcon(label.icon)} &nbsp;
@@ -181,4 +191,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   deleteTransaction,
+  addSelectedLabel,
 })(TransactionItem);

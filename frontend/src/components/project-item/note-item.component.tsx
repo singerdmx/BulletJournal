@@ -2,7 +2,7 @@
 // react import
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 // antd imports
 import {
   DeleteTwoTone,
@@ -75,6 +75,14 @@ const ManageNote: React.FC<NoteManageProps> = props => {
 };
 
 const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
+    // hook history in router
+    const history = useHistory();
+    // jump to label searching page by label click
+    const toLabelSearching = (label: Label) => {
+        props.addSelectedLabel(label);
+        history.push('/labels/search');
+    };
+  
   const { note, deleteNote } = props;
 
   const getMore = () => {
@@ -117,8 +125,9 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
                   <Tag
                     key={`label${label.id}`}
                     className="labels"
+                    onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
-                    style={{ borderRadius: 10 }}
+                    style={{cursor: 'pointer', borderRadius: 10 }}
                   >
                     <span>
                       {getIcon(label.icon)} &nbsp;
