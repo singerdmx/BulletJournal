@@ -203,6 +203,11 @@ public class GoogleCalendarController {
     public Project watchCalendar(
             @NotNull @PathVariable String calendarId,
             @Valid @RequestBody @NotNull WatchCalendarParams watchCalendarParams) throws IOException {
+        Project project = getWatchedProject(calendarId);
+        if (project.getId() != null) {
+            throw new BadRequestException("Calendar " + calendarId + " is already watched");
+        }
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String channelId = UUID.randomUUID().toString();
         Channel createdChannel;
