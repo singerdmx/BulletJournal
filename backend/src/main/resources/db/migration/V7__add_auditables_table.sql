@@ -1,5 +1,5 @@
 --
--- Name: notification_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: auditable_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.auditable_sequence
