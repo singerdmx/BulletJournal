@@ -38,10 +38,8 @@ import {
   AlertOutlined,
   CheckSquareTwoTone,
   CloseSquareTwoTone,
-  TeamOutlined,
   SyncOutlined,
   RetweetOutlined,
-  SwapOutlined,
   CloudDownloadOutlined,
   DownCircleFilled,
 } from '@ant-design/icons';
