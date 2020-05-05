@@ -407,7 +407,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                   </div>
                   <div className='pull-tab-eventList'>
                     <span>
-                      Event
+                      Event&nbsp;&nbsp;
                       <Tooltip title='Select All'>
                         <CheckSquareTwoTone
                           onClick={selectAll}

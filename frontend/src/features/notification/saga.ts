@@ -4,19 +4,19 @@ import {
   actions as notificationsActions,
   NoticeApiErrorAction,
   NotificationsAction,
-  AnswerNotificationAction
+  AnswerNotificationAction,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchNotifications,
-  answerNotification
+  answerNotification,
 } from '../../apis/notificationApis';
 import { updateGroups, groupUpdate } from '../group/actions';
 import { Notification } from './interface';
 import { IState } from '../../store';
 import { EventType } from './constants';
-import { fetchSystemUpdates } from '../../apis/systemApis';
 import { actions as SystemActions } from '../system/reducer';
+import { updateLatestNotification } from './actions';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -31,17 +31,33 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     const state: IState = yield select();
     const systemState = state.system;
 
-    if (etag && state.system.notificationsEtag && state.system.notificationsEtag !== etag) {
+    //update latest notification
+    let latestNotification = undefined;
+    if (notifications && notifications.length > 0) {
+      latestNotification = notifications[0];
+      //update latest notification to reducer
+      yield put(updateLatestNotification(latestNotification));
+    }
+
+    if (
+      etag &&
+      state.system.notificationsEtag &&
+      state.system.notificationsEtag !== etag &&
+      latestNotification &&
+      latestNotification !== state.notice.latestNotification
+    ) {
       yield call(message.info, "You've got new notifications");
     }
     yield put(
-        SystemActions.systemUpdateReceived({
-          ...systemState,
-          notificationsEtag: etag
-        })
+      SystemActions.systemUpdateReceived({
+        ...systemState,
+        notificationsEtag: etag,
+      })
     );
     yield put(
-      notificationsActions.notificationsReceived({ notifications: notifications })
+      notificationsActions.notificationsReceived({
+        notifications: notifications,
+      })
     );
   } catch (error) {
     yield call(message.error, `Notice Error Received: ${error}`);
@@ -74,7 +90,7 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
     (notice: Notification) => notice.id !== notificationId
   );
   yield put(
-    notificationsActions.notificationsReceived({notifications: notifications})
+    notificationsActions.notificationsReceived({ notifications: notifications })
   );
 }
 
@@ -88,6 +104,6 @@ export default function* notificationSagas() {
       notificationsActions.notificationsUpdate.type,
       notificationsUpdate
     ),
-    yield takeLatest(notificationsActions.answerNotice.type, answerNotice)
+    yield takeLatest(notificationsActions.answerNotice.type, answerNotice),
   ]);
 }
