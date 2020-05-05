@@ -152,7 +152,7 @@ class SideMenu extends React.Component<
               <span>
                 <ProfileOutlined />
                 <Tooltip placement='right' title='BuJo created by me'>
-                  <span>Owned BuJo</span>
+                  <span>Own BuJo</span>
                 </Tooltip>
               </span>
             }
