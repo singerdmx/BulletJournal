@@ -54,6 +54,7 @@ type ModalProps = {
   calendar: CalendarListEntry;
   watchedProject: Project | undefined;
   eventList: GoogleCalendarEvent[];
+  syncing: boolean;
   updateWatchedProject: (calendarId: string) => void;
   watchCalendar: (calendarId: string, projectId: number) => void;
   unwatchCalendar: (calendarId: string) => void;
@@ -77,6 +78,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     eventList,
     googleCalendarEventListReceived,
     importEventsToProject,
+    syncing,
   } = props;
   const [visible, setVisible] = useState(false);
   const [isSync, setIsSync] = useState(false);
@@ -129,8 +131,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     e: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     e.stopPropagation();
-    // TODO: check projects.length
-    props.watchCalendar(calendar.id, projectId);
+    if (projectId >= 0) props.watchCalendar(calendar.id, projectId);
   };
 
   const handleUnwatchCalendar = (
@@ -297,7 +298,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                     </div>
                   ) : (
                     <div>
-                      <b>Choose a BuJo to sync</b>
+                      <b>{syncing ? 'Syncing...' : 'Choose a BuJo to sync'}</b>
                     </div>
                   )}
                 </div>
@@ -478,6 +479,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   watchedProject: state.calendarSync.watchedProject,
   eventList: state.calendarSync.googleCalendarEventList,
+  syncing: state.calendarSync.syncing,
 });
 
 export default connect(mapStateToProps, {

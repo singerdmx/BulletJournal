@@ -50,17 +50,26 @@ export type ImportEventsToProjectAction = {
   projectId: number;
 };
 
+export type SyncingAction = {
+  syncing: boolean;
+};
+
 let initialState = {
   googleTokenExpirationTime: 0 as number,
   googleCalendarList: [] as CalendarListEntry[],
   googleCalendarEventList: [] as GoogleCalendarEvent[],
   watchedProject: undefined as Project | undefined,
+  syncing: false as boolean,
 };
 
 const slice = createSlice({
   name: 'calendarSync',
   initialState,
   reducers: {
+    updateSyncing: (state, action: PayloadAction<SyncingAction>) => {
+      const { syncing } = action.payload;
+      state.syncing = syncing;
+    },
     googleTokenExpirationTimeReceived: (
       state,
       action: PayloadAction<ExpirationTimeAction>

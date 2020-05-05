@@ -119,12 +119,21 @@ function* updateWatchedProject(
 
 function* watchCalendarChannel(action: PayloadAction<WatchedCalendarAction>) {
   try {
+    const state: IState = yield select();
+    if (state.calendarSync.syncing) {
+      yield call(message.info, 'Syncing in progress');
+      return;
+    }
+    yield put(calendarSyncActions.updateSyncing({ syncing: true }));
+
     const { calendarId, projectId } = action.payload;
     const project: Project = yield call(watchCalendar, calendarId, projectId);
+
     yield put(calendarSyncActions.watchedProjectReceived({ project: project }));
   } catch (error) {
     yield call(message.error, `watchCalendarChannel Error Received: ${error}`);
   }
+  yield put(calendarSyncActions.updateSyncing({ syncing: false }));
 }
 
 function* unwatchCalendarChannel(
