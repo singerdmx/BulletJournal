@@ -34,7 +34,6 @@ public abstract class Informed {
 
     protected abstract String getEventTitle(Event event);
 
-    // TODO: abstract
     public abstract String getLink(Long contentId);
 
     public List<Notification> toNotifications() {
