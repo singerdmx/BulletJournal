@@ -212,8 +212,8 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		return
 	}
 
-	if (strings.HasPrefix(r.RequestURI, "/api/public/items/") ||
-		strings.HasPrefix(r.RequestURI, "/public/items/") ||
+	if (strings.HasPrefix(r.RequestURI, "/api/public/") ||
+		strings.HasPrefix(r.RequestURI, "/public/") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/channel/notifications")) {
 		logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)

@@ -6,6 +6,8 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { unregister } from './serviceWorker';
 import PublicPage from './Public';
+import PrivacyPage from "./Privacy";
+import TermsOfServicePage from "./TermsOfService";
 
 const store = createStore();
 
@@ -13,6 +15,8 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <Switch>
+        <Route path="/public/privacy" component={PrivacyPage} />
+        <Route path="/public/tos" component={TermsOfServicePage} />
         <Route path="/public/items/:itemId" component={PublicPage} />
         <Route path="/" component={App} />
       </Switch>
