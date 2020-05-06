@@ -20,6 +20,7 @@ import {
   DeleteTwoTone,
   PlusCircleTwoTone,
   UpSquareOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
@@ -66,6 +67,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
   const handleClose = () => {
     setEditorShow(false);
+  };
+
+  const handleRefresh = () => {
+    note && note.id && updateNoteContents(note.id);
   };
 
   const labelEditableHandler = () => {
@@ -125,6 +130,11 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
               <DeleteTwoTone twoToneColor='#f5222d' />
             </div>
           </Popconfirm>
+        </Tooltip>
+        <Tooltip title='refresh'>
+          <div>
+            <SyncOutlined onClick={handleRefresh} />
+          </div>
         </Tooltip>
         <Tooltip title='Go to Parent BuJo'>
           <div>

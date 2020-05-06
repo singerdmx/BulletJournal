@@ -36,4 +36,4 @@ export const getProjectItemType = (input: ProjectType) => {
   }
 };
 
-export const completedTaskPageSize = 50;
+export const completedTaskPageSize = 2;

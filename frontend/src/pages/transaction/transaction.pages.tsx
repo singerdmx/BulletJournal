@@ -36,6 +36,7 @@ import {
   AccountBookOutlined,
   DollarCircleOutlined,
   UpSquareOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
@@ -98,6 +99,10 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
   const handleClose = () => {
     setEditorShow(false);
+  };
+
+  const handleRefresh = () => {
+    transaction && transaction.id && updateTransactionContents(transaction.id);
   };
 
   const getPaymentDateTime = (transaction: Transaction) => {
@@ -177,6 +182,11 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                 <DeleteTwoTone twoToneColor='#f5222d' />
               </div>
             </Popconfirm>
+          </Tooltip>
+          <Tooltip title='refresh'>
+            <div>
+              <SyncOutlined onClick={handleRefresh} />
+            </div>
           </Tooltip>
           <Tooltip title='Go to Parent BuJo'>
             <div>

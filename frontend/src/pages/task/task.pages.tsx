@@ -19,6 +19,7 @@ import {
   DeleteTwoTone,
   UpSquareOutlined,
   PlusCircleTwoTone,
+  SyncOutlined,
 } from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
@@ -71,6 +72,10 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 
   const labelEditableHandler = () => {
     setLabelEditable((labelEditable) => !labelEditable);
+  };
+
+  const handleRefresh = () => {
+    task && task.id && updateTaskContents(task.id);
   };
 
   const createContentElem = (
@@ -164,6 +169,11 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
               <DeleteTwoTone twoToneColor='#f5222d' />
             </div>
           </Popconfirm>
+        </Tooltip>
+        <Tooltip title='refresh'>
+          <div>
+            <SyncOutlined onClick={handleRefresh} />
+          </div>
         </Tooltip>
         <Tooltip title='Go to Parent BuJo'>
           <div>
