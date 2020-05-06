@@ -58,7 +58,6 @@ import { IState } from '../../store';
 import { Content, Revision, ProjectItems } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
 import { actions as SystemActions } from '../system/reducer';
-import { Task } from 'redux-saga';
 import {completedTaskPageSize} from "../project/constants";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {

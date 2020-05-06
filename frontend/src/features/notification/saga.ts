@@ -26,17 +26,15 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
   try {
     const data = yield call(fetchNotifications);
     const etag = data.headers.get('Etag')!;
-    const notifications = yield data.json();
+    const notifications : Notification[] = yield data.json();
 
     const state: IState = yield select();
     const systemState = state.system;
 
     //update latest notification
-    let latestNotification = undefined;
+    let latestNotification : Notification | undefined = undefined;
     if (notifications && notifications.length > 0) {
       latestNotification = notifications[0];
-      //update latest notification to reducer
-      yield put(updateLatestNotification(latestNotification));
     }
 
     if (
@@ -44,10 +42,14 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
       state.system.notificationsEtag &&
       state.system.notificationsEtag !== etag &&
       latestNotification &&
-      latestNotification !== state.notice.latestNotification
+      latestNotification !== state.notice.latestNotification &&
+      latestNotification.timestamp > (Date.now() - 120000)
     ) {
+      // if latestNotification is within 2 minutes
       yield call(message.info, "You've got new notifications");
     }
+    //update latest notification to reducer
+    yield put(updateLatestNotification(latestNotification));
     yield put(
       SystemActions.systemUpdateReceived({
         ...systemState,
