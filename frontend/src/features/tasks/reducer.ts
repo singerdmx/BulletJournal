@@ -25,8 +25,6 @@ export type UpdateTasks = {
 
 export type UpdateCompletedTasks = {
   projectId: number;
-  pageNo: number;
-  pageSize: number;
 };
 
 export type CreateTask = {
@@ -57,6 +55,8 @@ export type GetTask = {
 export type TasksAction = {
   tasks: Array<Task>;
 };
+
+export type ClearCompletedTasksAction = {};
 
 export type TaskAction = {
   task: Task | undefined;
@@ -148,8 +148,8 @@ export type LoadingCompletedTaskAction = {
   loadingCompletedTask: boolean;
 };
 
-export type UpdateCompletedTaskNoAction = {
-  completedTaskNo: number;
+export type UpdateCompletedTaskPageNoAction = {
+  completedTaskPageNo: number;
 };
 
 let initialState = {
@@ -158,11 +158,12 @@ let initialState = {
   task: undefined as Task | undefined,
   tasks: [] as Array<Task>,
   completedTasks: [] as Array<Task>,
+  nextCompletedTasks: [] as Array<Task>,
   sharedUsers: [] as User[],
   sharedLinks: [] as SharableLink[],
   sharedLink: '',
   loadingCompletedTask: false as boolean,
-  completedTaskNo: 0,
+  completedTaskPageNo: 0,
 };
 
 const slice = createSlice({
@@ -177,12 +178,12 @@ const slice = createSlice({
       const { task } = action.payload;
       state.task = task;
     },
-    updateCompletedTaskNo: (
+    updateCompletedTaskPageNo: (
       state,
-      action: PayloadAction<UpdateCompletedTaskNoAction>
+      action: PayloadAction<UpdateCompletedTaskPageNoAction>
     ) => {
-      const { completedTaskNo } = action.payload;
-      state.completedTaskNo = completedTaskNo;
+      const { completedTaskPageNo } = action.payload;
+      state.completedTaskPageNo = completedTaskPageNo;
     },
     updateLoadingCompletedTask: (
       state,
@@ -213,6 +214,14 @@ const slice = createSlice({
     completedTasksReceived: (state, action: PayloadAction<TasksAction>) => {
       const { tasks } = action.payload;
       state.completedTasks = tasks;
+    },
+    clearCompletedTasks: (state, action: PayloadAction<ClearCompletedTasksAction>) => {
+      state.completedTasks = [];
+      state.completedTaskPageNo = 0;
+    },
+    nextCompletedTasksReceived: (state, action: PayloadAction<TasksAction>) => {
+      const { tasks } = action.payload;
+      state.nextCompletedTasks = tasks;
     },
     taskApiErrorReceived: (state, action: PayloadAction<TaskApiErrorAction>) =>
       state,

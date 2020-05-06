@@ -1,5 +1,4 @@
 import React from 'react';
-import { History } from 'history';
 import {Tree, Tooltip, Empty} from 'antd';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
@@ -12,8 +11,7 @@ import {
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
-import {completedTasksReceived} from "../../features/tasks/actions";
-import {Task} from "../../features/tasks/interface";
+import {clearCompletedTasks} from "../../features/tasks/actions";
 
 export const iconMapper = {
   TODO: <CarryOutOutlined />,
@@ -75,7 +73,7 @@ const reorder = (
 type ProjectProps = {
   sharedProjects: ProjectsWithOwner[];
   updateSharedProjectsOrder: (projectOwners: string[]) => void;
-  completedTasksReceived: (tasks: Task[]) => void;
+  clearCompletedTasks: () => void;
 };
 
 class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
@@ -103,7 +101,7 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
                     item.owner,
                     index,
                     (itemId: number) => {
-                      completedTasksReceived([]);
+                      clearCompletedTasks();
                       this.props.history.push(`/projects/${itemId}`);
                     }
                   );
@@ -139,6 +137,6 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
   }
 }
 
-export default connect(null, { updateSharedProjectsOrder, completedTasksReceived })(
+export default connect(null, { updateSharedProjectsOrder, clearCompletedTasks })(
   withRouter(ProjectDnd)
 );

@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { List, Divider, Tree, Empty, Button } from 'antd';
+import React, { useEffect } from 'react';
+import {List, Divider, Tree, Empty, Tooltip} from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
+import ReactLoading from 'react-loading';
 import {
   putTask,
   updateTasks,
   updateCompletedTasks,
-  updateCompletedTaskNo,
+  updateCompletedTaskPageNo,
 } from '../../features/tasks/actions';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
-import { completeTaskSize } from '../../features/project/constants';
-import { SyncOutlined } from '@ant-design/icons';
+import {CloudSyncOutlined} from '@ant-design/icons';
+import './task.styles.less';
 
 type TasksProps = {
   showCompletedTask: boolean;
@@ -22,14 +23,10 @@ type TasksProps = {
   tasks: Task[];
   completedTasks: Task[];
   loadingCompletedTask: boolean;
-  completedTaskNo: number;
+  nextCompletedTasks: Task[];
   updateTasks: (projectId: number) => void;
-  updateCompletedTaskNo: (completedTaskNo: number) => void;
-  updateCompletedTasks: (
-    projectId: number,
-    pageNo: number,
-    pageSize: number
-  ) => void;
+  updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
+  updateCompletedTasks: (projectId: number) => void;
   putTask: (projectId: number, tasks: Task[]) => void;
 };
 
@@ -136,6 +133,12 @@ const onDrop = (tasks: Task[], putTask: Function, projectId: number) => (
   putTask(projectId, resTasks);
 };
 
+const Loading = () => (
+    <div className="loading">
+      <ReactLoading type="bubbles" color="#0984e3" height="75" width="75" />
+    </div>
+);
+
 const TaskTree: React.FC<TasksProps> = (props) => {
   const {
     project,
@@ -146,8 +149,8 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     updateCompletedTasks,
     putTask,
     loadingCompletedTask,
-    completedTaskNo,
-    updateCompletedTaskNo,
+    nextCompletedTasks,
+    updateCompletedTaskPageNo,
   } = props;
 
   useEffect(() => {
@@ -156,14 +159,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     }
   }, [project]);
 
-  const handleloadMore = () => {
+  const handleLoadMore = () => {
     if (project) {
-      updateCompletedTasks(
-        project.id,
-        0,
-        completeTaskSize * (completedTaskNo + 1)
-      );
-      updateCompletedTaskNo(completedTaskNo + 1);
+      updateCompletedTasks(project.id);
     }
   };
 
@@ -197,12 +195,14 @@ const TaskTree: React.FC<TasksProps> = (props) => {
                 );
               })}
             </List>
-            {loadingCompletedTask ? (
-              <SyncOutlined />
-            ) : (
-              <Button onClick={handleloadMore}>Load More</Button>
-            )}
           </div>
+          {loadingCompletedTask ? (
+              <Loading />
+          ) : (
+              nextCompletedTasks.length === 0 ? null : <span className='load-more-button' onClick={handleLoadMore}>
+                <Tooltip title='Load More'><CloudSyncOutlined /></Tooltip>
+              </span>
+          )}
         </div>
       );
     }
@@ -231,12 +231,12 @@ const mapStateToProps = (state: IState) => ({
   tasks: state.task.tasks,
   completedTasks: state.task.completedTasks,
   loadingCompletedTask: state.task.loadingCompletedTask,
-  completedTaskNo: state.task.completedTaskNo,
+  nextCompletedTasks: state.task.nextCompletedTasks,
 });
 
 export default connect(mapStateToProps, {
   updateTasks,
   updateCompletedTasks,
   putTask,
-  updateCompletedTaskNo,
+  updateCompletedTaskPageNo,
 })(TaskTree);

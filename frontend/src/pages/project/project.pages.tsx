@@ -20,7 +20,6 @@ import AddTask from '../../components/modals/add-task.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
 import {
   ProjectType,
-  completeTaskSize,
 } from '../../features/project/constants';
 import { NoteTree } from '../../components/note-tree';
 import { History } from 'history';
@@ -31,7 +30,7 @@ import TransactionProject from './transaction-project.pages';
 import './project.styles.less';
 import {
   updateCompletedTasks,
-  updateCompletedTaskNo,
+  updateCompletedTaskPageNo,
 } from '../../features/tasks/actions';
 
 type ProjectPathParams = {
@@ -55,19 +54,15 @@ interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
 type ProjectPageProps = {
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
-  completedTaskNo: number;
+  completedTaskPageNo: number;
   getProject: (projectId: number) => void;
   deleteProject: (
     projectId: number,
     name: string,
     history: History<History.PoorMansUnknown>
   ) => void;
-  updateCompletedTasks: (
-    projectId: number,
-    pageNo: number,
-    pageSize: number
-  ) => void;
-  updateCompletedTaskNo: (completedTaskNo: number) => void;
+  updateCompletedTasks: (projectId: number) => void;
+  updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
 };
 
 type MyselfProps = {
@@ -87,12 +82,14 @@ class ProjectPage extends React.Component<
   componentDidMount() {
     const projectId = this.props.match.params.projectId;
     this.props.getProject(parseInt(projectId));
+    this.setState({completeTasksShown: false});
   }
 
   componentDidUpdate(prevProps: ProjectPathProps): void {
     const projectId = this.props.match.params.projectId;
     if (projectId !== prevProps.match.params.projectId) {
       this.props.getProject(parseInt(projectId));
+      this.setState({completeTasksShown: false});
     }
   }
 
@@ -104,7 +101,7 @@ class ProjectPage extends React.Component<
     if (this.state.completeTasksShown) {
       return (
         <Tooltip placement='top' title='Hide Completed Tasks'>
-          <div onClick={this.handleClickShowCompletedTasksButton}>
+          <div onClick={e => this.setState({completeTasksShown: false})}>
             <CloseCircleOutlined
               style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
             />
@@ -125,15 +122,10 @@ class ProjectPage extends React.Component<
   };
 
   handleClickShowCompletedTasksButton = () => {
-    this.setState({ completeTasksShown: !this.state.completeTasksShown });
-    if (this.props.completedTaskNo === 0) {
+    this.setState({ completeTasksShown: true });
+    if (this.props.completedTaskPageNo === 0) {
       const projectId = this.props.match.params.projectId;
-      this.props.updateCompletedTasks(
-        parseInt(projectId),
-        0,
-        completeTaskSize * (this.props.completedTaskNo + 1)
-      );
-      this.props.updateCompletedTaskNo(this.props.completedTaskNo + 1);
+      this.props.updateCompletedTasks(parseInt(projectId));
     }
   };
 
@@ -301,12 +293,12 @@ const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   groups: state.group.groups,
   myself: state.myself.username,
-  completedTaskNo: state.task.completedTaskNo,
+  completedTaskPageNo: state.task.completedTaskPageNo,
 });
 
 export default connect(mapStateToProps, {
   getProject,
   deleteProject,
   updateCompletedTasks,
-  updateCompletedTaskNo,
+  updateCompletedTaskPageNo,
 })(ProjectPage);

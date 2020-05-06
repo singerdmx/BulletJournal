@@ -59,6 +59,7 @@ import { Content, Revision, ProjectItems } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
 import { actions as SystemActions } from '../system/reducer';
 import { Task } from 'redux-saga';
+import {completedTaskPageSize} from "../project/constants";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -92,19 +93,39 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
 
 function* completedTasksUpdate(action: PayloadAction<UpdateCompletedTasks>) {
   try {
+    const { projectId } = action.payload;
+
     const state: IState = yield select();
     if (state.task.loadingCompletedTask) {
-      yield call(message.info, 'Loading in progress');
+      yield call(message.info, 'Loading completed tasks in progress');
       return;
     }
     yield put(updateLoadingCompletedTask(true));
-    const { projectId, pageNo, pageSize } = action.payload;
-    const tasks = yield call(fetchCompletedTasks, projectId, pageNo, pageSize);
+    if (state.task.completedTaskPageNo === 0) {
+      const tasks = yield call(fetchCompletedTasks, projectId, state.task.completedTaskPageNo, completedTaskPageSize);
+      yield put(
+          tasksActions.completedTasksReceived({
+            tasks: tasks,
+          })
+      );
+    } else {
+      yield put(
+          tasksActions.completedTasksReceived({
+            tasks: state.task.completedTasks.concat(state.task.nextCompletedTasks),
+          })
+      );
+    }
 
+    const tasks = yield call(fetchCompletedTasks, projectId, state.task.completedTaskPageNo + 1, completedTaskPageSize);
     yield put(
-      tasksActions.completedTasksReceived({
-        tasks: tasks,
-      })
+        tasksActions.nextCompletedTasksReceived({
+          tasks: tasks,
+        })
+    );
+    yield put(
+        tasksActions.updateCompletedTaskPageNo({
+          completedTaskPageNo: state.task.completedTaskPageNo + 1,
+        })
     );
   } catch (error) {
     yield call(message.error, `completedTasksUpdate Error Received: ${error}`);
@@ -277,18 +298,28 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
         tasks: tasks,
       })
     );
-    const completedTasks = yield call(
-      fetchCompletedTasks,
-      task.projectId,
-      0,
-      5
-    );
-    yield put(
-      tasksActions.completedTasksReceived({
-        tasks: completedTasks,
-      })
-    );
+
     const state: IState = yield select();
+    const completedTaskPageNo = state.task.completedTaskPageNo;
+    if (completedTaskPageNo > 0) {
+      const completedTasks = yield call(
+          fetchCompletedTasks,
+          task.projectId,
+          0,
+          completedTaskPageNo * completedTaskPageSize
+      );
+      yield put(
+          tasksActions.completedTasksReceived({
+            tasks: completedTasks,
+          })
+      );
+      const tasks = yield call(fetchCompletedTasks, task.projectId, completedTaskPageNo, completedTaskPageSize);
+      yield put(
+          tasksActions.nextCompletedTasksReceived({
+            tasks: tasks,
+          })
+      );
+    }
 
     yield put(
       getProjectItemsAfterUpdateSelect(
@@ -313,17 +344,27 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
         tasks: tasks,
       })
     );
-    const completedTasks = yield call(
-      fetchCompletedTasks,
-      task.projectId,
-      0,
-      5
-    );
-    yield put(
-      tasksActions.completedTasksReceived({
-        tasks: completedTasks,
-      })
-    );
+    const state: IState = yield select();
+    const completedTaskPageNo = state.task.completedTaskPageNo;
+    if (completedTaskPageNo > 0) {
+      const completedTasks = yield call(
+          fetchCompletedTasks,
+          task.projectId,
+          0,
+          completedTaskPageNo * completedTaskPageSize
+      );
+      yield put(
+          tasksActions.completedTasksReceived({
+            tasks: completedTasks,
+          })
+      );
+      const tasks = yield call(fetchCompletedTasks, task.projectId, completedTaskPageNo, completedTaskPageSize);
+      yield put(
+          tasksActions.nextCompletedTasksReceived({
+            tasks: tasks,
+          })
+      );
+    }
   } catch (error) {
     yield call(message.error, `Uncomplete Task Error Received: ${error}`);
   }

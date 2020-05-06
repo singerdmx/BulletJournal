@@ -7,8 +7,7 @@ import {updateProjectRelations} from '../../features/project/actions';
 import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {connect} from 'react-redux';
-import {completedTasksReceived} from "../../features/tasks/actions";
-import {Task} from "../../features/tasks/interface";
+import {clearCompletedTasks} from "../../features/tasks/actions";
 
 export const iconMapper = {
     TODO: <CarryOutOutlined/>,
@@ -43,7 +42,7 @@ type ProjectProps = {
     id: number,
     ownProjects: Project[];
     updateProjectRelations: (Projects: Project[]) => void;
-    completedTasksReceived: (tasks: Task[]) => void;
+    clearCompletedTasks: () => void;
 };
 
 const onDragEnter = (info: any) => {
@@ -126,7 +125,7 @@ const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
 
     const onClick = (history: History<History.PoorMansUnknown>) => (e: any) => {
         if (e.length) {
-            props.completedTasksReceived([]);
+            props.clearCompletedTasks();
             history.push(`/projects/${e[0]}`)
         }
     };
@@ -146,6 +145,6 @@ const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
         treeData={treeNode}/></div>);
 };
 
-export default connect(null, {updateProjectRelations, completedTasksReceived})(
+export default connect(null, {updateProjectRelations, clearCompletedTasks})(
     withRouter(OwnProject)
 );
