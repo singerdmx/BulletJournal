@@ -131,7 +131,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
             </div>
           </Popconfirm>
         </Tooltip>
-        <Tooltip title='refresh'>
+        <Tooltip title='Refresh Contents'>
           <div>
             <SyncOutlined onClick={handleRefresh} />
           </div>

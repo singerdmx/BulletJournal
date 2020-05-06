@@ -183,7 +183,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               </div>
             </Popconfirm>
           </Tooltip>
-          <Tooltip title='refresh'>
+          <Tooltip title='Refresh Contents'>
             <div>
               <SyncOutlined onClick={handleRefresh} />
             </div>
