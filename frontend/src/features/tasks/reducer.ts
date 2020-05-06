@@ -217,6 +217,7 @@ const slice = createSlice({
     },
     clearCompletedTasks: (state, action: PayloadAction<ClearCompletedTasksAction>) => {
       state.completedTasks = [];
+      state.nextCompletedTasks = [];
       state.completedTaskPageNo = 0;
     },
     nextCompletedTasksReceived: (state, action: PayloadAction<TasksAction>) => {
