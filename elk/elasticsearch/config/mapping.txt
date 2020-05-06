@@ -1,0 +1,31 @@
+{
+  "search-index" : {
+	  "mappings":{
+	      "properties":{
+		         "@timestamp":{
+		            "type":"date"
+		         },
+		         "group_id":{
+		            "type":"keyword"
+		         },
+		         "id":{
+		            "type":"keyword"
+		         },
+		         "type":{
+		            "type":"keyword"
+		         },
+		         "value":{
+		            "type":"text",
+		            "fields":{
+		               "keyword":{
+		                  "type":"keyword"
+		               }
+		            }
+		         },
+		         "parent_id":{
+		            "type":"keyword"
+		         }
+	      	}
+   		}
+    }
+}
