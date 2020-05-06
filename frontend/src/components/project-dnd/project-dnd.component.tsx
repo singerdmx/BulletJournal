@@ -12,6 +12,8 @@ import {
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
+import {completedTasksReceived} from "../../features/tasks/actions";
+import {Task} from "../../features/tasks/interface";
 
 export const iconMapper = {
   TODO: <CarryOutOutlined />,
@@ -23,13 +25,13 @@ const getTree = (
   data: Project[],
   owner: string,
   index: number,
-  history: History<History.PoorMansUnknown>
+  onClick: Function
 ): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Project) => {
     const node = {} as TreeNodeNormal;
     if (item.subProjects && item.subProjects.length) {
-      node.children = getTree(item.subProjects, owner, index, history);
+      node.children = getTree(item.subProjects, owner, index, onClick);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
@@ -37,7 +39,7 @@ const getTree = (
       node.title = (
         <Tooltip placement="right" title={'Owner: ' + item.owner}>
           <span
-            onClick={e => history.push(`/projects/${item.id}`)}>
+            onClick={e => onClick(item.id)}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
           </span>
         </Tooltip>
@@ -73,6 +75,7 @@ const reorder = (
 type ProjectProps = {
   sharedProjects: ProjectsWithOwner[];
   updateSharedProjectsOrder: (projectOwners: string[]) => void;
+  completedTasksReceived: (tasks: Task[]) => void;
 };
 
 class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
@@ -99,7 +102,10 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
                     item.projects,
                     item.owner,
                     index,
-                    this.props.history
+                    (itemId: number) => {
+                      completedTasksReceived([]);
+                      this.props.history.push(`/projects/${itemId}`);
+                    }
                   );
                   return (
                     <Draggable
@@ -133,6 +139,6 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
   }
 }
 
-export default connect(null, { updateSharedProjectsOrder })(
+export default connect(null, { updateSharedProjectsOrder, completedTasksReceived })(
   withRouter(ProjectDnd)
 );

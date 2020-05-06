@@ -1,17 +1,14 @@
 import React from 'react';
 import {History} from 'history';
-import {Tree,Empty} from 'antd';
+import {Empty, Tree} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
 import {updateProjectRelations} from '../../features/project/actions';
-import {
-    CarryOutOutlined,
-    AccountBookOutlined,
-    FileTextOutlined
-} from '@ant-design/icons';
-import {withRouter, RouteComponentProps} from 'react-router';
+import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
+import {RouteComponentProps, withRouter} from 'react-router';
 import {connect} from 'react-redux';
-
+import {completedTasksReceived} from "../../features/tasks/actions";
+import {Task} from "../../features/tasks/interface";
 
 export const iconMapper = {
     TODO: <CarryOutOutlined/>,
@@ -32,7 +29,7 @@ const getTree = (
             node.children = [] as TreeNodeNormal[];
         }
         node.title = (
-          <span style={{width: '100%'}}>
+            <span style={{width: '100%'}}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
           </span>
         );
@@ -46,10 +43,10 @@ type ProjectProps = {
     id: number,
     ownProjects: Project[];
     updateProjectRelations: (Projects: Project[]) => void;
+    completedTasksReceived: (tasks: Task[]) => void;
 };
 
 const onDragEnter = (info: any) => {
-    console.log(info.node)
     // expandedKeys 需要受控时设置
     // setState({
     //   expendKey: info.expandedKeys,
@@ -70,7 +67,7 @@ const findProjectById = (projects: Project[], projectId: number): Project => {
         }
     }
     return res;
-}
+};
 
 const dragProjectById = (projects: Project[], projectId: number): Project[] => {
     let res = [] as Project[];
@@ -79,9 +76,9 @@ const dragProjectById = (projects: Project[], projectId: number): Project[] => {
         const subProjects = dragProjectById(item.subProjects, projectId);
         project = {...item, subProjects: subProjects};
         if (project.id !== projectId) res.push(project);
-    })
+    });
     return res;
-}
+};
 
 const DropProjectById = (projects: Project[], dropId: number, dropProject: Project): Project[] => {
     let res = [] as Project[];
@@ -94,11 +91,11 @@ const DropProjectById = (projects: Project[], dropId: number, dropProject: Proje
         } else {
             subProjects = DropProjectById(item.subProjects, dropId, dropProject);
         }
-        project = {...item, subProjects: subProjects}
+        project = {...item, subProjects: subProjects};
         res.push(project);
-    })
+    });
     return res;
-}
+};
 
 const onDrop = (projects: Project[], updateProject: Function) => (info: any) => {
     const projectId = parseInt(info.dragNode.key)
@@ -121,21 +118,21 @@ const onDrop = (projects: Project[], updateProject: Function) => (info: any) => 
         resProjects = DropProjectById(dragProjects, parseInt(info.node.key), targetProject);
     }
     updateProject(resProjects);
-}
-
-const onClick = (history: History<History.PoorMansUnknown>) => (e:any) => {
-  if(e.length){
-    history.push(`/projects/${e[0]}`)
-  }
-}
-
+};
 
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
     const {ownProjects, history, id, updateProjectRelations} = props;
     const treeNode = getTree(ownProjects, id);
 
+    const onClick = (history: History<History.PoorMansUnknown>) => (e: any) => {
+        if (e.length) {
+            props.completedTasksReceived([]);
+            history.push(`/projects/${e[0]}`)
+        }
+    };
+
     if (ownProjects.length === 0) {
-        return <Empty />;
+        return <Empty/>;
     }
 
     return (<div style={{marginLeft: '20%'}}><Tree
@@ -147,8 +144,8 @@ const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
         onSelect={onClick(history)}
         onDrop={onDrop(ownProjects, updateProjectRelations)}
         treeData={treeNode}/></div>);
-}
+};
 
-export default connect(null, {updateProjectRelations})(
+export default connect(null, {updateProjectRelations, completedTasksReceived})(
     withRouter(OwnProject)
 );

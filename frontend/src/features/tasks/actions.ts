@@ -141,3 +141,6 @@ export const updateCompletedTaskNo = (completedTaskNo: number) =>
   actions.updateCompletedTaskNo({
     completedTaskNo: completedTaskNo,
   });
+
+export const completedTasksReceived = (tasks: Task[]) =>
+    actions.completedTasksReceived({tasks: tasks});
