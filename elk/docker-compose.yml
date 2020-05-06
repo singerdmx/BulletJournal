@@ -26,3 +26,25 @@ services:
       - "5601:5601"
     depends_on:
       - elasticsearch
+  
+  # logstash:
+  #   container_name: logstash
+  #   build:
+  #     context: $HOME/BulletJournal/elk/logstash/
+  #     args:
+  #       ELK_VERSION: 7.6.0
+  #   volumes:
+  #     - $HOME/BulletJournal/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+  #     - $HOME/BulletJournal/elk/logstash/pipeline:/usr/share/logstash/pipeline
+  #   ports:
+  #     - "5000:5000/tcp"
+  #     - "5000:5000/udp"
+  #     - "9600:9600"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx512m -Xms256m"
+  #     postgres_hostname: db
+  #     postgres_jdbc_driver_absolute_path: /usr/share/logstash/logstash-core/lib/jars/postgresql.jar
+  #     logstash_last_run_metadata_absolute_path: /usr/share/logstash/.logstash_jdbc_last_run
+  #     elasticsearch_hostname: elasticsearch
+  #   depends_on:
+  #     - elasticsearch
