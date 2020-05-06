@@ -35,3 +35,5 @@ export const getProjectItemType = (input: ProjectType) => {
       return ProjectItemType.TASK;
   }
 };
+
+export const completeTaskSize = 2;

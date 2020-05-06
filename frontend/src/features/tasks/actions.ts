@@ -4,8 +4,16 @@ import { History } from 'history';
 
 export const updateTasks = (projectId: number) =>
   actions.TasksUpdate({ projectId: projectId });
-export const updateCompletedTasks = (projectId: number) =>
-  actions.CompletedTasksUpdate({ projectId: projectId });
+export const updateCompletedTasks = (
+  projectId: number,
+  pageNo: number,
+  pageSize: number
+) =>
+  actions.CompletedTasksUpdate({
+    projectId: projectId,
+    pageNo: pageNo,
+    pageSize: pageSize,
+  });
 export const createTask = (
   projectId: number,
   name: string,
@@ -123,4 +131,13 @@ export const patchContent = (taskId: number, contentId: number, text: string) =>
     taskId: taskId,
     contentId: contentId,
     text: text,
+  });
+export const updateLoadingCompletedTask = (loadingCompletedTask: boolean) =>
+  actions.updateLoadingCompletedTask({
+    loadingCompletedTask: loadingCompletedTask,
+  });
+
+export const updateCompletedTaskNo = (completedTaskNo: number) =>
+  actions.updateCompletedTaskNo({
+    completedTaskNo: completedTaskNo,
   });

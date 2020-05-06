@@ -23,6 +23,12 @@ export type UpdateTasks = {
   projectId: number;
 };
 
+export type UpdateCompletedTasks = {
+  projectId: number;
+  pageNo: number;
+  pageSize: number;
+};
+
 export type CreateTask = {
   projectId: number;
   name: string;
@@ -138,6 +144,14 @@ export type GetCompletedTasks = {
   projectId: number;
 };
 
+export type LoadingCompletedTaskAction = {
+  loadingCompletedTask: boolean;
+};
+
+export type UpdateCompletedTaskNoAction = {
+  completedTaskNo: number;
+};
+
 let initialState = {
   addTaskVisible: false,
   contents: [] as Array<Content>,
@@ -147,6 +161,8 @@ let initialState = {
   sharedUsers: [] as User[],
   sharedLinks: [] as SharableLink[],
   sharedLink: '',
+  loadingCompletedTask: false as boolean,
+  completedTaskNo: 0,
 };
 
 const slice = createSlice({
@@ -160,6 +176,20 @@ const slice = createSlice({
     taskReceived: (state, action: PayloadAction<TaskAction>) => {
       const { task } = action.payload;
       state.task = task;
+    },
+    updateCompletedTaskNo: (
+      state,
+      action: PayloadAction<UpdateCompletedTaskNoAction>
+    ) => {
+      const { completedTaskNo } = action.payload;
+      state.completedTaskNo = completedTaskNo;
+    },
+    updateLoadingCompletedTask: (
+      state,
+      action: PayloadAction<LoadingCompletedTaskAction>
+    ) => {
+      const { loadingCompletedTask } = action.payload;
+      state.loadingCompletedTask = loadingCompletedTask;
     },
     taskSharablesReceived: (
       state,
@@ -187,7 +217,10 @@ const slice = createSlice({
     taskApiErrorReceived: (state, action: PayloadAction<TaskApiErrorAction>) =>
       state,
     TasksUpdate: (state, action: PayloadAction<UpdateTasks>) => state,
-    CompletedTasksUpdate: (state, action: PayloadAction<UpdateTasks>) => state,
+    CompletedTasksUpdate: (
+      state,
+      action: PayloadAction<UpdateCompletedTasks>
+    ) => state,
     TasksCreate: (state, action: PayloadAction<CreateTask>) => state,
     TaskPut: (state, action: PayloadAction<PutTask>) => state,
     TaskGet: (state, action: PayloadAction<GetTask>) => state,

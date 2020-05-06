@@ -21,6 +21,7 @@ import {
   PatchContent,
   UpdateTaskContentRevision,
   UpdateTaskContents,
+  UpdateCompletedTasks,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -47,12 +48,17 @@ import {
   updateContent,
   getCompletedTaskContents,
 } from '../../apis/taskApis';
-import { updateTasks, updateTaskContents } from './actions';
+import {
+  updateTasks,
+  updateTaskContents,
+  updateLoadingCompletedTask,
+} from './actions';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { IState } from '../../store';
 import { Content, Revision, ProjectItems } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
 import { actions as SystemActions } from '../system/reducer';
+import { Task } from 'redux-saga';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -84,10 +90,16 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
   }
 }
 
-function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
+function* completedTasksUpdate(action: PayloadAction<UpdateCompletedTasks>) {
   try {
-    const { projectId } = action.payload;
-    const tasks = yield call(fetchCompletedTasks, projectId);
+    const state: IState = yield select();
+    if (state.task.loadingCompletedTask) {
+      yield call(message.info, 'Loading in progress');
+      return;
+    }
+    yield put(updateLoadingCompletedTask(true));
+    const { projectId, pageNo, pageSize } = action.payload;
+    const tasks = yield call(fetchCompletedTasks, projectId, pageNo, pageSize);
 
     yield put(
       tasksActions.completedTasksReceived({
@@ -97,6 +109,7 @@ function* completedTasksUpdate(action: PayloadAction<UpdateTasks>) {
   } catch (error) {
     yield call(message.error, `completedTasksUpdate Error Received: ${error}`);
   }
+  yield put(updateLoadingCompletedTask(false));
 }
 
 function* taskCreate(action: PayloadAction<CreateTask>) {
@@ -264,7 +277,12 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
         tasks: tasks,
       })
     );
-    const completedTasks = yield call(fetchCompletedTasks, task.projectId);
+    const completedTasks = yield call(
+      fetchCompletedTasks,
+      task.projectId,
+      0,
+      5
+    );
     yield put(
       tasksActions.completedTasksReceived({
         tasks: completedTasks,
@@ -295,7 +313,12 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
         tasks: tasks,
       })
     );
-    const completedTasks = yield call(fetchCompletedTasks, task.projectId);
+    const completedTasks = yield call(
+      fetchCompletedTasks,
+      task.projectId,
+      0,
+      5
+    );
     yield put(
       tasksActions.completedTasksReceived({
         tasks: completedTasks,

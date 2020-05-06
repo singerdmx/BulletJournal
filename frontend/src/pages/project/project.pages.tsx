@@ -7,12 +7,21 @@ import { GroupsWithOwner } from '../../features/group/interface';
 import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
-import { HistoryOutlined, DeleteOutlined, TeamOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import {
+  HistoryOutlined,
+  DeleteOutlined,
+  TeamOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
-import { ProjectType } from '../../features/project/constants';
+import {
+  ProjectType,
+  completeTaskSize,
+} from '../../features/project/constants';
 import { NoteTree } from '../../components/note-tree';
 import { History } from 'history';
 import { getGroupByProject } from '../projects/projects.pages';
@@ -20,6 +29,10 @@ import TaskTree from './task-tree.component';
 import TransactionProject from './transaction-project.pages';
 
 import './project.styles.less';
+import {
+  updateCompletedTasks,
+  updateCompletedTaskNo,
+} from '../../features/tasks/actions';
 
 type ProjectPathParams = {
   projectId: string;
@@ -42,12 +55,19 @@ interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
 type ProjectPageProps = {
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
+  completedTaskNo: number;
   getProject: (projectId: number) => void;
   deleteProject: (
     projectId: number,
     name: string,
     history: History<History.PoorMansUnknown>
   ) => void;
+  updateCompletedTasks: (
+    projectId: number,
+    pageNo: number,
+    pageSize: number
+  ) => void;
+  updateCompletedTaskNo: (completedTaskNo: number) => void;
 };
 
 type MyselfProps = {
@@ -82,22 +102,39 @@ class ProjectPage extends React.Component<
 
   getShowCompletedTasksIcon = () => {
     if (this.state.completeTasksShown) {
-      return <Tooltip placement='top' title='Hide Completed Tasks'>
-        <div onClick={this.handleClickShowCompletedTasksButton}>
-          <CloseCircleOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
-        </div>
-      </Tooltip>;
+      return (
+        <Tooltip placement='top' title='Hide Completed Tasks'>
+          <div onClick={this.handleClickShowCompletedTasksButton}>
+            <CloseCircleOutlined
+              style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
+            />
+          </div>
+        </Tooltip>
+      );
     }
 
-    return <Tooltip placement='top' title='Show Completed Tasks'>
-      <div onClick={this.handleClickShowCompletedTasksButton}>
-        <CheckCircleOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
-      </div>
-    </Tooltip>;
+    return (
+      <Tooltip placement='top' title='Show Completed Tasks'>
+        <div onClick={this.handleClickShowCompletedTasksButton}>
+          <CheckCircleOutlined
+            style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
+          />
+        </div>
+      </Tooltip>
+    );
   };
 
   handleClickShowCompletedTasksButton = () => {
     this.setState({ completeTasksShown: !this.state.completeTasksShown });
+    if (this.props.completedTaskNo === 0) {
+      const projectId = this.props.match.params.projectId;
+      this.props.updateCompletedTasks(
+        parseInt(projectId),
+        0,
+        completeTaskSize * (this.props.completedTaskNo + 1)
+      );
+      this.props.updateCompletedTaskNo(this.props.completedTaskNo + 1);
+    }
   };
 
   onCancel = () => {
@@ -113,20 +150,29 @@ class ProjectPage extends React.Component<
     let createContent = null;
     let projectContent = null;
     let showCompletedTasks = null;
-    const showHistory = <Tooltip title='Show History'>
-      <div>
-        <HistoryOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
-      </div>
-    </Tooltip>;
+    const showHistory = (
+      <Tooltip title='Show History'>
+        <div>
+          <HistoryOutlined
+            style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
+          />
+        </div>
+      </Tooltip>
+    );
 
     switch (project.projectType) {
       case ProjectType.NOTE:
         createContent = <AddNote />;
-        projectContent = <NoteTree readOnly={project.shared}/>;
+        projectContent = <NoteTree readOnly={project.shared} />;
         break;
       case ProjectType.TODO:
         createContent = <AddTask />;
-        projectContent = <TaskTree showCompletedTask={this.state.completeTasksShown} readOnly={project.shared}/>;
+        projectContent = (
+          <TaskTree
+            showCompletedTask={this.state.completeTasksShown}
+            readOnly={project.shared}
+          />
+        );
         showCompletedTasks = this.getShowCompletedTasksIcon();
         break;
       case ProjectType.LEDGER:
@@ -140,18 +186,20 @@ class ProjectPage extends React.Component<
       editContent = <EditProject project={project} />;
       deleteContent = (
         <Popconfirm
-          title="Deleting BuJo also deletes its child BuJo. Are you sure?"
-          okText="Yes"
-          cancelText="No"
+          title='Deleting BuJo also deletes its child BuJo. Are you sure?'
+          okText='Yes'
+          cancelText='No'
           onConfirm={() => {
             this.props.deleteProject(project.id, project.name, history);
           }}
-          className="group-setting"
-          placement="bottom"
+          className='group-setting'
+          placement='bottom'
         >
-          <Tooltip placement="top" title="Delete BuJo">
-            <div className="project-delete">
-              <DeleteOutlined style={{ paddingLeft: '0.5em', cursor: 'pointer' }} />
+          <Tooltip placement='top' title='Delete BuJo'>
+            <div className='project-delete'>
+              <DeleteOutlined
+                style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
+              />
             </div>
           </Tooltip>
         </Popconfirm>
@@ -161,7 +209,7 @@ class ProjectPage extends React.Component<
     let description = null;
     if (project && project.description) {
       description = (
-        <div className="project-description">
+        <div className='project-description'>
           {project.description.split('\n').map((s, key) => {
             return <p>{s}</p>;
           })}
@@ -178,7 +226,7 @@ class ProjectPage extends React.Component<
       editContent = null;
       deleteContent = null;
       if (groupUsers) {
-        groupUsers = groupUsers.filter(u => u.name === project.owner);
+        groupUsers = groupUsers.filter((u) => u.name === project.owner);
       }
     }
 
@@ -188,7 +236,7 @@ class ProjectPage extends React.Component<
         <div>
           {groupUsers.map((u, index) => (
             <p key={index}>
-              <Avatar size="small" src={u.avatar} />
+              <Avatar size='small' src={u.avatar} />
               &nbsp;{u.name}
             </p>
           ))}
@@ -197,20 +245,20 @@ class ProjectPage extends React.Component<
     }
 
     return (
-      <div className="project">
+      <div className='project'>
         <Tooltip
-          placement="top"
+          placement='top'
           title={project.owner}
-          className="project-avatar"
+          className='project-avatar'
         >
           <span>
-            <Avatar size="large" src={project.ownerAvatar} />
+            <Avatar size='large' src={project.ownerAvatar} />
           </span>
         </Tooltip>
-        <div className="project-header">
+        <div className='project-header'>
           <h2>
             <Tooltip
-              placement="top"
+              placement='top'
               title={`${project.projectType} ${project.name}`}
             >
               <span>
@@ -219,15 +267,15 @@ class ProjectPage extends React.Component<
               </span>
             </Tooltip>
           </h2>
-          <div className="project-control">
+          <div className='project-control'>
             <Popover
               title={group && group.name}
-              placement="bottom"
+              placement='bottom'
               content={popContent}
             >
               <span
                 style={{ cursor: 'pointer' }}
-                onClick={e => this.onClickGroup(group.id)}
+                onClick={(e) => this.onClickGroup(group.id)}
               >
                 <TeamOutlined />
                 {group && groupUsers.length}
@@ -241,9 +289,9 @@ class ProjectPage extends React.Component<
           </div>
         </div>
         {description && (
-          <div className="project-description">{description}</div>
+          <div className='project-description'>{description}</div>
         )}
-        <div className="project-content">{projectContent}</div>
+        <div className='project-content'>{projectContent}</div>
       </div>
     );
   }
@@ -252,9 +300,13 @@ class ProjectPage extends React.Component<
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   groups: state.group.groups,
-  myself: state.myself.username
+  myself: state.myself.username,
+  completedTaskNo: state.task.completedTaskNo,
 });
 
-export default connect(mapStateToProps, { getProject, deleteProject })(
-  ProjectPage
-);
+export default connect(mapStateToProps, {
+  getProject,
+  deleteProject,
+  updateCompletedTasks,
+  updateCompletedTaskNo,
+})(ProjectPage);

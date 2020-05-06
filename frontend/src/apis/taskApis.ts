@@ -9,8 +9,14 @@ export const fetchTasks = (projectId: number) => {
     });
 };
 
-export const fetchCompletedTasks = (projectId: number) => {
-  return doFetch(`/api/projects/${projectId}/completedTasks`)
+export const fetchCompletedTasks = (
+  projectId: number,
+  pageNo: number,
+  pageSize: number
+) => {
+  return doFetch(
+    `/api/projects/${projectId}/completedTasks?pageNo=${pageNo}&pageSize=${pageSize}`
+  )
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err.message);
@@ -18,19 +24,19 @@ export const fetchCompletedTasks = (projectId: number) => {
 };
 
 export const getTaskById = (taskId: number) => {
-    return doFetch(`/api/tasks/${taskId}`)
-        .then((res) => res.json())
-        .catch((err) => {
-            throw Error(err.message);
-        });
+  return doFetch(`/api/tasks/${taskId}`)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };
 
 export const getCompletedTaskById = (taskId: number) => {
-    return doFetch(`/api/completedTasks/${taskId}`)
-        .then((res) => res.json())
-        .catch((err) => {
-            throw Error(err.message);
-        });
+  return doFetch(`/api/completedTasks/${taskId}`)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };
 
 export const deleteTaskById = (taskId: number) => {
@@ -79,9 +85,11 @@ export const createTask = (
 
 export const putTasks = (projectId: number, tasks: Task[], etag: string) => {
   const putBody = JSON.stringify(tasks);
-  return doPut(`/api/projects/${projectId}/tasks`, putBody, etag).catch((err) => {
-    throw Error(err.message);
-  });
+  return doPut(`/api/projects/${projectId}/tasks`, putBody, etag).catch(
+    (err) => {
+      throw Error(err.message);
+    }
+  );
 };
 
 export const updateTask = (
@@ -103,7 +111,7 @@ export const updateTask = (
     duration: duration,
     timezone: timezone,
     reminderSetting: reminderSetting,
-    recurrenceRule: recurrenceRule
+    recurrenceRule: recurrenceRule,
   });
   return doPatch(`/api/tasks/${taskId}`, patchBody)
     .then((res) => res.json())
@@ -153,16 +161,16 @@ export const shareTaskWithOther = (
   generateLink: boolean,
   targetUser?: string,
   targetGroup?: number,
-  ttl?: number,
+  ttl?: number
 ) => {
   const postBody = JSON.stringify({
     targetUser: targetUser,
     targetGroup: targetGroup,
     generateLink: generateLink,
-    ttl: ttl
+    ttl: ttl,
   });
   return doPost(`/api/tasks/${taskId}/share`, postBody)
-    .then(res => generateLink ? res.json() : res)
+    .then((res) => (generateLink ? res.json() : res))
     .catch((err) => {
       throw Error(err);
     });
@@ -170,23 +178,27 @@ export const shareTaskWithOther = (
 
 export const getSharables = (taskId: number) => {
   return doFetch(`/api/tasks/${taskId}/sharables`)
-      .then(res => res.json())
-      .catch(err => {
-        throw Error(err.message);
-      });
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };
 
-export const revokeSharable = (taskId: number, user?: string, link?: string) => {
+export const revokeSharable = (
+  taskId: number,
+  user?: string,
+  link?: string
+) => {
   const postBody = JSON.stringify({
     user: user,
-    link: link
+    link: link,
   });
 
   return doPost(`/api/tasks/${taskId}/revokeSharable`, postBody)
-      .then(res => res)
-      .catch(err => {
-        throw Error(err);
-      });
+    .then((res) => res)
+    .catch((err) => {
+      throw Error(err);
+    });
 };
 
 export const getContents = (taskId: number) => {
@@ -198,11 +210,11 @@ export const getContents = (taskId: number) => {
 };
 
 export const getCompletedTaskContents = (taskId: number) => {
-    return doFetch(`/api/completedTasks/${taskId}/contents`)
-        .then((res) => res.json())
-        .catch((err) => {
-            throw Error(err.message);
-        });
+  return doFetch(`/api/completedTasks/${taskId}/contents`)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };
 
 export const addContent = (taskId: number, text: string) => {
@@ -240,10 +252,16 @@ export const updateContent = (
     });
 };
 
-export const getContentRevision = (taskId: number, contentId: number, revisionId: number) => {
-    return doFetch(`/api/tasks/${taskId}/contents/${contentId}/revisions/${revisionId}`)
-        .then((res) => res.json())
-        .catch((err) => {
-            throw Error(err.message);
-        });
+export const getContentRevision = (
+  taskId: number,
+  contentId: number,
+  revisionId: number
+) => {
+  return doFetch(
+    `/api/tasks/${taskId}/contents/${contentId}/revisions/${revisionId}`
+  )
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };
