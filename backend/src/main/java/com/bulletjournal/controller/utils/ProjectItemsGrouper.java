@@ -65,6 +65,14 @@ public class ProjectItemsGrouper {
         return map;
     }
 
+    public static final Comparator<Transaction> TRANSACTION_COMPARATOR = (t1, t2) -> {
+
+        // Sort transaction by date time
+        ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
+        ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
+        return z1.compareTo(z2);
+    };
+
     /*
      * Merge transactions map to target projectItems map
      *
@@ -81,13 +89,7 @@ public class ProjectItemsGrouper {
             projectItem.setDate(ZonedDateTimeHelper.getDate(zonedDateTime));
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Transaction> transactions = transactionsMap.get(zonedDateTime);
-            transactions.sort((t1, t2) -> {
-
-                // Sort transaction by end time
-                ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
-                ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
-                return z1.compareTo(z2);
-            });
+            transactions.sort(TRANSACTION_COMPARATOR);
             projectItem.setTransactions(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
@@ -134,6 +136,8 @@ public class ProjectItemsGrouper {
         return mergedMap;
     }
 
+    public static final Comparator<Note> NOTE_COMPARATOR = Comparator.comparing(AuditModel::getUpdatedAt);
+
     /*
      * Merge notes map to target projectItems map
      *
@@ -152,7 +156,7 @@ public class ProjectItemsGrouper {
             List<Note> notes = notesMap.get(zonedDateTime);
 
             // Sort note by update time
-            notes.sort(Comparator.comparing(AuditModel::getUpdatedAt));
+            notes.sort(NOTE_COMPARATOR);
             projectItem.setNotes(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });

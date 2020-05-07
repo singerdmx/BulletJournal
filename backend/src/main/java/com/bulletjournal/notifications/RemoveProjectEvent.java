@@ -21,7 +21,7 @@ public class RemoveProjectEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return this.getOriginator() + " removed Project " + event.getContentName();
+        return "##" + this.getOriginator() + "## removed BuJo ##" + event.getContentName() + "##";
     }
 
     @Override

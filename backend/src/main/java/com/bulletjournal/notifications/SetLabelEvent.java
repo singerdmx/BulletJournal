@@ -20,7 +20,7 @@ public class SetLabelEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return this.getOriginator() + " updated labels for " + this.contentType.name() + " " + event.getContentName();
+        return "##" + this.getOriginator() + "## updated labels for " + this.contentType.name() + " ##" + event.getContentName() + "##";
     }
 
     @Override

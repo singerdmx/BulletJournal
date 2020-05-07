@@ -20,9 +20,9 @@ public class UpdateTaskAssigneeEvent extends Informed {
     @Override
     protected String getEventTitle(Event event) {
         if (assignedTo == null) {
-            return "Task " + event.getContentName() + " is unassigned by " + this.getOriginator();
+            return "Task ##" + event.getContentName() + "## is unassigned by ##" + this.getOriginator() + "##";
         }
-        return "Task " + event.getContentName() + " is assigned to " + this.assignedTo + " by " + this.getOriginator();
+        return "Task ##" + event.getContentName() + "## is assigned to ##" + this.assignedTo + "## by ##" + this.getOriginator() + "##";
     }
 
     @Override

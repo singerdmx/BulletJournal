@@ -52,9 +52,7 @@ public class NotificationDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<Informed> events) {
-        events.forEach(event -> {
-            event.toNotifications().forEach(n -> this.notificationRepository.save(n));
-        });
+        events.forEach(event -> event.toNotifications().forEach(n -> this.notificationRepository.save(n)));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

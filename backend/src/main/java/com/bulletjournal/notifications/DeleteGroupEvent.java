@@ -17,7 +17,7 @@ public class DeleteGroupEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "Group " + event.getContentName() + " is deleted";
+        return "Group ##" + event.getContentName() + "## is deleted";
     }
 
     @Override

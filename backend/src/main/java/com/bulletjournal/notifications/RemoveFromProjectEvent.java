@@ -21,7 +21,7 @@ public class RemoveFromProjectEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "You've been removed from " + event.getContentName();
+        return "You've been removed from BuJo ##" + event.getContentName() + "##";
     }
 
     @Override

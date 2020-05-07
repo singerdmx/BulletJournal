@@ -21,7 +21,7 @@ public class CreateProjectEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return this.getOriginator() + " created Project " + event.getContentName();
+        return "##" + this.getOriginator() + "## created BuJo ##" + event.getContentName() + "##";
     }
 
     @Override
