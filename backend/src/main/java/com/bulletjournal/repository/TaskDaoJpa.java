@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -100,6 +101,22 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .stream()
                 .map(task -> addLabels(task, tasksMap))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Task> getTasksByAssignee(
+            Long projectId, String requester, String assignee) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        if (project.isShared()) {
+            return Collections.emptyList();
+        }
+
+        List<Task> tasks = this.taskRepository.findTasksByAssigneeAndProject(assignee, projectId);
+        tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
+        return tasks.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels);
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -241,7 +258,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecurringTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasksBetween = new ArrayList<>();
-        List<Task> recurrentTasks = this.taskRepository.findTasksByAssigneesAndRecurrenceRuleNotNull(assignee);
+        List<Task> recurrentTasks = this.taskRepository.findTasksByAssigneeAndRecurrenceRuleNotNull(assignee);
         DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
         DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
 

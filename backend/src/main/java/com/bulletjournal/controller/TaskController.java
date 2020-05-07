@@ -8,6 +8,7 @@ import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.TaskContent;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -55,7 +56,12 @@ public class TaskController {
     private UserClient userClient;
 
     @GetMapping(TASKS_ROUTE)
-    public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId) {
+    public ResponseEntity<List<Task>> getTasks(
+            @NotNull @PathVariable Long projectId, @RequestParam(required = false) String assignee) {
+        if (StringUtils.isNotBlank(assignee)) {
+            return getTasksByAssignee(projectId, assignee);
+        }
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Task> tasks = this.taskDaoJpa.getTasks(projectId, username);
         String tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -66,6 +72,12 @@ public class TaskController {
 
         return ResponseEntity.ok().headers(responseHeader).body(
                 tasks.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
+    }
+
+    private ResponseEntity<List<Task>> getTasksByAssignee(Long projectId, String assignee) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Task> tasks = this.taskDaoJpa.getTasksByAssignee(projectId, username, assignee);
+        return ResponseEntity.ok().body(tasks);
     }
 
     private Task addAvatar(Task task) {
@@ -112,7 +124,7 @@ public class TaskController {
         if (!events.isEmpty()) {
             events.forEach((event) -> notificationService.inform(event));
         }
-        return getTasks(task.getProjectId());
+        return getTasks(task.getProjectId(), null);
     }
 
     @PutMapping(TASKS_ROUTE)
@@ -129,7 +141,7 @@ public class TaskController {
             }
         }
         this.taskDaoJpa.updateUserTasks(projectId, tasks);
-        return getTasks(projectId);
+        return getTasks(projectId, null);
     }
 
     @PostMapping(COMPLETE_TASK_ROUTE)
@@ -166,7 +178,7 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
-        return getTasks(task.getProjectId());
+        return getTasks(task.getProjectId(), null);
     }
 
     @DeleteMapping(COMPLETED_TASK_ROUTE)

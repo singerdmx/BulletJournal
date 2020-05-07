@@ -94,6 +94,23 @@ public class ProjectItemsGrouper {
         return mergedMap;
     }
 
+    public static final Comparator<Task> TASK_COMPARATOR = (t1, t2) -> {
+        if (!t1.hasDueDate() && !t2.hasDueDate()) {
+            return Long.compare(t1.getId(), t2.getId());
+        }
+        if (!t1.hasDueDate()) {
+            return 1;
+        }
+        if (!t2.hasDueDate()) {
+            return -1;
+        }
+
+        // Sort task by due time
+        ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
+        ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
+        return z1.compareTo(z2);
+    };
+
     /*
      * Merge tasks map to target projectItems map
      *
@@ -110,17 +127,7 @@ public class ProjectItemsGrouper {
             projectItem.setDate(ZonedDateTimeHelper.getDate(zonedDateTime));
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Task> tasks = tasksMap.get(zonedDateTime);
-            tasks.sort((t1, t2) -> {
-                if (!t1.hasDueDate())
-                    return 1;
-                if (!t2.hasDueDate())
-                    return -1;
-
-                // Sort task by end time
-                ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
-                ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
-                return z1.compareTo(z2);
-            });
+            tasks.sort(TASK_COMPARATOR);
             projectItem.setTasks(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });

@@ -14,8 +14,12 @@ import java.util.Optional;
 public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositoryCustom {
     List<Task> findTaskByProject(Project project);
 
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.project_id = :project_id",
+            nativeQuery = true)
+    List<Task> findTasksByAssigneeAndProject(@Param("assignee") String assignee, @Param("project_id") Long projectId);
+
     @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.recurrence_rule IS NOT NULL", nativeQuery = true)
-    List<Task> findTasksByAssigneesAndRecurrenceRuleNotNull(@Param("assignee") String assignee);
+    List<Task> findTasksByAssigneeAndRecurrenceRuleNotNull(@Param("assignee") String assignee);
 
     Optional<Task> findTaskByGoogleCalendarEventId(String googleCalendarEventId);
 
