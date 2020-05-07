@@ -1,19 +1,23 @@
 package com.bulletjournal.notifications;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.ProjectItemModel;
 
 public class Auditable {
     private Project project;
-    private ProjectItemModel projectItem;
+    private ContentType contentType;
+    // projectItem may be deleted already
+    private Long projectItemId;
     private String activity;
     private String originator;
 
-    public Auditable(Project project, ProjectItemModel projectItem, String activity, String originator) {
+    public Auditable(
+            Project project, String activity, String originator, ContentType contentType, Long projectItemId) {
         this.project = project;
-        this.projectItem = projectItem;
+        this.contentType = contentType;
         this.activity = activity;
         this.originator = originator;
+        this.projectItemId = projectItemId;
     }
 
     public Project getProject() {
@@ -24,12 +28,20 @@ public class Auditable {
         this.project = project;
     }
 
-    public ProjectItemModel getProjectItem() {
-        return projectItem;
+    public ContentType getContentType() {
+        return contentType;
     }
 
-    public void setProjectItem(ProjectItemModel projectItem) {
-        this.projectItem = projectItem;
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
+    }
+
+    public Long getProjectItemId() {
+        return projectItemId;
+    }
+
+    public void setProjectItemId(Long projectItemId) {
+        this.projectItemId = projectItemId;
     }
 
     public String getActivity() {
@@ -46,5 +58,9 @@ public class Auditable {
 
     public void setOriginator(String originator) {
         this.originator = originator;
+    }
+
+    public com.bulletjournal.repository.models.Auditable toRepositoryAuditable() {
+        return new com.bulletjournal.repository.models.Auditable(this.project, this.activity, this.originator);
     }
 }

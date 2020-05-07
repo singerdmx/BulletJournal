@@ -1,5 +1,6 @@
 package com.bulletjournal.notifications;
 
+import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
@@ -17,13 +18,15 @@ import java.util.concurrent.*;
 public class NotificationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationService.class);
     private final ExecutorService executorService;
-    private final BlockingQueue<Informed> eventQueue;
+    private final BlockingQueue<Object> eventQueue;
     private final NotificationDaoJpa notificationDaoJpa;
+    private final AuditableDaoJpa auditableDaoJpa;
     private volatile boolean stop = false;
 
     @Autowired
-    public NotificationService(NotificationDaoJpa notificationDaoJpa) {
+    public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa) {
         this.notificationDaoJpa = notificationDaoJpa;
+        this.auditableDaoJpa = auditableDaoJpa;
         this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("notification-service"));
         this.eventQueue = new LinkedBlockingQueue<>();
     }
@@ -41,9 +44,17 @@ public class NotificationService {
         this.eventQueue.offer(informed);
     }
 
+    public void trackActivity(Auditable auditable) {
+        LOGGER.info("Received auditable: " + auditable);
+        if (auditable == null) {
+            return;
+        }
+        this.eventQueue.offer(auditable);
+    }
+
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        List<Informed> events = new ArrayList<>();
+        List<Object> events = new ArrayList<>();
 
         while (!stop) {
             try {
@@ -57,10 +68,28 @@ public class NotificationService {
             } catch (Exception ex) {
                 LOGGER.error("Error on draining from eventQueue", ex);
             }
+            List<Informed> informeds = new ArrayList<>();
+            List<Auditable> auditables = new ArrayList<>();
+            events.stream().forEach((e) -> {
+                if (e instanceof Informed) {
+                    informeds.add((Informed) e);
+                } else if (e instanceof Auditable) {
+                    auditables.add((Auditable) e);
+                }
+            });
             try {
-                this.notificationDaoJpa.create(events);
+                if (!informeds.isEmpty()) {
+                    this.notificationDaoJpa.create(informeds);
+                }
             } catch (Exception ex) {
                 LOGGER.error("Error on creating records in notificationDaoJpa", ex);
+            }
+            try {
+                if (!auditables.isEmpty()) {
+                    this.auditableDaoJpa.create(auditables);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on creating records in auditableDaoJpa", ex);
             }
             events = new ArrayList<>();
         }

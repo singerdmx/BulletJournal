@@ -15,7 +15,9 @@ public class NotificationServiceTest {
     @Test
     public void testGetUser() {
         MockedNotificationDaoJpa mockedNotificationDaoJpa = new MockedNotificationDaoJpa();
-        NotificationService notificationService = new NotificationService(mockedNotificationDaoJpa);
+        MockedAuditableDaoJpa mockedAuditableDaoJpa = new MockedAuditableDaoJpa();
+        NotificationService notificationService = new NotificationService(
+                mockedNotificationDaoJpa, mockedAuditableDaoJpa);
         notificationService.postConstruct();
         String originator = "BulletJournal";
         String targetUser = "u1";

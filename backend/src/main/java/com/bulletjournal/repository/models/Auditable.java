@@ -31,6 +31,12 @@ public class Auditable extends AuditModel {
     @Column(length = 100)
     private String originator;
 
+    public Auditable(Project project, String activity, String originator) {
+        this.project = project;
+        this.activity = activity;
+        this.originator = originator;
+    }
+
     public Long getId() {
         return id;
     }
