@@ -1,80 +1,80 @@
 import React from 'react';
 
 import {
+  ContactsOutlined,
   DeleteOutlined,
   EyeOutlined,
   InfoCircleOutlined,
-  UsergroupAddOutlined,
-  UsergroupDeleteOutlined,
-  SolutionOutlined,
   PlusSquareOutlined,
-  ContactsOutlined,
-  UserDeleteOutlined,
   ShareAltOutlined,
+  SolutionOutlined,
+  StopOutlined,
   TagOutlined,
-  StopOutlined
+  UserDeleteOutlined,
+  UsergroupAddOutlined,
+  UsergroupDeleteOutlined
 } from '@ant-design/icons';
 
-import { Avatar, Badge } from 'antd';
-import { EventType } from '../../features/notification/constants'
+import {Avatar, Badge} from 'antd';
+import {EventType} from '../../features/notification/constants'
 
 type titleAvatarProps = {
-    source: string;
-    type: string;
-  };
+  source: string;
+  type: string;
+};
 
-const TitleAvatar = ({ source, type }: titleAvatarProps) => {
+const TitleAvatar = ({source, type}: titleAvatarProps) => {
   let icon = null;
-  switch (type){
+  switch (type) {
     case EventType.JoinGroupEvent:
-      icon =  <UsergroupAddOutlined />;
+      icon = <UsergroupAddOutlined/>;
       break;
     case EventType.RemoveUserFromGroupEvent:
-      icon =  <UsergroupDeleteOutlined />;
+      icon = <UsergroupDeleteOutlined/>;
       break;
     case EventType.DeleteGroupEvent:
     case EventType.RemoveNoteEvent:
     case EventType.RemoveProjectEvent:
     case EventType.RemoveTaskEvent:
     case EventType.RemoveTransactionEvent:
-      icon = <DeleteOutlined />;
+      icon = <DeleteOutlined/>;
       break;
     case EventType.JoinGroupResponseEvent:
-      icon = <InfoCircleOutlined />;
+      icon = <InfoCircleOutlined/>;
       break;
     case EventType.UpdateTaskAssigneeEvent:
     case EventType.UpdateTransactionPayerEvent:
-      icon = <SolutionOutlined />
+      icon = <SolutionOutlined/>
       break;
     case EventType.CreateProjectEvent:
-      icon = <PlusSquareOutlined />
+      icon = <PlusSquareOutlined/>
       break;
     case EventType.JoinProjectEvent:
-      icon = <ContactsOutlined />
+      icon = <ContactsOutlined/>
       break;
     case EventType.RemoveFromProjectEvent:
-      icon = <UserDeleteOutlined />
+      icon = <UserDeleteOutlined/>
       break;
     case EventType.ShareProjectItemEvent:
-      icon = <ShareAltOutlined />
+      icon = <ShareAltOutlined/>
       break;
     case EventType.SetLabelEvent:
-      icon = <TagOutlined />
+      icon = <TagOutlined/>
       break;
     case EventType.RevokeSharableEvent:
-      icon = <StopOutlined />
+      icon = <StopOutlined/>
       break;
     default:
-      icon = <EyeOutlined />;
+      icon = <EyeOutlined/>;
   }
   return (
-    <div className="avatar-title">
-      <Badge
-        count={icon}
-      >
-        <Avatar src={source} />
-      </Badge>
-    </div>
+      <div className="avatar-title">
+        <Badge
+            count={icon}
+        >
+          <Avatar src={source}/>
+        </Badge>
+      </div>
   );
 };
 

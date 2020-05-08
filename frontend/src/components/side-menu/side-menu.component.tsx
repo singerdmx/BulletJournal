@@ -14,6 +14,7 @@ import {
   CarryOutOutlined,
   AccountBookOutlined,
   FileTextOutlined,
+  AppstoreOutlined
 } from '@ant-design/icons';
 
 import AddGroup from '../../components/modals/add-group.component';
@@ -128,8 +129,14 @@ class SideMenu extends React.Component<
             Today
           </Menu.Item>
           <Menu.Item
-            key='calendar'
-            onClick={() => this.handleClickToday('calendar')}
+              key='recent'
+          >
+            <AppstoreOutlined />
+            Recent
+          </Menu.Item>
+          <Menu.Item
+              key='calendar'
+              onClick={() => this.handleClickToday('calendar')}
           >
             <CalendarOutlined />
             Calendar

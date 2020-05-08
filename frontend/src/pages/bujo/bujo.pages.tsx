@@ -7,6 +7,7 @@ import {
   AccountBookOutlined,
   CarryOutOutlined,
   SyncOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 import { IState } from '../../store/index';
 import { Project } from '../../features/project/interface';
@@ -21,6 +22,7 @@ import {
 } from '../../features/myBuJo/actions';
 
 import './bujo.styles.less';
+import RecentItemList from "../../components/recent/recent-item-list.component";
 
 type BujoProps = {
   todoSelected: boolean;
@@ -88,15 +90,38 @@ class BujoPage extends React.Component<
     );
   };
 
+  getCategoryPage = (category: string) => {
+    switch (category) {
+      case 'today':
+        return <ProjectItemList />;
+      case 'calendar':
+        return <BujoCalendar />;
+      case 'recent':
+        return <RecentItemList />;
+      default:
+        return null;
+    }
+  };
+
   render() {
     const { category } = this.props.match.params;
-    let plusIcon = null;
+    let plusIcon;
     if (this.props.ownedProjects.length === 0) {
       plusIcon = <AddProject history={this.props.history} mode={'MyBuJo'} />;
     } else {
       plusIcon = (
         <AddProjectItem history={this.props.history} mode={'MyBuJo'} />
       );
+    }
+    let noteCheckbox = null;
+    if (category === 'recent') {
+      noteCheckbox = <Checkbox
+          value='note'
+      >
+        <Tooltip placement='top' title='NOTE'>
+          <FileTextOutlined />
+        </Tooltip>
+      </Checkbox>
     }
     return (
       <div className='todo'>
@@ -111,6 +136,7 @@ class BujoPage extends React.Component<
                 <CarryOutOutlined />
               </Tooltip>
             </Checkbox>
+            {noteCheckbox}
             <Checkbox
               checked={this.props.ledgerSelected}
               value='ledger'
@@ -131,7 +157,7 @@ class BujoPage extends React.Component<
           {plusIcon}
         </div>
 
-        {category === 'today' ? <ProjectItemList /> : <BujoCalendar />}
+        {this.getCategoryPage(category)}
       </div>
     );
   }
