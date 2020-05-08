@@ -3,6 +3,7 @@ export interface User {
   avatar: string;
   id: number;
   name: string;
+  alias: string;
   thumbnail: string;
 }
 

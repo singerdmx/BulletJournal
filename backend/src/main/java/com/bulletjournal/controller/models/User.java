@@ -15,6 +15,7 @@ public class User implements Serializable {
     private Integer id;
     @Id
     private String name;
+    private String alias;
     private String thumbnail;
     private String avatar;
 
@@ -32,6 +33,7 @@ public class User implements Serializable {
     public User(Integer id, String name, String thumbnail, String avatar) {
         this.id = id;
         this.name = name;
+        this.alias = name;
         this.thumbnail = thumbnail;
         this.avatar = avatar;
     }
@@ -50,6 +52,15 @@ public class User implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.alias = name;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public String getThumbnail() {
