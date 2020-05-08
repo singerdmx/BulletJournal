@@ -1,8 +1,10 @@
 import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
 import { Task, ReminderSetting } from '../features/tasks/interface';
 
-export const fetchTasks = (projectId: number) => {
-  return doFetch(`/api/projects/${projectId}/tasks`)
+export const fetchTasks = (projectId: number, assignee?: string) => {
+  let url = `/api/projects/${projectId}/tasks`;
+  if (assignee) url += `?assignee=${assignee}`;
+  return doFetch(url)
     .then((res) => res)
     .catch((err) => {
       throw Error(err.message);

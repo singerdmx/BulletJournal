@@ -18,9 +18,7 @@ import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
-import {
-  ProjectType,
-} from '../../features/project/constants';
+import { ProjectType } from '../../features/project/constants';
 import { NoteTree } from '../../components/note-tree';
 import { History } from 'history';
 import { getGroupByProject } from '../projects/projects.pages';
@@ -31,7 +29,9 @@ import './project.styles.less';
 import {
   updateCompletedTasks,
   updateCompletedTaskPageNo,
+  getTasksByAssignee,
 } from '../../features/tasks/actions';
+import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
 
 type ProjectPathParams = {
   projectId: string;
@@ -41,6 +41,8 @@ type ModalState = {
   isShow: boolean;
   groupName: string;
   completeTasksShown: boolean;
+  tasksByUsersShown: boolean;
+  assignee: string;
 };
 
 type GroupProps = {
@@ -63,6 +65,7 @@ type ProjectPageProps = {
   ) => void;
   updateCompletedTasks: (projectId: number) => void;
   updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
+  getTasksByAssignee: (projectId: number, assignee: string) => void;
 };
 
 type MyselfProps = {
@@ -77,19 +80,22 @@ class ProjectPage extends React.Component<
     isShow: false,
     groupName: '',
     completeTasksShown: false,
+    //used for tasks by assignee modal
+    tasksByUsersShown: false,
+    assignee: '',
   };
 
   componentDidMount() {
     const projectId = this.props.match.params.projectId;
     this.props.getProject(parseInt(projectId));
-    this.setState({completeTasksShown: false});
+    this.setState({ completeTasksShown: false });
   }
 
   componentDidUpdate(prevProps: ProjectPathProps): void {
     const projectId = this.props.match.params.projectId;
     if (projectId !== prevProps.match.params.projectId) {
       this.props.getProject(parseInt(projectId));
-      this.setState({completeTasksShown: false});
+      this.setState({ completeTasksShown: false });
     }
   }
 
@@ -101,7 +107,7 @@ class ProjectPage extends React.Component<
     if (this.state.completeTasksShown) {
       return (
         <Tooltip placement='top' title='Hide Completed Tasks'>
-          <div onClick={e => this.setState({completeTasksShown: false})}>
+          <div onClick={(e) => this.setState({ completeTasksShown: false })}>
             <CloseCircleOutlined
               style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
             />
@@ -133,6 +139,18 @@ class ProjectPage extends React.Component<
     this.setState({ isShow: false });
   };
 
+  handleGetTasksByAssignee = (u: any) => {
+    this.setState({ tasksByUsersShown: true });
+    this.setState({ assignee: u.name });
+    //update tasks
+    console.log(this.props.match.params.projectId);
+    console.log(u.name);
+    this.props.getTasksByAssignee(
+      parseInt(this.props.match.params.projectId),
+      u.name
+    );
+  };
+
   render() {
     const { project, myself, history } = this.props;
     if (!project) {
@@ -142,6 +160,8 @@ class ProjectPage extends React.Component<
     let createContent = null;
     let projectContent = null;
     let showCompletedTasks = null;
+    let projectItemsByUser = null;
+
     const showHistory = (
       <Tooltip title='Show History'>
         <div>
@@ -166,6 +186,15 @@ class ProjectPage extends React.Component<
           />
         );
         showCompletedTasks = this.getShowCompletedTasksIcon();
+        projectItemsByUser = (
+          <TasksByAssignee
+            assignee={this.state.assignee}
+            visible={this.state.tasksByUsersShown}
+            onCancel={() => {
+              this.setState({ tasksByUsersShown: false });
+            }}
+          />
+        );
         break;
       case ProjectType.LEDGER:
         createContent = <AddTransaction />;
@@ -227,7 +256,11 @@ class ProjectPage extends React.Component<
       popContent = (
         <div>
           {groupUsers.map((u, index) => (
-            <p key={index}>
+            <p
+              key={index}
+              className='avatar-container'
+              onClick={() => this.handleGetTasksByAssignee(u)}
+            >
               <Avatar size='small' src={u.avatar} />
               &nbsp;{u.name}
             </p>
@@ -278,6 +311,7 @@ class ProjectPage extends React.Component<
             {createContent}
             {editContent}
             {deleteContent}
+            {projectItemsByUser}
           </div>
         </div>
         {description && (
@@ -301,4 +335,5 @@ export default connect(mapStateToProps, {
   deleteProject,
   updateCompletedTasks,
   updateCompletedTaskPageNo,
+  getTasksByAssignee,
 })(ProjectPage);

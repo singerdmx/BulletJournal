@@ -7,7 +7,7 @@ import { createNote } from '../../features/notes/actions';
 import { IState } from '../../store';
 import { updateNoteVisible } from '../../features/notes/actions';
 import './modals.styles.less';
-import {Project} from "../../features/project/interface";
+import { Project } from '../../features/project/interface';
 
 type NoteProps = {
   project: Project | undefined;
@@ -19,10 +19,10 @@ interface NoteCreateFormProps {
   addNoteVisible: boolean;
 }
 
-const AddNote: React.FC<RouteComponentProps &
-  NoteProps &
-  NoteCreateFormProps> = props => {
-  const {project} = props;
+const AddNote: React.FC<
+  RouteComponentProps & NoteProps & NoteCreateFormProps
+> = (props) => {
+  const { project } = props;
   const [form] = Form.useForm();
   const addNote = (values: any) => {
     if (project) {
@@ -48,12 +48,12 @@ const AddNote: React.FC<RouteComponentProps &
           onOk={() => {
             form
               .validateFields()
-              .then(values => {
+              .then((values) => {
                 console.log(values);
                 form.resetFields();
                 addNote(values);
               })
-              .catch(info => console.log(info));
+              .catch((info) => console.log(info));
           }}
         >
           <Form form={form}>
@@ -72,7 +72,7 @@ const AddNote: React.FC<RouteComponentProps &
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
-  addNoteVisible: state.note.addNoteVisible
+  addNoteVisible: state.note.addNoteVisible,
 });
 
 export default connect(mapStateToProps, { createNote, updateNoteVisible })(

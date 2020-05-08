@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import { getReminderSettingString, Task } from '../../features/tasks/interface';
 import { connect } from 'react-redux';
-import {Link, useHistory} from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import {
   completeTask,
   deleteCompletedTask,
@@ -19,7 +19,7 @@ import {
 } from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import {Label, stringToRGB} from '../../features/label/interface';
+import { Label, stringToRGB } from '../../features/label/interface';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import MoveProjectItem from '../modals/move-project-item.component';
@@ -30,10 +30,11 @@ import {
   getIcon,
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
-import {addSelectedLabel} from "../../features/label/actions";
+import { addSelectedLabel } from '../../features/label/actions';
 
 type ProjectProps = {
   readOnly: boolean;
+  inModal?: boolean;
   addSelectedLabel: (label: Label) => void;
 };
 
@@ -166,7 +167,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
   };
 
   const getMore = () => {
-    if (props.readOnly) {
+    if (props.readOnly || props.inModal === true) {
       return null;
     }
     return (
@@ -268,7 +269,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
                     className='labels'
                     onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
-                    style={{cursor: 'pointer', borderRadius: 10 }}
+                    style={{ cursor: 'pointer', borderRadius: 10 }}
                   >
                     <span>
                       {getIcon(label.icon)} &nbsp;

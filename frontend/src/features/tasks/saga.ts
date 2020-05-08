@@ -22,6 +22,7 @@ import {
   UpdateTaskContentRevision,
   UpdateTaskContents,
   UpdateCompletedTasks,
+  GetTasksByAssignee,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -58,10 +59,25 @@ import { IState } from '../../store';
 import { Content, Revision, ProjectItems } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
 import { actions as SystemActions } from '../system/reducer';
-import {completedTaskPageSize} from "../project/constants";
+import { completedTaskPageSize } from '../project/constants';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
+}
+
+function* getTasksByAssignee(action: PayloadAction<GetTasksByAssignee>) {
+  try {
+    const { projectId, assignee } = action.payload;
+    const data = yield call(fetchTasks, projectId, assignee);
+    const tasksByAssignee = yield data.json();
+    yield put(
+      tasksActions.tasksByAssigneeReceived({
+        tasksByAssignee: tasksByAssignee,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `getTasksByAssignee Error Received: ${error}`);
+  }
 }
 
 function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
@@ -101,30 +117,42 @@ function* completedTasksUpdate(action: PayloadAction<UpdateCompletedTasks>) {
     }
     yield put(updateLoadingCompletedTask(true));
     if (state.task.completedTaskPageNo === 0) {
-      const tasks = yield call(fetchCompletedTasks, projectId, state.task.completedTaskPageNo, completedTaskPageSize);
+      const tasks = yield call(
+        fetchCompletedTasks,
+        projectId,
+        state.task.completedTaskPageNo,
+        completedTaskPageSize
+      );
       yield put(
-          tasksActions.completedTasksReceived({
-            tasks: tasks,
-          })
+        tasksActions.completedTasksReceived({
+          tasks: tasks,
+        })
       );
     } else {
       yield put(
-          tasksActions.completedTasksReceived({
-            tasks: state.task.completedTasks.concat(state.task.nextCompletedTasks),
-          })
+        tasksActions.completedTasksReceived({
+          tasks: state.task.completedTasks.concat(
+            state.task.nextCompletedTasks
+          ),
+        })
       );
     }
 
-    const tasks = yield call(fetchCompletedTasks, projectId, state.task.completedTaskPageNo + 1, completedTaskPageSize);
-    yield put(
-        tasksActions.nextCompletedTasksReceived({
-          tasks: tasks,
-        })
+    const tasks = yield call(
+      fetchCompletedTasks,
+      projectId,
+      state.task.completedTaskPageNo + 1,
+      completedTaskPageSize
     );
     yield put(
-        tasksActions.updateCompletedTaskPageNo({
-          completedTaskPageNo: state.task.completedTaskPageNo + 1,
-        })
+      tasksActions.nextCompletedTasksReceived({
+        tasks: tasks,
+      })
+    );
+    yield put(
+      tasksActions.updateCompletedTaskPageNo({
+        completedTaskPageNo: state.task.completedTaskPageNo + 1,
+      })
     );
   } catch (error) {
     yield call(message.error, `completedTasksUpdate Error Received: ${error}`);
@@ -302,21 +330,26 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
     const completedTaskPageNo = state.task.completedTaskPageNo;
     if (completedTaskPageNo > 0) {
       const completedTasks = yield call(
-          fetchCompletedTasks,
-          task.projectId,
-          0,
-          completedTaskPageNo * completedTaskPageSize
+        fetchCompletedTasks,
+        task.projectId,
+        0,
+        completedTaskPageNo * completedTaskPageSize
       );
       yield put(
-          tasksActions.completedTasksReceived({
-            tasks: completedTasks,
-          })
+        tasksActions.completedTasksReceived({
+          tasks: completedTasks,
+        })
       );
-      const tasks = yield call(fetchCompletedTasks, task.projectId, completedTaskPageNo, completedTaskPageSize);
+      const tasks = yield call(
+        fetchCompletedTasks,
+        task.projectId,
+        completedTaskPageNo,
+        completedTaskPageSize
+      );
       yield put(
-          tasksActions.nextCompletedTasksReceived({
-            tasks: tasks,
-          })
+        tasksActions.nextCompletedTasksReceived({
+          tasks: tasks,
+        })
       );
     }
 
@@ -347,21 +380,26 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
     const completedTaskPageNo = state.task.completedTaskPageNo;
     if (completedTaskPageNo > 0) {
       const completedTasks = yield call(
-          fetchCompletedTasks,
-          task.projectId,
-          0,
-          completedTaskPageNo * completedTaskPageSize
+        fetchCompletedTasks,
+        task.projectId,
+        0,
+        completedTaskPageNo * completedTaskPageSize
       );
       yield put(
-          tasksActions.completedTasksReceived({
-            tasks: completedTasks,
-          })
+        tasksActions.completedTasksReceived({
+          tasks: completedTasks,
+        })
       );
-      const tasks = yield call(fetchCompletedTasks, task.projectId, completedTaskPageNo, completedTaskPageSize);
+      const tasks = yield call(
+        fetchCompletedTasks,
+        task.projectId,
+        completedTaskPageNo,
+        completedTaskPageSize
+      );
       yield put(
-          tasksActions.nextCompletedTasksReceived({
-            tasks: tasks,
-          })
+        tasksActions.nextCompletedTasksReceived({
+          tasks: tasks,
+        })
       );
     }
   } catch (error) {
@@ -670,5 +708,6 @@ export default function* taskSagas() {
       tasksActions.CompleteTaskContentsUpdate.type,
       completeTaskContentsUpdate
     ),
+    yield takeLatest(tasksActions.getTasksByAssignee.type, getTasksByAssignee),
   ]);
 }

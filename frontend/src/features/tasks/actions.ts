@@ -5,7 +5,7 @@ import { History } from 'history';
 export const updateTasks = (projectId: number) =>
   actions.TasksUpdate({ projectId: projectId });
 export const updateCompletedTasks = (projectId: number) =>
-  actions.CompletedTasksUpdate({projectId: projectId});
+  actions.CompletedTasksUpdate({ projectId: projectId });
 export const createTask = (
   projectId: number,
   name: string,
@@ -135,3 +135,9 @@ export const updateCompletedTaskPageNo = (completedTaskPageNo: number) =>
   });
 
 export const clearCompletedTasks = () => actions.clearCompletedTasks({});
+
+export const getTasksByAssignee = (projectId: number, assignee: string) =>
+  actions.getTasksByAssignee({
+    projectId: projectId,
+    assignee: assignee,
+  });

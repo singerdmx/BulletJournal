@@ -23,6 +23,15 @@ export type UpdateTasks = {
   projectId: number;
 };
 
+export type GetTasksByAssignee = {
+  projectId: number;
+  assignee: string;
+};
+
+export type TasksByAssigneeAction = {
+  tasksByAssignee: Array<Task>;
+};
+
 export type UpdateCompletedTasks = {
   projectId: number;
 };
@@ -164,12 +173,22 @@ let initialState = {
   sharedLink: '',
   loadingCompletedTask: false as boolean,
   completedTaskPageNo: 0,
+  tasksByAssignee: [] as Array<Task>,
 };
 
 const slice = createSlice({
   name: 'task',
   initialState,
   reducers: {
+    tasksByAssigneeReceived: (
+      state,
+      action: PayloadAction<TasksByAssigneeAction>
+    ) => {
+      const { tasksByAssignee } = action.payload;
+      state.tasksByAssignee = tasksByAssignee;
+    },
+    getTasksByAssignee: (state, action: PayloadAction<GetTasksByAssignee>) =>
+      state,
     tasksReceived: (state, action: PayloadAction<TasksAction>) => {
       const { tasks } = action.payload;
       state.tasks = tasks;
@@ -215,7 +234,10 @@ const slice = createSlice({
       const { tasks } = action.payload;
       state.completedTasks = tasks;
     },
-    clearCompletedTasks: (state, action: PayloadAction<ClearCompletedTasksAction>) => {
+    clearCompletedTasks: (
+      state,
+      action: PayloadAction<ClearCompletedTasksAction>
+    ) => {
       state.completedTasks = [];
       state.nextCompletedTasks = [];
       state.completedTaskPageNo = 0;
