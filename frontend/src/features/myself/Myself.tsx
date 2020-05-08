@@ -9,7 +9,7 @@ import { IState } from '../../store/index';
 import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
 import { Project, ProjectsWithOwner } from '../project/interface';
-import { updateExpandedMyself, updateMyself, updateTheme } from './actions';
+import { updateExpandedMyself, updateMyself } from './actions';
 import { groupUpdate, updateGroups } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
 import { updateSystem } from '../system/actions';
@@ -19,7 +19,6 @@ import './myself.styles.less';
 type MyselfProps = {
   username: string;
   avatar: string;
-  theme: string;
   ownedProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
   updateMyself: () => void;
@@ -70,7 +69,6 @@ class Myself extends React.Component<MyselfProps & PathProps> {
         <Popover
           content={
             <DropdownMenu
-              theme={this.props.theme}
               username={this.props.username}
               history={this.props.history}
             />
@@ -94,13 +92,11 @@ class Myself extends React.Component<MyselfProps & PathProps> {
 const mapStateToProps = (state: IState) => ({
   username: state.myself.username,
   avatar: state.myself.avatar,
-  theme: state.settings.theme,
   ownedProjects: state.project.owned,
   sharedProjects: state.project.shared
 });
 
 export default connect(mapStateToProps, {
-  updateTheme,
   updateMyself,
   updateExpandedMyself,
   updateGroups,

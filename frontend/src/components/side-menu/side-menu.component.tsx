@@ -28,7 +28,6 @@ import { createGroupByName, updateGroups } from '../../features/group/actions';
 import { updateProjects } from '../../features/project/actions';
 import { IState } from '../../store';
 import { getProjectItemsAfterUpdateSelect } from '../../features/myBuJo/actions';
-import { updateTheme } from '../../features/myself/actions';
 
 const { SubMenu } = Menu;
 //props of groups
@@ -49,11 +48,6 @@ type ProjectProps = {
     category: string
   ) => void;
 };
-// props of account
-type AccountProps = {
-  updateTheme: () => void;
-  theme: string;
-};
 
 export const iconMapper = {
   TODO: <CarryOutOutlined />,
@@ -73,8 +67,8 @@ declare global {
 
 // class component
 class SideMenu extends React.Component<
-  GroupProps & PathProps & ProjectProps & AccountProps
-> {
+  GroupProps & PathProps & ProjectProps
+  > {
   // click handler when click menu item
   onClick = (menu: any) => {
     const path = menu.keyPath.reverse().join('/');
@@ -109,7 +103,6 @@ class SideMenu extends React.Component<
     const { groups: groupsByOwner, ownProjects } = this.props;
     return (
       <Menu
-        theme={this.props.theme === 'DARK' ? 'dark' : 'light'}
         mode='inline'
         defaultOpenKeys={['todo', 'ownedProjects', 'sharedProjects']}
         style={{ height: '100%', fontWeight: 500 }}
@@ -129,14 +122,14 @@ class SideMenu extends React.Component<
             Today
           </Menu.Item>
           <Menu.Item
-              key='recent'
+            key='recent'
           >
             <AppstoreOutlined />
             Recent
           </Menu.Item>
           <Menu.Item
-              key='calendar'
-              onClick={() => this.handleClickToday('calendar')}
+            key='calendar'
+            onClick={() => this.handleClickToday('calendar')}
           >
             <CalendarOutlined />
             Calendar
@@ -242,7 +235,6 @@ const mapStateToProps = (state: IState) => ({
   id: state.user.id,
   groups: state.group.groups,
   timezone: state.myself.timezone,
-  theme: state.settings.theme,
   ownProjects: state.project.owned,
   sharedProjects: state.project.shared,
   todoSelected: state.myBuJo.todoSelected,
@@ -250,7 +242,6 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-  updateTheme,
   updateGroups,
   createGroupByName,
   updateProjects,

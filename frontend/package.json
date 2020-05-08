@@ -10,7 +10,7 @@
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^7.2.1",
     "@types/moment-timezone": "^0.5.13",
-    "antd": "^4.0.4",
+    "antd": "^4.1.4",
     "axios": "^0.19.2",
     "braft-editor": "^2.3.9",
     "country-code": "0.0.3",

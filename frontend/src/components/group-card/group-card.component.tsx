@@ -11,7 +11,6 @@ import {
 } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interface';
 import { MyselfWithAvatar } from '../../features/myself/reducer';
-import { updateTheme } from '../../features/myself/actions';
 import { IState } from '../../store';
 
 import './group-card.styles.less';
@@ -33,10 +32,6 @@ type GroupProps = {
 };
 
 type PathProps = RouteComponentProps;
-
-type AccountProps = {
-  theme: string;
-}
 
 type GroupState = {
   showModal: boolean;
@@ -66,7 +61,7 @@ function getGroupUserSpan(item: User, group: Group): JSX.Element {
 
 const { Title } = Typography;
 
-class GroupCard extends React.Component<GroupProps & PathProps & AccountProps, GroupState> {
+class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   state: GroupState = {
     showModal: false
   };
@@ -84,13 +79,12 @@ class GroupCard extends React.Component<GroupProps & PathProps & AccountProps, G
   };
 
   render() {
-    const { group, theme } = this.props;
+    const { group } = this.props;
     const isEditable = group.owner === this.props.myself.username;
     return (
       <div className="group-card">
         <div className="group-title">
           <Title
-            style={{ color: theme === 'DARK' ? 'white' : 'black' }}
             level={4}
             editable={isEditable ? { onChange: this.titleChange } : false}
           >
@@ -162,11 +156,9 @@ class GroupCard extends React.Component<GroupProps & PathProps & AccountProps, G
 
 const mapStateToProps = (state: IState) => ({
   myself: state.myself,
-  theme: state.settings.theme,
 });
 
 export default connect(mapStateToProps, {
-  updateTheme,
   deleteGroup,
   removeUserGroupByUsername,
   getGroup,
