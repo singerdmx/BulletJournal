@@ -45,7 +45,7 @@ const getTree = (data: Task[], readOnly: boolean): TreeNodeNormal[] => {
         task={item}
         isComplete={false}
         readOnly={readOnly}
-        completeOnyOccurrence={false}
+        completeOnlyOccurrence={false}
       />
     );
     node.key = item.id.toString();
@@ -189,7 +189,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
                       task={task}
                       isComplete={true}
                       readOnly={readOnly}
-                      completeOnyOccurrence={false}
+                      completeOnlyOccurrence={false}
                     />
                   </List.Item>
                 );

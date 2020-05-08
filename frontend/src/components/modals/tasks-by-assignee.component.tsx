@@ -33,7 +33,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
                 isComplete={false}
                 readOnly={false}
                 inModal={true}
-                completeOnyOccurrence={false}
+                completeOnlyOccurrence={false}
               />
             </div>
           );

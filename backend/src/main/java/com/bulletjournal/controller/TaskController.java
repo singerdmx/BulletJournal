@@ -77,7 +77,7 @@ public class TaskController {
     private ResponseEntity<List<Task>> getTasksByAssignee(Long projectId, String assignee) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Task> tasks = this.taskDaoJpa.getTasksByAssignee(projectId, username, assignee);
-        return ResponseEntity.ok().body(tasks);
+        return ResponseEntity.ok().body(tasks.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
     }
 
     private Task addAvatar(Task task) {

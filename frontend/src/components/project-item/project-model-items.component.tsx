@@ -14,13 +14,13 @@ const { Panel } = Collapse;
 
 type ProjectModelItemsProps = {
   projectItems: ProjectItems[];
-  completeOnyOccurrence: boolean;
+  completeOnlyOccurrence: boolean;
 };
 
 const getTasksPanel = (
   items: ProjectItems,
   index: number,
-  completeOnyOccurrence: boolean
+  completeOnlyOccurrence: boolean
 ) => {
   if (items.tasks.length === 0) {
     return null;
@@ -38,7 +38,7 @@ const getTasksPanel = (
               task={item}
               isComplete={false}
               readOnly={false}
-              completeOnyOccurrence={completeOnyOccurrence}
+              completeOnlyOccurrence={completeOnlyOccurrence}
             />
           </div>
         );
@@ -113,7 +113,7 @@ const ProjectModelItems: React.FC<ProjectModelItemsProps> = (props) => {
                 'notes' + index,
               ]}
             >
-              {getTasksPanel(items, index, props.completeOnyOccurrence)}
+              {getTasksPanel(items, index, props.completeOnlyOccurrence)}
               {getTransactionsPanel(items, index)}
               {getNotesPanel(items, index)}
             </Collapse>

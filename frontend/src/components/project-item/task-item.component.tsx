@@ -41,7 +41,7 @@ type ProjectProps = {
 type TaskProps = {
   task: Task;
   isComplete: boolean;
-  completeOnyOccurrence: boolean;
+  completeOnlyOccurrence: boolean;
   completeTask: (taskId: number, dateTime?: string) => void;
   uncompleteTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
@@ -52,7 +52,7 @@ const ManageTask: React.FC<TaskProps> = (props) => {
   const {
     task,
     isComplete,
-    completeOnyOccurrence,
+    completeOnlyOccurrence,
     completeTask,
     uncompleteTask,
     deleteTask,
@@ -86,7 +86,7 @@ const ManageTask: React.FC<TaskProps> = (props) => {
   }
 
   const handleCompleteTaskClick = () => {
-    if (completeOnyOccurrence) {
+    if (completeOnlyOccurrence) {
       completeTask(task.id, task.dueDate + ' ' + task.dueTime);
     } else {
       completeTask(task.id);
@@ -179,7 +179,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
           <ManageTask
             task={task}
             isComplete={isComplete}
-            completeOnyOccurrence={completeOnyOccurrence}
+            completeOnlyOccurrence={completeOnlyOccurrence}
             completeTask={completeTask}
             uncompleteTask={uncompleteTask}
             deleteTask={deleteTask}
@@ -199,7 +199,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
   const {
     task,
     isComplete,
-    completeOnyOccurrence,
+    completeOnlyOccurrence,
     completeTask,
     uncompleteTask,
     deleteTask,

@@ -77,7 +77,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
       </div>
       <Divider />
       <div>
-        <ProjectModelItems projectItems={props.items} completeOnyOccurrence={false}/>
+        <ProjectModelItems projectItems={props.items} completeOnlyOccurrence={false}/>
       </div>
     </div>
   );

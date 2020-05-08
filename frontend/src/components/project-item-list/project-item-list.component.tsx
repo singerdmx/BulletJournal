@@ -73,7 +73,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
         <div>
           <ProjectModelItems
             projectItems={this.props.projectItems}
-            completeOnyOccurrence={true}
+            completeOnlyOccurrence={true}
           />
         </div>
       </div>
