@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
+import {GroupsWithOwner, User} from '../../features/group/interface';
 import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
@@ -140,23 +140,36 @@ class ProjectPage extends React.Component<
     this.setState({ isShow: false });
   };
 
-  handleGetTasksByAssignee = (u: any) => {
+  handleGetTasksByAssignee = (u: User) => {
     this.setState({ tasksByUsersShown: true });
     this.setState({ assignee: u.name });
-    //update tasks
-    console.log(this.props.match.params.projectId);
-    console.log(u.name);
+    // update tasks
     this.props.getTasksByAssignee(
       parseInt(this.props.match.params.projectId),
       u.name
     );
   };
 
+  handleGetNotesByOwner = (u: User) => {
+  };
+
+  handleGetTransactionByPayer = (u: User) => {
+  };
+
+  handleGetProjectItemsByUseCall: { [key in ProjectType]: Function } = {
+    [ProjectType.NOTE]: this.handleGetNotesByOwner,
+    [ProjectType.TODO]: this.handleGetTasksByAssignee,
+    [ProjectType.LEDGER]: this.handleGetTransactionByPayer,
+  };
+
   render() {
     const { project, myself, history } = this.props;
+
     if (!project) {
       return null;
     }
+
+    const handleGetProjectItemsByUse = this.handleGetProjectItemsByUseCall[project.projectType];
 
     let createContent = null;
     let projectContent = null;
@@ -250,7 +263,7 @@ class ProjectPage extends React.Component<
             <p
               key={index}
               className='avatar-container'
-              onClick={() => this.handleGetTasksByAssignee(u)}
+              onClick={() => handleGetProjectItemsByUse(u)}
             >
               <Avatar size='small' src={u.avatar} />
               &nbsp;{u.name}
