@@ -32,6 +32,7 @@ import {
   getTasksByAssignee,
 } from '../../features/tasks/actions';
 import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
+import ShowProjectHistory from "../../components/modals/show-project-history.component";
 
 type ProjectPathParams = {
   projectId: string;
@@ -161,16 +162,6 @@ class ProjectPage extends React.Component<
     let projectContent = null;
     let showCompletedTasks = null;
     let projectItemsByUser = null;
-
-    const showHistory = (
-      <Tooltip title='Show History'>
-        <div>
-          <HistoryOutlined
-            style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
-          />
-        </div>
-      </Tooltip>
-    );
 
     switch (project.projectType) {
       case ProjectType.NOTE:
@@ -307,7 +298,7 @@ class ProjectPage extends React.Component<
               </span>
             </Popover>
             {showCompletedTasks}
-            {showHistory}
+            <ShowProjectHistory />
             {createContent}
             {editContent}
             {deleteContent}
