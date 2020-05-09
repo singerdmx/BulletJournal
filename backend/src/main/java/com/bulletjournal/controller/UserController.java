@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.redis.RedisUserRepository;
+import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ public class UserController {
     public static final String MYSELF_ROUTE = "/api/myself";
     public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
     public static final String CLEAR_MYSELF_ROUTE = "/api/myself/clear";
+    protected static final String CHANGE_ALIAS_ROUTE = "/api/users/{username}/changeAlias";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
 
@@ -29,6 +31,9 @@ public class UserController {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private UserAliasDaoJpa userAliasDaoJpa;
 
     @Autowired
     private RedisUserRepository redisUserRepository;
@@ -82,6 +87,16 @@ public class UserController {
             this.redisUserRepository.delete(userOptional.get());
         }
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(CHANGE_ALIAS_ROUTE)
+    public ResponseEntity<?> changeAlias(
+            @NotNull @PathVariable String username,
+            @Valid @RequestBody ChangeAliasParams changeAliasParams) {
+        LOGGER.info("Changing " + username + "'s alias to " + changeAliasParams.getAlias());
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.userAliasDaoJpa.changeAlias(requester, username, changeAliasParams.getAlias());
         return ResponseEntity.ok().build();
     }
 }
