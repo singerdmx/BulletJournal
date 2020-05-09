@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.UserAlias;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +25,13 @@ public class UserAliasDaoJpa {
         aliases.put(targetUser, alias);
         userAlias.setAliases(GSON.toJson(aliases));
         this.userAliasRepository.save(userAlias);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Map<String, String> getAliases(String requester) {
+        UserAlias userAlias = userAliasRepository.findById(requester)
+                .orElseThrow(() -> new ResourceNotFoundException("UserAlias for " + requester + " not found"));
+        Map<String, String> aliases = GSON.fromJson(userAlias.getAliases(), Map.class);
+        return aliases;
     }
 }

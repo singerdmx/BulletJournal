@@ -1,4 +1,4 @@
-import { doFetch } from './api-helper';
+import {doFetch, doPost} from './api-helper';
 
 export const fetchUser = (username: string) => {
   return doFetch(`/api/users/${username}`)
@@ -6,4 +6,11 @@ export const fetchUser = (username: string) => {
     .catch(err => {
       throw Error(err);
     });
+};
+
+export const changeUserAlias = (targetUser: string, alias: string) => {
+    return doPost(`/api/users/${targetUser}/changeAlias`)
+        .catch(err => {
+            throw Error(err);
+        });
 };

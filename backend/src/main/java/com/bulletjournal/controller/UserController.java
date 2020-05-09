@@ -19,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 public class UserController {
+    private static final String GET_USER_ROUTE = "/api/users/{username}";
     public static final String MYSELF_ROUTE = "/api/myself";
     public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
     public static final String CLEAR_MYSELF_ROUTE = "/api/myself/clear";
@@ -38,7 +39,7 @@ public class UserController {
     @Autowired
     private RedisUserRepository redisUserRepository;
 
-    @GetMapping("/api/users/{username}")
+    @GetMapping(GET_USER_ROUTE)
     public User getUser(@NotNull @PathVariable String username) {
         return userClient.getUser(username);
     }

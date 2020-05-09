@@ -15,6 +15,11 @@ export type UpdateUser = {
   name: string;
 };
 
+export type ChangeAlias = {
+  targetUser: string;
+  alias: string;
+};
+
 export type ClearUser = {};
 
 let initialState = {
@@ -38,6 +43,7 @@ const slice = createSlice({
     userApiErrorReceived: (state, action: PayloadAction<UserApiErrorAction>) =>
       state,
     userUpdate: (state, action: PayloadAction<UpdateUser>) => state,
+    userAliasUpdate: (state, action: PayloadAction<ChangeAlias>) => state,
     userClear: (state, action: PayloadAction<ClearUser>) => {
       state.name = '';
       state.avatar = '';

@@ -3,10 +3,10 @@ import { message } from 'antd';
 import {
   actions as userActions,
   UserApiErrorAction,
-  UpdateUser
+  UpdateUser, ChangeAlias
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
-import { fetchUser } from '../../apis/userApis';
+import {changeUserAlias, fetchUser} from '../../apis/userApis';
 
 function* userApiErrorAction(action: PayloadAction<UserApiErrorAction>) {
   yield call(message.error, `${action.payload.error}`);
@@ -30,9 +30,19 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
   }
 }
 
+function* changeAlias(action: PayloadAction<ChangeAlias>) {
+  const { targetUser, alias } = action.payload;
+  try {
+    yield call(changeUserAlias, targetUser, alias);
+  } catch (error) {
+    yield call(message.error, `changeAlias Fail: ${error}`);
+  }
+}
+
 export default function* userSagas() {
   yield all([
     yield takeLatest(userActions.userApiErrorReceived.type, userApiErrorAction),
-    yield takeLatest(userActions.userUpdate.type, userUpdate)
+    yield takeLatest(userActions.userUpdate.type, userUpdate),
+    yield takeLatest(userActions.userAliasUpdate.type, changeAlias)
   ]);
 }
