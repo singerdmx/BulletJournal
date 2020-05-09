@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,4 +35,12 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee,
                                           @Param("startTime") String startTime,
                                           @Param("endTime") String endTime);
+
+    @Query("SELECT task " +
+            "FROM Task task " +
+            "WHERE task.startTime IS NOT NULL " +
+            "AND task.endTime IS NOT NULL " +
+            "AND task.updatedAt >= :startTime AND task.updatedAt <= :endTime")
+    List<Task> findRecentTasksBetween(@Param("startTime") Timestamp startTime,
+                                      @Param("endTime") Timestamp endTime);
 }

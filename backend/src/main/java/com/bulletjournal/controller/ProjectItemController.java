@@ -1,15 +1,13 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectItemType;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.repository.LabelDaoJpa;
-import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.TransactionDaoJpa;
-import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.User;
@@ -35,9 +33,13 @@ import java.util.stream.Collectors;
 public class ProjectItemController {
 
     protected static final String PROJECT_ITEMS_ROUTE = "/api/projectItems";
+    public static final String RECENT_ITEMS_ROUTE = "/api/recentItems";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private SystemDaoJpa systemDaoJpa;
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
@@ -111,5 +113,16 @@ public class ProjectItemController {
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionMap);
 
         return projectItemsMap;
+    }
+
+    @GetMapping(RECENT_ITEMS_ROUTE)
+    @ResponseBody
+    public List<ProjectItem> getRecentProjectItems(
+            @Valid @RequestParam List<ProjectType> types,
+            @NotBlank @RequestParam String startDate,
+            @NotBlank @RequestParam String endDate,
+            @NotBlank @RequestParam String timezone) {
+        this.systemDaoJpa.getRecentItems(1);
+        return null;
     }
 }

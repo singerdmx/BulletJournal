@@ -31,13 +31,9 @@ public class SystemController {
     public static final String UPDATES_ROUTE = "/api/system/updates";
     public static final String PUBLIC_ITEM_ROUTE_PREFIX = "/api/public/items/";
     public static final String PUBLIC_ITEM_ROUTE = PUBLIC_ITEM_ROUTE_PREFIX + "{itemId}";
-    public static final String RECENT_ITEMS_ROUTE = "/api/recentItems/";
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
-
-    @Autowired
-    private SystemDaoJpa systemDaoJpa;
 
     @Autowired
     private NotificationDaoJpa notificationDaoJpa;
@@ -217,12 +213,5 @@ public class SystemController {
         }
 
         return true;
-    }
-
-    @GetMapping(RECENT_ITEMS_ROUTE)
-    public List<ProjectItem> getRecentProjectItems(
-            @RequestParam(required = false, defaultValue = "1") Integer weekNum) {
-        this.systemDaoJpa.getRecentItems(weekNum);
-        return null;
     }
 }
