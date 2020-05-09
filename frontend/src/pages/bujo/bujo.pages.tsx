@@ -27,6 +27,7 @@ import RecentItemList from "../../components/recent/recent-item-list.component";
 type BujoProps = {
   todoSelected: boolean;
   ledgerSelected: boolean;
+  noteSelected: boolean;
   timezone: string;
   startDate: string;
   endDate: string;
@@ -67,27 +68,37 @@ class BujoPage extends React.Component<
   };
 
   handleOnChange = (type: string, category: string) => {
-    let { ledgerSelected, todoSelected } = this.props;
+    let { ledgerSelected, todoSelected, noteSelected } = this.props;
     if (type === 'todo') {
       todoSelected = !todoSelected;
-    } else {
+    } else if (type === 'ledger') {
       ledgerSelected = !ledgerSelected;
+    } else {
+      noteSelected = !noteSelected;
     }
 
-    this.props.getProjectItemsAfterUpdateSelect(
-      todoSelected,
-      ledgerSelected,
-      category
-    );
+    if (category === 'recent') {
+      // TODO: getRecentItemsUpdate
+    } else {
+      this.props.getProjectItemsAfterUpdateSelect(
+          todoSelected,
+          ledgerSelected,
+          category
+      );
+    }
   };
 
   refresh = (category: string) => {
-    let { ledgerSelected, todoSelected } = this.props;
-    this.props.getProjectItemsAfterUpdateSelect(
-      todoSelected,
-      ledgerSelected,
-      category
-    );
+    let { ledgerSelected, todoSelected, noteSelected } = this.props;
+    if (category === 'recent') {
+      // TODO: getRecentItemsUpdate
+    } else {
+      this.props.getProjectItemsAfterUpdateSelect(
+          todoSelected,
+          ledgerSelected,
+          category
+      );
+    }
   };
 
   getCategoryPage = (category: string) => {
@@ -116,6 +127,7 @@ class BujoPage extends React.Component<
     let noteCheckbox = null;
     if (category === 'recent') {
       noteCheckbox = <Checkbox
+          checked={this.props.noteSelected}
           value='note'
       >
         <Tooltip placement='top' title='NOTE'>
@@ -167,6 +179,7 @@ const mapStateToProps = (state: IState) => ({
   ownedProjects: state.project.owned,
   todoSelected: state.myBuJo.todoSelected,
   ledgerSelected: state.myBuJo.ledgerSelected,
+  noteSelected: state.myBuJo.noteSelected,
   timezone: state.myself.timezone,
   startDate: state.myBuJo.startDate,
   endDate: state.myBuJo.endDate,
