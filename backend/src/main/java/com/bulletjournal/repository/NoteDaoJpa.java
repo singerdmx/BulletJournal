@@ -225,6 +225,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Override
     List<Long> findItemLabelsByProject(Project project) {
-        return null;
+        return noteRepository.findUniqueLabelsByProject(project.getId());
     }
 }

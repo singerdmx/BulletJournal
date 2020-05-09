@@ -450,7 +450,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<Event> - a list of events for users notification
      */
     private List<UpdateTaskAssigneeEvent> updateAssignees(String requester, UpdateTaskParams updateTaskParams,
-                                       Task task, List<UpdateTaskAssigneeEvent> events) {
+                                                          Task task, List<UpdateTaskAssigneeEvent> events) {
         if (updateTaskParams.getAssignees() == null) {
             return events;
         }
@@ -790,7 +790,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Override
     List<Long> findItemLabelsByProject(Project project) {
-        return null;
+        return taskRepository.findUniqueLabelsByProject(project.getId());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

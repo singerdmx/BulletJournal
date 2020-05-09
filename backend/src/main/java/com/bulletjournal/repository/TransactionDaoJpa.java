@@ -242,6 +242,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Override
     List<Long> findItemLabelsByProject(Project project) {
-        return null;
+        return transactionRepository.findUniqueLabelsByProject(project.getId());
     }
 }
