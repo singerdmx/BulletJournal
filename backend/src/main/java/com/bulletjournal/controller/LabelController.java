@@ -70,7 +70,7 @@ public class LabelController {
                 .stream().map(label -> label.toPresentationModel())
                 .collect(Collectors.toList());
         if (projectId != null) {
-            List<Label> labelsForProject = this.systemDaoJpa.getProjectItems(projectId, username);
+            List<Label> labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
             if (labelsForProject != null) {
                 labels.addAll(labelsForProject);
             }

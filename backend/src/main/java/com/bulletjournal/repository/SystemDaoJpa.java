@@ -39,7 +39,7 @@ public class SystemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Label> getProjectItems(Long projectId, String requester) {
+    public List<Label> getProjectItemLabels(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         ProjectType projectType = ProjectType.getType(project.getType());
         ProjectItemDaoJpa dao = daos.get(projectType);
