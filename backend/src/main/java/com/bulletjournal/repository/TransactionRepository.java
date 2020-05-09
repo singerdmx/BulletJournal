@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, TransactionRepositoryCustom {
-    @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels WHERE transactions.project_id = :project_id",
+    @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels FROM transactions WHERE transactions.project_id = :project_id",
             nativeQuery = true)
     List<Long> findUniqueLabelsByProject(@Param("project_id") Long projectId);
 

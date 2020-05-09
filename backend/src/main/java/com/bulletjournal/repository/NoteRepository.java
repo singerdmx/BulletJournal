@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long>, NoteRepositoryCustom {
-    @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels WHERE notes.project_id = :project_id",
+    @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels FROM notes WHERE notes.project_id = :project_id",
             nativeQuery = true)
     List<Long> findUniqueLabelsByProject(@Param("project_id") Long projectId);
 

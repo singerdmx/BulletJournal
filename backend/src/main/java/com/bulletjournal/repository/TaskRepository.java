@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositoryCustom {
-    @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels WHERE tasks.project_id = :project_id",
+    @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels FROM tasks WHERE tasks.project_id = :project_id",
             nativeQuery = true)
     List<Long> findUniqueLabelsByProject(@Param("project_id") Long projectId);
 
