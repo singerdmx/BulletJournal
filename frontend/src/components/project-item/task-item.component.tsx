@@ -35,12 +35,12 @@ import {IState} from "../../store";
 
 type ProjectProps = {
   readOnly: boolean;
-  inModal?: boolean;
   addSelectedLabel: (label: Label) => void;
 };
 
 type ManageTaskProps = {
   task: Task;
+  inModal?: boolean;
   isComplete: boolean;
   completeOnlyOccurrence: boolean;
   uncompleteTask: (taskId: number) => void;
@@ -56,6 +56,7 @@ type TaskProps = {
 const ManageTask: React.FC<ManageTaskProps> = (props) => {
   const {
     task,
+    inModal,
     isComplete,
     completeOnlyOccurrence,
     completeTask,
@@ -97,6 +98,31 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
       completeTask(task.id);
     }
   };
+
+  if (inModal === true) {
+    return <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div
+          onClick={() => handleCompleteTaskClick()}
+          className='popover-control-item'
+      >
+        <span>Complete</span>
+        <CheckCircleTwoTone twoToneColor='#52c41a' />
+      </div>
+      <Popconfirm
+          title='Deleting Task also deletes its child tasks. Are you sure?'
+          okText='Yes'
+          cancelText='No'
+          onConfirm={() => deleteTask(task.id)}
+          className='group-setting'
+          placement='bottom'
+      >
+        <div className='popover-control-item'>
+          <span>Delete</span>
+          <DeleteTwoTone twoToneColor='#f5222d' />
+        </div>
+      </Popconfirm>
+    </div>
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -172,7 +198,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (props) =
   };
 
   const getMore = () => {
-    if (props.readOnly || props.inModal === true) {
+    if (props.readOnly) {
       return null;
     }
     return (
@@ -183,6 +209,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (props) =
         content={
           <ManageTask
             task={task}
+            inModal={inModal}
             isComplete={isComplete}
             completeOnlyOccurrence={completeOnlyOccurrence}
             completeTask={completeTask}
@@ -203,6 +230,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (props) =
 
   const {
     task,
+    inModal,
     isComplete,
     completeOnlyOccurrence,
     completeTask,

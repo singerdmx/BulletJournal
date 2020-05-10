@@ -360,6 +360,13 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
         'today'
       )
     );
+
+    const tasksByAssignee = state.task.tasksByAssignee.filter(t => t.id !== taskId);
+    yield put(
+        tasksActions.tasksByAssigneeReceived({
+          tasksByAssignee: tasksByAssignee,
+        })
+    );
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
   }
@@ -439,6 +446,13 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
       labelItems.push(projectItem);
     });
     yield put(updateItemsByLabels(labelItems));
+
+    const tasksByAssignee = state.task.tasksByAssignee.filter(t => t.id !== taskId);
+    yield put(
+        tasksActions.tasksByAssigneeReceived({
+          tasksByAssignee: tasksByAssignee,
+        })
+    );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
