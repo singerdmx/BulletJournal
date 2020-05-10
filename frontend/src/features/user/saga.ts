@@ -7,6 +7,7 @@ import {
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {changeUserAlias, fetchUser} from '../../apis/userApis';
+import {actions as groupsActions} from "../group/reducer";
 
 function* userApiErrorAction(action: PayloadAction<UserApiErrorAction>) {
   yield call(message.error, `${action.payload.error}`);
@@ -31,9 +32,14 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
 }
 
 function* changeAlias(action: PayloadAction<ChangeAlias>) {
-  const { targetUser, alias } = action.payload;
+  const { targetUser, alias, groupId } = action.payload;
   try {
     yield call(changeUserAlias, targetUser, alias);
+
+    yield all([
+      yield put(groupsActions.groupsUpdate({})),
+      yield put(groupsActions.getGroup({groupId: groupId})),
+    ]);
   } catch (error) {
     yield call(message.error, `changeAlias Fail: ${error}`);
   }

@@ -17,9 +17,10 @@ public class UserGroup extends User {
         this.accepted = accepted;
     }
 
-    public UserGroup(String name, String thumbnail, String avatar, boolean accepted) {
+    public UserGroup(String name, String thumbnail, String avatar, boolean accepted, String alias) {
         super(name, thumbnail, avatar);
         this.accepted = accepted;
+        this.setAlias(alias);
     }
 
     public boolean isAccepted() {

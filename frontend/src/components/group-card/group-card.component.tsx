@@ -16,12 +16,14 @@ import { IState } from '../../store';
 import './group-card.styles.less';
 import AddUser from '../modals/add-user.component';
 import { History } from "history";
+import {changeAlias} from "../../features/user/actions";
 
 
 type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
   deleteGroup: (groupId: number, groupName: string, history: History<History.PoorMansUnknown>) => void;
+  changeAlias: (targetUser: string, alias: string, groupId: number) => void;
   removeUserGroupByUsername: (
     groupId: number,
     username: string,
@@ -37,29 +39,14 @@ type GroupState = {
   showModal: boolean;
 };
 
-function getGroupUserTitle(item: User, group: Group): string {
-  if (item.name === group.owner) {
+function getGroupUserTitle(user: User, group: Group): string {
+  if (user.name === group.owner) {
     return 'Owner';
   }
-  return item.accepted ? 'Joined' : 'Not Joined';
+  return user.accepted ? `${user.name} Joined` : `${user.name} Not Joined`;
 }
 
-function getGroupUserSpan(item: User, group: Group): JSX.Element {
-  if (item.name === group.owner) {
-    return (
-      <span>
-        &nbsp;&nbsp;<strong>{item.name}</strong>
-      </span>
-    );
-  }
-  if (item.accepted) {
-    return <span>&nbsp;&nbsp;{item.name}</span>;
-  }
-
-  return <span style={{ color: 'grey' }}>&nbsp;&nbsp;{item.name}</span>;
-}
-
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   state: GroupState = {
@@ -77,6 +64,33 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   titleChange = (content: string) => {
     this.props.patchGroup(this.props.group.id, content);
   };
+
+  onAliasChange(alias: string, targetUser: string, groupId: number) {
+    this.props.changeAlias(targetUser, alias, groupId);
+  }
+
+  getGroupUserSpan(user: User, group: Group): JSX.Element {
+    if (user.name === group.owner) {
+      return (
+          <span>
+        &nbsp;&nbsp;<strong>{user.name}</strong>
+      </span>
+      );
+    }
+    if (this.props.myself.username === user.name) {
+      return <span>&nbsp;&nbsp;{user.name}</span>;
+    }
+
+    if (user.accepted) {
+      return <span><Text
+          editable={{onChange: (e) => this.onAliasChange(e, user.name, group.id)}}
+      >&nbsp;&nbsp;{user.alias}</Text></span>;
+    }
+
+    return <span style={{ color: 'grey' }}><Text
+        editable={{onChange: (e) => this.onAliasChange(e, user.name, group.id)}}
+    >&nbsp;&nbsp;{user.alias}</Text></span>;
+  }
 
   render() {
     const { group } = this.props;
@@ -123,7 +137,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
                       <Badge dot={!item.accepted}>
                         <Avatar size={item.name === group.owner ? 'large' : 'default'} src={item.avatar} />
                       </Badge>
-                      {getGroupUserSpan(item, group)}
+                      {this.getGroupUserSpan(item, group)}
                     </div>
                   </Tooltip>
                   {item.name !== group.owner &&
@@ -162,5 +176,6 @@ export default connect(mapStateToProps, {
   deleteGroup,
   removeUserGroupByUsername,
   getGroup,
-  patchGroup
+  patchGroup,
+  changeAlias
 })(withRouter(GroupCard));

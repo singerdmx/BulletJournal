@@ -166,7 +166,7 @@ public class GroupController {
         List<UserGroup> users = g.getUsers().stream()
                 .map(user -> {
                     User u = this.userClient.getUser(user.getName());
-                    return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted());
+                    return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted(), u.getAlias());
                 }).collect(Collectors.toList());
         g.setUsers(users);
         return g;

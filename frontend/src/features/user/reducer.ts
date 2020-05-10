@@ -18,6 +18,7 @@ export type UpdateUser = {
 export type ChangeAlias = {
   targetUser: string;
   alias: string;
+  groupId: number;
 };
 
 export type ClearUser = {};

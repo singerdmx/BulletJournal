@@ -9,7 +9,10 @@ export const fetchUser = (username: string) => {
 };
 
 export const changeUserAlias = (targetUser: string, alias: string) => {
-    return doPost(`/api/users/${targetUser}/changeAlias`)
+    const postBody = JSON.stringify({
+        alias: alias
+    });
+    return doPost(`/api/users/${targetUser}/changeAlias`, postBody)
         .catch(err => {
             throw Error(err);
         });
