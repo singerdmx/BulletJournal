@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put } from 'redux-saga/effects';
+import {takeLatest, call, all, put, select} from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as userActions,
@@ -8,6 +8,8 @@ import {
 import { PayloadAction } from 'redux-starter-kit';
 import {changeUserAlias, fetchUser} from '../../apis/userApis';
 import {actions as groupsActions} from "../group/reducer";
+import {IState} from "../../store";
+import {GroupsWithOwner} from "../group/interface";
 
 function* userApiErrorAction(action: PayloadAction<UserApiErrorAction>) {
   yield call(message.error, `${action.payload.error}`);
@@ -36,10 +38,24 @@ function* changeAlias(action: PayloadAction<ChangeAlias>) {
   try {
     yield call(changeUserAlias, targetUser, alias);
 
-    yield all([
-      yield put(groupsActions.groupsUpdate({})),
-      yield put(groupsActions.getGroup({groupId: groupId})),
-    ]);
+    const state: IState = yield select();
+    const groups : GroupsWithOwner[] = JSON.parse(JSON.stringify(state.group.groups));
+    let targetGroup = null;
+    groups.forEach(g => {
+      g.groups.forEach(group => {
+        group.users.forEach(u => {
+          if (u.name === targetUser) {
+            u.alias = alias;
+          }
+        });
+        if (group.id === groupId) {
+          targetGroup = group;
+        }
+      })
+    });
+
+    yield put(groupsActions.groupsReceived({groups: groups}));
+    yield put(groupsActions.groupReceived({group: targetGroup}));
   } catch (error) {
     yield call(message.error, `changeAlias Fail: ${error}`);
   }

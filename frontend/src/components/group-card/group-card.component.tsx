@@ -105,8 +105,26 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
 
     if (user.accepted) {
       return (
-        <span className="group-user-info">
+        <Tooltip title='Change Alias' placement='right'>
+          <span className="group-user-info">
+            <Text
+                ellipsis={true}
+                editable={{
+                  onChange: (e) => this.onAliasChange(e, user.name, group.id),
+                }}
+            >
+              {user.alias}
+            </Text>
+          </span>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Tooltip title='Change Alias' placement='right'>
+        <span className="group-user-info" style={{ color: "grey" }}>
           <Text
+            ellipsis={true}
             editable={{
               onChange: (e) => this.onAliasChange(e, user.name, group.id),
             }}
@@ -114,19 +132,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
             {user.alias}
           </Text>
         </span>
-      );
-    }
-
-    return (
-      <span className="group-user-info" style={{ color: "grey" }}>
-        <Text
-          editable={{
-            onChange: (e) => this.onAliasChange(e, user.name, group.id),
-          }}
-        >
-          {user.alias}
-        </Text>
-      </span>
+      </Tooltip>
     );
   }
 
@@ -168,20 +174,20 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
             renderItem={(item) => {
               return (
                 <List.Item key={item.id}>
-                  <Tooltip
-                    placement="right"
-                    title={getGroupUserTitle(item, group)}
-                  >
                     <div className="group-user">
-                      <Badge dot={!item.accepted}>
-                        <Avatar
-                          size={item.name === group.owner ? "large" : "default"}
-                          src={item.avatar}
-                        />
-                      </Badge>
+                      <Tooltip
+                          placement="topLeft"
+                          title={getGroupUserTitle(item, group)}
+                      >
+                        <Badge dot={!item.accepted}>
+                          <Avatar
+                            size={item.name === group.owner ? "large" : "default"}
+                            src={item.avatar}
+                          />
+                        </Badge>
+                      </Tooltip>
                       {this.getGroupUserSpan(item, group)}
                     </div>
-                  </Tooltip>
                   {item.name !== group.owner &&
                     group.owner === this.props.myself.username && (
                       <Tooltip
