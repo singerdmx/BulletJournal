@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {List, Divider, Tree, Empty, Tooltip} from 'antd';
+import { List, Divider, Tree, Empty, Tooltip } from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
@@ -13,7 +13,7 @@ import {
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
-import {CloudSyncOutlined} from '@ant-design/icons';
+import { CloudSyncOutlined } from '@ant-design/icons';
 import './task.styles.less';
 
 type TasksProps = {
@@ -45,6 +45,7 @@ const getTree = (data: Task[], readOnly: boolean): TreeNodeNormal[] => {
         task={item}
         isComplete={false}
         readOnly={readOnly}
+        inProject={true}
         completeOnlyOccurrence={false}
       />
     );
@@ -134,9 +135,9 @@ const onDrop = (tasks: Task[], putTask: Function, projectId: number) => (
 };
 
 const Loading = () => (
-    <div className="loading">
-      <ReactLoading type="bubbles" color="#0984e3" height="75" width="75" />
-    </div>
+  <div className='loading'>
+    <ReactLoading type='bubbles' color='#0984e3' height='75' width='75' />
+  </div>
 );
 
 const TaskTree: React.FC<TasksProps> = (props) => {
@@ -189,6 +190,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
                       task={task}
                       isComplete={true}
                       readOnly={readOnly}
+                      inProject={false}
                       completeOnlyOccurrence={false}
                     />
                   </List.Item>
@@ -197,11 +199,13 @@ const TaskTree: React.FC<TasksProps> = (props) => {
             </List>
           </div>
           {loadingCompletedTask ? (
-              <Loading />
-          ) : (
-              nextCompletedTasks.length === 0 ? null : <span className='load-more-button' onClick={handleLoadMore}>
-                <Tooltip title='Load More'><CloudSyncOutlined /></Tooltip>
-              </span>
+            <Loading />
+          ) : nextCompletedTasks.length === 0 ? null : (
+            <span className='load-more-button' onClick={handleLoadMore}>
+              <Tooltip title='Load More'>
+                <CloudSyncOutlined />
+              </Tooltip>
+            </span>
           )}
         </div>
       );

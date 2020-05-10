@@ -38,6 +38,7 @@ const getTasksPanel = (
               task={item}
               isComplete={false}
               readOnly={false}
+              inProject={false}
               completeOnlyOccurrence={completeOnlyOccurrence}
             />
           </div>

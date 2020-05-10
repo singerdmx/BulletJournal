@@ -16,11 +16,11 @@ type LabelSearchProps = {
   endSearching: () => void;
 };
 
-const LabelsSearching: React.FC<LabelSearchProps> = props => {
+const LabelsSearching: React.FC<LabelSearchProps> = (props) => {
   const [form] = Form.useForm();
   const { defaultLabels } = props;
   const handleSearch = () => {
-    form.validateFields().then(values => {
+    form.validateFields().then((values) => {
       if (!values) {
         return;
       }
@@ -29,7 +29,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
   };
 
   const initialValues = {
-    selectLabels: defaultLabels.map(label => label.id)
+    selectLabels: defaultLabels.map((label) => label.id),
   };
 
   useEffect(() => {
@@ -37,27 +37,27 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
   }, []);
 
   return (
-    <div className="labels-search-container">
+    <div className='labels-search-container'>
       <PageHeader
-        title="Search By Label(s)"
-        subTitle="Click to choose label(s)"
+        title='Search By Label(s)'
+        subTitle='Click to choose label(s)'
         onBack={props.endSearching}
       />
-      <div className="label-search-input">
+      <div className='label-search-input'>
         <Form
           form={form}
-          layout="inline"
+          layout='inline'
           onFinish={handleSearch}
           initialValues={initialValues}
         >
           <Form.Item
-            name="selectLabels"
+            name='selectLabels'
             rules={[{ required: true, message: 'Missing Label(s)' }]}
             style={{ flex: 5 }}
           >
-            <Select mode="multiple">
+            <Select mode='multiple'>
               {props.labelOptions &&
-                props.labelOptions.map(option => {
+                props.labelOptions.map((option) => {
                   return (
                     <Select.Option key={option.id} value={option.id}>
                       {option.value}
@@ -67,8 +67,8 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
             </Select>
           </Form.Item>
           <Form.Item style={{ flex: 1 }}>
-            <Tooltip placement="top" title="Search">
-              <Button shape="circle" type="primary" htmlType="submit">
+            <Tooltip placement='top' title='Search'>
+              <Button shape='circle' type='primary' htmlType='submit'>
                 <SearchOutlined />
               </Button>
             </Tooltip>
@@ -77,16 +77,19 @@ const LabelsSearching: React.FC<LabelSearchProps> = props => {
       </div>
       <Divider />
       <div>
-        <ProjectModelItems projectItems={props.items} completeOnlyOccurrence={false}/>
+        <ProjectModelItems
+          projectItems={props.items}
+          completeOnlyOccurrence={false}
+        />
       </div>
     </div>
   );
 };
 
 const mapStateToProps = (state: IState) => ({
-  items: state.label.items
+  items: state.label.items,
 });
 
 export default connect(mapStateToProps, {
-  getItemsByLabels
+  getItemsByLabels,
 })(LabelsSearching);

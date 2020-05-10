@@ -31,6 +31,7 @@ import {
 } from '../draggable-labels/draggable-label-list.component';
 import { addSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
+import { User } from '../../features/group/interface';
 
 type ProjectProps = {
   readOnly: boolean;
@@ -50,6 +51,7 @@ type ManageTaskProps = {
 
 type TaskProps = {
   aliases: any;
+  inProject: boolean;
 };
 
 const ManageTask: React.FC<ManageTaskProps> = (props) => {
@@ -238,6 +240,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   const {
     task,
+    inProject,
     inModal,
     isComplete,
     completeOnlyOccurrence,
@@ -268,7 +271,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     if (task.assignees.length === 1) {
       return (
         <Tooltip title={`Assignee ${task.assignees[0].alias}`}>
-          <Avatar src={task.assignees[0].avatar} size='small' />
+          {getAvatar(task.assignees[0])}
         </Tooltip>
       );
     }
@@ -281,15 +284,24 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
           <div>
             {task.assignees.map((u, index) => (
               <p key={index}>
-                <Avatar size='small' src={u.avatar} />
+                {getAvatar(u)}
                 &nbsp;{u.alias}
               </p>
             ))}
           </div>
         }
       >
-        <Avatar src={task.assignees[0].avatar} size='small' />
+        {getAvatar(task.assignees[0])}
       </Popover>
+    );
+  };
+
+  const getAvatar = (user: User) => {
+    if (!inProject) return <Avatar src={user.avatar} size='small' />;
+    return (
+      <span onClick={() => console.log('1')}>
+        <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
+      </span>
     );
   };
 

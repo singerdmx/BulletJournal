@@ -34,8 +34,8 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
 
   render() {
     return (
-      <div className="todo-list">
-        <div className="todo-panel">
+      <div className='todo-list'>
+        <div className='todo-panel'>
           <RangePicker
             ranges={{
               Today: [moment(), moment()],
@@ -63,8 +63,8 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
             format={dateFormat}
             onChange={this.handleRangeChange}
           />
-          <Tooltip placement="top" title="Change Time Zone">
-            <Link to="/settings" style={{ paddingLeft: '30px' }}>
+          <Tooltip placement='top' title='Change Time Zone'>
+            <Link to='/settings' style={{ paddingLeft: '30px' }}>
               {this.props.timezone}
             </Link>
           </Tooltip>

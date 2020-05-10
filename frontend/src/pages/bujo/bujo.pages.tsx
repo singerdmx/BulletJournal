@@ -7,7 +7,7 @@ import {
   AccountBookOutlined,
   CarryOutOutlined,
   SyncOutlined,
-  FileTextOutlined
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { IState } from '../../store/index';
 import { Project } from '../../features/project/interface';
@@ -22,7 +22,7 @@ import {
 } from '../../features/myBuJo/actions';
 
 import './bujo.styles.less';
-import RecentItemList from "../../components/recent/recent-item-list.component";
+import RecentItemList from '../../components/recent/recent-item-list.component';
 
 type BujoProps = {
   todoSelected: boolean;
@@ -81,9 +81,9 @@ class BujoPage extends React.Component<
       // TODO: getRecentItemsUpdate
     } else {
       this.props.getProjectItemsAfterUpdateSelect(
-          todoSelected,
-          ledgerSelected,
-          category
+        todoSelected,
+        ledgerSelected,
+        category
       );
     }
   };
@@ -94,9 +94,9 @@ class BujoPage extends React.Component<
       // TODO: getRecentItemsUpdate
     } else {
       this.props.getProjectItemsAfterUpdateSelect(
-          todoSelected,
-          ledgerSelected,
-          category
+        todoSelected,
+        ledgerSelected,
+        category
       );
     }
   };
@@ -126,14 +126,13 @@ class BujoPage extends React.Component<
     }
     let noteCheckbox = null;
     if (category === 'recent') {
-      noteCheckbox = <Checkbox
-          checked={this.props.noteSelected}
-          value='note'
-      >
-        <Tooltip placement='top' title='NOTE'>
-          <FileTextOutlined />
-        </Tooltip>
-      </Checkbox>
+      noteCheckbox = (
+        <Checkbox checked={this.props.noteSelected} value='note'>
+          <Tooltip placement='top' title='NOTE'>
+            <FileTextOutlined />
+          </Tooltip>
+        </Checkbox>
+      );
     }
     return (
       <div className='todo'>
