@@ -50,6 +50,7 @@ const { Option } = Select;
 type ModalProps = {
   projects: Project[];
   calendar: CalendarListEntry;
+  aliases: any;
   watchedProject: Project | undefined;
   eventList: GoogleCalendarEvent[];
   syncing: boolean;
@@ -71,6 +72,7 @@ type ModalProps = {
 const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   const {
     calendar,
+    aliases,
     watchedProject,
     projects,
     eventList,
@@ -176,7 +178,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
             {projects.map((project) => {
               return (
                 <Option value={project.id} key={project.id}>
-                  <Tooltip title={project.owner} placement='right'>
+                  <Tooltip title={`${aliases[project.owner] ? aliases[project.owner] : project.owner}`} placement='right'>
                     <span>
                       <Avatar size='small' src={project.ownerAvatar} />
                       &nbsp; {iconMapper[project.projectType]}
@@ -337,7 +339,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                             return (
                               <Option value={project.id} key={project.id}>
                                 <Tooltip
-                                  title={project.owner}
+                                  title={`${aliases[project.owner] ? aliases[project.owner] : project.owner}`}
                                   placement='right'
                                 >
                                   <span>
@@ -478,6 +480,7 @@ const mapStateToProps = (state: IState) => ({
   watchedProject: state.calendarSync.watchedProject,
   eventList: state.calendarSync.googleCalendarEventList,
   syncing: state.calendarSync.syncing,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {

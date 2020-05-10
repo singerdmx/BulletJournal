@@ -22,6 +22,7 @@ import {changeAlias} from "../../features/user/actions";
 type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
+  aliases: any;
   deleteGroup: (groupId: number, groupName: string, history: History<History.PoorMansUnknown>) => void;
   changeAlias: (targetUser: string, alias: string, groupId: number) => void;
   removeUserGroupByUsername: (
@@ -75,7 +76,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
     if (user.name === group.owner) {
       return (
           <span>
-        &nbsp;&nbsp;<strong>{user.name}</strong>
+        &nbsp;&nbsp;<strong>{`${this.props.aliases[user.name] ? this.props.aliases[user.name]: user.name}`}</strong>
       </span>
       );
     }
@@ -172,6 +173,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
 
 const mapStateToProps = (state: IState) => ({
   myself: state.myself,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {

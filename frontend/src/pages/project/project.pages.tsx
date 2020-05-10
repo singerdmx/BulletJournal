@@ -70,6 +70,7 @@ type ProjectPageProps = {
 
 type MyselfProps = {
   myself: string;
+  aliases: any;
 };
 
 class ProjectPage extends React.Component<
@@ -276,7 +277,7 @@ class ProjectPage extends React.Component<
       <div className='project'>
         <Tooltip
           placement='top'
-          title={project.owner}
+          title={`${this.props.aliases[project.owner] ? this.props.aliases[project.owner] : project.owner}`}
           className='project-avatar'
         >
           <span>
@@ -331,6 +332,7 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
   myself: state.myself.username,
   completedTaskPageNo: state.task.completedTaskPageNo,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {

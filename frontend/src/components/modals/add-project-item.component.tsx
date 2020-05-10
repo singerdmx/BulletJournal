@@ -22,6 +22,7 @@ type ProjectItemProps = {
   mode: string;
   ownedProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
+  aliases: any;
 };
 
 //props of groups
@@ -86,7 +87,7 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                   {projects.map(project => {
                     return (
                         <Option value={getProjectValue(project)} key={project.id}>
-                          <Tooltip title={project.owner} placement='right'>
+                          <Tooltip title={`${props.aliases[project.owner] ? props.aliases[project.owner] : project.owner}`} placement='right'>
                         <span>
                           <Avatar size='small' src={project.ownerAvatar}/>
                           &nbsp; {iconMapper[project.projectType]}
@@ -161,7 +162,8 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
   project: state.project.project,
   ownedProjects: state.project.owned,
-  sharedProjects: state.project.shared
+  sharedProjects: state.project.shared,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {

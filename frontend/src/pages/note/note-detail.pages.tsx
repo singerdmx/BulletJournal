@@ -16,6 +16,7 @@ import { Content } from '../../features/myBuJo/interface';
 
 export type NoteProps = {
   note: Note | undefined;
+  aliases: any;
   contents: Content[];
 };
 
@@ -29,6 +30,7 @@ type NoteDetailProps = {
 const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
   const {
     note,
+    aliases,
     labelEditable,
     noteOperation,
     noteEditorElem,
@@ -38,7 +40,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
   if (!note) return null;
   return (
     <div className='note-page'>
-      <Tooltip placement='top' title={note.owner} className='note-avatar'>
+      <Tooltip placement='top' title={`${note.owner && aliases[note.owner] ? aliases[note.owner] : note?.owner}`} className='note-avatar'>
         <span>
           <Avatar size='large' src={note.ownerAvatar} />
         </span>

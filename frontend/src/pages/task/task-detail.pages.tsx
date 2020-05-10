@@ -24,6 +24,7 @@ import TaskContentList from '../../components/content/content-list.component';
 
 export type TaskProps = {
   task: Task | undefined;
+  aliases: any;
   contents: Content[];
   contentEditable?: boolean;
 };
@@ -87,7 +88,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     <div className='task-page'>
       <Tooltip
         placement='top'
-        title={`Created by ${task.owner}`}
+        title={`Created by ${task.owner && props.aliases[task.owner] ? props.aliases[task.owner] : task.owner}`}
         className='task-avatar'
       >
         <span>

@@ -16,6 +16,7 @@ const { Option } = Select;
 
 type ProjectProps = {
   project: Project;
+  aliases: any;
   updateProject: (
     projectId: number,
     description: string,
@@ -154,12 +155,12 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
                     <Option
                       key={`group${group.id}`}
                       value={group.id}
-                      title={`Group "${group.name}" (owner "${group.owner}")`}
+                      title={`Group "${group.name}" (owner "${props.aliases[group.owner] ? props.aliases[group.owner] : group.owner}")`}
                     >
                       <Avatar size="small" src={group.ownerAvatar} />
                       &nbsp;&nbsp;Group <strong>
                         {group.name}
-                      </strong> (owner <strong>{group.owner}</strong>)
+                      </strong> (owner <strong>{props.aliases[group.owner] ? props.aliases[group.owner] : group.owner}</strong>)
                     </Option>
                   ));
                 })}
@@ -182,7 +183,8 @@ const EditProject: React.FC<GroupProps & ProjectProps> = props => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  groups: state.group.groups
+  groups: state.group.groups,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, { updateGroups, updateProject })(

@@ -24,6 +24,7 @@ const { Option } = Select;
 type ProjectProps = {
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
+  aliases: any;
   mode: string;
   createProjectByName: (
     description: string,
@@ -171,12 +172,12 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
                       <Option
                         key={`group${group.id}`}
                         value={group.id}
-                        title={`Group "${group.name}" (owner "${group.owner}")`}
+                        title={`Group "${group.name}" (owner "${props.aliases[group.owner] ? props.aliases[group.owner] : group.owner}")`}
                       >
                         <Avatar size="small" src={group.ownerAvatar} />
                         &nbsp;&nbsp;Group <strong>
                           {group.name}
-                        </strong> (owner <strong>{group.owner}</strong>)
+                        </strong> (owner <strong>{props.aliases[group.owner] ? props.aliases[group.owner] : group.owner}</strong>)
                       </Option>
                     ));
                   }
@@ -231,6 +232,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
   project: state.project.project,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, { updateGroups, createProjectByName })(

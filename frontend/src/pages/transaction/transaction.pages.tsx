@@ -53,6 +53,7 @@ type TransactionProps = {
   currency: string;
   transaction: Transaction | undefined;
   contents: Content[];
+  aliases: any;
   deleteTransaction: (transactionId: number) => void;
   updateTransactionContents: (transactionId: number) => void;
 };
@@ -69,6 +70,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     transaction,
     deleteTransaction,
     currency,
+    aliases,
     contents,
     updateTransactionContents,
   } = props;
@@ -151,7 +153,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           />
         </div>
         <div className='transaction-operation'>
-          <Tooltip title={`Created by ${transaction.owner}`}>
+          <Tooltip title={`Created by ${transaction.owner && aliases[transaction.owner] ? aliases[transaction.owner] : transaction.owner}`}>
             <div className='transaction-owner'>
               <Avatar src={transaction.ownerAvatar} />
             </div>
@@ -246,6 +248,7 @@ const mapStateToProps = (state: IState) => ({
   transaction: state.transaction.transaction,
   currency: state.myself.currency,
   contents: state.transaction.contents,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {

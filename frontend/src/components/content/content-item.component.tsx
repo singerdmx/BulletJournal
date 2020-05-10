@@ -19,6 +19,7 @@ import {deleteContent as deleteTransactionContent} from "../../features/transact
 type ContentProps = {
   contentEditable?: boolean;
   content: Content;
+  aliases: any;
   projectItem: ProjectItem;
   project: Project | undefined;
   myself: string;
@@ -37,6 +38,7 @@ const ContentItem: React.FC<ContentProps> = ({
   myself,
   project,
   content,
+  aliases,
   projectItem,
   contentEditable,
   deleteNoteContent,
@@ -97,7 +99,7 @@ const ContentItem: React.FC<ContentProps> = ({
 
   const getActions = () => {
     const actions = [
-      <Tooltip title={`Created by ${content.owner} ${createdTime}`}>
+      <Tooltip title={`Created by ${aliases[content.owner] ? aliases[content.owner] : content.owner} ${createdTime}`}>
         <Avatar src={content.ownerAvatar} size="small" />
       </Tooltip>,
       <Tooltip title="Click to view">
@@ -166,6 +168,7 @@ const ContentItem: React.FC<ContentProps> = ({
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   myself: state.myself.username,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {
