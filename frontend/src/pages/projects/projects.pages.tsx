@@ -86,7 +86,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         let popContent = null;
         if (group) {
             popContent = <div>
-                {group.users.map((u, index) => <p key={index}><Avatar size="small" src={u.avatar}/>&nbsp;{u.name}</p>)}
+                {group.users.map((u, index) => <p key={index}><Avatar size="small" src={u.avatar}/>&nbsp;{u.alias}</p>)}
             </div>;
         }
         return (

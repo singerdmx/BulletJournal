@@ -186,7 +186,7 @@ const AddTask: React.FC<
             return (
                 <Option value={user.name} key={user.name}>
                   <Avatar size='small' src={user.avatar} />
-                  &nbsp;&nbsp; <strong>{user.name}</strong>
+                  &nbsp;&nbsp; <strong>{user.alias}</strong>
                 </Option>
             );
           })}

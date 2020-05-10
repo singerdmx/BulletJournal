@@ -225,7 +225,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
 
     if (task.assignees.length === 1) {
       return (
-        <Tooltip title={`Assignee ${task.assignees[0].name}`}>
+        <Tooltip title={`Assignee ${task.assignees[0].alias}`}>
           <Avatar src={task.assignees[0].avatar} size='small' />
         </Tooltip>
       );

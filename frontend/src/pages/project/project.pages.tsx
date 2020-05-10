@@ -266,7 +266,7 @@ class ProjectPage extends React.Component<
               onClick={() => handleGetProjectItemsByUse(u)}
             >
               <Avatar size='small' src={u.avatar} />
-              &nbsp;{u.name}
+              &nbsp;{u.alias}
             </p>
           ))}
         </div>

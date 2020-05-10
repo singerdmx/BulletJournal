@@ -58,7 +58,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
         <div className="row-item-has-space" key={u.name}>
           <p>
             <Avatar size="small" src={u.avatar} />
-            &nbsp;{u.name}
+            &nbsp;{u.alias}
           </p>
           <Tooltip title="Revoke" placement="right">
             <Button
