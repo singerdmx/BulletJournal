@@ -103,7 +103,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   useEffect(() => {
     let events: string[] = [];
     eventList.forEach((event) => {
-      events.push(event.iCalUID);
+      events.push(event.eventId);
     });
     setEvents(events);
   }, [eventList]);
@@ -226,7 +226,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   const selectAll = () => {
     let events: string[] = [];
     props.eventList.forEach((event) => {
-      events.push(event.iCalUID);
+      events.push(event.eventId);
     });
     setEvents(events);
   };
@@ -431,7 +431,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                       {eventList &&
                         eventList.map((event, index) => {
                           return (
-                            <Option value={event.iCalUID} key={index}>
+                            <Option value={event.eventId} key={index}>
                               <div>
                                 <div className='name-container'>
                                   <div className='reminder'>

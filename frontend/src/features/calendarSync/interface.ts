@@ -20,5 +20,5 @@ export interface CalendarListEntry {
 export interface GoogleCalendarEvent {
     task: Task;
     content: Content;
-    iCalUID: string;
+    eventId: string;
 }

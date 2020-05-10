@@ -162,7 +162,7 @@ function* importEventsToProject(
 
     eventList.forEach((eventId: string) => {
       let event = allEvents.filter(
-        (e: GoogleCalendarEvent) => e.iCalUID === eventId
+        (e: GoogleCalendarEvent) => e.eventId === eventId
       );
       importEvents.push(event[0]);
     });
