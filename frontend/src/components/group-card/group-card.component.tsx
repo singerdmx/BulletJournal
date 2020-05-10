@@ -66,7 +66,9 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   };
 
   onAliasChange(alias: string, targetUser: string, groupId: number) {
-    this.props.changeAlias(targetUser, alias, groupId);
+    if (alias) {
+      this.props.changeAlias(targetUser, alias, groupId);
+    }
   }
 
   getGroupUserSpan(user: User, group: Group): JSX.Element {
