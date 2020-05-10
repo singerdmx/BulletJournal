@@ -46,6 +46,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskDaoJpa.class);
     private static final Gson GSON = new Gson();
+    private static final int REMINDING_TASK_BUFFER_IN_MINS = 10;
 
     private static final Gson GSON_ALLOW_EXPOSE_ONLY = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
@@ -103,6 +104,17 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieve assignee's task by project id
+     *
+     * 1. Check if project is shared to requester. If not, return empty list.
+     * 2. Return assignee's task list and sort by end time
+     *
+     * @param projectId the project Id of task
+     * @param requester the requester username
+     * @param assignee the assignee of task
+     * @return a list of tasks assigned to assignee
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasksByAssignee(
             Long projectId, String requester, String assignee) {
@@ -173,7 +185,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * <p>
      * Reminding tasks qualifications:
      * 1. Reminding Time is before current time.
-     * 2. Starting time is after the current time.
+     * 2. Starting time plus 10 minutes buffer is after the current time.
+     *
+     * [Reminding Time] <= Now <= [Starting Time + 10 mins]
      *
      * @param assignee the username of task assignee
      * @param now      the ZonedDateTime object of the current time
@@ -182,10 +196,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
         Timestamp currentTime = Timestamp.from(now.toInstant());
+        // Subtract current time by 10 minutes to compare with task's starting time
+        Timestamp startTime = Timestamp.from(now.minusMinutes(REMINDING_TASK_BUFFER_IN_MINS).toInstant());
 
         // Fetch regular reminding tasks
         List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
-                .findRemindingTasks(assignee, currentTime.toString())
+                .findRemindingTasks(assignee, currentTime.toString(), startTime.toString())
                 .stream()
                 .map(TaskModel::toPresentationModel)
                 .collect(Collectors.toList());
