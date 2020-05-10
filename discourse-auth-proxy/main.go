@@ -162,6 +162,9 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 
 	if err == nil && cookie != nil {
 		username, groups, err = parseCookie(cookie.Value, config.CookieSecret)
+		if (err != nil) {
+			logger.Printf("parseCookie err: %v", err)
+		}
 	}
 
 	if err == nil {
