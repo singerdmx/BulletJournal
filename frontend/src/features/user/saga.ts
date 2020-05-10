@@ -40,7 +40,7 @@ function* changeAlias(action: PayloadAction<ChangeAlias>) {
 
     const state: IState = yield select();
     const groups : GroupsWithOwner[] = JSON.parse(JSON.stringify(state.group.groups));
-    let targetGroup = null;
+    let targetGroup = undefined;
     groups.forEach(g => {
       g.groups.forEach(group => {
         group.users.forEach(u => {
