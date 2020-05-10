@@ -9,7 +9,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users",
-        indexes = {@Index(name = "user_name_index", columnList = "name")},
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"name"})
         })

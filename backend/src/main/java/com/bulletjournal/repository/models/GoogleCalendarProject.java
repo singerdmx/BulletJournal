@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "google_calendar_projects",
-        indexes = {@Index(name = "calendar_channel_id_index", columnList = "channel_id")},
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"channel_id"})
         })

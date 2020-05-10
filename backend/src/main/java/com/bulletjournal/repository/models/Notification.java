@@ -5,9 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "notifications",
-        indexes = {@Index(name = "notification_time_index", columnList = "target_user,updated_at"),
-                @Index(name = "notification_stale_check_index", columnList = "updated_at")})
+@Table(name = "notifications")
 public class Notification extends AuditModel {
 
     @Id

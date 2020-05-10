@@ -10,7 +10,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "projects",
-        indexes = {@Index(name = "project_owner_index", columnList = "owner")},
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"owner", "name"})
         })

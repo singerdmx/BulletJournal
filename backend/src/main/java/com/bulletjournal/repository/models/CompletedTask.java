@@ -6,8 +6,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "completed_tasks",
-        indexes = {@Index(name = "completed_task_project_id_index", columnList = "project_id")})
+@Table(name = "completed_tasks")
 public class CompletedTask extends TaskModel {
 
     @Id

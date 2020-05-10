@@ -16,10 +16,7 @@ import java.util.List;
  * This class is for ProjectType.LEDGER
  */
 @Entity
-@Table(name = "transactions",
-        indexes = {
-                @Index(name = "transaction_payer_interval_index", columnList = "payer, start_time, end_time"),
-                @Index(name = "transaction_project_interval_index", columnList = "project_id, start_time, end_time")})
+@Table(name = "transactions")
 public class Transaction extends ProjectItemModel {
     @Id
     @GeneratedValue(generator = "transaction_generator")

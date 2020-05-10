@@ -8,9 +8,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "public_project_items",
-        indexes = {@Index(name = "public_project_items_task_index", columnList = "task_id"),
-                @Index(name = "public_project_items_note_index", columnList = "note_id")})
+@Table(name = "public_project_items")
 public class PublicProjectItem extends AuditModel {
 
     @Id

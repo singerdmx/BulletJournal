@@ -6,10 +6,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "shared_project_items",
-        indexes = {@Index(name = "shared_project_items_username_index", columnList = "username"),
-                @Index(name = "shared_project_items_task_index", columnList = "task_id"),
-                @Index(name = "shared_project_items_note_index", columnList = "note_id")})
+@Table(name = "shared_project_items")
 public class SharedProjectItem extends AuditModel {
 
     @Id
