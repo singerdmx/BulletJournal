@@ -9,18 +9,21 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { deleteTransaction } from '../../features/transactions/actions';
-import {Label, stringToRGB} from '../../features/label/interface';
+import { Label, stringToRGB } from '../../features/label/interface';
 import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { dateFormat } from '../../features/myBuJo/constants';
 import { IState } from '../../store';
 import { ProjectType } from '../../features/project/constants';
 //import modal
 import MoveProjectItem from '../modals/move-project-item.component';
 import EditTransaction from '../modals/edit-transaction.component';
-import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
-import {addSelectedLabel} from "../../features/label/actions";
+import {
+  getIcon,
+  getItemIcon,
+} from '../draggable-labels/draggable-label-list.component';
+import { addSelectedLabel } from '../../features/label/actions';
 
 const LocaleCurrency = require('locale-currency'); //currency code
 
@@ -82,7 +85,14 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
 
     return (
       <Tooltip
-        title={moment(transaction.date, dateFormat).fromNow()}
+        title={moment
+          .tz(
+            `${transaction.date} ${
+              transaction.time ? transaction.time : '00:00'
+            }`,
+            transaction.timezone
+          )
+          .fromNow()}
         placement={'bottom'}
       >
         <div className='project-item-time'>
@@ -117,7 +127,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
 
     return null;
   };
-  
+
   return (
     <div className='project-item'>
       <div className='project-item-content'>
@@ -137,7 +147,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
                     className='labels'
                     onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
-                    style={{cursor: 'pointer', borderRadius: 10 }}
+                    style={{ cursor: 'pointer', borderRadius: 10 }}
                   >
                     <span>
                       {getIcon(label.icon)} &nbsp;
@@ -153,12 +163,24 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip title={`Created by ${aliases[transaction.owner] ? aliases[transaction.owner] : transaction.owner}`}>
+          <Tooltip
+            title={`Created by ${
+              aliases[transaction.owner]
+                ? aliases[transaction.owner]
+                : transaction.owner
+            }`}
+          >
             <Avatar src={transaction.ownerAvatar} size='small' />
           </Tooltip>
         </div>
         <div className='project-item-owner'>
-          <Tooltip title={`Payer ${aliases[transaction.payer] ? aliases[transaction.payer] : transaction.payer}`}>
+          <Tooltip
+            title={`Payer ${
+              aliases[transaction.payer]
+                ? aliases[transaction.payer]
+                : transaction.payer
+            }`}
+          >
             <Avatar src={transaction.payerAvatar} size='small' />
           </Tooltip>
         </div>
@@ -188,7 +210,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   currency: state.myself.currency,
-  aliases: state.system.aliases
+  aliases: state.system.aliases,
 });
 
 export default connect(mapStateToProps, {

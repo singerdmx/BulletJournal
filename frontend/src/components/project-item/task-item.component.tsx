@@ -20,8 +20,7 @@ import {
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
 import { Label, stringToRGB } from '../../features/label/interface';
-import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import moment from 'moment-timezone';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
 import { ProjectType } from '../../features/project/constants';
@@ -31,7 +30,7 @@ import {
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
 import { addSelectedLabel } from '../../features/label/actions';
-import {IState} from "../../store";
+import { IState } from '../../store';
 
 type ProjectProps = {
   readOnly: boolean;
@@ -47,7 +46,7 @@ type ManageTaskProps = {
   completeTask: (taskId: number, dateTime?: string) => void;
   deleteCompletedTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
-}
+};
 
 type TaskProps = {
   aliases: any;
@@ -100,28 +99,30 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
   };
 
   if (inModal === true) {
-    return <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div
           onClick={() => handleCompleteTaskClick()}
           className='popover-control-item'
-      >
-        <span>Complete</span>
-        <CheckCircleTwoTone twoToneColor='#52c41a' />
-      </div>
-      <Popconfirm
+        >
+          <span>Complete</span>
+          <CheckCircleTwoTone twoToneColor='#52c41a' />
+        </div>
+        <Popconfirm
           title='Deleting Task also deletes its child tasks. Are you sure?'
           okText='Yes'
           cancelText='No'
           onConfirm={() => deleteTask(task.id)}
           className='group-setting'
           placement='bottom'
-      >
-        <div className='popover-control-item'>
-          <span>Delete</span>
-          <DeleteTwoTone twoToneColor='#f5222d' />
-        </div>
-      </Popconfirm>
-    </div>
+        >
+          <div className='popover-control-item'>
+            <span>Delete</span>
+            <DeleteTwoTone twoToneColor='#f5222d' />
+          </div>
+        </Popconfirm>
+      </div>
+    );
   }
 
   return (
@@ -174,7 +175,12 @@ export const getDueDateTime = (task: Task) => {
     return null;
   }
 
-  let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
+  let dueDateTitle = moment
+    .tz(
+      `${task.dueDate} ${task.dueTime ? task.dueTime : '00:00'}`,
+      task.timezone
+    )
+    .fromNow();
   if (task.duration) {
     dueDateTitle += `, duration ${task.duration} minutes`;
   }
@@ -188,7 +194,9 @@ export const getDueDateTime = (task: Task) => {
   );
 };
 
-const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (props) => {
+const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
+  props
+) => {
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -319,7 +327,13 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (props) =
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip title={`Created by ${task.owner && aliases[task.owner] ? aliases[task.owner] : task.owner}`}>
+          <Tooltip
+            title={`Created by ${
+              task.owner && aliases[task.owner]
+                ? aliases[task.owner]
+                : task.owner
+            }`}
+          >
             <Avatar src={task.ownerAvatar} size='small' />
           </Tooltip>
         </div>
@@ -336,7 +350,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (props) =
 };
 
 const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases
+  aliases: state.system.aliases,
 });
 
 export default connect(mapStateToProps, {
