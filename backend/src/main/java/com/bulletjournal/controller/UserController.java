@@ -19,10 +19,10 @@ import java.util.Optional;
 
 @RestController
 public class UserController {
-    private static final String GET_USER_ROUTE = "/api/users/{username}";
     public static final String MYSELF_ROUTE = "/api/myself";
     public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
     public static final String CLEAR_MYSELF_ROUTE = "/api/myself/clear";
+    protected static final String GET_USER_ROUTE = "/api/users/{username}";
     protected static final String CHANGE_ALIAS_ROUTE = "/api/users/{username}/changeAlias";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
@@ -41,7 +41,7 @@ public class UserController {
 
     @GetMapping(GET_USER_ROUTE)
     public User getUser(@NotNull @PathVariable String username) {
-        return userClient.getUser(username);
+        return this.userClient.getUser(username);
     }
 
     @GetMapping(MYSELF_ROUTE)

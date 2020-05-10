@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.RedisUserRepository;
+import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,15 +36,18 @@ public class UserClient {
     private final String ssoAPIKey;
     private final RedisUserRepository redisUserRepository;
     private final UserDaoJpa userDaoJpa;
+    private final UserAliasDaoJpa userAliasDaoJpa;
 
     @Autowired
-    public UserClient(SSOConfig ssoConfig, RedisUserRepository redisUserRepository, UserDaoJpa userDaoJpa)
+    public UserClient(SSOConfig ssoConfig, RedisUserRepository redisUserRepository,
+                      UserDaoJpa userDaoJpa, UserAliasDaoJpa userAliasDaoJpa)
             throws URISyntaxException {
         this.restClient = new RestTemplate();
         this.ssoEndPoint = new URI(ssoConfig.getEndpoint());
         this.ssoAPIKey = ssoConfig.getAPIKey();
         this.redisUserRepository = redisUserRepository;
         this.userDaoJpa = userDaoJpa;
+        this.userAliasDaoJpa = userAliasDaoJpa;
     }
 
     public void logout(String username) {
@@ -67,13 +71,13 @@ public class UserClient {
         Optional<User> userOptional = redisUserRepository.findById(username);
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            return user;
+            return this.userAliasDaoJpa.updateUserAlias(user);
         }
 
         LinkedHashMap userInfo;
         try {
             userInfo = getSSOUserInfo(username);
-            user = getUser(username, userInfo);
+            user = this.userAliasDaoJpa.updateUserAlias(getUser(username, userInfo));
         } catch (HttpClientErrorException ex) {
             throw new ResourceNotFoundException("Unable to find user " + username, ex);
         }

@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.ChangeAliasParams;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.TestHelpers;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,28 @@ public class UserControllerTest {
                 "Xavier");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        ResponseEntity<User> getUserResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + UserController.GET_USER_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                User.class,
+                "Xavier");
+
+        User user = getUserResponse.getBody();
+        assertEquals("Xavier", user.getName());
+        assertEquals("X", user.getAlias());
+
+        getUserResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + UserController.GET_USER_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                User.class,
+                "xlf");
+
+        user = getUserResponse.getBody();
+        assertEquals("xlf", user.getName());
+        assertEquals("xlf", user.getAlias());
     }
 
 }

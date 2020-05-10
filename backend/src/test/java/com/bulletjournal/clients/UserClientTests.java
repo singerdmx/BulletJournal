@@ -27,9 +27,10 @@ public class UserClientTests {
         RedisUserRepository redisUserRepository = mock(RedisUserRepository.class);
         when(redisUserRepository.findById(username)).thenReturn(Optional.empty());
         UserDaoJpa userDaoJpa = mock(UserDaoJpa.class);
+        MockUserAliasDaoJpa userAliasDaoJpa = new MockUserAliasDaoJpa();
 
         UserClient userClient = new UserClient(new SSOConfig(
-                "https://1o24bbs.com"), redisUserRepository, userDaoJpa);
+                "https://1o24bbs.com"), redisUserRepository, userDaoJpa, userAliasDaoJpa);
 
         User user = userClient.getUser(username);
         Assert.assertEquals(username, user.getName());
