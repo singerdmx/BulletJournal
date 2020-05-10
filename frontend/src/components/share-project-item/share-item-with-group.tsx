@@ -17,6 +17,7 @@ const { Option } = Select;
 
 type ProjectItemProps = {
   type: ProjectType;
+  aliases: any;
   projectItemId: number;
   shareTask: (
     taskId: number,
@@ -44,7 +45,7 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
   props
 ) => {
   const [form] = Form.useForm();
-  const { groups: groupsWithOwner } = props;
+  const { groups: groupsWithOwner, aliases } = props;
 
   const shareProjectItemCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: props.shareNote,
@@ -86,12 +87,12 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
                     <Option
                       key={`group${group.id}`}
                       value={group.id}
-                      title={`Group "${group.name}" (owner "${group.owner}")`}
+                      title={`Group "${group.name}" (owner "${aliases[group.owner] ? aliases[group.owner] : group.owner}")`}
                     >
                       <Avatar size="small" src={group.ownerAvatar} />
                       &nbsp;&nbsp;
                       <strong> {group.name} </strong> (owner{' '}
-                      <strong>{group.owner}</strong>)
+                      <strong>{`${aliases[group.owner] ? aliases[group.owner] : group.owner}`}</strong>)
                     </Option>
                   ));
                 }
@@ -131,6 +132,7 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
+  aliases: state.system.aliases,
   groups: state.group.groups,
 });
 

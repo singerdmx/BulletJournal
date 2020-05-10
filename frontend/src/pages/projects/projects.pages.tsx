@@ -16,6 +16,7 @@ const {Panel} = Collapse;
 
 // props of projects
 type ProjectsProps = {
+    aliases: any;
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     updateProjects: () => void;
@@ -70,7 +71,7 @@ export const getGroupByProject = (
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
-    const {groups, ownedProjects, sharedProjects, updateGroups, updateProjects} = props;
+    const {groups, ownedProjects, sharedProjects, updateGroups, updateProjects, aliases} = props;
 
     useEffect(() => {
         updateGroups();
@@ -109,7 +110,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
             >
                 <List.Item.Meta
                     avatar={
-                        <Tooltip title={project.owner} placement='left'>
+                        <Tooltip title={`${aliases[project.owner] ? aliases[project.owner] : project.owner}`} placement='left'>
                             <Avatar size="small" src={project.ownerAvatar}/>
                         </Tooltip>
                     }
@@ -164,6 +165,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
 };
 
 const mapStateToProps = (state: IState) => ({
+    aliases: state.system.aliases,
     groups: state.group.groups,
     ownedProjects: state.project.owned,
     sharedProjects: state.project.shared

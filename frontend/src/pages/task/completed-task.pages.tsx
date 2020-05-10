@@ -43,7 +43,7 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const taskOperation = () => {
     return (
       <div className='task-operation'>
-        <Tooltip title={`Created by ${task.owner}`}>
+        <Tooltip title={`Created by ${task.owner && aliases[task.owner] ? aliases[task.owner] : task?.owner}`}>
           <div className='task-owner'>
             <Avatar src={task.ownerAvatar} />
           </div>
