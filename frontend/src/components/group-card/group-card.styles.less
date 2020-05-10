@@ -28,6 +28,18 @@
     .group-users {
         flex-grow: 1;
         overflow-y: auto;
+
+        .group-user {
+            display: flex;
+            align-items: baseline;
+            .group-user-info {
+                margin-left: 0.5rem;
+            }
+            .ant-typography-edit-content {
+                margin: 0;
+                margin-left: 0.5rem;
+            }
+        }
     }
     .group-users .user-item {
         height: 52px;

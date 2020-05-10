@@ -1,29 +1,40 @@
-import React from 'react';
-import { CloseOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, List, Badge, Avatar, Typography, Popconfirm, Tooltip } from 'antd';
-import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps } from 'react-router';
+import React from "react";
+import { CloseOutlined, DeleteOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  Button,
+  List,
+  Badge,
+  Avatar,
+  Typography,
+  Popconfirm,
+  Tooltip,
+} from "antd";
+import { connect } from "react-redux";
+import { withRouter, RouteComponentProps } from "react-router";
 import {
   deleteGroup,
   removeUserGroupByUsername,
   getGroup,
-  patchGroup
-} from '../../features/group/actions';
-import { Group, User } from '../../features/group/interface';
-import { MyselfWithAvatar } from '../../features/myself/reducer';
-import { IState } from '../../store';
+  patchGroup,
+} from "../../features/group/actions";
+import { Group, User } from "../../features/group/interface";
+import { MyselfWithAvatar } from "../../features/myself/reducer";
+import { IState } from "../../store";
 
-import './group-card.styles.less';
-import AddUser from '../modals/add-user.component';
+import "./group-card.styles.less";
+import AddUser from "../modals/add-user.component";
 import { History } from "history";
-import {changeAlias} from "../../features/user/actions";
-
+import { changeAlias } from "../../features/user/actions";
 
 type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
   aliases: any;
-  deleteGroup: (groupId: number, groupName: string, history: History<History.PoorMansUnknown>) => void;
+  deleteGroup: (
+    groupId: number,
+    groupName: string,
+    history: History<History.PoorMansUnknown>
+  ) => void;
   changeAlias: (targetUser: string, alias: string, groupId: number) => void;
   removeUserGroupByUsername: (
     groupId: number,
@@ -42,7 +53,7 @@ type GroupState = {
 
 function getGroupUserTitle(user: User, group: Group): string {
   if (user.name === group.owner) {
-    return 'Owner';
+    return "Owner";
   }
   return user.accepted ? `${user.name} Joined` : `${user.name} Not Joined`;
 }
@@ -51,7 +62,7 @@ const { Title, Text } = Typography;
 
 class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   state: GroupState = {
-    showModal: false
+    showModal: false,
   };
 
   deleteUser = (groupId: number, username: string, groupName: string) => {
@@ -59,7 +70,11 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   };
 
   deleteGroup = () => {
-    this.props.deleteGroup(this.props.group.id, this.props.group.name, this.props.history);
+    this.props.deleteGroup(
+      this.props.group.id,
+      this.props.group.name,
+      this.props.history
+    );
   };
 
   titleChange = (content: string) => {
@@ -75,24 +90,44 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   getGroupUserSpan(user: User, group: Group): JSX.Element {
     if (user.name === group.owner) {
       return (
-          <span>
-        &nbsp;&nbsp;<strong>{`${this.props.aliases[user.name] ? this.props.aliases[user.name]: user.name}`}</strong>
-      </span>
+        <span className="group-user-info">
+          <strong>{`${
+            this.props.aliases[user.name]
+              ? this.props.aliases[user.name]
+              : user.name
+          }`}</strong>
+        </span>
       );
     }
     if (this.props.myself.username === user.name) {
-      return <span>&nbsp;&nbsp;{user.name}</span>;
+      return <span className="group-user-info">{user.name}</span>;
     }
 
     if (user.accepted) {
-      return <span><Text
-          editable={{onChange: (e) => this.onAliasChange(e, user.name, group.id)}}
-      >&nbsp;&nbsp;{user.alias}</Text></span>;
+      return (
+        <span className="group-user-info">
+          <Text
+            editable={{
+              onChange: (e) => this.onAliasChange(e, user.name, group.id),
+            }}
+          >
+            {user.alias}
+          </Text>
+        </span>
+      );
     }
 
-    return <span style={{ color: 'grey' }}><Text
-        editable={{onChange: (e) => this.onAliasChange(e, user.name, group.id)}}
-    >&nbsp;&nbsp;{user.alias}</Text></span>;
+    return (
+      <span className="group-user-info" style={{ color: "grey" }}>
+        <Text
+          editable={{
+            onChange: (e) => this.onAliasChange(e, user.name, group.id),
+          }}
+        >
+          {user.alias}
+        </Text>
+      </span>
+    );
   }
 
   render() {
@@ -120,7 +155,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
                 onConfirm={this.deleteGroup}
                 className="group-setting"
               >
-                <Tooltip placement="top" title="Delete Group" >
+                <Tooltip placement="top" title="Delete Group">
                   <DeleteOutlined />
                 </Tooltip>
               </Popconfirm>
@@ -130,26 +165,32 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
         <div className="group-users">
           <List
             dataSource={group.users}
-            renderItem={item => {
+            renderItem={(item) => {
               return (
                 <List.Item key={item.id}>
-                  <Tooltip placement="right" title={getGroupUserTitle(item, group)}>
-                    <div
-                      className="group-user"
-                    >
+                  <Tooltip
+                    placement="right"
+                    title={getGroupUserTitle(item, group)}
+                  >
+                    <div className="group-user">
                       <Badge dot={!item.accepted}>
-                        <Avatar size={item.name === group.owner ? 'large' : 'default'} src={item.avatar} />
+                        <Avatar
+                          size={item.name === group.owner ? "large" : "default"}
+                          src={item.avatar}
+                        />
                       </Badge>
                       {this.getGroupUserSpan(item, group)}
                     </div>
                   </Tooltip>
                   {item.name !== group.owner &&
                     group.owner === this.props.myself.username && (
-                      <Tooltip placement="right" title={item.accepted ? 'Remove' : 'Cancel Invitation'}>
+                      <Tooltip
+                        placement="right"
+                        title={item.accepted ? "Remove" : "Cancel Invitation"}
+                      >
                         <Button
                           type="link"
                           size="small"
-
                           onClick={() =>
                             this.deleteUser(group.id, item.name, group.name)
                           }
@@ -173,7 +214,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
 
 const mapStateToProps = (state: IState) => ({
   myself: state.myself,
-  aliases: state.system.aliases
+  aliases: state.system.aliases,
 });
 
 export default connect(mapStateToProps, {
@@ -181,5 +222,5 @@ export default connect(mapStateToProps, {
   removeUserGroupByUsername,
   getGroup,
   patchGroup,
-  changeAlias
+  changeAlias,
 })(withRouter(GroupCard));
