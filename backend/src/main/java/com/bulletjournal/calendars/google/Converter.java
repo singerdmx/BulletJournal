@@ -77,7 +77,7 @@ public class Converter {
         content.setText(text.toString());
         content.setOwner(username);
 
-        return new GoogleCalendarEvent(task, content, event.getICalUID());
+        return new GoogleCalendarEvent(task, content, event.getId());
     }
 
     private static Long getValue(EventDateTime eventDateTime) {

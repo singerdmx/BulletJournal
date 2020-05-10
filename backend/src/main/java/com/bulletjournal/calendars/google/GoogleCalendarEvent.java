@@ -9,15 +9,15 @@ public class GoogleCalendarEvent {
 
     private Content content;
 
-    private String iCalUID;
+    private String eventId;
 
     public GoogleCalendarEvent() {
     }
 
-    public GoogleCalendarEvent(Task task, Content content, String iCalUID) {
+    public GoogleCalendarEvent(Task task, Content content, String eventId) {
         this.task = task;
         this.content = content;
-        this.iCalUID = iCalUID;
+        this.eventId = eventId;
     }
 
     public Task getTask() {
@@ -36,11 +36,11 @@ public class GoogleCalendarEvent {
         this.content = content;
     }
 
-    public String getiCalUID() {
-        return iCalUID;
+    public String getEventId() {
+        return eventId;
     }
 
-    public void setiCalUID(String iCalUID) {
-        this.iCalUID = iCalUID;
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }

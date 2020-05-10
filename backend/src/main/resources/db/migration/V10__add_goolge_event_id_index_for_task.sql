@@ -1,0 +1,1 @@
+CREATE INDEX google_calendar_event_id_index ON public.tasks USING btree (google_calendar_event_id);

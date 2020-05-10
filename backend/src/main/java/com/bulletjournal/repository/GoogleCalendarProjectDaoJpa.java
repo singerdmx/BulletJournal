@@ -28,7 +28,7 @@ public class GoogleCalendarProjectDaoJpa {
             throw new BadRequestException("Invalid project type " + projectType);
         }
         GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(
-                calendarId, project, channelId, channel, syncToken);
+                calendarId, project, channelId, channel, syncToken, requester);
         return this.googleCalendarProjectRepository.save(googleCalendarProject);
     }
 

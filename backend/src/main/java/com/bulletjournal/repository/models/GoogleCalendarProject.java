@@ -28,15 +28,19 @@ public class GoogleCalendarProject extends AuditModel {
     @Column(length = 300)
     private String token;
 
+    @Column(length = 100)
+    private String owner;
+
     public GoogleCalendarProject() {
     }
 
-    public GoogleCalendarProject(String id, Project project, String channelId, String channel, String token) {
+    public GoogleCalendarProject(String id, Project project, String channelId, String channel, String token, String owner) {
         this.id = id;
         this.project = project;
         this.channelId = channelId;
         this.channel = channel;
         this.token = token;
+        this.owner = owner;
     }
 
     public String getId() {
@@ -63,6 +67,14 @@ public class GoogleCalendarProject extends AuditModel {
         this.channelId = channelId;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
     public String getChannel() {
         return channel;
     }
@@ -87,6 +99,7 @@ public class GoogleCalendarProject extends AuditModel {
                 ", channelId='" + channelId + '\'' +
                 ", channel='" + channel + '\'' +
                 ", token='" + token + '\'' +
+                ", owner='" + owner + '\'' +
                 '}';
     }
 }

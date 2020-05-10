@@ -3,10 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.CreateTaskParams;
-import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.controller.models.UpdateTaskParams;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
@@ -17,6 +14,9 @@ import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
@@ -367,19 +367,36 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(Long projectId, String owner, CreateTaskParams createTaskParams,
-                       String iCalUID, String text) {
-        // Skip duplicated iCalUID
-        if (this.taskRepository.findTaskByGoogleCalendarEventId(iCalUID).isPresent()) {
-            LOGGER.info("Task with iCalUID {} already exists", iCalUID);
+                       String eventId, String text) {
+        // Skip duplicated eventId
+        if (this.taskRepository.findTaskByGoogleCalendarEventId(eventId).isPresent()) {
+            LOGGER.info("Task with eventId {} already exists", eventId);
             return;
         }
 
         Task task = create(projectId, owner, createTaskParams);
-        task.setGoogleCalendarEventId(iCalUID);
+        task.setGoogleCalendarEventId(eventId);
         task = this.taskRepository.save(task);
         LOGGER.info("Created task {}", task);
         addContent(task.getId(), owner, new TaskContent(text));
     }
+
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteTaskByGoogleEvenId(String eventId) {
+        Optional<Task> task = this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
+        if (!task.isPresent()) {
+            LOGGER.info("Task with eventId {} doesn't  exists", eventId);
+            return;
+        }
+        taskRepository.delete(task.get());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Optional<Task> getTaskByGoogleCalendarEventId(String eventId) {
+        return this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
+    }
+
 
     private ReminderSetting getReminderSetting(
             String dueDate, Task task, String time, String timezone, String recurrenceRule,
@@ -817,5 +834,22 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<TaskContent> getCompletedTaskContents(Long taskId, String requester) {
         CompletedTask task = getCompletedTask(taskId, requester);
         return Arrays.asList(GSON.fromJson(task.getContents(), TaskContent[].class));
+    }
+
+    public boolean isTaskModified(Task task, String requester) {
+        if (Math.abs(task.getCreatedAt().getTime() - task.getUpdatedAt().getTime()) > 1000) {
+            return true;
+        }
+        List<TaskContent> contents = this.getContents(task.getId(), requester);
+
+        if (null == contents || contents.isEmpty()) {
+            return false;
+        }
+        Timestamp latestContentTime = contents.get(0).getUpdatedAt();
+
+        if (latestContentTime.getTime() - task.getUpdatedAt().getTime() > 30000) {
+            return true;
+        }
+        return false;
     }
 }
