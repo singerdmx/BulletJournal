@@ -228,7 +228,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 	sig := query.Get("sig")
 
 	if len(sso) == 0 {
-		logger.Printf("Redirect %s to sso_provider", r.URL)
+		logger.Printf("Redirect %s to sso_provider, cookie %v", r.URL, cookie)
 		url := config.SSOURLString + "/session/sso_provider?" + sso_payload(config.SSOSecret, config.ProxyURLString, r.URL.String())
 		http.Redirect(w, r, url, 302)
 	} else {
