@@ -25,9 +25,11 @@ import moment from 'moment';
 import './project-item.styles.less';
 import { ProjectType } from '../../features/project/constants';
 import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
+import {IState} from "../../store";
 
 type ProjectProps = {
   readOnly: boolean;
+  aliases: any;
 };
 
 type NoteProps = {
@@ -83,7 +85,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
         history.push('/labels/search');
     };
   
-  const { note, deleteNote } = props;
+  const { note, deleteNote, aliases } = props;
 
   const getMore = () => {
     if (props.readOnly) {
@@ -103,7 +105,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
     </Popover>
   };
 
-  // TODO: if readOnly, link to public item page
+  // if readOnly, link to public item page
   let noteLink = `/note/${note.id}`;
   if (props.readOnly) {
     noteLink = `/public/items/NOTE${note.id}`;
@@ -145,7 +147,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
 
       <div className="project-control">
         <div className="project-item-owner">
-          <Tooltip title={note.owner}>
+          <Tooltip title={note.owner && aliases[note.owner] ? aliases[note.owner] : note.owner}>
             <Avatar src={note.ownerAvatar} size="small" />
           </Tooltip>
         </div>
@@ -155,4 +157,8 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
   );
 };
 
-export default connect(null, { deleteNote, addSelectedLabel })(NoteItem);
+const mapStateToProps = (state: IState) => ({
+    aliases: state.system.aliases
+});
+
+export default connect(mapStateToProps, { deleteNote, addSelectedLabel })(NoteItem);

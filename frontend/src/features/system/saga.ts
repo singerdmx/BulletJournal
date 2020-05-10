@@ -149,6 +149,7 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         sharedProjectsEtag: data.sharedProjectsEtag,
         remindingTaskEtag: data.remindingTaskEtag,
         reminders: data.reminders,
+        aliases: data.aliases
       })
     );
   } catch (error) {

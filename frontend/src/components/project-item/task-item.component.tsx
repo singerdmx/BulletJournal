@@ -31,6 +31,7 @@ import {
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
 import { addSelectedLabel } from '../../features/label/actions';
+import {IState} from "../../store";
 
 type ProjectProps = {
   readOnly: boolean;
@@ -38,17 +39,21 @@ type ProjectProps = {
   addSelectedLabel: (label: Label) => void;
 };
 
-type TaskProps = {
+type ManageTaskProps = {
   task: Task;
   isComplete: boolean;
   completeOnlyOccurrence: boolean;
-  completeTask: (taskId: number, dateTime?: string) => void;
   uncompleteTask: (taskId: number) => void;
-  deleteTask: (taskId: number) => void;
+  completeTask: (taskId: number, dateTime?: string) => void;
   deleteCompletedTask: (taskId: number) => void;
+  deleteTask: (taskId: number) => void;
+}
+
+type TaskProps = {
+  aliases: any;
 };
 
-const ManageTask: React.FC<TaskProps> = (props) => {
+const ManageTask: React.FC<ManageTaskProps> = (props) => {
   const {
     task,
     isComplete,
@@ -157,7 +162,7 @@ export const getDueDateTime = (task: Task) => {
   );
 };
 
-const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
+const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (props) => {
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -204,13 +209,14 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
     uncompleteTask,
     deleteTask,
     deleteCompletedTask,
+    aliases,
   } = props;
 
   const taskStyle = isComplete
     ? 'project-item-name completed-task'
     : 'project-item-name';
-  // TODO: if readOnly, link to public item page
-  // TODO: if isComplete, go to completedTask page
+  // if readOnly, link to public item page
+  // if isComplete, go to completedTask page
   let taskLink = `/task/${task.id}`;
   if (props.readOnly) {
     taskLink = `/public/items/TASK${task.id}`;
@@ -285,7 +291,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip title={`Created by ${task.owner}`}>
+          <Tooltip title={`Created by ${task.owner && aliases[task.owner] ? aliases[task.owner] : task.owner}`}>
             <Avatar src={task.ownerAvatar} size='small' />
           </Tooltip>
         </div>
@@ -301,7 +307,11 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
   );
 };
 
-export default connect(null, {
+const mapStateToProps = (state: IState) => ({
+  aliases: state.system.aliases
+});
+
+export default connect(mapStateToProps, {
   completeTask,
   uncompleteTask,
   deleteTask,
