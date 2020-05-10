@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @MappedSuperclass
@@ -259,11 +260,15 @@ public abstract class TaskModel extends ProjectItemModel {
     }
 
     public com.bulletjournal.controller.models.Task toPresentationModel() {
-        return toPresentationModel(Collections.emptyList());
+        return toPresentationModel(Collections.emptyList(), Collections.emptyMap());
+    }
+
+    public com.bulletjournal.controller.models.Task toPresentationModel(Map<String, String> aliases) {
+        return toPresentationModel(Collections.emptyList(), aliases);
     }
 
     public com.bulletjournal.controller.models.Task toPresentationModel(
-            List<com.bulletjournal.controller.models.Label> labels) {
+            List<com.bulletjournal.controller.models.Label> labels, Map<String, String> aliases) {
 
         ReminderSetting reminderSetting = new ReminderSetting();
         if (this.hasReminderDate()) {
@@ -278,7 +283,11 @@ public abstract class TaskModel extends ProjectItemModel {
         return new com.bulletjournal.controller.models.Task(
                 this.getId(),
                 this.getOwner(),
-                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
+                this.getAssignees().stream().map(a -> {
+                    User user = new User(a);
+                    user.setAlias(aliases.getOrDefault(user.getName(), user.getName()));
+                    return user;
+                }).collect(Collectors.toList()),
                 this.getDueDate(),
                 this.getDueTime(),
                 this.getTimezone(),

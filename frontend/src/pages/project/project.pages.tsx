@@ -8,7 +8,6 @@ import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
 import {
-  HistoryOutlined,
   DeleteOutlined,
   TeamOutlined,
   CheckCircleOutlined,
@@ -43,7 +42,7 @@ type ModalState = {
   groupName: string;
   completeTasksShown: boolean;
   tasksByUsersShown: boolean;
-  assignee: string;
+  assignee: User | undefined;
 };
 
 type GroupProps = {
@@ -83,7 +82,7 @@ class ProjectPage extends React.Component<
     completeTasksShown: false,
     //used for tasks by assignee modal
     tasksByUsersShown: false,
-    assignee: '',
+    assignee: undefined,
   };
 
   componentDidMount() {
@@ -142,7 +141,7 @@ class ProjectPage extends React.Component<
 
   handleGetTasksByAssignee = (u: User) => {
     this.setState({ tasksByUsersShown: true });
-    this.setState({ assignee: u.name });
+    this.setState({ assignee: u });
     // update tasks
     this.props.getTasksByAssignee(
       parseInt(this.props.match.params.projectId),

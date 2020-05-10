@@ -19,6 +19,7 @@ export type SystemUpdate = {
   sharedProjectsEtag: string;
   remindingTaskEtag: string;
   reminders: Task[];
+  aliases: {};
 };
 
 export type PublicProjectItemUpdate = {
@@ -44,7 +45,8 @@ let initialState = {
   publicTask: {} as Task,
   reminders: [] as Task[],
   contents: [] as Array<Content>,
-  contentType: ContentType.NOTE
+  contentType: ContentType.NOTE,
+  aliases: {}
 };
 
 const slice = createSlice({
@@ -60,7 +62,8 @@ const slice = createSlice({
         ownedProjectsEtag,
         sharedProjectsEtag,
         remindingTaskEtag,
-        reminders
+        reminders,
+        aliases
       } = action.payload;
       if (tasksEtag) {
         state.tasksEtag = tasksEtag;
@@ -86,6 +89,7 @@ const slice = createSlice({
       if (reminders && reminders.length > 0) {
         state.reminders = reminders
       }
+      state.aliases = aliases;
     },
     systemApiErrorReceived: (
       state,

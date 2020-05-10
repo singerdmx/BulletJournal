@@ -32,7 +32,7 @@ public class UserAliasDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected Map<String, String> getAliases(String requester) {
+    public Map<String, String> getAliases(String requester) {
         Optional<UserAlias> userAlias = userAliasRepository.findById(requester);
         if (!userAlias.isPresent()) {
             return Collections.emptyMap();

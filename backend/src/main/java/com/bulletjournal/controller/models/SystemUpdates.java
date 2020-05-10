@@ -3,6 +3,7 @@ package com.bulletjournal.controller.models;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SystemUpdates {
@@ -20,6 +21,8 @@ public class SystemUpdates {
     private String notificationsEtag;
 
     private String remindingTaskEtag;
+
+    private Map<String, String> aliases;
 
     private List<Task> reminders;
 
@@ -88,4 +91,11 @@ public class SystemUpdates {
         this.notesEtag = notesEtag;
     }
 
+    public Map<String, String> getAliases() {
+        return aliases;
+    }
+
+    public void setAliases(Map<String, String> aliases) {
+        this.aliases = aliases;
+    }
 }

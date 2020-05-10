@@ -62,6 +62,9 @@ public class SystemController {
     @Autowired
     private TokenBucket tokenBucket;
 
+    @Autowired
+    private UserAliasDaoJpa userAliasDaoJpa;
+
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
                                     @RequestParam(name = "projectId", required = false) Long projectId,
@@ -141,6 +144,7 @@ public class SystemController {
         systemUpdates.setGroupsEtag(groupsEtag);
         systemUpdates.setReminders(remindingTasks);
         systemUpdates.setRemindingTaskEtag(remindingTaskEtag);
+        systemUpdates.setAliases(this.userAliasDaoJpa.getAliases(username));
         return systemUpdates;
     }
 

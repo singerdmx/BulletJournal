@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, Empty } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
 import TaskItem from '../project-item/task-item.component';
 import { Task } from '../../features/tasks/interface';
+import {User} from "../../features/group/interface";
 
 type TasksByAssigneeProps = {
   tasksByAssignee: Task[];
   visible: boolean;
-  assignee: string;
+  assignee: User | undefined;
   onCancel: () => void;
 };
 
@@ -17,7 +18,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   const { visible, assignee, tasksByAssignee } = props;
   return (
     <Modal
-      title={`Assigned to ${assignee}`}
+      title={`Assigned to ${assignee ? assignee.alias : ''}`}
       visible={visible}
       onCancel={props.onCancel}
       footer={false}

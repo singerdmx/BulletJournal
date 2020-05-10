@@ -15,20 +15,21 @@ public class TaskRelationsProcessor {
             .excludeFieldsWithoutExposeAnnotation().create();
 
     public static List<Task> processRelations(
-            Map<Long, com.bulletjournal.repository.models.Task> taskMap, String relations) {
+            Map<Long, com.bulletjournal.repository.models.Task> taskMap, String relations, Map<String, String> aliases) {
         Task[] list = GSON.fromJson(
                 relations.replace(HierarchyItem.SUB_ITEMS_KEY_REPLACEMENT, SUB_TASKS_KEY), Task[].class);
         List<Task> tasks = new ArrayList<>();
         for (Task task : list) {
-            tasks.add(merge(taskMap, task));
+            tasks.add(merge(taskMap, task, aliases));
         }
         return tasks;
     }
 
-    private static Task merge(Map<Long, com.bulletjournal.repository.models.Task> taskMap, Task cur) {
-        cur.clone(taskMap.get(cur.getId()).toPresentationModel());
+    private static Task merge(Map<Long, com.bulletjournal.repository.models.Task> taskMap,
+                              Task cur, Map<String, String> aliases) {
+        cur.clone(taskMap.get(cur.getId()).toPresentationModel(aliases));
         for (Task subNote : cur.getSubTasks()) {
-            merge(taskMap, subNote);
+            merge(taskMap, subNote, aliases);
         }
         return cur;
     }

@@ -240,7 +240,7 @@ const TaskItem: React.FC<ProjectProps & TaskProps> = (props) => {
             {task.assignees.map((u, index) => (
               <p key={index}>
                 <Avatar size='small' src={u.avatar} />
-                &nbsp;{u.name}
+                &nbsp;{u.alias}
               </p>
             ))}
           </div>

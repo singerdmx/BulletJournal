@@ -27,6 +27,7 @@ const LocaleCurrency = require('locale-currency'); //currency code
 type TransactionProps = {
   currency: string;
   transaction: Transaction;
+  aliases: any;
   deleteTransaction: (transactionId: number) => void;
   addSelectedLabel: (label: Label) => void;
 };
@@ -72,7 +73,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
     props.addSelectedLabel(label);
     history.push('/labels/search');
   };
-  const { transaction, deleteTransaction } = props;
+  const { transaction, deleteTransaction, aliases } = props;
 
   const getPaymentDateTime = () => {
     if (!transaction.date) {
@@ -116,7 +117,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
 
     return null;
   };
-
+  
   return (
     <div className='project-item'>
       <div className='project-item-content'>
@@ -152,12 +153,12 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip title={`Created by ${transaction.owner}`}>
+          <Tooltip title={`Created by ${aliases[transaction.owner] ? aliases[transaction.owner] : transaction.owner}`}>
             <Avatar src={transaction.ownerAvatar} size='small' />
           </Tooltip>
         </div>
         <div className='project-item-owner'>
-          <Tooltip title={`Payer ${transaction.payer}`}>
+          <Tooltip title={`Payer ${aliases[transaction.payer] ? aliases[transaction.payer] : transaction.payer}`}>
             <Avatar src={transaction.payerAvatar} size='small' />
           </Tooltip>
         </div>
@@ -187,6 +188,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   currency: state.myself.currency,
+  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {

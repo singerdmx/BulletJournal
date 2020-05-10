@@ -72,6 +72,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Autowired
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
+    @Autowired
+    private UserAliasDaoJpa userAliasDaoJpa;
+
     @Override
     public JpaRepository getJpaRepository() {
         return this.taskRepository;
@@ -98,7 +101,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         ProjectTasks projectTasks = projectTasksOptional.get();
         final Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
                 .stream().collect(Collectors.toMap(Task::getId, n -> n));
-        return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks())
+        return TaskRelationsProcessor.processRelations(
+                tasksMap, projectTasks.getTasks(), this.userAliasDaoJpa.getAliases(requester))
                 .stream()
                 .map(task -> addLabels(task, tasksMap))
                 .collect(Collectors.toList());
@@ -127,7 +131,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
         return tasks.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, this.userAliasDaoJpa.getAliases(requester));
         }).collect(Collectors.toList());
     }
 
@@ -163,7 +167,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public com.bulletjournal.controller.models.Task getTask(String requester, Long id) {
         Task task = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
-        return task.toPresentationModel(labels);
+        return task.toPresentationModel(labels, this.userAliasDaoJpa.getAliases(requester));
     }
 
     /**
