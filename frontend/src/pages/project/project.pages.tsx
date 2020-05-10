@@ -170,7 +170,6 @@ class ProjectPage extends React.Component<
     const handleGetProjectItemsByUse = this.handleGetProjectItemsByUseCall[
       project.projectType
     ];
-    const projectId = this.props.match.params.projectId;
     let createContent = null;
     let projectContent = null;
     let showCompletedTasks = null;

@@ -13,7 +13,6 @@ import { Label, stringToRGB } from '../../features/label/interface';
 import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
 import moment from 'moment-timezone';
-import { dateFormat } from '../../features/myBuJo/constants';
 import { IState } from '../../store';
 import { ProjectType } from '../../features/project/constants';
 //import modal

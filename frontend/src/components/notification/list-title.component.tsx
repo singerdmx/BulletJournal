@@ -1,6 +1,5 @@
 import React from 'react';
 import moment from 'moment';
-import { EventType } from '../../features/notification/constants'
 
 type titleProps = {
   title: string;

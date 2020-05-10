@@ -8,7 +8,6 @@ import {
   putTask,
   updateTasks,
   updateCompletedTasks,
-  updateCompletedTaskPageNo,
 } from '../../features/tasks/actions';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
@@ -26,13 +25,13 @@ type TasksProps = {
   loadingCompletedTask: boolean;
   nextCompletedTasks: Task[];
   updateTasks: (projectId: number) => void;
-  updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
   updateCompletedTasks: (projectId: number) => void;
   putTask: (projectId: number, tasks: Task[]) => void;
   showModal?: (user: User) => void;
 };
 
 const getTree = (
+  inProject: boolean,
   data: Task[],
   readOnly: boolean,
   showModal?: (user: User) => void
@@ -41,7 +40,7 @@ const getTree = (
   data.forEach((item: Task) => {
     const node = {} as TreeNodeNormal;
     if (item.subTasks && item.subTasks.length) {
-      node.children = getTree(item.subTasks, readOnly, showModal);
+      node.children = getTree(inProject, item.subTasks, readOnly, showModal);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
@@ -158,7 +157,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     putTask,
     loadingCompletedTask,
     nextCompletedTasks,
-    updateCompletedTaskPageNo,
     showModal,
   } = props;
 
@@ -173,8 +171,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       updateCompletedTasks(project.id);
     }
   };
-
-  let treeTask = getTree(tasks, readOnly, showModal);
 
   let completedTaskList = null;
   if (props.showCompletedTask) {
@@ -223,6 +219,8 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     return null;
   }
 
+  const treeTask = getTree(!project.shared, tasks, readOnly, showModal);
+
   return (
     <div>
       <Tree
@@ -250,5 +248,4 @@ export default connect(mapStateToProps, {
   updateTasks,
   updateCompletedTasks,
   putTask,
-  updateCompletedTaskPageNo,
 })(TaskTree);
