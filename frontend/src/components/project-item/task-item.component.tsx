@@ -36,6 +36,7 @@ import { User } from '../../features/group/interface';
 type ProjectProps = {
   readOnly: boolean;
   addSelectedLabel: (label: Label) => void;
+  showModal?: (user: User) => void;
 };
 
 type ManageTaskProps = {
@@ -249,6 +250,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     deleteTask,
     deleteCompletedTask,
     aliases,
+    showModal,
   } = props;
 
   const taskStyle = isComplete
@@ -298,8 +300,13 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   const getAvatar = (user: User) => {
     if (!inProject) return <Avatar src={user.avatar} size='small' />;
+    if (!showModal) return <Avatar src={user.avatar} size='small' />;
     return (
-      <span onClick={() => console.log('1')}>
+      <span
+        onClick={() => {
+          showModal(user);
+        }}
+      >
         <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
       </span>
     );
@@ -346,7 +353,14 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
                 : task.owner
             }`}
           >
-            <Avatar src={task.ownerAvatar} size='small' />
+            {getAvatar({
+              accepted: true,
+              avatar: task.ownerAvatar ? task.ownerAvatar : '',
+              id: 0,
+              name: task.owner ? task.owner : '',
+              alias: task.owner ? task.owner : '',
+              thumbnail: '',
+            })}
           </Tooltip>
         </div>
         <div className='project-item-assignee'>{getAssignees()}</div>

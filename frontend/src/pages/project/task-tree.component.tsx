@@ -15,6 +15,7 @@ import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { CloudSyncOutlined } from '@ant-design/icons';
 import './task.styles.less';
+import { User } from '../../features/group/interface';
 
 type TasksProps = {
   showCompletedTask: boolean;
@@ -28,14 +29,19 @@ type TasksProps = {
   updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
   updateCompletedTasks: (projectId: number) => void;
   putTask: (projectId: number, tasks: Task[]) => void;
+  showModal?: (user: User) => void;
 };
 
-const getTree = (data: Task[], readOnly: boolean): TreeNodeNormal[] => {
+const getTree = (
+  data: Task[],
+  readOnly: boolean,
+  showModal?: (user: User) => void
+): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Task) => {
     const node = {} as TreeNodeNormal;
     if (item.subTasks && item.subTasks.length) {
-      node.children = getTree(item.subTasks, readOnly);
+      node.children = getTree(item.subTasks, readOnly, showModal);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
@@ -47,6 +53,7 @@ const getTree = (data: Task[], readOnly: boolean): TreeNodeNormal[] => {
         readOnly={readOnly}
         inProject={true}
         completeOnlyOccurrence={false}
+        showModal={showModal}
       />
     );
     node.key = item.id.toString();
@@ -152,6 +159,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     loadingCompletedTask,
     nextCompletedTasks,
     updateCompletedTaskPageNo,
+    showModal,
   } = props;
 
   useEffect(() => {
@@ -166,7 +174,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     }
   };
 
-  let treeTask = getTree(tasks, readOnly);
+  let treeTask = getTree(tasks, readOnly, showModal);
 
   let completedTaskList = null;
   if (props.showCompletedTask) {

@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import {GroupsWithOwner, User} from '../../features/group/interface';
+import { GroupsWithOwner, User } from '../../features/group/interface';
 import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
@@ -31,7 +31,7 @@ import {
   getTasksByAssignee,
 } from '../../features/tasks/actions';
 import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
-import ShowProjectHistory from "../../components/modals/show-project-history.component";
+import ShowProjectHistory from '../../components/modals/show-project-history.component';
 
 type ProjectPathParams = {
   projectId: string;
@@ -150,11 +150,9 @@ class ProjectPage extends React.Component<
     );
   };
 
-  handleGetNotesByOwner = (u: User) => {
-  };
+  handleGetNotesByOwner = (u: User) => {};
 
-  handleGetTransactionByPayer = (u: User) => {
-  };
+  handleGetTransactionByPayer = (u: User) => {};
 
   handleGetProjectItemsByUseCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOwner,
@@ -169,8 +167,10 @@ class ProjectPage extends React.Component<
       return null;
     }
 
-    const handleGetProjectItemsByUse = this.handleGetProjectItemsByUseCall[project.projectType];
-
+    const handleGetProjectItemsByUse = this.handleGetProjectItemsByUseCall[
+      project.projectType
+    ];
+    const projectId = this.props.match.params.projectId;
     let createContent = null;
     let projectContent = null;
     let showCompletedTasks = null;
@@ -187,6 +187,11 @@ class ProjectPage extends React.Component<
           <TaskTree
             showCompletedTask={this.state.completeTasksShown}
             readOnly={project.shared}
+            showModal={(user: User) => {
+              this.setState({ tasksByUsersShown: true });
+              this.setState({ assignee: user });
+              handleGetProjectItemsByUse(user);
+            }}
           />
         );
         showCompletedTasks = this.getShowCompletedTasksIcon();
@@ -277,7 +282,11 @@ class ProjectPage extends React.Component<
       <div className='project'>
         <Tooltip
           placement='top'
-          title={`${this.props.aliases[project.owner] ? this.props.aliases[project.owner] : project.owner}`}
+          title={`${
+            this.props.aliases[project.owner]
+              ? this.props.aliases[project.owner]
+              : project.owner
+          }`}
           className='project-avatar'
         >
           <span>
@@ -332,7 +341,7 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
   myself: state.myself.username,
   completedTaskPageNo: state.task.completedTaskPageNo,
-  aliases: state.system.aliases
+  aliases: state.system.aliases,
 });
 
 export default connect(mapStateToProps, {
