@@ -44,7 +44,7 @@ interface NotePageHandler {
 const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   // hook history in router
   const history = useHistory();
-  const { note, deleteNote, contents, updateNoteContents, aliases } = props;
+  const { note, deleteNote, contents, getNote, updateNoteContents, aliases } = props;
   // get id of note from router
   const { noteId } = useParams();
   // state control drawer displaying
@@ -53,11 +53,12 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
-    noteId && props.getNote(parseInt(noteId));
+    noteId && getNote(parseInt(noteId));
   }, [noteId]);
 
   React.useEffect(() => {
     note && note.id && updateNoteContents(note.id);
+    noteId && getNote(parseInt(noteId));
   }, [note]);
 
   // show drawer

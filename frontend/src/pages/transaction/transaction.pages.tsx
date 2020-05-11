@@ -73,6 +73,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     aliases,
     contents,
     updateTransactionContents,
+    getTransaction
   } = props;
 
   // get id of Transaction from oruter
@@ -86,7 +87,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
-    transactionId && props.getTransaction(parseInt(transactionId));
+    transactionId && getTransaction(parseInt(transactionId));
   }, [transactionId]);
 
   React.useEffect(() => {
@@ -105,6 +106,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
   const handleRefresh = () => {
     transaction && transaction.id && updateTransactionContents(transaction.id);
+    transactionId && getTransaction(parseInt(transactionId));
   };
 
   const getPaymentDateTime = (transaction: Transaction) => {

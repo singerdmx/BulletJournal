@@ -42,7 +42,7 @@ interface TaskPageHandler {
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
-  const { task, deleteTask, updateTaskContents, contents, aliases } = props;
+  const { task, deleteTask, updateTaskContents, getTask, contents, aliases } = props;
   // get id of task from router
   const { taskId } = useParams();
   // state control drawer displaying
@@ -53,7 +53,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 
   // listening on the empty state working as componentDidmount
   React.useEffect(() => {
-    taskId && props.getTask(parseInt(taskId));
+    taskId && getTask(parseInt(taskId));
   }, [taskId]);
 
   React.useEffect(() => {
@@ -76,6 +76,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 
   const handleRefresh = () => {
     task && task.id && updateTaskContents(task.id);
+    taskId && getTask(parseInt(taskId));
   };
 
   const createContentElem = (
