@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -157,6 +158,7 @@ public class SystemController {
             @NotNull @PathVariable String itemId) {
         if (this.tokenBucket.isLimitExceeded(TokenBucketType.PUBLIC_ITEM)) {
             LOGGER.error("Get PublicProjectItem limit exceeded");
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(null);
         }
         String originalUser = MDC.get(UserClient.USER_NAME_KEY);
         String username = AuthorizationService.SUPER_USER;

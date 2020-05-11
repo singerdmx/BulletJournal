@@ -2,15 +2,31 @@ package com.bulletjournal.filters.rate.limiting;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.MDCConfig;
+import com.bulletjournal.config.RateConfig;
+import io.github.bucket4j.*;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class TokenBucket {
 
     @Autowired
     private MDCConfig mdcConfig;
+
+    @Autowired
+    private RateConfig rateConfig;
+
+    @Autowired
+    private UserClient userClient;
+
+    private final Map<String, Bucket> bucketsUser = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> bucketsFileUpload = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> bucketsPublicItem = new ConcurrentHashMap<>();
 
     public boolean isLimitExceeded(TokenBucketType type) {
         switch (type) {
@@ -27,18 +43,33 @@ public class TokenBucket {
 
     private boolean isLimitExceededByPublicItem() {
         String ip = MDC.get(this.mdcConfig.getDefaultClientIpKey());
-        return false;
+        return consumeToken(ip, bucketsPublicItem, rateConfig.getPublicItem());
     }
 
     private boolean isLimitExceededByFileUpload() {
         // FileController
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return false;
+        return consumeToken(username, bucketsFileUpload, rateConfig.getFileUpload());
     }
 
     private boolean isLimitExceededByUser() {
         // For RateLimitFilter
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return false;
+
+        int limit = this.rateConfig.getUser();
+
+        return consumeToken(username, bucketsUser, limit);
+    }
+
+    private boolean consumeToken(String subject, Map<String, Bucket> buckets, int limit) {
+        Bucket requestBucket = buckets.computeIfAbsent(subject, key -> standardBucket(limit));
+        ConsumptionProbe probe = requestBucket.tryConsumeAndReturnRemaining(1);
+        return !probe.isConsumed();
+    }
+
+    private static Bucket standardBucket(int limit) {
+        return Bucket4j.builder()
+                .addLimit(Bandwidth.classic(limit, Refill.intervally(limit, Duration.ofMinutes(1))))
+                .build();
     }
 }
