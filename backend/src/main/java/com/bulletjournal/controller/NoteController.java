@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -55,7 +56,12 @@ public class NoteController {
     private SearchService searchService;
 
     @GetMapping(NOTES_ROUTE)
-    public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId) {
+    public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId,
+            @RequestParam(required = false) String owner) {
+        if (StringUtils.isNotBlank(owner)) {
+            return getNotesByOwner(projectId, owner);
+        }
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Note> notes = this.noteDaoJpa.getNotes(projectId, username);
         String notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -64,8 +70,14 @@ public class NoteController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(notesEtag);
 
-        return ResponseEntity.ok().headers(responseHeader).body(notes
-                .stream().map(n -> addAvatar(n)).collect(Collectors.toList()));
+        return ResponseEntity.ok().headers(responseHeader)
+                .body(notes.stream().map(n -> addAvatar(n)).collect(Collectors.toList()));
+    }
+
+    private ResponseEntity<List<Note>> getNotesByOwner(Long projectId, String owner) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Note> notes = this.noteDaoJpa.getNotesByOwner(projectId, username, owner);
+        return ResponseEntity.ok().body(notes.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
     }
 
     private Note addAvatar(Note note) {
@@ -80,8 +92,7 @@ public class NoteController {
 
     @PostMapping(NOTES_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Note createNote(@NotNull @PathVariable Long projectId,
-                           @Valid @RequestBody CreateNoteParams note) {
+    public Note createNote(@NotNull @PathVariable Long projectId, @Valid @RequestBody CreateNoteParams note) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note createdNote = noteDaoJpa.create(projectId, username, note).toPresentationModel();
         searchService.saveToES(createdNote);
@@ -96,10 +107,10 @@ public class NoteController {
 
     @PatchMapping(NOTE_ROUTE)
     public ResponseEntity<List<Note>> updateNote(@NotNull @PathVariable Long noteId,
-                                                 @Valid @RequestBody UpdateNoteParams updateNoteParams) {
+            @Valid @RequestBody UpdateNoteParams updateNoteParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note note = this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
-        return getNotes(note.getProjectId());
+        return getNotes(note.getProjectId(), null);
     }
 
     @DeleteMapping(NOTE_ROUTE)
@@ -110,14 +121,12 @@ public class NoteController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveNoteEvent(events, username));
         }
-        return getNotes(note.getProjectId());
+        return getNotes(note.getProjectId(), null);
     }
 
     @PutMapping(NOTES_ROUTE)
-    public ResponseEntity<List<Note>> updateNoteRelations(
-            @NotNull @PathVariable Long projectId,
-            @Valid @RequestBody List<Note> notes,
-            @RequestHeader(IF_NONE_MATCH) Optional<String> notesEtag) {
+    public ResponseEntity<List<Note>> updateNoteRelations(@NotNull @PathVariable Long projectId,
+            @Valid @RequestBody List<Note> notes, @RequestHeader(IF_NONE_MATCH) Optional<String> notesEtag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         if (notesEtag.isPresent()) {
             List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
@@ -128,12 +137,11 @@ public class NoteController {
             }
         }
         this.noteDaoJpa.updateUserNotes(projectId, notes);
-        return getNotes(projectId);
+        return getNotes(projectId, null);
     }
 
     @PutMapping(NOTE_SET_LABELS_ROUTE)
-    public Note setLabels(@NotNull @PathVariable Long noteId,
-                          @NotNull @RequestBody List<Long> labels) {
+    public Note setLabels(@NotNull @PathVariable Long noteId, @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.notificationService.inform(this.noteDaoJpa.setLabels(username, noteId, labels));
         return getNote(noteId);
@@ -141,19 +149,17 @@ public class NoteController {
 
     @PostMapping(MOVE_NOTE_ROUTE)
     public void moveNote(@NotNull @PathVariable Long noteId,
-                         @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+            @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.move(username, noteId, moveProjectItemParams.getTargetProject());
     }
 
     @PostMapping(SHARE_NOTE_ROUTE)
-    public SharableLink shareNote(
-            @NotNull @PathVariable Long noteId,
+    public SharableLink shareNote(@NotNull @PathVariable Long noteId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         if (shareProjectItemParams.isGenerateLink()) {
-            return this.noteDaoJpa.generatePublicItemLink(
-                    noteId, username, shareProjectItemParams.getTtl());
+            return this.noteDaoJpa.generatePublicItemLink(noteId, username, shareProjectItemParams.getTtl());
         }
 
         Informed inform = this.noteDaoJpa.shareProjectItem(noteId, shareProjectItemParams, username);
@@ -172,8 +178,7 @@ public class NoteController {
     }
 
     @PostMapping(REVOKE_SHARABLE_ROUTE)
-    public void revokeSharable(
-            @NotNull @PathVariable Long noteId,
+    public void revokeSharable(@NotNull @PathVariable Long noteId,
             @NotNull @RequestBody RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.revokeSharable(noteId, username, revokeProjectItemSharableParams);
@@ -181,7 +186,7 @@ public class NoteController {
 
     @PostMapping(ADD_CONTENT_ROUTE)
     public Content addContent(@NotNull @PathVariable Long noteId,
-                              @NotNull @RequestBody CreateContentParams createContentParams) {
+            @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.noteDaoJpa.addContent(noteId, username, new NoteContent(createContentParams.getText()))
                 .toPresentationModel();
@@ -190,39 +195,33 @@ public class NoteController {
     @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.noteDaoJpa.getContents(noteId, username).stream()
-                .map(t -> {
-                    Content content = t.toPresentationModel();
-                    content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
-                    for (Revision revision : content.getRevisions()) {
-                        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
-                    }
-                    return content;
-                })
-                .collect(Collectors.toList());
+        return this.noteDaoJpa.getContents(noteId, username).stream().map(t -> {
+            Content content = t.toPresentationModel();
+            content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
+            for (Revision revision : content.getRevisions()) {
+                revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
+            }
+            return content;
+        }).collect(Collectors.toList());
     }
 
     @DeleteMapping(CONTENT_ROUTE)
-    public List<Content> deleteContent(@NotNull @PathVariable Long noteId,
-                                       @NotNull @PathVariable Long contentId) {
+    public List<Content> deleteContent(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.deleteContent(contentId, noteId, username);
         return getContents(noteId);
     }
 
     @PatchMapping(CONTENT_ROUTE)
-    public List<Content> updateContent(@NotNull @PathVariable Long noteId,
-                                       @NotNull @PathVariable Long contentId,
-                                       @NotNull @RequestBody UpdateContentParams updateContentParams) {
+    public List<Content> updateContent(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId,
+            @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams);
         return getContents(noteId);
     }
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
-    public Revision getContentRevision(
-            @NotNull @PathVariable Long noteId,
-            @NotNull @PathVariable Long contentId,
+    public Revision getContentRevision(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId,
             @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
