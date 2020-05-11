@@ -1,6 +1,5 @@
 import React from 'react';
 import { Content } from '../../features/myBuJo/interface';
-import BraftEditor from 'braft-editor';
 import './content-editor.style.less';
 
 type ContentReaderProps = {

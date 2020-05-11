@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { List, Divider, Tree, Empty, Tooltip } from 'antd';
+import { List, Divider, Tree, Empty, Tooltip, Button } from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
@@ -12,9 +12,10 @@ import {
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
-import { CloudSyncOutlined } from '@ant-design/icons';
+import { CloudSyncOutlined, SearchOutlined } from '@ant-design/icons';
 import './task.styles.less';
 import { User } from '../../features/group/interface';
+import {useHistory} from "react-router-dom";
 
 type TasksProps = {
   showCompletedTask: boolean;
@@ -166,10 +167,16 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     }
   }, [project]);
 
+  const history = useHistory();
+
   const handleLoadMore = () => {
     if (project) {
       updateCompletedTasks(project.id);
     }
+  };
+
+  const handleSearchCompletedTasksClick = () => {
+    history.push('/completedTasks/search');
   };
 
   let completedTaskList = null;
@@ -185,6 +192,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       completedTaskList = (
         <div>
           <Divider />
+          <div className='search-completed-tasks-button'>
+            <Button icon={<SearchOutlined />} onClick={handleSearchCompletedTasksClick}>Search Completed Tasks</Button>
+          </div>
           <div className='completed-tasks'>
             <List>
               {completedTasks.map((task) => {
