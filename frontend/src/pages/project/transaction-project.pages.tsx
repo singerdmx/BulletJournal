@@ -588,7 +588,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       <List className="transaction-list">
         {transactions.map((item) => (
           <List.Item key={item.id} className="transaction-list-item">
-            <TransactionItem transaction={item} />
+            <TransactionItem transaction={item} inProject={true}/>
           </List.Item>
         ))}
       </List>

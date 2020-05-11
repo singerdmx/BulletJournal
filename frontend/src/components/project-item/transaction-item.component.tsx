@@ -23,24 +23,46 @@ import {
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
 import { addSelectedLabel } from '../../features/label/actions';
+import {User} from "../../features/group/interface";
 
 const LocaleCurrency = require('locale-currency'); //currency code
 
 type TransactionProps = {
+  inProject: boolean;
   currency: string;
-  transaction: Transaction;
   aliases: any;
-  deleteTransaction: (transactionId: number) => void;
   addSelectedLabel: (label: Label) => void;
+  showModal?: (user: User) => void;
 };
 
 type TransactionManageProps = {
+  inModal?: boolean;
   transaction: Transaction;
   deleteTransaction: (transactionId: number) => void;
 };
 
 const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
-  const { transaction, deleteTransaction } = props;
+  const { transaction, deleteTransaction, inModal } = props;
+
+  if (inModal === true) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Popconfirm
+              title='Are you sure?'
+              okText='Yes'
+              cancelText='No'
+              className='group-setting'
+              placement='bottom'
+              onConfirm={() => deleteTransaction(transaction.id)}
+          >
+            <div className='popover-control-item'>
+              <span>Delete</span>
+              <DeleteTwoTone twoToneColor='#f5222d' />
+            </div>
+          </Popconfirm>
+        </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -67,7 +89,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
   );
 };
 
-const TransactionItem: React.FC<TransactionProps> = (props) => {
+const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (props) => {
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -75,7 +97,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
     props.addSelectedLabel(label);
     history.push('/labels/search');
   };
-  const { transaction, deleteTransaction, aliases } = props;
+  const { transaction, deleteTransaction, aliases, inModal, inProject, showModal } = props;
 
   const getPaymentDateTime = () => {
     if (!transaction.date) {
@@ -127,6 +149,20 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
     return null;
   };
 
+  const getAvatar = (user: User) => {
+    if (!inProject) return <Avatar src={user.avatar} size='small' />;
+    if (!showModal) return <Avatar src={user.avatar} size='small' />;
+    return (
+        <span
+            onClick={() => {
+              showModal(user);
+            }}
+        >
+        <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
+      </span>
+    );
+  };
+
   return (
     <div className='project-item'>
       <div className='project-item-content'>
@@ -169,7 +205,14 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
                 : transaction.owner
             }`}
           >
-            <Avatar src={transaction.ownerAvatar} size='small' />
+            {getAvatar({
+              accepted: true,
+              avatar: transaction.ownerAvatar ? transaction.ownerAvatar : '',
+              id: 0,
+              name: transaction.owner ? transaction.owner : '',
+              alias: transaction.owner ? transaction.owner : '',
+              thumbnail: '',
+            })}
           </Tooltip>
         </div>
         <div className='project-item-owner'>
@@ -180,7 +223,14 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
                 : transaction.payer
             }`}
           >
-            <Avatar src={transaction.payerAvatar} size='small' />
+            {getAvatar({
+              accepted: true,
+              avatar: transaction.payerAvatar ? transaction.payerAvatar : '',
+              id: 0,
+              name: transaction.payer ? transaction.payer : '',
+              alias: transaction.payer ? transaction.payer : '',
+              thumbnail: '',
+            })}
           </Tooltip>
         </div>
         <div className='project-item-owner'>
@@ -194,6 +244,7 @@ const TransactionItem: React.FC<TransactionProps> = (props) => {
             <ManageTransaction
               transaction={transaction}
               deleteTransaction={deleteTransaction}
+              inModal={inModal}
             />
           }
           trigger='click'

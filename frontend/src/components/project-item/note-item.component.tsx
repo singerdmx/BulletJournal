@@ -26,10 +26,12 @@ import './project-item.styles.less';
 import { ProjectType } from '../../features/project/constants';
 import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
 import {IState} from "../../store";
+import {User} from "../../features/group/interface";
 
 type ProjectProps = {
   readOnly: boolean;
   aliases: any;
+  showModal?: (user: User) => void;
 };
 
 type NoteProps = {
@@ -45,6 +47,26 @@ type NoteManageProps = {
 
 const ManageNote: React.FC<NoteManageProps> = props => {
   const { note, deleteNote, inModal } = props;
+
+  if (inModal === true) {
+      return (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Popconfirm
+                  title="Deleting Note also deletes its child notes. Are you sure?"
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => deleteNote(note.id)}
+                  className="group-setting"
+                  placement="bottom"
+              >
+                  <div className="popover-control-item">
+                      <span>Delete</span>
+                      <DeleteTwoTone twoToneColor="#f5222d" />
+                  </div>
+              </Popconfirm>
+          </div>
+      );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -85,10 +107,10 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
         history.push('/labels/search');
     };
   
-  const { note, deleteNote, aliases, inModal } = props;
+  const { note, deleteNote, aliases, inModal, inProject, showModal, readOnly } = props;
 
   const getMore = () => {
-    if (props.readOnly) {
+    if (readOnly) {
       return null;
     }
 
@@ -103,6 +125,20 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
             <MoreOutlined />
           </span>
     </Popover>
+  };
+
+  const getAvatar = (user: User) => {
+      if (!inProject) return <Avatar src={user.avatar} size='small' />;
+      if (!showModal) return <Avatar src={user.avatar} size='small' />;
+      return (
+          <span
+              onClick={() => {
+                  showModal(user);
+              }}
+          >
+        <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
+      </span>
+      );
   };
 
   // if readOnly, link to public item page
@@ -148,7 +184,14 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
       <div className="project-control">
         <div className="project-item-owner">
           <Tooltip title={note.owner && aliases[note.owner] ? aliases[note.owner] : note.owner}>
-            <Avatar src={note.ownerAvatar} size="small" />
+              {getAvatar({
+                  accepted: true,
+                  avatar: note.ownerAvatar ? note.ownerAvatar : '',
+                  id: 0,
+                  name: note.owner ? note.owner : '',
+                  alias: note.owner ? note.owner : '',
+                  thumbnail: '',
+              })}
           </Tooltip>
         </div>
         {getMore()}

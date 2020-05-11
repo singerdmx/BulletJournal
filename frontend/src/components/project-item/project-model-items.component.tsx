@@ -62,7 +62,7 @@ const getTransactionsPanel = (items: ProjectItems, index: number) => {
         {items.transactions.map((item, index) => {
           return (
             <div key={`transactions${item.id}#${index}`}>
-              <TransactionItem transaction={item} />
+              <TransactionItem transaction={item} inProject={false}/>
             </div>
           );
         })}
