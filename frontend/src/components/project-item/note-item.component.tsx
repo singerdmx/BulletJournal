@@ -33,18 +33,18 @@ type ProjectProps = {
 };
 
 type NoteProps = {
-  note: Note;
-  deleteNote: (noteId: number) => void;
+  inProject: boolean;
   addSelectedLabel: (label: Label) => void;
 };
 
 type NoteManageProps = {
   note: Note;
+  inModal?: boolean;
   deleteNote: (noteId: number) => void;
 };
 
 const ManageNote: React.FC<NoteManageProps> = props => {
-  const { note, deleteNote } = props;
+  const { note, deleteNote, inModal } = props;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -76,7 +76,7 @@ const ManageNote: React.FC<NoteManageProps> = props => {
   );
 };
 
-const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
+const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => {
     // hook history in router
     const history = useHistory();
     // jump to label searching page by label click
@@ -85,7 +85,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
         history.push('/labels/search');
     };
   
-  const { note, deleteNote, aliases } = props;
+  const { note, deleteNote, aliases, inModal } = props;
 
   const getMore = () => {
     if (props.readOnly) {
@@ -96,7 +96,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps> = props => {
         arrowPointAtCenter
         placement="rightTop"
         overlayStyle={{ width: '150px' }}
-        content={<ManageNote note={note} deleteNote={deleteNote} />}
+        content={<ManageNote note={note} deleteNote={deleteNote} inModal={inModal} />}
         trigger="click"
     >
           <span className="project-control-more">

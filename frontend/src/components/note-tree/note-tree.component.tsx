@@ -27,7 +27,7 @@ const getTree = (data: Note[], readOnly: boolean): TreeNodeNormal[] => {
     } else {
       node.children = [] as TreeNodeNormal[];
     }
-    node.title = <TreeItem note={item} readOnly={readOnly}/>;
+    node.title = <TreeItem note={item} readOnly={readOnly} inProject={true}/>;
     node.key = item.id.toString();
     res.push(node);
   });

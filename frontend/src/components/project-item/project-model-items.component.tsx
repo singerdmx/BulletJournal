@@ -85,7 +85,7 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
         {items.notes.map((item, index) => {
           return (
             <div key={`note${item.id}#${index}`}>
-              <NoteItem note={item} readOnly={false} />
+              <NoteItem note={item} readOnly={false} inProject={false}/>
             </div>
           );
         })}
