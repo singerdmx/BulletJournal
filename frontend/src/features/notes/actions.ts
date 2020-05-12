@@ -70,3 +70,9 @@ export const revokeNoteSharable = (
   user?: string,
   link?: string
 ) => actions.NoteRevokeSharable({ noteId: noteId, user: user, link: link });
+
+export const getNotesByOwner = (projectId: number, owner: string) =>
+  actions.getNotesByOwner({
+    projectId: projectId,
+    owner: owner,
+  });

@@ -19,6 +19,7 @@ import {
   UpdateNoteContentRevision,
   UpdateNoteContents,
   UpdateNotes,
+  GetNotesByOwner,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -135,6 +136,21 @@ function* noteContentRevisionUpdate(
       message.error,
       `noteContentRevisionUpdate Error Received: ${error}`
     );
+  }
+}
+
+function* getNotesByOwner(action: PayloadAction<GetNotesByOwner>) {
+  try {
+    const { projectId, owner } = action.payload;
+    const data = yield call(fetchNotes, projectId, owner);
+    const notesByOwner = yield data.json();
+    yield put(
+      notesActions.notesByOwnerReceived({
+        notesByOwner: notesByOwner,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `getNotesByOwner Error Received: ${error}`);
   }
 }
 
@@ -403,5 +419,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NoteShare.type, shareNote),
     yield takeLatest(notesActions.NoteSharablesGet.type, getNoteSharables),
     yield takeLatest(notesActions.NoteRevokeSharable.type, revokeNoteSharable),
+    yield takeLatest(notesActions.getNotesByOwner.type, getNotesByOwner),
   ]);
 }

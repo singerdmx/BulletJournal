@@ -111,6 +111,15 @@ export type ShareLinkAction = {
   link: string;
 };
 
+export type GetNotesByOwner = {
+  projectId: number;
+  owner: string;
+};
+
+export type NotesByOwnerAction = {
+  notesByOwner: Array<Note>;
+};
+
 let initialState = {
   note: undefined as Note | undefined,
   contents: [] as Array<Content>,
@@ -120,12 +129,21 @@ let initialState = {
   sharedUsers: [] as User[],
   sharedLinks: [] as SharableLink[],
   sharedLink: '',
+  notesByOwner: [] as Array<Note>,
 };
 
 const slice = createSlice({
   name: 'note',
   initialState,
   reducers: {
+    notesByOwnerReceived: (
+      state,
+      action: PayloadAction<NotesByOwnerAction>
+    ) => {
+      const { notesByOwner } = action.payload;
+      state.notesByOwner = notesByOwner;
+    },
+    getNotesByOwner: (state, action: PayloadAction<GetNotesByOwner>) => state,
     notesReceived: (state, action: PayloadAction<NotesAction>) => {
       const { notes } = action.payload;
       state.notes = notes;

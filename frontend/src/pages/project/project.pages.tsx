@@ -30,7 +30,9 @@ import {
   updateCompletedTaskPageNo,
   getTasksByAssignee,
 } from '../../features/tasks/actions';
+import { getNotesByOwner } from '../../features/notes/actions';
 import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
+import NotesByOwner from '../../components/modals/notes-by-owner.component';
 import ShowProjectHistory from '../../components/modals/show-project-history.component';
 
 type ProjectPathParams = {
@@ -42,6 +44,7 @@ type ModalState = {
   groupName: string;
   completeTasksShown: boolean;
   tasksByUsersShown: boolean;
+  notesByUsersShown: boolean;
   assignee: User | undefined;
 };
 
@@ -66,6 +69,7 @@ type ProjectPageProps = {
   updateCompletedTasks: (projectId: number) => void;
   updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
   getTasksByAssignee: (projectId: number, assignee: string) => void;
+  getNotesByOwner: (projectId: number, owner: string) => void;
 };
 
 type MyselfProps = {
@@ -83,6 +87,7 @@ class ProjectPage extends React.Component<
     completeTasksShown: false,
     //used for tasks by assignee modal
     tasksByUsersShown: false,
+    notesByUsersShown: false,
     assignee: undefined,
   };
 
@@ -150,7 +155,15 @@ class ProjectPage extends React.Component<
     );
   };
 
-  handleGetNotesByOwner = (u: User) => {};
+  handleGetNotesByOwner = (u: User) => {
+    this.setState({ notesByUsersShown: true });
+    this.setState({ assignee: u });
+    // update tasks
+    this.props.getNotesByOwner(
+      parseInt(this.props.match.params.projectId),
+      u.name
+    );
+  };
 
   handleGetTransactionByPayer = (u: User) => {};
 
@@ -178,7 +191,23 @@ class ProjectPage extends React.Component<
     switch (project.projectType) {
       case ProjectType.NOTE:
         createContent = <AddNote />;
-        projectContent = <NoteTree readOnly={project.shared} />;
+        projectContent = (
+          <NoteTree
+            readOnly={project.shared}
+            showModal={(user: User) => {
+              handleGetProjectItemsByUse(user);
+            }}
+          />
+        );
+        projectItemsByUser = (
+          <NotesByOwner
+            owner={this.state.assignee}
+            visible={this.state.notesByUsersShown}
+            onCancel={() => {
+              this.setState({ notesByUsersShown: false });
+            }}
+          />
+        );
         break;
       case ProjectType.TODO:
         createContent = <AddTask />;
@@ -187,8 +216,6 @@ class ProjectPage extends React.Component<
             showCompletedTask={this.state.completeTasksShown}
             readOnly={project.shared}
             showModal={(user: User) => {
-              this.setState({ tasksByUsersShown: true });
-              this.setState({ assignee: user });
               handleGetProjectItemsByUse(user);
             }}
           />
@@ -349,4 +376,5 @@ export default connect(mapStateToProps, {
   updateCompletedTasks,
   updateCompletedTaskPageNo,
   getTasksByAssignee,
+  getNotesByOwner,
 })(ProjectPage);
