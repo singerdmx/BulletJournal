@@ -144,3 +144,22 @@ export const updateTransactionForm = (
     ledgerSummaryType,
     timezone,
   });
+
+export const getTransactionsByPayer = (
+  projectId: number,
+  timezone: string,
+  ledgerSummaryType: string,
+  frequencyType?: string,
+  startDate?: string,
+  endDate?: string,
+  payer?: string
+) =>
+  actions.getTransactionsByPayer({
+    projectId: projectId,
+    timezone: timezone,
+    ledgerSummaryType: ledgerSummaryType,
+    frequencyType: frequencyType,
+    startDate: startDate,
+    endDate: endDate,
+    payer: payer,
+  });

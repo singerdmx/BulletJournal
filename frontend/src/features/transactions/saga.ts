@@ -16,6 +16,7 @@ import {
   PatchContent,
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
+  GetTransactionsByPayer,
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -419,6 +420,44 @@ function* deleteTransactionContent(action: PayloadAction<DeleteContent>) {
   }
 }
 
+function* getTransactionsByPayer(
+  action: PayloadAction<GetTransactionsByPayer>
+) {
+  console.log('inside saga');
+  try {
+    const {
+      projectId,
+      timezone,
+      ledgerSummaryType,
+      frequencyType,
+      startDate,
+      endDate,
+      payer,
+    } = action.payload;
+    const data = yield call(
+      fetchTransactions,
+      projectId,
+      timezone,
+      ledgerSummaryType,
+      frequencyType,
+      startDate,
+      endDate,
+      payer
+    );
+    const transactionsByPayer = yield data.json();
+    yield put(
+      transactionsActions.transactionsByPayerReceived({
+        transactionsByPayer: transactionsByPayer,
+      })
+    );
+  } catch (error) {
+    yield call(
+      message.error,
+      `getTransactionsByPayer Error Received: ${error}`
+    );
+  }
+}
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -470,6 +509,10 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.TransactionContentDelete.type,
       deleteTransactionContent
+    ),
+    yield takeLatest(
+      transactionsActions.getTransactionsByPayer.type,
+      getTransactionsByPayer
     ),
   ]);
 }

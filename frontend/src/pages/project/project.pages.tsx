@@ -31,9 +31,15 @@ import {
   getTasksByAssignee,
 } from '../../features/tasks/actions';
 import { getNotesByOwner } from '../../features/notes/actions';
+import { getTransactionsByPayer } from '../../features/transactions/actions';
 import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
 import NotesByOwner from '../../components/modals/notes-by-owner.component';
+import TransactionsByPayer from '../../components/modals/transactions-by-payer.component';
 import ShowProjectHistory from '../../components/modals/show-project-history.component';
+import {
+  FrequencyType,
+  LedgerSummaryType,
+} from '../../features/transactions/interface';
 
 type ProjectPathParams = {
   projectId: string;
@@ -45,6 +51,7 @@ type ModalState = {
   completeTasksShown: boolean;
   tasksByUsersShown: boolean;
   notesByUsersShown: boolean;
+  transactionsByUsersShown: boolean;
   assignee: User | undefined;
 };
 
@@ -60,6 +67,11 @@ type ProjectPageProps = {
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
   completedTaskPageNo: number;
+  transactionTimezone: string;
+  transactionFrequencyType: FrequencyType;
+  transactionStartDate: string;
+  transactionEndDate: string;
+  transactionLedgerSummaryType: LedgerSummaryType;
   getProject: (projectId: number) => void;
   deleteProject: (
     projectId: number,
@@ -70,6 +82,15 @@ type ProjectPageProps = {
   updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
   getTasksByAssignee: (projectId: number, assignee: string) => void;
   getNotesByOwner: (projectId: number, owner: string) => void;
+  getTransactionsByPayer: (
+    projectId: number,
+    timezone: string,
+    ledgerSummaryType: string,
+    frequencyType?: string,
+    startDate?: string,
+    endDate?: string,
+    payer?: string
+  ) => void;
 };
 
 type MyselfProps = {
@@ -88,6 +109,7 @@ class ProjectPage extends React.Component<
     //used for tasks by assignee modal
     tasksByUsersShown: false,
     notesByUsersShown: false,
+    transactionsByUsersShown: false,
     assignee: undefined,
   };
 
@@ -164,8 +186,27 @@ class ProjectPage extends React.Component<
       u.name
     );
   };
-
-  handleGetTransactionByPayer = (u: User) => {};
+  handleGetTransactionByPayer = (u: User) => {
+    const {
+      transactionTimezone,
+      transactionFrequencyType,
+      transactionStartDate,
+      transactionEndDate,
+      transactionLedgerSummaryType,
+    } = this.props;
+    this.setState({ transactionsByUsersShown: true });
+    this.setState({ assignee: u });
+    // update tasks
+    this.props.getTransactionsByPayer(
+      parseInt(this.props.match.params.projectId),
+      transactionTimezone,
+      transactionLedgerSummaryType,
+      transactionFrequencyType,
+      transactionStartDate,
+      transactionEndDate,
+      u.name
+    );
+  };
 
   handleGetProjectItemsByUseCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOwner,
@@ -233,7 +274,22 @@ class ProjectPage extends React.Component<
         break;
       case ProjectType.LEDGER:
         createContent = <AddTransaction />;
-        projectContent = <TransactionProject />;
+        projectContent = (
+          <TransactionProject
+            showModal={(user: User) => {
+              handleGetProjectItemsByUse(user);
+            }}
+          />
+        );
+        projectItemsByUser = (
+          <TransactionsByPayer
+            payer={this.state.assignee}
+            visible={this.state.transactionsByUsersShown}
+            onCancel={() => {
+              this.setState({ transactionsByUsersShown: false });
+            }}
+          />
+        );
     }
 
     let editContent = null;
@@ -368,6 +424,11 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself.username,
   completedTaskPageNo: state.task.completedTaskPageNo,
   aliases: state.system.aliases,
+  transactionTimezone: state.transaction.timezone,
+  transactionFrequencyType: state.transaction.frequencyType,
+  transactionStartDate: state.transaction.startDate,
+  transactionEndDate: state.transaction.endDate,
+  transactionLedgerSummaryType: state.transaction.ledgerSummaryType,
 });
 
 export default connect(mapStateToProps, {
@@ -377,4 +438,5 @@ export default connect(mapStateToProps, {
   updateCompletedTaskPageNo,
   getTasksByAssignee,
   getNotesByOwner,
+  getTransactionsByPayer,
 })(ProjectPage);

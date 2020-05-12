@@ -6,7 +6,8 @@ export const fetchTransactions = (
   ledgerSummaryType: string,
   frequencyType?: string,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
+  payer?: string
 ) => {
   // e.g. /api/projects/105/transactions?frequencyType=MONTHLY&timezone=America%2FLos_Angeles
   let url = `/api/projects/${projectId}/transactions?timezone=${encodeURIComponent(
@@ -18,6 +19,9 @@ export const fetchTransactions = (
   }
   if (startDate && endDate) {
     url += `&startDate=${startDate}&endDate=${endDate}`;
+  }
+  if (payer) {
+    url += `&payer=${payer}`;
   }
   return doFetch(url)
     .then((res) => res)

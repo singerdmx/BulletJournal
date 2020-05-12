@@ -114,12 +114,27 @@ export type SetTransactionLabels = {
   transactionId: number;
   labels: number[];
 };
+
 export type UpdateForm = {
   startDate?: string;
   endDate?: string;
   frequencyType?: FrequencyType;
   ledgerSummaryType?: LedgerSummaryType;
   timezone?: string;
+};
+
+export type GetTransactionsByPayer = {
+  projectId: number;
+  timezone: string;
+  ledgerSummaryType: string;
+  frequencyType?: string;
+  startDate?: string;
+  endDate?: string;
+  payer?: string;
+};
+
+export type TransactionsByPayerAction = {
+  transactionsByPayer: Array<Transaction>;
 };
 
 let initialState = {
@@ -133,12 +148,24 @@ let initialState = {
   frequencyType: FrequencyType.MONTHLY,
   ledgerSummaryType: LedgerSummaryType.DEFAULT,
   timezone: '',
+  transactionsByPayer: [] as Array<Transaction>,
 };
 
 const slice = createSlice({
   name: 'transaction',
   initialState,
   reducers: {
+    transactionsByPayerReceived: (
+      state,
+      action: PayloadAction<TransactionsByPayerAction>
+    ) => {
+      const { transactionsByPayer } = action.payload;
+      state.transactionsByPayer = transactionsByPayer;
+    },
+    getTransactionsByPayer: (
+      state,
+      action: PayloadAction<GetTransactionsByPayer>
+    ) => state,
     transactionsReceived: (
       state,
       action: PayloadAction<TransactionsAction>
