@@ -53,17 +53,19 @@ public class TransactionController {
     private UserClient userClient;
 
     @GetMapping(TRANSACTIONS_ROUTE)
-    public ResponseEntity<LedgerSummary> getTransactions(
-            @NotNull @PathVariable Long projectId,
+    public ResponseEntity<?> getTransactions(@NotNull @PathVariable Long projectId,
             @NotNull @RequestParam(required = false) FrequencyType frequencyType,
-            @NotBlank @RequestParam String timezone,
-            @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
+            @NotBlank @RequestParam String timezone, @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
+            @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String payer) {
 
         Pair<ZonedDateTime, ZonedDateTime> startEndTime = getStartEndTime(frequencyType, timezone, startDate, endDate);
         ZonedDateTime startTime = startEndTime.getLeft();
         ZonedDateTime endTime = startEndTime.getRight();
+
+        if (StringUtils.isNotBlank(payer)) {
+            return getTransactionsByPayer(projectId, payer, startTime, endTime);
+        }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId, startTime, endTime, username)
@@ -75,10 +77,18 @@ public class TransactionController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(transactionsEtag);
 
-        final LedgerSummary ledgerSummary = this.ledgerSummaryCalculator.getLedgerSummary(
-                ledgerSummaryType, startTime, endTime, transactions, frequencyType);
+        final LedgerSummary ledgerSummary = this.ledgerSummaryCalculator.getLedgerSummary(ledgerSummaryType, startTime,
+                endTime, transactions, frequencyType);
 
         return ResponseEntity.ok().headers(responseHeader).body(ledgerSummary);
+    }
+
+    private ResponseEntity<List<Transaction>> getTransactionsByPayer(Long projectId, String payer,
+            ZonedDateTime startTime, ZonedDateTime endTime) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Transaction> transactions = this.transactionDaoJpa.getTransactionsByPayer(projectId, username, payer,
+                startTime, endTime);
+        return ResponseEntity.ok().body(transactions.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
     }
 
     private Transaction addAvatar(Transaction transaction) {
@@ -90,7 +100,7 @@ public class TransactionController {
     @PostMapping(TRANSACTIONS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Transaction createTransaction(@NotNull @PathVariable Long projectId,
-                                         @Valid @RequestBody CreateTransactionParams createTransactionParams) {
+            @Valid @RequestBody CreateTransactionParams createTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return transactionDaoJpa.create(projectId, username, createTransactionParams).toPresentationModel();
     }
@@ -106,11 +116,12 @@ public class TransactionController {
 
     @PatchMapping(TRANSACTION_ROUTE)
     public Transaction updateTransaction(@NotNull @PathVariable Long transactionId,
-                                         @Valid @RequestBody UpdateTransactionParams updateTransactionParams) {
+            @Valid @RequestBody UpdateTransactionParams updateTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> events = transactionDaoJpa.partialUpdate(username, transactionId, updateTransactionParams);
         if (!events.isEmpty()) {
-            notificationService.inform(new UpdateTransactionPayerEvent(events, username, updateTransactionParams.getPayer()));
+            notificationService
+                    .inform(new UpdateTransactionPayerEvent(events, username, updateTransactionParams.getPayer()));
         }
         return getTransaction(transactionId);
     }
@@ -125,8 +136,7 @@ public class TransactionController {
     }
 
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
-    public Transaction setLabels(@NotNull @PathVariable Long transactionId,
-                                 @NotNull @RequestBody List<Long> labels) {
+    public Transaction setLabels(@NotNull @PathVariable Long transactionId, @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.notificationService.inform(this.transactionDaoJpa.setLabels(username, transactionId, labels));
         return getTransaction(transactionId);
@@ -134,15 +144,14 @@ public class TransactionController {
 
     @PostMapping(MOVE_TRANSACTION_ROUTE)
     public void moveTransaction(@NotNull @PathVariable Long transactionId,
-                                @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+            @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
     }
 
     @Deprecated
     @PostMapping(SHARE_TRANSACTION_ROUTE)
-    public String shareTransaction(
-            @NotNull @PathVariable Long transactionId,
+    public String shareTransaction(@NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Informed inform = this.transactionDaoJpa.shareProjectItem(transactionId, shareProjectItemParams, username);
@@ -150,12 +159,8 @@ public class TransactionController {
         return null; // may be generated link
     }
 
-    private Pair<ZonedDateTime, ZonedDateTime> getStartEndTime(
-            FrequencyType frequencyType,
-            String timezone,
-            String startDate,
-            String endDate
-    ) {
+    private Pair<ZonedDateTime, ZonedDateTime> getStartEndTime(FrequencyType frequencyType, String timezone,
+            String startDate, String endDate) {
         ZonedDateTime startTime;
         ZonedDateTime endTime;
         if (StringUtils.isBlank(startDate) || StringUtils.isBlank(endDate)) {
@@ -173,48 +178,45 @@ public class TransactionController {
 
     @PostMapping(ADD_CONTENT_ROUTE)
     public Content addContent(@NotNull @PathVariable Long transactionId,
-                              @NotNull @RequestBody CreateContentParams createContentParams) {
+            @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.transactionDaoJpa.addContent(transactionId, username,
-                new TransactionContent(createContentParams.getText())).toPresentationModel();
+        return this.transactionDaoJpa
+                .addContent(transactionId, username, new TransactionContent(createContentParams.getText()))
+                .toPresentationModel();
     }
 
     @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.transactionDaoJpa.getContents(transactionId, username).stream()
-                .map(t -> {
-                    Content content = t.toPresentationModel();
-                    content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
-                    for (Revision revision : content.getRevisions()) {
-                        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
-                    }
-                    return content;
-                }).collect(Collectors.toList());
+        return this.transactionDaoJpa.getContents(transactionId, username).stream().map(t -> {
+            Content content = t.toPresentationModel();
+            content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
+            for (Revision revision : content.getRevisions()) {
+                revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
+            }
+            return content;
+        }).collect(Collectors.toList());
     }
 
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long transactionId,
-                              @NotNull @PathVariable Long contentId) {
+            @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
         return getContents(transactionId);
     }
 
     @PatchMapping(CONTENT_ROUTE)
-    public List<Content> updateContent(@NotNull @PathVariable Long transactionId,
-                              @NotNull @PathVariable Long contentId,
-                              @NotNull @RequestBody UpdateContentParams updateContentParams) {
+    public List<Content> updateContent(@NotNull @PathVariable Long transactionId, @NotNull @PathVariable Long contentId,
+            @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.updateContent(contentId, transactionId, username, updateContentParams);
         return getContents(transactionId);
     }
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
-    public Revision getContentRevision(
-        @NotNull @PathVariable Long transactionId,
-        @NotNull @PathVariable Long contentId,
-        @NotNull @PathVariable Long revisionId) {
+    public Revision getContentRevision(@NotNull @PathVariable Long transactionId, @NotNull @PathVariable Long contentId,
+            @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.transactionDaoJpa.getContentRevision(username, transactionId, contentId, revisionId);
         revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());

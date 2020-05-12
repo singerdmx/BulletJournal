@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.CreateTransactionParams;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
+import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.ledger.TransactionType;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -48,21 +50,22 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      * <p>
      * Parameter:
      *
-     * @param projectId - Project identifier to retrieve project from project repository
+     * @param projectId - Project identifier to retrieve project from project
+     *                  repository
      * @param startTime - Range start time
      * @param endTime   - Range end time
      * @retVal List<Transaction> - List of transaction
      */
-    public List<com.bulletjournal.controller.models.Transaction> getTransactions(
-            Long projectId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Transaction> getTransactions(Long projectId,
+            ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
 
         return this.transactionRepository
-                .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()))
-                .stream()
-                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
-                .map(transaction -> addLabels(transaction))
-                .collect(Collectors.toList());
+                .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()),
+                        Timestamp.from(endTime.toInstant()))
+                .stream().sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
+                .map(transaction -> addLabels(transaction)).collect(Collectors.toList());
     }
 
     /**
@@ -70,7 +73,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      * <p>
      * Parameter:
      *
-     * @param id - Transaction identifier to retrieve transaction from ledger repository
+     * @param id - Transaction identifier to retrieve transaction from ledger
+     *           repository
      * @retVal a Transaction object
      */
     public com.bulletjournal.controller.models.Transaction getTransaction(String requester, Long id) {
@@ -88,14 +92,15 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      * <p>
      * Parameter:
      *
-     * @param payer     - Payer identifier to retrieve transaction from ledger repository
+     * @param payer     - Payer identifier to retrieve transaction from ledger
+     *                  repository
      * @param startTime - Start Time to retrieve transaction from ledger repository
      * @param endTime   - End Time to retrieve transaction from ledger repository
      * @retVal List of Transaction
      */
     public List<Transaction> getTransactionsBetween(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
-        return this.transactionRepository.findTransactionsOfPayerBetween(payer,
-                Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+        return this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
+                Timestamp.from(endTime.toInstant()));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -126,50 +131,71 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> partialUpdate(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams) {
+    public List<com.bulletjournal.controller.models.Transaction> getTransactionsByPayer(Long projectId,
+            String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        if (project.isShared()) {
+            return Collections.emptyList();
+        }
+
+        List<Transaction> transactions = this.transactionRepository.findTransactionsInProjectByPayerBetween(payer,
+                project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+        transactions.sort(ProjectItemsGrouper.TRANSACTION_COMPARATOR);
+        return transactions.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels);
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Event> partialUpdate(String requester, Long transactionId,
+            UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                transaction.getOwner(), requester, ContentType.TRANSACTION, Operation.UPDATE,
-                transactionId, transaction.getProject().getOwner());
+        this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
+                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasName(), updateTransactionParams.getName(), transaction::setName);
+        DaoHelper.updateIfPresent(updateTransactionParams.hasName(), updateTransactionParams.getName(),
+                transaction::setName);
 
         List<Event> events = this.updatePayer(requester, transactionId, updateTransactionParams, transaction);
 
         DaoHelper.updateIfPresent(updateTransactionParams.hasTransactionType(),
-                updateTransactionParams.hasTransactionType() ?
-                        TransactionType.getType(updateTransactionParams.getTransactionType()) : null,
+                updateTransactionParams.hasTransactionType()
+                        ? TransactionType.getType(updateTransactionParams.getTransactionType())
+                        : null,
                 transaction::setTransactionType);
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasAmount(), updateTransactionParams.getAmount(), transaction::setAmount);
+        DaoHelper.updateIfPresent(updateTransactionParams.hasAmount(), updateTransactionParams.getAmount(),
+                transaction::setAmount);
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasDate(), updateTransactionParams.getDate(), transaction::setDate);
+        DaoHelper.updateIfPresent(updateTransactionParams.hasDate(), updateTransactionParams.getDate(),
+                transaction::setDate);
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasTime(), updateTransactionParams.getTime(), transaction::setTime);
+        DaoHelper.updateIfPresent(updateTransactionParams.hasTime(), updateTransactionParams.getTime(),
+                transaction::setTime);
 
-        DaoHelper.updateIfPresent(
-                updateTransactionParams.hasTimezone(), updateTransactionParams.getTimezone(), transaction::setTimezone);
+        DaoHelper.updateIfPresent(updateTransactionParams.hasTimezone(), updateTransactionParams.getTimezone(),
+                transaction::setTimezone);
 
         String date = updateTransactionParams.getOrDefaultDate(transaction.getDate());
         String time = updateTransactionParams.getOrDefaultTime(transaction.getTime());
         String timezone = updateTransactionParams.getOrDefaultTimezone(transaction.getTimezone());
 
         DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()), transaction::setStartTime);
+                Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()),
+                transaction::setStartTime);
 
         DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()), transaction::setEndTime);
+                Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
+                transaction::setEndTime);
 
         this.transactionRepository.save(transaction);
         return events;
     }
 
-    private List<Event> updatePayer(String requester, Long transactionId, UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+    private List<Event> updatePayer(String requester, Long transactionId,
+            UpdateTransactionParams updateTransactionParams, Transaction transaction) {
         List<Event> events = new ArrayList<>();
 
         if (!updateTransactionParams.hasPayer())
@@ -236,8 +262,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Override
     public <T extends ProjectItemModel> List<TransactionContent> findContents(T projectItem) {
-        return this.transactionContentRepository
-                .findTransactionContentByTransaction((Transaction) projectItem);
+        return this.transactionContentRepository.findTransactionContentByTransaction((Transaction) projectItem);
     }
 
     @Override
