@@ -29,7 +29,7 @@ const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
         notesByOwner.map((note, index) => {
           return (
             <div key={index}>
-              <NoteItem note={note} readOnly={false} inProject={false} />
+              <NoteItem note={note} readOnly={false} inProject={false} inModal={true}/>
             </div>
           );
         })
