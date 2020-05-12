@@ -12,7 +12,3 @@ export const answerNotice = (
     notificationId: notificationId,
     type: type,
   });
-export const updateLatestNotification = (
-  latestNotifaction: Notification | undefined
-) =>
-  actions.latestNotificationReceived({ latestNotifaction: latestNotifaction });

@@ -255,7 +255,6 @@ const EditTask: React.FC<
           form
             .validateFields()
             .then((values) => {
-              console.log(values);
               form.resetFields();
               setVisible(!visible);
               updateTask(values);

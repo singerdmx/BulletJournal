@@ -144,7 +144,7 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
         tasksEtag: tasksEtag,
         notesEtag: notesEtag,
         groupsEtag: data.groupsEtag,
-        notificationsEtag: data.notificationsEtag,
+        notificationsEtag: '', // already done by put(updateNotifications())
         ownedProjectsEtag: data.ownedProjectsEtag,
         sharedProjectsEtag: data.sharedProjectsEtag,
         remindingTaskEtag: data.remindingTaskEtag,

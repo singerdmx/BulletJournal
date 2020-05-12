@@ -16,7 +16,6 @@ import { Notification } from './interface';
 import { IState } from '../../store';
 import { EventType } from './constants';
 import { actions as SystemActions } from '../system/reducer';
-import { updateLatestNotification } from './actions';
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -31,25 +30,16 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
     const state: IState = yield select();
     const systemState = state.system;
 
-    //update latest notification
-    let latestNotification : Notification | undefined = undefined;
-    if (notifications && notifications.length > 0) {
-      latestNotification = notifications[0];
-    }
-
     if (
       etag &&
       state.system.notificationsEtag &&
       state.system.notificationsEtag !== etag &&
-      latestNotification &&
-      latestNotification !== state.notice.latestNotification &&
-      latestNotification.timestamp > (Date.now() - 120000)
+      notifications.filter(n => n.timestamp > (Date.now() - 120000)).length > 0
     ) {
       // if latestNotification is within 2 minutes
       yield call(message.info, "You've got new notifications");
     }
-    //update latest notification to reducer
-    yield put(updateLatestNotification(latestNotification));
+
     yield put(
       SystemActions.systemUpdateReceived({
         ...systemState,

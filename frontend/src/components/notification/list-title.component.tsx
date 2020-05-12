@@ -10,7 +10,7 @@ type titleProps = {
 function getTitleText(title: string): JSX.Element {
   return (<span>{title.split("##").map((s, index) => {
     if (index % 2 === 1) {
-      return <strong>{s}</strong>;
+      return <strong key={index}>{s}</strong>;
     }
     return s;
   })}</span>)
