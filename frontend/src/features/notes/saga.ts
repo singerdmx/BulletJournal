@@ -289,6 +289,13 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
       labelItems.push(projectItem);
     });
     yield put(updateItemsByLabels(labelItems));
+
+    const notesByOwner = state.note.notesByOwner.filter(n => n.id !== noteId);
+    yield put(
+        notesActions.notesByOwnerReceived({
+          notesByOwner: notesByOwner,
+        })
+    );
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
   }
