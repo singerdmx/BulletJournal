@@ -30,8 +30,10 @@ public class Note extends ProjectItem {
                 @NotBlank String name,
                 @NotNull Project project,
                 List<Label> labels,
+                Long createdAt,
                 Long updatedAt) {
         super(id, name, owner, project, labels);
+        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 

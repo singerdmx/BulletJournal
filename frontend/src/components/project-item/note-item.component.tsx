@@ -8,6 +8,7 @@ import {
   DeleteTwoTone,
   MoreOutlined,
   FileTextOutlined,
+  FormOutlined
 } from '@ant-design/icons';
 import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 // features import
@@ -176,7 +177,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
               })}
           </div>
           <div className="project-item-time">
-            {note.updatedAt && moment(note.updatedAt).fromNow()}
+            {note.createdAt && `Created ${moment(note.createdAt).fromNow()}`}
           </div>
         </div>
       </div>
@@ -193,6 +194,11 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
                   thumbnail: '',
               })}
           </Tooltip>
+        </div>
+        <div>
+           <Tooltip title={note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`}>
+               <FormOutlined />
+           </Tooltip>
         </div>
         {getMore()}
       </div>

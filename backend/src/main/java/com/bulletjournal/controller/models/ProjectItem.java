@@ -30,6 +30,8 @@ public abstract class ProjectItem {
 
     protected Long updatedAt;
 
+    protected Long createdAt;
+
     public ProjectItem() {
     }
 
@@ -100,6 +102,14 @@ public abstract class ProjectItem {
         this.updatedAt = updatedAt;
     }
 
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -125,5 +135,6 @@ public abstract class ProjectItem {
         this.setOwner(projectItem.getOwner());
         this.setOwnerAvatar(projectItem.getOwnerAvatar());
         this.setUpdatedAt(projectItem.getUpdatedAt());
+        this.setCreatedAt(projectItem.getCreatedAt());
     }
 }

@@ -42,6 +42,7 @@ public class Note extends ProjectItemModel {
                 this.getName(),
                 this.getProject(),
                 labels,
+                this.getCreatedAt().getTime(),
                 this.getUpdatedAt().getTime());
     }
 

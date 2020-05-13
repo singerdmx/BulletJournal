@@ -58,7 +58,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
   React.useEffect(() => {
     note && note.id && updateNoteContents(note.id);
-    noteId && getNote(parseInt(noteId));
   }, [note]);
 
   // show drawer
