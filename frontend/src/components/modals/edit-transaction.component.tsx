@@ -73,7 +73,6 @@ const EditTransaction: React.FC<
   const { mode, transaction } = props;
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
-  const [timeVisible, setTimeVisible] = useState(false);
 
   const [transactionName, setTransactionName] = useState(transaction.name);
   const [payerName, setPayerName] = useState(transaction.payer);
@@ -112,7 +111,6 @@ const EditTransaction: React.FC<
 
   useEffect(() => {
     props.updateExpandedMyself(true);
-    if (transaction.time) setTimeVisible(true);
   }, []);
 
   useEffect(() => {
@@ -240,7 +238,6 @@ const EditTransaction: React.FC<
             <Tooltip title='Select Date' placement='bottom'>
               <Form.Item name='date'>
                 <DatePicker
-                  onChange={(value) => setTimeVisible(value !== null)}
                   placeholder='Select Date'
                   defaultValue={
                     transaction.date
@@ -250,22 +247,21 @@ const EditTransaction: React.FC<
                 />
               </Form.Item>
             </Tooltip>
-            {timeVisible && (
-              <Tooltip title='Select Time' placement='bottom'>
-                <Form.Item name='time' style={{ width: '100px' }}>
-                  <TimePicker
-                    allowClear
-                    format='HH:mm'
-                    placeholder='Select Time'
-                    defaultValue={
-                      transaction.time
-                        ? moment(transaction.time, 'HH:mm')
-                        : undefined
-                    }
-                  />
-                </Form.Item>
-              </Tooltip>
-            )}
+
+            <Tooltip title='Select Time' placement='bottom'>
+              <Form.Item name='time' style={{ width: '100px' }}>
+                <TimePicker
+                  allowClear
+                  format='HH:mm'
+                  placeholder='Select Time'
+                  defaultValue={
+                    transaction.time
+                      ? moment(transaction.time, 'HH:mm')
+                      : undefined
+                  }
+                />
+              </Form.Item>
+            </Tooltip>
 
             <Tooltip title='Time Zone'>
               <Form.Item name='timezone'>

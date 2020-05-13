@@ -210,6 +210,11 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
       labelItems.push(projectItem);
     });
     yield put(updateItemsByLabels(labelItems));
+
+    const transactionsByPayer = state.transaction.transactionsByPayer.filter(t => t.id !== transactionId);
+    yield put(
+        transactionsActions.transactionsByPayerReceived({transactionsByPayer: transactionsByPayer})
+    );
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
@@ -423,7 +428,6 @@ function* deleteTransactionContent(action: PayloadAction<DeleteContent>) {
 function* getTransactionsByPayer(
   action: PayloadAction<GetTransactionsByPayer>
 ) {
-  console.log('inside saga');
   try {
     const {
       projectId,
