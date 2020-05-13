@@ -9,6 +9,7 @@ import {
   deleteTask,
   getTask,
   updateTaskContents,
+  completeTask
 } from '../../features/tasks/actions';
 import { Label } from '../../features/label/interface';
 import { addSelectedLabel } from '../../features/label/actions';
@@ -20,6 +21,7 @@ import {
   UpSquareOutlined,
   PlusCircleTwoTone,
   SyncOutlined,
+  CheckCircleTwoTone
 } from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
@@ -39,10 +41,11 @@ interface TaskPageHandler {
   addSelectedLabel: (label: Label) => void;
   deleteTask: (taskId: number) => void;
   updateTaskContents: (taskId: number) => void;
+  completeTask: (taskId: number, dateTime?: string) => void;
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
-  const { task, deleteTask, updateTaskContents, getTask, contents, aliases } = props;
+  const { task, deleteTask, updateTaskContents, getTask, contents, aliases, completeTask } = props;
   // get id of task from router
   const { taskId } = useParams();
   // state control drawer displaying
@@ -134,6 +137,11 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     );
   };
 
+  const handleCompleteTaskClick = () => {
+      completeTask(task.id);
+      history.push(`/projects/${task.projectId}`);
+  };
+
   const taskOperation = () => {
     return (
       <div className='task-operation'>
@@ -176,6 +184,12 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             <SyncOutlined onClick={handleRefresh} />
           </div>
         </Tooltip>
+        <Tooltip title='Complete Task'>
+          <div>
+            <CheckCircleTwoTone twoToneColor='#52c41a'
+                                onClick={() => handleCompleteTaskClick()}/>
+          </div>
+        </Tooltip>
         <Tooltip title='Go to Parent BuJo'>
           <div>
             <UpSquareOutlined
@@ -211,4 +225,5 @@ export default connect(mapStateToProps, {
   getTask,
   addSelectedLabel,
   updateTaskContents,
+  completeTask
 })(TaskPage);

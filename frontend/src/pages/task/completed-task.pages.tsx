@@ -8,9 +8,10 @@ import { connect } from 'react-redux';
 import {
   getCompletedTask,
   updateCompleteTaskContents,
+  uncompleteTask
 } from '../../features/tasks/actions';
 import { Avatar, Tooltip } from 'antd';
-import { UpSquareOutlined } from '@ant-design/icons';
+import { UpSquareOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { IState } from '../../store';
 // antd imports
 import './task-page.styles.less';
@@ -23,10 +24,11 @@ import TaskDetailPage, { TaskProps } from './task-detail.pages';
 interface TaskPageHandler {
   getCompletedTask: (taskId: number) => void;
   updateCompleteTaskContents: (taskId: number) => void;
+  uncompleteTask: (taskId: number) => void;
 }
 
 const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
-  const { task, contents, aliases } = props;
+  const { task, contents, aliases, uncompleteTask } = props;
   // get id of task from router
   const { taskId } = useParams();
   // hook history in router
@@ -46,6 +48,16 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         <Tooltip title={`Created by ${task.owner && aliases[task.owner] ? aliases[task.owner] : task?.owner}`}>
           <div className='task-owner'>
             <Avatar src={task.ownerAvatar} />
+          </div>
+        </Tooltip>
+        <Tooltip title='Uncomplete Task'>
+          <div>
+            <CloseCircleOutlined
+                twoToneColor='#52c41a'
+                onClick={() => {
+                  uncompleteTask(task.id);
+                  history.push(`/projects/${task.projectId}`);
+                }}/>
           </div>
         </Tooltip>
         <Tooltip title='Go to Parent BuJo'>
@@ -82,4 +94,5 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   getCompletedTask,
   updateCompleteTaskContents,
+  uncompleteTask
 })(CompletedTaskPage);
