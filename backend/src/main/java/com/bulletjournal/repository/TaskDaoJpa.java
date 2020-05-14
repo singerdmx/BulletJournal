@@ -21,6 +21,8 @@ import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
@@ -48,8 +50,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     private static final Gson GSON = new Gson();
     private static final int REMINDING_TASK_BUFFER_IN_MINS = 10;
 
-    private static final Gson GSON_ALLOW_EXPOSE_ONLY = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson GSON_ALLOW_EXPOSE_ONLY = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
+            .create();
 
     @Autowired
     private TaskRepository taskRepository;
@@ -85,7 +87,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      *
      * @param projectId the project identifier
      * @param requester the username of action requester
-     * @return List<com.bulletjournal.controller.models.Task> - a list of controller model tasks with labels
+     * @return List<com.bulletjournal.controller.models.Task> - a list of controller
+     *         model tasks with labels
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
@@ -99,29 +102,27 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             return Collections.emptyList();
         }
         ProjectTasks projectTasks = projectTasksOptional.get();
-        final Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project)
-                .stream().collect(Collectors.toMap(Task::getId, n -> n));
-        return TaskRelationsProcessor.processRelations(
-                tasksMap, projectTasks.getTasks(), this.userAliasDaoJpa.getAliases(requester))
-                .stream()
-                .map(task -> addLabels(task, tasksMap))
-                .collect(Collectors.toList());
+        final Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project).stream()
+                .collect(Collectors.toMap(Task::getId, n -> n));
+        return TaskRelationsProcessor
+                .processRelations(tasksMap, projectTasks.getTasks(), this.userAliasDaoJpa.getAliases(requester))
+                .stream().map(task -> addLabels(task, tasksMap)).collect(Collectors.toList());
     }
 
     /**
      * Retrieve assignee's task by project id
      *
-     * 1. Check if project is shared to requester. If not, return empty list.
-     * 2. Return assignee's task list and sort by end time
+     * 1. Check if project is shared to requester. If not, return empty list. 2.
+     * Return assignee's task list and sort by end time
      *
      * @param projectId the project Id of task
      * @param requester the requester username
-     * @param assignee the assignee of task
+     * @param assignee  the assignee of task
      * @return a list of tasks assigned to assignee
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getTasksByAssignee(
-            Long projectId, String requester, String assignee) {
+    public List<com.bulletjournal.controller.models.Task> getTasksByAssignee(Long projectId, String requester,
+            String assignee) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
             return Collections.emptyList();
@@ -135,17 +136,43 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }).collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Task> getTasksByOrder(Long projectId, String requester,
+            String startDate, String endDate, String timezone) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        if (project.isShared()) {
+            return Collections.emptyList();
+        }
+
+        List<Task> tasks = Collections.emptyList();
+        if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
+            tasks = this.taskRepository.findTaskByProject(project);
+        } else {
+            // Set start time and end time
+            ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+            ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+            tasks = this.taskRepository.findTasksBetween(project, Timestamp.from(startTime.toInstant()),
+                    Timestamp.from(endTime.toInstant()));
+        }
+
+        tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
+        return tasks.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels, this.userAliasDaoJpa.getAliases(requester));
+        }).collect(Collectors.toList());
+    }
+
     /**
      * Apply labels to tasks
      *
      * @param task     the task object
-     * @param tasksMap the Map object mapping relationship between TaskId and Task Instance
+     * @param tasksMap the Map object mapping relationship between TaskId and Task
+     *                 Instance
      * @return com.bulletjournal.controller.models.Task - task instance with labels
      */
-    private com.bulletjournal.controller.models.Task addLabels(
-            com.bulletjournal.controller.models.Task task, Map<Long, Task> tasksMap) {
-        List<com.bulletjournal.controller.models.Label> labels =
-                getLabelsToProjectItem(tasksMap.get(task.getId()));
+    private com.bulletjournal.controller.models.Task addLabels(com.bulletjournal.controller.models.Task task,
+            Map<Long, Task> tasksMap) {
+        List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(tasksMap.get(task.getId()));
         task.setLabels(labels);
         for (com.bulletjournal.controller.models.Task subTask : task.getSubTasks()) {
             addLabels(subTask, tasksMap);
@@ -156,12 +183,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Get completed task by task identifier
      * <p>
-     * 1. Get task from database
-     * 2. Look up task labels and add to task
+     * 1. Get task from database 2. Look up task labels and add to task
      *
      * @param requester the username of action requester
      * @param id        the task identifier
-     * @return com.bulletjournal.controller.models.Task - controller model task with label
+     * @return com.bulletjournal.controller.models.Task - controller model task with
+     *         label
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.Task getTask(String requester, Long id) {
@@ -174,7 +201,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * Get completed tasks from database
      *
      * @param id the task id
-     * @return List<com.bulletjournal.controller.models.Task> - a list of completed tasks
+     * @return List<com.bulletjournal.controller.models.Task> - a list of completed
+     *         tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public CompletedTask getCompletedTask(Long id, String requester) {
@@ -187,15 +215,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Get assignee's reminding tasks and recurring reminding tasks from database.
      * <p>
-     * Reminding tasks qualifications:
-     * 1. Reminding Time is before current time.
-     * 2. Starting time plus 10 minutes buffer is after the current time.
+     * Reminding tasks qualifications: 1. Reminding Time is before current time. 2.
+     * Starting time plus 10 minutes buffer is after the current time.
      *
      * [Reminding Time] <= Now <= [Starting Time + 10 mins]
      *
      * @param assignee the username of task assignee
      * @param now      the ZonedDateTime object of the current time
-     * @return List<com.bulletjournal.controller.models.Task> - a list of tasks to be reminded
+     * @return List<com.bulletjournal.controller.models.Task> - a list of tasks to
+     *         be reminded
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
@@ -205,10 +233,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         // Fetch regular reminding tasks
         List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
-                .findRemindingTasks(assignee, currentTime.toString(), startTime.toString())
-                .stream()
-                .map(TaskModel::toPresentationModel)
-                .collect(Collectors.toList());
+                .findRemindingTasks(assignee, currentTime.toString(), startTime.toString()).stream()
+                .map(TaskModel::toPresentationModel).collect(Collectors.toList());
 
         // Fetch recurring reminding tasks
         List<com.bulletjournal.controller.models.Task> recurringTask = getRecurringTaskNeedReminding(assignee, now);
@@ -228,10 +254,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(
-                assignee,
-                ZonedDateTimeHelper.toDBTimestamp(startTime),
-                ZonedDateTimeHelper.toDBTimestamp(endTime));
+        List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(assignee,
+                ZonedDateTimeHelper.toDBTimestamp(startTime), ZonedDateTimeHelper.toDBTimestamp(endTime));
 
         List<Task> recurrentTasks = this.getRecurringTasks(assignee, startTime, endTime);
 
@@ -242,33 +266,30 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Get recurring reminding tasks from database.
      * <p>
-     * Reminding tasks qualifications:
-     * 1. Reminding Time is before current time.
-     * 2. Starting time is after the current time.
+     * Reminding tasks qualifications: 1. Reminding Time is before current time. 2.
+     * Starting time is after the current time.
      *
      * @param assignee the username of task assignee
      * @param now      the ZonedDateTime object of the current time
      * @return List<com.bulletjournal.controller.models.Task> - a list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(
-            final String assignee, final ZonedDateTime now) {
+    public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(final String assignee,
+            final ZonedDateTime now) {
         ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
-        return this.getRecurringTasks(assignee, now, maxRemindingTime)
-                .stream()
+        return this.getRecurringTasks(assignee, now, maxRemindingTime).stream()
                 .filter(t -> t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now))
                         && t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
-                .map(TaskModel::toPresentationModel)
-                .collect(Collectors.toList());
+                .map(TaskModel::toPresentationModel).collect(Collectors.toList());
     }
 
     /**
-     * Get all recurrent tasks of an assignee within requested start time and end time
+     * Get all recurrent tasks of an assignee within requested start time and end
+     * time
      * <p>
-     * Procedure:
-     * 1. Fetch all tasks with recurrence rule
-     * 2. Obtain new DateTime instance by using RecurrenceRule iterator
-     * 3. Clone the original recurring task and set its start/end time and reminding setting
+     * Procedure: 1. Fetch all tasks with recurrence rule 2. Obtain new DateTime
+     * instance by using RecurrenceRule iterator 3. Clone the original recurring
+     * task and set its start/end time and reminding setting
      *
      * @param assignee  the username of task assignee
      * @param startTime the ZonedDateTime object of start time
@@ -306,7 +327,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                     cloned.setDueTime(time); // Set due time
 
                     // Set start time and end time
-                    cloned.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+                    cloned.setStartTime(
+                            Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
                     cloned.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
 
                     cloned.setReminderSetting(t.getReminderSetting()); // Set reminding setting to cloned
@@ -351,8 +373,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String date = createTaskParams.getDueDate();
         String time = createTaskParams.getDueTime();
         String timezone = createTaskParams.getTimezone();
-        ReminderSetting reminderSetting = getReminderSetting(
-                date, task, time, timezone, createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
+        ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
+                createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
         task = this.taskRepository.save(task);
 
@@ -366,8 +388,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void create(Long projectId, String owner, CreateTaskParams createTaskParams,
-                       String eventId, String text) {
+    public void create(Long projectId, String owner, CreateTaskParams createTaskParams, String eventId, String text) {
         // Skip duplicated eventId
         if (this.taskRepository.findTaskByGoogleCalendarEventId(eventId).isPresent()) {
             LOGGER.info("Task with eventId {} already exists", eventId);
@@ -380,7 +401,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         LOGGER.info("Created task {}", task);
         addContent(task.getId(), owner, new TaskContent(text));
     }
-
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteTaskByGoogleEvenId(String eventId) {
@@ -397,10 +417,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
     }
 
-
-    private ReminderSetting getReminderSetting(
-            String dueDate, Task task, String time, String timezone, String recurrenceRule,
-            ReminderSetting reminderSetting) {
+    private ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
+            String recurrenceRule, ReminderSetting reminderSetting) {
         if (dueDate != null) {
             task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(dueDate, time, timezone).toInstant()));
             task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(dueDate, time, timezone).toInstant()));
@@ -408,7 +426,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             task.setStartTime(null);
             task.setEndTime(null);
             if (recurrenceRule == null) {
-                //  set no reminder
+                // set no reminder
                 reminderSetting = new ReminderSetting();
             }
         }
@@ -424,20 +442,20 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      *
      * @param requester        the username of action requester
      * @param taskId           the task id
-     * @param updateTaskParams the update task param object contains task fields update information
+     * @param updateTaskParams the update task param object contains task fields
+     *                         update information
      * @return List<Event> - a list of events for users notification
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams, List<UpdateTaskAssigneeEvent> events) {
+    public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams,
+            List<UpdateTaskAssigneeEvent> events) {
 
         Task task = this.getProjectItem(taskId, requester);
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                task.getOwner(), requester, ContentType.TASK, Operation.UPDATE,
-                taskId, task.getProject().getOwner());
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
+                Operation.UPDATE, taskId, task.getProject().getOwner());
 
-        DaoHelper.updateIfPresent(
-                updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
+        DaoHelper.updateIfPresent(updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
 
         updateAssignees(requester, updateTaskParams, task, events);
 
@@ -448,15 +466,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         DaoHelper.updateIfPresent(updateTaskParams.hasDueDate(), date, task::setDueDate);
         DaoHelper.updateIfPresent(updateTaskParams.hasDueTime(), time, task::setDueTime);
         DaoHelper.updateIfPresent(updateTaskParams.hasTimezone(), timezone, task::setTimezone);
-        DaoHelper.updateIfPresent(updateTaskParams.hasRecurrenceRule(), updateTaskParams.getRecurrenceRule(), task::setRecurrenceRule);
+        DaoHelper.updateIfPresent(updateTaskParams.hasRecurrenceRule(), updateTaskParams.getRecurrenceRule(),
+                task::setRecurrenceRule);
         DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(), task::setDuration);
 
         if (updateTaskParams.hasTimezone()) {
             updateCompletedSlotsWithTimezone(task, timezone);
         }
 
-        ReminderSetting reminderSetting = getReminderSetting(
-                date, task, time, timezone, updateTaskParams.getRecurrenceRule(), updateTaskParams.getReminderSetting());
+        ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
+                updateTaskParams.getRecurrenceRule(), updateTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
         return this.taskRepository.save(task);
     }
@@ -482,12 +501,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * Add assignees change event to notification
      *
      * @param requester        the username of action requester
-     * @param updateTaskParams the update task param object contains task fields update information
+     * @param updateTaskParams the update task param object contains task fields
+     *                         update information
      * @param task             the task object gets updated
      * @return List<Event> - a list of events for users notification
      */
     private List<UpdateTaskAssigneeEvent> updateAssignees(String requester, UpdateTaskParams updateTaskParams,
-                                                          Task task, List<UpdateTaskAssigneeEvent> events) {
+            Task task, List<UpdateTaskAssigneeEvent> events) {
         if (updateTaskParams.getAssignees() == null) {
             return events;
         }
@@ -517,8 +537,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Set a task to complete
      * <p>
-     * 1. Get task from task table
-     * 2. Delete task and its sub tasks from task table
+     * 1. Get task from task table 2. Delete task and its sub tasks from task table
      * 3. Add task and its sub tasks to complete task table
      *
      * @param requester the username of action requester
@@ -530,33 +549,28 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         Task task = this.getProjectItem(taskId, requester);
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
-                requester, ContentType.TASK,
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
 
         // clone its contents
-        String contents = GSON_ALLOW_EXPOSE_ONLY.toJson(this.getContents(taskId, requester)
-                .stream().collect(Collectors.toList()));
+        String contents = GSON_ALLOW_EXPOSE_ONLY
+                .toJson(this.getContents(taskId, requester).stream().collect(Collectors.toList()));
 
         if (dateTime != null) {
             return completeSingleRecurringTask(task, dateTime, contents);
         }
 
-        deleteTaskAndAdjustRelations(
-                requester, task,
-                (targetTasks) -> {
-                    targetTasks.forEach(t -> {
-                        if (!t.getId().equals(task.getId())) {
-                            this.completedTaskRepository.save(
-                                    new CompletedTask(t,
-                                            GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository.findTaskContentByTask(t)
-                                                    .stream().collect(Collectors.toList()))));
-                        }
-                    });
-                    this.taskRepository.deleteAll(targetTasks);
-                },
-                (target) -> {
-                });
+        deleteTaskAndAdjustRelations(requester, task, (targetTasks) -> {
+            targetTasks.forEach(t -> {
+                if (!t.getId().equals(task.getId())) {
+                    this.completedTaskRepository
+                            .save(new CompletedTask(t, GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository
+                                    .findTaskContentByTask(t).stream().collect(Collectors.toList()))));
+                }
+            });
+            this.taskRepository.deleteAll(targetTasks);
+        }, (target) -> {
+        });
 
         CompletedTask completedTask = new CompletedTask(task, contents);
         this.completedTaskRepository.save(completedTask);
@@ -581,8 +595,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
 
         // Added target date time to the recurring task's completed slots
-        task.setCompletedSlots(task.getCompletedSlots() == null ?
-                dateTime.toString() : task.getCompletedSlots() + "," + dateTime.toString());
+        task.setCompletedSlots(task.getCompletedSlots() == null ? dateTime.toString()
+                : task.getCompletedSlots() + "," + dateTime.toString());
         this.taskRepository.save(task);
 
         CompletedTask completedTask = new CompletedTask(task, contents);
@@ -621,10 +635,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> deleteTask(String requester, Long taskId) {
         Task task = this.getProjectItem(taskId, requester);
-        Project project = deleteTaskAndAdjustRelations(
-                requester, task,
-                (targetTasks) -> this.taskRepository.deleteAll(targetTasks),
-                (target) -> {
+        Project project = deleteTaskAndAdjustRelations(requester, task,
+                (targetTasks) -> this.taskRepository.deleteAll(targetTasks), (target) -> {
                 });
 
         return generateEvents(task, requester, project);
@@ -635,13 +647,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      *
      * @param requester           the username of action requester
      * @param task                the task object gets deleted
-     * @param targetTasksOperator Consumer class or Lambda function operates upon target tasks list
-     * @param targetOperator      Consumer class or Lambda function operates upon target HierarchyItem
+     * @param targetTasksOperator Consumer class or Lambda function operates upon
+     *                            target tasks list
+     * @param targetOperator      Consumer class or Lambda function operates upon
+     *                            target HierarchyItem
      * @retVal Project
      */
-    private Project deleteTaskAndAdjustRelations(
-            String requester, Task task,
-            Consumer<List<Task>> targetTasksOperator,
+    private Project deleteTaskAndAdjustRelations(String requester, Task task, Consumer<List<Task>> targetTasksOperator,
             Consumer<HierarchyItem> targetOperator) {
         Project project = task.getProject();
         Long projectId = project.getId();
@@ -654,8 +666,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String relations = projectTasks.getTasks();
 
         // delete tasks and its subTasks
-        List<Task> targetTasks = this.taskRepository.findAllById(
-                HierarchyProcessor.getSubItems(relations, task.getId()));
+        List<Task> targetTasks = this.taskRepository
+                .findAllById(HierarchyProcessor.getSubItems(relations, task.getId()));
         targetTasksOperator.accept(targetTasks);
 
         // Update task relations
@@ -672,8 +684,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Delete completed tasks from database
      * <p>
-     * 1. Check if the requester is authorized for the operation
-     * 2. Remove task from complete tasks table
+     * 1. Check if the requester is authorized for the operation 2. Remove task from
+     * complete tasks table
      *
      * @param requester the username of action requester
      * @param taskId    the task id
@@ -684,8 +696,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         CompletedTask task = this.completedTaskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
         Project project = task.getProject();
-        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
-                requester, ContentType.TASK,
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.DELETE, project.getId(), task.getProject().getOwner());
         this.completedTaskRepository.delete(task);
         return generateEvents(task, requester, project);
@@ -727,17 +738,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project, paging);
 
-        return completedTasks
-                .stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
+        return completedTasks.stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
                 .collect(Collectors.toList());
     }
 
     /**
      * Uncomplete completed task.
      * <p>
-     * 1. Check if requester is allowed to operate with this action
-     * 2. Remove task from Completed Task table
-     * 3. Create a new task and add it to regular Task table
+     * 1. Check if requester is allowed to operate with this action 2. Remove task
+     * from Completed Task table 3. Create a new task and add it to regular Task
+     * table
      *
      * @param requester the username of action requester
      * @param taskId    the task id
@@ -749,8 +759,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
         Project project = task.getProject();
         this.authorizationService.validateRequesterInProjectGroup(requester, project);
-        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(),
-                requester, ContentType.TASK,
+        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.UPDATE, project.getId(), task.getProject().getOwner());
         List<TaskContent> contents = getCompletedTaskContents(taskId, requester);
         this.completedTaskRepository.delete(task);
@@ -767,11 +776,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * Remove reminder setting from CreateTaskParams
      *
      * @param task the task object to be completed
-     * @return CreateTaskParams - a create task parameter object contains completed task creation information
+     * @return CreateTaskParams - a create task parameter object contains completed
+     *         task creation information
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
-        return new CreateTaskParams(task.getName(), task.getDueDate(),
-                task.getDueTime(), task.getDuration(), new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule());
+        return new CreateTaskParams(task.getName(), task.getDueDate(), task.getDueTime(), task.getDuration(),
+                new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule());
     }
 
     /**
@@ -794,20 +804,17 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.UPDATE, project.getId(), project.getOwner());
 
-        deleteTaskAndAdjustRelations(
-                requester, task,
-                (targetTasks) -> targetTasks.forEach((t) -> {
-                    t.setProject(project);
-                    this.taskRepository.save(t);
-                }),
-                (target) -> {
-                    final ProjectTasks projectTasks = this.projectTasksRepository.findById(targetProject)
-                            .orElseGet(ProjectTasks::new);
-                    String newRelations = HierarchyProcessor.addItem(projectTasks.getTasks(), target);
-                    projectTasks.setTasks(newRelations);
-                    projectTasks.setProjectId(targetProject);
-                    this.projectTasksRepository.save(projectTasks);
-                });
+        deleteTaskAndAdjustRelations(requester, task, (targetTasks) -> targetTasks.forEach((t) -> {
+            t.setProject(project);
+            this.taskRepository.save(t);
+        }), (target) -> {
+            final ProjectTasks projectTasks = this.projectTasksRepository.findById(targetProject)
+                    .orElseGet(ProjectTasks::new);
+            String newRelations = HierarchyProcessor.addItem(projectTasks.getTasks(), target);
+            projectTasks.setTasks(newRelations);
+            projectTasks.setProjectId(targetProject);
+            this.projectTasksRepository.save(projectTasks);
+        });
     }
 
     /**
