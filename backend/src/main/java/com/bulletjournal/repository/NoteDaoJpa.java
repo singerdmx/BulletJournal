@@ -3,11 +3,11 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.utils.ProjectItemsGrouper;
-import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.controller.models.CreateNoteParams;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateNoteParams;
+import com.bulletjournal.controller.utils.ProjectItemsGrouper;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -17,7 +17,6 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,12 +24,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.sql.Timestamp;
-import org.springframework.data.domain.Sort;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
