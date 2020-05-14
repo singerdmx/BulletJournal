@@ -4,6 +4,7 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.controller.models.CreateNoteParams;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateNoteParams;
@@ -16,15 +17,20 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.sql.Timestamp;
+import org.springframework.data.domain.Sort;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
@@ -76,6 +82,32 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             addLabels(subNote, notesMap);
         }
         return note;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Note> getNotesByOrder(Long projectId, String requester,
+            String startDate, String endDate, String timezone) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        if (project.isShared()) {
+            return Collections.emptyList();
+        }
+
+        List<Note> notes = Collections.emptyList();
+        if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
+            notes = this.noteRepository.findNoteByProject(project);
+        } else {
+            // Set start time and end time
+            ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+            ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+            notes = this.noteRepository.findNotesBetween(project, Timestamp.from(startTime.toInstant()),
+                    Timestamp.from(endTime.toInstant()));
+        }
+
+        notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
+        return notes.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels);
+        }).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -163,7 +195,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                 Operation.DELETE, projectId, project.getOwner());
 
         ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("ProjectTasks by " + projectId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ProjectNotes by " + projectId + " not found"));
 
         String relations = projectNotes.getNotes();
 
@@ -209,7 +241,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.UPDATE, project.getId(), project.getOwner());
 
-        deleteNoteAndAdjustRelations(requester, note, (targetTasks) -> targetTasks.forEach((t) -> {
+        deleteNoteAndAdjustRelations(requester, note, (targetNotes) -> targetNotes.forEach((t) -> {
             t.setProject(project);
             this.noteRepository.save(t);
         }), (target) -> {

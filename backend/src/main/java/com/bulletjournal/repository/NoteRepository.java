@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -17,4 +18,9 @@ public interface NoteRepository extends JpaRepository<Note, Long>, NoteRepositor
     List<Note> findNoteByProject(Project project);
 
     List<Note> findNotesByOwnerAndProject(String owner, Project project);
+
+    @Query(value = "SELECT note FROM Note note WHERE note.project = :project AND "
+            + "note.updatedAt >= :startTime AND note.updatedAt <= :endTime")
+    List<Note> findNotesBetween(@Param("project") Project project, @Param("startTime") Timestamp startTime,
+            @Param("endTime") Timestamp endTime);
 }

@@ -57,9 +57,14 @@ public class NoteController {
 
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId,
-            @RequestParam(required = false) String owner) {
+            @RequestParam(required = false) String owner, @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate, @RequestParam(required = false) Boolean order,
+            @RequestParam(required = false) String timezone) {
         if (StringUtils.isNotBlank(owner)) {
             return getNotesByOwner(projectId, owner);
+        }
+        if (Boolean.TRUE.equals(order)) {
+            return getNotesByOrder(projectId, startDate, endDate, timezone);
         }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -77,6 +82,13 @@ public class NoteController {
     private ResponseEntity<List<Note>> getNotesByOwner(Long projectId, String owner) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Note> notes = this.noteDaoJpa.getNotesByOwner(projectId, username, owner);
+        return ResponseEntity.ok().body(notes.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
+    }
+
+    private ResponseEntity<List<Note>> getNotesByOrder(Long projectId, String startDate, String endDate,
+            String timezone) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Note> notes = this.noteDaoJpa.getNotesByOrder(projectId, username, startDate, endDate, timezone);
         return ResponseEntity.ok().body(notes.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
     }
 
@@ -110,7 +122,7 @@ public class NoteController {
             @Valid @RequestBody UpdateNoteParams updateNoteParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note note = this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
-        return getNotes(note.getProjectId(), null);
+        return getNotes(note.getProjectId(), null, null, null, null, null);
     }
 
     @DeleteMapping(NOTE_ROUTE)
@@ -121,7 +133,7 @@ public class NoteController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveNoteEvent(events, username));
         }
-        return getNotes(note.getProjectId(), null);
+        return getNotes(note.getProjectId(), null, null, null, null, null);
     }
 
     @PutMapping(NOTES_ROUTE)
@@ -137,7 +149,7 @@ public class NoteController {
             }
         }
         this.noteDaoJpa.updateUserNotes(projectId, notes);
-        return getNotes(projectId, null);
+        return getNotes(projectId, null, null, null, null, null);
     }
 
     @PutMapping(NOTE_SET_LABELS_ROUTE)
