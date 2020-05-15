@@ -18,18 +18,25 @@ type NotesProps = {
   updateNotes: (projectId: number) => void;
   putNote: (projectId: number, notes: Note[]) => void;
   showModal?: (user: User) => void;
+  showOrderModal?: () => void;
 };
 
 const getTree = (
   data: Note[],
   readOnly: boolean,
-  showModal?: (user: User) => void
+  showModal?: (user: User) => void,
+  showOrderModal?: () => void
 ): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Note) => {
     const node = {} as TreeNodeNormal;
     if (item.subNotes && item.subNotes.length) {
-      node.children = getTree(item.subNotes, readOnly, showModal);
+      node.children = getTree(
+        item.subNotes,
+        readOnly,
+        showModal,
+        showOrderModal
+      );
     } else {
       node.children = [] as TreeNodeNormal[];
     }
@@ -39,6 +46,7 @@ const getTree = (
         readOnly={readOnly}
         inProject={true}
         showModal={showModal}
+        showOrderModal={showOrderModal}
       />
     );
     node.key = item.id.toString();
@@ -127,13 +135,21 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (
 };
 
 const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
-  const { project, notes, putNote, updateNotes, readOnly, showModal } = props;
+  const {
+    project,
+    notes,
+    putNote,
+    updateNotes,
+    readOnly,
+    showModal,
+    showOrderModal,
+  } = props;
   useEffect(() => {
     if (project) {
       updateNotes(project.id);
     }
   }, [project]);
-  let treeNote = getTree(notes, readOnly, showModal);
+  let treeNote = getTree(notes, readOnly, showModal, showOrderModal);
 
   if (!project) {
     return null;

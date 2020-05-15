@@ -76,3 +76,16 @@ export const getNotesByOwner = (projectId: number, owner: string) =>
     projectId: projectId,
     owner: owner,
   });
+
+export const getNotesByOrder = (
+  projectId: number,
+  timezone: string,
+  startDate?: string,
+  endDate?: string
+) =>
+  actions.getNotesByOrder({
+    projectId: projectId,
+    timezone: timezone,
+    startDate: startDate,
+    endDate: endDate,
+  });

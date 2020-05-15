@@ -8,7 +8,7 @@ import {
   DeleteTwoTone,
   MoreOutlined,
   FileTextOutlined,
-  FormOutlined
+  FormOutlined,
 } from '@ant-design/icons';
 import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 // features import
@@ -25,14 +25,18 @@ import moment from 'moment';
 // assets import
 import './project-item.styles.less';
 import { ProjectType } from '../../features/project/constants';
-import {getIcon, getItemIcon} from "../draggable-labels/draggable-label-list.component";
-import {IState} from "../../store";
-import {User} from "../../features/group/interface";
+import {
+  getIcon,
+  getItemIcon,
+} from '../draggable-labels/draggable-label-list.component';
+import { IState } from '../../store';
+import { User } from '../../features/group/interface';
 
 type ProjectProps = {
   readOnly: boolean;
   aliases: any;
   showModal?: (user: User) => void;
+  showOrderModal?: () => void;
 };
 
 type NoteProps = {
@@ -46,100 +50,129 @@ type NoteManageProps = {
   deleteNote: (noteId: number) => void;
 };
 
-const ManageNote: React.FC<NoteManageProps> = props => {
+const ManageNote: React.FC<NoteManageProps> = (props) => {
   const { note, deleteNote, inModal } = props;
 
   if (inModal === true) {
-      return (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <Popconfirm
-                  title="Deleting Note also deletes its child notes. Are you sure?"
-                  okText="Yes"
-                  cancelText="No"
-                  onConfirm={() => deleteNote(note.id)}
-                  className="group-setting"
-                  placement="bottom"
-              >
-                  <div className="popover-control-item">
-                      <span>Delete</span>
-                      <DeleteTwoTone twoToneColor="#f5222d" />
-                  </div>
-              </Popconfirm>
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Popconfirm
+          title='Deleting Note also deletes its child notes. Are you sure?'
+          okText='Yes'
+          cancelText='No'
+          onConfirm={() => deleteNote(note.id)}
+          className='group-setting'
+          placement='bottom'
+        >
+          <div className='popover-control-item'>
+            <span>Delete</span>
+            <DeleteTwoTone twoToneColor='#f5222d' />
           </div>
-      );
+        </Popconfirm>
+      </div>
+    );
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditNote note={note} mode="div" />
+      <EditNote note={note} mode='div' />
       <MoveProjectItem
         type={ProjectType.NOTE}
         projectItemId={note.id}
-        mode="div"
+        mode='div'
       />
       <ShareProjectItem
         type={ProjectType.NOTE}
         projectItemId={note.id}
-        mode="div"
+        mode='div'
       />
       <Popconfirm
-        title="Deleting Note also deletes its child notes. Are you sure?"
-        okText="Yes"
-        cancelText="No"
+        title='Deleting Note also deletes its child notes. Are you sure?'
+        okText='Yes'
+        cancelText='No'
         onConfirm={() => deleteNote(note.id)}
-        className="group-setting"
-        placement="bottom"
+        className='group-setting'
+        placement='bottom'
       >
-        <div className="popover-control-item">
+        <div className='popover-control-item'>
           <span>Delete</span>
-          <DeleteTwoTone twoToneColor="#f5222d" />
+          <DeleteTwoTone twoToneColor='#f5222d' />
         </div>
       </Popconfirm>
     </div>
   );
 };
 
-const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => {
-    // hook history in router
-    const history = useHistory();
-    // jump to label searching page by label click
-    const toLabelSearching = (label: Label) => {
-        props.addSelectedLabel(label);
-        history.push('/labels/search');
-    };
-  
-  const { note, deleteNote, aliases, inModal, inProject, showModal, readOnly } = props;
+const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
+  props
+) => {
+  // hook history in router
+  const history = useHistory();
+  // jump to label searching page by label click
+  const toLabelSearching = (label: Label) => {
+    props.addSelectedLabel(label);
+    history.push('/labels/search');
+  };
+
+  const {
+    note,
+    deleteNote,
+    aliases,
+    inModal,
+    inProject,
+    showModal,
+    showOrderModal,
+    readOnly,
+  } = props;
 
   const getMore = () => {
     if (readOnly) {
       return null;
     }
 
-    return <Popover
+    return (
+      <Popover
         arrowPointAtCenter
-        placement="rightTop"
+        placement='rightTop'
         overlayStyle={{ width: '150px' }}
-        content={<ManageNote note={note} deleteNote={deleteNote} inModal={inModal} />}
-        trigger="click"
-    >
-          <span className="project-control-more">
-            <MoreOutlined />
-          </span>
-    </Popover>
+        content={
+          <ManageNote note={note} deleteNote={deleteNote} inModal={inModal} />
+        }
+        trigger='click'
+      >
+        <span className='project-control-more'>
+          <MoreOutlined />
+        </span>
+      </Popover>
+    );
   };
 
   const getAvatar = (user: User) => {
-      if (!inProject) return <Avatar src={user.avatar} size='small' />;
-      if (!showModal) return <Avatar src={user.avatar} size='small' />;
-      return (
-          <span
-              onClick={() => {
-                  showModal(user);
-              }}
-          >
+    if (!inProject) return <Avatar src={user.avatar} size='small' />;
+    if (!showModal) return <Avatar src={user.avatar} size='small' />;
+    return (
+      <span
+        onClick={() => {
+          showModal(user);
+        }}
+      >
         <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
       </span>
-      );
+    );
+  };
+
+  const getOrderIcon = () => {
+    if (!inProject) return <FormOutlined />;
+    if (!showOrderModal) return <FormOutlined />;
+    return (
+      <span
+        onClick={() => {
+          showOrderModal();
+        }}
+      >
+        <FormOutlined />
+      </span>
+    );
   };
 
   // if readOnly, link to public item page
@@ -148,25 +181,25 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
     noteLink = `/public/items/NOTE${note.id}`;
   }
   return (
-    <div className="project-item">
-      <div className="project-item-content">
+    <div className='project-item'>
+      <div className='project-item-content'>
         <Link to={noteLink}>
-          <h3 className="project-item-name">
+          <h3 className='project-item-name'>
             {getItemIcon(note, <FileTextOutlined />)}&nbsp;
             {note.name}
           </h3>
         </Link>
-        <div className="project-item-subs">
-          <div className="project-item-labels">
+        <div className='project-item-subs'>
+          <div className='project-item-labels'>
             {note.labels &&
-              note.labels.map(label => {
+              note.labels.map((label) => {
                 return (
                   <Tag
                     key={`label${label.id}`}
-                    className="labels"
+                    className='labels'
                     onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
-                    style={{cursor: 'pointer', borderRadius: 10 }}
+                    style={{ cursor: 'pointer', borderRadius: 10 }}
                   >
                     <span>
                       {getIcon(label.icon)} &nbsp;
@@ -176,29 +209,39 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
                 );
               })}
           </div>
-          <div className="project-item-time">
+          <div className='project-item-time'>
             {note.createdAt && `Created ${moment(note.createdAt).fromNow()}`}
           </div>
         </div>
       </div>
 
-      <div className="project-control">
-        <div className="project-item-owner">
-          <Tooltip title={note.owner && aliases[note.owner] ? aliases[note.owner] : note.owner}>
-              {getAvatar({
-                  accepted: true,
-                  avatar: note.ownerAvatar ? note.ownerAvatar : '',
-                  id: 0,
-                  name: note.owner ? note.owner : '',
-                  alias: note.owner ? note.owner : '',
-                  thumbnail: '',
-              })}
+      <div className='project-control'>
+        <div className='project-item-owner'>
+          <Tooltip
+            title={
+              note.owner && aliases[note.owner]
+                ? aliases[note.owner]
+                : note.owner
+            }
+          >
+            {getAvatar({
+              accepted: true,
+              avatar: note.ownerAvatar ? note.ownerAvatar : '',
+              id: 0,
+              name: note.owner ? note.owner : '',
+              alias: note.owner ? note.owner : '',
+              thumbnail: '',
+            })}
           </Tooltip>
         </div>
         <div>
-           <Tooltip title={note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`}>
-               <FormOutlined />
-           </Tooltip>
+          <Tooltip
+            title={
+              note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
+            }
+          >
+            {getOrderIcon()}
+          </Tooltip>
         </div>
         {getMore()}
       </div>
@@ -207,7 +250,9 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = props => 
 };
 
 const mapStateToProps = (state: IState) => ({
-    aliases: state.system.aliases
+  aliases: state.system.aliases,
 });
 
-export default connect(mapStateToProps, { deleteNote, addSelectedLabel })(NoteItem);
+export default connect(mapStateToProps, { deleteNote, addSelectedLabel })(
+  NoteItem
+);

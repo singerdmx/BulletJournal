@@ -1,9 +1,21 @@
 import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
 import { Note } from '../features/notes/interface';
 
-export const fetchNotes = (projectId: number, owner?: string) => {
+export const fetchNotes = (
+  projectId: number,
+  owner?: string,
+  timezone?: string,
+  startDate?: string,
+  endDate?: string,
+  order?: boolean
+) => {
   let url = `/api/projects/${projectId}/notes`;
   if (owner) url += `?owner=${owner}`;
+  if (order) {
+    url += `?order=true&timezone=${timezone}`;
+    if (startDate) url += `&startDate=${startDate}`;
+    if (endDate) url += `&endDate=${endDate}`;
+  }
   return doFetch(url)
     .then((res) => res)
     .catch((err) => {

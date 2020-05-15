@@ -20,6 +20,7 @@ import {
   UpdateNoteContents,
   UpdateNotes,
   GetNotesByOwner,
+  GetNotesByOrder,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -151,6 +152,31 @@ function* getNotesByOwner(action: PayloadAction<GetNotesByOwner>) {
     );
   } catch (error) {
     yield call(message.error, `getNotesByOwner Error Received: ${error}`);
+  }
+}
+
+function* getNotesByOrder(action: PayloadAction<GetNotesByOrder>) {
+  try {
+    const { projectId, timezone, startDate, endDate } = action.payload;
+    const data = yield call(
+      fetchNotes,
+      projectId,
+      undefined,
+      timezone,
+      startDate,
+      endDate,
+      true
+    );
+    const notesByOrder = yield data.json();
+    console.log('inside saga');
+    console.log(notesByOrder);
+    yield put(
+      notesActions.notesByOrderReceived({
+        notesByOrder: notesByOrder,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `getNotesByOrder Error Received: ${error}`);
   }
 }
 
@@ -290,11 +316,11 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
     });
     yield put(updateItemsByLabels(labelItems));
 
-    const notesByOwner = state.note.notesByOwner.filter(n => n.id !== noteId);
+    const notesByOwner = state.note.notesByOwner.filter((n) => n.id !== noteId);
     yield put(
-        notesActions.notesByOwnerReceived({
-          notesByOwner: notesByOwner,
-        })
+      notesActions.notesByOwnerReceived({
+        notesByOwner: notesByOwner,
+      })
     );
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
@@ -427,5 +453,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NoteSharablesGet.type, getNoteSharables),
     yield takeLatest(notesActions.NoteRevokeSharable.type, revokeNoteSharable),
     yield takeLatest(notesActions.getNotesByOwner.type, getNotesByOwner),
+    yield takeLatest(notesActions.getNotesByOrder.type, getNotesByOrder),
   ]);
 }

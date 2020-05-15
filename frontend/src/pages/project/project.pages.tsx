@@ -23,6 +23,7 @@ import { History } from 'history';
 import { getGroupByProject } from '../projects/projects.pages';
 import TaskTree from './task-tree.component';
 import TransactionProject from './transaction-project.pages';
+import { updateExpandedMyself } from '../../features/myself/actions';
 
 import './project.styles.less';
 import {
@@ -30,10 +31,11 @@ import {
   updateCompletedTaskPageNo,
   getTasksByAssignee,
 } from '../../features/tasks/actions';
-import { getNotesByOwner } from '../../features/notes/actions';
+import { getNotesByOwner, getNotesByOrder } from '../../features/notes/actions';
 import { getTransactionsByPayer } from '../../features/transactions/actions';
 import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
 import NotesByOwner from '../../components/modals/notes-by-owner.component';
+import NotesByOrder from '../../components/modals/notes-by-order.component';
 import TransactionsByPayer from '../../components/modals/transactions-by-payer.component';
 import ShowProjectHistory from '../../components/modals/show-project-history.component';
 import {
@@ -53,6 +55,7 @@ type ModalState = {
   notesByUsersShown: boolean;
   transactionsByUsersShown: boolean;
   assignee: User | undefined;
+  notesByOrderShown: boolean;
 };
 
 type GroupProps = {
@@ -64,6 +67,7 @@ interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
 }
 
 type ProjectPageProps = {
+  timezone: string;
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
   completedTaskPageNo: number;
@@ -91,6 +95,13 @@ type ProjectPageProps = {
     endDate?: string,
     payer?: string
   ) => void;
+  getNotesByOrder: (
+    projectId: number,
+    timezone: string,
+    startDate?: string,
+    endDate?: string
+  ) => void;
+  updateExpandedMyself: (updateSettings: boolean) => void;
 };
 
 type MyselfProps = {
@@ -110,10 +121,12 @@ class ProjectPage extends React.Component<
     tasksByUsersShown: false,
     notesByUsersShown: false,
     transactionsByUsersShown: false,
+    notesByOrderShown: false,
     assignee: undefined,
   };
 
   componentDidMount() {
+    this.props.updateExpandedMyself(true);
     const projectId = this.props.match.params.projectId;
     this.props.getProject(parseInt(projectId));
     this.setState({ completeTasksShown: false });
@@ -166,7 +179,7 @@ class ProjectPage extends React.Component<
   onCancel = () => {
     this.setState({ isShow: false });
   };
-
+  //by user modal
   handleGetTasksByAssignee = (u: User) => {
     this.setState({ tasksByUsersShown: true });
     this.setState({ assignee: u });
@@ -208,10 +221,28 @@ class ProjectPage extends React.Component<
     );
   };
 
+  //by order modal
+  handleGetNotesByOrder = () => {
+    const { timezone } = this.props;
+    this.setState({ notesByOrderShown: true });
+    console.log(timezone);
+    this.props.getNotesByOrder(
+      parseInt(this.props.match.params.projectId),
+      timezone,
+      undefined,
+      undefined
+    );
+  };
+
   handleGetProjectItemsByUseCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOwner,
     [ProjectType.TODO]: this.handleGetTasksByAssignee,
     [ProjectType.LEDGER]: this.handleGetTransactionByPayer,
+  };
+  handleGetProjectItemsByOrderCall: { [key in ProjectType]: Function } = {
+    [ProjectType.NOTE]: this.handleGetNotesByOrder,
+    [ProjectType.TODO]: () => {},
+    [ProjectType.LEDGER]: () => {},
   };
 
   render() {
@@ -224,10 +255,14 @@ class ProjectPage extends React.Component<
     const handleGetProjectItemsByUse = this.handleGetProjectItemsByUseCall[
       project.projectType
     ];
+    const handleGetProjectItemsByOrder = this.handleGetProjectItemsByOrderCall[
+      project.projectType
+    ];
     let createContent = null;
     let projectContent = null;
     let showCompletedTasks = null;
     let projectItemsByUser = null;
+    let projectItemsByOrder = null;
 
     switch (project.projectType) {
       case ProjectType.NOTE:
@@ -238,6 +273,9 @@ class ProjectPage extends React.Component<
             showModal={(user: User) => {
               handleGetProjectItemsByUse(user);
             }}
+            showOrderModal={() => {
+              handleGetProjectItemsByOrder();
+            }}
           />
         );
         projectItemsByUser = (
@@ -246,6 +284,14 @@ class ProjectPage extends React.Component<
             visible={this.state.notesByUsersShown}
             onCancel={() => {
               this.setState({ notesByUsersShown: false });
+            }}
+          />
+        );
+        projectItemsByOrder = (
+          <NotesByOrder
+            visible={this.state.notesByOrderShown}
+            onCancel={() => {
+              this.setState({ notesByOrderShown: false });
             }}
           />
         );
@@ -323,7 +369,7 @@ class ProjectPage extends React.Component<
       description = (
         <div className='project-description'>
           {project.description.split('\n').map((s, key) => {
-            return <p>{s}</p>;
+            return <p key={key}>{s}</p>;
           })}
           <Divider style={{ marginTop: '8px' }} />
         </div>
@@ -407,6 +453,7 @@ class ProjectPage extends React.Component<
             {editContent}
             {deleteContent}
             {projectItemsByUser}
+            {projectItemsByOrder}
           </div>
         </div>
         {description && (
@@ -429,6 +476,7 @@ const mapStateToProps = (state: IState) => ({
   transactionStartDate: state.transaction.startDate,
   transactionEndDate: state.transaction.endDate,
   transactionLedgerSummaryType: state.transaction.ledgerSummaryType,
+  timezone: state.settings.timezone,
 });
 
 export default connect(mapStateToProps, {
@@ -439,4 +487,6 @@ export default connect(mapStateToProps, {
   getTasksByAssignee,
   getNotesByOwner,
   getTransactionsByPayer,
+  getNotesByOrder,
+  updateExpandedMyself,
 })(ProjectPage);

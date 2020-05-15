@@ -120,6 +120,17 @@ export type NotesByOwnerAction = {
   notesByOwner: Array<Note>;
 };
 
+export type GetNotesByOrder = {
+  projectId: number;
+  timezone: string;
+  startDate?: string;
+  endDate?: string;
+};
+
+export type NotesByOrderAction = {
+  notesByOrder: Array<Note>;
+};
+
 let initialState = {
   note: undefined as Note | undefined,
   contents: [] as Array<Content>,
@@ -130,12 +141,21 @@ let initialState = {
   sharedLinks: [] as SharableLink[],
   sharedLink: '',
   notesByOwner: [] as Array<Note>,
+  notesByOrder: [] as Array<Note>,
 };
 
 const slice = createSlice({
   name: 'note',
   initialState,
   reducers: {
+    notesByOrderReceived: (
+      state,
+      action: PayloadAction<NotesByOrderAction>
+    ) => {
+      const { notesByOrder } = action.payload;
+      state.notesByOrder = notesByOrder;
+    },
+    getNotesByOrder: (state, action: PayloadAction<GetNotesByOrder>) => state,
     notesByOwnerReceived: (
       state,
       action: PayloadAction<NotesByOwnerAction>
