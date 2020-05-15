@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { List, Divider, Tree, Empty, Tooltip, Button } from 'antd';
+import {List, Divider, Tree, Empty, Tooltip, Button, Result} from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
@@ -16,6 +16,10 @@ import { CloudSyncOutlined, SearchOutlined } from '@ant-design/icons';
 import './task.styles.less';
 import { User } from '../../features/group/interface';
 import {useHistory} from "react-router-dom";
+import AddTask from "../../components/modals/add-task.component";
+import {
+  CarryOutOutlined
+} from '@ant-design/icons';
 
 type TasksProps = {
   showCompletedTask: boolean;
@@ -227,6 +231,14 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   }
   if (!project) {
     return null;
+  }
+  if (tasks.length === 0) {
+    return <div className='add-task-button'>
+      <Result
+          icon={<CarryOutOutlined />}
+          extra={<AddTask mode='button'/>}
+      />
+    </div>
   }
 
   const treeTask = getTree(!project.shared, tasks, readOnly, showModal);

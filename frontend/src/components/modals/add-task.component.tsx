@@ -55,6 +55,7 @@ type TaskProps = {
 };
 
 interface TaskCreateFormProps {
+  mode: string;
   createTask: (
     projectId: number,
     name: string,
@@ -193,6 +194,264 @@ const AddTask: React.FC<
         </Select>
     )
   };
+
+  const getModal = () => {
+    return <Modal
+        title='Create New Task'
+        visible={props.addTaskVisible}
+        okText='Create'
+        onCancel={onCancel}
+        onOk={() => {
+          form
+              .validateFields()
+              .then((values) => {
+                console.log(values);
+                form.resetFields();
+                addTask(values);
+              })
+              .catch((info) => console.log(info));
+        }}
+    >
+      <Form form={form} layout='vertical'>
+        {/* form for name */}
+        <Form.Item
+            name='taskName'
+            label='Name'
+            rules={[{ required: true, message: 'Missing Task Name!' }]}
+        >
+          <Input placeholder='Enter Task Name' allowClear />
+        </Form.Item>
+        {/* form for Assignees */}
+        <Form.Item
+            name='assignees'
+            label={
+              <span>
+                  Assignees{' '}
+                <Tooltip title='Select All'>
+                    <CheckSquareTwoTone
+                        onClick={selectAll}
+                        style={{ cursor: 'pointer' }}
+                    />
+                  </Tooltip>
+                  <Tooltip title='Clear All'>
+                    <CloseSquareTwoTone
+                        onClick={clearAll}
+                        style={{ cursor: 'pointer' }}
+                    />
+                  </Tooltip>
+                </span>
+            }
+        >
+          {getSelections()}
+        </Form.Item>
+        {/* due type */}
+        <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+              Due&nbsp;&nbsp;
+            </span>
+        <Radio.Group
+            defaultValue={'dueByTime'}
+            onChange={(e) => setDueType(e.target.value)}
+            buttonStyle='solid'
+            style={{ marginBottom: 18 }}
+        >
+          <Radio.Button value={'dueByTime'}>Date (Time)</Radio.Button>
+          <Radio.Button
+              value={'dueByRec'}
+              onClick={() => {
+                //force remind option to be before
+                setRemindButton('remindBefore');
+                setReminderType('remindBefore');
+              }}
+          >
+            Recurrence
+          </Radio.Button>
+        </Radio.Group>
+        <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', flex: 1 }}>
+            <Tooltip title='Select Due Date' placement='top'>
+              <Form.Item name='dueDate' style={{ width: '100%' }}>
+                <DatePicker
+                    allowClear={true}
+                    style={{ width: '100%' }}
+                    placeholder='Due Date'
+                    disabled={dueType !== 'dueByTime'}
+                    onChange={(value) => setDueTimeVisible(value !== null)}
+                />
+              </Form.Item>
+            </Tooltip>
+            {dueTimeVisible && (
+                <Tooltip title='Select Due Time' placement='top'>
+                  <Form.Item name='dueTime' style={{ width: '210px' }}>
+                    <TimePicker
+                        allowClear={true}
+                        format='HH:mm'
+                        placeholder='Due Time'
+                        disabled={dueType !== 'dueByTime'}
+                    />
+                  </Form.Item>
+                </Tooltip>
+            )}
+          </div>
+          <Form.Item style={{ flex: 1 }}>
+            <Tooltip title={rRuleText} placement='bottom'>
+              <Popover
+                  content={<ReactRRuleGenerator />}
+                  title={
+                    <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '0.5em',
+                        }}
+                    >
+                      <div className='recurrence-title'>
+                        <div>{rRuleTextList && rRuleTextList[0]}</div>
+                        {rRuleTextList &&
+                        rRuleTextList.length > 1 &&
+                        rRuleTextList
+                            .slice(1)
+                            .map((text, index) => (
+                                <div key={index}>{text}</div>
+                            ))}
+                      </div>
+                      <Button
+                          onClick={() => setRecurrenceVisible(false)}
+                          type='primary'
+                      >
+                        Done
+                      </Button>
+                    </div>
+                  }
+                  visible={recurrenceVisible && dueType === 'dueByRec'}
+                  onVisibleChange={(visible) => {
+                    setRecurrenceVisible(visible);
+                  }}
+                  trigger='click'
+                  placement='top'
+              >
+                <Button type='default' disabled={dueType !== 'dueByRec'}>
+                  <p className='marquee'>{rRuleText}</p>
+                </Button>
+              </Popover>
+            </Tooltip>
+          </Form.Item>
+        </div>
+        <Form.Item
+            label='Time Zone and Duration'
+            style={{ marginBottom: 0 }}
+        >
+          <Tooltip title='Time Zone' placement='bottom'>
+            <Form.Item
+                name='timezone'
+                style={{ display: 'inline-block', width: '70%' }}
+            >
+              <Select
+                  showSearch={true}
+                  placeholder='Select Time Zone'
+                  defaultValue={props.timezone ? props.timezone : ''}
+              >
+                {zones.map((zone: string, index: number) => (
+                    <Option key={zone} value={zone}>
+                      <Tooltip title={zone} placement='right'>
+                        {<span>{zone}</span>}
+                      </Tooltip>
+                    </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Tooltip>
+          <Form.Item
+              name='duration'
+              rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Duration' }]}
+              style={{ display: 'inline-block', width: '30%' }}
+          >
+            <AutoComplete placeholder='Duration' options={options}>
+              <Input suffix='Minutes' />
+            </AutoComplete>
+          </Form.Item>
+        </Form.Item>
+
+        {/* reminder */}
+        <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+              Reminder&nbsp;&nbsp;
+            </span>
+        <Radio.Group
+            value={remindButton}
+            onChange={(e) => {
+              setRemindButton(e.target.value);
+              setReminderType(e.target.value);
+            }}
+            buttonStyle='solid'
+            style={{ marginBottom: 18 }}
+        >
+          <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
+          <Radio.Button
+              value={'reminderDate'}
+              disabled={dueType === 'dueByRec'}
+          >
+            Date (Time)
+          </Radio.Button>
+        </Radio.Group>
+        <div style={{ display: 'flex' }}>
+          <Form.Item name='remindBefore'>
+            <Select
+                defaultValue={ReminderBeforeTaskText[props.before]}
+                disabled={reminderType !== 'remindBefore'}
+                style={{ width: '180px' }}
+                placeholder='Reminder Before Task'
+            >
+              {ReminderBeforeTaskText.map(
+                  (before: string, index: number) => (
+                      <Option key={index} value={index}>
+                        {before}
+                      </Option>
+                  )
+              )}
+            </Select>
+          </Form.Item>
+          <div style={{ display: 'flex' }}>
+            <Tooltip title='Reminder Date' placement='bottom'>
+              <Form.Item name='reminderDate'>
+                <DatePicker
+                    placeholder='Date'
+                    disabled={reminderType !== 'reminderDate'}
+                    allowClear={true}
+                    onChange={(value) => {
+                      if (value === null) {
+                        setReminderTimeVisible(false);
+                      } else {
+                        setReminderTimeVisible(true);
+                      }
+                    }}
+                />
+              </Form.Item>
+            </Tooltip>
+            {reminderTimeVisible && (
+                <Tooltip title='Reminder Time' placement='bottom'>
+                  <Form.Item name='reminderTime' style={{ width: '100px' }}>
+                    <TimePicker
+                        allowClear={true}
+                        format='HH:mm'
+                        placeholder='Time'
+                        disabled={reminderType !== 'reminderDate'}
+                    />
+                  </Form.Item>
+                </Tooltip>
+            )}
+          </div>
+        </div>
+      </Form>
+    </Modal>
+  };
+
+  if (props.mode === 'button') {
+    return <div className='add-task'>
+      <Button type="primary" onClick={openModal}>Create New Task</Button>
+      {getModal()}
+    </div>;
+  }
+
   return (
     <Tooltip placement='top' title='Create New Task'>
       <div className='add-task'>
@@ -201,253 +460,7 @@ const AddTask: React.FC<
           onClick={openModal}
           title='Create New Task'
         />
-        <Modal
-          title='Create New Task'
-          visible={props.addTaskVisible}
-          okText='Create'
-          onCancel={onCancel}
-          onOk={() => {
-            form
-              .validateFields()
-              .then((values) => {
-                console.log(values);
-                form.resetFields();
-                addTask(values);
-              })
-              .catch((info) => console.log(info));
-          }}
-        >
-          <Form form={form} layout='vertical'>
-            {/* form for name */}
-            <Form.Item
-              name='taskName'
-              label='Name'
-              rules={[{ required: true, message: 'Missing Task Name!' }]}
-            >
-              <Input placeholder='Enter Task Name' allowClear />
-            </Form.Item>
-            {/* form for Assignees */}
-            <Form.Item
-              name='assignees'
-              label={
-                <span>
-                  Assignees{' '}
-                  <Tooltip title='Select All'>
-                    <CheckSquareTwoTone
-                      onClick={selectAll}
-                      style={{ cursor: 'pointer' }}
-                    />
-                  </Tooltip>
-                  <Tooltip title='Clear All'>
-                    <CloseSquareTwoTone
-                      onClick={clearAll}
-                      style={{ cursor: 'pointer' }}
-                    />
-                  </Tooltip>
-                </span>
-              }
-            >
-              {getSelections()}
-            </Form.Item>
-            {/* due type */}
-            <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
-              Due&nbsp;&nbsp;
-            </span>
-            <Radio.Group
-              defaultValue={'dueByTime'}
-              onChange={(e) => setDueType(e.target.value)}
-              buttonStyle='solid'
-              style={{ marginBottom: 18 }}
-            >
-              <Radio.Button value={'dueByTime'}>Date (Time)</Radio.Button>
-              <Radio.Button
-                value={'dueByRec'}
-                onClick={() => {
-                  //force remind option to be before
-                  setRemindButton('remindBefore');
-                  setReminderType('remindBefore');
-                }}
-              >
-                Recurrence
-              </Radio.Button>
-            </Radio.Group>
-            <div style={{ display: 'flex' }}>
-              <div style={{ display: 'flex', flex: 1 }}>
-                <Tooltip title='Select Due Date' placement='top'>
-                  <Form.Item name='dueDate' style={{ width: '100%' }}>
-                    <DatePicker
-                      allowClear={true}
-                      style={{ width: '100%' }}
-                      placeholder='Due Date'
-                      disabled={dueType !== 'dueByTime'}
-                      onChange={(value) => setDueTimeVisible(value !== null)}
-                    />
-                  </Form.Item>
-                </Tooltip>
-                {dueTimeVisible && (
-                  <Tooltip title='Select Due Time' placement='top'>
-                    <Form.Item name='dueTime' style={{ width: '210px' }}>
-                      <TimePicker
-                        allowClear={true}
-                        format='HH:mm'
-                        placeholder='Due Time'
-                        disabled={dueType !== 'dueByTime'}
-                      />
-                    </Form.Item>
-                  </Tooltip>
-                )}
-              </div>
-              <Form.Item style={{ flex: 1 }}>
-                <Tooltip title={rRuleText} placement='bottom'>
-                  <Popover
-                    content={<ReactRRuleGenerator />}
-                    title={
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: '0.5em',
-                        }}
-                      >
-                        <div className='recurrence-title'>
-                          <div>{rRuleTextList && rRuleTextList[0]}</div>
-                          {rRuleTextList &&
-                            rRuleTextList.length > 1 &&
-                            rRuleTextList
-                              .slice(1)
-                              .map((text, index) => (
-                                <div key={index}>{text}</div>
-                              ))}
-                        </div>
-                        <Button
-                          onClick={() => setRecurrenceVisible(false)}
-                          type='primary'
-                        >
-                          Done
-                        </Button>
-                      </div>
-                    }
-                    visible={recurrenceVisible && dueType === 'dueByRec'}
-                    onVisibleChange={(visible) => {
-                      setRecurrenceVisible(visible);
-                    }}
-                    trigger='click'
-                    placement='top'
-                  >
-                    <Button type='default' disabled={dueType !== 'dueByRec'}>
-                      <p className='marquee'>{rRuleText}</p>
-                    </Button>
-                  </Popover>
-                </Tooltip>
-              </Form.Item>
-            </div>
-            <Form.Item
-              label='Time Zone and Duration'
-              style={{ marginBottom: 0 }}
-            >
-              <Tooltip title='Time Zone' placement='bottom'>
-                <Form.Item
-                  name='timezone'
-                  style={{ display: 'inline-block', width: '70%' }}
-                >
-                  <Select
-                    showSearch={true}
-                    placeholder='Select Time Zone'
-                    defaultValue={props.timezone ? props.timezone : ''}
-                  >
-                    {zones.map((zone: string, index: number) => (
-                      <Option key={zone} value={zone}>
-                        <Tooltip title={zone} placement='right'>
-                          {<span>{zone}</span>}
-                        </Tooltip>
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Tooltip>
-              <Form.Item
-                name='duration'
-                rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Duration' }]}
-                style={{ display: 'inline-block', width: '30%' }}
-              >
-                <AutoComplete placeholder='Duration' options={options}>
-                  <Input suffix='Minutes' />
-                </AutoComplete>
-              </Form.Item>
-            </Form.Item>
-
-            {/* reminder */}
-            <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
-              Reminder&nbsp;&nbsp;
-            </span>
-            <Radio.Group
-              value={remindButton}
-              onChange={(e) => {
-                setRemindButton(e.target.value);
-                setReminderType(e.target.value);
-              }}
-              buttonStyle='solid'
-              style={{ marginBottom: 18 }}
-            >
-              <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
-              <Radio.Button
-                value={'reminderDate'}
-                disabled={dueType === 'dueByRec'}
-              >
-                Date (Time)
-              </Radio.Button>
-            </Radio.Group>
-            <div style={{ display: 'flex' }}>
-              <Form.Item name='remindBefore'>
-                <Select
-                  defaultValue={ReminderBeforeTaskText[props.before]}
-                  disabled={reminderType !== 'remindBefore'}
-                  style={{ width: '180px' }}
-                  placeholder='Reminder Before Task'
-                >
-                  {ReminderBeforeTaskText.map(
-                    (before: string, index: number) => (
-                      <Option key={index} value={index}>
-                        {before}
-                      </Option>
-                    )
-                  )}
-                </Select>
-              </Form.Item>
-              <div style={{ display: 'flex' }}>
-                <Tooltip title='Reminder Date' placement='bottom'>
-                  <Form.Item name='reminderDate'>
-                    <DatePicker
-                      placeholder='Date'
-                      disabled={reminderType !== 'reminderDate'}
-                      allowClear={true}
-                      onChange={(value) => {
-                        if (value === null) {
-                          setReminderTimeVisible(false);
-                        } else {
-                          setReminderTimeVisible(true);
-                        }
-                      }}
-                    />
-                  </Form.Item>
-                </Tooltip>
-                {reminderTimeVisible && (
-                  <Tooltip title='Reminder Time' placement='bottom'>
-                    <Form.Item name='reminderTime' style={{ width: '100px' }}>
-                      <TimePicker
-                        allowClear={true}
-                        format='HH:mm'
-                        placeholder='Time'
-                        disabled={reminderType !== 'reminderDate'}
-                      />
-                    </Form.Item>
-                  </Tooltip>
-                )}
-              </div>
-            </div>
-          </Form>
-        </Modal>
+        {getModal()}
       </div>
     </Tooltip>
   );

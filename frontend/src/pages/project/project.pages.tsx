@@ -297,7 +297,7 @@ class ProjectPage extends React.Component<
         );
         break;
       case ProjectType.TODO:
-        createContent = <AddTask />;
+        createContent = <AddTask mode='icon'/>;
         projectContent = (
           <TaskTree
             showCompletedTask={this.state.completeTasksShown}
