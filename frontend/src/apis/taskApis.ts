@@ -1,9 +1,21 @@
 import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
 import { Task, ReminderSetting } from '../features/tasks/interface';
 
-export const fetchTasks = (projectId: number, assignee?: string) => {
+export const fetchTasks = (
+  projectId: number,
+  assignee?: string,
+  timezone?: string,
+  startDate?: string,
+  endDate?: string,
+  order?: boolean
+) => {
   let url = `/api/projects/${projectId}/tasks`;
   if (assignee) url += `?assignee=${assignee}`;
+  if (order) {
+    url += `?order=true&timezone=${timezone}`;
+    if (startDate) url += `&startDate=${startDate}`;
+    if (endDate) url += `&endDate=${endDate}`;
+  }
   return doFetch(url)
     .then((res) => res)
     .catch((err) => {

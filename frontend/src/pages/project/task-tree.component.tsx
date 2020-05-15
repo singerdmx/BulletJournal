@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {List, Divider, Tree, Empty, Tooltip, Button, Result} from 'antd';
+import { List, Divider, Tree, Empty, Tooltip, Button, Result } from 'antd';
 import { Task } from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
@@ -15,11 +15,9 @@ import { Project } from '../../features/project/interface';
 import { CloudSyncOutlined, SearchOutlined } from '@ant-design/icons';
 import './task.styles.less';
 import { User } from '../../features/group/interface';
-import {useHistory} from "react-router-dom";
-import AddTask from "../../components/modals/add-task.component";
-import {
-  CarryOutOutlined
-} from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
+import AddTask from '../../components/modals/add-task.component';
+import { CarryOutOutlined } from '@ant-design/icons';
 
 type TasksProps = {
   showCompletedTask: boolean;
@@ -33,19 +31,27 @@ type TasksProps = {
   updateCompletedTasks: (projectId: number) => void;
   putTask: (projectId: number, tasks: Task[]) => void;
   showModal?: (user: User) => void;
+  showOrderModal?: () => void;
 };
 
 const getTree = (
   inProject: boolean,
   data: Task[],
   readOnly: boolean,
-  showModal?: (user: User) => void
+  showModal?: (user: User) => void,
+  showOrderModal?: () => void
 ): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Task) => {
     const node = {} as TreeNodeNormal;
     if (item.subTasks && item.subTasks.length) {
-      node.children = getTree(inProject, item.subTasks, readOnly, showModal);
+      node.children = getTree(
+        inProject,
+        item.subTasks,
+        readOnly,
+        showModal,
+        showOrderModal
+      );
     } else {
       node.children = [] as TreeNodeNormal[];
     }
@@ -58,6 +64,7 @@ const getTree = (
         inProject={inProject}
         completeOnlyOccurrence={false}
         showModal={showModal}
+        showOrderModal={showOrderModal}
       />
     );
     node.key = item.id.toString();
@@ -163,6 +170,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     loadingCompletedTask,
     nextCompletedTasks,
     showModal,
+    showOrderModal,
   } = props;
 
   useEffect(() => {
@@ -197,7 +205,12 @@ const TaskTree: React.FC<TasksProps> = (props) => {
         <div>
           <Divider />
           <div className='search-completed-tasks-button'>
-            <Button icon={<SearchOutlined />} onClick={handleSearchCompletedTasksClick}>Search Completed Tasks</Button>
+            <Button
+              icon={<SearchOutlined />}
+              onClick={handleSearchCompletedTasksClick}
+            >
+              Search Completed Tasks
+            </Button>
           </div>
           <div className='completed-tasks'>
             <List>
@@ -233,15 +246,20 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     return null;
   }
   if (tasks.length === 0) {
-    return <div className='add-task-button'>
-      <Result
-          icon={<CarryOutOutlined />}
-          extra={<AddTask mode='button'/>}
-      />
-    </div>
+    return (
+      <div className='add-task-button'>
+        <Result icon={<CarryOutOutlined />} extra={<AddTask mode='button' />} />
+      </div>
+    );
   }
 
-  const treeTask = getTree(!project.shared, tasks, readOnly, showModal);
+  const treeTask = getTree(
+    !project.shared,
+    tasks,
+    readOnly,
+    showModal,
+    showOrderModal
+  );
 
   return (
     <div>

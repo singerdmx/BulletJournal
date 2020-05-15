@@ -37,6 +37,7 @@ type ProjectProps = {
   readOnly: boolean;
   addSelectedLabel: (label: Label) => void;
   showModal?: (user: User) => void;
+  showOrderModal?: () => void;
 };
 
 type ManageTaskProps = {
@@ -251,6 +252,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     deleteCompletedTask,
     aliases,
     showModal,
+    showOrderModal,
   } = props;
 
   const taskStyle = isComplete
@@ -312,6 +314,20 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     );
   };
 
+  const getOrderIcon = () => {
+    if (!inProject) return <AlertOutlined />;
+    if (!showOrderModal) return <AlertOutlined />;
+    return (
+      <span
+        onClick={() => {
+          showOrderModal();
+        }}
+      >
+        <AlertOutlined />
+      </span>
+    );
+  };
+
   return (
     <div className='project-item'>
       <div className='project-item-content'>
@@ -366,7 +382,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
         <div className='project-item-assignee'>{getAssignees()}</div>
         <div className='project-item-assignee'>
           <Tooltip title={getReminderSettingString(task.reminderSetting)}>
-            <AlertOutlined />
+            {getOrderIcon()}
           </Tooltip>
         </div>
         {getMore()}

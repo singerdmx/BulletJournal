@@ -161,6 +161,17 @@ export type UpdateCompletedTaskPageNoAction = {
   completedTaskPageNo: number;
 };
 
+export type GetTasksByOrder = {
+  projectId: number;
+  timezone: string;
+  startDate?: string;
+  endDate?: string;
+};
+
+export type TasksByOrderAction = {
+  tasksByOrder: Array<Task>;
+};
+
 let initialState = {
   addTaskVisible: false,
   contents: [] as Array<Content>,
@@ -174,12 +185,21 @@ let initialState = {
   loadingCompletedTask: false as boolean,
   completedTaskPageNo: 0,
   tasksByAssignee: [] as Array<Task>,
+  tasksByOrder: [] as Array<Task>,
 };
 
 const slice = createSlice({
   name: 'task',
   initialState,
   reducers: {
+    tasksByOrderReceived: (
+      state,
+      action: PayloadAction<TasksByOrderAction>
+    ) => {
+      const { tasksByOrder } = action.payload;
+      state.tasksByOrder = tasksByOrder;
+    },
+    getTasksByOrder: (state, action: PayloadAction<GetTasksByOrder>) => state,
     tasksByAssigneeReceived: (
       state,
       action: PayloadAction<TasksByAssigneeAction>

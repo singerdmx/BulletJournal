@@ -141,3 +141,16 @@ export const getTasksByAssignee = (projectId: number, assignee: string) =>
     projectId: projectId,
     assignee: assignee,
   });
+
+export const getTasksByOrder = (
+  projectId: number,
+  timezone: string,
+  startDate?: string,
+  endDate?: string
+) =>
+  actions.getTasksByOrder({
+    projectId: projectId,
+    timezone: timezone,
+    startDate: startDate,
+    endDate: endDate,
+  });

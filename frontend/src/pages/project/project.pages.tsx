@@ -30,10 +30,12 @@ import {
   updateCompletedTasks,
   updateCompletedTaskPageNo,
   getTasksByAssignee,
+  getTasksByOrder,
 } from '../../features/tasks/actions';
 import { getNotesByOwner, getNotesByOrder } from '../../features/notes/actions';
 import { getTransactionsByPayer } from '../../features/transactions/actions';
 import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
+import TasksByOrder from '../../components/modals/tasks-by-order.component';
 import NotesByOwner from '../../components/modals/notes-by-owner.component';
 import NotesByOrder from '../../components/modals/notes-by-order.component';
 import TransactionsByPayer from '../../components/modals/transactions-by-payer.component';
@@ -56,6 +58,7 @@ type ModalState = {
   transactionsByUsersShown: boolean;
   assignee: User | undefined;
   notesByOrderShown: boolean;
+  tasksByOrderShown: boolean;
 };
 
 type GroupProps = {
@@ -101,6 +104,12 @@ type ProjectPageProps = {
     startDate?: string,
     endDate?: string
   ) => void;
+  getTasksByOrder: (
+    projectId: number,
+    timezone: string,
+    startDate?: string,
+    endDate?: string
+  ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
 };
 
@@ -122,6 +131,7 @@ class ProjectPage extends React.Component<
     notesByUsersShown: false,
     transactionsByUsersShown: false,
     notesByOrderShown: false,
+    tasksByOrderShown: false,
     assignee: undefined,
   };
 
@@ -225,8 +235,18 @@ class ProjectPage extends React.Component<
   handleGetNotesByOrder = () => {
     const { timezone } = this.props;
     this.setState({ notesByOrderShown: true });
-    console.log(timezone);
     this.props.getNotesByOrder(
+      parseInt(this.props.match.params.projectId),
+      timezone,
+      undefined,
+      undefined
+    );
+  };
+
+  handleGetTasksByOrder = () => {
+    const { timezone } = this.props;
+    this.setState({ tasksByOrderShown: true });
+    this.props.getTasksByOrder(
       parseInt(this.props.match.params.projectId),
       timezone,
       undefined,
@@ -241,7 +261,7 @@ class ProjectPage extends React.Component<
   };
   handleGetProjectItemsByOrderCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOrder,
-    [ProjectType.TODO]: () => {},
+    [ProjectType.TODO]: this.handleGetTasksByOrder,
     [ProjectType.LEDGER]: () => {},
   };
 
@@ -266,7 +286,7 @@ class ProjectPage extends React.Component<
 
     switch (project.projectType) {
       case ProjectType.NOTE:
-        createContent = <AddNote mode='icon'/>;
+        createContent = <AddNote mode='icon' />;
         projectContent = (
           <NoteTree
             readOnly={project.shared}
@@ -297,13 +317,16 @@ class ProjectPage extends React.Component<
         );
         break;
       case ProjectType.TODO:
-        createContent = <AddTask mode='icon'/>;
+        createContent = <AddTask mode='icon' />;
         projectContent = (
           <TaskTree
             showCompletedTask={this.state.completeTasksShown}
             readOnly={project.shared}
             showModal={(user: User) => {
               handleGetProjectItemsByUse(user);
+            }}
+            showOrderModal={() => {
+              handleGetProjectItemsByOrder();
             }}
           />
         );
@@ -317,9 +340,17 @@ class ProjectPage extends React.Component<
             }}
           />
         );
+        projectItemsByOrder = (
+          <TasksByOrder
+            visible={this.state.tasksByOrderShown}
+            onCancel={() => {
+              this.setState({ tasksByOrderShown: false });
+            }}
+          />
+        );
         break;
       case ProjectType.LEDGER:
-        createContent = <AddTransaction mode='icon'/>;
+        createContent = <AddTransaction mode='icon' />;
         projectContent = (
           <TransactionProject
             showModal={(user: User) => {
@@ -488,5 +519,6 @@ export default connect(mapStateToProps, {
   getNotesByOwner,
   getTransactionsByPayer,
   getNotesByOrder,
+  getTasksByOrder,
   updateExpandedMyself,
 })(ProjectPage);

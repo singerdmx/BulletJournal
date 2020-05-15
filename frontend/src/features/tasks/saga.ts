@@ -23,6 +23,7 @@ import {
   UpdateTaskContents,
   UpdateCompletedTasks,
   GetTasksByAssignee,
+  GetTasksByOrder,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -361,11 +362,13 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
       )
     );
 
-    const tasksByAssignee = state.task.tasksByAssignee.filter(t => t.id !== taskId);
+    const tasksByAssignee = state.task.tasksByAssignee.filter(
+      (t) => t.id !== taskId
+    );
     yield put(
-        tasksActions.tasksByAssigneeReceived({
-          tasksByAssignee: tasksByAssignee,
-        })
+      tasksActions.tasksByAssigneeReceived({
+        tasksByAssignee: tasksByAssignee,
+      })
     );
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
@@ -447,11 +450,13 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
     });
     yield put(updateItemsByLabels(labelItems));
 
-    const tasksByAssignee = state.task.tasksByAssignee.filter(t => t.id !== taskId);
+    const tasksByAssignee = state.task.tasksByAssignee.filter(
+      (t) => t.id !== taskId
+    );
     yield put(
-        tasksActions.tasksByAssigneeReceived({
-          tasksByAssignee: tasksByAssignee,
-        })
+      tasksActions.tasksByAssigneeReceived({
+        tasksByAssignee: tasksByAssignee,
+      })
     );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
@@ -682,6 +687,31 @@ function* deleteTaskContent(action: PayloadAction<DeleteContent>) {
   }
 }
 
+function* getTasksByOrder(action: PayloadAction<GetTasksByOrder>) {
+  try {
+    const { projectId, timezone, startDate, endDate } = action.payload;
+    const data = yield call(
+      fetchTasks,
+      projectId,
+      undefined,
+      timezone,
+      startDate,
+      endDate,
+      true
+    );
+    const tasksByOrder = yield data.json();
+    console.log('inside saga');
+    console.log(tasksByOrder);
+    yield put(
+      tasksActions.tasksByOrderReceived({
+        tasksByOrder: tasksByOrder,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `getTasksByOrder Error Received: ${error}`);
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -723,5 +753,6 @@ export default function* taskSagas() {
       completeTaskContentsUpdate
     ),
     yield takeLatest(tasksActions.getTasksByAssignee.type, getTasksByAssignee),
+    yield takeLatest(tasksActions.getTasksByOrder.type, getTasksByOrder),
   ]);
 }
