@@ -168,8 +168,6 @@ function* getNotesByOrder(action: PayloadAction<GetNotesByOrder>) {
       true
     );
     const notesByOrder = yield data.json();
-    console.log('inside saga');
-    console.log(notesByOrder);
     yield put(
       notesActions.notesByOrderReceived({
         notesByOrder: notesByOrder,
@@ -325,9 +323,9 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
 
     const notesByOrder = state.note.notesByOrder.filter((n) => n.id !== noteId);
     yield put(
-        notesActions.notesByOrderReceived({
-          notesByOrder: notesByOrder,
-        })
+      notesActions.notesByOrderReceived({
+        notesByOrder: notesByOrder,
+      })
     );
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);

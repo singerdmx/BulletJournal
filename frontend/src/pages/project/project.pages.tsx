@@ -309,6 +309,7 @@ class ProjectPage extends React.Component<
         );
         projectItemsByOrder = (
           <NotesByOrder
+            projectId={project.id}
             visible={this.state.notesByOrderShown}
             onCancel={() => {
               this.setState({ notesByOrderShown: false });

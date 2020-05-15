@@ -459,13 +459,11 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
       })
     );
 
-    const tasksByOrder = state.task.tasksByOrder.filter(
-        (t) => t.id !== taskId
-    );
+    const tasksByOrder = state.task.tasksByOrder.filter((t) => t.id !== taskId);
     yield put(
-        tasksActions.tasksByOrderReceived({
-          tasksByOrder: tasksByOrder,
-        })
+      tasksActions.tasksByOrderReceived({
+        tasksByOrder: tasksByOrder,
+      })
     );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
@@ -709,8 +707,6 @@ function* getTasksByOrder(action: PayloadAction<GetTasksByOrder>) {
       true
     );
     const tasksByOrder = yield data.json();
-    console.log('inside saga');
-    console.log(tasksByOrder);
     yield put(
       tasksActions.tasksByOrderReceived({
         tasksByOrder: tasksByOrder,
