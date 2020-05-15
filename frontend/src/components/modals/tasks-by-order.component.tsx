@@ -12,6 +12,7 @@ const { RangePicker } = DatePicker;
 
 type TasksByOrderProps = {
   projectId: number;
+  timezone: string;
   tasksByOrder: Task[];
   visible: boolean;
   onCancel: () => void;
