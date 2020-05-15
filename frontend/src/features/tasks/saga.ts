@@ -370,6 +370,13 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
         tasksByAssignee: tasksByAssignee,
       })
     );
+
+    const tasksByOrder = state.task.tasksByOrder.filter((t) => t.id !== taskId);
+    yield put(
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
+    );
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
   }

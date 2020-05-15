@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, Empty, DatePicker, Divider, Button } from 'antd';
+import {Modal, Empty, DatePicker, Divider, Tooltip} from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
 import NoteItem from '../project-item/note-item.component';
 import moment from 'moment';
+import { SyncOutlined } from '@ant-design/icons';
 import { Note } from '../../features/notes/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
 import { getNotesByOrder } from '../../features/notes/actions';
@@ -40,26 +41,26 @@ const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
       footer={false}
     >
       <div>
-        <RangePicker
-          ranges={{
-            Today: [moment(), moment()],
-            'This Week': [moment().startOf('week'), moment().endOf('week')],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-          }}
-          value={
-            dateArray[0] ? [moment(dateArray[0]), moment(dateArray[1])] : null
-          }
-          size='small'
-          allowClear={true}
-          format={dateFormat}
-          placeholder={['Start Date', 'End Date']}
-          onChange={handleRangeChange}
-        />
-        <span style={{ paddingLeft: '130px' }}>
-          <Button type='primary' onClick={handleUpdate}>
-            Update
-          </Button>
-        </span>
+        <div className='range-picker'>
+          <RangePicker
+              ranges={{
+                Today: [moment(), moment()],
+                'This Week': [moment().startOf('week'), moment().endOf('week')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+              }}
+              value={
+                dateArray[0] ? [moment(dateArray[0]), moment(dateArray[1])] : null
+              }
+              size='small'
+              allowClear={true}
+              format={dateFormat}
+              placeholder={['Start Date', 'End Date']}
+              onChange={handleRangeChange}
+          />
+          <span>
+            <Tooltip title='Refresh'><SyncOutlined onClick={handleUpdate} /></Tooltip>
+          </span>
+        </div>
         <Divider />
         {notesByOrder.length === 0 ? (
           <Empty />
