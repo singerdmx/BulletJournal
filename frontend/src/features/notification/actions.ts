@@ -1,5 +1,4 @@
 import { actions } from './reducer';
-import { Notification } from './interface';
 
 export const updateNotifications = () => actions.notificationsUpdate({});
 export const answerNotice = (

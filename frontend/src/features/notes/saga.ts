@@ -322,6 +322,13 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
         notesByOwner: notesByOwner,
       })
     );
+
+    const notesByOrder = state.note.notesByOrder.filter((n) => n.id !== noteId);
+    yield put(
+        notesActions.notesByOrderReceived({
+          notesByOrder: notesByOrder,
+        })
+    );
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
   }
