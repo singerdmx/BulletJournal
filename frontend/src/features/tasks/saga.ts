@@ -458,6 +458,15 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
         tasksByAssignee: tasksByAssignee,
       })
     );
+
+    const tasksByOrder = state.task.tasksByOrder.filter(
+        (t) => t.id !== taskId
+    );
+    yield put(
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
+    );
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
