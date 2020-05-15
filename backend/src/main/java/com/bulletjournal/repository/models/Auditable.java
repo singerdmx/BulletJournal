@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "auditables")
@@ -24,11 +25,15 @@ public class Auditable extends AuditModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
+    @Column(name = "activity", nullable = false, updatable = false)
     private String activity;
+
+    @Column(name = "activity_time", nullable = false, updatable = false)
+    private Timestamp activityTime;
 
     @NotBlank
     @Size(min = 2, max = 100)
-    @Column(length = 100)
+    @Column(length = 100, nullable = false, updatable = false)
     private String originator;
 
     public Auditable(Project project, String activity, String originator) {
@@ -67,5 +72,13 @@ public class Auditable extends AuditModel {
 
     public void setOriginator(String originator) {
         this.originator = originator;
+    }
+
+    public Timestamp getActivityTime() {
+        return activityTime;
+    }
+
+    public void setActivityTime(Timestamp activityTime) {
+        this.activityTime = activityTime;
     }
 }
