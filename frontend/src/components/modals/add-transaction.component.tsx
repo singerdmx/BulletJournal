@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, DatePicker, Form, Input, InputNumber, Modal, Radio, Select, TimePicker, Tooltip,} from 'antd';
+import {Avatar, Button, DatePicker, Form, Input, InputNumber, Modal, Radio, Select, TimePicker, Tooltip,} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
@@ -37,6 +37,7 @@ type TransactionProps = {
 };
 
 interface TransactionCreateFormProps {
+  mode: string;
   createTransaction: (
     projectId: number,
     amount: number,
@@ -109,6 +110,131 @@ const AddTransaction: React.FC<
         </Select>
     )
   };
+
+  const getModal = () => {
+    return <Modal
+        destroyOnClose
+        centered
+        title='Create New Transaction'
+        visible={props.addTransactionVisible}
+        okText='Create'
+        onCancel={onCancel}
+        onOk={() => {
+          form
+              .validateFields()
+              .then((values) => {
+                console.log(values);
+                form.resetFields();
+                addTransaction(values);
+              })
+              .catch((info) => console.log(info));
+        }}
+    >
+      <Form form={form} labelAlign='left'>
+        <Form.Item
+            name='transactionName'
+            label='Name'
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            rules={[{ required: true, message: 'Missing Transaction Name!' }]}
+        >
+          <Input placeholder='Enter Transaction Name' allowClear />
+        </Form.Item>
+        <Form.Item
+            name='payerName'
+            label='Payer'
+            labelCol={{ span: 4 }}
+            style={{ marginLeft: '10px' }}
+            wrapperCol={{ span: 20 }}
+        >
+          {getSelections()}
+        </Form.Item>
+        <div style={{ display: 'flex' }}>
+          <Form.Item
+              name='amount'
+              label='Amount'
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 8 }}
+              rules={[{ required: true, message: 'Missing Amount!' }]}
+          >
+            <InputNumber
+                style={{ width: 160 }}
+                formatter={(value) =>
+                    `${LocaleCurrency.getCurrency(props.currency)} ${value}`
+                }
+                parser={(value) => {
+                  return value ? value.replace(/^[A-Za-z]+\s?/g, '') : 0;
+                }}
+            />
+          </Form.Item>
+
+          <Form.Item
+              name='transactionType'
+              style={{ marginLeft: 15 }}
+              colon={false}
+              rules={[{ required: true, message: 'Missing Type!' }]}
+          >
+            <Radio.Group>
+              <Radio value={0}>Income</Radio>
+              <Radio value={1}>Expense</Radio>
+            </Radio.Group>
+          </Form.Item>
+        </div>
+
+        <div style={{ display: 'flex' }}>
+          <Tooltip title='Select Date' placement='bottom'>
+            <Form.Item
+                name='date'
+                rules={[{ required: true, message: 'Missing Date!' }]}
+            >
+              <DatePicker
+                  placeholder='Select Date'
+                  onChange={(value) => setTimeVisible(value !== null)}
+              />
+            </Form.Item>
+          </Tooltip>
+
+          {timeVisible && (
+              <Tooltip title='Select Time' placement='bottom'>
+                <Form.Item name='time' style={{ width: '100px' }}>
+                  <TimePicker
+                      allowClear
+                      format='HH:mm'
+                      placeholder='Select Time'
+                  />
+                </Form.Item>
+              </Tooltip>
+          )}
+
+          <Tooltip title='Time Zone'>
+            <Form.Item name='timezone'>
+              <Select
+                  showSearch={true}
+                  placeholder='Select Time Zone'
+                  defaultValue={props.timezone ? props.timezone : ''}
+              >
+                {zones.map((zone: string, index: number) => (
+                    <Option key={zone} value={zone}>
+                      <Tooltip title={zone} placement='right'>
+                        {<span>{zone}</span>}
+                      </Tooltip>
+                    </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Tooltip>
+        </div>
+      </Form>
+    </Modal>
+  };
+
+  if (props.mode === 'button') {
+    return <div className='add-transaction'>
+      <Button type="primary" onClick={openModal}>Create New Transaction</Button>
+      {getModal()}
+    </div>;
+  }
+
   return (
     <Tooltip placement='top' title='Create New Transaction'>
       <div className='add-transaction'>
@@ -117,120 +243,7 @@ const AddTransaction: React.FC<
           onClick={openModal}
           title='Create New Transaction'
         />
-        <Modal
-          destroyOnClose
-          centered
-          title='Create New Transaction'
-          visible={props.addTransactionVisible}
-          okText='Create'
-          onCancel={onCancel}
-          onOk={() => {
-            form
-              .validateFields()
-              .then((values) => {
-                console.log(values);
-                form.resetFields();
-                addTransaction(values);
-              })
-              .catch((info) => console.log(info));
-          }}
-        >
-          <Form form={form} labelAlign='left'>
-            <Form.Item
-              name='transactionName'
-              label='Name'
-              labelCol={{ span: 4 }}
-              wrapperCol={{ span: 20 }}
-              rules={[{ required: true, message: 'Missing Transaction Name!' }]}
-            >
-              <Input placeholder='Enter Transaction Name' allowClear />
-            </Form.Item>
-            <Form.Item
-              name='payerName'
-              label='Payer'
-              labelCol={{ span: 4 }}
-              style={{ marginLeft: '10px' }}
-              wrapperCol={{ span: 20 }}
-            >
-              {getSelections()}
-            </Form.Item>
-            <div style={{ display: 'flex' }}>
-              <Form.Item
-                name='amount'
-                label='Amount'
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 8 }}
-                rules={[{ required: true, message: 'Missing Amount!' }]}
-              >
-                <InputNumber
-                  style={{ width: 160 }}
-                  formatter={(value) =>
-                    `${LocaleCurrency.getCurrency(props.currency)} ${value}`
-                  }
-                  parser={(value) => {
-                    return value ? value.replace(/^[A-Za-z]+\s?/g, '') : 0;
-                  }}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name='transactionType'
-                style={{ marginLeft: 15 }}
-                colon={false}
-                rules={[{ required: true, message: 'Missing Type!' }]}
-              >
-                <Radio.Group>
-                  <Radio value={0}>Income</Radio>
-                  <Radio value={1}>Expense</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </div>
-
-            <div style={{ display: 'flex' }}>
-              <Tooltip title='Select Date' placement='bottom'>
-                <Form.Item
-                  name='date'
-                  rules={[{ required: true, message: 'Missing Date!' }]}
-                >
-                  <DatePicker
-                    placeholder='Select Date'
-                    onChange={(value) => setTimeVisible(value !== null)}
-                  />
-                </Form.Item>
-              </Tooltip>
-
-              {timeVisible && (
-                <Tooltip title='Select Time' placement='bottom'>
-                  <Form.Item name='time' style={{ width: '100px' }}>
-                    <TimePicker
-                      allowClear
-                      format='HH:mm'
-                      placeholder='Select Time'
-                    />
-                  </Form.Item>
-                </Tooltip>
-              )}
-
-              <Tooltip title='Time Zone'>
-                <Form.Item name='timezone'>
-                  <Select
-                    showSearch={true}
-                    placeholder='Select Time Zone'
-                    defaultValue={props.timezone ? props.timezone : ''}
-                  >
-                    {zones.map((zone: string, index: number) => (
-                      <Option key={zone} value={zone}>
-                        <Tooltip title={zone} placement='right'>
-                          {<span>{zone}</span>}
-                        </Tooltip>
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Tooltip>
-            </div>
-          </Form>
-        </Modal>
+        {getModal()}
       </div>
     </Tooltip>
   );

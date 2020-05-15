@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Carousel, DatePicker, Form, List, Radio, Select, Tooltip } from 'antd';
+import {Carousel, DatePicker, Form, List, Radio, Result, Select, Tooltip} from 'antd';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
@@ -35,6 +35,10 @@ import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
 import { RadioChangeEvent } from 'antd/lib/radio';
 import { Project } from '../../features/project/interface';
 import { User } from '../../features/group/interface';
+import {
+  AccountBookOutlined
+} from '@ant-design/icons';
+import AddTransaction from "../../components/modals/add-transaction.component";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -337,8 +341,22 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     '#FF334F',
   ];
 
+  const getAddTransactionButton = () => {
+    if (transactions.length === 0) {
+      return <div className='add-transaction-button'>
+        <Result
+            icon={<AccountBookOutlined />}
+            extra={<AddTransaction mode='button'/>}
+        />
+      </div>
+    }
+
+    return null;
+  };
+
   return (
     <div className='transaction-page'>
+      {getAddTransactionButton()}
       <div className='transaction-control'>
         <Form
           form={form}
