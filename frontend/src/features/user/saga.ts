@@ -8,6 +8,7 @@ import {
 import { PayloadAction } from 'redux-starter-kit';
 import {changeUserAlias, fetchUser} from '../../apis/userApis';
 import {actions as groupsActions} from "../group/reducer";
+import {actions as systemsActions} from "../system/reducer";
 import {IState} from "../../store";
 import {GroupsWithOwner} from "../group/interface";
 
@@ -58,6 +59,7 @@ function* changeAlias(action: PayloadAction<ChangeAlias>) {
     yield put(groupsActions.groupReceived({group: targetGroup}));
 
     yield call(message.success, `User ${targetUser} is aliased to ${alias}. It may take some time to take effect.`);
+    yield put(systemsActions.systemUpdate({}));
   } catch (error) {
     yield call(message.error, `changeAlias Fail: ${error}`);
   }
