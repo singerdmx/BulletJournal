@@ -343,6 +343,7 @@ class ProjectPage extends React.Component<
         );
         projectItemsByOrder = (
           <TasksByOrder
+            projectId={project.id}
             visible={this.state.tasksByOrderShown}
             onCancel={() => {
               this.setState({ tasksByOrderShown: false });
