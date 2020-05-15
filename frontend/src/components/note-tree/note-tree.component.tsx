@@ -26,6 +26,7 @@ type NotesProps = {
 };
 
 const getTree = (
+  inProject: boolean,
   data: Note[],
   readOnly: boolean,
   showModal?: (user: User) => void,
@@ -36,6 +37,7 @@ const getTree = (
     const node = {} as TreeNodeNormal;
     if (item.subNotes && item.subNotes.length) {
       node.children = getTree(
+        inProject,
         item.subNotes,
         readOnly,
         showModal,
@@ -48,7 +50,7 @@ const getTree = (
       <TreeItem
         note={item}
         readOnly={readOnly}
-        inProject={true}
+        inProject={inProject}
         showModal={showModal}
         showOrderModal={showOrderModal}
       />
@@ -153,7 +155,6 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
       updateNotes(project.id);
     }
   }, [project]);
-  let treeNote = getTree(notes, readOnly, showModal, showOrderModal);
 
   if (!project) {
     return null;
@@ -167,6 +168,9 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
       />
     </div>
   }
+
+  let treeNote = getTree(!project.shared, notes, readOnly, showModal, showOrderModal);
+
   return (
     <Tree
       className='ant-tree'

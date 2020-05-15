@@ -107,6 +107,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [showPayerExpenseTab, setShowPayerExpenseTab] = useState(false);
   const [showPayerIncomeTab, setShowPayerIncomeTab] = useState(false);
 
+  const { project, ledgerSummary } = props;
+
   const {
     balance,
     income,
@@ -114,8 +116,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     startDate,
     endDate,
     transactionsSummaries,
-  } = props.ledgerSummary;
-  const { transactions = [] } = props.ledgerSummary;
+  } = ledgerSummary;
+  const { transactions = [] } = ledgerSummary;
 
   const updateTransactions = (
     values: any,
@@ -131,9 +133,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     const endDate = values.date[1].format(dateFormat);
     const frequencyType = values.frequencyType || FrequencyType.MONTHLY;
 
-    if (props.project) {
+    if (project) {
       props.updateTransactions(
-        props.project.id,
+        project.id,
         values.timezone,
         currentLedgerSummaryType,
         frequencyType,
@@ -155,9 +157,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       currentZone
     );
     props.updateExpandedMyself(true);
-    if (props.project) {
+    if (project) {
       props.updateTransactions(
-        props.project.id,
+        project.id,
         currentZone,
         ledgerSummaryType,
         'MONTHLY',
@@ -253,7 +255,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       setShowPayerExpenseTab(false);
       setShowPayerIncomeTab(false);
     }
-  }, [props.ledgerSummary]);
+  }, [ledgerSummary]);
 
   const getDefault = () => {
     return (
@@ -353,6 +355,10 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
     return null;
   };
+
+  if (!project) {
+    return null;
+  }
 
   return (
     <div className='transaction-page'>
@@ -637,7 +643,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           <List.Item key={item.id} className='transaction-list-item'>
             <TransactionItem
               transaction={item}
-              inProject={true}
+              inProject={!project.shared}
               showModal={props.showModal}
             />
           </List.Item>

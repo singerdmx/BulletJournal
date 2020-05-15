@@ -55,7 +55,7 @@ const getTree = (
         task={item}
         isComplete={false}
         readOnly={readOnly}
-        inProject={true}
+        inProject={inProject}
         completeOnlyOccurrence={false}
         showModal={showModal}
       />
