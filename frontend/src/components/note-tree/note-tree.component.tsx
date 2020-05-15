@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { TreeNodeNormal } from 'antd/lib/tree/Tree';
-import { Tree } from 'antd';
+import { Tree, Result } from 'antd';
 import TreeItem from '../project-item/note-item.component';
 import { putNote, updateNotes } from '../../features/notes/actions';
 import { Note } from '../../features/notes/interface';
@@ -10,6 +10,10 @@ import { IState } from '../../store';
 import './note-tree.component.styles.less';
 import { Project } from '../../features/project/interface';
 import { User } from '../../features/group/interface';
+import {
+  FileAddOutlined
+} from '@ant-design/icons';
+import AddNote from "../modals/add-note.component";
 
 type NotesProps = {
   notes: Note[];
@@ -153,6 +157,15 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
 
   if (!project) {
     return null;
+  }
+
+  if (notes.length === 0) {
+    return <div className='add-note-button'>
+      <Result
+          icon={<FileAddOutlined />}
+          extra={<AddNote mode='button'/>}
+      />
+    </div>
   }
   return (
     <Tree

@@ -266,7 +266,7 @@ class ProjectPage extends React.Component<
 
     switch (project.projectType) {
       case ProjectType.NOTE:
-        createContent = <AddNote />;
+        createContent = <AddNote mode='icon'/>;
         projectContent = (
           <NoteTree
             readOnly={project.shared}

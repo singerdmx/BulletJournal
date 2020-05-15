@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, Tooltip, Form } from 'antd';
+import {Modal, Input, Tooltip, Form, Button} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router';
@@ -14,6 +14,7 @@ type NoteProps = {
 };
 
 interface NoteCreateFormProps {
+  mode: string;
   createNote: (projectId: number, name: string) => void;
   updateNoteVisible: (visible: boolean) => void;
   addNoteVisible: boolean;
@@ -22,7 +23,7 @@ interface NoteCreateFormProps {
 const AddNote: React.FC<
   RouteComponentProps & NoteProps & NoteCreateFormProps
 > = (props) => {
-  const { project } = props;
+  const { project, mode } = props;
   const [form] = Form.useForm();
   const addNote = (values: any) => {
     if (project) {
@@ -32,6 +33,40 @@ const AddNote: React.FC<
   };
   const onCancel = () => props.updateNoteVisible(false);
   const openModal = () => props.updateNoteVisible(true);
+  const getModal = () => {
+    return <Modal
+        title='Create New Note'
+        visible={props.addNoteVisible}
+        okText='Create'
+        onCancel={onCancel}
+        onOk={() => {
+          form
+              .validateFields()
+              .then((values) => {
+                console.log(values);
+                form.resetFields();
+                addNote(values);
+              })
+              .catch((info) => console.log(info));
+        }}
+    >
+      <Form form={form}>
+        <Form.Item
+            name='noteName'
+            rules={[{ required: true, message: 'Missing Note Name!' }]}
+        >
+          <Input placeholder='Enter Note Name' allowClear />
+        </Form.Item>
+      </Form>
+    </Modal>
+  };
+
+  if (mode === 'button') {
+    return <div className='add-note'>
+      <Button type="primary" onClick={openModal}>Create New Note</Button>
+      {getModal()}
+    </div>;
+  }
   return (
     <Tooltip placement='top' title='Create New Note'>
       <div className='add-note'>
@@ -40,31 +75,7 @@ const AddNote: React.FC<
           onClick={openModal}
           title='Create New Note'
         />
-        <Modal
-          title='Create New Note'
-          visible={props.addNoteVisible}
-          okText='Create'
-          onCancel={onCancel}
-          onOk={() => {
-            form
-              .validateFields()
-              .then((values) => {
-                console.log(values);
-                form.resetFields();
-                addNote(values);
-              })
-              .catch((info) => console.log(info));
-          }}
-        >
-          <Form form={form}>
-            <Form.Item
-              name='noteName'
-              rules={[{ required: true, message: 'Missing Note Name!' }]}
-            >
-              <Input placeholder='Enter Note Name' allowClear />
-            </Form.Item>
-          </Form>
-        </Modal>
+        {getModal()}
       </div>
     </Tooltip>
   );
