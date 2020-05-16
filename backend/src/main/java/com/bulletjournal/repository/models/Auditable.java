@@ -6,6 +6,9 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import com.bulletjournal.contents.ContentAction;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -13,12 +16,11 @@ import java.sql.Timestamp;
 public class Auditable extends AuditModel {
     @Id
     @GeneratedValue(generator = "auditable_generator")
-    @SequenceGenerator(
-            name = "auditable_generator",
-            sequenceName = "auditable_sequence",
-            initialValue = 200
-    )
+    @SequenceGenerator(name = "auditable_generator", sequenceName = "auditable_sequence", initialValue = 200)
     private Long id;
+
+    @Column(name = "action", nullable = false, updatable = false)
+    private ContentAction action;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
@@ -80,5 +82,13 @@ public class Auditable extends AuditModel {
 
     public void setActivityTime(Timestamp activityTime) {
         this.activityTime = activityTime;
+    }
+
+    public ContentAction getAction() {
+        return action;
+    }
+
+    public void setAction(ContentAction action) {
+        this.action = action;
     }
 }
