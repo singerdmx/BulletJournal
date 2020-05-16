@@ -50,15 +50,13 @@ public class GroupController {
     public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> events = this.groupDaoJpa.delete(groupId, username);
-        this.notificationService.inform(
-                new DeleteGroupEvent(events,
-                        username));
+        this.notificationService.inform(new DeleteGroupEvent(events, username));
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping(GROUP_ROUTE)
     public Group updateGroup(@NotNull @PathVariable Long groupId,
-                             @Valid @RequestBody UpdateGroupParams updateGroupParams) {
+            @Valid @RequestBody UpdateGroupParams updateGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.groupDaoJpa.partialUpdate(username, groupId, updateGroupParams);
         return getGroup(groupId);
@@ -85,8 +83,7 @@ public class GroupController {
         List<Group> groups = this.groupDaoJpa.getGroups(username);
         Long defaultGroupId = groups.get(0).getId();
         String groupsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                EtagGenerator.HashType.TO_HASHCODE,
-                groups);
+                EtagGenerator.HashType.TO_HASHCODE, groups);
         groups = addUserAvatarToGroups(groups);
         // owner name -> groups (order by owner)
         Map<String, List<Group>> m = new TreeMap<>();
@@ -94,8 +91,8 @@ public class GroupController {
         Map<Group, Boolean> accepts = new HashMap<>();
         for (Group group : groups) {
             m.computeIfAbsent(group.getOwner(), k -> new ArrayList<>()).add(group);
-            UserGroup self = group.getUsers().stream()
-                    .filter(u -> Objects.equals(username, u.getName())).findFirst().get();
+            UserGroup self = group.getUsers().stream().filter(u -> Objects.equals(username, u.getName())).findFirst()
+                    .get();
             accepts.put(group, self.isAccepted());
         }
         List<GroupsWithOwner> result = new ArrayList<>();
@@ -148,8 +145,8 @@ public class GroupController {
             return a.getName().compareTo(b.getName());
         });
         // move owner to the first
-        UserGroup ownerUserGroup = group.getUsers().stream()
-                .filter(u -> Objects.equals(group.getOwner(), u.getName())).findFirst().get();
+        UserGroup ownerUserGroup = group.getUsers().stream().filter(u -> Objects.equals(group.getOwner(), u.getName()))
+                .findFirst().get();
         group.getUsers().remove(ownerUserGroup);
         group.getUsers().add(0, ownerUserGroup);
         return group;
@@ -163,11 +160,10 @@ public class GroupController {
     }
 
     private Group addUserAvatarToGroup(Group g) {
-        List<UserGroup> users = g.getUsers().stream()
-                .map(user -> {
-                    User u = this.userClient.getUser(user.getName());
-                    return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted(), u.getAlias());
-                }).collect(Collectors.toList());
+        List<UserGroup> users = g.getUsers().stream().map(user -> {
+            User u = this.userClient.getUser(user.getName());
+            return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted(), u.getAlias());
+        }).collect(Collectors.toList());
         g.setUsers(users);
         return g;
     }

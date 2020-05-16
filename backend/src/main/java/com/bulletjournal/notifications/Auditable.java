@@ -1,39 +1,28 @@
 package com.bulletjournal.notifications;
 
+import java.sql.Timestamp;
+
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
 
 public class Auditable {
-    private Project project;
-    private ContentType contentType;
+    private Long pojectId;
     // projectItem may be deleted already
     private Long projectItemId;
     private String activity;
     private String originator;
+    private ContentAction action;
+    private Timestamp activityTime;
 
-    public Auditable(
-            Project project, String activity, String originator, ContentType contentType, Long projectItemId) {
-        this.project = project;
-        this.contentType = contentType;
+    public Auditable(Long pojectId, String activity, String originator, Long projectItemId, Timestamp activityTime,
+            ContentAction action) {
+        this.pojectId = pojectId;
         this.activity = activity;
         this.originator = originator;
         this.projectItemId = projectItemId;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public ContentType getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(ContentType contentType) {
-        this.contentType = contentType;
+        this.activityTime = activityTime;
+        this.action = action;
     }
 
     public Long getProjectItemId() {
@@ -60,7 +49,32 @@ public class Auditable {
         this.originator = originator;
     }
 
-    public com.bulletjournal.repository.models.Auditable toRepositoryAuditable() {
-        return new com.bulletjournal.repository.models.Auditable(this.project, this.activity, this.originator);
+    public com.bulletjournal.repository.models.Auditable toRepositoryAuditable(Project project) {
+        return new com.bulletjournal.repository.models.Auditable(project, this.activity, this.originator,
+                this.activityTime, this.action);
+    }
+
+    public ContentAction getAction() {
+        return action;
+    }
+
+    public void setAction(ContentAction action) {
+        this.action = action;
+    }
+
+    public Timestamp getActivityTime() {
+        return activityTime;
+    }
+
+    public void setActivityTime(Timestamp activityTime) {
+        this.activityTime = activityTime;
+    }
+
+    public Long getPojectId() {
+        return pojectId;
+    }
+
+    public void setPojectId(Long pojectId) {
+        this.pojectId = pojectId;
     }
 }

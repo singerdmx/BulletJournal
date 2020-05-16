@@ -41,12 +41,10 @@ public class ProjectController {
         Projects projects = this.projectDaoJpa.getProjects(username);
 
         String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                EtagGenerator.HashType.TO_HASHCODE,
-                projects.getOwned());
+                EtagGenerator.HashType.TO_HASHCODE, projects.getOwned());
 
         String sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                EtagGenerator.HashType.TO_HASHCODE,
-                projects.getShared());
+                EtagGenerator.HashType.TO_HASHCODE, projects.getShared());
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(ownedProjectsEtag + "|" + sharedProjectsEtag);
@@ -83,12 +81,14 @@ public class ProjectController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new CreateProjectEvent(events, username));
         }
+        this.notificationService
+                .trackActivity(new Auditable(project, activity, originator, projectItemId, activityTime, action));
         return createdProject;
     }
 
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
-                                 @Valid @RequestBody UpdateProjectParams updateProjectParams) {
+            @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> joined = new ArrayList<>();
         List<Event> removed = new ArrayList<>();

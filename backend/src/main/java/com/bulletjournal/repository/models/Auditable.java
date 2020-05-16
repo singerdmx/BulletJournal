@@ -22,9 +22,9 @@ public class Auditable extends AuditModel {
     @Column(name = "action", nullable = false, updatable = false)
     private ContentAction action;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "project_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Project project;
 
     @Column(name = "activity", nullable = false, updatable = false)
@@ -38,10 +38,13 @@ public class Auditable extends AuditModel {
     @Column(length = 100, nullable = false, updatable = false)
     private String originator;
 
-    public Auditable(Project project, String activity, String originator) {
+    public Auditable(Project project, String activity, String originator, Timestamp activityTime,
+            ContentAction action) {
         this.project = project;
         this.activity = activity;
         this.originator = originator;
+        this.activityTime = activityTime;
+        this.action = action;
     }
 
     public Long getId() {
