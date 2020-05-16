@@ -245,13 +245,18 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   if (!project) {
     return null;
   }
-  if (tasks.length === 0) {
-    return (
-      <div className='add-task-button'>
-        <Result icon={<CarryOutOutlined />} extra={<AddTask mode='button' />} />
-      </div>
-    );
-  }
+
+  const getAddTaskButton = () => {
+    if (tasks.length === 0) {
+      return (
+          <div className='add-task-button'>
+            <Result icon={<CarryOutOutlined />} extra={<AddTask mode='button' />} />
+          </div>
+      );
+    }
+
+    return null;
+  };
 
   const treeTask = getTree(
     !project.shared,
@@ -263,6 +268,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
 
   return (
     <div>
+      {getAddTaskButton()}
       <Tree
         className='ant-tree'
         draggable
