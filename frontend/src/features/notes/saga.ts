@@ -225,7 +225,7 @@ function* getNote(action: PayloadAction<GetNote>) {
     const data = yield call(getNoteById, action.payload.noteId);
     yield put(notesActions.noteReceived({ note: data }));
   } catch (error) {
-    yield call(message.error, `Get Note Error Received: ${error}`);
+    yield call(message.error, 'Note Unavailable');
   }
 }
 

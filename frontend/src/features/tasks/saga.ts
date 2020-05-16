@@ -234,7 +234,7 @@ function* getTask(action: PayloadAction<GetTask>) {
     const data = yield call(getTaskById, action.payload.taskId);
     yield put(tasksActions.taskReceived({ task: data }));
   } catch (error) {
-    yield call(message.error, `Get Task Error Received: ${error}`);
+    yield call(message.error, 'Task Unavailable');
   }
 }
 

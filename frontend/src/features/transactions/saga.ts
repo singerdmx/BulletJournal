@@ -161,7 +161,7 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
     const data = yield call(getTransactionById, action.payload.transactionId);
     yield put(transactionsActions.transactionReceived({ transaction: data }));
   } catch (error) {
-    yield call(message.error, `Get Transaction Error Received: ${error}`);
+    yield call(message.error, 'Transaction Unavailable');
   }
 }
 
