@@ -3,7 +3,6 @@ package com.bulletjournal.notifications;
 import java.sql.Timestamp;
 
 import com.bulletjournal.contents.ContentAction;
-import com.bulletjournal.repository.models.Project;
 
 public class Auditable {
     private Long projectId;
@@ -48,8 +47,8 @@ public class Auditable {
         this.originator = originator;
     }
 
-    public com.bulletjournal.repository.models.Auditable toRepositoryAuditable(Project project) {
-        return new com.bulletjournal.repository.models.Auditable(project, this.activity, this.originator,
+    public com.bulletjournal.repository.models.Auditable toRepositoryAuditable() {
+        return new com.bulletjournal.repository.models.Auditable(this.projectId, this.activity, this.originator,
                 this.activityTime, this.action);
     }
 

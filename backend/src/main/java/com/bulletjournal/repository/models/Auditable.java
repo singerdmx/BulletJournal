@@ -1,8 +1,5 @@
 package com.bulletjournal.repository.models;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -22,10 +19,8 @@ public class Auditable extends AuditModel {
     @Column(name = "action", nullable = false, updatable = false)
     private ContentAction action;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "project_id", nullable = true)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-    private Project project;
+    @Column(name = "project_id")
+    private Long projectId;
 
     @Column(name = "activity", nullable = false, updatable = false)
     private String activity;
@@ -38,9 +33,9 @@ public class Auditable extends AuditModel {
     @Column(length = 100, nullable = false, updatable = false)
     private String originator;
 
-    public Auditable(Project project, String activity, String originator, Timestamp activityTime,
+    public Auditable(Long projectId, String activity, String originator, Timestamp activityTime,
             ContentAction action) {
-        this.project = project;
+        this.projectId = projectId;
         this.activity = activity;
         this.originator = originator;
         this.activityTime = activityTime;
@@ -55,12 +50,12 @@ public class Auditable extends AuditModel {
         this.id = id;
     }
 
-    public Project getProject() {
-        return project;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     public String getActivity() {

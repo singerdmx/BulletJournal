@@ -17,6 +17,7 @@ import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -297,7 +298,7 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> deleteProject(String requester, Long projectId) {
+    public Pair<List<Event>, Project> deleteProject(String requester, Long projectId) {
         Project project = this.projectRepository
                 .findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -321,7 +322,7 @@ public class ProjectDaoJpa {
         this.userProjectsRepository.save(userProjects);
 
         // return generated events
-        return generateEvents(requester, targetProjects);
+        return Pair.of(generateEvents(requester, targetProjects), project);
     }
 
     private List<Event> generateEvents(String owner, List<Project> targetProjects) {

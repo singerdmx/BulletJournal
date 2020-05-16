@@ -6,6 +6,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.ProjectDaoJpa;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -113,7 +114,9 @@ public class ProjectController {
     @DeleteMapping(PROJECT_ROUTE)
     public void deleteProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Event> events = this.projectDaoJpa.deleteProject(username, projectId);
+        Pair<List<Event>, com.bulletjournal.repository.models.Project> res =
+                this.projectDaoJpa.deleteProject(username, projectId);
+        List<Event> events = res.getLeft();
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveProjectEvent(events, username));
         }
