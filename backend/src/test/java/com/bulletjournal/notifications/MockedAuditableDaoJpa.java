@@ -13,6 +13,6 @@ public class MockedAuditableDaoJpa extends AuditableDaoJpa {
 
     @Override
     public synchronized void create(List<Auditable> activities) {
-        activities.forEach(auditable -> this.auditables.add(auditable.toRepositoryAuditable()));
+        activities.forEach(auditable -> this.auditables.add(auditable.toRepositoryAuditable(null)));
     }
 }

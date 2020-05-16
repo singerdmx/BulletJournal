@@ -3,11 +3,10 @@ package com.bulletjournal.notifications;
 import java.sql.Timestamp;
 
 import com.bulletjournal.contents.ContentAction;
-import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
 
 public class Auditable {
-    private Long pojectId;
+    private Long projectId;
     // projectItem may be deleted already
     private Long projectItemId;
     private String activity;
@@ -15,9 +14,9 @@ public class Auditable {
     private ContentAction action;
     private Timestamp activityTime;
 
-    public Auditable(Long pojectId, String activity, String originator, Long projectItemId, Timestamp activityTime,
-            ContentAction action) {
-        this.pojectId = pojectId;
+    public Auditable(Long projectId, String activity, String originator, Long projectItemId, Timestamp activityTime,
+                     ContentAction action) {
+        this.projectId = projectId;
         this.activity = activity;
         this.originator = originator;
         this.projectItemId = projectItemId;
@@ -70,11 +69,11 @@ public class Auditable {
         this.activityTime = activityTime;
     }
 
-    public Long getPojectId() {
-        return pojectId;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public void setPojectId(Long pojectId) {
-        this.pojectId = pojectId;
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 }

@@ -21,12 +21,17 @@ public class AuditableDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<Auditable> auditables) {
-        List<Long> projectIds = auditables.stream().filter(s -> s.getPojectId() != null).map(s -> s.getPojectId())
+        List<Long> projectIds = auditables.stream().filter(s -> s.getProjectId() != null).map(s -> s.getProjectId())
                 .collect(Collectors.toList());
         List<Project> projects = projectRepository.findAllById(projectIds);
 
-        auditables.forEach(auditable -> this.auditableRepository.save(auditable.toRepositoryAuditable(
-                projects.stream().filter(s -> s.getId().equals(auditable.getPojectId())).findAny().get())));
+        auditables.forEach(auditable -> {
+            Project project = null;
+            if (auditable.getProjectId() != null) {
+                project = projects.stream().filter(s -> s.getId().equals(auditable.getProjectId())).findAny().get();
+            }
+            this.auditableRepository.save(auditable.toRepositoryAuditable(project));
+        });
 
     }
 }

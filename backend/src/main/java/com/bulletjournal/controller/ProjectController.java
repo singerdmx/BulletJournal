@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -82,7 +85,9 @@ public class ProjectController {
             this.notificationService.inform(new CreateProjectEvent(events, username));
         }
         this.notificationService
-                .trackActivity(new Auditable(project, activity, originator, projectItemId, activityTime, action));
+                .trackActivity(new Auditable(
+                        createdProject.getId(), "created BuJo ##" + project.getName() + "##",
+                        username, null, Timestamp.from(Instant.now()), ContentAction.ADD_PROJECT));
         return createdProject;
     }
 
