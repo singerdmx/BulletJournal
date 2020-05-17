@@ -323,7 +323,7 @@ public class TaskController {
         ProjectItemModel task = this.taskDaoJpa.deleteContent(contentId, taskId, username);
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
-                "Delete Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
+                "Deleted Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
                 username, taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
 
         return getContents(taskId);
@@ -337,7 +337,7 @@ public class TaskController {
                 .getRight();
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
-                "Update Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
+                "updated Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
                 username, taskId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
 
         return getContents(taskId);
