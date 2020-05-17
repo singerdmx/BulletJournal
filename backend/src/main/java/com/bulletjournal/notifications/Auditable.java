@@ -14,7 +14,7 @@ public class Auditable {
     private Timestamp activityTime;
 
     public Auditable(Long projectId, String activity, String originator, Long projectItemId, Timestamp activityTime,
-                     ContentAction action) {
+            ContentAction action) {
         this.projectId = projectId;
         this.activity = activity;
         this.originator = originator;
@@ -49,7 +49,7 @@ public class Auditable {
 
     public com.bulletjournal.repository.models.Auditable toRepositoryAuditable() {
         return new com.bulletjournal.repository.models.Auditable(this.projectId, this.activity, this.originator,
-                this.activityTime, this.action);
+                this.activityTime, this.action, this.projectItemId);
     }
 
     public ContentAction getAction() {
