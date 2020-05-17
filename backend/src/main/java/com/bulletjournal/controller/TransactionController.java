@@ -142,14 +142,18 @@ public class TransactionController {
     @DeleteMapping(TRANSACTION_ROUTE)
     public void deleteTransaction(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Event> events = this.transactionDaoJpa.delete(username, transactionId);
-        Transaction transaction = getTransaction(transactionId);
+
+        Pair<List<Event>, com.bulletjournal.repository.models.Transaction> res = this.transactionDaoJpa.delete(username,
+                transactionId);
+        List<Event> events = res.getLeft();
+        Long projectId = res.getRight().getProject().getId();
+        String transactionName = res.getRight().getName();
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTransactionEvent(events, username));
         }
-        this.notificationService.trackActivity(
-                new Auditable(transaction.getProjectId(), "deleted Transaction ##" + transaction.getName() + "##",
-                        username, transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
+        this.notificationService
+                .trackActivity(new Auditable(projectId, "deleted Transaction ##" + transactionName + "##", username,
+                        transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
     }
 
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)

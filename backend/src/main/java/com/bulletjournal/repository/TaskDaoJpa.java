@@ -22,6 +22,7 @@ import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
@@ -633,13 +634,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<Event> - a list of notification events
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> deleteTask(String requester, Long taskId) {
+    public Pair<List<Event>, Task> deleteTask(String requester, Long taskId) {
         Task task = this.getProjectItem(taskId, requester);
+
         Project project = deleteTaskAndAdjustRelations(requester, task,
                 (targetTasks) -> this.taskRepository.deleteAll(targetTasks), (target) -> {
                 });
 
-        return generateEvents(task, requester, project);
+        return Pair.of(generateEvents(task, requester, project), task);
     }
 
     /**

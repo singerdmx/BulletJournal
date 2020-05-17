@@ -18,6 +18,7 @@ import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -175,14 +176,14 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> deleteNote(String requester, Long noteId) {
+    public Pair<List<Event>, Note> deleteNote(String requester, Long noteId) {
         Note note = this.getProjectItem(noteId, requester);
 
         Project project = deleteNoteAndAdjustRelations(requester, note,
                 (targetNotes) -> this.noteRepository.deleteAll(targetNotes), (target) -> {
                 });
 
-        return generateEvents(note, requester, project);
+        return Pair.of(generateEvents(note, requester, project), note);
     }
 
     private Project deleteNoteAndAdjustRelations(String requester, Note note, Consumer<List<Note>> targetNotesOperator,

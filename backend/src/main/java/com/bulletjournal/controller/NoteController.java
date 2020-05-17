@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -113,9 +114,8 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note createdNote = noteDaoJpa.create(projectId, username, note).toPresentationModel();
         searchService.saveToES(createdNote);
-        this.notificationService
-                .trackActivity(new Auditable(projectId, "deleted note ##" + createdNote.getName() + "##", username,
-                        createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
+        this.notificationService.trackActivity(new Auditable(projectId, "create note ##" + createdNote.getName() + "##",
+                username, createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_NOTE));
         return createdNote;
     }
 
@@ -140,13 +140,16 @@ public class NoteController {
     public ResponseEntity<List<Note>> deleteNote(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note note = getNote(noteId);
-        List<Event> events = this.noteDaoJpa.deleteNote(username, noteId);
+        Pair<List<Event>, com.bulletjournal.repository.models.Note> res = this.noteDaoJpa.deleteNote(username, noteId);
+        List<Event> events = res.getLeft();
+        Long projectId = res.getRight().getProject().getId();
+        String noteName = res.getRight().getName();
+
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveNoteEvent(events, username));
         }
-        this.notificationService
-                .trackActivity(new Auditable(note.getProjectId(), "deleted note ##" + note.getName() + "##", username,
-                        noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
+        this.notificationService.trackActivity(new Auditable(projectId, "deleted note ##" + noteName + "##", username,
+                noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
         return getNotes(note.getProjectId(), null, null, null, null, null);
     }
 

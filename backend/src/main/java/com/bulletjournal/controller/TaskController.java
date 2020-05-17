@@ -10,6 +10,7 @@ import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.TaskContent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -192,15 +193,17 @@ public class TaskController {
     @DeleteMapping(TASK_ROUTE)
     public ResponseEntity<List<Task>> deleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Task task = getTask(taskId);
-        List<Event> events = this.taskDaoJpa.deleteTask(username, taskId);
+
+        Pair<List<Event>, com.bulletjournal.repository.models.Task> res = this.taskDaoJpa.deleteTask(username, taskId);
+        List<Event> events = res.getLeft();
+        String taskName = res.getRight().getName();
+        Long projectId = res.getRight().getProject().getId();
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
-        this.notificationService
-                .trackActivity(new Auditable(task.getProjectId(), "deleted Task ##" + task.getName() + "##", username,
-                        taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
-        return getTasks(task.getProjectId(), null, null, null, null, null);
+        this.notificationService.trackActivity(new Auditable(projectId, "deleted Task ##" + taskName + "##", username,
+                taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
+        return getTasks(projectId, null, null, null, null, null);
     }
 
     @DeleteMapping(COMPLETED_TASK_ROUTE)

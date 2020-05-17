@@ -71,8 +71,7 @@ public class ProjectDaoJpa {
         return project;
     }
 
-    private List<ProjectsWithOwner> getSharedProjects(
-            UserProjects userProjects, String owner) {
+    private List<ProjectsWithOwner> getSharedProjects(UserProjects userProjects, String owner) {
         User user = this.userDaoJpa.getByName(owner);
         // project owner -> project ids
         Map<String, Set<Long>> projectIds = new HashMap<>();
@@ -145,8 +144,8 @@ public class ProjectDaoJpa {
         return projectsWithOwner;
     }
 
-    private void addProjectsByOwner(
-            List<String> newOwners, String o, Set<Long> projectsByOwner, List<ProjectsWithOwner> result) {
+    private void addProjectsByOwner(List<String> newOwners, String o, Set<Long> projectsByOwner,
+            List<ProjectsWithOwner> result) {
         if (projectsByOwner == null) {
             return;
         }
@@ -155,8 +154,8 @@ public class ProjectDaoJpa {
         List<Project> projects = this.projectRepository.findByOwner(o);
         String projectRelationsByOwner = this.userProjectsRepository.findById(o).get().getOwnedProjects();
         List<com.bulletjournal.controller.models.Project> l = ProjectRelationsProcessor.processRelations(
-                projects.stream().collect(Collectors.toMap(Project::getId, p -> p)),
-                projectRelationsByOwner, projectsByOwner);
+                projects.stream().collect(Collectors.toMap(Project::getId, p -> p)), projectRelationsByOwner,
+                projectsByOwner);
 
         if (l.isEmpty()) {
             return;
@@ -165,15 +164,14 @@ public class ProjectDaoJpa {
         result.add(new ProjectsWithOwner(o, l));
     }
 
-    private List<com.bulletjournal.controller.models.Project> getOwnerProjects(
-            UserProjects userProjects, String owner) {
+    private List<com.bulletjournal.controller.models.Project> getOwnerProjects(UserProjects userProjects,
+            String owner) {
         if (userProjects.getOwnedProjects() == null) {
             return Collections.emptyList();
         }
-        Map<Long, Project> projects = this.projectRepository.findByOwner(owner)
-                .stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
-        return ProjectRelationsProcessor.processRelations(
-                projects, userProjects.getOwnedProjects(), null);
+        Map<Long, Project> projects = this.projectRepository.findByOwner(owner).stream()
+                .collect(Collectors.toMap(p -> p.getId(), p -> p));
+        return ProjectRelationsProcessor.processRelations(projects, userProjects.getOwnedProjects(), null);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -194,8 +192,8 @@ public class ProjectDaoJpa {
         project = this.projectRepository.save(project);
 
         Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
-        final UserProjects userProjects = userProjectsOptional.isPresent() ?
-                userProjectsOptional.get() : new UserProjects();
+        final UserProjects userProjects = userProjectsOptional.isPresent() ? userProjectsOptional.get()
+                : new UserProjects();
 
         String newRelations = HierarchyProcessor.addItem(userProjects.getOwnedProjects(), project.getId());
         userProjects.setOwnedProjects(newRelations);
@@ -219,34 +217,30 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Project partialUpdate(String requester, Long projectId, UpdateProjectParams updateProjectParams, List<Event> joined, List<Event> removed) {
-        Project project = this.projectRepository
-                .findById(projectId)
+    public Project partialUpdate(String requester, Long projectId, UpdateProjectParams updateProjectParams,
+            List<Event> joined, List<Event> removed) {
+        Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                project.getOwner(), requester, ContentType.PROJECT, Operation.UPDATE, projectId);
+        this.authorizationService.checkAuthorizedToOperateOnContent(project.getOwner(), requester, ContentType.PROJECT,
+                Operation.UPDATE, projectId);
 
-        DaoHelper.updateIfPresent(
-                updateProjectParams.hasName(), updateProjectParams.getName(), (value) -> project.setName(value));
+        DaoHelper.updateIfPresent(updateProjectParams.hasName(), updateProjectParams.getName(),
+                (value) -> project.setName(value));
 
-        DaoHelper.updateIfPresent(
-                updateProjectParams.hasDescription(),
-                updateProjectParams.getDescription(),
-                (value) -> project.setDescription(value)
-        );
+        DaoHelper.updateIfPresent(updateProjectParams.hasDescription(), updateProjectParams.getDescription(),
+                (value) -> project.setDescription(value));
 
         Group oldGroup = project.getGroup();
-        if (updateProjectParams.hasGroupId() &&
-                !Objects.equals(updateProjectParams.getGroupId(), oldGroup.getId())) {
-            Group group = this.groupRepository
-                    .findById(updateProjectParams.getGroupId())
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("Group " + updateProjectParams.getGroupId() + " not found"));
+        if (updateProjectParams.hasGroupId() && !Objects.equals(updateProjectParams.getGroupId(), oldGroup.getId())) {
+            Group group = this.groupRepository.findById(updateProjectParams.getGroupId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Group " + updateProjectParams.getGroupId() + " not found"));
             project.setGroup(group);
 
-            Set<String> oldUsers = oldGroup.getAcceptedUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toSet());
-            Set<String> newUsers = group.getAcceptedUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toSet());
+            Set<String> oldUsers = oldGroup.getAcceptedUsers().stream().map(u -> u.getUser().getName())
+                    .collect(Collectors.toSet());
+            Set<String> newUsers = group.getAcceptedUsers().stream().map(u -> u.getUser().getName())
+                    .collect(Collectors.toSet());
 
             generateEvents(joined, removed, project, oldUsers, newUsers);
 
@@ -255,7 +249,8 @@ public class ProjectDaoJpa {
         return this.projectRepository.save(project);
     }
 
-    private void generateEvents(List<Event> joined, List<Event> removed, Project project, Set<String> oldUsers, Set<String> newUsers) {
+    private void generateEvents(List<Event> joined, List<Event> removed, Project project, Set<String> oldUsers,
+            Set<String> newUsers) {
         Set<String> overlap = new HashSet<>(newUsers);
         overlap.retainAll(oldUsers);
         for (String user : oldUsers) {
@@ -270,12 +265,11 @@ public class ProjectDaoJpa {
         }
     }
 
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateUserOwnedProjects(String user, List<com.bulletjournal.controller.models.Project> projects) {
         Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(user);
-        final UserProjects userProjects = userProjectsOptional.isPresent() ?
-                userProjectsOptional.get() : new UserProjects();
+        final UserProjects userProjects = userProjectsOptional.isPresent() ? userProjectsOptional.get()
+                : new UserProjects();
 
         userProjects.setOwnedProjects(ProjectRelationsProcessor.processRelations(projects));
         userProjects.setOwner(user);
@@ -284,14 +278,12 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateSharedProjectsOrder(
-            String owner, UpdateSharedProjectsOrderParams update) {
+    public void updateSharedProjectsOrder(String owner, UpdateSharedProjectsOrderParams update) {
         Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
-        final UserProjects userProjects = userProjectsOptional.isPresent() ?
-                userProjectsOptional.get() : new UserProjects();
+        final UserProjects userProjects = userProjectsOptional.isPresent() ? userProjectsOptional.get()
+                : new UserProjects();
 
-        DaoHelper.updateIfPresent(
-                update.hasProjectOwners(), update.getProjectOwners(),
+        DaoHelper.updateIfPresent(update.hasProjectOwners(), update.getProjectOwners(),
                 (value) -> userProjects.setSharedProjects(GSON.toJson(value)));
         userProjects.setOwner(owner);
         this.userProjectsRepository.save(userProjects);
@@ -299,12 +291,11 @@ public class ProjectDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Pair<List<Event>, Project> deleteProject(String requester, Long projectId) {
-        Project project = this.projectRepository
-                .findById(projectId)
+        Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                project.getOwner(), requester, ContentType.PROJECT, Operation.DELETE, projectId);
+        this.authorizationService.checkAuthorizedToOperateOnContent(project.getOwner(), requester, ContentType.PROJECT,
+                Operation.DELETE, projectId);
 
         UserProjects userProjects = this.userProjectsRepository.findById(requester)
                 .orElseThrow(() -> new ResourceNotFoundException("UserProjects by " + requester + " not found"));

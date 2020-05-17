@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -217,7 +218,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> delete(String requester, Long transactionId) {
+    public Pair<List<Event>, Transaction> delete(String requester, Long transactionId) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
         Project project = transaction.getProject();
         Long projectId = project.getId();
@@ -226,7 +227,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 ContentType.TRANSACTION, Operation.DELETE, projectId, project.getOwner());
 
         this.transactionRepository.delete(transaction);
-        return generateEvents(transaction, requester, project);
+        return Pair.of(generateEvents(transaction, requester, project), transaction);
     }
 
     private List<Event> generateEvents(Transaction transaction, String requester, Project project) {
