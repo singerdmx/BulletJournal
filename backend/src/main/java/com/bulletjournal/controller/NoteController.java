@@ -1,10 +1,12 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.SearchService;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.NotificationService;
@@ -21,6 +23,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,6 +113,9 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note createdNote = noteDaoJpa.create(projectId, username, note).toPresentationModel();
         searchService.saveToES(createdNote);
+        this.notificationService
+                .trackActivity(new Auditable(projectId, "deleted note ##" + createdNote.getName() + "##", username,
+                        createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
         return createdNote;
     }
 
@@ -122,6 +130,9 @@ public class NoteController {
             @Valid @RequestBody UpdateNoteParams updateNoteParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note note = this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
+        this.notificationService
+                .trackActivity(new Auditable(note.getProjectId(), "update note ##" + note.getName() + "##", username,
+                        noteId, Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE));
         return getNotes(note.getProjectId(), null, null, null, null, null);
     }
 
@@ -133,6 +144,9 @@ public class NoteController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveNoteEvent(events, username));
         }
+        this.notificationService
+                .trackActivity(new Auditable(note.getProjectId(), "deleted note ##" + note.getName() + "##", username,
+                        noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
         return getNotes(note.getProjectId(), null, null, null, null, null);
     }
 

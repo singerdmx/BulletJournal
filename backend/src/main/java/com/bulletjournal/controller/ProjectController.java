@@ -86,8 +86,7 @@ public class ProjectController {
             this.notificationService.inform(new CreateProjectEvent(events, username));
         }
         this.notificationService
-                .trackActivity(new Auditable(
-                        createdProject.getId(), "created BuJo ##" + project.getName() + "##",
+                .trackActivity(new Auditable(createdProject.getId(), "created BuJo ##" + project.getName() + "##",
                         username, null, Timestamp.from(Instant.now()), ContentAction.ADD_PROJECT));
         return createdProject;
     }
@@ -105,7 +104,10 @@ public class ProjectController {
         if (!removed.isEmpty()) {
             this.notificationService.inform(new RemoveFromProjectEvent(removed, username));
         }
-        return getProject(projectId);
+        Project project = getProject(projectId);
+        this.notificationService.trackActivity(new Auditable(projectId, "updated BuJo ##" + project.getName() + "##",
+                username, null, Timestamp.from(Instant.now()), ContentAction.UPDATE_PROJECT));
+        return project;
     }
 
     /**
@@ -114,12 +116,15 @@ public class ProjectController {
     @DeleteMapping(PROJECT_ROUTE)
     public void deleteProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Pair<List<Event>, com.bulletjournal.repository.models.Project> res =
-                this.projectDaoJpa.deleteProject(username, projectId);
+        Pair<List<Event>, com.bulletjournal.repository.models.Project> res = this.projectDaoJpa.deleteProject(username,
+                projectId);
         List<Event> events = res.getLeft();
+        String projectName = res.getRight().getName();
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveProjectEvent(events, username));
         }
+        this.notificationService.trackActivity(new Auditable(projectId, "deleted BuJo ##" + projectName + "##",
+                username, null, Timestamp.from(Instant.now()), ContentAction.DELETE_PROJECT));
     }
 
     @PostMapping(UPDATE_SHARED_PROJECTS_ORDER_ROUTE)

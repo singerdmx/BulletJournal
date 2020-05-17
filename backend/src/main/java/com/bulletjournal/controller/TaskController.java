@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -122,7 +126,12 @@ public class TaskController {
     @ResponseStatus(HttpStatus.CREATED)
     public Task createTask(@NotNull @PathVariable Long projectId, @Valid @RequestBody CreateTaskParams task) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return taskDaoJpa.create(projectId, username, task).toPresentationModel();
+        Task createdTask = taskDaoJpa.create(projectId, username, task).toPresentationModel();
+        this.notificationService
+                .trackActivity(new Auditable(projectId, "created Task ##" + createdTask.getName() + "##", username,
+                        createdTask.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TASK));
+        return createdTask;
+
     }
 
     @PatchMapping(TASK_ROUTE)
@@ -134,6 +143,9 @@ public class TaskController {
         if (!events.isEmpty()) {
             events.forEach((event) -> notificationService.inform(event));
         }
+        this.notificationService
+                .trackActivity(new Auditable(task.getProjectId(), "updated Task ##" + task.getName() + "##", username,
+                        task.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
         return getTasks(task.getProjectId(), null, null, null, null, null);
     }
 
@@ -185,6 +197,9 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
+        this.notificationService
+                .trackActivity(new Auditable(task.getProjectId(), "deleted Task ##" + task.getName() + "##", username,
+                        taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
         return getTasks(task.getProjectId(), null, null, null, null, null);
     }
 

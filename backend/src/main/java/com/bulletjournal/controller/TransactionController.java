@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -24,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -102,7 +106,12 @@ public class TransactionController {
     public Transaction createTransaction(@NotNull @PathVariable Long projectId,
             @Valid @RequestBody CreateTransactionParams createTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return transactionDaoJpa.create(projectId, username, createTransactionParams).toPresentationModel();
+        Transaction createdTransaction = transactionDaoJpa.create(projectId, username, createTransactionParams)
+                .toPresentationModel();
+        this.notificationService.trackActivity(
+                new Auditable(projectId, "deleted Transaction ##" + createdTransaction.getName() + "##", username,
+                        createdTransaction.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TRANSACTION));
+        return createdTransaction;
     }
 
     @GetMapping(TRANSACTION_ROUTE)
@@ -123,16 +132,24 @@ public class TransactionController {
             notificationService
                     .inform(new UpdateTransactionPayerEvent(events, username, updateTransactionParams.getPayer()));
         }
-        return getTransaction(transactionId);
+        Transaction transaction = getTransaction(transactionId);
+        this.notificationService.trackActivity(
+                new Auditable(transaction.getProjectId(), "update Transaction ##" + transaction.getName() + "##",
+                        username, transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_TRANSACTION));
+        return transaction;
     }
 
     @DeleteMapping(TRANSACTION_ROUTE)
     public void deleteTransaction(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> events = this.transactionDaoJpa.delete(username, transactionId);
+        Transaction transaction = getTransaction(transactionId);
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTransactionEvent(events, username));
         }
+        this.notificationService.trackActivity(
+                new Auditable(transaction.getProjectId(), "delete Transaction ##" + transaction.getName() + "##",
+                        username, transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
     }
 
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)

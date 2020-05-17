@@ -52,7 +52,7 @@ public class LabelController {
 
     @PatchMapping(LABEL_ROUTE)
     public Label updateLabel(@NotNull @PathVariable Long labelId,
-                             @Valid @RequestBody UpdateLabelParams updateLabelParams) {
+            @Valid @RequestBody UpdateLabelParams updateLabelParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return labelDaoJpa.partialUpdate(username, labelId, updateLabelParams).toPresentationModel();
     }
@@ -63,11 +63,9 @@ public class LabelController {
     }
 
     @GetMapping(LABELS_ROUTE)
-    public ResponseEntity<List<Label>> getLabels(
-            @RequestParam(name = "projectId", required = false) Long projectId) {
+    public ResponseEntity<List<Label>> getLabels(@RequestParam(name = "projectId", required = false) Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Label> labels = this.labelDaoJpa.getLabels(username)
-                .stream().map(label -> label.toPresentationModel())
+        List<Label> labels = this.labelDaoJpa.getLabels(username).stream().map(label -> label.toPresentationModel())
                 .collect(Collectors.toList());
         if (projectId != null) {
             List<Label> labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
@@ -77,8 +75,7 @@ public class LabelController {
         }
         labels = new ArrayList<>(new HashSet<>(labels));
         String labelsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                EtagGenerator.HashType.TO_HASHCODE,
-                labels);
+                EtagGenerator.HashType.TO_HASHCODE, labels);
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(labelsEtag);
@@ -96,8 +93,7 @@ public class LabelController {
     public List<ProjectItems> getItemsByLabels(@Valid @RequestParam List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         User user = this.userDaoJpa.getByName(username);
-        return ProjectItems.addOwnerAvatar(
-                this.labelDaoJpa.getItemsByLabels(user.getTimezone(), labels, username),
+        return ProjectItems.addOwnerAvatar(this.labelDaoJpa.getItemsByLabels(user.getTimezone(), labels, username),
                 this.userClient);
     }
 
