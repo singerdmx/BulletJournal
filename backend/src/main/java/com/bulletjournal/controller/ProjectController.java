@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -28,6 +29,7 @@ import java.util.List;
 public class ProjectController {
     protected static final String PROJECTS_ROUTE = "/api/projects";
     protected static final String PROJECT_ROUTE = "/api/projects/{projectId}";
+    protected static final String PROJECT_HISTORY_ROUTE = "/api/projects/{projectId}/history";
     protected static final String UPDATE_SHARED_PROJECTS_ORDER_ROUTE = "/api/updateSharedProjectsOrder";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
     @Autowired
@@ -141,5 +143,14 @@ public class ProjectController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.projectDaoJpa.updateUserOwnedProjects(username, projects);
         return getProjects();
+    }
+
+    @GetMapping(PROJECT_HISTORY_ROUTE)
+    public List<Activity> getHistory(
+            @NotNull @PathVariable Long projectId,
+            @NotBlank @RequestParam String timezone,
+            @NotBlank @RequestParam String startDate,
+            @RequestParam String endDate) {
+        return null;
     }
 }
