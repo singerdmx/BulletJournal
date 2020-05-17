@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.AWSS3Client;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.filters.rate.limiting.TokenBucketType;
 import com.bulletjournal.redis.RedisUserRepository;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 public class FileController {
@@ -47,6 +49,12 @@ public class FileController {
         String fileName = file.getOriginalFilename();
         LOGGER.info("Uploading avatar " + fileName);
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.userClient.uploadAvatar(this.redisUserRepository, file, username);
+        this.userClient.uploadAvatar(file, username);
+
+        LOGGER.info("Clearing " + username + " cache");
+        Optional<User> userOptional = redisUserRepository.findById(username);
+        if (userOptional.isPresent()) {
+            this.redisUserRepository.delete(userOptional.get());
+        }
     }
 }

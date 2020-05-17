@@ -145,8 +145,7 @@ public class UserClient {
         return request;
     }
 
-    public void uploadAvatar(RedisUserRepository redisUserRepository,
-                             MultipartFile file, String username) throws IOException {
+    public void uploadAvatar(MultipartFile file, String username) throws IOException {
         if (this.ssoAPIKey == null) {
             throw new IllegalArgumentException("ssoAPIKey missing");
         }
@@ -186,12 +185,6 @@ public class UserClient {
                 new HttpEntity<>(new PickAvatarParams("uploaded", uploadId), headers),
                 LinkedHashMap.class);
         LOGGER.info("Pick avatar response {}", response);
-
-        LOGGER.info("Clearing " + username + " cache");
-        Optional<User> userOptional = redisUserRepository.findById(username);
-        if (userOptional.isPresent()) {
-            this.redisUserRepository.delete(userOptional.get());
-        }
     }
 
     private HttpHeaders getHttpHeaders(String username, MediaType mediaType) {
