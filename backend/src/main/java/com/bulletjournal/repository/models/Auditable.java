@@ -19,6 +19,9 @@ public class Auditable extends AuditModel {
     @Column(name = "action", nullable = false, updatable = false)
     private ContentAction action;
 
+    @Column(name = "project_item_id")
+    private Long project_item_id;
+
     @Column(name = "project_id")
     private Long projectId;
 
@@ -33,8 +36,7 @@ public class Auditable extends AuditModel {
     @Column(length = 100, nullable = false, updatable = false)
     private String originator;
 
-    public Auditable(Long projectId, String activity, String originator, Timestamp activityTime,
-            ContentAction action) {
+    public Auditable(Long projectId, String activity, String originator, Timestamp activityTime, ContentAction action) {
         this.projectId = projectId;
         this.activity = activity;
         this.originator = originator;
