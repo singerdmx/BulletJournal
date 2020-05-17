@@ -274,12 +274,12 @@ public class TaskController {
                 new TaskContent(createContentParams.getText()));
 
         Content createdContent = res.getLeft().toPresentationModel();
-        String TaskName = res.getRight().getName();
+        String taskName = res.getRight().getName();
         Long projectId = res.getRight().getProject().getId();
         String projectName = res.getRight().getProject().getName();
 
         this.notificationService.trackActivity(new Auditable(projectId,
-                "created Content in Task ##" + TaskName + "## under BuJo ##" + projectName + "##", username, taskId,
+                "created Content in Task ##" + taskName + "## under BuJo ##" + projectName + "##", username, taskId,
                 Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
 
         return createdContent;

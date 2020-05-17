@@ -12,7 +12,9 @@ import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
+import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -217,8 +219,9 @@ public class NoteController {
     public Content addContent(@NotNull @PathVariable Long noteId,
             @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.noteDaoJpa.addContent(noteId, username, new NoteContent(createContentParams.getText()))
-                .toPresentationModel();
+        Pair<ContentModel, ProjectItemModel> res =
+                this.noteDaoJpa.addContent(noteId, username, new NoteContent(createContentParams.getText()));
+        return res.getLeft().toPresentationModel();
     }
 
     @GetMapping(CONTENTS_ROUTE)

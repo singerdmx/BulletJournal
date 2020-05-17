@@ -12,6 +12,8 @@ import com.bulletjournal.ledger.LedgerSummaryCalculator;
 import com.bulletjournal.ledger.LedgerSummaryType;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TransactionDaoJpa;
+import com.bulletjournal.repository.models.ContentModel;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TransactionContent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -201,9 +203,9 @@ public class TransactionController {
     public Content addContent(@NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.transactionDaoJpa
-                .addContent(transactionId, username, new TransactionContent(createContentParams.getText()))
-                .toPresentationModel();
+        Pair<ContentModel, ProjectItemModel> res = this.transactionDaoJpa
+                .addContent(transactionId, username, new TransactionContent(createContentParams.getText()));
+        return res.getLeft().toPresentationModel();
     }
 
     @GetMapping(CONTENTS_ROUTE)
