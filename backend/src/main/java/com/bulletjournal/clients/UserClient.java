@@ -10,13 +10,15 @@ import com.bulletjournal.repository.UserDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
@@ -30,6 +32,8 @@ public class UserClient {
     private static final String THUMBNAIL_SIZE = "37";
     private static final String SIZE_HOLDER = "{size}";
     private static final String DEFAULT_USER_TIME_ZONE = "America/Los_Angeles";
+    public static final String API_USERNAME = "Api-Username";
+    public static final String API_KEY = "Api-Key";
 
     private final RestTemplate restClient;
     private final URI ssoEndPoint;
@@ -134,11 +138,67 @@ public class UserClient {
         }
         HttpEntity<LinkedHashMap> request;
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Api-Username", "system");
-        headers.add("Api-Key", this.ssoAPIKey);
+        headers.add(API_USERNAME, "system");
+        headers.add(API_KEY, this.ssoAPIKey);
         // build the request
         request = new HttpEntity(headers);
         return request;
     }
 
+    public void uploadAvatar(RedisUserRepository redisUserRepository,
+                             MultipartFile file, String username) throws IOException {
+        if (this.ssoAPIKey == null) {
+            throw new IllegalArgumentException("ssoAPIKey missing");
+        }
+
+        HttpHeaders headers = getHttpHeaders(username, MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
+        ContentDisposition contentDisposition = ContentDisposition
+                .builder("form-data")
+                .name("file")
+                .filename(file.getOriginalFilename())
+                .build();
+        fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
+        HttpEntity<byte[]> fileEntity = new HttpEntity<>(file.getBytes(), fileMap);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", fileEntity);
+        body.add("type", "avatar");
+        body.add("user_id", this.getUser(username).getId());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                new HttpEntity<>(body, headers);
+        String url = this.ssoEndPoint.resolve("/uploads.json").toString();
+        ResponseEntity<LinkedHashMap> response = this.restClient.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                LinkedHashMap.class);
+        LOGGER.info("Upload avatar response {}", response);
+
+        int uploadId = (Integer) response.getBody().get("id");
+        headers = getHttpHeaders(username, MediaType.APPLICATION_JSON);
+        url = this.ssoEndPoint.resolve("/users/" + username + "/preferences/avatar/pick").toString();
+        response = this.restClient.exchange(
+                url,
+                HttpMethod.PUT,
+                new HttpEntity<>(new PickAvatarParams("uploaded", uploadId), headers),
+                LinkedHashMap.class);
+        LOGGER.info("Pick avatar response {}", response);
+
+        LOGGER.info("Clearing " + username + " cache");
+        Optional<User> userOptional = redisUserRepository.findById(username);
+        if (userOptional.isPresent()) {
+            this.redisUserRepository.delete(userOptional.get());
+        }
+    }
+
+    private HttpHeaders getHttpHeaders(String username, MediaType mediaType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(API_USERNAME, username);
+        headers.add(API_KEY, this.ssoAPIKey);
+        headers.setContentType(mediaType);
+        return headers;
+    }
 }
