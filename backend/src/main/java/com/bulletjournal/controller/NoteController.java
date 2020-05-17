@@ -121,7 +121,7 @@ public class NoteController {
         searchService.saveToES(createdNote);
 
         this.notificationService.trackActivity(new Auditable(projectId,
-                "create note ##" + createdNote.getName() + "## in BuJo ##" + projectName + "##", username,
+                "created Note ##" + createdNote.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_NOTE));
         return createdNote;
     }
@@ -141,7 +141,7 @@ public class NoteController {
         Note note = updatedNote.toPresentationModel();
         String projectName = updatedNote.getProject().getName();
         this.notificationService.trackActivity(new Auditable(note.getProjectId(),
-                "update note ##" + note.getName() + "## in BuJo " + projectName + "##", username, noteId,
+                "updated note ##" + note.getName() + "## in BuJo " + projectName + "##", username, noteId,
                 Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE));
         return getNotes(note.getProjectId(), null, null, null, null, null);
     }
@@ -262,7 +262,7 @@ public class NoteController {
         ProjectItemModel note = this.noteDaoJpa.deleteContent(contentId, noteId, username);
 
         this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
-                "Delete Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
+                "deleted Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
                 username, noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
 
         return getContents(noteId);
@@ -276,7 +276,7 @@ public class NoteController {
                 .getRight();
 
         this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
-                "Update Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
+                "updated Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
                 username, noteId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
 
         return getContents(noteId);

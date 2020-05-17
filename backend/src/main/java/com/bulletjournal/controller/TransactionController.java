@@ -245,7 +245,7 @@ public class TransactionController {
         ProjectItemModel transaction = this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
 
         this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
-                "Delete Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
+                "deleted Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
                         + transaction.getProject().getName() + "##",
                 username, transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
 
@@ -260,7 +260,7 @@ public class TransactionController {
                 .updateContent(contentId, transactionId, username, updateContentParams).getRight();
 
         this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
-                "Update Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
+                "updated Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
                         + transaction.getProject().getName() + "##",
                 username, transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
 
