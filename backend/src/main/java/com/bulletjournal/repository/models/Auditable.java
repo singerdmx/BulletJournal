@@ -5,6 +5,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.bulletjournal.contents.ContentAction;
+import com.bulletjournal.controller.models.Activity;
+import com.bulletjournal.controller.models.User;
 
 import java.sql.Timestamp;
 
@@ -100,5 +102,14 @@ public class Auditable extends AuditModel {
 
     public void setProjectItemId(Long projectItemId) {
         this.projectItemId = projectItemId;
+    }
+
+    public Activity toActivity() {
+        Activity activity = new Activity();
+        activity.setAction(this.getAction());
+        activity.setActivity(this.activity);
+        activity.setActivityTime(this.activityTime);
+        activity.setOriginator(new User(this.originator));
+        return activity;
     }
 }

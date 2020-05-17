@@ -1,21 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import {Avatar, Form, Modal, Select, Tooltip} from 'antd';
-import {PlusOutlined} from '@ant-design/icons';
-import {connect} from 'react-redux';
-import {GroupsWithOwner} from '../../features/group/interface';
-import {createProjectByName} from '../../features/project/actions';
-import {updateGroups} from '../../features/group/actions';
-import {IState} from '../../store';
-import {Project, ProjectsWithOwner} from '../../features/project/interface';
-import {iconMapper} from '../side-menu/side-menu.component';
-import {History} from 'history';
-import {updateTaskVisible} from '../../features/tasks/actions';
-import {updateNoteVisible} from '../../features/notes/actions';
-import {updateTransactionVisible} from '../../features/transactions/actions';
+import React, { useEffect, useState } from 'react';
+import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { connect } from 'react-redux';
+import { GroupsWithOwner } from '../../features/group/interface';
+import { createProjectByName } from '../../features/project/actions';
+import { updateGroups } from '../../features/group/actions';
+import { IState } from '../../store';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
+import { iconMapper } from '../side-menu/side-menu.component';
+import { History } from 'history';
+import { updateTaskVisible } from '../../features/tasks/actions';
+import { updateNoteVisible } from '../../features/notes/actions';
+import { updateTransactionVisible } from '../../features/transactions/actions';
 import './modals.styles.less';
-import {flattenOwnedProject, flattenSharedProject} from '../../pages/projects/projects.pages';
+import {
+  flattenOwnedProject,
+  flattenSharedProject,
+} from '../../pages/projects/projects.pages';
 
-const {Option} = Select;
+const { Option } = Select;
 
 type ProjectItemProps = {
   history: History<History.PoorMansUnknown>;
@@ -34,7 +37,7 @@ type GroupProps = {
   updateTransactionVisible: (addTransactionVisible: boolean) => void;
 };
 
-const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
+const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
@@ -76,82 +79,89 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   const getProjectSelections = () => {
     if (projects && projects[0]) {
       return (
-          <Form form={form} labelAlign='left'>
-            <Tooltip title='Choose BuJo' placement='topLeft'>
-              <Form.Item name='project'>
-                <Select
-                    placeholder='Choose BuJo'
-                    style={{width: '100%'}}
-                    defaultValue={getProjectValue(projects[0])}
-                >
-                  {projects.map(project => {
-                    return (
-                        <Option value={getProjectValue(project)} key={project.id}>
-                          <Tooltip title={`${props.aliases[project.owner] ? props.aliases[project.owner] : project.owner}`} placement='right'>
+        <Form form={form} labelAlign='left'>
+          <Tooltip title='Choose BuJo' placement='topLeft'>
+            <Form.Item name='project'>
+              <Select
+                placeholder='Choose BuJo'
+                style={{ width: '100%' }}
+                defaultValue={getProjectValue(projects[0])}
+              >
+                {projects.map((project) => {
+                  return (
+                    <Option value={getProjectValue(project)} key={project.id}>
+                      <Tooltip
+                        title={`${
+                          props.aliases[project.owner]
+                            ? props.aliases[project.owner]
+                            : project.owner
+                        }`}
+                        placement='right'
+                      >
                         <span>
-                          <Avatar size='small' src={project.ownerAvatar}/>
+                          <Avatar size='small' src={project.ownerAvatar} />
                           &nbsp; {iconMapper[project.projectType]}
                           &nbsp; <strong>{project.name}</strong>
                           &nbsp; (Group <strong>{project.group.name}</strong>)
                         </span>
-                          </Tooltip>
-                        </Option>
-                    );
-                  })}
-                </Select>
-              </Form.Item>
-            </Tooltip>
-          </Form>
+                      </Tooltip>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Tooltip>
+        </Form>
       );
     }
 
-    return <div/>;
+    return <div />;
   };
 
   const getModal = () => {
     return (
-        <Modal
-            title='Create New BuJo Item'
-            destroyOnClose
-            centered
-            okText='Create'
-            visible={visible}
-            onCancel={onCancel}
-            onOk={() => {
-              form
-                  .validateFields()
-                  .then(values => {
-                    form.resetFields();
-                    addBuJoItem(values);
-                  })
-                  .catch(info => console.log(info));
-            }}
-        >
-          <div>{getProjectSelections()}</div>
-        </Modal>
+      <Modal
+        title='Create New BuJo Item'
+        destroyOnClose
+        centered
+        okText='Create'
+        visible={visible}
+        onCancel={onCancel}
+        onOk={() => {
+          form
+            .validateFields()
+            .then((values) => {
+              form.resetFields();
+              addBuJoItem(values);
+            })
+            .catch((info) => console.log(info));
+        }}
+      >
+        <div>{getProjectSelections()}</div>
+      </Modal>
     );
   };
 
   const getDiv = () => {
     if (props.mode === 'MyBuJo') {
       return (
-          <div>
-            <Tooltip placement='bottom' title='Create New BuJo Item'>
-              <h2 className='add-todo-button' onClick={openModal}>
-                <PlusOutlined/>
-              </h2>
-            </Tooltip>
-            {getModal()}
-          </div>
-      );
-    }
-    return (
         <div>
           <Tooltip placement='bottom' title='Create New BuJo Item'>
-            <PlusOutlined className='rotateIcon' onClick={openModal}/>
+            <h2 className='add-todo-button' onClick={openModal}>
+              <PlusOutlined />
+            </h2>
           </Tooltip>
           {getModal()}
         </div>
+      );
+    }
+    return (
+      <div>
+        <Tooltip placement='bottom' title='Create New BuJo Item'>
+          <PlusOutlined className='rotateIcon' onClick={openModal} />
+        </Tooltip>
+        {getModal()}
+      </div>
     );
   };
 
@@ -163,7 +173,7 @@ const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   ownedProjects: state.project.owned,
   sharedProjects: state.project.shared,
-  aliases: state.system.aliases
+  aliases: state.system.aliases,
 });
 
 export default connect(mapStateToProps, {
@@ -171,5 +181,5 @@ export default connect(mapStateToProps, {
   createProjectByName,
   updateTaskVisible,
   updateNoteVisible,
-  updateTransactionVisible
+  updateTransactionVisible,
 })(AddProjectItem);

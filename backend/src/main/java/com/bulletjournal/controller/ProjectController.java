@@ -5,6 +5,7 @@ import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -34,6 +35,9 @@ public class ProjectController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
+
+    @Autowired
+    private AuditableDaoJpa auditableDaoJpa;
 
     @Autowired
     private NotificationService notificationService;
@@ -146,11 +150,8 @@ public class ProjectController {
     }
 
     @GetMapping(PROJECT_HISTORY_ROUTE)
-    public List<Activity> getHistory(
-            @NotNull @PathVariable Long projectId,
-            @NotBlank @RequestParam String timezone,
-            @NotBlank @RequestParam String startDate,
-            @RequestParam String endDate) {
+    public List<Activity> getHistory(@NotNull @PathVariable Long projectId, @NotBlank @RequestParam String timezone,
+            @NotBlank @RequestParam String startDate, @RequestParam String endDate) {
         return null;
     }
 }
