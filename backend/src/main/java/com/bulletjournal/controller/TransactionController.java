@@ -109,7 +109,7 @@ public class TransactionController {
         Transaction createdTransaction = transactionDaoJpa.create(projectId, username, createTransactionParams)
                 .toPresentationModel();
         this.notificationService.trackActivity(
-                new Auditable(projectId, "deleted Transaction ##" + createdTransaction.getName() + "##", username,
+                new Auditable(projectId, "created Transaction ##" + createdTransaction.getName() + "##", username,
                         createdTransaction.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TRANSACTION));
         return createdTransaction;
     }
@@ -134,7 +134,7 @@ public class TransactionController {
         }
         Transaction transaction = getTransaction(transactionId);
         this.notificationService.trackActivity(
-                new Auditable(transaction.getProjectId(), "update Transaction ##" + transaction.getName() + "##",
+                new Auditable(transaction.getProjectId(), "updated Transaction ##" + transaction.getName() + "##",
                         username, transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_TRANSACTION));
         return transaction;
     }
@@ -148,7 +148,7 @@ public class TransactionController {
             this.notificationService.inform(new RemoveTransactionEvent(events, username));
         }
         this.notificationService.trackActivity(
-                new Auditable(transaction.getProjectId(), "delete Transaction ##" + transaction.getName() + "##",
+                new Auditable(transaction.getProjectId(), "deleted Transaction ##" + transaction.getName() + "##",
                         username, transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
     }
 
