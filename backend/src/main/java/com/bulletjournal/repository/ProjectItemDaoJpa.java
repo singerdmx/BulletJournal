@@ -19,6 +19,7 @@ import com.bulletjournal.util.ContentDiffTool;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,19 +57,18 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     abstract <T extends ProjectItemModel> List<K> findContents(T projectItem);
 
-    abstract List<Long> findItemLabelsByProject(
-            com.bulletjournal.repository.models.Project project);
+    abstract List<Long> findItemLabelsByProject(com.bulletjournal.repository.models.Project project);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> SharableLink generatePublicItemLink(
-            Long projectItemId, String requester, Long ttl) {
+    public <T extends ProjectItemModel> SharableLink generatePublicItemLink(Long projectItemId, String requester,
+            Long ttl) {
         T projectItem = getProjectItem(projectItemId, requester);
         return this.publicProjectItemDaoJpa.generatePublicItemLink(projectItem, requester, ttl);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> ShareProjectItemEvent shareProjectItem(
-            Long projectItemId, ShareProjectItemParams shareProjectItemParams, String requester) {
+    public <T extends ProjectItemModel> ShareProjectItemEvent shareProjectItem(Long projectItemId,
+            ShareProjectItemParams shareProjectItemParams, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
         List<String> users = new ArrayList<>();
         if (StringUtils.isNotBlank(shareProjectItemParams.getTargetUser())) {
@@ -90,12 +90,10 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     public <T extends ProjectItemModel> ProjectItemSharables getSharables(Long projectItemId, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
 
-        List<SharableLink> links = this.publicProjectItemDaoJpa.getPublicItemLinks(projectItem)
-                .stream()
-                .map(item -> item.toSharableLink())
-                .collect(Collectors.toList());
-        Set<String> users = this.sharedProjectItemDaoJpa.getProjectItemSharedUsers(projectItem)
-                .stream().map(item -> item.getUsername()).collect(Collectors.toSet());
+        List<SharableLink> links = this.publicProjectItemDaoJpa.getPublicItemLinks(projectItem).stream()
+                .map(item -> item.toSharableLink()).collect(Collectors.toList());
+        Set<String> users = this.sharedProjectItemDaoJpa.getProjectItemSharedUsers(projectItem).stream()
+                .map(item -> item.getUsername()).collect(Collectors.toSet());
         ProjectItemSharables result = new ProjectItemSharables();
         result.setLinks(links);
         result.setUsers(users.stream().map(u -> new User(u)).collect(Collectors.toList()));
@@ -103,8 +101,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> RevokeSharableEvent revokeSharable(
-            Long projectItemId, String requester,
+    public <T extends ProjectItemModel> RevokeSharableEvent revokeSharable(Long projectItemId, String requester,
             RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
         T projectItem = getProjectItem(projectItemId, requester);
 
@@ -116,22 +113,21 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String user = revokeProjectItemSharableParams.getUser();
         if (user != null) {
             this.sharedProjectItemDaoJpa.revokeSharableWithUser(projectItem, user);
-            return new RevokeSharableEvent(
-                    new Event(user, projectItemId, projectItem.getName()), requester, projectItem.getContentType());
+            return new RevokeSharableEvent(new Event(user, projectItemId, projectItem.getName()), requester,
+                    projectItem.getContentType());
         }
 
         return null;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> ContentModel addContent(
-            Long projectItemId, String owner, K content) {
+    public <T extends ProjectItemModel> Pair<ContentModel, T> addContent(Long projectItemId, String owner, K content) {
         T projectItem = getProjectItem(projectItemId, owner);
         content.setProjectItem(projectItem);
         content.setOwner(owner);
         updateRevision(content, content.getText(), owner);
         this.getContentJpaRepository().save(content);
-        return content;
+        return Pair.of(content, projectItem);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -143,33 +139,32 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> K updateContent(
-            Long contentId, Long projectItemId, String requester, UpdateContentParams updateContentParams) {
+    public <T extends ProjectItemModel> Pair<K, T> updateContent(Long contentId, Long projectItemId, String requester,
+            UpdateContentParams updateContentParams) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
-        Preconditions.checkState(
-                Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
+        Preconditions.checkState(Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
                 "ProjectItem ID mismatch");
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                content.getOwner(), requester, ContentType.CONTENT, Operation.UPDATE, content.getId(),
-                projectItem.getOwner(), projectItem.getProject().getOwner(), projectItem);
+        this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
+                Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
+                projectItem);
         updateRevision(content, updateContentParams.getText(), requester);
         content.setText(updateContentParams.getText());
         this.getContentJpaRepository().save(content);
-        return content;
+        return Pair.of(content, projectItem);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> void deleteContent(Long contentId, Long projectItemId, String requester) {
+    public <T extends ProjectItemModel> T deleteContent(Long contentId, Long projectItemId, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
-        Preconditions.checkState(
-                Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
+        Preconditions.checkState(Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
                 "ProjectItem ID mismatch");
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                content.getOwner(), requester, ContentType.CONTENT, Operation.DELETE, content.getId(),
-                projectItem.getOwner(), projectItem.getProject().getOwner(), projectItem);
+        this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
+                Operation.DELETE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
+                projectItem);
         this.getContentJpaRepository().delete(content);
+        return projectItem;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -181,7 +176,8 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabelsToProjectItem(T projectItem) {
+    protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabelsToProjectItem(
+            T projectItem) {
         return this.labelDaoJpa.getLabels(projectItem.getLabels());
     }
 
@@ -202,17 +198,14 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> Revision getContentRevision(
-        String requester, Long projectItemId, Long contentId, Long revisionId) {
+    public <T extends ProjectItemModel> Revision getContentRevision(String requester, Long projectItemId,
+            Long contentId, Long revisionId) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
-        Preconditions.checkState(
-            Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
-            "ProjectItem ID mismatch");
+        Preconditions.checkState(Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
+                "ProjectItem ID mismatch");
         Revision[] revisions = GSON.fromJson(content.getRevisions(), Revision[].class);
-        Preconditions.checkNotNull(
-                revisions,
-                "Revisions for Content: {} is null", contentId);
+        Preconditions.checkNotNull(revisions, "Revisions for Content: {} is null", contentId);
         if (!Arrays.stream(revisions).anyMatch(revision -> Objects.equals(revision.getId(), revisionId))) {
             throw new BadRequestException("Invalid revisionId: " + revisionId + " for content: " + contentId);
         }
@@ -268,8 +261,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> List<K> getContents(Long projectItemId, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
-        return this.findContents(projectItem).stream()
-                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+        return this.findContents(projectItem).stream().sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
                 .collect(Collectors.toList());
     }
 

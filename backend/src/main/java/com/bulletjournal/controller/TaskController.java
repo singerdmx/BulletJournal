@@ -8,6 +8,8 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
+import com.bulletjournal.repository.models.ContentModel;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TaskContent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -198,11 +200,13 @@ public class TaskController {
         List<Event> events = res.getLeft();
         String taskName = res.getRight().getName();
         Long projectId = res.getRight().getProject().getId();
+        String projectName = res.getRight().getProject().getName();
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
-        this.notificationService.trackActivity(new Auditable(projectId, "deleted Task ##" + taskName + "##", username,
-                taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
+        this.notificationService.trackActivity(
+                new Auditable(projectId, "deleted Task ##" + taskName + "## in BuJo ##" + projectName + "##", username,
+                        taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
         return getTasks(projectId, null, null, null, null, null);
     }
 
@@ -265,8 +269,20 @@ public class TaskController {
     public Content addContent(@NotNull @PathVariable Long taskId,
             @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.addContent(taskId, username, new TaskContent(createContentParams.getText()))
-                .toPresentationModel();
+
+        Pair<ContentModel, ProjectItemModel> res = this.taskDaoJpa.addContent(taskId, username,
+                new TaskContent(createContentParams.getText()));
+
+        Content createdContent = res.getLeft().toPresentationModel();
+        String TaskName = res.getRight().getName();
+        Long projectId = res.getRight().getProject().getId();
+        String projectName = res.getRight().getProject().getName();
+
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "created Content in Task ##" + TaskName + "## under BuJo ##" + projectName + "##", username, taskId,
+                Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
+
+        return createdContent;
     }
 
     @GetMapping(CONTENTS_ROUTE)
@@ -295,7 +311,12 @@ public class TaskController {
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long taskId, @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.deleteContent(contentId, taskId, username);
+        ProjectItemModel task = this.taskDaoJpa.deleteContent(contentId, taskId, username);
+
+        this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
+                "Delete Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
+                username, taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
+
         return getContents(taskId);
     }
 
@@ -303,7 +324,13 @@ public class TaskController {
     public List<Content> updateContent(@NotNull @PathVariable Long taskId, @NotNull @PathVariable Long contentId,
             @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams);
+        ProjectItemModel task = this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams)
+                .getRight();
+
+        this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
+                "Update Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
+                username, taskId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
+
         return getContents(taskId);
     }
 
