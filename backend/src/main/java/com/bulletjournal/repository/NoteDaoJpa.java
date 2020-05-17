@@ -110,7 +110,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Note create(Long projectId, String owner, CreateNoteParams createNoteParams) {
+    public Pair<Note, Project> create(Long projectId, String owner, CreateNoteParams createNoteParams) {
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.NOTE.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be NOTE while request is " + project.getType());
@@ -125,7 +125,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         projectNotes.setNotes(newRelations);
         projectNotes.setProjectId(projectId);
         projectNotesRepository.save(projectNotes);
-        return note;
+        return Pair.of(note, project);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

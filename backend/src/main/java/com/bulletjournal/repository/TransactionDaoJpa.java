@@ -105,7 +105,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Transaction create(Long projectId, String owner, CreateTransactionParams createTransaction) {
+    public Pair<Transaction, Project> create(Long projectId, String owner, CreateTransactionParams createTransaction) {
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.LEDGER.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be LEDGER while request is " + project.getType());
@@ -128,7 +128,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
         transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
 
-        return this.transactionRepository.save(transaction);
+        return Pair.of(this.transactionRepository.save(transaction), project);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -149,7 +149,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Event> partialUpdate(String requester, Long transactionId,
+    public Pair<List<Event>, Transaction> partialUpdate(String requester, Long transactionId,
             UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
 
@@ -192,7 +192,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 transaction::setEndTime);
 
         this.transactionRepository.save(transaction);
-        return events;
+        return Pair.of(events, transaction);
     }
 
     private List<Event> updatePayer(String requester, Long transactionId,

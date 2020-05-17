@@ -129,10 +129,13 @@ public class TaskController {
     @ResponseStatus(HttpStatus.CREATED)
     public Task createTask(@NotNull @PathVariable Long projectId, @Valid @RequestBody CreateTaskParams task) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Task createdTask = taskDaoJpa.create(projectId, username, task).toPresentationModel();
-        this.notificationService
-                .trackActivity(new Auditable(projectId, "created Task ##" + createdTask.getName() + "##", username,
-                        createdTask.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TASK));
+        Pair<com.bulletjournal.repository.models.Task, com.bulletjournal.repository.models.Project> res = taskDaoJpa
+                .create(projectId, username, task);
+        Task createdTask = res.getLeft().toPresentationModel();
+        String projectName = res.getRight().getName();
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "created Task ##" + createdTask.getName() + "## in BuJo ##" + projectName + "##", username,
+                createdTask.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TASK));
         return createdTask;
 
     }
@@ -142,12 +145,19 @@ public class TaskController {
             @Valid @RequestBody UpdateTaskParams updateTaskParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<UpdateTaskAssigneeEvent> events = new ArrayList<>();
-        Task task = this.taskDaoJpa.partialUpdate(username, taskId, updateTaskParams, events).toPresentationModel();
+
+        com.bulletjournal.repository.models.Task updatedTask = this.taskDaoJpa.partialUpdate(username, taskId,
+                updateTaskParams, events);
+
+        Task task = updatedTask.toPresentationModel();
+        String projectName = updatedTask.getProject().getName();
         if (!events.isEmpty()) {
             events.forEach((event) -> notificationService.inform(event));
         }
-        this.notificationService.trackActivity(new Auditable(task.getProjectId(), "updated Task ##" + task.getName(),
-                username, task.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
+
+        this.notificationService.trackActivity(new Auditable(task.getProjectId(),
+                "updated Task ##" + task.getName() + "## in BuJo ##" + projectName + "##", username, task.getId(),
+                Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
         return getTasks(task.getProjectId(), null, null, null, null, null);
     }
 

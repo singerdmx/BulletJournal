@@ -114,10 +114,15 @@ public class NoteController {
     @ResponseStatus(HttpStatus.CREATED)
     public Note createNote(@NotNull @PathVariable Long projectId, @Valid @RequestBody CreateNoteParams note) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Note createdNote = noteDaoJpa.create(projectId, username, note).toPresentationModel();
+        Pair<com.bulletjournal.repository.models.Note, com.bulletjournal.repository.models.Project> res = noteDaoJpa
+                .create(projectId, username, note);
+        Note createdNote = res.getLeft().toPresentationModel();
+        String projectName = res.getRight().getName();
         searchService.saveToES(createdNote);
-        this.notificationService.trackActivity(new Auditable(projectId, "create note ##" + createdNote.getName() + "##",
-                username, createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_NOTE));
+
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "create note ##" + createdNote.getName() + "## in BuJo ##" + projectName + "##", username,
+                createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_NOTE));
         return createdNote;
     }
 
@@ -131,10 +136,13 @@ public class NoteController {
     public ResponseEntity<List<Note>> updateNote(@NotNull @PathVariable Long noteId,
             @Valid @RequestBody UpdateNoteParams updateNoteParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Note note = this.noteDaoJpa.partialUpdate(username, noteId, updateNoteParams).toPresentationModel();
-        this.notificationService
-                .trackActivity(new Auditable(note.getProjectId(), "update note ##" + note.getName() + "##", username,
-                        noteId, Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE));
+        com.bulletjournal.repository.models.Note updatedNote = this.noteDaoJpa.partialUpdate(username, noteId,
+                updateNoteParams);
+        Note note = updatedNote.toPresentationModel();
+        String projectName = updatedNote.getProject().getName();
+        this.notificationService.trackActivity(new Auditable(note.getProjectId(),
+                "update note ##" + note.getName() + "## in BuJo " + projectName + "##", username, noteId,
+                Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE));
         return getNotes(note.getProjectId(), null, null, null, null, null);
     }
 

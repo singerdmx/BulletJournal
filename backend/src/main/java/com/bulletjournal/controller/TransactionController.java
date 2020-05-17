@@ -108,11 +108,14 @@ public class TransactionController {
     public Transaction createTransaction(@NotNull @PathVariable Long projectId,
             @Valid @RequestBody CreateTransactionParams createTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Transaction createdTransaction = transactionDaoJpa.create(projectId, username, createTransactionParams)
-                .toPresentationModel();
-        this.notificationService.trackActivity(
-                new Auditable(projectId, "created Transaction ##" + createdTransaction.getName() + "##", username,
-                        createdTransaction.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TRANSACTION));
+        Pair<com.bulletjournal.repository.models.Transaction, com.bulletjournal.repository.models.Project> res = transactionDaoJpa
+                .create(projectId, username, createTransactionParams);
+        Transaction createdTransaction = res.getLeft().toPresentationModel();
+        String projectName = res.getRight().getName();
+
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "created Transaction ##" + createdTransaction.getName() + "## in BuJo ##" + projectName + "##",
+                username, createdTransaction.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TRANSACTION));
         return createdTransaction;
     }
 
@@ -129,15 +132,19 @@ public class TransactionController {
     public Transaction updateTransaction(@NotNull @PathVariable Long transactionId,
             @Valid @RequestBody UpdateTransactionParams updateTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Event> events = transactionDaoJpa.partialUpdate(username, transactionId, updateTransactionParams);
+        Pair<List<Event>, com.bulletjournal.repository.models.Transaction> res = transactionDaoJpa
+                .partialUpdate(username, transactionId, updateTransactionParams);
+        List<Event> events = res.getLeft();
+        String projectName = res.getRight().getName();
+
         if (!events.isEmpty()) {
             notificationService
                     .inform(new UpdateTransactionPayerEvent(events, username, updateTransactionParams.getPayer()));
         }
         Transaction transaction = getTransaction(transactionId);
-        this.notificationService.trackActivity(
-                new Auditable(transaction.getProjectId(), "updated Transaction ##" + transaction.getName() + "##",
-                        username, transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_TRANSACTION));
+        this.notificationService.trackActivity(new Auditable(transaction.getProjectId(),
+                "updated Transaction ##" + transaction.getName() + "## in BuJo ##" + projectName + "##", username,
+                transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_TRANSACTION));
         return transaction;
     }
 

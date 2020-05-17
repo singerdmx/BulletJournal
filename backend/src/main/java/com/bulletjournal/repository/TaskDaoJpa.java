@@ -353,7 +353,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return Task - A repository task model
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
+    public Pair<Task, Project> create(Long projectId, String owner, CreateTaskParams createTaskParams) {
 
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
@@ -385,7 +385,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         projectTasks.setProjectId(projectId);
         projectTasks.setTasks(newRelations);
         this.projectTasksRepository.save(projectTasks);
-        return task;
+        return Pair.of(task, project);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -396,7 +396,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             return;
         }
 
-        Task task = create(projectId, owner, createTaskParams);
+        Task task = create(projectId, owner, createTaskParams).getLeft();
         task.setGoogleCalendarEventId(eventId);
         task = this.taskRepository.save(task);
         LOGGER.info("Created task {}", task);
@@ -765,7 +765,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 Operation.UPDATE, project.getId(), task.getProject().getOwner());
         List<TaskContent> contents = getCompletedTaskContents(taskId, requester);
         this.completedTaskRepository.delete(task);
-        Long newId = create(project.getId(), task.getOwner(), getCreateTaskParams(task)).getId();
+        Long newId = create(project.getId(), task.getOwner(), getCreateTaskParams(task)).getLeft().getId();
         Collections.reverse(contents);
         // we order contents by getUpdatedAt in descending order
         for (TaskContent content : contents) {
