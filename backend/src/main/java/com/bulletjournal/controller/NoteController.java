@@ -219,9 +219,20 @@ public class NoteController {
     public Content addContent(@NotNull @PathVariable Long noteId,
             @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Pair<ContentModel, ProjectItemModel> res =
-                this.noteDaoJpa.addContent(noteId, username, new NoteContent(createContentParams.getText()));
-        return res.getLeft().toPresentationModel();
+
+        Pair<ContentModel, ProjectItemModel> res = this.noteDaoJpa.addContent(noteId, username,
+                new NoteContent(createContentParams.getText()));
+
+        Content createdContent = res.getLeft().toPresentationModel();
+        String noteName = res.getRight().getName();
+        Long projectId = res.getRight().getProject().getId();
+        String projectName = res.getRight().getProject().getName();
+
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "created Content in Note ##" + noteName + "## under BuJo ##" + projectName + "##", username, noteId,
+                Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
+
+        return createdContent;
     }
 
     @GetMapping(CONTENTS_ROUTE)
@@ -240,7 +251,12 @@ public class NoteController {
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.deleteContent(contentId, noteId, username);
+        ProjectItemModel note = this.noteDaoJpa.deleteContent(contentId, noteId, username);
+
+        this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
+                "Delete Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
+                username, noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
+
         return getContents(noteId);
     }
 
@@ -248,7 +264,13 @@ public class NoteController {
     public List<Content> updateContent(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId,
             @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams);
+        ProjectItemModel note = this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams)
+                .getRight();
+
+        this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
+                "Update Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
+                username, noteId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
+
         return getContents(noteId);
     }
 

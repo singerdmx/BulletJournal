@@ -203,9 +203,19 @@ public class TransactionController {
     public Content addContent(@NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Pair<ContentModel, ProjectItemModel> res = this.transactionDaoJpa
-                .addContent(transactionId, username, new TransactionContent(createContentParams.getText()));
-        return res.getLeft().toPresentationModel();
+        Pair<ContentModel, ProjectItemModel> res = this.transactionDaoJpa.addContent(transactionId, username,
+                new TransactionContent(createContentParams.getText()));
+
+        Content createdContent = res.getLeft().toPresentationModel();
+        String transactionName = res.getRight().getName();
+        Long projectId = res.getRight().getProject().getId();
+        String projectName = res.getRight().getProject().getName();
+
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "created Content in Transaction ##" + transactionName + "## under BuJo ##" + projectName + "##",
+                username, transactionId, Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
+
+        return createdContent;
     }
 
     @GetMapping(CONTENTS_ROUTE)
@@ -225,7 +235,13 @@ public class TransactionController {
     public List<Content> deleteContent(@NotNull @PathVariable Long transactionId,
             @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
+        ProjectItemModel transaction = this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
+
+        this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
+                "Delete Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
+                        + transaction.getProject().getName() + "##",
+                username, transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
+
         return getContents(transactionId);
     }
 
@@ -233,7 +249,14 @@ public class TransactionController {
     public List<Content> updateContent(@NotNull @PathVariable Long transactionId, @NotNull @PathVariable Long contentId,
             @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.transactionDaoJpa.updateContent(contentId, transactionId, username, updateContentParams);
+        ProjectItemModel transaction = this.transactionDaoJpa
+                .updateContent(contentId, transactionId, username, updateContentParams).getRight();
+
+        this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
+                "Update Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
+                        + transaction.getProject().getName() + "##",
+                username, transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
+
         return getContents(transactionId);
     }
 

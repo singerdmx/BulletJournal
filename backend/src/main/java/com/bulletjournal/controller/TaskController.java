@@ -146,9 +146,8 @@ public class TaskController {
         if (!events.isEmpty()) {
             events.forEach((event) -> notificationService.inform(event));
         }
-        this.notificationService
-                .trackActivity(new Auditable(task.getProjectId(), "updated Task ##" + task.getName() + "##", username,
-                        task.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
+        this.notificationService.trackActivity(new Auditable(task.getProjectId(), "updated Task ##" + task.getName(),
+                username, task.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
         return getTasks(task.getProjectId(), null, null, null, null, null);
     }
 
@@ -278,9 +277,9 @@ public class TaskController {
         Long projectId = res.getRight().getProject().getId();
         String projectName = res.getRight().getProject().getName();
 
-        this.notificationService.trackActivity(new Auditable(projectId,
-                "created Content in Task ##" + taskName + "## under BuJo ##" + projectName + "##", username, taskId,
-                Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
+        this.notificationService.trackActivity(
+                new Auditable(projectId, "created Content in Task ##" + taskName + "## in BuJo ##" + projectName + "##",
+                        username, taskId, Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
 
         return createdContent;
     }
