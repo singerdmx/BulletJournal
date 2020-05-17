@@ -6,7 +6,7 @@ const { Footer } = Layout;
 class FooterLayout extends React.Component {
   render() {
     return (
-      <Footer style={{ textAlign: 'center' }}>
+      <Footer className="footer">
         Bullet Journal ©2020 Created by 1024 BBS
       </Footer>
     );
