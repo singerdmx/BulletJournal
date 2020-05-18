@@ -127,45 +127,40 @@ public class LabelDaoJpa {
         this.noteRepository.saveAll(notes);
     }
 
-    /**
-     * Retrieves project items by a list of labels
-     * <p>
-     * Steps:
-     * 1. Fetch project items with custom query
-     * 2. Group project items by date
-     * 3. Sort project items groups by date
-     *
-     * @param timezone  the timezone of requester
-     * @param labels    a list of labels
-     * @param requester request user
-     * @return List<ProjectItems> - a list of sorted project items with labels
-     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItems> getItemsByLabels(String timezone, List<Long> labels, String requester) {
         List<Label> l = this.labelRepository.findAllById(labels);
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
-
-        // Query project items from its own repository
         List<Task> tasks = this.taskRepository.findTasksByLabelIds(labels);
         List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelIds(labels);
         List<Note> notes = this.noteRepository.findNotesByLabelIds(labels);
 
-        // Todo: add username to query
         if (l.stream().anyMatch(label -> !label.getOwner().equals(requester))) {
             tasks = filter(tasks, requester);
             transactions = filter(transactions, requester);
             notes = filter(notes, requester);
         }
 
-        // Group project items by date
+        Map<ProjectItemType, Map<Long, List<Long>>> labelIds = new HashMap<>();
+        Map<Long, List<Long>> tasklabels = tasks.stream().collect(
+                Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
+        labelIds.put(ProjectItemType.TASK, tasklabels);
+        Map<Long, List<Long>> transactionlabels = transactions.stream().collect(
+                Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
+        labelIds.put(ProjectItemType.TRANSACTION, transactionlabels);
+        Map<Long, List<Long>> notelabels = notes.stream().collect(
+                Collectors.toMap(n -> n.getId(), n -> n.getLabels()));
+        labelIds.put(ProjectItemType.NOTE, notelabels);
+
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
         Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
-        return ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+        List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+        return getLabelsForProjectItems(projectItems, labelIds);
     }
 
     private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester) {
