@@ -6,8 +6,8 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { unregister } from './serviceWorker';
 import PublicPage from './Public';
-import PrivacyPage from "./Privacy";
-import TermsOfServicePage from "./TermsOfService";
+import PrivacyPage from './Privacy';
+import TermsOfServicePage from './TermsOfService';
 
 const store = createStore();
 

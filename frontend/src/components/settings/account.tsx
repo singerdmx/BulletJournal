@@ -3,6 +3,7 @@ import TimezonePicker from './timezone';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import ReminderBeforeTaskPicker from './reminder-before-task';
 import CurrencyPicker from './currency';
+import AvatarUploader from './upload';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import {
@@ -74,6 +75,10 @@ class Account extends React.Component<AccountProps> {
   render() {
     return (
       <div>
+        <div className="option-container">
+          <span>Avatar &nbsp;&nbsp;&nbsp;</span>
+          <AvatarUploader />
+        </div>
         <div className="option-container">
           <span>Time Zone &nbsp;&nbsp;&nbsp;</span> <TimezonePicker />
         </div>
