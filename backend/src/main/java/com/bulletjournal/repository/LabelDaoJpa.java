@@ -174,18 +174,6 @@ public class LabelDaoJpa {
     public List<ProjectItems> getLabelsForProjectItems(
             List<ProjectItems> projectItems,
             Map<ProjectItemType, Map<Long, List<Long>>> labelIds) {
-        Map<Long, Label> labelMap = new HashMap<>();
-        projectItems.forEach(p -> {
-            p.getTasks().forEach(t -> labelMap.put(t.getId(), null));
-            p.getTransactions().forEach(t -> labelMap.put(t.getId(), null));
-            p.getNotes().forEach(n -> labelMap.put(n.getId(), null));
-        });
-
-        List<Label> labels = this.labelRepository.findAllById(labelMap.keySet());
-        for (Label label : labels) {
-            labelMap.put(label.getId(), label);
-        }
-
         projectItems.forEach(p -> {
             p.getTasks().forEach(t -> t.setLabels(getLabels(labelIds.get(ProjectItemType.TASK).get(t.getId()))));
             p.getTransactions().forEach(t ->
