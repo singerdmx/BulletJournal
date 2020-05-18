@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectItemType;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ProjectType;
@@ -23,10 +24,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bulletjournal.controller.utils.ProjectItemsGrouper.*;
@@ -122,31 +120,29 @@ public class ProjectItemController {
 
     @GetMapping(RECENT_ITEMS_ROUTE)
     @ResponseBody
-    public ProjectItems getRecentProjectItems(
+    public List<ProjectItem> getRecentProjectItems(
             @Valid @RequestParam List<ProjectType> types,
             @NotBlank @RequestParam String startDate,
             @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
 
         if (types.isEmpty()) {
-            return new ProjectItems();
+            return Collections.emptyList();
         }
 
         Timestamp startTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(startDate, null, timezone).toInstant());
         Timestamp endTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(endDate, null, timezone).toInstant());
-        ProjectItems projectItems = new ProjectItems();
+        List<ProjectItem> projectItems = new LinkedList<>();
 
         List<Task> tasks = taskDaoJpa.getRecentTasksBetween(startTime, endTime);
         List<Transaction> transactions = transactionDaoJpa.getRecentTransactionsBetween(startTime, endTime);
         List<Note> notes = noteDaoJpa.getRecentNotesBetween(startTime, endTime);
 
-        tasks.sort(RECENT_TASK_COMPARATOR);
-        transactions.sort(RECENT_TRANSACTION_COMPARATOR);
-        notes.sort(RECENT_NOTE_COMPARATOR);
+        projectItems.addAll(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
+        projectItems.addAll(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
+        projectItems.addAll(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
 
-        projectItems.setTasks(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
-        projectItems.setTransactions(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
-        projectItems.setNotes(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
+        projectItems.sort((t1, t2) -> t2.getUpdatedAt().compareTo(t1.getUpdatedAt()));
 
         return projectItems;
     }
