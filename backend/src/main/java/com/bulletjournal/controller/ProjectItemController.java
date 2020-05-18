@@ -1,13 +1,13 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectItemType;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.User;
@@ -19,15 +19,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.bulletjournal.controller.utils.ProjectItemsGrouper.*;
 
 @RestController
 public class ProjectItemController {
@@ -43,6 +45,9 @@ public class ProjectItemController {
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
+
+    @Autowired
+    private NoteDaoJpa noteDaoJpa;
 
     @Autowired
     private LabelDaoJpa labelDaoJpa;
@@ -117,12 +122,32 @@ public class ProjectItemController {
 
     @GetMapping(RECENT_ITEMS_ROUTE)
     @ResponseBody
-    public List<ProjectItem> getRecentProjectItems(
+    public ProjectItems getRecentProjectItems(
             @Valid @RequestParam List<ProjectType> types,
             @NotBlank @RequestParam String startDate,
             @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
-        this.systemDaoJpa.getRecentItems(1);
-        return null;
+
+        if (types.isEmpty()) {
+            return new ProjectItems();
+        }
+
+        Timestamp startTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(startDate, null, timezone).toInstant());
+        Timestamp endTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(endDate, null, timezone).toInstant());
+        ProjectItems projectItems = new ProjectItems();
+
+        List<Task> tasks = taskDaoJpa.getRecentTasksBetween(startTime, endTime);
+        List<Transaction> transactions = transactionDaoJpa.getRecentTransactionsBetween(startTime, endTime);
+        List<Note> notes = noteDaoJpa.getRecentNotesBetween(startTime, endTime);
+
+        tasks.sort(RECENT_TASK_COMPARATOR);
+        transactions.sort(RECENT_TRANSACTION_COMPARATOR);
+        notes.sort(RECENT_NOTE_COMPARATOR);
+
+        projectItems.setTasks(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
+        projectItems.setTransactions(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
+        projectItems.setNotes(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
+
+        return projectItems;
     }
 }

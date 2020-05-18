@@ -113,6 +113,18 @@ public class ProjectItemsGrouper {
         return z1.compareTo(z2);
     };
 
+    public static final Comparator<Task> RECENT_TASK_COMPARATOR = (t1, t2) -> {
+        return t2.getUpdatedAt().compareTo(t1.getUpdatedAt());
+    };
+
+    public static final Comparator<Transaction> RECENT_TRANSACTION_COMPARATOR = (t1, t2) -> {
+        return t2.getUpdatedAt().compareTo(t1.getUpdatedAt());
+    };
+
+    public static final Comparator<Note> RECENT_NOTE_COMPARATOR = (n1, n2) -> {
+        return n2.getUpdatedAt().compareTo(n1.getUpdatedAt());
+    };
+
     /*
      * Merge tasks map to target projectItems map
      *

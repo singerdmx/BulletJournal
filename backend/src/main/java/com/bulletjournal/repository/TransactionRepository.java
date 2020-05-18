@@ -25,13 +25,18 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                         + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
                         + "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
         List<Transaction> findTransactionsOfPayerBetween(@Param("payer") String payer,
-                        @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
+                                                         @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
 
         @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND transaction.payer = :payer AND "
-                        + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
-                        + "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
+                + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
+                + "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
         List<Transaction> findTransactionsInProjectByPayerBetween(@Param("payer") String payer,
-                        @Param("project") Project project, @Param("startTime") Timestamp startTime,
-                        @Param("endTime") Timestamp endTime);
+                                                                  @Param("project") Project project, @Param("startTime") Timestamp startTime,
+                                                                  @Param("endTime") Timestamp endTime);
+
+        @Query("SELECT transaction FROM Transaction transaction WHERE transaction.updatedAt >= :startTime AND transaction.updatedAt <= :endTime")
+        List<Transaction> findRecentTransactionsBetween(@Param("startTime") Timestamp startTime,
+                                                        @Param("endTime") Timestamp endTime);
+
 
 }

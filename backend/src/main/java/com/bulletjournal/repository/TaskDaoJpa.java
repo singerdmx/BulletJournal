@@ -861,4 +861,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
         return false;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getRecentTasksBetween(Timestamp startTime, Timestamp endTime) {
+        List<Task> tasks = this.taskRepository.findRecentTasksBetween(startTime, endTime);
+        return tasks;
+    }
 }
