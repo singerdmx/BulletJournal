@@ -58,7 +58,7 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
   };
 
   return (
-    <div>
+    <div className="upload-container">
       <Upload
         listType="picture-card"
         showUploadList={false}
@@ -74,7 +74,7 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
         onClick={() => handleUpload(state.file)}
         loading={state.uploading}
       >
-        Update
+        Upload
       </Button>
     </div>
   );

@@ -76,22 +76,22 @@ class Account extends React.Component<AccountProps> {
     return (
       <div>
         <div className="option-container">
-          <span>Avatar &nbsp;&nbsp;&nbsp;</span>
+          <span>Avatar :</span>
           <AvatarUploader />
         </div>
         <div className="option-container">
-          <span>Time Zone &nbsp;&nbsp;&nbsp;</span> <TimezonePicker />
+          <span>Time Zone :</span> <TimezonePicker />
         </div>
         <div className="option-container">
-          <span>Default Reminder Before Task&nbsp;&nbsp;&nbsp;</span>
+          <span>Default Reminder Before Task : </span>
           <ReminderBeforeTaskPicker />
         </div>
         <div className="option-container">
-          <span>Currency&nbsp;&nbsp;&nbsp;</span>
+          <span>Currency :</span>
           <CurrencyPicker />
         </div>
         <div className="option-container">
-          <span>Theme&nbsp;&nbsp;&nbsp;</span>
+          <span>Theme :</span>
           <span>
             <Select
               style={{ width: 80 }}
