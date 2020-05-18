@@ -41,7 +41,7 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
 
   const handleUpload = (file: RcFile) => {
     if (!file) {
-      message.warn('Please select an image for avatar and then click Update button');
+      message.warn('Please select an image for avatar and then click Upload button');
       return;
     }
     let formData = new FormData();
