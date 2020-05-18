@@ -7,6 +7,7 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
+import com.bulletjournal.repository.UserAliasDaoJpa;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProjectController {
@@ -44,6 +47,9 @@ public class ProjectController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private UserAliasDaoJpa userAliasDaoJpa;
 
     @GetMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> getProjects() {
@@ -153,6 +159,13 @@ public class ProjectController {
     public List<Activity> getHistory(@NotNull @PathVariable Long projectId, @NotBlank @RequestParam String timezone,
             @NotBlank @RequestParam String startDate, @RequestParam String endDate) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-        return this.auditableDaoJpa.getHistory(projectId, timezone, startDate, endDate, requester);
+        Map<String, String> alias = this.userAliasDaoJpa.getAliases(requester);
+        return this.auditableDaoJpa.getHistory(projectId, timezone, startDate, endDate, requester)
+                .stream().map(a -> {
+                    User user = this.userClient.getUser(a.getOriginator().getName());
+                    user.setAlias(alias.getOrDefault(user.getName(), user.getName()));
+                    a.setOriginator(user);
+                    return a;
+                }).collect(Collectors.toList());
     }
 }
