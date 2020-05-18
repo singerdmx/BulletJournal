@@ -51,7 +51,6 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
       .then((res) => {
-        message.success('upload finished');
         setAState({ ...state, uploading: false });
       })
       .catch((e) => message.error('Problem while uploading'));
