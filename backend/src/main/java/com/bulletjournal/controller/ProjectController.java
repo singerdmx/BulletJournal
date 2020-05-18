@@ -152,6 +152,7 @@ public class ProjectController {
     @GetMapping(PROJECT_HISTORY_ROUTE)
     public List<Activity> getHistory(@NotNull @PathVariable Long projectId, @NotBlank @RequestParam String timezone,
             @NotBlank @RequestParam String startDate, @RequestParam String endDate) {
-        return null;
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        return this.auditableDaoJpa.getHistory(projectId, timezone, startDate, endDate, requester);
     }
 }
