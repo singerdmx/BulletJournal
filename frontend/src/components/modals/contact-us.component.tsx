@@ -1,6 +1,7 @@
 import React from 'react';
 import { BugOutlined, MessageOutlined } from '@ant-design/icons';
 import { Modal, Tabs } from 'antd';
+import Feedback from "../contact-us/feedback.component";
 
 const { TabPane } = Tabs;
 
@@ -10,6 +11,7 @@ type ContactUsProps = {
 };
 
 const ContactUs: React.FC<ContactUsProps> = ({ visible, onCancel }) => {
+
   return (
     <Modal
       title='Contact Support'
@@ -26,7 +28,9 @@ const ContactUs: React.FC<ContactUsProps> = ({ visible, onCancel }) => {
             </span>
           }
           key='Feedback'
-        ></TabPane>
+        >
+          <Feedback/>
+        </TabPane>
         <TabPane
           tab={
             <span>
