@@ -1,21 +1,27 @@
-import React, {useEffect, useState} from 'react';
-import {Avatar, Form, Modal, Select, Tooltip} from 'antd';
-import {useHistory} from 'react-router-dom';
-import {RightCircleOutlined} from '@ant-design/icons';
-import {connect} from 'react-redux';
-import {GroupsWithOwner} from '../../features/group/interface';
-import {createProjectByName} from '../../features/project/actions';
-import {updateGroups} from '../../features/group/actions';
-import {IState} from '../../store';
-import {Project, ProjectsWithOwner} from '../../features/project/interface';
-import {iconMapper} from '../side-menu/side-menu.component';
-import {moveTask} from '../../features/tasks/actions';
-import {moveNote} from '../../features/notes/actions';
-import {moveTransaction} from '../../features/transactions/actions';
-import {History} from 'history';
+import React, { useEffect, useState } from 'react';
+import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
+import { useHistory } from 'react-router-dom';
+import { RightCircleOutlined } from '@ant-design/icons';
+import { connect } from 'react-redux';
+import { GroupsWithOwner } from '../../features/group/interface';
+import { createProjectByName } from '../../features/project/actions';
+import { updateGroups } from '../../features/group/actions';
+import { IState } from '../../store';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
+import { iconMapper } from '../side-menu/side-menu.component';
+import { moveTask } from '../../features/tasks/actions';
+import { moveNote } from '../../features/notes/actions';
+import { moveTransaction } from '../../features/transactions/actions';
+import { History } from 'history';
 import './modals.styles.less';
-import {flattenOwnedProject, flattenSharedProject} from '../../pages/projects/projects.pages';
-import {getProjectItemType, ProjectType} from "../../features/project/constants";
+import {
+  flattenOwnedProject,
+  flattenSharedProject,
+} from '../../pages/projects/projects.pages';
+import {
+  getProjectItemType,
+  ProjectType,
+} from '../../features/project/constants';
 
 const { Option } = Select;
 
@@ -42,7 +48,7 @@ type GroupProps = {
   ) => void;
 };
 
-const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
+const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
   const { mode } = props;
   const [projects, setProjects] = useState<Project[]>([]);
   const [form] = Form.useForm();
@@ -63,19 +69,18 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
   }, []);
 
   useEffect(() => {
-    setProjects([]);
-    setProjects(flattenOwnedProject(props.ownedProjects, projects));
-    setProjects(flattenSharedProject(props.sharedProjects, projects));
-    setProjects(
-      projects.filter(p => {
-        if (!props.project) {
-          return true;
-        }
-        return (
-          p.projectType === props.type && p.id !== props.project.id && !p.shared
-        );
-      })
-    );
+    let updateProjects = [] as Project[];
+    updateProjects = flattenOwnedProject(props.ownedProjects, updateProjects);
+    updateProjects = flattenSharedProject(props.sharedProjects, updateProjects);
+    updateProjects.filter((p) => {
+      if (!props.project) {
+        return true;
+      }
+      return (
+        p.projectType === props.type && p.id !== props.project.id && !p.shared
+      );
+    });
+    setProjects(updateProjects);
   }, [props.ownedProjects, props.sharedProjects]);
 
   const moveProjectItem = (values: any) => {
@@ -109,10 +114,17 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
                 style={{ width: '100%' }}
                 defaultValue={projects[0].id}
               >
-                {projects.map(project => {
+                {projects.map((project) => {
                   return (
                     <Option value={project.id} key={project.id}>
-                      <Tooltip title={`${props.aliases[project.owner] ? props.aliases[project.owner] : project.owner}`} placement='right'>
+                      <Tooltip
+                        title={`${
+                          props.aliases[project.owner]
+                            ? props.aliases[project.owner]
+                            : project.owner
+                        }`}
+                        placement='right'
+                      >
                         <span>
                           <Avatar size='small' src={project.ownerAvatar} />
                           &nbsp; {iconMapper[project.projectType]}
@@ -141,15 +153,15 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
         centered
         okText='Confirm'
         visible={visible}
-        onCancel={e => handleCancel(e)}
+        onCancel={(e) => handleCancel(e)}
         onOk={() => {
           form
             .validateFields()
-            .then(values => {
+            .then((values) => {
               form.resetFields();
               moveProjectItem(values);
             })
-            .catch(info => console.log(info));
+            .catch((info) => console.log(info));
         }}
       >
         <div>{getProjectSelections()}</div>
@@ -171,14 +183,14 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = props => {
       );
     } else {
       return (
-          <Tooltip title={`MOVE ${getProjectItemType(props.type)}`}>
-            <div>
-              <span onClick={openModal}>
-                <RightCircleOutlined />
-                {getModal()}
-              </span>
-            </div>
-          </Tooltip>
+        <Tooltip title={`MOVE ${getProjectItemType(props.type)}`}>
+          <div>
+            <span onClick={openModal}>
+              <RightCircleOutlined />
+              {getModal()}
+            </span>
+          </div>
+        </Tooltip>
       );
     }
   };
@@ -191,7 +203,7 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
   project: state.project.project,
   ownedProjects: state.project.owned,
-  sharedProjects: state.project.shared
+  sharedProjects: state.project.shared,
 });
 
 export default connect(mapStateToProps, {
@@ -199,5 +211,5 @@ export default connect(mapStateToProps, {
   createProjectByName,
   moveNote,
   moveTask,
-  moveTransaction
+  moveTransaction,
 })(MoveProjectItem);
