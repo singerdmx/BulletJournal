@@ -756,7 +756,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal Long - the completed task id
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Long uncomplete(String requester, Long taskId) {
+    public Pair<Long, CompletedTask> uncomplete(String requester, Long taskId) {
         CompletedTask task = this.completedTaskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
         Project project = task.getProject();
@@ -771,7 +771,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         for (TaskContent content : contents) {
             this.addContent(newId, content.getOwner(), content);
         }
-        return newId;
+        return Pair.of(newId, task);
     }
 
     /**

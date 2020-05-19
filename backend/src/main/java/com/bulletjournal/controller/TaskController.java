@@ -181,13 +181,25 @@ public class TaskController {
     public Task completeTask(@NotNull @PathVariable Long taskId, @RequestBody Optional<String> dateTime) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         CompletedTask task = this.taskDaoJpa.complete(username, taskId, dateTime.orElse(null));
+
+        this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
+                "completed Task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##", username,
+                task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
+
         return getCompletedTask(task.getId());
     }
 
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
     public Task uncompleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Long newId = this.taskDaoJpa.uncomplete(username, taskId);
+        Pair<Long, CompletedTask> res = this.taskDaoJpa.uncomplete(username, taskId);
+        Long newId = res.getLeft();
+        CompletedTask task = res.getRight();
+
+        this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
+                "uncompleted Task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##", username,
+                task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
+
         return getTask(newId);
     }
 

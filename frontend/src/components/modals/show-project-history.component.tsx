@@ -125,13 +125,8 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                     setSelectProject(id);
                     projects.forEach((p) => {
                       if (p.id === id) {
-                        console.log('inside');
-                        console.log(id);
-                        console.log(projects);
-                        console.log(p.group.id);
                         getGroup(p.group.id);
                         setSelectUser('Everyone');
-                        console.log(group);
                       }
                     });
                   }}

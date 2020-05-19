@@ -10,6 +10,7 @@ public class Activity {
     private String activity;
     private Timestamp activityTime;
     private ContentAction action;
+    private String link;
 
     public User getOriginator() {
         return originator;
@@ -41,6 +42,14 @@ public class Activity {
 
     public void setAction(ContentAction action) {
         this.action = action;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
 }
