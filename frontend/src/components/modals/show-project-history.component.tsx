@@ -10,7 +10,7 @@ import {
   Button,
   Avatar,
 } from 'antd';
-import { HistoryOutlined, SyncOutlined } from '@ant-design/icons';
+import { HistoryOutlined, SyncOutlined, TeamOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { ContentAction } from '../../features/project/constants';
 import { iconMapper } from '../side-menu/side-menu.component';
@@ -20,6 +20,7 @@ import {
 } from '../../pages/projects/projects.pages';
 import { getGroup } from '../../features/group/actions';
 import { User, Group } from '../../features/group/interface';
+import moment from 'moment';
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -38,13 +39,20 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   sharedProjects,
   aliases,
   group,
+  getGroup,
 }) => {
   const [visible, setVisible] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   //used for form
+  const [selectDate, setSelectDate] = useState([
+    moment().startOf('month').toString(),
+    moment().endOf('month').toString(),
+  ]);
+
   const [selectProject, setSelectProject] = useState(-1);
-  const [selectAction, setSelectAction] = useState(ContentAction.ADD_PROJECT);
+  const [selectAction, setSelectAction] = useState('ALL_ACTIONS');
   const [selectGroup, setSelectGroup] = useState([] as User[]);
+  const [selectUser, setSelectUser] = useState('Everyone');
 
   const onCancel = () => setVisible(false);
   const openModal = () => setVisible(true);
@@ -66,6 +74,10 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
     setProjects(updateProjects);
   }, [ownedProjects, sharedProjects]);
 
+  const handleRangeChange = (dates: any, dateStrings: string[]) => {
+    setSelectDate([dateStrings[0], dateStrings[1]]);
+  };
+
   if (!project) {
     return null;
   }
@@ -82,22 +94,43 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
           visible={visible}
           onCancel={onCancel}
           footer={false}
+          destroyOnClose={true}
         >
           <div>
             <div style={{ paddingBottom: '20px' }}>
-              <RangePicker />
+              <RangePicker
+                ranges={{
+                  Today: [moment(), moment()],
+                  'This Week': [
+                    moment().startOf('week'),
+                    moment().endOf('week'),
+                  ],
+                  'This Month': [
+                    moment().startOf('month'),
+                    moment().endOf('month'),
+                  ],
+                }}
+                value={[moment(selectDate[0]), moment(selectDate[1])]}
+                allowClear={false}
+                onChange={handleRangeChange}
+              />
             </div>
             <div style={{ paddingBottom: '20px' }}>
-              <Tooltip title='Select an Project'>
+              <Tooltip title='Select BuJo'>
                 <Select
                   style={{ width: '256px' }}
-                  placeholder='Select a Project'
+                  placeholder='Select BuJo'
                   value={selectProject}
                   onChange={(id: number) => {
                     setSelectProject(id);
                     projects.forEach((p) => {
                       if (p.id === id) {
+                        console.log('inside');
+                        console.log(id);
+                        console.log(projects);
+                        console.log(p.group.id);
                         getGroup(p.group.id);
+                        setSelectUser('Everyone');
                         console.log(group);
                       }
                     });
@@ -130,33 +163,37 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
           </div>
           <div style={{ display: 'flex' }}>
             <span>
-              <Tooltip title='Select an Action'>
-                <Select
-                  style={{ width: '200px', marginRight: '25px' }}
-                  placeholder='Select an Action'
-                  value={selectAction}
-                  onChange={(action) => {
-                    setSelectAction(action);
-                  }}
-                >
-                  {Object.keys(ContentAction).map((action) => {
-                    return (
-                      <Option value={action} key={action}>
-                        <Tooltip title={action}>
-                          <span> {action}</span>
-                        </Tooltip>
-                      </Option>
-                    );
-                  })}
-                </Select>
-              </Tooltip>
+              <Select
+                style={{ width: '200px', marginRight: '25px' }}
+                value={selectAction.replace('_', ' ')}
+                onChange={(action) => {
+                  let actionkey = action.replace(' ', '_');
+                  setSelectAction(actionkey);
+                }}
+              >
+                {Object.values(ContentAction).map((action) => {
+                  return (
+                    <Option value={action} key={action}>
+                      <span> {action}</span>
+                    </Option>
+                  );
+                })}
+              </Select>
             </span>
             <span>
-              <Tooltip title='Select an Person'>
+              <Tooltip title='Select User'>
                 <Select
                   style={{ width: '150px' }}
-                  placeholder='Select a Person'
+                  placeholder='Select User'
+                  value={selectUser}
+                  onChange={(user) => {
+                    setSelectUser(user);
+                  }}
                 >
+                  <Option value='Everyone' key='Everyone'>
+                    <TeamOutlined style={{ fontSize: '20px' }} />
+                    &nbsp;&nbsp;&nbsp;&nbsp;<strong>Everyone</strong>
+                  </Option>
                   {selectGroup &&
                     selectGroup.length > 0 &&
                     selectGroup.map((user) => {
