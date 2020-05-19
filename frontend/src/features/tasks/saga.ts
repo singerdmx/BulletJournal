@@ -328,6 +328,15 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
     );
 
     const state: IState = yield select();
+    //get etag from header
+    const etag = data.headers.get('Etag')!;
+    const systemState = state.system;
+    yield put(
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag,
+        })
+    );
     const completedTaskPageNo = state.task.completedTaskPageNo;
     if (completedTaskPageNo > 0) {
       const completedTasks = yield call(
@@ -394,6 +403,15 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
       })
     );
     const state: IState = yield select();
+    //get etag from header
+    const etag = data.headers.get('Etag')!;
+    const systemState = state.system;
+    yield put(
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag,
+        })
+    );
     const completedTaskPageNo = state.task.completedTaskPageNo;
     if (completedTaskPageNo > 0) {
       const completedTasks = yield call(
