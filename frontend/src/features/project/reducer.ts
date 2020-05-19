@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { ProjectType } from './constants';
-import { Project, ProjectsWithOwner } from './interface';
+import { ProjectType, ContentAction } from './constants';
+import { Project, ProjectsWithOwner, Activity } from './interface';
 import { History } from 'history';
+import { User } from '../group/interface';
 
 export type ProjectApiErrorAction = {
   error: string;
@@ -51,25 +52,41 @@ export type Projects = {
   shared: ProjectsWithOwner[];
 };
 
+export type HistoryAction = {
+  projectHistory: Activity[];
+};
+
+export type GetProjectHistoryAction = {
+  projectId: number;
+  timezone: string;
+  startDate: string;
+  endDate: string;
+};
+
 let initialState = {
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
   project: undefined as Project | undefined,
+  projectHistory: [] as Activity[],
 };
 
 const slice = createSlice({
   name: 'projects',
   initialState,
   reducers: {
+    historyReceived: (state, action: PayloadAction<HistoryAction>) => {
+      const { projectHistory } = action.payload;
+      state.projectHistory = projectHistory;
+    },
+    getProjectHistory: (
+      state,
+      action: PayloadAction<GetProjectHistoryAction>
+    ) => state,
     projectsReceived: (state, action: PayloadAction<Projects>) => {
-      const {
-        owned,
-        shared
-      } = action.payload;
+      const { owned, shared } = action.payload;
       state.owned = owned;
       state.shared = shared;
     },
-
     projectsApiErrorReceived: (
       state,
       action: PayloadAction<ProjectApiErrorAction>
@@ -90,8 +107,8 @@ const slice = createSlice({
     updateProjectRelations: (
       state,
       action: PayloadAction<UpdateProjectRelationsAction>
-    ) => state
-  }
+    ) => state,
+  },
 });
 
 export const reducer = slice.reducer;

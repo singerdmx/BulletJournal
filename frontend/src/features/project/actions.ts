@@ -15,14 +15,18 @@ export const createProjectByName = (
     groupId: groupId,
     name: name,
     projectType: projectType,
-    history: history
+    history: history,
   });
 export const getProject = (projectId: number) =>
   actions.getProject({ projectId: projectId });
 export const updateSharedProjectsOrder = (projectOwners: string[]) =>
   actions.updateSharedProjectsOrder({ projectOwners: projectOwners });
-export const deleteProject = (projectId: number, name: string, history: History<History.PoorMansUnknown>) =>
-  actions.deleteProject({ projectId: projectId, name: name, history: history});
+export const deleteProject = (
+  projectId: number,
+  name: string,
+  history: History<History.PoorMansUnknown>
+) =>
+  actions.deleteProject({ projectId: projectId, name: name, history: history });
 export const updateProject = (
   projectId: number,
   description: string,
@@ -33,6 +37,19 @@ export const updateProject = (
     projectId: projectId,
     description: description,
     groupId: groupId,
-    name: name
+    name: name,
   });
-export const updateProjectRelations = (projects: Project[]) => actions.updateProjectRelations({ projects: projects });
+export const updateProjectRelations = (projects: Project[]) =>
+  actions.updateProjectRelations({ projects: projects });
+export const getProjectHistory = (
+  projectId: number,
+  timezone: string,
+  startDate: string,
+  endDate: string
+) =>
+  actions.getProjectHistory({
+    projectId: projectId,
+    timezone: timezone,
+    startDate: startDate,
+    endDate: endDate,
+  });

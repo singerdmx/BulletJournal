@@ -1,5 +1,5 @@
-import { ProjectType } from './constants';
-import { Group } from '../group/interface';
+import { ProjectType, ContentAction } from './constants';
+import { Group, User } from '../group/interface';
 
 export interface Project {
   description: string;
@@ -17,4 +17,12 @@ export interface ProjectsWithOwner {
   owner: string;
   ownerAvatar: string;
   projects: Project[];
+}
+
+export interface Activity {
+  originator: User;
+  activity: String;
+  activityTime: String;
+  action: ContentAction;
+  link: String;
 }

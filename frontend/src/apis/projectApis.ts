@@ -3,16 +3,16 @@ import { Project } from '../features/project/interface';
 
 export const fetchProjects = () => {
   return doFetch('/api/projects')
-    .then(res => res)
-    .catch(err => {
+    .then((res) => res)
+    .catch((err) => {
       throw Error(err.message);
     });
 };
 
 export const getProject = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}`)
-    .then(res => res.json())
-    .catch(err => {
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err.message);
     });
 };
@@ -27,29 +27,28 @@ export const createProject = (
     description: description,
     name: name,
     projectType: projectType,
-    groupId: groupId
+    groupId: groupId,
   });
   return doPost('/api/projects', postBody)
-    .then(res => res.json())
-    .catch(err => {
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err.message);
     });
 };
 
 export const updateSharedProjectsOrder = (projectOwners: string[]) => {
   const postBody = JSON.stringify({
-    projectOwners: projectOwners
+    projectOwners: projectOwners,
   });
   console.log(postBody);
 
-  return doPost('/api/updateSharedProjectsOrder', postBody)
-    .catch(err => {
-      throw Error(err.message);
-    });
+  return doPost('/api/updateSharedProjectsOrder', postBody).catch((err) => {
+    throw Error(err.message);
+  });
 };
 
 export const deleteProject = (projectId: number) => {
-  return doDelete(`/api/projects/${projectId}`).catch(err => {
+  return doDelete(`/api/projects/${projectId}`).catch((err) => {
     throw Error(err);
   });
 };
@@ -63,11 +62,11 @@ export const updateProject = (
   const patchBody = JSON.stringify({
     description: description,
     groupId: groupId,
-    name: name
+    name: name,
   });
   return doPatch(`/api/projects/${projectId}`, patchBody)
-    .then(res => res.json())
-    .catch(err => {
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err.message);
     });
 };
@@ -75,8 +74,23 @@ export const updateProject = (
 export const updateProjectRelations = (projects: Project[]) => {
   const putBody = JSON.stringify(projects);
   return doPut('/api/projects', putBody)
-    .then(res => res)
-    .catch(err => {
+    .then((res) => res)
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};
+
+export const GetProjectHistory = (
+  projectId: number,
+  timezone: string,
+  startDate: string,
+  endDate: string
+) => {
+  return doFetch(
+    `/api/projects/${projectId}/history?timezone=${timezone}&startDate=${startDate}&endDate=${endDate}`
+  )
+    .then((res) => res.json())
+    .catch((err) => {
       throw Error(err.message);
     });
 };

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { IState } from '../../store';
-import { Project, ProjectsWithOwner } from '../../features/project/interface';
+import {
+  Project,
+  ProjectsWithOwner,
+  Activity,
+} from '../../features/project/interface';
 import {
   Modal,
   Tooltip,
@@ -21,6 +25,7 @@ import {
 import { getGroup } from '../../features/group/actions';
 import { User, Group } from '../../features/group/interface';
 import moment from 'moment';
+import { getProjectHistory } from '../../features/project/actions';
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -30,7 +35,15 @@ type ShowProjectHistoryProps = {
   sharedProjects: ProjectsWithOwner[];
   aliases: any;
   group: Group | undefined;
+  timezone: string;
+  projectHistory: Activity[];
   getGroup: (groupId: number) => void;
+  getProjectHistory: (
+    projectId: number,
+    timezone: string,
+    startDate: string,
+    endDate: string
+  ) => void;
 };
 
 const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
@@ -39,14 +52,17 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   sharedProjects,
   aliases,
   group,
+  projectHistory,
+  timezone,
   getGroup,
+  getProjectHistory,
 }) => {
   const [visible, setVisible] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   //used for form
   const [selectDate, setSelectDate] = useState([
-    moment().startOf('month').toString(),
-    moment().endOf('month').toString(),
+    moment().startOf('month').format('YYYY-MM-DD'),
+    moment().endOf('month').format('YYYY-MM-DD'),
   ]);
 
   const [selectProject, setSelectProject] = useState(-1);
@@ -76,6 +92,10 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
 
   const handleRangeChange = (dates: any, dateStrings: string[]) => {
     setSelectDate([dateStrings[0], dateStrings[1]]);
+  };
+
+  const handleGetHistory = () => {
+    getProjectHistory(selectProject, timezone, selectDate[0], selectDate[1]);
   };
 
   if (!project || project.shared) {
@@ -204,12 +224,16 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
             </span>
             <span className='history-refresh-button'>
               <Tooltip title='Refresh'>
-                <Button type='primary'>Search</Button>
+                <Button type='primary' onClick={handleGetHistory}>
+                  Search
+                </Button>
               </Tooltip>
             </span>
           </div>
           <Divider />
-          <div>aaaaas</div>
+          {projectHistory.map((p) => {
+            return <div>aaa</div>;
+          })}
         </Modal>
       </div>
     </Tooltip>
@@ -222,6 +246,10 @@ const mapStateToProps = (state: IState) => ({
   sharedProjects: state.project.shared,
   aliases: state.system.aliases,
   group: state.group.group,
+  projectHistory: state.project.projectHistory,
+  timezone: state.myself.timezone,
 });
 
-export default connect(mapStateToProps, { getGroup })(ShowProjectHistory);
+export default connect(mapStateToProps, { getGroup, getProjectHistory })(
+  ShowProjectHistory
+);
