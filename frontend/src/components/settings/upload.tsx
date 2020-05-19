@@ -41,7 +41,7 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
 
   const handleUpload = (file: RcFile) => {
     if (!file) {
-      message.warn('find a new avatar');
+      message.warn('Please select an image for avatar and then click Upload button');
       return;
     }
     let formData = new FormData();
@@ -51,14 +51,13 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
       .then((res) => {
-        message.success('upload finished');
         setAState({ ...state, uploading: false });
       })
       .catch((e) => message.error('Problem while uploading'));
   };
 
   return (
-    <div>
+    <div className="upload-container">
       <Upload
         listType="picture-card"
         showUploadList={false}
@@ -74,7 +73,7 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
         onClick={() => handleUpload(state.file)}
         loading={state.uploading}
       >
-        Update
+        Upload
       </Button>
     </div>
   );

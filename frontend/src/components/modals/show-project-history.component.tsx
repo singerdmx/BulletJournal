@@ -1,20 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { Modal, Tooltip, Select, DatePicker, Divider } from 'antd';
-import { HistoryOutlined, SyncOutlined } from '@ant-design/icons';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
+import {
+  Modal,
+  Tooltip,
+  Select,
+  DatePicker,
+  Divider,
+  Button,
+  Avatar,
+} from 'antd';
+import { HistoryOutlined, SyncOutlined, TeamOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
+import { ContentAction } from '../../features/project/constants';
+import { iconMapper } from '../side-menu/side-menu.component';
+import {
+  flattenOwnedProject,
+  flattenSharedProject,
+} from '../../pages/projects/projects.pages';
+import { getGroup } from '../../features/group/actions';
+import { User, Group } from '../../features/group/interface';
+import moment from 'moment';
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 type ShowProjectHistoryProps = {
   project: Project | undefined;
+  ownedProjects: Project[];
+  sharedProjects: ProjectsWithOwner[];
+  aliases: any;
+  group: Group | undefined;
+  getGroup: (groupId: number) => void;
 };
 
-const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({ project }) => {
+const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
+  project,
+  ownedProjects,
+  sharedProjects,
+  aliases,
+  group,
+  getGroup,
+}) => {
   const [visible, setVisible] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  //used for form
+  const [selectDate, setSelectDate] = useState([
+    moment().startOf('month').toString(),
+    moment().endOf('month').toString(),
+  ]);
+
+  const [selectProject, setSelectProject] = useState(-1);
+  const [selectAction, setSelectAction] = useState('ALL_ACTIONS');
+  const [selectGroup, setSelectGroup] = useState([] as User[]);
+  const [selectUser, setSelectUser] = useState('Everyone');
+
   const onCancel = () => setVisible(false);
   const openModal = () => setVisible(true);
+
+  useEffect(() => {
+    if (group) {
+      setSelectGroup(group.users);
+    }
+  }, [group]);
+  useEffect(() => {
+    if (project) {
+      setSelectProject(project.id);
+    }
+  }, [project]);
+  useEffect(() => {
+    let updateProjects = [] as Project[];
+    updateProjects = flattenOwnedProject(ownedProjects, updateProjects);
+    updateProjects = flattenSharedProject(sharedProjects, updateProjects);
+    setProjects(updateProjects);
+  }, [ownedProjects, sharedProjects]);
+
+  const handleRangeChange = (dates: any, dateStrings: string[]) => {
+    setSelectDate([dateStrings[0], dateStrings[1]]);
+  };
 
   if (!project) {
     return null;
@@ -32,45 +94,127 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({ project }) => {
           visible={visible}
           onCancel={onCancel}
           footer={false}
+          destroyOnClose={true}
         >
           <div>
-            <div>
-              <RangePicker />
-              <span className='history-refresh-button'>
-                <Tooltip title='Refresh'>
-                  <SyncOutlined />
-                </Tooltip>
-              </span>
+            <div style={{ paddingBottom: '20px' }}>
+              <RangePicker
+                ranges={{
+                  Today: [moment(), moment()],
+                  'This Week': [
+                    moment().startOf('week'),
+                    moment().endOf('week'),
+                  ],
+                  'This Month': [
+                    moment().startOf('month'),
+                    moment().endOf('month'),
+                  ],
+                }}
+                value={[moment(selectDate[0]), moment(selectDate[1])]}
+                allowClear={false}
+                onChange={handleRangeChange}
+              />
             </div>
-            <div style={{ display: 'flex' }}>
-              <span>
+            <div style={{ paddingBottom: '20px' }}>
+              <Tooltip title='Select BuJo'>
                 <Select
-                  style={{ width: '150px', marginRight: '30px' }}
-                  placeholder='Select Person'
+                  style={{ width: '256px' }}
+                  placeholder='Select BuJo'
+                  value={selectProject}
+                  onChange={(id: number) => {
+                    setSelectProject(id);
+                    projects.forEach((p) => {
+                      if (p.id === id) {
+                        console.log('inside');
+                        console.log(id);
+                        console.log(projects);
+                        console.log(p.group.id);
+                        getGroup(p.group.id);
+                        setSelectUser('Everyone');
+                        console.log(group);
+                      }
+                    });
+                  }}
                 >
-                  <Option key='aa' value='aa'>
-                    aa
-                  </Option>
-                  <Option key='bb' value='bb'>
-                    bb
-                  </Option>
+                  {projects.map((project) => {
+                    return (
+                      <Option value={project.id} key={project.id}>
+                        <Tooltip
+                          title={`${
+                            aliases[project.owner]
+                              ? aliases[project.owner]
+                              : project.owner
+                          }`}
+                          placement='right'
+                        >
+                          <span>
+                            <Avatar size='small' src={project.ownerAvatar} />
+                            &nbsp; {iconMapper[project.projectType]}
+                            &nbsp; <strong>{project.name}</strong>
+                            &nbsp; (Group <strong>{project.group.name}</strong>)
+                          </span>
+                        </Tooltip>
+                      </Option>
+                    );
+                  })}
                 </Select>
-              </span>
-              <span>
-                <Select
-                  style={{ width: '150px', marginRight: '30px' }}
-                  placeholder='Select Action'
-                >
-                  <Option key='aa' value='aa'>
-                    aa
-                  </Option>
-                  <Option key='bb' value='bb'>
-                    bb
-                  </Option>
-                </Select>
-              </span>
+              </Tooltip>
             </div>
           </div>
+          <div style={{ display: 'flex' }}>
+            <span>
+              <Select
+                style={{ width: '200px', marginRight: '25px' }}
+                value={selectAction.replace('_', ' ')}
+                onChange={(action) => {
+                  let actionkey = action.replace(' ', '_');
+                  setSelectAction(actionkey);
+                }}
+              >
+                {Object.values(ContentAction).map((action) => {
+                  return (
+                    <Option value={action} key={action}>
+                      <span> {action}</span>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </span>
+            <span>
+              <Tooltip title='Select User'>
+                <Select
+                  style={{ width: '150px' }}
+                  placeholder='Select User'
+                  value={selectUser}
+                  onChange={(user) => {
+                    setSelectUser(user);
+                  }}
+                >
+                  <Option value='Everyone' key='Everyone'>
+                    <TeamOutlined style={{ fontSize: '20px' }} />
+                    &nbsp;&nbsp;&nbsp;&nbsp;<strong>Everyone</strong>
+                  </Option>
+                  {selectGroup &&
+                    selectGroup.length > 0 &&
+                    selectGroup.map((user) => {
+                      return (
+                        <Option value={user.name} key={user.name}>
+                          <Avatar size='small' src={user.avatar} />
+                          &nbsp;&nbsp; <strong>{user.alias}</strong>
+                        </Option>
+                      );
+                    })}
+                </Select>
+              </Tooltip>
+            </span>
+            <span className='history-refresh-button'>
+              <Tooltip title='Refresh'>
+                <Button type='primary'>Search</Button>
+              </Tooltip>
+            </span>
+          </div>
+          <Divider />
+          <div>aaaaas</div>
         </Modal>
       </div>
     </Tooltip>
@@ -79,6 +223,10 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({ project }) => {
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
+  ownedProjects: state.project.owned,
+  sharedProjects: state.project.shared,
+  aliases: state.system.aliases,
+  group: state.group.group,
 });
 
-export default connect(mapStateToProps, {})(ShowProjectHistory);
+export default connect(mapStateToProps, { getGroup })(ShowProjectHistory);
