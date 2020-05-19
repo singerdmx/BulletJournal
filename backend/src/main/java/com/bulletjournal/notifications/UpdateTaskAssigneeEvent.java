@@ -2,7 +2,6 @@ package com.bulletjournal.notifications;
 
 import com.bulletjournal.contents.ContentType;
 
-
 public class UpdateTaskAssigneeEvent extends Informed {
 
     private final String assignedTo;
@@ -22,11 +21,12 @@ public class UpdateTaskAssigneeEvent extends Informed {
         if (assignedTo == null) {
             return "Task ##" + event.getContentName() + "## is unassigned by ##" + this.getOriginator() + "##";
         }
-        return "Task ##" + event.getContentName() + "## is assigned to ##" + this.assignedTo + "## by ##" + this.getOriginator() + "##";
+        return "Task ##" + event.getContentName() + "## is assigned to ##" + this.assignedTo + "## by ##"
+                + this.getOriginator() + "##";
     }
 
     @Override
     public String getLink(Long contentId) {
-        return String.format("/task/%d", contentId);
+        return ContentType.getContentLink(this.getContentType(), contentId);
     }
 }

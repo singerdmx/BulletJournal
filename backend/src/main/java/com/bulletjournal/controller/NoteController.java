@@ -238,7 +238,7 @@ public class NoteController {
 
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Content in Note ##" + noteName + "## under BuJo ##" + projectName + "##", username, noteId,
-                Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
+                Timestamp.from(Instant.now()), ContentAction.ADD_NOTE_CONTENT));
 
         return createdContent;
     }
@@ -263,7 +263,7 @@ public class NoteController {
 
         this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
                 "deleted Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
-                username, noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
+                username, noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE_CONTENT));
 
         return getContents(noteId);
     }
@@ -277,7 +277,7 @@ public class NoteController {
 
         this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
                 "updated Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
-                username, noteId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
+                username, noteId, Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE_CONTENT));
 
         return getContents(noteId);
     }

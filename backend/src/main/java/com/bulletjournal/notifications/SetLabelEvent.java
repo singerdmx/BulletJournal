@@ -20,11 +20,12 @@ public class SetLabelEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginator() + "## updated labels for " + this.contentType.name() + " ##" + event.getContentName() + "##";
+        return "##" + this.getOriginator() + "## updated labels for " + this.contentType.name() + " ##"
+                + event.getContentName() + "##";
     }
 
     @Override
     public String getLink(Long contentId) {
-        return String.format("/" + this.contentType.name().toLowerCase() + "/%d", contentId);
+        return ContentType.getContentLink(this.contentType, contentId);
     }
 }

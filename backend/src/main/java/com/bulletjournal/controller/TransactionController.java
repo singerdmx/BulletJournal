@@ -220,7 +220,7 @@ public class TransactionController {
 
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Content in Transaction ##" + transactionName + "## under BuJo ##" + projectName + "##",
-                username, transactionId, Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
+                username, transactionId, Timestamp.from(Instant.now()), ContentAction.ADD_TRANSACTION_CONTENT));
 
         return createdContent;
     }
@@ -247,7 +247,7 @@ public class TransactionController {
         this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
                 "deleted Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
                         + transaction.getProject().getName() + "##",
-                username, transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
+                username, transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION_CONTENT));
 
         return getContents(transactionId);
     }
@@ -262,7 +262,7 @@ public class TransactionController {
         this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
                 "updated Content in Transaction ##" + transaction.getName() + "## under BuJo ##"
                         + transaction.getProject().getName() + "##",
-                username, transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
+                username, transactionId, Timestamp.from(Instant.now()), ContentAction.UPDATE_TRANSACTION_CONTENT));
 
         return getContents(transactionId);
     }

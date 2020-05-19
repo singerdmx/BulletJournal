@@ -301,7 +301,7 @@ public class TaskController {
 
         this.notificationService.trackActivity(
                 new Auditable(projectId, "created Content in Task ##" + taskName + "## in BuJo ##" + projectName + "##",
-                        username, taskId, Timestamp.from(Instant.now()), ContentAction.ADD_CONTENT));
+                        username, taskId, Timestamp.from(Instant.now()), ContentAction.ADD_TASK_CONTENT));
 
         return createdContent;
     }
@@ -336,7 +336,7 @@ public class TaskController {
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
                 "Deleted Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
-                username, taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_CONTENT));
+                username, taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK_CONTENT));
 
         return getContents(taskId);
     }
@@ -350,7 +350,7 @@ public class TaskController {
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
                 "updated Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
-                username, taskId, Timestamp.from(Instant.now()), ContentAction.UPDATE_CONTENT));
+                username, taskId, Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK_CONTENT));
 
         return getContents(taskId);
     }
