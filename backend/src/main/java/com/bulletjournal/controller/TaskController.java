@@ -198,7 +198,7 @@ public class TaskController {
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
                 "uncompleted Task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##", username,
-                task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
+                task.getId(), Timestamp.from(Instant.now()), ContentAction.UNCOMPLETE_TASK));
 
         return getTask(newId);
     }

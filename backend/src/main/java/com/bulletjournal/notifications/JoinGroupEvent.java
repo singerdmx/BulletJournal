@@ -27,7 +27,7 @@ public class JoinGroupEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        return String.format("/groups/group%d", contentId);
+        return ContentType.getContentLink(ContentType.GROUP, contentId);
     }
 
     @Override
