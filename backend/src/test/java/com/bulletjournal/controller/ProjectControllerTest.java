@@ -587,12 +587,13 @@ public class ProjectControllerTest {
         String recurrenceRule = "DTSTART:20200420T000000Z RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20200520T000000Z";
         String taskName = "rt1";
 
+        String requester = sampleUsers[3];
         CreateTaskParams task = new CreateTaskParams(taskName, null,
-                null, null, null, ImmutableList.of(sampleUsers[0]), TIMEZONE, recurrenceRule);
+                null, null, null, ImmutableList.of(requester), TIMEZONE, recurrenceRule);
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
-                TestHelpers.actAsOtherUser(task, sampleUsers[0]),
+                TestHelpers.actAsOtherUser(task, requester),
                 Task.class,
                 project.getId());
         Task createdTask = response.getBody();
@@ -600,7 +601,7 @@ public class ProjectControllerTest {
         assertEquals(taskName, createdTask.getName());
         assertEquals(project.getId(), createdTask.getProjectId());
         assertEquals(TIMEZONE, createdTask.getTimezone());
-        assertEquals(sampleUsers[0], createdTask.getAssignees().get(0).getName());
+        assertEquals(requester, createdTask.getAssignees().get(0).getName());
         assertEquals(recurrenceRule, createdTask.getRecurrenceRule());
 
         return createdTask;
