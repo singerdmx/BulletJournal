@@ -31,13 +31,13 @@ type MyselfProps = {
 
 type ModalState = {
   showContactUs: boolean;
-}
+};
 
 type PathProps = RouteComponentProps;
 
 class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
   state: ModalState = {
-    showContactUs: false
+    showContactUs: false,
   };
 
   interval: any = 0;
@@ -60,33 +60,41 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
 
   render() {
     let plusIcon = null;
-    if (this.props.ownedProjects.length === 0 && this.props.sharedProjects.length === 0) {
-      plusIcon = <AddProject history={this.props.history} mode={'complex'} />
+    if (
+      this.props.ownedProjects.length === 0 &&
+      this.props.sharedProjects.length === 0
+    ) {
+      plusIcon = <AddProject history={this.props.history} mode={'complex'} />;
     } else {
-      plusIcon = <AddProjectItem history={this.props.history} mode={'complex'} />
+      plusIcon = (
+        <AddProjectItem history={this.props.history} mode={'complex'} />
+      );
     }
     return (
       <div className='myselfContainer'>
         {plusIcon}
-        <Tooltip placement="bottom" title='Refresh' >
+        <Tooltip placement='bottom' title='Refresh'>
           <SyncOutlined
             className='rotateIcon'
-            onClick={this.handleRefreshOnClick} />
+            onClick={this.handleRefreshOnClick}
+          />
         </Tooltip>
         <Notifications />
         <Popover
           content={
             <DropdownMenu
-                username={this.props.username}
-                history={this.props.history}
-                showContactUs={this.state.showContactUs}
-                onCancelShowContactUs={() => {
-                  this.setState({ showContactUs: false });
-                  console.log(this.state.showContactUs)
-                }}
-                handleContact={() => {
-                  this.setState({ showContactUs: true });
-                }}
+              username={this.props.username}
+              history={this.props.history}
+              showContactUs={this.state.showContactUs}
+              onCancelShowContactUs={(
+                e: React.MouseEvent<HTMLElement, MouseEvent>
+              ) => {
+                e.stopPropagation();
+                this.setState({ showContactUs: false });
+              }}
+              handleContact={() => {
+                this.setState({ showContactUs: true });
+              }}
             />
           }
           trigger='click'
@@ -109,7 +117,7 @@ const mapStateToProps = (state: IState) => ({
   username: state.myself.username,
   avatar: state.myself.avatar,
   ownedProjects: state.project.owned,
-  sharedProjects: state.project.shared
+  sharedProjects: state.project.shared,
 });
 
 export default connect(mapStateToProps, {
@@ -118,5 +126,5 @@ export default connect(mapStateToProps, {
   updateGroups,
   updateNotifications,
   groupUpdate,
-  updateSystem
+  updateSystem,
 })(withRouter(Myself));
