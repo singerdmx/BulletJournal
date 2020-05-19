@@ -39,13 +39,12 @@ public class AuthorizationService {
     }
 
     public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, Project project) {
-        if (ADMINS.contains(SUPER_USER)) {
+        if (ADMINS.contains(requester)) {
             return;
         }
 
-        List<String> projectGroupUsers = project.getGroup()
-                .getAcceptedUsers().stream().map(u -> u.getUser().getName()).collect(Collectors.toList());
-        if (!projectGroupUsers.stream().anyMatch(u -> Objects.equals(requester, u))) {
+        if (!project.getGroup().getAcceptedUsers()
+                .stream().anyMatch(u -> Objects.equals(requester, u.getUser().getName()))) {
             throw new UnAuthorizedException("User " + requester + " not in Project "
                     + project.getName());
         }
