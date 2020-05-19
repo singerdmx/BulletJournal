@@ -14,6 +14,31 @@ import java.util.stream.Collectors;
 
 public class ProjectItemsGrouper {
 
+    public static final Comparator<Transaction> TRANSACTION_COMPARATOR = (t1, t2) -> {
+
+        // Sort transaction by date time
+        ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
+        ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
+        return z1.compareTo(z2);
+    };
+    public static final Comparator<Task> TASK_COMPARATOR = (t1, t2) -> {
+        if (!t1.hasDueDate() && !t2.hasDueDate()) {
+            return Long.compare(t1.getId(), t2.getId());
+        }
+        if (!t1.hasDueDate()) {
+            return 1;
+        }
+        if (!t2.hasDueDate()) {
+            return -1;
+        }
+
+        // Sort task by due time
+        ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
+        ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
+        return z1.compareTo(z2);
+    };
+    public static final Comparator<Note> NOTE_COMPARATOR = Comparator.comparing(AuditModel::getUpdatedAt);
+
     /*
      * Convert list of transactions to a <ZonedDateTime, Transaction List> Map
      *
@@ -65,14 +90,6 @@ public class ProjectItemsGrouper {
         return map;
     }
 
-    public static final Comparator<Transaction> TRANSACTION_COMPARATOR = (t1, t2) -> {
-
-        // Sort transaction by date time
-        ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
-        ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDate(), t2.getTime(), t2.getTimezone());
-        return z1.compareTo(z2);
-    };
-
     /*
      * Merge transactions map to target projectItems map
      *
@@ -96,23 +113,6 @@ public class ProjectItemsGrouper {
         return mergedMap;
     }
 
-    public static final Comparator<Task> TASK_COMPARATOR = (t1, t2) -> {
-        if (!t1.hasDueDate() && !t2.hasDueDate()) {
-            return Long.compare(t1.getId(), t2.getId());
-        }
-        if (!t1.hasDueDate()) {
-            return 1;
-        }
-        if (!t2.hasDueDate()) {
-            return -1;
-        }
-
-        // Sort task by due time
-        ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDueDate(), t1.getDueTime(), t1.getTimezone());
-        ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
-        return z1.compareTo(z2);
-    };
-
     /*
      * Merge tasks map to target projectItems map
      *
@@ -135,8 +135,6 @@ public class ProjectItemsGrouper {
         });
         return mergedMap;
     }
-
-    public static final Comparator<Note> NOTE_COMPARATOR = Comparator.comparing(AuditModel::getUpdatedAt);
 
     /*
      * Merge notes map to target projectItems map
@@ -170,7 +168,7 @@ public class ProjectItemsGrouper {
      */
     public static List<ProjectItems> getSortedProjectItems(@NotNull Map<ZonedDateTime, ProjectItems> mergedMap) {
         List<Map.Entry<ZonedDateTime, ProjectItems>> entries = new ArrayList<>(mergedMap.entrySet());
-        entries.sort((e1, e2) -> e2.getKey().compareTo(e1.getKey()));
+        entries.sort(Map.Entry.comparingByKey());
         List<ProjectItems> projectItems = new ArrayList<>();
         entries.forEach(e -> {
             projectItems.add(e.getValue());
