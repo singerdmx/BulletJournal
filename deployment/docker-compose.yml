@@ -38,13 +38,13 @@ services:
         condition: service_healthy
 
   cache:
-    image: redis
+    image: mwangxx/redis:5.0.8
     container_name: cache
     ports:
       - "127.0.0.1:6379:6379"
 
   database:
-    image: postgres
+    image: mwangxx/postgres:12.2-2
     container_name: db
     hostname: postgres
     ports:
