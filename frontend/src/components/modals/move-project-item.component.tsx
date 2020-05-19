@@ -149,7 +149,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
     return (
       <Modal
         title={`MOVE ${getProjectItemType(props.type)}`}
-        destroyOnClose
+        destroyOnClose={true}
         centered
         okText='Confirm'
         visible={visible}

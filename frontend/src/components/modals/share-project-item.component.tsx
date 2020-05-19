@@ -62,7 +62,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
     return (
       <Modal
         title={`Share ${getProjectItemType(props.type).toLocaleLowerCase()}`}
-        destroyOnClose
+        destroyOnClose={true}
         centered
         visible={visible}
         onCancel={(e) => handleCancel(e)}

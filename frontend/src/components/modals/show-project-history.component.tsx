@@ -10,7 +10,7 @@ import {
   Button,
   Avatar,
 } from 'antd';
-import { HistoryOutlined, SyncOutlined, TeamOutlined } from '@ant-design/icons';
+import { HistoryOutlined, TeamOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { ContentAction } from '../../features/project/constants';
 import { iconMapper } from '../side-menu/side-menu.component';

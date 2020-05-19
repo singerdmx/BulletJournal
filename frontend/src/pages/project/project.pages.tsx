@@ -254,7 +254,7 @@ class ProjectPage extends React.Component<
     );
   };
 
-  handleGetProjectItemsByUseCall: { [key in ProjectType]: Function } = {
+  handleGetProjectItemsByUserCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOwner,
     [ProjectType.TODO]: this.handleGetTasksByAssignee,
     [ProjectType.LEDGER]: this.handleGetTransactionByPayer,
@@ -272,7 +272,7 @@ class ProjectPage extends React.Component<
       return null;
     }
 
-    const handleGetProjectItemsByUse = this.handleGetProjectItemsByUseCall[
+    const handleGetProjectItemsByUser = this.handleGetProjectItemsByUserCall[
       project.projectType
     ];
     const handleGetProjectItemsByOrder = this.handleGetProjectItemsByOrderCall[
@@ -291,7 +291,7 @@ class ProjectPage extends React.Component<
           <NoteTree
             readOnly={project.shared}
             showModal={(user: User) => {
-              handleGetProjectItemsByUse(user);
+              handleGetProjectItemsByUser(user);
             }}
             showOrderModal={() => {
               handleGetProjectItemsByOrder();
@@ -324,7 +324,7 @@ class ProjectPage extends React.Component<
             showCompletedTask={this.state.completeTasksShown}
             readOnly={project.shared}
             showModal={(user: User) => {
-              handleGetProjectItemsByUse(user);
+              handleGetProjectItemsByUser(user);
             }}
             showOrderModal={() => {
               handleGetProjectItemsByOrder();
@@ -356,7 +356,7 @@ class ProjectPage extends React.Component<
         projectContent = (
           <TransactionProject
             showModal={(user: User) => {
-              handleGetProjectItemsByUse(user);
+              handleGetProjectItemsByUser(user);
             }}
           />
         );
@@ -429,7 +429,7 @@ class ProjectPage extends React.Component<
             <p
               key={index}
               className='avatar-container'
-              onClick={() => handleGetProjectItemsByUse(u)}
+              onClick={() => handleGetProjectItemsByUser(u)}
             >
               <Avatar size='small' src={u.avatar} />
               &nbsp;{u.alias}

@@ -29,9 +29,17 @@ type MyselfProps = {
   updateSystem: () => void;
 };
 
+type ModalState = {
+  showContactUs: boolean;
+}
+
 type PathProps = RouteComponentProps;
 
-class Myself extends React.Component<MyselfProps & PathProps> {
+class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
+  state: ModalState = {
+    showContactUs: false
+  };
+
   interval: any = 0;
 
   componentDidMount() {
@@ -69,8 +77,16 @@ class Myself extends React.Component<MyselfProps & PathProps> {
         <Popover
           content={
             <DropdownMenu
-              username={this.props.username}
-              history={this.props.history}
+                username={this.props.username}
+                history={this.props.history}
+                showContactUs={this.state.showContactUs}
+                onCancelShowContactUs={() => {
+                  this.setState({ showContactUs: false });
+                  console.log(this.state.showContactUs)
+                }}
+                handleContact={() => {
+                  this.setState({ showContactUs: true });
+                }}
             />
           }
           trigger='click'
