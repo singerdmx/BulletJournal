@@ -78,7 +78,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
     setSelectDate([dateStrings[0], dateStrings[1]]);
   };
 
-  if (!project) {
+  if (!project || project.shared) {
     return null;
   }
 
