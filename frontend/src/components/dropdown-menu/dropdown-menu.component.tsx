@@ -1,5 +1,5 @@
 import React from 'react';
-import {CustomerServiceOutlined, ExportOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons';
+import {CustomerServiceOutlined, ExportOutlined, SettingOutlined, UserOutlined, MailOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
 import {logoutUser} from '../../apis/myselfApis';
 import {History} from 'history';
@@ -37,6 +37,11 @@ const DropdownMenu = (
         <Menu.Item className='modified-item' onClick={() => onClickSetting(history)}>
             <SettingOutlined/>
             Settings
+        </Menu.Item>
+        <Menu.Item className='modified-item'
+                   onClick={() => window.location.href = `https://1o24bbs.com/u/${username}/messages`}>
+            <MailOutlined />
+            Messages
         </Menu.Item>
         <Menu.Item className='modified-item' onClick={() => handleContact()}>
             <CustomerServiceOutlined/>
