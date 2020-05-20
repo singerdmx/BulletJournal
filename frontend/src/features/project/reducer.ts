@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { ProjectType, ContentAction } from './constants';
+import { ProjectType } from './constants';
 import { Project, ProjectsWithOwner, Activity } from './interface';
 import { History } from 'history';
-import { User } from '../group/interface';
 
 export type ProjectApiErrorAction = {
   error: string;

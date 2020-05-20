@@ -1,31 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { IState } from '../../store';
+import React, {useEffect, useState} from 'react';
+import {IState} from '../../store';
+import {Activity, Project, ProjectsWithOwner,} from '../../features/project/interface';
+import {Avatar, Button, DatePicker, Divider, Modal, Select, Tooltip,} from 'antd';
 import {
-  Project,
-  ProjectsWithOwner,
-  Activity,
-} from '../../features/project/interface';
-import {
-  Modal,
-  Tooltip,
-  Select,
-  DatePicker,
-  Divider,
-  Button,
-  Avatar,
-} from 'antd';
-import { HistoryOutlined, TeamOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { ContentAction } from '../../features/project/constants';
-import { iconMapper } from '../side-menu/side-menu.component';
-import {
-  flattenOwnedProject,
-  flattenSharedProject,
-} from '../../pages/projects/projects.pages';
-import { getGroup } from '../../features/group/actions';
-import { User, Group } from '../../features/group/interface';
+  CheckCircleTwoTone,
+  CloseCircleTwoTone,
+  DeleteTwoTone,
+  HistoryOutlined,
+  PlusCircleTwoTone,
+  StarTwoTone,
+  TeamOutlined,
+  EditTwoTone
+} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {ContentAction} from '../../features/project/constants';
+import {iconMapper} from '../side-menu/side-menu.component';
+import {flattenOwnedProject, flattenSharedProject,} from '../../pages/projects/projects.pages';
+import {getGroup} from '../../features/group/actions';
+import {Group, User} from '../../features/group/interface';
 import moment from 'moment';
-import { getProjectHistory } from '../../features/project/actions';
+import {getProjectHistory} from '../../features/project/actions';
+
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -44,6 +39,25 @@ type ShowProjectHistoryProps = {
     startDate: string,
     endDate: string
   ) => void;
+};
+
+const getIcon = (action: string) => {
+  if (action.startsWith('ADD')) {
+    return <PlusCircleTwoTone />
+  }
+  if (action.startsWith('DELETE')) {
+    return <DeleteTwoTone />
+  }
+  if (action.startsWith('UPDATE')) {
+    return <EditTwoTone />
+  }
+  if (action.startsWith('COMPLETE')) {
+    return <CheckCircleTwoTone />
+  }
+  if (action.startsWith('UNCOMPLETE')) {
+    return <CloseCircleTwoTone />
+  }
+  return <StarTwoTone />;
 };
 
 const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
@@ -188,9 +202,11 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
               >
                 {Object.values(ContentAction).map((action) => {
                   return (
-                    <Option value={action} key={action}>
-                      <span> {action}</span>
-                    </Option>
+                      <Option value={action} key={action}>
+                        <Tooltip key={action} title={action} placement='right'>
+                          <span>{getIcon(action)}&nbsp;{action}</span>
+                        </Tooltip>
+                      </Option>
                   );
                 })}
               </Select>
