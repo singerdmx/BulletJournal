@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.hierarchy.HierarchyProcessorProcessorTest;
 import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
@@ -11,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -59,9 +61,13 @@ public class ProjectControllerTest {
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
 
+    @Autowired
+    TokenBucket tokenBucket;
+
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        tokenBucket.clearBucket();
     }
 
     @Test

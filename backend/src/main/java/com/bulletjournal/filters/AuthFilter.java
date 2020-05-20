@@ -6,6 +6,8 @@ import com.bulletjournal.config.SSOConfig;
 import com.bulletjournal.controller.GoogleCalendarController;
 import com.bulletjournal.controller.SystemController;
 import com.bulletjournal.controller.UserController;
+import com.bulletjournal.redis.LockedUser;
+import com.bulletjournal.redis.RedisLockedUserRepository;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Order(0)
@@ -37,7 +40,10 @@ public class AuthFilter implements Filter {
     @Autowired
     private SSOConfig ssoConfig;
 
-    //this method will be called by container when we send any request
+
+    @Autowired
+    private RedisLockedUserRepository redisLockedUserRepository;
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
@@ -51,7 +57,18 @@ public class AuthFilter implements Filter {
                 String name = headerNames.nextElement();
                 String val = request.getHeader(name);
                 if (UserClient.USER_NAME_KEY.equals(name)) {
+
                     username = URLDecoder.decode(val, StandardCharsets.UTF_8.toString());
+
+                    Optional<LockedUser> lockedUserOptional = redisLockedUserRepository.findById(username);
+                    if (lockedUserOptional.isPresent()) {
+                        LOGGER.info("User {} remains locked for {} hour(s)", username,
+                                String.format("%.2f", lockedUserOptional.get().getExpirationInHour()));
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        // TODO : add body message for reason
+                        return;
+                    }
+
                     MDC.put(UserClient.USER_NAME_KEY, username);
                     LOGGER.info("User " + username + " logged in");
                     break;

@@ -1,5 +1,3 @@
-// RateFilter
-
 package com.bulletjournal.filters;
 
 
