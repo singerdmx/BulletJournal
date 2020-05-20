@@ -153,12 +153,10 @@ public class LabelDaoJpa {
         List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelIds(labels);
         List<Note> notes = this.noteRepository.findNotesByLabelIds(labels);
 
-        tasks = filter(tasks, requester);
-        transactions = filter(transactions, requester);
-        notes = filter(notes, requester);
-
-        // Todo: add a map for caching key project id, value boolean
-
+        Map<Long, Boolean> cache = new HashMap<>();
+        tasks = filter(tasks, requester, cache);
+        transactions = filter(transactions, requester, cache);
+        notes = filter(notes, requester, cache);
 
         // Group project items by date
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true);
@@ -172,11 +170,19 @@ public class LabelDaoJpa {
 
     }
 
-    private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester) {
+    private <T extends ProjectItemModel> List<T> filter(
+            List<T> projectItems, String requester, Map<Long, Boolean> cache) {
         return projectItems.stream().filter(
-                item -> item.getProject().getGroup().getAcceptedUsers().stream().anyMatch(
-                        u -> requester.equals(u.getUser().getName()))
-        ).collect(Collectors.toList());
+                item -> {
+                    Long projectId = item.getProject().getId();
+                    if (cache.containsKey(projectId)) {
+                        return cache.get(projectId);
+                    }
+                    boolean match = item.getProject().getGroup().getAcceptedUsers().stream().anyMatch(
+                            u -> requester.equals(u.getUser().getName()));
+                    cache.put(projectId, match);
+                    return match;
+                }).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
