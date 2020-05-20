@@ -52,7 +52,7 @@ public abstract class ProjectItemModel extends OwnedModel {
     }
 
     public void setLabels(List<Long> labels) {
-        this.labels = labels == null ? null : labels.stream().toArray(Long[]::new);
+        this.labels = labels == null ? null : labels.toArray(new Long[0]);
     }
 
     public Project getProject() {

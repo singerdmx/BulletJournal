@@ -27,6 +27,10 @@ public class Label {
         this.icon = icon;
     }
 
+    public Label(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }

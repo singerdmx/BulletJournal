@@ -3,7 +3,6 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.ProjectItemType;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
@@ -37,6 +36,9 @@ public class LabelDaoJpa {
 
     @Autowired
     private AuthorizationService authorizationService;
+
+    @Autowired
+    private UserAliasDaoJpa userAliasDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Label create(String name, String owner, String icon) {
@@ -127,58 +129,73 @@ public class LabelDaoJpa {
         this.noteRepository.saveAll(notes);
     }
 
+    /**
+     * Retrieves project items by a list of labels
+     * <p>
+     * Steps:
+     * 1. Fetch project items with custom query of labels
+     * 2. Group project items by date
+     * 3. Sort project items groups by date
+     * 4. Attach project items' labels to themselves
+     * 5. Convert to presentation model and return
+     *
+     * @param timezone  the timezone of requester
+     * @param labels    a list of labels
+     * @param requester request user
+     * @return List<ProjectItems> - a list of sorted project items with labels
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItems> getItemsByLabels(String timezone, List<Long> labels, String requester) {
-        List<Label> l = this.labelRepository.findAllById(labels);
-
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
+
+        // Query project items from its own repository
         List<Task> tasks = this.taskRepository.findTasksByLabelIds(labels);
         List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelIds(labels);
         List<Note> notes = this.noteRepository.findNotesByLabelIds(labels);
 
-        if (l.stream().anyMatch(label -> !label.getOwner().equals(requester))) {
-            tasks = filter(tasks, requester);
-            transactions = filter(transactions, requester);
-            notes = filter(notes, requester);
-        }
+        tasks = filter(tasks, requester);
+        transactions = filter(transactions, requester);
+        notes = filter(notes, requester);
 
-        Map<ProjectItemType, Map<Long, List<Long>>> labelIds = new HashMap<>();
-        Map<Long, List<Long>> tasklabels = tasks.stream().collect(
-                Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
-        labelIds.put(ProjectItemType.TASK, tasklabels);
-        Map<Long, List<Long>> transactionlabels = transactions.stream().collect(
-                Collectors.toMap(t -> t.getId(), t -> t.getLabels()));
-        labelIds.put(ProjectItemType.TRANSACTION, transactionlabels);
-        Map<Long, List<Long>> notelabels = notes.stream().collect(
-                Collectors.toMap(n -> n.getId(), n -> n.getLabels()));
-        labelIds.put(ProjectItemType.NOTE, notelabels);
+        // Todo: add a map for caching key project id, value boolean
 
+
+        // Group project items by date
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true);
-        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
+        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap, this.userAliasDaoJpa.getAliases(requester));
         Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
-        return getLabelsForProjectItems(projectItems, labelIds);
+        return getLabelsForProjectItems(projectItems);
+
     }
 
     private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester) {
         return projectItems.stream().filter(
-                item -> item.getProject().getGroup().getUsers().stream().anyMatch(
+                item -> item.getProject().getGroup().getAcceptedUsers().stream().anyMatch(
                         u -> requester.equals(u.getUser().getName()))
         ).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<ProjectItems> getLabelsForProjectItems(
-            List<ProjectItems> projectItems,
-            Map<ProjectItemType, Map<Long, List<Long>>> labelIds) {
+    public List<ProjectItems> getLabelsForProjectItems(List<ProjectItems> projectItems) {
+        Set<Long> labelIds = new HashSet<>();
         projectItems.forEach(p -> {
-            p.getTasks().forEach(t -> t.setLabels(getLabels(labelIds.get(ProjectItemType.TASK).get(t.getId()))));
+            p.getTasks().forEach(t -> labelIds.addAll(t.getLabels().stream().map(e -> e.getId()).collect(Collectors.toList())));
             p.getTransactions().forEach(t ->
-                    t.setLabels(getLabels(labelIds.get(ProjectItemType.TRANSACTION).get(t.getId()))));
-            p.getNotes().forEach(t -> t.setLabels(getLabels(labelIds.get(ProjectItemType.NOTE).get(t.getId()))));
+                    labelIds.addAll(t.getLabels().stream().map(e -> e.getId()).collect(Collectors.toList())));
+            p.getNotes().forEach(t -> labelIds.addAll(t.getLabels().stream().map(e -> e.getId()).collect(Collectors.toList())));
+        });
+
+        Map<Long, com.bulletjournal.controller.models.Label> m = getLabels(new ArrayList<>(labelIds)).stream()
+                .collect(Collectors.toMap(com.bulletjournal.controller.models.Label::getId, l -> l));
+
+        projectItems.forEach(p -> {
+            p.getTasks().forEach(t -> t.setLabels(t.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
+            p.getTransactions().forEach(t -> t.setLabels(t.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
+            p.getNotes().forEach(t -> t.setLabels(t.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
         });
         return projectItems;
     }

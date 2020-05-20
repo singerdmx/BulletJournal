@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.utils;
 
+import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.Note;
@@ -107,7 +108,13 @@ public class ProjectItemsGrouper {
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Transaction> transactions = transactionsMap.get(zonedDateTime);
             transactions.sort(TRANSACTION_COMPARATOR);
-            projectItem.setTransactions(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
+            projectItem.setTransactions(transactions
+                    .stream()
+                    .map(t -> t.toPresentationModel(t.getLabels()
+                            .stream()
+                            .map(Label::new)
+                            .collect(Collectors.toList())))
+                    .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
@@ -119,18 +126,22 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeTasksMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap) {
+                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap,
+                                                                 Map<String, String> aliases) {
         if (tasksMap == null) {
             return mergedMap;
         }
 
+        // Add an abstract toPresentationModel to parent class
         tasksMap.keySet().forEach(zonedDateTime -> {
             ProjectItems projectItem = mergedMap.getOrDefault(zonedDateTime, new ProjectItems());
             projectItem.setDate(ZonedDateTimeHelper.getDate(zonedDateTime));
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort(TASK_COMPARATOR);
-            projectItem.setTasks(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
+            projectItem.setTasks(tasks.stream().map(t ->
+                    t.toPresentationModel(t.getLabels().stream().map(Label::new).collect(Collectors.toList()), aliases))
+                    .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
@@ -155,7 +166,7 @@ public class ProjectItemsGrouper {
 
             // Sort note by update time
             notes.sort(NOTE_COMPARATOR);
-            projectItem.setNotes(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
+            projectItem.setNotes(notes.stream().map(n -> n.toPresentationModel(n.getLabels().stream().map(Label::new).collect(Collectors.toList()))).collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
