@@ -1,21 +1,20 @@
 // note item component for note tree
 // react import
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
 // antd imports
 import {
-  DeleteTwoTone,
-  MoreOutlined,
-  FileTextOutlined,
-  FormOutlined,
+  LinkOutlined,
 } from '@ant-design/icons';
-import { Avatar, Popconfirm, Popover, Tag, Tooltip, Empty } from 'antd';
+import { Avatar, Table, Tooltip, Empty } from 'antd';
 import { getIcon } from '../modals/show-project-history.component';
 // assets import
 import { IState } from '../../store';
 import { Activity } from '../../features/project/interface';
 import moment from 'moment';
+import {User} from "../../features/group/interface";
+import {ContentAction} from "../../features/project/constants";
 
 type ProjectHistoryProps = {
   activities: Activity[];
@@ -23,9 +22,46 @@ type ProjectHistoryProps = {
 
 const ProjectHistory: React.FC<ProjectHistoryProps> = (props) => {
   const { activities } = props;
+  const columns = [
+     {
+      title: '',
+      dataIndex: 'action',
+      key: 'action',
+         render: (a: ContentAction) => <Tooltip placement='left' title={a.toString().replace(/_/g, " ")}>
+             {getIcon(a.toString())}
+      </Tooltip>
+     },
+     {
+      title: 'User',
+      dataIndex: 'originator',
+      key: 'originator',
+      render: (u: User) => <Tooltip title={u.alias}>
+        <Avatar src={u.avatar} />
+      </Tooltip>
 
+    },
+    {
+      title: 'Activity',
+      dataIndex: 'activity',
+      key: 'activity',
+      render: (a: string) => parseActivity(a)
+    },
+    {
+      title: 'Time',
+      dataIndex: 'activityTime',
+      key: 'activityTime',
+      render: (a: string) => moment(a).fromNow()
+    },
+    {
+      title: '',
+      dataIndex: 'link',
+      key: 'link',
+      render: (l: string) => l ? <Link to={l}>
+          <LinkOutlined /> </Link>: null
+    },
+  ];
   function parseActivity(activity: string): JSX.Element {
-    return (
+    const res = (
       <span>
         {activity.split('##').map((a, index) => {
           if (index % 2 === 1) {
@@ -35,40 +71,18 @@ const ProjectHistory: React.FC<ProjectHistoryProps> = (props) => {
         })}
       </span>
     );
+    return res;
   }
 
-  if (activities && activities.length > 0) {
-    return (
+  if (!activities || activities.length === 0) {
+    return <Empty />;
+  }
+
+  return (
       <div>
-        {activities.map((a: Activity, index) => {
-          let meta = (
-            <div key={index} onClick={() => console.log(a.link)}>
-              <div>
-                <Tooltip title={a.originator.alias}>
-                  <Avatar src={a.originator.thumbnail} />
-                </Tooltip>
-                {getIcon(a.action)}
-                &nbsp;&nbsp;
-                {parseActivity(a.activity)}&nbsp;&nbsp;
-                {moment(a.activityTime).fromNow()}
-              </div>
-            </div>
-          );
-
-          if (a.link)
-            meta = (
-              <Link color='black' to={a.link}>
-                {meta}
-              </Link>
-            );
-
-          return meta;
-        })}
+        <Table columns={columns} dataSource={activities} />
       </div>
-    );
-  }
-
-  return <Empty />;
+  );
 };
 
 const mapStateToProps = (state: IState) => ({});
