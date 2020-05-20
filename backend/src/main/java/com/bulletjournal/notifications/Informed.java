@@ -43,7 +43,7 @@ public abstract class Informed {
                     Notification notification = new Notification(
                             this.getOriginator(),
                             this.getEventTitle(event),
-                            null,
+                            this.getEventContent(event),
                             event.getTargetUser(),
                             this.getEventType(),
                             event.getContentId(),
@@ -59,6 +59,13 @@ public abstract class Informed {
 
     public String getEventType() {
         return getClass().getSimpleName();
+    }
+
+    /**
+     * Additional description for the event
+     */
+    protected String getEventContent(Event event) {
+        return null;
     }
 
     public List<Event> getEvents() {
