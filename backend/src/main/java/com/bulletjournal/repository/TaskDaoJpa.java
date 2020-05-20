@@ -557,7 +557,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String contents = GSON_ALLOW_EXPOSE_ONLY
                 .toJson(this.getContents(taskId, requester).stream().collect(Collectors.toList()));
 
-        if (dateTime != null) {
+        if (dateTime != null && StringUtils.isNotBlank(task.getRecurrenceRule())) {
             return completeSingleRecurringTask(task, dateTime, contents);
         }
 
