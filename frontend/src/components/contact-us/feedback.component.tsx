@@ -11,7 +11,7 @@ const handleFeedback = (title: String, content: String) => {
     });
 };
 
-const Feedback: React.FC<FeedbackProps> = ({}) => {
+const Feedback: React.FC<FeedbackProps> = () => {
     const [form] = Form.useForm();
     const onReset = () => {
         form.resetFields();
@@ -34,7 +34,7 @@ const Feedback: React.FC<FeedbackProps> = ({}) => {
     };
 
     return <Form {...layout} form={form}>
-        <Form.Item name="title" label="Title" rules={[{required: true}]}>
+        <Form.Item name="title" label="Title" rules={[{required: true, min: 3}]}>
             <Input/>
         </Form.Item>
         <Form.Item name="content" label="Content" rules={[{required: true, min: 3}]}>
