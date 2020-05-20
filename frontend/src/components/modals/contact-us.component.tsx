@@ -2,6 +2,7 @@ import React from 'react';
 import { BugOutlined, MessageOutlined } from '@ant-design/icons';
 import { Modal, Tabs } from 'antd';
 import Feedback from "../contact-us/feedback.component";
+import Issue from "../contact-us/issue.component";
 
 const { TabPane } = Tabs;
 
@@ -39,7 +40,9 @@ const ContactUs: React.FC<ContactUsProps> = ({ visible, onCancel }) => {
             </span>
           }
           key='Issue'
-        ></TabPane>
+        >
+          <Issue/>
+        </TabPane>
       </Tabs>
     </Modal>
   );

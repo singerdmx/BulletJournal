@@ -5,13 +5,13 @@ import {ContactType} from "../../features/system/constants";
 
 type FeedbackProps = {};
 
-const handleFeedback = (title: String, content: String) => {
-    contactSupport(ContactType.FEEDBACK, title, content).then((res) => {
+const handleIssue = (title: String, content: String) => {
+    contactSupport(ContactType.ISSUE, title, content).then((res) => {
         window.location.href = res.headers.get('Location')!;
     });
 };
 
-const Feedback: React.FC<FeedbackProps> = ({}) => {
+const Issue: React.FC<FeedbackProps> = ({}) => {
     const [form] = Form.useForm();
     const onReset = () => {
         form.resetFields();
@@ -20,7 +20,7 @@ const Feedback: React.FC<FeedbackProps> = ({}) => {
         form
             .validateFields()
             .then((values) => {
-                handleFeedback(values.title, values.content);
+                handleIssue(values.title, values.content);
             })
             .catch((info) => console.log(info));
     };
@@ -51,4 +51,4 @@ const Feedback: React.FC<FeedbackProps> = ({}) => {
     </Form>
 };
 
-export default Feedback;
+export default Issue;

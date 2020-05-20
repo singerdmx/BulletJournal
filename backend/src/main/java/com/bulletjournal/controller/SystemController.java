@@ -17,11 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -32,6 +36,7 @@ public class SystemController {
     public static final String UPDATES_ROUTE = "/api/system/updates";
     public static final String PUBLIC_ITEM_ROUTE_PREFIX = "/api/public/items/";
     public static final String PUBLIC_ITEM_ROUTE = PUBLIC_ITEM_ROUTE_PREFIX + "{itemId}";
+    private static final String CONTACTS_ROUTE = "/api/contacts";
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
@@ -65,6 +70,9 @@ public class SystemController {
 
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
+
+    @Autowired
+    private UserClient userClient;
 
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
@@ -223,5 +231,17 @@ public class SystemController {
         }
 
         return true;
+    }
+
+    @PostMapping(CONTACTS_ROUTE)
+    public ResponseEntity<?> contactSupport(
+            @NotNull @Valid @RequestBody CreateContactTopicParams createContactTopicParams)
+            throws URISyntaxException {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        String topicUrl = this.userClient.createTopic(username, createContactTopicParams.getContactType(),
+                createContactTopicParams.getTitle(), createContactTopicParams.getContent());
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(new URI(topicUrl));
+        return ResponseEntity.ok().headers(responseHeaders).build();
     }
 }

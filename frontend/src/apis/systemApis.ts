@@ -1,4 +1,5 @@
-import {doFetch} from './api-helper';
+import {doFetch, doPost} from './api-helper';
+import {ContactType} from "../features/system/constants";
 
 export const fetchSystemUpdates = (targets = '', projectId = undefined, remindingTaskEtag = undefined) => {
     let endpoint = '/api/system/updates';
@@ -22,4 +23,13 @@ export const getPublicProjectItem = (itemId: string) => {
         .catch(err => {
             throw Error(err.message);
         });
+};
+
+export const contactSupport = (contactType: ContactType, title: String, content: String) => {
+    const postBody = JSON.stringify({
+        contactType: contactType,
+        title: title,
+        content: content
+    });
+    return doPost('/api/contacts', postBody);
 };

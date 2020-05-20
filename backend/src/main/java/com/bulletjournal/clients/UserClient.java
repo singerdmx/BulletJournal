@@ -1,6 +1,7 @@
 package com.bulletjournal.clients;
 
 import com.bulletjournal.config.SSOConfig;
+import com.bulletjournal.controller.models.ContactType;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -193,5 +194,22 @@ public class UserClient {
         headers.add(API_KEY, this.ssoAPIKey);
         headers.setContentType(mediaType);
         return headers;
+    }
+
+    public String createTopic(String username, ContactType contactType, String title, String content) {
+        if (this.ssoAPIKey == null) {
+            throw new IllegalArgumentException("ssoAPIKey missing");
+        }
+        String url = this.ssoEndPoint.resolve("/posts.json").toString();
+        HttpHeaders headers = getHttpHeaders(username, MediaType.APPLICATION_JSON);
+        ResponseEntity<LinkedHashMap> response = this.restClient.exchange(
+                url,
+                HttpMethod.POST,
+                new HttpEntity<>(
+                        new CreateTopicParams(title, content, ContactType.getForumCategoryID(contactType)), headers),
+                LinkedHashMap.class);
+        LOGGER.info("Posts response {}", response);
+        return this.ssoEndPoint.resolve(
+                "/t/" + response.getBody().get("topic_slug") + "/" + response.getBody().get("topic_id")).toString();
     }
 }
