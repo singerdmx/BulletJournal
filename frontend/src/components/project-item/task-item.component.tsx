@@ -29,13 +29,13 @@ import {
   getIcon,
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
-import { addSelectedLabel } from '../../features/label/actions';
+import { setSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 import { User } from '../../features/group/interface';
 
 type ProjectProps = {
   readOnly: boolean;
-  addSelectedLabel: (label: Label) => void;
+  setSelectedLabel: (label: Label) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
 };
@@ -205,7 +205,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   const history = useHistory();
   // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
-    props.addSelectedLabel(label);
+    props.setSelectedLabel(label);
     history.push('/labels/search');
   };
 
@@ -400,5 +400,5 @@ export default connect(mapStateToProps, {
   uncompleteTask,
   deleteTask,
   deleteCompletedTask,
-  addSelectedLabel,
+  setSelectedLabel,
 })(TaskItem);

@@ -12,7 +12,7 @@ import {
   completeTask
 } from '../../features/tasks/actions';
 import { Label } from '../../features/label/interface';
-import { addSelectedLabel } from '../../features/label/actions';
+import { setSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 // antd imports
 import { Avatar, Popconfirm, Tooltip, Button, Popover } from 'antd';
@@ -38,7 +38,7 @@ import LabelManagement from '../project/label-management.compoent';
 
 interface TaskPageHandler {
   getTask: (taskId: number) => void;
-  addSelectedLabel: (label: Label) => void;
+  setSelectedLabel: (label: Label) => void;
   deleteTask: (taskId: number) => void;
   updateTaskContents: (taskId: number) => void;
   completeTask: (taskId: number, dateTime?: string) => void;
@@ -223,7 +223,7 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   deleteTask,
   getTask,
-  addSelectedLabel,
+  setSelectedLabel,
   updateTaskContents,
   completeTask
 })(TaskPage);

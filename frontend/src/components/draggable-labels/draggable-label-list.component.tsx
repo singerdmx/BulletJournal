@@ -4,7 +4,7 @@ import { Select, Tag } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { PlusOutlined, TagOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { addSelectedLabel, labelsUpdate } from '../../features/label/actions';
+import { setSelectedLabel, labelsUpdate } from '../../features/label/actions';
 import { setNoteLabels } from '../../features/notes/actions';
 import { setTaskLabels } from '../../features/tasks/actions';
 import { setTransactionLabels } from '../../features/transactions/actions';
@@ -28,7 +28,7 @@ type DraggableLabelsProps = {
   editable: boolean;
   labelOptions: Label[];
   itemId: number;
-  addSelectedLabel: (label: Label) => void;
+  setSelectedLabel: (label: Label) => void;
   setNoteLabels: (noteId: number, labels: number[]) => void;
   setTaskLabels: (taskId: number, labels: number[]) => void;
   setTransactionLabels: (transactionId: number, labels: number[]) => void;
@@ -66,7 +66,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   project,
   editable,
   itemId,
-  addSelectedLabel,
+  setSelectedLabel,
   setNoteLabels,
   setTaskLabels,
   setTransactionLabels,
@@ -96,7 +96,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   }, [labels]);
   // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
-    addSelectedLabel(label);
+    setSelectedLabel(label);
     history.push('/labels/search');
   };
 
@@ -235,6 +235,6 @@ export default connect(mapStateToProps, {
   setNoteLabels,
   setTaskLabels,
   setTransactionLabels,
-  addSelectedLabel,
+  setSelectedLabel,
   labelsUpdate,
 })(DraggableLabelsList);

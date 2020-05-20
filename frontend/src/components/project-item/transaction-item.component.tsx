@@ -22,7 +22,7 @@ import {
   getIcon,
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
-import { addSelectedLabel } from '../../features/label/actions';
+import { setSelectedLabel } from '../../features/label/actions';
 import {User} from "../../features/group/interface";
 
 const LocaleCurrency = require('locale-currency'); //currency code
@@ -31,7 +31,7 @@ type TransactionProps = {
   inProject: boolean;
   currency: string;
   aliases: any;
-  addSelectedLabel: (label: Label) => void;
+  setSelectedLabel: (label: Label) => void;
   showModal?: (user: User) => void;
 };
 
@@ -94,7 +94,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
   const history = useHistory();
   // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
-    props.addSelectedLabel(label);
+    props.setSelectedLabel(label);
     history.push('/labels/search');
   };
   const { transaction, deleteTransaction, aliases, inModal, inProject, showModal } = props;
@@ -265,5 +265,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   deleteTransaction,
-  addSelectedLabel,
+  setSelectedLabel,
 })(TransactionItem);

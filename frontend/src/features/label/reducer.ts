@@ -65,10 +65,9 @@ const slice = createSlice({
       state.labelOptions = Object.assign([], labels);
       state.labelsSelected = [];
     },
-    addSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
+    setSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
       const { label } = action.payload;
-      state.labelsSelected.unshift(label);
-      // state.labelOptions = state.labelOptions.filter(l => l.value !== label.value);
+      state.labelsSelected = [label];
     },
     removeSelectedLabel: (
       state,

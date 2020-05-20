@@ -15,7 +15,7 @@ import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 import { deleteNote } from '../../features/notes/actions';
 import { Note } from '../../features/notes/interface';
 import { Label, stringToRGB } from '../../features/label/interface';
-import { addSelectedLabel } from '../../features/label/actions';
+import { setSelectedLabel } from '../../features/label/actions';
 // modals import
 import EditNote from '../modals/edit-note.component';
 import MoveProjectItem from '../modals/move-project-item.component';
@@ -41,7 +41,7 @@ type ProjectProps = {
 
 type NoteProps = {
   inProject: boolean;
-  addSelectedLabel: (label: Label) => void;
+  setSelectedLabel: (label: Label) => void;
 };
 
 type NoteManageProps = {
@@ -110,7 +110,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   const history = useHistory();
   // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
-    props.addSelectedLabel(label);
+    props.setSelectedLabel(label);
     history.push('/labels/search');
   };
 
@@ -253,6 +253,6 @@ const mapStateToProps = (state: IState) => ({
   aliases: state.system.aliases,
 });
 
-export default connect(mapStateToProps, { deleteNote, addSelectedLabel })(
+export default connect(mapStateToProps, { deleteNote, setSelectedLabel })(
   NoteItem
 );
