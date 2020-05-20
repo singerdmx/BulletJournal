@@ -16,7 +16,10 @@ const getThemeColorVars = (theme: string) => {
         };
       }
       case 'DARK': {
-        return darkVars;
+        return {
+          ...darkVars,
+          '@primary-color': '#696969'
+        };
       }
     }
   }
