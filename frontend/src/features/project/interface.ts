@@ -21,8 +21,8 @@ export interface ProjectsWithOwner {
 
 export interface Activity {
   originator: User;
-  activity: String;
-  activityTime: String;
+  activity: string;
+  activityTime: string;
   action: ContentAction;
-  link: String;
+  link: string;
 }
