@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
@@ -23,6 +25,8 @@ public class NotificationDaoJpa {
     private NotificationRepository notificationRepository;
     @Autowired
     private UserClient userClient;
+    @Autowired
+    private UserAliasDaoJpa userAliasDaoJpa;
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
         List<Notification> notifications = this.notificationRepository.findByTargetUser(username);
@@ -52,7 +56,13 @@ public class NotificationDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<Informed> events) {
-        events.forEach(event -> event.toNotifications().forEach(n -> this.notificationRepository.save(n)));
+        final Map<String, Map<String, String>> cache = new HashMap<>();
+        events.forEach(event -> {
+            String originator = event.getOriginator();
+            Map<String, String> aliases = cache.computeIfAbsent(originator, k -> this.userAliasDaoJpa.getAliases(k));
+            event.setOriginatorAlias(aliases.get(originator));
+            event.toNotifications().forEach(n -> this.notificationRepository.save(n));
+        });
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -22,7 +22,7 @@ public class JoinGroupEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginator() + "## invited you to join Group ##" + event.getContentName() + "##";
+        return "##" + this.getOriginatorAlias() + "## invited you to join Group ##" + event.getContentName() + "##";
     }
 
     @Override

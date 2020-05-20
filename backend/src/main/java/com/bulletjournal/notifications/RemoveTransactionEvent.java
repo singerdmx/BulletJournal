@@ -21,7 +21,7 @@ public class RemoveTransactionEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginator() + "## removed Transaction ##" + event.getContentName() + "##";
+        return "##" + this.getOriginatorAlias() + "## removed Transaction ##" + event.getContentName() + "##";
     }
 
     @Override

@@ -21,11 +21,11 @@ public class UpdateTransactionPayerEvent extends Informed {
     @Override
     protected String getEventTitle(Event event) {
         if (payer == null) {
-            return "Transaction ##" + event.getContentName() + "## payer is removed by ##" + this.getOriginator()
+            return "Transaction ##" + event.getContentName() + "## payer is removed by ##" + this.getOriginatorAlias()
                     + "##";
         }
         return "Transaction ##" + event.getContentName() + "## payer is changed to ##" + this.payer + "## by ##"
-                + this.getOriginator() + "##";
+                + this.getOriginatorAlias() + "##";
     }
 
     @Override

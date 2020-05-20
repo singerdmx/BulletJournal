@@ -21,11 +21,11 @@ public class CreateProjectEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginator() + "## created BuJo ##" + event.getContentName() + "##";
+        return "##" + this.getOriginatorAlias() + "## created BuJo ##" + event.getContentName() + "##";
     }
 
     @Override
     public String getLink(Long contentId) {
-        return String.format("/projects/%d", contentId);
+        return ContentType.getContentLink(ContentType.PROJECT, contentId);
     }
 }

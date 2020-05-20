@@ -175,13 +175,9 @@ public class LabelDaoJpa {
         return projectItems.stream().filter(
                 item -> {
                     Long projectId = item.getProject().getId();
-                    if (cache.containsKey(projectId)) {
-                        return cache.get(projectId);
-                    }
-                    boolean match = item.getProject().getGroup().getAcceptedUsers().stream().anyMatch(
-                            u -> requester.equals(u.getUser().getName()));
-                    cache.put(projectId, match);
-                    return match;
+                    return cache.computeIfAbsent(projectId,
+                            k -> item.getProject().getGroup().getAcceptedUsers()
+                                    .stream().anyMatch(u -> requester.equals(u.getUser().getName())));
                 }).collect(Collectors.toList());
     }
 

@@ -21,7 +21,7 @@ public class RemoveUserFromGroupEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginator() + "## removed you from Group ##" + event.getContentName() + "##";
+        return "##" + this.getOriginatorAlias() + "## removed you from Group ##" + event.getContentName() + "##";
     }
 
     @Override

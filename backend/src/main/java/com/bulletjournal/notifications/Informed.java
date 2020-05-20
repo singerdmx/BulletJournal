@@ -15,6 +15,7 @@ public abstract class Informed {
     private static final Gson GSON = new Gson();
     private List<Event> events;
     private String originator;
+    private String originatorAlias;
 
     public Informed(Event event, String originator) {
         this.events = ImmutableList.of(event);
@@ -42,7 +43,7 @@ public abstract class Informed {
                     Notification notification = new Notification(
                             this.getOriginator(),
                             this.getEventTitle(event),
-                            this.getEventContent(event),
+                            null,
                             event.getTargetUser(),
                             this.getEventType(),
                             event.getContentId(),
@@ -60,10 +61,6 @@ public abstract class Informed {
         return getClass().getSimpleName();
     }
 
-    protected String getEventContent(Event event) {
-        return null;
-    }
-
     public List<Event> getEvents() {
         return events;
     }
@@ -75,6 +72,14 @@ public abstract class Informed {
 
     public String getOriginator() {
         return this.originator;
+    }
+
+    public String getOriginatorAlias() {
+        return originatorAlias == null ? originator : originatorAlias;
+    }
+
+    public void setOriginatorAlias(String originatorAlias) {
+        this.originatorAlias = originatorAlias;
     }
 
     @Override
