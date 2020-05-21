@@ -46,7 +46,7 @@ const ProjectHistory: React.FC<ProjectHistoryProps> = (props) => {
             title: 'Time',
             dataIndex: 'activityTime',
             key: 'activityTime',
-            render: (a: string) => moment(a).fromNow()
+            render: (a: string) => <Tooltip title={moment(a).fromNow()}><span>{moment(a).format('YYYY-MM-DD HH:mm')}</span></Tooltip>
         },
     ];
 
