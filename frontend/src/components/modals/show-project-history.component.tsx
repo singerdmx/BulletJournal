@@ -7,7 +7,6 @@ import {
 } from '../../features/project/interface';
 import {
   Avatar,
-  Button,
   DatePicker,
   Divider,
   Modal,
@@ -23,6 +22,7 @@ import {
   StarTwoTone,
   TeamOutlined,
   EditTwoTone,
+  SyncOutlined
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { ContentAction } from '../../features/project/constants';
@@ -159,7 +159,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
         >
           <div>
             <div style={{ paddingBottom: '20px' }}>
-              <RangePicker
+              <span className='history-label'>Range </span> <RangePicker
                 ranges={{
                   Today: [moment(), moment()],
                   'This Week': [
@@ -177,7 +177,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
               />
             </div>
             <div style={{ paddingBottom: '20px' }}>
-              <Tooltip title='Select BuJo'>
+              <span className='history-label'>BuJo </span> <Tooltip title='Select BuJo'>
                 <Select
                   style={{ width: '256px' }}
                   placeholder='Select BuJo'
@@ -223,8 +223,8 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                 style={{ width: '200px', marginRight: '25px' }}
                 value={selectAction.replace('_', ' ')}
                 onChange={(action) => {
-                  let actionkey = action.replace(' ', '_');
-                  setSelectAction(actionkey as ContentAction);
+                  let actionKey = action.replace(' ', '_');
+                  setSelectAction(actionKey as ContentAction);
                 }}
               >
                 {Object.values(ContentAction).map((action) => {
@@ -269,9 +269,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
             </span>
             <span className='history-refresh-button'>
               <Tooltip title='Refresh'>
-                <Button type='primary' onClick={handleGetHistory}>
-                  Search
-                </Button>
+                <SyncOutlined onClick={handleGetHistory} />
               </Tooltip>
             </span>
           </div>
