@@ -37,6 +37,8 @@ import moment from 'moment';
 import { getProjectHistory } from '../../features/project/actions';
 import ProjectHistory from '../project-history/project-history.component';
 
+import './modals.styles.less';
+
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -159,7 +161,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
         >
           <div>
             <div style={{ paddingBottom: '20px' }}>
-              <span className='history-label'>Range </span> <RangePicker
+              <div className='history-label'>Range </div> <RangePicker
                 ranges={{
                   Today: [moment(), moment()],
                   'This Week': [
@@ -177,7 +179,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
               />
             </div>
             <div style={{ paddingBottom: '20px' }}>
-              <span className='history-label'>BuJo </span> <Tooltip title='Select BuJo'>
+              <div className='history-label'>BuJo </div> <Tooltip title='Select BuJo'>
                 <Select
                   style={{ width: '256px' }}
                   placeholder='Select BuJo'
