@@ -7,7 +7,7 @@ type SearchCompletedTasksProps = {
     project: Project | undefined;
 }
 
-const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (props) => {
+const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = () => {
     return <div className='project'></div>
 };
 

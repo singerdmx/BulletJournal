@@ -13,6 +13,7 @@ import TransactionPage from '../../pages/transaction/transaction.pages';
 import CompletedTaskPage from "../../pages/task/completed-task.pages";
 import { Layout } from 'antd';
 import SearchCompletedTasksPage from "../../pages/project/search-completed-tasks.pages";
+import AdminPage from "../../pages/admin/admin.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -33,6 +34,7 @@ class ContentLayout extends React.Component {
           <Route exact path="/task/:taskId" component={TaskPage} />
           <Route exact path="/completedTask/:taskId" component={CompletedTaskPage} />
           <Route exact path="/completedTasks/search" component={SearchCompletedTasksPage} />
+          <Route exact path="/admin" component={AdminPage} />
           <Route
             exact
             path="/transaction/:transactionId"

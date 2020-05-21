@@ -67,7 +67,6 @@ public class TokenBucket {
 
     private boolean isLimitExceededByUser() {
 
-
         // For RateLimitFilter
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
