@@ -151,7 +151,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
           onClick={openModal}
         />
         <Modal
-          title={`BuJo "${project.name}" History`}
+          title='BuJo History'
           visible={visible}
           onCancel={onCancel}
           footer={false}
