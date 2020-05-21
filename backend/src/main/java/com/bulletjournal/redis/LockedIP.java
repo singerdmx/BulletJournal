@@ -8,23 +8,21 @@ import org.springframework.data.redis.core.TimeToLive;
 import java.io.Serializable;
 import java.util.Objects;
 
-
-@RedisHash(value = "LockedUser", timeToLive = 86400)
+@RedisHash(value = "LockedIP", timeToLive = 86400)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LockedUser implements Serializable {
-
+public class LockedIP implements Serializable {
     @Id
-    private String name;
+    private String ip;
     private String reason;
 
     @TimeToLive
     private Long expiration;
 
-    public LockedUser() {
+    public LockedIP() {
     }
 
-    public LockedUser(String name, String reason) {
-        this.name = name;
+    public LockedIP(String ip, String reason) {
+        this.ip = ip;
         this.reason = reason;
     }
 
@@ -36,12 +34,12 @@ public class LockedUser implements Serializable {
         return reason;
     }
 
-    public String getName() {
-        return name;
+    public String getIP() {
+        return ip;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIP(String ip) {
+        this.ip = ip;
     }
 
     public Long getExpiration() {
@@ -56,20 +54,14 @@ public class LockedUser implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LockedUser luser = (LockedUser) o;
-        return Objects.equals(name, luser.name);
+        LockedIP lockedIP = (LockedIP) o;
+        return Objects.equals(ip, lockedIP.ip) &&
+                Objects.equals(reason, lockedIP.reason) &&
+                Objects.equals(expiration, lockedIP.expiration);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                ", name='" + name + '\'' +
-                '}';
+        return Objects.hash(ip, reason, expiration);
     }
 }
-

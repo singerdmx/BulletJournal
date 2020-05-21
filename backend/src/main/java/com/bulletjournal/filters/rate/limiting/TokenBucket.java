@@ -4,7 +4,9 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.MDCConfig;
 import com.bulletjournal.config.RateConfig;
 import com.bulletjournal.config.RedisConfig;
+import com.bulletjournal.redis.LockedIP;
 import com.bulletjournal.redis.LockedUser;
+import com.bulletjournal.redis.RedisLockedIPRepository;
 import com.bulletjournal.redis.RedisLockedUserRepository;
 import io.github.bucket4j.*;
 import org.slf4j.MDC;
@@ -33,6 +35,9 @@ public class TokenBucket {
     @Autowired
     private RedisLockedUserRepository redisLockedUserRepository;
 
+    @Autowired
+    private RedisLockedIPRepository redisLockedIPRepository;
+
 
     private final Map<String, Bucket> bucketsUser = new ConcurrentHashMap<>();
     private final Map<String, Bucket> bucketsFileUpload = new ConcurrentHashMap<>();
@@ -56,13 +61,23 @@ public class TokenBucket {
 
     private boolean isLimitExceededByPublicItem() {
         String ip = MDC.get(this.mdcConfig.getDefaultClientIpKey());
-        return !consumeToken(ip, bucketsPublicItem, rateConfig.getPublicItem());
+        boolean consumed = consumeToken(ip, bucketsPublicItem, rateConfig.getPublicItem());
+
+        if (!consumed) {
+            redisLockedIPRepository.save(new LockedIP(ip, "Get public item requests exceeded limit"));
+        }
+
+        return !consumed;
     }
 
     private boolean isLimitExceededByFileUpload() {
-        // FileController
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return !consumeToken(username, bucketsFileUpload, rateConfig.getFileUpload());
+        boolean consumed = consumeToken(username, bucketsUser, rateConfig.getFileUpload());
+
+        if (!consumed) {
+            redisLockedUserRepository.save(new LockedUser(username, "User file upload requests exceeded limit"));
+        }
+        return !consumed;
     }
 
     private boolean isLimitExceededByUser() {
@@ -74,7 +89,7 @@ public class TokenBucket {
         boolean consumed = consumeToken(username, bucketsUser, limit);
 
         if (!consumed) {
-            redisLockedUserRepository.save(new LockedUser(username));
+            redisLockedUserRepository.save(new LockedUser(username, "User API requests exceeded limit"));
         }
 
         return !consumed;

@@ -2,6 +2,10 @@ package com.bulletjournal.filters;
 
 import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.config.MDCConfig;
+import com.bulletjournal.redis.LockedIP;
+import com.bulletjournal.redis.RedisLockedIPRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -13,17 +17,23 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class MDCFilter implements Filter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MDCFilter.class);
+
     @Autowired
     MDCConfig mdcConfig;
 
     @Autowired
     AuthConfig authConfig;
+
+    @Autowired
+    RedisLockedIPRepository redisLockedIPRepository;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -37,6 +47,15 @@ public class MDCFilter implements Filter {
 
             MDC.put(mdcConfig.getDefaultRequestIdKey(), requestId);
             MDC.put(mdcConfig.getDefaultClientIpKey(), clientIP);
+
+            Optional<LockedIP> lockedIPOptional = redisLockedIPRepository.findById(clientIP);
+            if (lockedIPOptional.isPresent()) {
+                LOGGER.info("IP {} remains locked for {} hour(s)", clientIP,
+                        String.format("%.2f", lockedIPOptional.get().getExpirationInHour()));
+                httpResponse.addHeader("Reason", "IP is locked");
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
 
             httpResponse.setHeader(mdcConfig.getDefaultRequestIdKey(), requestId);
 

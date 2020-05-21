@@ -64,8 +64,8 @@ public class AuthFilter implements Filter {
                     if (lockedUserOptional.isPresent()) {
                         LOGGER.info("User {} remains locked for {} hour(s)", username,
                                 String.format("%.2f", lockedUserOptional.get().getExpirationInHour()));
+                        response.addHeader("Reason", "User is locked");
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                        // TODO : add body message for reason
                         return;
                     }
 
