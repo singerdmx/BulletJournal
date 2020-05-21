@@ -53,7 +53,9 @@ type ShowProjectHistoryProps = {
     projectId: number,
     timezone: string,
     startDate: string,
-    endDate: string
+    endDate: string,
+    action: ContentAction,
+    username: string
   ) => void;
 };
 
@@ -96,7 +98,9 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   ]);
 
   const [selectProject, setSelectProject] = useState(-1);
-  const [selectAction, setSelectAction] = useState('ALL_ACTIONS');
+  const [selectAction, setSelectAction] = useState(
+    'ALL_ACTIONS' as ContentAction
+  );
   const [selectGroup, setSelectGroup] = useState([] as User[]);
   const [selectUser, setSelectUser] = useState('Everyone');
 
@@ -125,7 +129,14 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   };
 
   const handleGetHistory = () => {
-    getProjectHistory(selectProject, timezone, selectDate[0], selectDate[1]);
+    getProjectHistory(
+      selectProject,
+      timezone,
+      selectDate[0],
+      selectDate[1],
+      selectAction,
+      selectUser
+    );
   };
 
   if (!project || project.shared) {
@@ -213,7 +224,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                 value={selectAction.replace('_', ' ')}
                 onChange={(action) => {
                   let actionkey = action.replace(' ', '_');
-                  setSelectAction(actionkey);
+                  setSelectAction(actionkey as ContentAction);
                 }}
               >
                 {Object.values(ContentAction).map((action) => {
@@ -221,7 +232,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                     <Option value={action} key={action}>
                       <Tooltip key={action} title={action} placement='right'>
                         <span>
-                          {getIcon(action)}&nbsp;{action}
+                          {getIcon(action)}&nbsp;{action.replace('_', ' ')}
                         </span>
                       </Tooltip>
                     </Option>

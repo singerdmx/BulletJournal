@@ -1,5 +1,6 @@
 import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
 import { Project } from '../features/project/interface';
+import { ContentAction } from '../features/project/constants';
 
 export const fetchProjects = () => {
   return doFetch('/api/projects')
@@ -84,10 +85,12 @@ export const GetProjectHistory = (
   projectId: number,
   timezone: string,
   startDate: string,
-  endDate: string
+  endDate: string,
+  action: ContentAction,
+  username: string
 ) => {
   return doFetch(
-    `/api/projects/${projectId}/history?timezone=${timezone}&startDate=${startDate}&endDate=${endDate}`
+    `/api/projects/${projectId}/history?timezone=${timezone}&startDate=${startDate}&endDate=${endDate}&action=${action}&username=${username}`
   )
     .then((res) => res.json())
     .catch((err) => {

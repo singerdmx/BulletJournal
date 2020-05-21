@@ -111,7 +111,7 @@ public class Auditable extends AuditModel {
         Activity activity = new Activity();
         activity.setAction(this.getAction());
         activity.setActivity(this.activity);
-        activity.setActivityTime(this.activityTime);
+        activity.setActivityTime(this.activityTime.getTime());
         activity.setOriginator(new User(this.originator));
         activity.setLink(ContentAction.getContentLink(this.getAction(),
                 this.projectItemId != null ? this.projectItemId : this.projectId));

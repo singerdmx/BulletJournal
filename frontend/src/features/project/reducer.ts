@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { ProjectType } from './constants';
+import { ProjectType, ContentAction } from './constants';
 import { Project, ProjectsWithOwner, Activity } from './interface';
 import { History } from 'history';
 
@@ -60,6 +60,8 @@ export type GetProjectHistoryAction = {
   timezone: string;
   startDate: string;
   endDate: string;
+  action: ContentAction;
+  username: string;
 };
 
 let initialState = {

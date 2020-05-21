@@ -157,10 +157,11 @@ public class ProjectController {
 
     @GetMapping(PROJECT_HISTORY_ROUTE)
     public List<Activity> getHistory(@NotNull @PathVariable Long projectId, @NotBlank @RequestParam String timezone,
-            @NotBlank @RequestParam String startDate, @RequestParam String endDate) {
+            @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
+            @RequestParam @NotNull ContentAction action, @RequestParam @NotBlank String username) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         Map<String, String> alias = this.userAliasDaoJpa.getAliases(requester);
-        return this.auditableDaoJpa.getHistory(projectId, timezone, startDate, endDate, requester)
+        return this.auditableDaoJpa.getHistory(projectId, timezone, startDate, endDate, action, username, requester)
                 .stream().map(a -> {
                     User user = this.userClient.getUser(a.getOriginator().getName());
                     user.setAlias(alias.getOrDefault(user.getName(), user.getName()));

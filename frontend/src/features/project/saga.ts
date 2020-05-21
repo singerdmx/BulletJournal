@@ -208,13 +208,22 @@ function* putProjectRelations(
 
 function* getProjectHistory(action: PayloadAction<GetProjectHistoryAction>) {
   try {
-    const { projectId, timezone, startDate, endDate } = action.payload;
+    const {
+      projectId,
+      timezone,
+      startDate,
+      endDate,
+      username,
+    } = action.payload;
+
     const data: Activity[] = yield call(
       GetProjectHistory,
       projectId,
       timezone,
       startDate,
-      endDate
+      endDate,
+      action.payload.action,
+      username
     );
 
     yield put(projectActions.historyReceived({ projectHistory: data }));

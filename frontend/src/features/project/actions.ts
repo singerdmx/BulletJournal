@@ -1,6 +1,6 @@
 import { actions } from './reducer';
 import { Project } from './interface';
-import { ProjectType } from './constants';
+import { ProjectType, ContentAction } from './constants';
 import { History } from 'history';
 export const updateProjects = () => actions.projectsUpdate({});
 export const createProjectByName = (
@@ -45,11 +45,15 @@ export const getProjectHistory = (
   projectId: number,
   timezone: string,
   startDate: string,
-  endDate: string
+  endDate: string,
+  action: ContentAction,
+  username: string
 ) =>
   actions.getProjectHistory({
     projectId: projectId,
     timezone: timezone,
     startDate: startDate,
     endDate: endDate,
+    action: action,
+    username: username,
   });

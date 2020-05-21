@@ -1,14 +1,12 @@
 package com.bulletjournal.controller.models;
 
-import java.sql.Timestamp;
-
 import com.bulletjournal.contents.ContentAction;
 
 public class Activity {
 
     private User originator;
     private String activity;
-    private Timestamp activityTime;
+    private Long activityTime;
     private ContentAction action;
     private String link;
 
@@ -28,14 +26,6 @@ public class Activity {
         this.activity = activity;
     }
 
-    public Timestamp getActivityTime() {
-        return activityTime;
-    }
-
-    public void setActivityTime(Timestamp activityTime) {
-        this.activityTime = activityTime;
-    }
-
     public ContentAction getAction() {
         return action;
     }
@@ -50,6 +40,14 @@ public class Activity {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public Long getActivityTime() {
+        return activityTime;
+    }
+
+    public void setActivityTime(Long activityTime) {
+        this.activityTime = activityTime;
     }
 
 }
