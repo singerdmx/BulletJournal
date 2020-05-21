@@ -196,12 +196,8 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                     return (
                       <Option value={project.id} key={project.id}>
                         <Tooltip
-                          title={`${
-                            aliases[project.owner]
-                              ? aliases[project.owner]
-                              : project.owner
-                          }`}
-                          placement='right'
+                          title={`${project.name} (Group ${project.group.name})`}
+                          placement='left'
                         >
                           <span>
                             <Avatar size='small' src={project.ownerAvatar} />
@@ -230,7 +226,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                 {Object.values(ContentAction).map((action) => {
                   return (
                     <Option value={action} key={action}>
-                      <Tooltip key={action} title={action} placement='right'>
+                      <Tooltip key={action} title={action} placement='left'>
                         <span>
                           {getIcon(action)}&nbsp;{action.replace('_', ' ')}
                         </span>
