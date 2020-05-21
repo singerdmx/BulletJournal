@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Repository
 public class AuditableDaoJpa {
 
+    private static final String EVERYONE = "Everyone";
     @Autowired
     private AuditableRepository auditableRepository;
 
@@ -44,13 +45,13 @@ public class AuditableDaoJpa {
 
         List<com.bulletjournal.repository.models.Auditable> auditables = Collections.emptyList();
 
-        if (username.equals("Everyone") && action.equals(ContentAction.ALL_ACTIONS)) {
+        if (username.equals(EVERYONE) && action.equals(ContentAction.ALL_ACTIONS)) {
             auditables = this.auditableRepository.findAuditablesBetweenAllActionsAllUsers(projectId,
                     Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
-        } else if (username.equals("Everyone") && !action.equals(ContentAction.ALL_ACTIONS)) {
+        } else if (username.equals(EVERYONE) && !action.equals(ContentAction.ALL_ACTIONS)) {
             auditables = this.auditableRepository.findAuditablesBetweenAllUsers(projectId,
                     Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()), action);
-        } else if (!username.equals("Everyone") && action.equals(ContentAction.ALL_ACTIONS)) {
+        } else if (!username.equals(EVERYONE) && action.equals(ContentAction.ALL_ACTIONS)) {
             auditables = this.auditableRepository.findAuditablesBetweenAllActions(projectId,
                     Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()), username);
         } else {
