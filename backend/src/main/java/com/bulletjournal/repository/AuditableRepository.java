@@ -1,14 +1,13 @@
 package com.bulletjournal.repository;
 
-import java.sql.Timestamp;
-
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.repository.models.Auditable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository

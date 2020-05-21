@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
@@ -183,21 +184,28 @@ public class LabelDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItems> getLabelsForProjectItems(List<ProjectItems> projectItems) {
+        List<ProjectItem> items = new ArrayList<>();
+        projectItems.forEach(item -> {
+            item.getTasks().forEach(t -> items.add(t));
+            item.getTransactions().forEach(t -> items.add(t));
+            item.getNotes().forEach(n -> items.add(n));
+        });
+        getLabelsForProjectItemList(items);
+        return projectItems;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<ProjectItem> getLabelsForProjectItemList(List<ProjectItem> projectItems) {
         Set<Long> labelIds = new HashSet<>();
-        projectItems.forEach(p -> {
-            p.getTasks().forEach(t -> labelIds.addAll(t.getLabels().stream().map(e -> e.getId()).collect(Collectors.toList())));
-            p.getTransactions().forEach(t ->
-                    labelIds.addAll(t.getLabels().stream().map(e -> e.getId()).collect(Collectors.toList())));
-            p.getNotes().forEach(t -> labelIds.addAll(t.getLabels().stream().map(e -> e.getId()).collect(Collectors.toList())));
+        projectItems.forEach(item -> {
+            labelIds.addAll(item.getLabels().stream().map(l -> l.getId()).collect(Collectors.toList()));
         });
 
         Map<Long, com.bulletjournal.controller.models.Label> m = getLabels(new ArrayList<>(labelIds)).stream()
                 .collect(Collectors.toMap(com.bulletjournal.controller.models.Label::getId, l -> l));
 
-        projectItems.forEach(p -> {
-            p.getTasks().forEach(t -> t.setLabels(t.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
-            p.getTransactions().forEach(t -> t.setLabels(t.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
-            p.getNotes().forEach(t -> t.setLabels(t.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
+        projectItems.forEach(item -> {
+            item.setLabels(item.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList()));
         });
         return projectItems;
     }
