@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Upload, message, Button } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { IState } from '../../store';
+import { UploadOutlined } from '@ant-design/icons';
 import Axios from 'axios';
 
 const INITIAL_STATE = {
@@ -73,7 +74,7 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
         onClick={() => handleUpload(state.file)}
         loading={state.uploading}
       >
-        Upload
+        <UploadOutlined /> Upload&nbsp;
       </Button>
     </div>
   );
