@@ -179,11 +179,12 @@ class ProjectPage extends React.Component<
   };
 
   handleClickShowCompletedTasksButton = () => {
-    this.setState({ completeTasksShown: true });
     if (this.props.completedTaskPageNo === 0) {
       const projectId = this.props.match.params.projectId;
       this.props.updateCompletedTasks(parseInt(projectId));
     }
+    this.setState({ completeTasksShown: true });
+    window.scrollTo(0, document.body.scrollHeight);
   };
 
   onCancel = () => {
