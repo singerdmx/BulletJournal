@@ -154,3 +154,18 @@ export const getTasksByOrder = (
     startDate: startDate,
     endDate: endDate,
   });
+
+export const getSearchCompletedTasks = (
+  projectId: number,
+  assignee: string,
+  startDate: string,
+  endDate: string,
+  timezone: string
+) =>
+  actions.getSearchCompletedTasks({
+    projectId: projectId,
+    assignee: assignee,
+    startDate: startDate,
+    endDate: endDate,
+    timezone: timezone,
+  });

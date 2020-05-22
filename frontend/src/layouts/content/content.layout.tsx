@@ -10,34 +10,42 @@ import LabelsPage from '../../pages/labels';
 import NotePage from '../../pages/note/note.pages';
 import TaskPage from '../../pages/task/task.pages';
 import TransactionPage from '../../pages/transaction/transaction.pages';
-import CompletedTaskPage from "../../pages/task/completed-task.pages";
+import CompletedTaskPage from '../../pages/task/completed-task.pages';
 import { Layout } from 'antd';
-import SearchCompletedTasksPage from "../../pages/project/search-completed-tasks.pages";
-import AdminPage from "../../pages/admin/admin.pages";
+import SearchCompletedTasksPage from '../../pages/project/search-completed-tasks.pages';
+import AdminPage from '../../pages/admin/admin.pages';
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
   render() {
     return (
-      <Content className="content">
+      <Content className='content'>
         <Switch>
-          <Redirect exact from="/" to="/bujo/today" />
-          <Route exact path="/bujo/:category" component={BujoPage} />
-          <Route exact path="/settings" component={SettingPage} />
-          <Route exact path="/projects" component={ProjectsPage} />
-          <Route exact path="/projects/:projectId" component={ProjectPage} />
-          <Route exact path="/groups" component={GroupsPage} />
-          <Route exact path="/groups/:groupId" component={GroupPage} />
-          <Route exact path="/labels/:createOrSearch" component={LabelsPage} />
-          <Route path="/labels" component={LabelsPage} />
-          <Route exact path="/note/:noteId" component={NotePage} />
-          <Route exact path="/task/:taskId" component={TaskPage} />
-          <Route exact path="/completedTask/:taskId" component={CompletedTaskPage} />
-          <Route exact path="/completedTasks/search" component={SearchCompletedTasksPage} />
-          <Route exact path="/admin" component={AdminPage} />
+          <Redirect exact from='/' to='/bujo/today' />
+          <Route exact path='/bujo/:category' component={BujoPage} />
+          <Route exact path='/settings' component={SettingPage} />
+          <Route exact path='/projects' component={ProjectsPage} />
+          <Route exact path='/projects/:projectId' component={ProjectPage} />
+          <Route exact path='/groups' component={GroupsPage} />
+          <Route exact path='/groups/:groupId' component={GroupPage} />
+          <Route exact path='/labels/:createOrSearch' component={LabelsPage} />
+          <Route path='/labels' component={LabelsPage} />
+          <Route exact path='/note/:noteId' component={NotePage} />
+          <Route exact path='/task/:taskId' component={TaskPage} />
           <Route
             exact
-            path="/transaction/:transactionId"
+            path='/completedTask/:taskId'
+            component={CompletedTaskPage}
+          />
+          <Route
+            exact
+            path='/completedTasks/:projectId/search'
+            component={SearchCompletedTasksPage}
+          />
+          <Route exact path='/admin' component={AdminPage} />
+          <Route
+            exact
+            path='/transaction/:transactionId'
             component={TransactionPage}
           />
         </Switch>

@@ -24,6 +24,7 @@ import {
   UpdateCompletedTasks,
   GetTasksByAssignee,
   GetTasksByOrder,
+  GetSearchCompletedTasks,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -332,10 +333,10 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
     const etag = data.headers.get('Etag')!;
     const systemState = state.system;
     yield put(
-        SystemActions.systemUpdateReceived({
-          ...systemState,
-          tasksEtag: etag,
-        })
+      SystemActions.systemUpdateReceived({
+        ...systemState,
+        tasksEtag: etag,
+      })
     );
     const completedTaskPageNo = state.task.completedTaskPageNo;
     if (completedTaskPageNo > 0) {
@@ -382,9 +383,9 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
 
     const tasksByOrder = state.task.tasksByOrder.filter((t) => t.id !== taskId);
     yield put(
-        tasksActions.tasksByOrderReceived({
-          tasksByOrder: tasksByOrder,
-        })
+      tasksActions.tasksByOrderReceived({
+        tasksByOrder: tasksByOrder,
+      })
     );
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
@@ -407,10 +408,10 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
     const etag = data.headers.get('Etag')!;
     const systemState = state.system;
     yield put(
-        SystemActions.systemUpdateReceived({
-          ...systemState,
-          tasksEtag: etag,
-        })
+      SystemActions.systemUpdateReceived({
+        ...systemState,
+        tasksEtag: etag,
+      })
     );
     const completedTaskPageNo = state.task.completedTaskPageNo;
     if (completedTaskPageNo > 0) {
@@ -742,6 +743,41 @@ function* getTasksByOrder(action: PayloadAction<GetTasksByOrder>) {
   }
 }
 
+function* getSearchCompletedTasks(
+  action: PayloadAction<GetSearchCompletedTasks>
+) {
+  try {
+    const {
+      projectId,
+      assignee,
+      startDate,
+      endDate,
+      timezone,
+    } = action.payload;
+    const searchCompletedTasks = yield call(
+      fetchCompletedTasks,
+      projectId,
+      1,
+      1,
+      assignee,
+      startDate,
+      endDate,
+      timezone
+    );
+
+    yield put(
+      tasksActions.searchCompletedTasksReceived({
+        searchCompletedTasks: searchCompletedTasks,
+      })
+    );
+  } catch (error) {
+    yield call(
+      message.error,
+      `get search completed tasks Error Received: ${error}`
+    );
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -784,5 +820,9 @@ export default function* taskSagas() {
     ),
     yield takeLatest(tasksActions.getTasksByAssignee.type, getTasksByAssignee),
     yield takeLatest(tasksActions.getTasksByOrder.type, getTasksByOrder),
+    yield takeLatest(
+      tasksActions.getSearchCompletedTasks.type,
+      getSearchCompletedTasks
+    ),
   ]);
 }

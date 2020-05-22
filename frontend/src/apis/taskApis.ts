@@ -26,11 +26,17 @@ export const fetchTasks = (
 export const fetchCompletedTasks = (
   projectId: number,
   pageNo: number,
-  pageSize: number
+  pageSize: number,
+  assignee?: string,
+  startDate?: string,
+  endDate?: string,
+  timezone?: string
 ) => {
-  return doFetch(
-    `/api/projects/${projectId}/completedTasks?pageNo=${pageNo}&pageSize=${pageSize}`
-  )
+  let url = `/api/projects/${projectId}/completedTasks?pageNo=${pageNo}&pageSize=${pageSize}`;
+  if (startDate && startDate.length > 0) {
+    url += `&assignee=${assignee}&startDate=${startDate}&endDate=${endDate}&timezone=${timezone}`;
+  }
+  return doFetch(url)
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err.message);

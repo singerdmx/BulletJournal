@@ -753,7 +753,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         List<CompletedTask> completedTasks;
 
-        if (StringUtils.isNotBlank(assignee) || EVERYONE.equals(assignee)) {
+        if (StringUtils.isNotBlank(assignee) && !EVERYONE.equals(assignee)) {
             completedTasks = this.completedTaskRepository.findCompletedTaskByAssigneeBetween(projectId, assignee,
                     Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
         } else {

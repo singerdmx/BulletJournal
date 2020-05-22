@@ -188,7 +188,8 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   };
 
   const handleSearchCompletedTasksClick = () => {
-    history.push('/completedTasks/search');
+    const id = project?.id;
+    history.push(`/completedTasks/${id}/search`);
   };
 
   let completedTaskList = null;
@@ -249,9 +250,12 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   const getAddTaskButton = () => {
     if (tasks.length === 0) {
       return (
-          <div className='add-task-button'>
-            <Result icon={<CarryOutOutlined />} extra={<AddTask mode='button' />} />
-          </div>
+        <div className='add-task-button'>
+          <Result
+            icon={<CarryOutOutlined />}
+            extra={<AddTask mode='button' />}
+          />
+        </div>
       );
     }
 

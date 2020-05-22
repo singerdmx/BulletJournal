@@ -5,14 +5,7 @@ import {
   Project,
   ProjectsWithOwner,
 } from '../../features/project/interface';
-import {
-  Avatar,
-  DatePicker,
-  Divider,
-  Modal,
-  Select,
-  Tooltip,
-} from 'antd';
+import { Avatar, DatePicker, Divider, Modal, Select, Tooltip } from 'antd';
 import {
   CheckCircleTwoTone,
   CloseCircleTwoTone,
@@ -22,7 +15,7 @@ import {
   StarTwoTone,
   TeamOutlined,
   EditTwoTone,
-  SyncOutlined
+  SyncOutlined,
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { ContentAction } from '../../features/project/constants';
@@ -161,7 +154,8 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
         >
           <div>
             <div style={{ paddingBottom: '20px' }}>
-              <div className='history-label'>Range </div> <RangePicker
+              <div className='history-label'>Range </div>{' '}
+              <RangePicker
                 ranges={{
                   Today: [moment(), moment()],
                   'This Week': [
@@ -179,7 +173,8 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
               />
             </div>
             <div style={{ paddingBottom: '20px' }}>
-              <div className='history-label'>BuJo </div> <Tooltip title='Select BuJo'>
+              <div className='history-label'>BuJo </div>{' '}
+              <Tooltip title='Select BuJo'>
                 <Select
                   style={{ width: '256px' }}
                   placeholder='Select BuJo'
