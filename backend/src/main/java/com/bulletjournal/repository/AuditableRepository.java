@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -41,4 +44,8 @@ public interface AuditableRepository extends JpaRepository<Auditable, Long> {
                         + "auditable.activityTime >= :startTime AND auditable.activityTime <= :endTime")
         List<Auditable> findAuditablesBetweenAllActionsAllUsers(@Param("projectId") Long projectId,
                         @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
+
+        @Modifying
+        @Transactional
+        void deleteByUpdatedAtBefore(Timestamp expiryTime);
 }

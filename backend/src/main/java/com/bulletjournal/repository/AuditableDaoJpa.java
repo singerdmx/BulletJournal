@@ -60,4 +60,8 @@ public class AuditableDaoJpa {
         return auditables.stream().map(a -> a.toActivity()).collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteAllExpiredHistory(Timestamp expirationTime) {
+        this.auditableRepository.deleteByUpdatedAtBefore(expirationTime);
+    }
 }

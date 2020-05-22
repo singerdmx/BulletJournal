@@ -1,6 +1,7 @@
 package com.bulletjournal.daemon;
 
 import com.bulletjournal.config.NotificationConfig;
+import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.repository.PublicProjectItemDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
@@ -29,9 +30,11 @@ public class Cleaner {
     private NotificationConfig notificationConfig;
 
     @Autowired
+    private AuditableDaoJpa auditableDaoJpa;
+
+    @Autowired
     public Cleaner(NotificationDaoJpa notificationDaoJpa, PublicProjectItemDaoJpa publicProjectItemDaoJpa) {
-        this.executorService = Executors.newSingleThreadScheduledExecutor(
-                new CustomThreadFactory("cleaner"));
+        this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("cleaner"));
         this.notificationDaoJpa = notificationDaoJpa;
         this.publicProjectItemDaoJpa = publicProjectItemDaoJpa;
     }
@@ -50,6 +53,7 @@ public class Cleaner {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         cleanNotification();
         cleanPublicProjectItems();
+        cleanHisotry();
     }
 
     private void cleanNotification() {
@@ -63,6 +67,14 @@ public class Cleaner {
     private void cleanPublicProjectItems() {
         this.publicProjectItemDaoJpa.deleteAllExpiredPublicItems();
         LOGGER.info("PublicProjectItems Cleaning Done");
+    }
+
+    private void cleanHisotry() {
+        int historyMaxRetentionDays = notificationConfig.getCleaner().getHistoryMaxRetentionDays();
+        long expirationTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(historyMaxRetentionDays);
+
+        auditableDaoJpa.deleteAllExpiredHistory(new Timestamp(expirationTime));
+        LOGGER.info("History Cleaning Done");
     }
 
     @Override
@@ -83,11 +95,12 @@ public class Cleaner {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Cleaner)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Cleaner))
+            return false;
         Cleaner that = (Cleaner) o;
-        return executorService.equals(that.executorService) &&
-                notificationDaoJpa.equals(that.notificationDaoJpa) &&
-                notificationConfig.equals(that.notificationConfig);
+        return executorService.equals(that.executorService) && notificationDaoJpa.equals(that.notificationDaoJpa)
+                && notificationConfig.equals(that.notificationConfig);
     }
 }

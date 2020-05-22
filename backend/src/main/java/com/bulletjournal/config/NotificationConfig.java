@@ -23,6 +23,7 @@ public class NotificationConfig {
     public static class Cleaner {
         private int maxRetentionTimeInDays;
         private int intervalInSeconds;
+        private int historyMaxRetentionDays;
 
         public int getMaxRetentionTimeInDays() {
             return maxRetentionTimeInDays;
@@ -39,7 +40,15 @@ public class NotificationConfig {
         public void setIntervalInSeconds(int intervalInSeconds) {
             this.intervalInSeconds = intervalInSeconds;
         }
+
+        public int getHistoryMaxRetentionDays() {
+            return historyMaxRetentionDays;
+        }
+
+        public void setHistoryMaxRetentionDays(int historyMaxRetentionDays) {
+            this.historyMaxRetentionDays = historyMaxRetentionDays;
+        }
+
     }
 
 }
-

@@ -35,8 +35,8 @@ public class NotificationDaoJpa {
             notification.setOriginator(this.userClient.getUser(n.getOriginator()));
             if (n.getActions() != null) {
                 Action[] actions = GSON.fromJson(n.getActions(), Action[].class);
-                notification.setActions(Arrays.asList(actions)
-                        .stream().map(a -> a.getDescription()).collect(Collectors.toList()));
+                notification.setActions(
+                        Arrays.asList(actions).stream().map(a -> a.getDescription()).collect(Collectors.toList()));
             }
             return notification;
         }).sorted((a, b) -> {
