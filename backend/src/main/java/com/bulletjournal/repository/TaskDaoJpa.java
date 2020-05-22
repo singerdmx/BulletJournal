@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
-
+    private static final String EVERYONE = "Everyone";
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskDaoJpa.class);
     private static final Gson GSON = new Gson();
     private static final int REMINDING_TASK_BUFFER_IN_MINS = 10;
@@ -753,7 +753,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         List<CompletedTask> completedTasks;
 
-        if (StringUtils.isNotBlank(assignee)) {
+        if (StringUtils.isNotBlank(assignee) || EVERYONE.equals(assignee)) {
             completedTasks = this.completedTaskRepository.findCompletedTaskByAssigneeBetween(projectId, assignee,
                     Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
         } else {
