@@ -51,15 +51,14 @@ import java.util.stream.Collectors;
 @RestController
 public class GoogleCalendarController {
 
+    public static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
     private static final GsonFactory GSON = new GsonFactory();
     private static final String WATCH_CHANNEL_TOKEN = "BuJo";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
     private static final String APPLICATION_NAME = "Bullet Journal";
     private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
-    private static final String GOOLGE_CHANNEL_ID_HEADER = "x-goog-channel-id";
-    public static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
-
+    private static final String GOOGLE_CHANNEL_ID_HEADER = "x-goog-channel-id";
     @Autowired
     private GoogleCalConfig googleCalConfig;
 
@@ -247,8 +246,8 @@ public class GoogleCalendarController {
 
     @PostMapping(CHANNEL_NOTIFICATIONS_ROUTE)
     public void getChannelNotifications(@RequestHeader Map<String, String> headers) throws IOException {
-        String channelId = headers.get(GOOLGE_CHANNEL_ID_HEADER);
-        GoogleCalendarProject googleCalendarProject =  this.googleCalendarProjectDaoJpa.getByChannelId(channelId);
+        String channelId = headers.get(GOOGLE_CHANNEL_ID_HEADER);
+        GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.getByChannelId(channelId);
         String token = googleCalendarProject.getToken();
         String calendarId = googleCalendarProject.getId();
         String requester = googleCalendarProject.getOwner();
