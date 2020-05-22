@@ -268,7 +268,7 @@ const AddTask: React.FC<
         </Radio.Group>
         <div style={{ display: 'flex' }}>
           <div style={{ display: 'flex', flex: 1 }}>
-            <Tooltip title='Select Due Date' placement='top'>
+            <Tooltip title='Select Due Date' placement='left'>
               <Form.Item name='dueDate' style={{ width: '100%' }}>
                 <DatePicker
                     allowClear={true}
@@ -280,7 +280,7 @@ const AddTask: React.FC<
               </Form.Item>
             </Tooltip>
             {dueTimeVisible && (
-                <Tooltip title='Select Due Time' placement='top'>
+                <Tooltip title='Select Due Time' placement='right'>
                   <Form.Item name='dueTime' style={{ width: '210px' }}>
                     <TimePicker
                         allowClear={true}

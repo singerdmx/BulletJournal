@@ -166,6 +166,16 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
   );
 };
 
+const getCompletionTime = (task: Task) => {
+  return (
+      <Tooltip title={task.createdAt && `Completed ${moment(task.createdAt).fromNow()}`} placement={'bottom'}>
+        <div className='project-item-time'>
+          <Tag color='green'>{task.createdAt && moment(task.createdAt).format('YYYY-MM-DD HH:mm')}</Tag>
+        </div>
+      </Tooltip>
+  );
+};
+
 export const getDueDateTime = (task: Task) => {
   if (task.recurrenceRule) {
     return (
@@ -179,7 +189,7 @@ export const getDueDateTime = (task: Task) => {
     return null;
   }
 
-  let dueDateTitle = moment
+  let dueDateTitle = 'Due ' + moment
     .tz(
       `${task.dueDate} ${task.dueTime ? task.dueTime : '00:00'}`,
       task.timezone
@@ -192,7 +202,7 @@ export const getDueDateTime = (task: Task) => {
   return (
     <Tooltip title={dueDateTitle} placement={'bottom'}>
       <div className='project-item-time'>
-        {task.dueDate} {task.dueTime}
+        <Tag>{task.dueDate} {task.dueTime}</Tag>
       </div>
     </Tooltip>
   );
@@ -357,6 +367,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
               })}
           </div>
           {getDueDateTime(task)}
+          {isComplete && getCompletionTime(task)}
         </div>
       </div>
 

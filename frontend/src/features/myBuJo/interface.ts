@@ -20,6 +20,8 @@ export interface ProjectItem {
   projectId: number;
   labels: Label[];
   contentType: ContentType;
+  updatedAt?: number,
+  createdAt?: number
 }
 
 export interface Content {

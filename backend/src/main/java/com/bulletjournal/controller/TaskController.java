@@ -7,6 +7,7 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -61,6 +62,9 @@ public class TaskController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private UserAliasDaoJpa userAliasDaoJpa;
 
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId,
@@ -122,7 +126,9 @@ public class TaskController {
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username).toPresentationModel());
+
+        return addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username)
+                .toPresentationModel(this.userAliasDaoJpa.getAliases(username)));
     }
 
     @PostMapping(TASKS_ROUTE)
@@ -210,7 +216,8 @@ public class TaskController {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getCompletedTasks(projectId, username, pageNo, pageSize).stream()
-                .map(t -> addAvatar(t.toPresentationModel())).collect(Collectors.toList());
+                .map(t -> addAvatar(t.toPresentationModel(this.userAliasDaoJpa.getAliases(username))))
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping(TASK_ROUTE)

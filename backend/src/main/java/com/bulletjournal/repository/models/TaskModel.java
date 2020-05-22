@@ -296,7 +296,9 @@ public abstract class TaskModel extends ProjectItemModel {
                 this.getProject(),
                 labels,
                 reminderSetting,
-                this.getRecurrenceRule());
+                this.getRecurrenceRule(),
+                this.getCreatedAt().getTime(),
+                this.getUpdatedAt().getTime());
     }
 
     @Override

@@ -10,6 +10,8 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -235,6 +237,8 @@ public class ProjectItemsGrouperTest {
         task.setProject(project);
         task.setLabels(labels);
         task.setReminderSetting(reminderSetting);
+        task.setCreatedAt(Timestamp.from(Instant.now()));
+        task.setUpdatedAt(Timestamp.from(Instant.now()));
         return task;
     }
 

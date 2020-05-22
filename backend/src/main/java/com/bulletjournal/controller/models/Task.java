@@ -52,7 +52,9 @@ public class Task extends ProjectItem {
                 @NotNull Project project,
                 List<Label> labels,
                 ReminderSetting reminderSetting,
-                String recurrenceRule) {
+                String recurrenceRule,
+                Long createdAt,
+                Long updatedAt) {
         super(id, name, owner, project, labels);
         this.assignees = assignees;
         this.dueDate = dueDate;
@@ -63,6 +65,8 @@ public class Task extends ProjectItem {
             this.reminderSetting = reminderSetting;
         }
         this.recurrenceRule = recurrenceRule;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public String getDueDate() {
