@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
@@ -212,12 +213,25 @@ public class TaskController {
     @GetMapping(COMPLETED_TASKS_ROUTE)
     public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId,
             @RequestParam(required = false, defaultValue = "0") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "50") Integer pageSize) {
+            @RequestParam(required = false, defaultValue = "50") Integer pageSize,
+            @RequestParam(required = false) String assignee, @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate, @RequestParam(required = false) String timezone) {
+
+        if (StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)) {
+            return getCompletedTasksBetween(projectId, assignee, startDate, endDate, timezone);
+        }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getCompletedTasks(projectId, username, pageNo, pageSize).stream()
                 .map(t -> addAvatar(t.toPresentationModel(this.userAliasDaoJpa.getAliases(username))))
                 .collect(Collectors.toList());
+    }
+
+    private List<Task> getCompletedTasksBetween(Long projectId, String assignee, String startDate, String endDate,
+            String timezone) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.taskDaoJpa.getCompletedTasksBetween(projectId, assignee, username, startDate, endDate, timezone)
+                .stream().map(t -> addAvatar(t.toPresentationModel())).collect(Collectors.toList());
     }
 
     @DeleteMapping(TASK_ROUTE)
@@ -246,7 +260,7 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
-        return getCompletedTasks(task.getProjectId(), 0, 50);
+        return getCompletedTasks(task.getProjectId(), 0, 50, null, null, null, null);
     }
 
     @PutMapping(TASK_SET_LABELS_ROUTE)

@@ -744,6 +744,27 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<CompletedTask> getCompletedTasksBetween(Long projectId, String assignee, String requester,
+            String startDate, String endDate, String timezone) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+
+        List<CompletedTask> completedTasks;
+
+        if (StringUtils.isNotBlank(assignee)) {
+            completedTasks = this.completedTaskRepository.findCompletedTaskByAssigneeBetween(projectId, assignee,
+                    Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+        } else {
+            completedTasks = this.completedTaskRepository.findCompletedTaskBetween(project,
+                    Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+        }
+
+        return completedTasks.stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Uncomplete completed task.
      * <p>
