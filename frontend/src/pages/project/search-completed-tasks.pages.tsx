@@ -6,7 +6,6 @@ import {
   Avatar,
   DatePicker,
   Divider,
-  Modal,
   Select,
   Tooltip,
   Button,

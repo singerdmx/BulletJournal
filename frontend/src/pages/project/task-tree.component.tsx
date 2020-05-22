@@ -188,8 +188,10 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   };
 
   const handleSearchCompletedTasksClick = () => {
-    const id = project?.id;
-    history.push(`/completedTasks/${id}/search`);
+    if (!project) {
+      return;
+    }
+    history.push(`/completedTasks/${project.id}/search`);
   };
 
   let completedTaskList = null;
