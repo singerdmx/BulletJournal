@@ -178,10 +178,13 @@ const getCompletionTime = (task: Task) => {
 
 export const getDueDateTime = (task: Task) => {
   if (task.recurrenceRule) {
+    const s = convertToTextWithRRule(task.recurrenceRule);
     return (
-      <div className='project-item-time'>
-        {convertToTextWithRRule(task.recurrenceRule)}
-      </div>
+        <Tooltip title={s} placement='bottom'>
+          <div className='project-item-time'>
+            <Tag className='item-tag'>{s}</Tag>
+          </div>
+        </Tooltip>
     );
   }
 
