@@ -224,12 +224,13 @@ public class GoogleCalendarController {
             createdChannel = watch.execute();
         } else {
             createdChannel = channel;
+            createdChannel.setExpiration(System.currentTimeMillis());
         }
 
         LOGGER.info("Created channel {}", createdChannel);
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
                 calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toString(createdChannel),
-                getSyncToken(calendarId), username);
+                getSyncToken(calendarId), username, channel.getExpiration());
         LOGGER.info("Created GoogleCalendarProject {}", googleCalendarProject);
         return googleCalendarProject.getProject().toPresentationModel();
     }
@@ -278,7 +279,6 @@ public class GoogleCalendarController {
         this.googleCalendarProjectDaoJpa.delete(calendarId);
         return googleCalendarProject.getProject().toPresentationModel();
     }
-
 
     private String getSyncToken(String calendarId) throws IOException {
         Calendar service = getCalendarService();

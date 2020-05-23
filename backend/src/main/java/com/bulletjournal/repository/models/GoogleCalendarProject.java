@@ -38,13 +38,15 @@ public class GoogleCalendarProject extends AuditModel {
     public GoogleCalendarProject() {
     }
 
-    public GoogleCalendarProject(String id, Project project, String channelId, String channel, String token, String owner) {
+    public GoogleCalendarProject(String id, Project project, String channelId, String channel,
+                                 String token, String owner, Timestamp expiration) {
         this.id = id;
         this.project = project;
         this.channelId = channelId;
         this.channel = channel;
         this.token = token;
         this.owner = owner;
+        this.expiration = expiration;
     }
 
     public String getId() {
@@ -112,6 +114,7 @@ public class GoogleCalendarProject extends AuditModel {
                 ", channel='" + channel + '\'' +
                 ", token='" + token + '\'' +
                 ", owner='" + owner + '\'' +
+                ", expiration='" + expiration + '\'' +
                 '}';
     }
 }

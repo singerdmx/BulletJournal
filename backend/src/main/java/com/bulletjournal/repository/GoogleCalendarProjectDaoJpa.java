@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+
 @Repository
 public class GoogleCalendarProjectDaoJpa {
 
@@ -21,14 +23,15 @@ public class GoogleCalendarProjectDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public GoogleCalendarProject create(String calendarId, Long projectId, String channelId,
-                                        String channel, String syncToken, String requester) {
+                                        String channel, String syncToken, String requester,
+                                        long expiration) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         ProjectType projectType = ProjectType.getType(project.getType());
         if (!ProjectType.TODO.equals(projectType)) {
             throw new BadRequestException("Invalid project type " + projectType);
         }
         GoogleCalendarProject googleCalendarProject = new GoogleCalendarProject(
-                calendarId, project, channelId, channel, syncToken, requester);
+                calendarId, project, channelId, channel, syncToken, requester, new Timestamp(expiration));
         return this.googleCalendarProjectRepository.save(googleCalendarProject);
     }
 
