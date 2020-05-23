@@ -176,9 +176,36 @@ const getCompletionTime = (task: Task) => {
   );
 };
 
+const getDuration = (minutes: number) => {
+  let days = '';
+  let hours = '';
+  let mins = '';
+  if (minutes >= 1440) {
+    const d = Math.floor(minutes / 1440);
+    minutes -= d * 1440;
+    days = d === 1 ? '1 day ' : `${d} days `;
+  }
+  if (minutes >= 60) {
+    const h = Math.floor(minutes / 60);
+    minutes -= h * 60;
+    hours = h === 1 ? '1 hour ' : `${h} hours `;
+  }
+  if (minutes > 0) {
+    mins = minutes === 1 ? '1 minute' : `${minutes} minutes`;
+  }
+  return days + hours + mins;
+};
+
 export const getDueDateTime = (task: Task) => {
+  let duration = null;
+  if (task.duration) {
+    duration = getDuration(task.duration);
+  }
   if (task.recurrenceRule) {
-    const s = convertToTextWithRRule(task.recurrenceRule);
+    let s = convertToTextWithRRule(task.recurrenceRule);
+    if (duration) {
+      s += `, duration ${duration}`;
+    }
     return (
         <Tooltip title={s} placement='bottom'>
           <div className='project-item-time'>
@@ -198,8 +225,8 @@ export const getDueDateTime = (task: Task) => {
       task.timezone
     )
     .fromNow();
-  if (task.duration) {
-    dueDateTitle += `, duration ${task.duration} minutes`;
+  if (duration) {
+    dueDateTitle += `, duration ${duration}`;
   }
 
   return (
