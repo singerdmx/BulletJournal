@@ -401,6 +401,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         task = this.taskRepository.save(task);
         LOGGER.info("Created task {}", task);
         if (StringUtils.isNotBlank(text)) {
+            LOGGER.info("Also created task content {}", text);
             addContent(task.getId(), owner, new TaskContent(text));
         }
     }
