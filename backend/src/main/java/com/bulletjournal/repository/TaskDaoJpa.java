@@ -400,7 +400,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         task.setGoogleCalendarEventId(eventId);
         task = this.taskRepository.save(task);
         LOGGER.info("Created task {}", task);
-        addContent(task.getId(), owner, new TaskContent(text));
+        if (StringUtils.isNotBlank(text)) {
+            addContent(task.getId(), owner, new TaskContent(text));
+        }
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
