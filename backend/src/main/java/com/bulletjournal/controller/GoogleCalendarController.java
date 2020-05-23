@@ -217,7 +217,7 @@ public class GoogleCalendarController {
             createdChannel = watch.execute();
         } else {
             createdChannel = channel;
-            createdChannel.setExpiration(System.currentTimeMillis());
+            createdChannel.setExpiration(System.currentTimeMillis() + 9_000_000_000L);
         }
 
         LOGGER.info("Created channel {}", createdChannel);
