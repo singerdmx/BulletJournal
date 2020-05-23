@@ -223,7 +223,7 @@ public class GoogleCalendarController {
         LOGGER.info("Created channel {}", createdChannel);
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
                 calendarId, watchCalendarParams.getProjectId(), createdChannel.getId(), GSON.toString(createdChannel),
-                getSyncToken(calendarId), username, channel.getExpiration());
+                getSyncToken(calendarId), username, createdChannel.getExpiration());
         LOGGER.info("Created GoogleCalendarProject {}", googleCalendarProject);
         return googleCalendarProject.getProject().toPresentationModel();
     }
