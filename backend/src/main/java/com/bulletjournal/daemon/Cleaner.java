@@ -53,7 +53,7 @@ public class Cleaner {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         cleanNotification();
         cleanPublicProjectItems();
-        cleanHisotry();
+        cleanHistory();
     }
 
     private void cleanNotification() {
@@ -69,7 +69,7 @@ public class Cleaner {
         LOGGER.info("PublicProjectItems Cleaning Done");
     }
 
-    private void cleanHisotry() {
+    private void cleanHistory() {
         int historyMaxRetentionDays = notificationConfig.getCleaner().getHistoryMaxRetentionDays();
         long expirationTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(historyMaxRetentionDays);
 

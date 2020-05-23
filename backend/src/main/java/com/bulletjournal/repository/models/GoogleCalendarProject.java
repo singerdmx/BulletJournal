@@ -4,6 +4,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "google_calendar_projects",
@@ -30,6 +31,9 @@ public class GoogleCalendarProject extends AuditModel {
 
     @Column(length = 100)
     private String owner;
+
+    @Column(nullable = false)
+    private Timestamp expiration;
 
     public GoogleCalendarProject() {
     }
@@ -89,6 +93,14 @@ public class GoogleCalendarProject extends AuditModel {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Timestamp getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Timestamp expiration) {
+        this.expiration = expiration;
     }
 
     @Override
