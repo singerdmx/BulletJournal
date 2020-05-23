@@ -4,8 +4,6 @@ import { useParams, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 import { Transaction } from '../../features/transactions/interface';
-import { Label } from '../../features/label/interface';
-import { setSelectedLabel } from '../../features/label/actions';
 import { IState } from '../../store';
 import { ProjectType } from '../../features/project/constants';
 import {
@@ -60,7 +58,6 @@ type TransactionProps = {
 
 interface TransactionPageHandler {
   getTransaction: (transactionId: number) => void;
-  setSelectedLabel: (label: Label) => void;
 }
 
 const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
@@ -256,6 +253,5 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   getTransaction,
   deleteTransaction,
-  setSelectedLabel,
   updateTransactionContents,
 })(TransactionPage);

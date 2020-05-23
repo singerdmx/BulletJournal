@@ -62,8 +62,13 @@ const slice = createSlice({
       if (etag && etag.length > 0) {
         state.etag = etag;
       }
-      state.labelOptions = Object.assign([], labels);
-      state.labelsSelected = [];
+      const labelOptions = [...labels];
+      state.labelsSelected.forEach(label => {
+        if (!labelOptions.includes(label)) {
+          labelOptions.unshift(label);
+        }
+      });
+      state.labelOptions = labelOptions;
     },
     setSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
       const { label } = action.payload;
