@@ -1,9 +1,6 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.calendars.google.Converter;
-import com.bulletjournal.calendars.google.CreateGoogleCalendarEventsParams;
-import com.bulletjournal.calendars.google.GoogleCalendarEvent;
-import com.bulletjournal.calendars.google.WatchCalendarParams;
+import com.bulletjournal.calendars.google.*;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
@@ -17,7 +14,6 @@ import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.GoogleCalendarProject;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
@@ -25,7 +21,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +48,9 @@ public class GoogleCalendarController {
 
     public static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
     private static final GsonFactory GSON = new GsonFactory();
-    private static final String WATCH_CHANNEL_TOKEN = "BuJo";
+
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
-    private static final String APPLICATION_NAME = "Bullet Journal";
     private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
     private static final String GOOGLE_CHANNEL_ID_HEADER = "x-goog-channel-id";
     @Autowired
@@ -135,7 +129,7 @@ public class GoogleCalendarController {
             @RequestParam(name = "startDate", required = false) String startDate, // yyyy-MM-dd
             @RequestParam(name = "endDate", required = false) String endDate)
             throws IOException {
-        Calendar service = getCalendarService();
+        Calendar service = this.googleCalClient.getCalendarService();
         Calendar.Events.List list = service.events().list(calendarId);
         //        2002-10-02T10:00:00-05:00
         //        2002-10-02T10:00:00+05:00
@@ -184,7 +178,7 @@ public class GoogleCalendarController {
 
     @GetMapping("/api/calendar/google/calendarList")
     public List<CalendarListEntry> getCalendarList() throws IOException {
-        Calendar service = getCalendarService();
+        Calendar service = this.googleCalClient.getCalendarService();
         List<CalendarListEntry> result = new ArrayList<>();
         // Iterate through entries in calendar list
         String pageToken = null;
@@ -211,12 +205,11 @@ public class GoogleCalendarController {
         }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        String channelId = UUID.randomUUID().toString();
         Channel createdChannel;
-        Channel channel = getChannel(channelId);
+        Channel channel = Util.getChannel();
 
         if (isProd()) {
-            Calendar service = getCalendarService();
+            Calendar service = this.googleCalClient.getCalendarService();
             // https://developers.google.com/calendar/v3/push
             // https://developers.google.com/calendar/v3/reference/events/watch
             Calendar.Events.Watch watch = service.events().watch(calendarId, channel);
@@ -229,20 +222,10 @@ public class GoogleCalendarController {
 
         LOGGER.info("Created channel {}", createdChannel);
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.create(
-                calendarId, watchCalendarParams.getProjectId(), channelId, GSON.toString(createdChannel),
+                calendarId, watchCalendarParams.getProjectId(), createdChannel.getId(), GSON.toString(createdChannel),
                 getSyncToken(calendarId), username, channel.getExpiration());
         LOGGER.info("Created GoogleCalendarProject {}", googleCalendarProject);
         return googleCalendarProject.getProject().toPresentationModel();
-    }
-
-    private Channel getChannel(String channelId) {
-        Channel channel = new Channel();
-        channel.setId(channelId);
-        channel.setType("web_hook");
-        channel.setToken(WATCH_CHANNEL_TOKEN);
-        channel.setAddress("https://bulletjournal.us" + CHANNEL_NOTIFICATIONS_ROUTE);
-        channel.setParams(ImmutableMap.of("ttl", "99999999"));
-        return channel;
     }
 
     @PostMapping(CHANNEL_NOTIFICATIONS_ROUTE)
@@ -273,7 +256,7 @@ public class GoogleCalendarController {
         Channel channel = GSON.fromString(googleCalendarProject.getChannel(), Channel.class);
         LOGGER.info("Retrieved channel {}", channel);
         if (isProd()) {
-            Calendar service = getCalendarService();
+            Calendar service = this.googleCalClient.getCalendarService();
             service.channels().stop(channel).execute();
         }
         this.googleCalendarProjectDaoJpa.delete(calendarId);
@@ -281,7 +264,7 @@ public class GoogleCalendarController {
     }
 
     private String getSyncToken(String calendarId) throws IOException {
-        Calendar service = getCalendarService();
+        Calendar service = this.googleCalClient.getCalendarService();
         Calendar.Events.List request = service.events().list(calendarId);
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.add(java.util.Calendar.YEAR, -1);
@@ -292,7 +275,7 @@ public class GoogleCalendarController {
     }
 
     private void incrementSync(String calendarId, String token, String requester) throws IOException {
-        Calendar service = getCalendarService();
+        Calendar service = this.googleCalClient.getCalendarService();
         String timezone = service.calendarList().get(calendarId).execute().getTimeZone();
         Calendar.Events.List request = service.events().list(calendarId);
         request.setSyncToken(token);
@@ -324,24 +307,7 @@ public class GoogleCalendarController {
                 });
     }
 
-    private Calendar getCalendarService() throws IOException {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-        Credential credential = this.googleCalClient.getFlow().loadCredential(username);
-        if (credential == null) {
-            throw new BadRequestException("User not logged in");
-        }
 
-        if (credential.getExpiresInSeconds() <= 0) {
-            credential.refreshToken();
-            StoredCredential storedCredential = new StoredCredential(credential);
-            this.googleCalClient.getFlow().getCredentialDataStore().set(username, storedCredential);
-        }
-
-        // Initialize Calendar service with valid OAuth credentials
-        return new Calendar.Builder(
-                this.googleCalClient.getHttpTransport(), JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME).build();
-    }
 
     private String authorize() {
         if (this.googleCalClient.getFlow() == null) {

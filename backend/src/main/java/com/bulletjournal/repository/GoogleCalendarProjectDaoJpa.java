@@ -1,25 +1,42 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.calendars.google.Util;
+import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.GoogleCalendarProject;
 import com.bulletjournal.repository.models.Project;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class GoogleCalendarProjectDaoJpa {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarProjectDaoJpa.class);
 
     @Autowired
     private GoogleCalendarProjectRepository googleCalendarProjectRepository;
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
+
+    @Autowired
+    private GoogleCalClient googleCalClient;
+
+    private static final GsonFactory GSON = new GsonFactory();
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public GoogleCalendarProject create(String calendarId, Long projectId, String channelId,
@@ -61,4 +78,23 @@ public class GoogleCalendarProjectDaoJpa {
         return this.googleCalendarProjectRepository.save(googleCalendarProject);
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void renewExpiringGoogleCalendarWatch() throws IOException {
+        long expirationTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1);
+        List<GoogleCalendarProject> expiringGoogleCalendarProjects =
+                this.googleCalendarProjectRepository.getByExpirationBefore(new Timestamp(expirationTime));
+        Channel createdChannel;
+        for (GoogleCalendarProject googleCalendarProject : expiringGoogleCalendarProjects) {
+            Calendar service = this.googleCalClient.getCalendarService();
+            Calendar.Events.Watch watch = service.events().watch(googleCalendarProject.getId(), Util.getChannel());
+            LOGGER.info("Created watch {}", watch);
+            createdChannel = watch.execute();
+
+            googleCalendarProject.setChannelId(createdChannel.getId());
+            googleCalendarProject.setExpiration(new Timestamp(createdChannel.getExpiration()));
+            googleCalendarProject.setChannel(GSON.toString(createdChannel));
+            googleCalendarProjectRepository.save(googleCalendarProject);
+            LOGGER.info("Renew GoogleCalendarProject {}", googleCalendarProject);
+        }
+    }
 }

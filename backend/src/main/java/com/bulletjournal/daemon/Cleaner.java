@@ -1,7 +1,9 @@
 package com.bulletjournal.daemon;
 
+import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.config.NotificationConfig;
 import com.bulletjournal.repository.AuditableDaoJpa;
+import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.repository.PublicProjectItemDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.concurrent.Executors;
@@ -25,6 +28,7 @@ public class Cleaner {
     private final ScheduledExecutorService executorService;
     private final NotificationDaoJpa notificationDaoJpa;
     private final PublicProjectItemDaoJpa publicProjectItemDaoJpa;
+    private final GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa;
 
     @Autowired
     private NotificationConfig notificationConfig;
@@ -33,10 +37,12 @@ public class Cleaner {
     private AuditableDaoJpa auditableDaoJpa;
 
     @Autowired
-    public Cleaner(NotificationDaoJpa notificationDaoJpa, PublicProjectItemDaoJpa publicProjectItemDaoJpa) {
+    public Cleaner(NotificationDaoJpa notificationDaoJpa, PublicProjectItemDaoJpa publicProjectItemDaoJpa,
+                   GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa, GoogleCalClient googleCalClient) {
         this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("cleaner"));
         this.notificationDaoJpa = notificationDaoJpa;
         this.publicProjectItemDaoJpa = publicProjectItemDaoJpa;
+        this.googleCalendarProjectDaoJpa = googleCalendarProjectDaoJpa;
     }
 
     @PostConstruct
@@ -51,9 +57,34 @@ public class Cleaner {
 
     public void clean() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        cleanNotification();
-        cleanPublicProjectItems();
-        cleanHistory();
+        try {
+            cleanNotification();
+        } catch (Exception e) {
+            LOGGER.error("cleanNotification error", e);
+        }
+
+        try {
+            cleanPublicProjectItems();
+        } catch (Exception e) {
+            LOGGER.error("cleanPublicProjectItems error", e);
+        }
+
+        try {
+            cleanHistory();
+        } catch (Exception e) {
+            LOGGER.error("cleanHistory error", e);
+        }
+
+        try {
+            renewGoogleCalendarWatch();
+        } catch (Exception e) {
+            LOGGER.error("renewGoogleCalendarWatch error", e);
+        }
+    }
+
+    private void renewGoogleCalendarWatch() throws IOException {
+        this.googleCalendarProjectDaoJpa.renewExpiringGoogleCalendarWatch();
+        LOGGER.info("Google Calendar Expiring Watch Cleaning Done");
     }
 
     private void cleanNotification() {
