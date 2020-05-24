@@ -7,7 +7,7 @@ class FooterLayout extends React.Component {
   render() {
     return (
       <Footer className="footer">
-        Bullet Journal ©2020 Created by <a href='https://1o24bbs.com'>1024 BBS</a>
+        Bullet Journal ©2020 Powered by <a href='https://1o24bbs.com'>1024 BBS</a>
       </Footer>
     );
   }
