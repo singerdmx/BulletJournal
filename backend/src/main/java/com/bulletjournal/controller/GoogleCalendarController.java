@@ -170,10 +170,14 @@ public class GoogleCalendarController {
     }
 
     private void createTaskFromEvent(Long projectId, String username, GoogleCalendarEvent e) {
-        List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
-                .map(s -> "<p>" + s + "</p>").collect(Collectors.toList());
+        String text = e.getContent().getText();
+        if (StringUtils.isNotBlank(text)) {
+            List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
+                    .map(s -> "<p>" + s + "</p>").collect(Collectors.toList());
+            text = StringUtils.join(l, "");
+        }
         taskDaoJpa.create(projectId, username,
-                Converter.toCreateTaskParams(e), e.getEventId(), StringUtils.join(l, ""));
+                Converter.toCreateTaskParams(e), e.getEventId(), text);
     }
 
     @GetMapping("/api/calendar/google/calendarList")
