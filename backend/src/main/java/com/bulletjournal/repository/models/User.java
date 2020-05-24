@@ -15,7 +15,8 @@ public class User extends NamedModel {
     @SequenceGenerator(name = "user_generator", sequenceName = "user_sequence", initialValue = 100)
     private Long id;
 
-    private Integer role;
+    @Column(nullable = false)
+    private Integer role = 0;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
