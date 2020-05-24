@@ -25,7 +25,6 @@ import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 public class ProjectItemController {
@@ -122,20 +121,25 @@ public class ProjectItemController {
         Timestamp startTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(startDate, null, timezone).toInstant());
         Timestamp endTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(endDate, null, timezone).toInstant());
         List<ProjectItem> projectItems = new LinkedList<>();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
 
         if (types.contains(ProjectType.TODO)) {
             List<Task> tasks = taskDaoJpa.getRecentTasksBetween(startTime, endTime);
-            projectItems.addAll(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
+            if (!tasks.isEmpty()) {
+                Map<String, String> aliases = userAliasDaoJpa.getAliases(username);
+                projectItems.addAll(ProjectItemsGrouper.addLabelsToTasks(tasks, aliases));
+            }
         }
         if (types.contains(ProjectType.LEDGER)) {
             List<Transaction> transactions = transactionDaoJpa.getRecentTransactionsBetween(startTime, endTime);
-            projectItems.addAll(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
+            projectItems.addAll(ProjectItemsGrouper.addLabelsToTransactions(transactions));
         }
         if (types.contains(ProjectType.NOTE)) {
             List<Note> notes = noteDaoJpa.getRecentNotesBetween(startTime, endTime);
-            projectItems.addAll(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
+            projectItems.addAll(ProjectItemsGrouper.addLabelsToNotes(notes));
         }
 
+        projectItems = this.labelDaoJpa.getLabelsForProjectItemList(projectItems);
         projectItems.sort((t1, t2) -> t2.getUpdatedAt().compareTo(t1.getUpdatedAt()));
 
         return projectItems;

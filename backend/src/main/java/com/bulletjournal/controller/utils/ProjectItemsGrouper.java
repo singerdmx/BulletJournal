@@ -108,16 +108,21 @@ public class ProjectItemsGrouper {
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Transaction> transactions = transactionsMap.get(zonedDateTime);
             transactions.sort(TRANSACTION_COMPARATOR);
-            projectItem.setTransactions(transactions
-                    .stream()
-                    .map(t -> t.toPresentationModel(t.getLabels()
-                            .stream()
-                            .map(Label::new)
-                            .collect(Collectors.toList())))
-                    .collect(Collectors.toList()));
+            projectItem.setTransactions(addLabelsToTransactions(transactions));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
+    }
+
+    public static List<com.bulletjournal.controller.models.Transaction> addLabelsToTransactions(
+            List<Transaction> transactions) {
+        return transactions
+                .stream()
+                .map(t -> t.toPresentationModel(t.getLabels()
+                        .stream()
+                        .map(Label::new)
+                        .collect(Collectors.toList())))
+                .collect(Collectors.toList());
     }
 
     /*
@@ -139,12 +144,17 @@ public class ProjectItemsGrouper {
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort(TASK_COMPARATOR);
-            projectItem.setTasks(tasks.stream().map(t ->
-                    t.toPresentationModel(t.getLabels().stream().map(Label::new).collect(Collectors.toList()), aliases))
-                    .collect(Collectors.toList()));
+            projectItem.setTasks(addLabelsToTasks(tasks, aliases));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
+    }
+
+    public static List<com.bulletjournal.controller.models.Task> addLabelsToTasks(
+            List<Task> tasks, Map<String, String> aliases) {
+        return tasks.stream().map(t ->
+                t.toPresentationModel(t.getLabels().stream().map(Label::new).collect(Collectors.toList()), aliases))
+                .collect(Collectors.toList());
     }
 
     /*
@@ -166,10 +176,17 @@ public class ProjectItemsGrouper {
 
             // Sort note by update time
             notes.sort(NOTE_COMPARATOR);
-            projectItem.setNotes(notes.stream().map(n -> n.toPresentationModel(n.getLabels().stream().map(Label::new).collect(Collectors.toList()))).collect(Collectors.toList()));
+            projectItem.setNotes(addLabelsToNotes(notes));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
+    }
+
+    public static List<com.bulletjournal.controller.models.Note> addLabelsToNotes(List<Note> notes) {
+        return notes.stream().map(n ->
+                n.toPresentationModel(
+                        n.getLabels().stream().map(Label::new).collect(Collectors.toList())))
+                .collect(Collectors.toList());
     }
 
     /*
