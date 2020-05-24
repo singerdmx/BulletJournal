@@ -1,5 +1,5 @@
 import { actions } from './reducer';
-import { Project } from './interface';
+import {Activity, Project} from './interface';
 import { ProjectType, ContentAction } from './constants';
 import { History } from 'history';
 export const updateProjects = () => actions.projectsUpdate({});
@@ -57,3 +57,6 @@ export const getProjectHistory = (
     action: action,
     username: username,
   });
+
+export const historyReceived = (activities: Activity[]) =>
+  actions.historyReceived({projectHistory: activities});

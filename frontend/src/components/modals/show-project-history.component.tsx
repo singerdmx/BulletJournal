@@ -27,7 +27,7 @@ import {
 import { getGroup } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interface';
 import moment from 'moment';
-import { getProjectHistory } from '../../features/project/actions';
+import { getProjectHistory, historyReceived } from '../../features/project/actions';
 import ProjectHistory from '../project-history/project-history.component';
 
 import './modals.styles.less';
@@ -52,6 +52,7 @@ type ShowProjectHistoryProps = {
     action: ContentAction,
     username: string
   ) => void;
+  historyReceived: (activities: Activity[]) => void;
 };
 
 export const getIcon = (action: string) => {
@@ -83,6 +84,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   timezone,
   getGroup,
   getProjectHistory,
+  historyReceived,
 }) => {
   const [visible, setVisible] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -100,7 +102,10 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   const [selectUser, setSelectUser] = useState('Everyone');
 
   const onCancel = () => setVisible(false);
-  const openModal = () => setVisible(true);
+  const openModal = () => {
+    historyReceived([]);
+    setVisible(true);
+  };
 
   useEffect(() => {
     if (group) {
@@ -284,6 +289,6 @@ const mapStateToProps = (state: IState) => ({
   timezone: state.myself.timezone,
 });
 
-export default connect(mapStateToProps, { getGroup, getProjectHistory })(
+export default connect(mapStateToProps, { getGroup, getProjectHistory, historyReceived })(
   ShowProjectHistory
 );

@@ -90,7 +90,7 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
   };
   render() {
     if (this.props.sharedProjects.length === 0) {
-      return <Empty />;
+      return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
     }
     return (
       <div className="draggable-projects">

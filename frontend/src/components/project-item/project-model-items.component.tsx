@@ -96,7 +96,7 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
 
 const ProjectModelItems: React.FC<ProjectModelItemsProps> = (props) => {
   if (!props.projectItems || props.projectItems.length === 0) {
-    return <Empty />;
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
   }
   return (
     <Timeline mode={'left'}>

@@ -75,7 +75,6 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
         {plusIcon}
         <Tooltip placement='bottom' title='Refresh'>
           <SyncOutlined
-            className='rotateIcon'
             onClick={this.handleRefreshOnClick}
           />
         </Tooltip>

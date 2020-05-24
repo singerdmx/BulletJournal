@@ -135,7 +135,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                 </List>
             );
         }
-        return <Empty/>;
+        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
     };
 
     const getSharedBuJo = (sharedProjects: ProjectsWithOwner[]) => {
@@ -147,7 +147,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                 </List>
             );
         }
-        return <Empty/>;
+        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
     };
 
     return (

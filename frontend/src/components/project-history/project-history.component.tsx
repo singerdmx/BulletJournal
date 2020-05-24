@@ -70,7 +70,9 @@ const ProjectHistory: React.FC<ProjectHistoryProps> = (props) => {
     }
 
     if (!activities || activities.length === 0) {
-        return <Empty/>;
+        return <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description='No Data. Try the Refresh Button Above.'/>;
     }
 
     return (

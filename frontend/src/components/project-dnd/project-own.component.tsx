@@ -131,7 +131,7 @@ const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
     };
 
     if (ownProjects.length === 0) {
-        return <Empty/>;
+        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
     }
 
     return (<div style={{marginLeft: '20%'}}><Tree
