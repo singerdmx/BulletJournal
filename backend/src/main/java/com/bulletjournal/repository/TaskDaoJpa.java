@@ -884,13 +884,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecentTasksBetween(Timestamp startTime, Timestamp endTime) {
-        Set<Long> taskIdSet = new HashSet<>();
+        Map<Long, Task> taskIdMap = new HashMap<>();
         List<Task> tasks = this.taskRepository.findRecentTasksBetween(startTime, endTime);
-        tasks.stream().forEach(task -> taskIdSet.add(task.getId()));
+        tasks.stream().forEach(task -> taskIdMap.put(task.getId(), task));
         this.taskContentRepository.findRecentTaskContentsBetween(startTime, endTime)
                 .stream()
-                .filter(taskContent -> taskIdSet.add(taskContent.getTask().getId()))
-                .forEach(taskContent -> tasks.add(taskContent.getTask()));
-        return tasks;
+                .forEach(taskContent -> {
+                    if (taskIdMap.containsKey(taskContent.getTask().getId())) {
+                        Task task = taskIdMap.get(taskContent.getTask().getId());
+                        task.setUpdatedAt(
+                                task.getUpdatedAt().compareTo(taskContent.getUpdatedAt()) > 0
+                                        ? task.getUpdatedAt()
+                                        : taskContent.getUpdatedAt()
+                        );
+                    } else {
+                        taskIdMap.put(taskContent.getId(), taskContent.getTask());
+                    }
+                });
+        return taskIdMap.values().stream().collect(Collectors.toList());
     }
 }
