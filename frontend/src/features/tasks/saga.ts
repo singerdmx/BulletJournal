@@ -438,6 +438,12 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
         })
       );
     }
+    const searchCompletedTasks = state.task.searchCompletedTasks.filter((t) => t.id !== taskId);
+    yield put(
+        tasksActions.searchCompletedTasksReceived({
+          searchCompletedTasks: searchCompletedTasks,
+        })
+    );
   } catch (error) {
     yield call(message.error, `Uncomplete Task Error Received: ${error}`);
   }
@@ -505,6 +511,14 @@ function* deleteCompletedTask(action: PayloadAction<CompleteTask>) {
       tasksActions.completedTasksReceived({
         tasks: updatedCompletedTasks,
       })
+    );
+
+    const state: IState = yield select();
+    const searchCompletedTasks = state.task.searchCompletedTasks.filter((t) => t.id !== taskId);
+    yield put(
+        tasksActions.searchCompletedTasksReceived({
+          searchCompletedTasks: searchCompletedTasks,
+        })
     );
   } catch (error) {
     yield call(message.error, `Delete Completed Task Error Received: ${error}`);

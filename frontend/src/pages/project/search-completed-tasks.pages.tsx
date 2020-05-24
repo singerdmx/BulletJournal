@@ -18,6 +18,8 @@ import { getSearchCompletedTasks } from '../../features/tasks/actions';
 import { Task } from '../../features/tasks/interface';
 import TaskItem from '../../components/project-item/task-item.component';
 
+import './task.styles.less';
+
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -78,25 +80,29 @@ const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (
     setDate([dateStrings[0], dateStrings[1]]);
   };
 
-  const handleGetCompeletedTask = () => {
+  const handleGetCompletedTask = () => {
     if (!project) return;
     getSearchCompletedTasks(project.id, user, Date[0], Date[1], timezone);
   };
 
   return (
     <div className='project'>
-      <div>
-        <RangePicker
-          ranges={{
-            Today: [moment(), moment()],
-            'This Week': [moment().startOf('week'), moment().endOf('week')],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-          }}
-          value={[moment(Date[0]), moment(Date[1])]}
-          onChange={handleRangeChange}
-          allowClear={false}
-        ></RangePicker>
-        <Tooltip title='Select User'>
+      <div className='search-completed-task-header'>
+        <Tooltip title='Search by Completion Time'>
+          <span>
+            <RangePicker
+                ranges={{
+                  Today: [moment(), moment()],
+                  'This Week': [moment().startOf('week'), moment().endOf('week')],
+                  'This Month': [moment().startOf('month'), moment().endOf('month')],
+                }}
+                value={[moment(Date[0]), moment(Date[1])]}
+                onChange={handleRangeChange}
+                allowClear={false}
+            ></RangePicker>
+          </span>
+        </Tooltip>
+        <Tooltip title='Search by Assignee'>
           <Select
             style={{ width: '150px' }}
             placeholder='Select User'
@@ -120,27 +126,31 @@ const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (
           </Select>
         </Tooltip>
         <Tooltip title='Refresh'>
-          <span onClick={handleGetCompeletedTask}>
+          <span onClick={handleGetCompletedTask} className='search-completed-task-header-icon'>
             <SyncOutlined />
           </span>
         </Tooltip>
         <Tooltip title='Go to Parent BuJo'>
-          <UpSquareOutlined
+          <span className='search-completed-task-header-icon'>
+            <UpSquareOutlined
             onClick={(e) => history.push(`/projects/${projectId}`)}
-          />
+            />
+          </span>
         </Tooltip>
       </div>
       <Divider />
       <div>
         {searchCompletedTasks.map((t) => {
           return (
-            <TaskItem
-              task={t}
-              isComplete={true}
-              readOnly={false}
-              inProject={true}
-              completeOnlyOccurrence={false}
-            />
+              <div key={t.id}>
+                <TaskItem
+                    task={t}
+                    isComplete={true}
+                    readOnly={false}
+                    inProject={false}
+                    completeOnlyOccurrence={false}
+                />
+              </div>
           );
         })}
       </div>
