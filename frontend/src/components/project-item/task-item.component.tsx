@@ -168,11 +168,16 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
 
 const getCompletionTime = (task: Task) => {
   return (
-      <Tooltip title={task.createdAt && `Completed ${moment(task.createdAt).fromNow()}`} placement={'bottom'}>
-        <div className='project-item-time'>
-          <Tag color='green'>{task.createdAt && moment(task.createdAt).format('YYYY-MM-DD HH:mm')}</Tag>
-        </div>
-      </Tooltip>
+    <Tooltip
+      title={task.createdAt && `Completed ${moment(task.createdAt).fromNow()}`}
+      placement={'bottom'}
+    >
+      <div className='project-item-time'>
+        <Tag color='green'>
+          {task.createdAt && moment(task.createdAt).format('YYYY-MM-DD HH:mm')}
+        </Tag>
+      </div>
+    </Tooltip>
   );
 };
 
@@ -207,11 +212,11 @@ export const getDueDateTime = (task: Task) => {
       s += `, duration ${duration}`;
     }
     return (
-        <Tooltip title={s} placement='bottom'>
-          <div className='project-item-time'>
-            <Tag className='item-tag'>{s}</Tag>
-          </div>
-        </Tooltip>
+      <Tooltip title={s} placement='bottom'>
+        <div className='project-item-time'>
+          <Tag className='item-tag'>{s}</Tag>
+        </div>
+      </Tooltip>
     );
   }
 
@@ -219,12 +224,14 @@ export const getDueDateTime = (task: Task) => {
     return null;
   }
 
-  let dueDateTitle = 'Due ' + moment
-    .tz(
-      `${task.dueDate} ${task.dueTime ? task.dueTime : '00:00'}`,
-      task.timezone
-    )
-    .fromNow();
+  let dueDateTitle =
+    'Due ' +
+    moment
+      .tz(
+        `${task.dueDate} ${task.dueTime ? task.dueTime : '00:00'}`,
+        task.timezone
+      )
+      .fromNow();
   if (duration) {
     dueDateTitle += `, duration ${duration}`;
   }
@@ -232,7 +239,9 @@ export const getDueDateTime = (task: Task) => {
   return (
     <Tooltip title={dueDateTitle} placement={'bottom'}>
       <div className='project-item-time'>
-        <Tag>{task.dueDate} {task.dueTime}</Tag>
+        <Tag>
+          {task.dueDate} {task.dueTime}
+        </Tag>
       </div>
     </Tooltip>
   );

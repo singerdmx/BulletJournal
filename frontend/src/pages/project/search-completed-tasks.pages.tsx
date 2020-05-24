@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { connect } from 'react-redux';
+import { Avatar, DatePicker, Divider, Select, Tooltip } from 'antd';
 import {
-  Avatar,
-  DatePicker,
-  Divider,
-  Select,
-  Tooltip,
-  Button,
-} from 'antd';
-import { TeamOutlined } from '@ant-design/icons';
+  TeamOutlined,
+  SyncOutlined,
+  UpSquareOutlined,
+} from '@ant-design/icons';
 import moment from 'moment';
 import { getGroup } from '../../features/group/actions';
 import { User, Group } from '../../features/group/interface';
@@ -18,6 +16,7 @@ import { useParams } from 'react-router-dom';
 import { getProject } from '../../features/project/actions';
 import { getSearchCompletedTasks } from '../../features/tasks/actions';
 import { Task } from '../../features/tasks/interface';
+import TaskItem from '../../components/project-item/task-item.component';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -59,6 +58,8 @@ const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (
   ]);
   const [user, setUser] = useState('Everyone');
 
+  const history = useHistory();
+
   useEffect(() => {
     if (projectId) {
       getProject(parseInt(projectId));
@@ -95,8 +96,6 @@ const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (
           onChange={handleRangeChange}
           allowClear={false}
         ></RangePicker>
-      </div>
-      <div>
         <Tooltip title='Select User'>
           <Select
             style={{ width: '150px' }}
@@ -120,16 +119,29 @@ const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (
             })}
           </Select>
         </Tooltip>
-      </div>
-      <div>
-        <Button type='primary' onClick={handleGetCompeletedTask}>
-          refresh
-        </Button>
+        <Tooltip title='Refresh'>
+          <span onClick={handleGetCompeletedTask}>
+            <SyncOutlined />
+          </span>
+        </Tooltip>
+        <Tooltip title='Go to Parent BuJo'>
+          <UpSquareOutlined
+            onClick={(e) => history.push(`/projects/${projectId}`)}
+          />
+        </Tooltip>
       </div>
       <Divider />
       <div>
         {searchCompletedTasks.map((t) => {
-          return <div>aaa</div>;
+          return (
+            <TaskItem
+              task={t}
+              isComplete={true}
+              readOnly={false}
+              inProject={true}
+              completeOnlyOccurrence={false}
+            />
+          );
         })}
       </div>
     </div>
