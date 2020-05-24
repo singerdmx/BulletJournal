@@ -127,7 +127,6 @@ public class ProjectItemController {
             List<Task> tasks = taskDaoJpa.getRecentTasksBetween(startTime, endTime);
             projectItems.addAll(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
         }
-        // TODO: Transaction doesn't have updatedAt, will add it later.
         if (types.contains(ProjectType.LEDGER)) {
             List<Transaction> transactions = transactionDaoJpa.getRecentTransactionsBetween(startTime, endTime);
             projectItems.addAll(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));

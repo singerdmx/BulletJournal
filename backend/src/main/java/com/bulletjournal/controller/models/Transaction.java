@@ -54,6 +54,8 @@ public class Transaction extends ProjectItem {
                        String time,
                        @NotNull String timezone,
                        @NotNull Integer transactionType,
+                       @NotNull Long createdAt,
+                       @NotNull Long updatedAt,
                        List<Label> labels) {
         super(id, name, owner, project, labels);
         this.payer = payer;
@@ -62,6 +64,8 @@ public class Transaction extends ProjectItem {
         this.time = time;
         this.timezone = timezone;
         this.transactionType = transactionType;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     @Override

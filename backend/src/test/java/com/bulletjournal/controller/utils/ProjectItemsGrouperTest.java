@@ -221,6 +221,8 @@ public class ProjectItemsGrouperTest {
         transaction.setTime(time);
         transaction.setTimezone(timezone);
         transaction.setTransactionType(TransactionType.getType(transactionType));
+        transaction.setCreatedAt(Timestamp.from(Instant.now()));
+        transaction.setUpdatedAt(Timestamp.from(Instant.now()));
         return transaction;
     }
 

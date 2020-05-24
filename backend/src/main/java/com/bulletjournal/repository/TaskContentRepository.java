@@ -14,7 +14,7 @@ import java.util.List;
 public interface TaskContentRepository extends JpaRepository<TaskContent, Long> {
     List<TaskContent> findTaskContentByTask(Task task);
 
-    @Query("SELECT taskContent FROM TaskContent taskContent WHERE taskContent.updatedAt IS NOT NULL AND taskContent.updatedAt >= :startTime AND taskContent.updatedAt <= :endTime")
+    @Query("SELECT taskContent FROM TaskContent taskContent WHERE taskContent.updatedAt >= :startTime AND taskContent.updatedAt <= :endTime")
     List<TaskContent> findRecentTaskContentsBetween(@Param("startTime") Timestamp startTime,
                                                     @Param("endTime") Timestamp endTime);
 }

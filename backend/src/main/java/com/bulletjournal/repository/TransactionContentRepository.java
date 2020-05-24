@@ -14,7 +14,7 @@ import java.util.List;
 public interface TransactionContentRepository extends JpaRepository<TransactionContent, Long> {
     List<TransactionContent> findTransactionContentByTransaction(Transaction transaction);
 
-    @Query("SELECT transactionContent FROM TransactionContent transactionContent WHERE transactionContent.updatedAt IS NOT NULL AND transactionContent.updatedAt >= :startTime AND transactionContent.updatedAt <= :endTime")
+    @Query("SELECT transactionContent FROM TransactionContent transactionContent WHERE transactionContent.updatedAt >= :startTime AND transactionContent.updatedAt <= :endTime")
     List<TransactionContent> findRecentTransactionContentsBetween(@Param("startTime") Timestamp startTime,
                                                                   @Param("endTime") Timestamp endTime);
 }

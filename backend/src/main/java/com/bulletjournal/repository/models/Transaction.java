@@ -148,6 +148,8 @@ public class Transaction extends ProjectItemModel {
                 this.getTime(),
                 this.getTimezone(),
                 this.getTransactionType().getValue(),
+                this.getCreatedAt().getTime(),
+                this.getUpdatedAt().getTime(),
                 labels);
     }
 
