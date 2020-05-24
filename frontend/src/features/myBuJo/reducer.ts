@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import {ProjectItem, ProjectItems} from './interface';
+import {ProjectItems} from './interface';
 
 export type MyBuJo = {
   startDate: string;
@@ -13,6 +13,7 @@ export type SelectedCalendarDayAction = {
 export type UpdateSelectedAction = {
   todoSelected: boolean;
   ledgerSelected: boolean;
+  noteSelected: boolean;
 };
 
 export type ApiErrorAction = {
@@ -29,6 +30,7 @@ export type GetProjectItemsAction = {
 export type GetProjectItemsAfterUpdateSelectAction = {
   todoSelected: boolean;
   ledgerSelected: boolean;
+  noteSelected: boolean;
   category: string;
 };
 
@@ -38,10 +40,6 @@ export type ProjectItemsReceivedAction = {
 
 export type CalendarModeAction = {
   calendarMode: string;
-};
-
-export type RecentItemsReceivedAction = {
-  items: ProjectItem[];
 };
 
 let initialState = {
@@ -54,7 +52,6 @@ let initialState = {
   calendarMode: 'month',
   selectedCalendarDay: '',
   projectItemsForCalendar: [] as ProjectItems[],
-  recentItems: [] as ProjectItem[],
 };
 
 const slice = createSlice({
@@ -75,9 +72,10 @@ const slice = createSlice({
       state.selectedCalendarDay = selectedCalendarDay;
     },
     updateSelected: (state, action: PayloadAction<UpdateSelectedAction>) => {
-      const { todoSelected, ledgerSelected } = action.payload;
+      const { todoSelected, ledgerSelected, noteSelected } = action.payload;
       state.todoSelected = todoSelected;
       state.ledgerSelected = ledgerSelected;
+      state.noteSelected = noteSelected;
     },
     getProjectItems: (state, action: PayloadAction<GetProjectItemsAction>) =>
       state,
@@ -105,13 +103,6 @@ const slice = createSlice({
     ) => {
       const { calendarMode } = action.payload;
       state.calendarMode = calendarMode;
-    },
-    recentItemsReceived: (
-        state,
-        action: PayloadAction<RecentItemsReceivedAction>
-    ) => {
-      const { items } = action.payload;
-      state.recentItems = items;
     },
   }
 });

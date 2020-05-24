@@ -14,11 +14,13 @@ export const updateSelectedCalendarDay = (selectedCalendarDay: string) =>
 export const getProjectItemsAfterUpdateSelect = (
   todoSelected: boolean,
   ledgerSelected: boolean,
+  noteSelected: boolean,
   category: string
 ) =>
   actions.getProjectItemsAfterUpdateSelect({
     todoSelected: todoSelected,
     ledgerSelected: ledgerSelected,
+    noteSelected: noteSelected,
     category: category
   });
 

@@ -42,9 +42,11 @@ type ProjectProps = {
   updateProjects: () => void;
   todoSelected: boolean;
   ledgerSelected: boolean;
+  noteSelected: boolean;
   getProjectItemsAfterUpdateSelect: (
     todoSelected: boolean,
     ledgerSelected: boolean,
+    noteSelected: boolean,
     category: string
   ) => void;
 };
@@ -91,10 +93,11 @@ class SideMenu extends React.Component<
   }
 
   handleClickToday = (category: string) => {
-    let { ledgerSelected, todoSelected } = this.props;
+    let { ledgerSelected, todoSelected, noteSelected } = this.props;
     this.props.getProjectItemsAfterUpdateSelect(
       todoSelected,
       ledgerSelected,
+      noteSelected,
       category
     );
   };
@@ -239,6 +242,7 @@ const mapStateToProps = (state: IState) => ({
   sharedProjects: state.project.shared,
   todoSelected: state.myBuJo.todoSelected,
   ledgerSelected: state.myBuJo.ledgerSelected,
+  noteSelected: state.myBuJo.noteSelected,
 });
 
 export default connect(mapStateToProps, {

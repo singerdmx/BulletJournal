@@ -287,6 +287,7 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       getProjectItemsAfterUpdateSelect(
         state.myBuJo.todoSelected,
         state.myBuJo.ledgerSelected,
+        state.myBuJo.noteSelected,
         'today'
       )
     );
@@ -368,6 +369,7 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
       getProjectItemsAfterUpdateSelect(
         state.myBuJo.todoSelected,
         state.myBuJo.ledgerSelected,
+        state.myBuJo.noteSelected,
         'today'
       )
     );
@@ -466,6 +468,7 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
       getProjectItemsAfterUpdateSelect(
         state.myBuJo.todoSelected,
         state.myBuJo.ledgerSelected,
+        state.myBuJo.noteSelected,
         'today'
       )
     );

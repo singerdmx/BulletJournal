@@ -196,6 +196,7 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
       getProjectItemsAfterUpdateSelect(
         state.myBuJo.todoSelected,
         state.myBuJo.ledgerSelected,
+        state.myBuJo.noteSelected,
         'today'
       )
     );
@@ -273,6 +274,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       getProjectItemsAfterUpdateSelect(
         state.myBuJo.todoSelected,
         state.myBuJo.ledgerSelected,
+        state.myBuJo.noteSelected,
         'today'
       )
     );

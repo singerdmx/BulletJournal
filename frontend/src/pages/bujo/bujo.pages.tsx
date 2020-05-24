@@ -34,6 +34,7 @@ type BujoProps = {
   getProjectItemsAfterUpdateSelect: (
     todoSelected: boolean,
     ledgerSelected: boolean,
+    noteSelected: boolean,
     category: string
   ) => void;
   getProjectItems: (
@@ -73,32 +74,26 @@ class BujoPage extends React.Component<
       todoSelected = !todoSelected;
     } else if (type === 'ledger') {
       ledgerSelected = !ledgerSelected;
-    } else {
+    } else if (type === 'note') {
       noteSelected = !noteSelected;
     }
 
-    if (category === 'recent') {
-      // TODO: getRecentItemsUpdate
-    } else {
-      this.props.getProjectItemsAfterUpdateSelect(
-        todoSelected,
-        ledgerSelected,
-        category
-      );
-    }
+    this.props.getProjectItemsAfterUpdateSelect(
+      todoSelected,
+      ledgerSelected,
+      noteSelected,
+      category
+    );
   };
 
   refresh = (category: string) => {
     let { ledgerSelected, todoSelected, noteSelected } = this.props;
-    if (category === 'recent') {
-      // TODO: getRecentItemsUpdate
-    } else {
-      this.props.getProjectItemsAfterUpdateSelect(
-        todoSelected,
-        ledgerSelected,
-        category
-      );
-    }
+    this.props.getProjectItemsAfterUpdateSelect(
+      todoSelected,
+      ledgerSelected,
+      noteSelected,
+      category
+    );
   };
 
   getCategoryPage = (category: string) => {
@@ -127,7 +122,8 @@ class BujoPage extends React.Component<
     let noteCheckbox = null;
     if (category === 'recent') {
       noteCheckbox = (
-        <Checkbox checked={this.props.noteSelected} value='note'>
+        <Checkbox checked={this.props.noteSelected} value='note'
+                  onChange={(e) => this.handleOnChange(e.target.value, category)}>
           <Tooltip placement='top' title='NOTE'>
             <FileTextOutlined />
           </Tooltip>

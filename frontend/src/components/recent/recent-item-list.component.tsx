@@ -5,7 +5,7 @@ import {DatePicker, Divider, Tooltip} from "antd";
 import {Link} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {updateExpandedMyself} from "../../features/myself/actions";
+import {updateRecentItemsDates} from "../../features/recent/actions";
 
 const {RangePicker} = DatePicker;
 
@@ -16,18 +16,24 @@ type RecentItemProps = {
     timezone: string;
     startDate: string;
     endDate: string;
-    updateExpandedMyself: (updateSettings: boolean) => void;
+    updateRecentItemsDates: (startDate: string, endDate: string) => void;
 };
 
-const RecentItemList: React.FC<RecentItemProps> = ({
-                                                       todoSelected,
-                                                       ledgerSelected,
-                                                       noteSelected,
-                                                       timezone,
-                                                       startDate,
-                                                       endDate,
-                                                       updateExpandedMyself
-                                                   }) => {
+const RecentItemList: React.FC<RecentItemProps> = (
+    {
+        todoSelected,
+        ledgerSelected,
+        noteSelected,
+        timezone,
+        startDate,
+        endDate,
+        updateRecentItemsDates
+    }) => {
+
+    const handleRangeChange = (dates: any, dateStrings: string[]) => {
+        updateRecentItemsDates(dateStrings[0], dateStrings[1]);
+    };
+
     return <div>
         <div className="todo-panel">
             <RangePicker
@@ -41,20 +47,11 @@ const RecentItemList: React.FC<RecentItemProps> = ({
                 }}
                 allowClear={false}
                 value={[
-                    moment(
-                        startDate
-                            ? startDate
-                            : new Date().toLocaleString('fr-CA'),
-                        dateFormat
-                    ),
-                    moment(
-                        endDate
-                            ? endDate
-                            : new Date().toLocaleString('fr-CA'),
-                        dateFormat
-                    ),
+                    moment(startDate, dateFormat),
+                    moment(endDate, dateFormat),
                 ]}
                 format={dateFormat}
+                onChange={handleRangeChange}
             />
             <Tooltip placement="top" title="Change Time Zone">
                 <Link to="/settings" style={{paddingLeft: '30px'}}>
@@ -74,9 +71,10 @@ const mapStateToProps = (state: IState) => ({
     endDate: state.recent.endDate,
     todoSelected: state.myBuJo.todoSelected,
     ledgerSelected: state.myBuJo.ledgerSelected,
-    noteSelected: state.myBuJo.noteSelected
+    noteSelected: state.myBuJo.noteSelected,
+    items: state.recent.items
 });
 
 export default connect(mapStateToProps, {
-    updateExpandedMyself,
+    updateRecentItemsDates,
 })(RecentItemList);
