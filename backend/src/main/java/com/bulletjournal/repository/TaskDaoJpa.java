@@ -3,7 +3,10 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.CreateTaskParams;
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.UpdateTaskParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
@@ -14,16 +17,12 @@ import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.*;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
@@ -888,7 +887,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecentTasksBetween(Timestamp startTime, Timestamp endTime) {
+        Set<Long> taskIdSet = new HashSet<>();
         List<Task> tasks = this.taskRepository.findRecentTasksBetween(startTime, endTime);
+        tasks.stream().forEach(task -> taskIdSet.add(task.getId()));
+        this.taskContentRepository.findRecentTaskContentsBetween(startTime, endTime)
+                .stream()
+                .filter(taskContent -> taskIdSet.add(taskContent.getTask().getId()))
+                .forEach(taskContent -> tasks.add(taskContent.getTask()));
         return tasks;
     }
 }

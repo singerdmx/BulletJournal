@@ -14,19 +14,16 @@ import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -273,7 +270,14 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Transaction> getRecentTransactionsBetween(Timestamp startTime, Timestamp endTime) {
+        Set<Long> transactionIdSet = new HashSet<>();
         List<Transaction> transactions = this.transactionRepository.findRecentTransactionsBetween(startTime, endTime);
+        transactions.stream().forEach(transaction -> transactionIdSet.add(transaction.getId()));
+        this.transactionContentRepository.findRecentTransactionContentsBetween(startTime, endTime)
+                .stream()
+                .filter(transactionContent -> transactionIdSet.add(transactionContent.getTransaction().getId()))
+                .forEach(transactionContent -> transactions.add(transactionContent.getTransaction()));
         return transactions;
     }
 }
+

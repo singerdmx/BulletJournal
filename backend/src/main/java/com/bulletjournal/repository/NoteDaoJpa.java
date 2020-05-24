@@ -270,7 +270,14 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Note> getRecentNotesBetween(Timestamp startTime, Timestamp endTime) {
+        Set<Long> noteIdSet = new HashSet<>();
         List<Note> notes = this.noteRepository.findRecentNotesBetween(startTime, endTime);
+        notes.stream().forEach(note -> noteIdSet.add(note.getId()));
+        this.noteContentRepository.findRecentNoteContentsBetween(startTime, endTime)
+                .stream()
+                .filter(noteContent -> noteIdSet.add(noteContent.getNote().getId()))
+                .forEach(noteContent -> notes.add(noteContent.getNote()));
         return notes;
     }
 }
+

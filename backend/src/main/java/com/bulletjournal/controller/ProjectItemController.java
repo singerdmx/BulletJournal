@@ -126,13 +126,15 @@ public class ProjectItemController {
         Timestamp endTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(endDate, null, timezone).toInstant());
         List<ProjectItem> projectItems = new LinkedList<>();
 
-        List<Task> tasks = taskDaoJpa.getRecentTasksBetween(startTime, endTime);
-        List<Transaction> transactions = transactionDaoJpa.getRecentTransactionsBetween(startTime, endTime);
-        List<Note> notes = noteDaoJpa.getRecentNotesBetween(startTime, endTime);
-
-        projectItems.addAll(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
-        projectItems.addAll(transactions.stream().map(Transaction::toPresentationModel).collect(Collectors.toList()));
-        projectItems.addAll(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
+        if (types.contains(ProjectType.TODO)) {
+            List<Task> tasks = taskDaoJpa.getRecentTasksBetween(startTime, endTime);
+            projectItems.addAll(tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList()));
+        }
+        // TODO: Transaction doesn't have updatedAt, will add it later.
+        if (types.contains(ProjectType.NOTE)) {
+            List<Note> notes = noteDaoJpa.getRecentNotesBetween(startTime, endTime);
+            projectItems.addAll(notes.stream().map(Note::toPresentationModel).collect(Collectors.toList()));
+        }
 
         projectItems.sort((t1, t2) -> t2.getUpdatedAt().compareTo(t1.getUpdatedAt()));
 
