@@ -1,6 +1,9 @@
 import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
-import {fetchProjectItems, fetchRecentProjectItems} from '../../apis/projectItemsApis';
+import {
+  fetchProjectItems,
+  fetchRecentProjectItems,
+} from '../../apis/projectItemsApis';
 import {
   actions as projectItemsActions,
   ApiErrorAction,
@@ -14,7 +17,7 @@ import { ProjectType } from '../project/constants';
 import moment from 'moment';
 import { recentItemsReceived, updateRecentItemsDates } from '../recent/actions';
 import { dateFormat } from './constants';
-import {ProjectItem} from "./interface";
+import { ProjectItem } from './interface';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(
@@ -37,15 +40,35 @@ function* getProjectItems(action: PayloadAction<GetProjectItemsAction>) {
     if (!startDate || !endDate) return;
 
     if (category === 'calendar') {
-      const calendarData = yield call(fetchProjectItems, types, timezone, startDate, endDate);
+      const calendarData = yield call(
+        fetchProjectItems,
+        types,
+        timezone,
+        startDate,
+        endDate
+      );
       yield put(
-        projectItemsActions.projectItemsForCalenderReceived({ items: calendarData })
+        projectItemsActions.projectItemsForCalenderReceived({
+          items: calendarData,
+        })
       );
     } else if (category === 'today') {
-      const todayData = yield call(fetchProjectItems, types, timezone, startDate, endDate);
+      const todayData = yield call(
+        fetchProjectItems,
+        types,
+        timezone,
+        startDate,
+        endDate
+      );
       yield put(projectItemsActions.projectItemsReceived({ items: todayData }));
     } else if (category === 'recent') {
-      const recentItems : ProjectItem[] = yield call(fetchRecentProjectItems, types, timezone, startDate, endDate);
+      const recentItems: ProjectItem[] = yield call(
+        fetchRecentProjectItems,
+        types,
+        timezone,
+        startDate,
+        endDate
+      );
       yield put(updateRecentItemsDates(startDate, endDate));
       yield put(recentItemsReceived(recentItems));
     }
@@ -58,13 +81,18 @@ function* getProjectItemsAfterUpdateSelect(
   action: PayloadAction<GetProjectItemsAfterUpdateSelectAction>
 ) {
   try {
-    const { todoSelected, ledgerSelected, noteSelected, category } = action.payload;
+    const {
+      todoSelected,
+      ledgerSelected,
+      noteSelected,
+      category,
+    } = action.payload;
 
     yield put(
       projectItemsActions.updateSelected({
         todoSelected: todoSelected,
         ledgerSelected: ledgerSelected,
-        noteSelected: noteSelected
+        noteSelected: noteSelected,
       })
     );
 
@@ -113,11 +141,13 @@ function* getProjectItemsAfterUpdateSelect(
       );
       yield put(projectItemsActions.projectItemsReceived({ items: data }));
     } else if (category === 'recent') {
-      const recentItems : ProjectItem[] = yield call(fetchRecentProjectItems,
-          types,
-          state.myself.timezone,
-          state.recent.startDate,
-          state.recent.endDate);
+      const recentItems: ProjectItem[] = yield call(
+        fetchRecentProjectItems,
+        types,
+        state.myself.timezone,
+        state.recent.startDate,
+        state.recent.endDate
+      );
       yield put(recentItemsReceived(recentItems));
     }
   } catch (error) {
@@ -154,10 +184,6 @@ export default function* myBuJoSagas() {
       apiErrorReceived
     ),
     yield takeLatest(projectItemsActions.getProjectItems.type, getProjectItems),
-    yield takeLatest(
-      projectItemsActions.getProjectItemsAfterUpdateSelect.type,
-      getProjectItemsAfterUpdateSelect
-    ),
     yield takeLatest(
       projectItemsActions.getProjectItemsAfterUpdateSelect.type,
       getProjectItemsAfterUpdateSelect
