@@ -39,7 +39,7 @@ function* getProjectItems(action: PayloadAction<GetProjectItemsAction>) {
       yield put(
         projectItemsActions.projectItemsForCalenderReceived({ items: data })
       );
-    } else {
+    } else if (category === 'today') {
       yield put(projectItemsActions.projectItemsReceived({ items: data }));
     }
   } catch (error) {
@@ -94,7 +94,7 @@ function* getProjectItemsAfterUpdateSelect(
       yield put(
         projectItemsActions.projectItemsForCalenderReceived({ items: data })
       );
-    } else {
+    } else if (category === 'today') {
       data = yield call(
         fetchProjectItems,
         types,
