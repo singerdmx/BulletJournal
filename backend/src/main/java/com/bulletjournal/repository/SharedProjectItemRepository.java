@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface SharedProjectItemRepository extends JpaRepository<SharedProjectItem, Long> {
     List<SharedProjectItem> findByUsername(String username);
+
     List<SharedProjectItem> findByTask(Task task);
+
     List<SharedProjectItem> findByNote(Note note);
 }

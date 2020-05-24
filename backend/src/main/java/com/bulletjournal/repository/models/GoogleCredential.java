@@ -2,7 +2,9 @@ package com.bulletjournal.repository.models;
 
 import com.google.api.client.auth.oauth2.StoredCredential;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "google_credentials")

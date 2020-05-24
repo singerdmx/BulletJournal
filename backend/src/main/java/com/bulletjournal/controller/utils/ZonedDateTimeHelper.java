@@ -27,7 +27,7 @@ public class ZonedDateTimeHelper {
 
     public static String toDBTimestamp(ZonedDateTime zonedDateTime) {
         String res = Timestamp.from(zonedDateTime.toInstant()).toString();
-        return res.substring(0, res.lastIndexOf('.'));
+        return res.substring(0, res.lastIndexOf('.' ));
     }
 
     /**

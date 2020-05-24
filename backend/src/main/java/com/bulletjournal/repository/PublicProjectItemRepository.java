@@ -14,7 +14,9 @@ import java.util.List;
 @Repository
 public interface PublicProjectItemRepository extends JpaRepository<PublicProjectItem, String> {
     List<PublicProjectItem> findByTask(Task task);
+
     List<PublicProjectItem> findByNote(Note note);
+
     @Modifying
     @Transactional
     void deleteByExpirationTimeBefore(Timestamp expiryTime);

@@ -28,14 +28,13 @@ import java.util.Optional;
 @Component
 public class UserClient {
     public static final String USER_NAME_KEY = "discourse-user-name";
+    public static final String API_USERNAME = "Api-Username";
+    public static final String API_KEY = "Api-Key";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserClient.class);
     private static final String AVATAR_SIZE = "75";
     private static final String THUMBNAIL_SIZE = "37";
     private static final String SIZE_HOLDER = "{size}";
     private static final String DEFAULT_USER_TIME_ZONE = "America/Los_Angeles";
-    public static final String API_USERNAME = "Api-Username";
-    public static final String API_KEY = "Api-Key";
-
     private final RestTemplate restClient;
     private final URI ssoEndPoint;
     private final String ssoAPIKey;

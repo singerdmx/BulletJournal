@@ -10,6 +10,7 @@ import static com.bulletjournal.controller.GoogleCalendarController.CHANNEL_NOTI
 public class Util {
 
     private static final String WATCH_CHANNEL_TOKEN = "BuJo";
+
     public static Channel getChannel() {
         Channel channel = new Channel();
         channel.setId(UUID.randomUUID().toString());

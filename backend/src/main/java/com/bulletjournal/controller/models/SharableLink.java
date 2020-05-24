@@ -2,11 +2,9 @@ package com.bulletjournal.controller.models;
 
 public class SharableLink {
 
-    private String link;
-
-    private Long expirationTime;
-
     public Long createdAt;
+    private String link;
+    private Long expirationTime;
 
     public SharableLink() {
     }

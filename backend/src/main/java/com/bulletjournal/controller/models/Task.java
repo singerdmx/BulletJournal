@@ -36,11 +36,6 @@ public class Task extends ProjectItem {
     public Task() {
     }
 
-    @Override
-    public ContentType getContentType() {
-        return ContentType.TASK;
-    }
-
     public Task(Long id,
                 @NotBlank String owner,
                 List<User> assignees,
@@ -67,6 +62,11 @@ public class Task extends ProjectItem {
         this.recurrenceRule = recurrenceRule;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.TASK;
     }
 
     public String getDueDate() {

@@ -145,7 +145,7 @@ public class ProjectDaoJpa {
     }
 
     private void addProjectsByOwner(List<String> newOwners, String o, Set<Long> projectsByOwner,
-            List<ProjectsWithOwner> result) {
+                                    List<ProjectsWithOwner> result) {
         if (projectsByOwner == null) {
             return;
         }
@@ -165,7 +165,7 @@ public class ProjectDaoJpa {
     }
 
     private List<com.bulletjournal.controller.models.Project> getOwnerProjects(UserProjects userProjects,
-            String owner) {
+                                                                               String owner) {
         if (userProjects.getOwnedProjects() == null) {
             return Collections.emptyList();
         }
@@ -218,7 +218,7 @@ public class ProjectDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project partialUpdate(String requester, Long projectId, UpdateProjectParams updateProjectParams,
-            List<Event> joined, List<Event> removed) {
+                                 List<Event> joined, List<Event> removed) {
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
 
@@ -250,7 +250,7 @@ public class ProjectDaoJpa {
     }
 
     private void generateEvents(List<Event> joined, List<Event> removed, Project project, Set<String> oldUsers,
-            Set<String> newUsers) {
+                                Set<String> newUsers) {
         Set<String> overlap = new HashSet<>(newUsers);
         overlap.retainAll(oldUsers);
         for (String user : oldUsers) {

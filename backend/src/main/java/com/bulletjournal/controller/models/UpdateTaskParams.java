@@ -25,7 +25,7 @@ public class UpdateTaskParams {
     }
 
     public UpdateTaskParams(String dueDate, String dueTime, String name, Integer duration,
-            ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule) {
+                            ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule) {
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;

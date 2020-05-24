@@ -16,20 +16,20 @@ public class RateConfig {
         return fileUpload;
     }
 
-    public int getUser() {
-        return user;
-    }
-
-    public int getPublicItem() {
-        return publicItem;
-    }
-
     public void setFileUpload(int fileUpload) {
         this.fileUpload = fileUpload;
     }
 
+    public int getUser() {
+        return user;
+    }
+
     public void setUser(int user) {
         this.user = user;
+    }
+
+    public int getPublicItem() {
+        return publicItem;
     }
 
     public void setPublicItem(int publicItem) {

@@ -26,17 +26,13 @@ import java.util.concurrent.TimeUnit;
 public class GoogleCalendarProjectDaoJpa {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarProjectDaoJpa.class);
-
+    private static final GsonFactory GSON = new GsonFactory();
     @Autowired
     private GoogleCalendarProjectRepository googleCalendarProjectRepository;
-
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
-
     @Autowired
     private GoogleCalClient googleCalClient;
-
-    private static final GsonFactory GSON = new GsonFactory();
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public GoogleCalendarProject create(String calendarId, Long projectId, String channelId,

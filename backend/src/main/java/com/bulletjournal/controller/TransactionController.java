@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -60,10 +59,10 @@ public class TransactionController {
 
     @GetMapping(TRANSACTIONS_ROUTE)
     public ResponseEntity<?> getTransactions(@NotNull @PathVariable Long projectId,
-            @NotNull @RequestParam(required = false) FrequencyType frequencyType,
-            @NotBlank @RequestParam String timezone, @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
-            @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) String payer) {
+                                             @NotNull @RequestParam(required = false) FrequencyType frequencyType,
+                                             @NotBlank @RequestParam String timezone, @NotNull @RequestParam LedgerSummaryType ledgerSummaryType,
+                                             @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
+                                             @RequestParam(required = false) String payer) {
 
         Pair<ZonedDateTime, ZonedDateTime> startEndTime = getStartEndTime(frequencyType, timezone, startDate, endDate);
         ZonedDateTime startTime = startEndTime.getLeft();
@@ -90,7 +89,7 @@ public class TransactionController {
     }
 
     private ResponseEntity<List<Transaction>> getTransactionsByPayer(Long projectId, String payer,
-            ZonedDateTime startTime, ZonedDateTime endTime) {
+                                                                     ZonedDateTime startTime, ZonedDateTime endTime) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Transaction> transactions = this.transactionDaoJpa.getTransactionsByPayer(projectId, username, payer,
                 startTime, endTime);
@@ -106,7 +105,7 @@ public class TransactionController {
     @PostMapping(TRANSACTIONS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public Transaction createTransaction(@NotNull @PathVariable Long projectId,
-            @Valid @RequestBody CreateTransactionParams createTransactionParams) {
+                                         @Valid @RequestBody CreateTransactionParams createTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Pair<com.bulletjournal.repository.models.Transaction, com.bulletjournal.repository.models.Project> res = transactionDaoJpa
                 .create(projectId, username, createTransactionParams);
@@ -130,7 +129,7 @@ public class TransactionController {
 
     @PatchMapping(TRANSACTION_ROUTE)
     public Transaction updateTransaction(@NotNull @PathVariable Long transactionId,
-            @Valid @RequestBody UpdateTransactionParams updateTransactionParams) {
+                                         @Valid @RequestBody UpdateTransactionParams updateTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Pair<List<Event>, com.bulletjournal.repository.models.Transaction> res = transactionDaoJpa
                 .partialUpdate(username, transactionId, updateTransactionParams);
@@ -174,7 +173,7 @@ public class TransactionController {
 
     @PostMapping(MOVE_TRANSACTION_ROUTE)
     public void moveTransaction(@NotNull @PathVariable Long transactionId,
-            @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+                                @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
     }
@@ -182,7 +181,7 @@ public class TransactionController {
     @Deprecated
     @PostMapping(SHARE_TRANSACTION_ROUTE)
     public String shareTransaction(@NotNull @PathVariable Long transactionId,
-            @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+                                   @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Informed inform = this.transactionDaoJpa.shareProjectItem(transactionId, shareProjectItemParams, username);
         this.notificationService.inform(inform);
@@ -190,7 +189,7 @@ public class TransactionController {
     }
 
     private Pair<ZonedDateTime, ZonedDateTime> getStartEndTime(FrequencyType frequencyType, String timezone,
-            String startDate, String endDate) {
+                                                               String startDate, String endDate) {
         ZonedDateTime startTime;
         ZonedDateTime endTime;
         if (StringUtils.isBlank(startDate) || StringUtils.isBlank(endDate)) {
@@ -208,7 +207,7 @@ public class TransactionController {
 
     @PostMapping(ADD_CONTENT_ROUTE)
     public Content addContent(@NotNull @PathVariable Long transactionId,
-            @NotNull @RequestBody CreateContentParams createContentParams) {
+                              @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Pair<ContentModel, ProjectItemModel> res = this.transactionDaoJpa.addContent(transactionId, username,
                 new TransactionContent(createContentParams.getText()));
@@ -240,7 +239,7 @@ public class TransactionController {
 
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long transactionId,
-            @NotNull @PathVariable Long contentId) {
+                                       @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         ProjectItemModel transaction = this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
 
@@ -254,7 +253,7 @@ public class TransactionController {
 
     @PatchMapping(CONTENT_ROUTE)
     public List<Content> updateContent(@NotNull @PathVariable Long transactionId, @NotNull @PathVariable Long contentId,
-            @NotNull @RequestBody UpdateContentParams updateContentParams) {
+                                       @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         ProjectItemModel transaction = this.transactionDaoJpa
                 .updateContent(contentId, transactionId, username, updateContentParams).getRight();
@@ -269,7 +268,7 @@ public class TransactionController {
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
     public Revision getContentRevision(@NotNull @PathVariable Long transactionId, @NotNull @PathVariable Long contentId,
-            @NotNull @PathVariable Long revisionId) {
+                                       @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.transactionDaoJpa.getContentRevision(username, transactionId, contentId, revisionId);
         revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());

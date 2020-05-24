@@ -44,11 +44,6 @@ public class Transaction extends ProjectItem {
     public Transaction() {
     }
 
-    @Override
-    public ContentType getContentType() {
-        return ContentType.TRANSACTION;
-    }
-
     public Transaction(Long id,
                        @NotBlank String owner,
                        @NotBlank String name,
@@ -67,6 +62,11 @@ public class Transaction extends ProjectItem {
         this.time = time;
         this.timezone = timezone;
         this.transactionType = transactionType;
+    }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.TRANSACTION;
     }
 
     public String getPayer() {

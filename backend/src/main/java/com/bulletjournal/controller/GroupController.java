@@ -56,7 +56,7 @@ public class GroupController {
 
     @PatchMapping(GROUP_ROUTE)
     public Group updateGroup(@NotNull @PathVariable Long groupId,
-            @Valid @RequestBody UpdateGroupParams updateGroupParams) {
+                             @Valid @RequestBody UpdateGroupParams updateGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.groupDaoJpa.partialUpdate(username, groupId, updateGroupParams);
         return getGroup(groupId);

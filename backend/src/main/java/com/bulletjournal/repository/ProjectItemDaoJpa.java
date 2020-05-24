@@ -61,14 +61,14 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> SharableLink generatePublicItemLink(Long projectItemId, String requester,
-            Long ttl) {
+                                                                            Long ttl) {
         T projectItem = getProjectItem(projectItemId, requester);
         return this.publicProjectItemDaoJpa.generatePublicItemLink(projectItem, requester, ttl);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> ShareProjectItemEvent shareProjectItem(Long projectItemId,
-            ShareProjectItemParams shareProjectItemParams, String requester) {
+                                                                               ShareProjectItemParams shareProjectItemParams, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
         List<String> users = new ArrayList<>();
         if (StringUtils.isNotBlank(shareProjectItemParams.getTargetUser())) {
@@ -102,7 +102,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> RevokeSharableEvent revokeSharable(Long projectItemId, String requester,
-            RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
+                                                                           RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
         T projectItem = getProjectItem(projectItemId, requester);
 
         String link = revokeProjectItemSharableParams.getLink();
@@ -140,7 +140,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Pair<K, T> updateContent(Long contentId, Long projectItemId, String requester,
-            UpdateContentParams updateContentParams) {
+                                                                 UpdateContentParams updateContentParams) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
         Preconditions.checkState(Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
@@ -199,7 +199,7 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Revision getContentRevision(String requester, Long projectItemId,
-            Long contentId, Long revisionId) {
+                                                                    Long contentId, Long revisionId) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
         Preconditions.checkState(Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
