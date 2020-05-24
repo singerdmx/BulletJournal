@@ -105,7 +105,7 @@ public class ProjectController {
 
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
-            @Valid @RequestBody UpdateProjectParams updateProjectParams) {
+                                 @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> joined = new ArrayList<>();
         List<Event> removed = new ArrayList<>();
@@ -157,8 +157,8 @@ public class ProjectController {
 
     @GetMapping(PROJECT_HISTORY_ROUTE)
     public List<Activity> getHistory(@NotNull @PathVariable Long projectId, @NotBlank @RequestParam String timezone,
-            @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
-            @RequestParam @NotNull ContentAction action, @RequestParam @NotBlank String username) {
+                                     @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
+                                     @RequestParam @NotNull ContentAction action, @RequestParam @NotBlank String username) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         Map<String, String> alias = this.userAliasDaoJpa.getAliases(requester);
         return this.auditableDaoJpa.getHistory(projectId, timezone, startDate, endDate, action, username, requester)

@@ -13,40 +13,40 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositoryCustom {
-        @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels FROM tasks WHERE tasks.project_id = :project_id", nativeQuery = true)
-        List<Long> findUniqueLabelsByProject(@Param("project_id") Long projectId);
+    @Query(value = "SELECT DISTINCT unnest(labels) AS uniqueLabels FROM tasks WHERE tasks.project_id = :project_id", nativeQuery = true)
+    List<Long> findUniqueLabelsByProject(@Param("project_id") Long projectId);
 
-        List<Task> findTaskByProject(Project project);
+    List<Task> findTaskByProject(Project project);
 
-        @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.project_id = :project_id", nativeQuery = true)
-        List<Task> findTasksByAssigneeAndProject(@Param("assignee") String assignee,
-                        @Param("project_id") Long projectId);
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.project_id = :project_id", nativeQuery = true)
+    List<Task> findTasksByAssigneeAndProject(@Param("assignee") String assignee,
+                                             @Param("project_id") Long projectId);
 
-        @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.recurrence_rule IS NOT NULL", nativeQuery = true)
-        List<Task> findTasksByAssigneeAndRecurrenceRuleNotNull(@Param("assignee") String assignee);
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.recurrence_rule IS NOT NULL", nativeQuery = true)
+    List<Task> findTasksByAssigneeAndRecurrenceRuleNotNull(@Param("assignee") String assignee);
 
-        Optional<Task> findTaskByGoogleCalendarEventId(String googleCalendarEventId);
+    Optional<Task> findTaskByGoogleCalendarEventId(String googleCalendarEventId);
 
-        @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND tasks.reminder_date_time IS NOT NULL"
-                        + " AND tasks.start_time >= to_timestamp(:start, 'YYYY-MM-DD HH24:MI:SS') AND tasks.reminder_date_time <= to_timestamp(:now, 'YYYY-MM-DD HH24:MI:SS')", nativeQuery = true)
-        List<Task> findRemindingTasks(@Param("assignee") String assignee, @Param("now") String now,
-                        @Param("start") String start);
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND tasks.reminder_date_time IS NOT NULL"
+            + " AND tasks.start_time >= to_timestamp(:start, 'YYYY-MM-DD HH24:MI:SS') AND tasks.reminder_date_time <= to_timestamp(:now, 'YYYY-MM-DD HH24:MI:SS')", nativeQuery = true)
+    List<Task> findRemindingTasks(@Param("assignee") String assignee, @Param("now") String now,
+                                  @Param("start") String start);
 
-        @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND "
-                        + "tasks.end_time IS NOT NULL AND "
-                        + "((tasks.start_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.start_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')) OR "
-                        + "(tasks.end_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.end_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')))", nativeQuery = true)
-        List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee, @Param("startTime") String startTime,
-                        @Param("endTime") String endTime);
+    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND "
+            + "tasks.end_time IS NOT NULL AND "
+            + "((tasks.start_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.start_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')) OR "
+            + "(tasks.end_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.end_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')))", nativeQuery = true)
+    List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee, @Param("startTime") String startTime,
+                                          @Param("endTime") String endTime);
 
-        @Query("SELECT task FROM Task task WHERE task.updatedAt IS NOT NULL AND task.updatedAt >= :startTime AND task.updatedAt <= :endTime")
-        List<Task> findRecentTasksBetween(@Param("startTime") Timestamp startTime,
-                                          @Param("endTime") Timestamp endTime);
+    @Query("SELECT task FROM Task task WHERE task.updatedAt IS NOT NULL AND task.updatedAt >= :startTime AND task.updatedAt <= :endTime")
+    List<Task> findRecentTasksBetween(@Param("startTime") Timestamp startTime,
+                                      @Param("endTime") Timestamp endTime);
 
-        @Query(value = "SELECT task FROM Task task WHERE task.project = :project AND "
-                        + "task.startTime IS NOT NULL AND task.endTime IS NOT NULL AND "
-                        + "((task.startTime >= :startTime AND task.startTime <= :endTime) OR "
-                        + "(task.endTime >= :startTime AND task.endTime <= :endTime))")
-        List<Task> findTasksBetween(@Param("project") Project project, @Param("startTime") Timestamp startTime,
-                        @Param("endTime") Timestamp endTime);
+    @Query(value = "SELECT task FROM Task task WHERE task.project = :project AND "
+            + "task.startTime IS NOT NULL AND task.endTime IS NOT NULL AND "
+            + "((task.startTime >= :startTime AND task.startTime <= :endTime) OR "
+            + "(task.endTime >= :startTime AND task.endTime <= :endTime))")
+    List<Task> findTasksBetween(@Param("project") Project project, @Param("startTime") Timestamp startTime,
+                                @Param("endTime") Timestamp endTime);
 }

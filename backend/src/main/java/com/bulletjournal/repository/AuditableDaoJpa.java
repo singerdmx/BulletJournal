@@ -32,7 +32,7 @@ public class AuditableDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Activity> getHistory(Long projectId, String timezone, String startDate, String endDate,
-            ContentAction action, String username, String requester) {
+                                     ContentAction action, String username, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
             return Collections.emptyList();

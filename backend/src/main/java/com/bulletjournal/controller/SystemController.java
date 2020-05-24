@@ -32,10 +32,10 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class SystemController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
     public static final String UPDATES_ROUTE = "/api/system/updates";
     public static final String PUBLIC_ITEM_ROUTE_PREFIX = "/api/public/items/";
     public static final String PUBLIC_ITEM_ROUTE = PUBLIC_ITEM_ROUTE_PREFIX + "{itemId}";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
     private static final String CONTACTS_ROUTE = "/api/contacts";
 
     @Autowired

@@ -20,11 +20,6 @@ public class Note extends ProjectItem {
     public Note() {
     }
 
-    @Override
-    public ContentType getContentType() {
-        return ContentType.NOTE;
-    }
-
     public Note(Long id,
                 @NotBlank String owner,
                 @NotBlank String name,
@@ -37,6 +32,10 @@ public class Note extends ProjectItem {
         this.updatedAt = updatedAt;
     }
 
+    @Override
+    public ContentType getContentType() {
+        return ContentType.NOTE;
+    }
 
     public List<Note> getSubNotes() {
         return subNotes;

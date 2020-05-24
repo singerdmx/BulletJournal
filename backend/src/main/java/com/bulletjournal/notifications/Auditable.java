@@ -1,8 +1,8 @@
 package com.bulletjournal.notifications;
 
-import java.sql.Timestamp;
-
 import com.bulletjournal.contents.ContentAction;
+
+import java.sql.Timestamp;
 
 public class Auditable {
     private Long projectId;
@@ -14,7 +14,7 @@ public class Auditable {
     private Timestamp activityTime;
 
     public Auditable(Long projectId, String activity, String originator, Long projectItemId, Timestamp activityTime,
-            ContentAction action) {
+                     ContentAction action) {
         this.projectId = projectId;
         this.activity = activity;
         this.originator = originator;

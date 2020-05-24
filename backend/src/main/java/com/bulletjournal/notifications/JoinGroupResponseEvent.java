@@ -24,7 +24,6 @@ public class JoinGroupResponseEvent extends Informed {
     }
 
 
-
     @Override
     protected String getEventTitle(Event event) {
         return "##" + this.getOriginatorAlias() + "## " + this.action.getPastTenseDescription()

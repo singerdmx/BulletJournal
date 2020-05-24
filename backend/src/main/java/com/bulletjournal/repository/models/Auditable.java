@@ -1,13 +1,12 @@
 package com.bulletjournal.repository.models;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.Activity;
 import com.bulletjournal.controller.models.User;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 @Entity
@@ -42,7 +41,7 @@ public class Auditable extends AuditModel {
     }
 
     public Auditable(Long projectId, String activity, String originator, Timestamp activityTime, ContentAction action,
-            Long projectItemId) {
+                     Long projectItemId) {
         this.projectId = projectId;
         this.activity = activity;
         this.originator = originator;

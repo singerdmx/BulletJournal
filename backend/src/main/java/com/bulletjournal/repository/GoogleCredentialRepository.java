@@ -11,7 +11,9 @@ import java.util.Set;
 @Repository
 public interface GoogleCredentialRepository extends JpaRepository<GoogleCredential, String> {
     Optional<GoogleCredential> findByKey(String key);
+
     Optional<GoogleCredential> findByAccessToken(String key);
+
     @Query(value = "select key from google_credentials", nativeQuery = true)
     Set<String> findAllKeys();
 }

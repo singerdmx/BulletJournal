@@ -20,28 +20,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class TokenBucket {
 
-    @Autowired
-    private MDCConfig mdcConfig;
-
-    @Autowired
-    private RateConfig rateConfig;
-
-    @Autowired
-    private UserClient userClient;
-
-    @Autowired
-    private RedisConfig redisConfig;
-
-    @Autowired
-    private RedisLockedUserRepository redisLockedUserRepository;
-
-    @Autowired
-    private RedisLockedIPRepository redisLockedIPRepository;
-
-
     private final Map<String, Bucket> bucketsUser = new ConcurrentHashMap<>();
     private final Map<String, Bucket> bucketsFileUpload = new ConcurrentHashMap<>();
     private final Map<String, Bucket> bucketsPublicItem = new ConcurrentHashMap<>();
+    @Autowired
+    private MDCConfig mdcConfig;
+    @Autowired
+    private RateConfig rateConfig;
+    @Autowired
+    private UserClient userClient;
+    @Autowired
+    private RedisConfig redisConfig;
+    @Autowired
+    private RedisLockedUserRepository redisLockedUserRepository;
+    @Autowired
+    private RedisLockedIPRepository redisLockedIPRepository;
 
     public TokenBucket() {
     }

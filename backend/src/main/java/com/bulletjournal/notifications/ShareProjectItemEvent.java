@@ -8,7 +8,7 @@ public class ShareProjectItemEvent extends Informed {
 
     private final ContentType contentType;
 
-    public ShareProjectItemEvent(List<Event> events, String originator,  ContentType contentType) {
+    public ShareProjectItemEvent(List<Event> events, String originator, ContentType contentType) {
         super(events, originator);
         this.contentType = contentType;
     }
