@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.authz.Role;
 import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
@@ -79,14 +80,23 @@ public class UserDaoJpa {
         DaoHelper.updateIfPresent(updateMyselfParams.hasTimezone(), updateMyselfParams.getTimezone(),
                 (value) -> self.setTimezone(value));
         DaoHelper.updateIfPresent(updateMyselfParams.hasReminderBeforeTask(),
-                updateMyselfParams.getReminderBeforeTask(),
-                (value) -> self.setReminderBeforeTask(value));
-        DaoHelper.updateIfPresent(updateMyselfParams.hasCurrency(),
-                updateMyselfParams.getCurrency(),
+                updateMyselfParams.getReminderBeforeTask(), (value) -> self.setReminderBeforeTask(value));
+        DaoHelper.updateIfPresent(updateMyselfParams.hasCurrency(), updateMyselfParams.getCurrency(),
                 (value) -> self.setCurrency(value));
-        DaoHelper.updateIfPresent(updateMyselfParams.hasTheme(),
-                updateMyselfParams.getTheme(),
+        DaoHelper.updateIfPresent(updateMyselfParams.hasTheme(), updateMyselfParams.getTheme(),
                 (value) -> self.setTheme(value));
         return self;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public boolean isAdmin(String username) {
+        return Role.getType(this.getByName(username).getRole()).equals(Role.ADMIN);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void setAdmin(String username) {
+        User user = this.getByName(username);
+        user.setRole(Role.ADMIN.getValue());
+        this.userRepository.save(user);
     }
 }

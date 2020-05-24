@@ -36,9 +36,6 @@ public class ProjectItemController {
     private TaskDaoJpa taskDaoJpa;
 
     @Autowired
-    private SystemDaoJpa systemDaoJpa;
-
-    @Autowired
     private TransactionDaoJpa transactionDaoJpa;
 
     @Autowired

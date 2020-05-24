@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { ProjectItems } from './interface';
+import {ProjectItem, ProjectItems} from './interface';
 
 export type MyBuJo = {
   startDate: string;
@@ -40,6 +40,10 @@ export type CalendarModeAction = {
   calendarMode: string;
 };
 
+export type RecentItemsReceivedAction = {
+  items: ProjectItem[];
+};
+
 let initialState = {
   startDate: '',
   endDate: '',
@@ -50,6 +54,7 @@ let initialState = {
   calendarMode: 'month',
   selectedCalendarDay: '',
   projectItemsForCalendar: [] as ProjectItems[],
+  recentItems: [] as ProjectItem[],
 };
 
 const slice = createSlice({
@@ -100,6 +105,13 @@ const slice = createSlice({
     ) => {
       const { calendarMode } = action.payload;
       state.calendarMode = calendarMode;
+    },
+    recentItemsReceived: (
+        state,
+        action: PayloadAction<RecentItemsReceivedAction>
+    ) => {
+      const { items } = action.payload;
+      state.recentItems = items;
     },
   }
 });

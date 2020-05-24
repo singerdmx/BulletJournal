@@ -8,19 +8,14 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"name"})
-        })
+@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }) })
 public class User extends NamedModel {
     @Id
     @GeneratedValue(generator = "user_generator")
-    @SequenceGenerator(
-            name = "user_generator",
-            sequenceName = "user_sequence",
-            initialValue = 100
-    )
+    @SequenceGenerator(name = "user_generator", sequenceName = "user_sequence", initialValue = 100)
     private Long id;
+
+    private Integer role;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
@@ -173,8 +168,10 @@ public class User extends NamedModel {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         User user = (User) o;
         return Objects.equals(id, user.id);
     }
@@ -182,5 +179,13 @@ public class User extends NamedModel {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 }
