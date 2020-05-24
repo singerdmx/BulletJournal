@@ -7,10 +7,7 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
-import com.bulletjournal.repository.models.Note;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.*;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,6 +22,7 @@ import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProjectItemController {
@@ -39,6 +37,9 @@ public class ProjectItemController {
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
+
+    @Autowired
+    private NoteDaoJpa projectItemDaoJpa;
 
     @Autowired
     private LabelDaoJpa labelDaoJpa;
@@ -124,18 +125,21 @@ public class ProjectItemController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         if (types.contains(ProjectType.TODO)) {
-            List<Task> tasks = taskDaoJpa.getRecentTasksBetween(startTime, endTime);
+            List<Task> tasks = projectItemDaoJpa.getRecentProjectItemsBetween(startTime, endTime, ProjectType.TODO)
+                    .stream().map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
             if (!tasks.isEmpty()) {
                 Map<String, String> aliases = userAliasDaoJpa.getAliases(username);
                 projectItems.addAll(ProjectItemsGrouper.addLabelsToTasks(tasks, aliases));
             }
         }
         if (types.contains(ProjectType.LEDGER)) {
-            List<Transaction> transactions = transactionDaoJpa.getRecentTransactionsBetween(startTime, endTime);
+            List<Transaction> transactions = projectItemDaoJpa.getRecentProjectItemsBetween(startTime, endTime, ProjectType.LEDGER)
+                    .stream().map(projectItemModel -> (Transaction) projectItemModel).collect(Collectors.toList());
             projectItems.addAll(ProjectItemsGrouper.addLabelsToTransactions(transactions));
         }
         if (types.contains(ProjectType.NOTE)) {
-            List<Note> notes = noteDaoJpa.getRecentNotesBetween(startTime, endTime);
+            List<Note> notes = projectItemDaoJpa.getRecentProjectItemsBetween(startTime, endTime, ProjectType.NOTE)
+                    .stream().map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList());
             projectItems.addAll(ProjectItemsGrouper.addLabelsToNotes(notes));
         }
 

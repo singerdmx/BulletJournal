@@ -27,6 +27,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,6 +51,18 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ContentRevisionConfig revisionConfig;
     @Autowired
     private ContentDiffTool contentDiffTool;
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private TaskContentRepository taskContentRepository;
+    @Autowired
+    private NoteRepository noteRepository;
+    @Autowired
+    private NoteContentRepository noteContentRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private TransactionContentRepository transactionContentRepository;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -265,4 +278,43 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> List<ProjectItemModel> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, ProjectType type) {
+        Map<Long, ProjectItemModel> projectItemIdMap = new HashMap<>();
+        List<ProjectItemModel> projectItemModels = new LinkedList<>();
+        List<ContentModel> projectItemContentModels = new LinkedList<>();
+        switch (type) {
+            case TODO:
+                projectItemModels.addAll(this.taskRepository.findRecentTasksBetween(startTime, endTime));
+                projectItemContentModels.addAll(this.taskContentRepository.findRecentTaskContentsBetween(startTime, endTime));
+                break;
+            case NOTE:
+                projectItemModels.addAll(this.noteRepository.findRecentNotesBetween(startTime, endTime));
+                projectItemContentModels.addAll(this.noteContentRepository.findRecentNoteContentsBetween(startTime, endTime));
+                break;
+            case LEDGER:
+                projectItemModels.addAll(this.transactionRepository.findRecentTransactionsBetween(startTime, endTime));
+                projectItemContentModels.addAll(this.transactionContentRepository.findRecentTransactionContentsBetween(startTime, endTime));
+                break;
+            default:
+                throw new IllegalArgumentException();
+
+        }
+        projectItemModels.forEach(pi -> projectItemIdMap.put(pi.getId(), pi));
+        projectItemContentModels
+                .forEach(projectItemContent -> {
+                    if (projectItemIdMap.containsKey(projectItemContent.getProjectItem().getId())) {
+                        ProjectItemModel projectItem = projectItemIdMap.get(projectItemContent.getProjectItem().getId());
+                        projectItem.setUpdatedAt(
+                                projectItem.getUpdatedAt().compareTo(projectItemContent.getUpdatedAt()) > 0
+                                        ? projectItem.getUpdatedAt()
+                                        : projectItemContent.getUpdatedAt()
+                        );
+                    } else {
+                        projectItemIdMap.put(projectItemContent.getProjectItem().getId(), projectItemContent.getProjectItem());
+                    }
+                });
+        return new ArrayList<>(projectItemIdMap.values());
+    }
 }
+

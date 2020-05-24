@@ -46,12 +46,4 @@ public class SystemDaoJpa {
         List<Long> labelIds = dao.findItemLabelsByProject(project);
         return this.labelDaoJpa.getLabels(labelIds);
     }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getRecentItems(Integer weekNum) {
-        List<Task> tasks = this.taskRepository.findRecentTasksBetween(
-                Timestamp.valueOf(LocalDateTime.now().minusWeeks(100L)),
-                Timestamp.valueOf(LocalDateTime.now()));
-        return tasks;
-    }
 }

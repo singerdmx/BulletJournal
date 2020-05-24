@@ -267,17 +267,5 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     List<Long> findItemLabelsByProject(Project project) {
         return transactionRepository.findUniqueLabelsByProject(project.getId());
     }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Transaction> getRecentTransactionsBetween(Timestamp startTime, Timestamp endTime) {
-        Set<Long> transactionIdSet = new HashSet<>();
-        List<Transaction> transactions = this.transactionRepository.findRecentTransactionsBetween(startTime, endTime);
-        transactions.stream().forEach(transaction -> transactionIdSet.add(transaction.getId()));
-        this.transactionContentRepository.findRecentTransactionContentsBetween(startTime, endTime)
-                .stream()
-                .filter(transactionContent -> transactionIdSet.add(transactionContent.getTransaction().getId()))
-                .forEach(transactionContent -> transactions.add(transactionContent.getTransaction()));
-        return transactions;
-    }
 }
 
