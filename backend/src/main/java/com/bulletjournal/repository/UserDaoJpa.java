@@ -94,9 +94,9 @@ public class UserDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void setAdmin(String username) {
+    public void setRole(String username, Role role) {
         User user = this.getByName(username);
-        user.setRole(Role.ADMIN.getValue());
+        user.setRole(role.getValue());
         this.userRepository.save(user);
     }
 }

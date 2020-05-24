@@ -13,6 +13,7 @@ import { reducer as transactionReducer } from '../features/transactions/reducer'
 import { reducer as taskReducer } from '../features/tasks/reducer';
 import { reducer as calendarSyncReducer } from '../features/calendarSync/reducer';
 import { reducer as recent } from '../features/recent/reducer';
+import { reducer as admin } from '../features/admin/reducer';
 
 export default {
   settings: settingsReducer,
@@ -29,5 +30,6 @@ export default {
   transaction: transactionReducer,
   task: taskReducer,
   calendarSync: calendarSyncReducer,
-  recent: recent
+  recent: recent,
+  admin: admin,
 };

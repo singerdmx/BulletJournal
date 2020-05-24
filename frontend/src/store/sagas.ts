@@ -12,6 +12,7 @@ import rRuleSaga from '../features/recurrence/saga';
 import taskSaga from '../features/tasks/saga';
 import transactionSaga from '../features/transactions/saga';
 import calendarSyncSaga from '../features/calendarSync/saga';
+import adminSaga from '../features/admin/saga';
 
 export default function* root() {
   yield spawn(myselfSaga);
@@ -27,4 +28,5 @@ export default function* root() {
   yield spawn(taskSaga);
   yield spawn(transactionSaga);
   yield spawn(calendarSyncSaga);
+  yield spawn(adminSaga);
 }
