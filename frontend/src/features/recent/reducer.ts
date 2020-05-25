@@ -18,7 +18,7 @@ let initialState = {
 };
 
 const slice = createSlice({
-    name: 'myBuJo',
+    name: 'recent',
     initialState,
     reducers: {
         recentItemsReceived: (
