@@ -11,6 +11,10 @@ export type LabelsAction = {
   etag: string;
 };
 
+export type ProjectLabelsAction = {
+  labels: Label[];
+};
+
 export type LabelCreateAction = {
   value: string;
   icon: string;
@@ -35,6 +39,10 @@ export type UpdateLabels = {
   projectId?: number;
 };
 
+export type UpdateProjectLabels = {
+  projectId: number;
+};
+
 export type SelectedLabelAction = {
   label: Label;
 };
@@ -49,7 +57,8 @@ let initialState = {
   labelOptions: [] as Label[],
   etag: '',
   label: {} as Label,
-  items: [] as ProjectItems[]
+  items: [] as ProjectItems[],
+  projectLabels: [] as Label[],
 };
 
 const slice = createSlice({
@@ -70,6 +79,10 @@ const slice = createSlice({
       });
       state.labelOptions = labelOptions;
     },
+    projectLabelsReceived: (state, action: PayloadAction<ProjectLabelsAction>) => {
+      const { labels } = action.payload;
+      state.projectLabels = labels;
+    },
     setSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
       const { label } = action.payload;
       state.labelsSelected = [label];
@@ -88,6 +101,7 @@ const slice = createSlice({
       );
     },
     labelsUpdate: (state, action: PayloadAction<UpdateLabels>) => state,
+    projectLabelsUpdate: (state, action: PayloadAction<UpdateProjectLabels>) => state,
     labelsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
       state,
     createLabel: (state, action: PayloadAction<LabelCreateAction>) => state,

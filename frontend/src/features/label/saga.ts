@@ -7,12 +7,13 @@ import {
   DeleteLabelAction,
   PatchLabelAction,
   UpdateLabels,
+  UpdateProjectLabels,
   GetItemsByLabelsAction
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
 import {
-  fetchLabels, addLabel, updateLabel, deleteLabel, fetchItemsByLabels
+  fetchLabels, addLabel, updateLabel, deleteLabel, fetchItemsByLabels, fetchProjectLabels
 } from '../../apis/labelApis';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
@@ -29,6 +30,16 @@ function* labelsUpdate(action: PayloadAction<UpdateLabels>) {
     yield put(labelActions.labelsReceived({ labels: labels, etag: etag }));
   } catch (error) {
     yield call(message.error, `Get Labels Error Received: ${error}`);
+  }
+}
+
+function* projectLabelsUpdate(action: PayloadAction<UpdateProjectLabels>) {
+  try {
+    const {projectId} = action.payload;
+    const data = yield call(fetchProjectLabels, projectId);
+    yield put(labelActions.projectLabelsReceived({ labels: data }));
+  } catch (error) {
+    yield call(message.error, `projectLabelsUpdate Error Received: ${error}`);
   }
 }
 
@@ -93,6 +104,7 @@ export default function* labelSagas() {
     yield takeLatest(labelActions.labelsApiErrorReceived.type, apiErrorReceived),
     yield takeLatest(labelActions.patchLabel.type, patchLabel),
     yield takeLatest(labelActions.labelsUpdate.type, labelsUpdate),
+    yield takeLatest(labelActions.projectLabelsUpdate.type, projectLabelsUpdate),
     yield takeLatest(labelActions.getItemsByLabels.type, getItemsByLabels),
   ]);
 }

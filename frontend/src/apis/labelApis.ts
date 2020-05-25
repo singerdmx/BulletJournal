@@ -12,6 +12,14 @@ export const fetchLabels = (projectId: number | undefined) => {
         });
 };
 
+export const fetchProjectLabels = (projectId: number) => {
+    return doFetch(`/api/projects/${projectId}/labels`)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+};
+
 export const addLabel = (value: string, icon: string) => {
     const postBody = JSON.stringify({
       value: value,

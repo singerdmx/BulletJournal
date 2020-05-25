@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class LabelController {
 
     protected static final String LABELS_ROUTE = "/api/labels";
+    protected static final String PROJECT_LABELS_ROUTE = "/api/projects/{projectId}/labels";
     protected static final String LABEL_ROUTE = "/api/labels/{labelId}";
     protected static final String ITEMS_ROUTE = "/api/items";
 
@@ -80,6 +81,14 @@ public class LabelController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(labelsEtag);
         return ResponseEntity.ok().headers(responseHeader).body(labels);
+    }
+
+    @GetMapping(PROJECT_LABELS_ROUTE)
+    public ResponseEntity<List<Label>> getProjectLabels(
+            @NotNull @PathVariable Long projectId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<Label> labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
+        return ResponseEntity.ok().body(labelsForProject);
     }
 
     @DeleteMapping(LABEL_ROUTE)

@@ -4,7 +4,7 @@ import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner, User } from '../../features/group/interface';
-import { Avatar, Divider, Popconfirm, Popover, Tooltip } from 'antd';
+import {Avatar, Divider, Popconfirm, Popover, Tag, Tooltip, Collapse} from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
 import {
@@ -12,6 +12,7 @@ import {
   TeamOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  SyncOutlined
 } from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
@@ -44,6 +45,11 @@ import {
   FrequencyType,
   LedgerSummaryType,
 } from '../../features/transactions/interface';
+import {projectLabelsUpdate, setSelectedLabel} from "../../features/label/actions";
+import {Label, stringToRGB} from "../../features/label/interface";
+import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
+
+const { Panel } = Collapse;
 
 type ProjectPathParams = {
   projectId: string;
@@ -79,6 +85,7 @@ type ProjectPageProps = {
   transactionStartDate: string;
   transactionEndDate: string;
   transactionLedgerSummaryType: LedgerSummaryType;
+  projectLabels: Label[];
   getProject: (projectId: number) => void;
   deleteProject: (
     projectId: number,
@@ -111,6 +118,8 @@ type ProjectPageProps = {
     endDate?: string
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
+  projectLabelsUpdate: (projectId: number) => void;
+  setSelectedLabel: (label: Label) => void;
 };
 
 type MyselfProps = {
@@ -137,9 +146,10 @@ class ProjectPage extends React.Component<
 
   componentDidMount() {
     this.props.updateExpandedMyself(true);
-    const projectId = this.props.match.params.projectId;
-    this.props.getProject(parseInt(projectId));
+    const projectId = parseInt(this.props.match.params.projectId);
+    this.props.getProject(projectId);
     this.setState({ completeTasksShown: false });
+    this.props.projectLabelsUpdate(projectId);
   }
 
   componentDidUpdate(prevProps: ProjectPathProps): void {
@@ -147,8 +157,15 @@ class ProjectPage extends React.Component<
     if (projectId !== prevProps.match.params.projectId) {
       this.props.getProject(parseInt(projectId));
       this.setState({ completeTasksShown: false });
+      this.props.projectLabelsUpdate(parseInt(projectId));
     }
   }
+
+  // jump to label searching page by label click
+  toLabelSearching = (label: Label) => {
+    this.props.setSelectedLabel(label);
+    this.props.history.push('/labels/search');
+  };
 
   onClickGroup = (groupId: number) => {
     this.props.history.push(`/groups/group${groupId}`);
@@ -264,6 +281,36 @@ class ProjectPage extends React.Component<
     [ProjectType.NOTE]: this.handleGetNotesByOrder,
     [ProjectType.TODO]: this.handleGetTasksByOrder,
     [ProjectType.LEDGER]: () => {},
+  };
+
+  getProjectLabels = () => {
+    if (this.props.projectLabels.length === 0) {
+      return null;
+    }
+
+    return <Collapse
+        defaultActiveKey={['Labels']}
+        expandIconPosition='right'
+    >
+      <Panel header="Labels in BuJo" key="Labels" extra={
+        <Tooltip title='Refresh BuJo Labels'>
+          <SyncOutlined onClick={event => {
+            event.stopPropagation();
+            const projectId = parseInt(this.props.match.params.projectId);
+            this.props.projectLabelsUpdate(projectId);
+          }}/>
+        </Tooltip>}>
+        <div className="project-labels">
+          {this.props.projectLabels.map((label, index) =>
+              (<Tag
+                  key={label.id}
+                  color={stringToRGB(label.value)}
+                  onClick={() => this.toLabelSearching(label)}>
+                <span>{getIcon(label.icon)} &nbsp;{label.value}</span>
+              </Tag>))}
+        </div>
+      </Panel>
+    </Collapse>
   };
 
   render() {
@@ -493,6 +540,7 @@ class ProjectPage extends React.Component<
         {description && (
           <div className='project-description'>{description}</div>
         )}
+        {this.getProjectLabels()}
         <div className='project-content'>{projectContent}</div>
       </div>
     );
@@ -511,6 +559,7 @@ const mapStateToProps = (state: IState) => ({
   transactionEndDate: state.transaction.endDate,
   transactionLedgerSummaryType: state.transaction.ledgerSummaryType,
   timezone: state.settings.timezone,
+  projectLabels: state.label.projectLabels
 });
 
 export default connect(mapStateToProps, {
@@ -524,4 +573,6 @@ export default connect(mapStateToProps, {
   getNotesByOrder,
   getTasksByOrder,
   updateExpandedMyself,
+  projectLabelsUpdate,
+  setSelectedLabel
 })(ProjectPage);
