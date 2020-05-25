@@ -46,9 +46,10 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
       })
     );
     const state: IState = yield select();
-    if (!state.myBuJo.startDate) {
-      yield put(updateMyBuJoDates(currentTime, currentTime));
-    }
+
+    if (state.myBuJo.startDate) return;
+
+    yield put(updateMyBuJoDates(currentTime, currentTime));
 
     yield put(updateSelectedCalendarDay(currentTime));
     yield put(
@@ -73,25 +74,25 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
   }
 }
 
-function* updateTheme(action: PayloadAction<ThemeUpdate>){
-   try {
+function* updateTheme(action: PayloadAction<ThemeUpdate>) {
+  try {
     yield put(expandedMyselfLoading(true));
     const data = yield call(fetchMyself, true);
     yield put(
-        myselfActions.myselfDataReceived({
-            username: data.name,
-            avatar: data.avatar,
-            timezone: data.timezone,
-            before: data.reminderBeforeTask,
-            currency: data.currency,
-            theme: data.theme,
-        })
+      myselfActions.myselfDataReceived({
+        username: data.name,
+        avatar: data.avatar,
+        timezone: data.timezone,
+        before: data.reminderBeforeTask,
+        currency: data.currency,
+        theme: data.theme,
+      })
     );
     yield put(expandedMyselfLoading(false));
-   } catch (error) {
+  } catch (error) {
     yield put(expandedMyselfLoading(false));
     yield call(message.error, `Update Theme  Error Received: ${error}`);
-   }
+  }
 }
 
 function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
@@ -144,6 +145,6 @@ export default function* myselfSagas() {
       myselfActions.expandedMyselfUpdate.type,
       getExpandedMyself
     ),
-    yield takeLatest(myselfActions.themeUpdate.type, updateTheme)
+    yield takeLatest(myselfActions.themeUpdate.type, updateTheme),
   ]);
 }
