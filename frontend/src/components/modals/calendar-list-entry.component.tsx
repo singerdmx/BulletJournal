@@ -46,6 +46,7 @@ import {
 const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+const { Meta } = Card;
 
 type ModalProps = {
   projects: Project[];
@@ -213,13 +214,13 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
               }}
             />
           ) : (
-            <SyncOutlined
-              style={{ fontSize: '22px', color: '#2593FC' }}
-              onClick={(e) => {
-                handleWatchCalendar(e);
-              }}
-            />
-          )}
+              <SyncOutlined
+                style={{ fontSize: '22px', color: '#2593FC' }}
+                onClick={(e) => {
+                  handleWatchCalendar(e);
+                }}
+              />
+            )}
         </Tooltip>
       </div>
     );
@@ -252,13 +253,17 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     <Card
       key={calendar.id}
       onClick={(e) => handleOpen(e)}
+      hoverable
       className='card-style'
       style={{
-        backgroundColor: calendar.backgroundColor,
-        color: calendar.foregroundColor,
+        borderRadius: '15px'
       }}
     >
-      <span>{calendar.summary}</span>
+      <Card.Grid style={{ borderRadius: '15px', width: '85%' }}>
+        <Meta title={calendar.summary} description={watchedProject ? (`Synced with BuJo ${watchedProject!.name}`) : "Choose a BuJo to import calendar events"} />
+      </Card.Grid>
+      <Card.Grid style={{ backgroundColor: calendar.backgroundColor, borderRadius: '15px', width: '10%' }} />
+
       <Modal
         footer={false}
         destroyOnClose
@@ -268,7 +273,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
         onCancel={(e) => handleCancel(e)}
       >
         <div>
-          <Tabs defaultActiveKey='sync' tabPosition={'left'} type='card'>
+          <Tabs defaultActiveKey={watchedProject ? 'sync' : 'pull'} tabPosition={'left'} type='card'>
             {/* sync */}
             <TabPane
               key='sync'
@@ -297,10 +302,10 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                       </b>
                     </div>
                   ) : (
-                    <div>
-                      <b>{syncing ? 'Syncing...' : 'Choose a BuJo to sync'}</b>
-                    </div>
-                  )}
+                      <div>
+                        <b>{syncing ? 'Syncing...' : 'Choose a BuJo to sync'}</b>
+                      </div>
+                    )}
                 </div>
                 <div className='sync-tab-selections'>
                   {getProjectSelections()}
@@ -472,7 +477,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
           </Tabs>
         </div>
       </Modal>
-    </Card>
+    </Card >
   );
 };
 
