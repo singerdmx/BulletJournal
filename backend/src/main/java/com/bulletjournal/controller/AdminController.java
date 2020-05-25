@@ -1,8 +1,5 @@
 package com.bulletjournal.controller;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.SetRoleParams;
 import com.bulletjournal.exceptions.UnAuthorizedException;
@@ -13,6 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @RestController
 public class AdminController {

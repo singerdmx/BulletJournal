@@ -2,7 +2,10 @@ package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.AuditModel;
+import com.bulletjournal.repository.models.Note;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
