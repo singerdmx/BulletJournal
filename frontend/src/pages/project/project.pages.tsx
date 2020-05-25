@@ -4,7 +4,7 @@ import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner, User } from '../../features/group/interface';
-import {Avatar, Divider, Popconfirm, Popover, Tag, Tooltip, Collapse} from 'antd';
+import {Avatar, Popconfirm, Popover, Tag, Tooltip, Collapse} from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
 import {
@@ -452,7 +452,6 @@ class ProjectPage extends React.Component<
           {project.description.split('\n').map((s, key) => {
             return <p key={key}>{s}</p>;
           })}
-          <Divider style={{ marginTop: '8px' }} />
         </div>
       );
     }
