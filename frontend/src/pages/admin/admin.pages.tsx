@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
 
 import './admin.styles.less';
-import {Avatar, Button, Empty, Input, Select, Tooltip} from 'antd';
+import {Avatar, Button, Collapse, Empty, Input, Select, Tooltip} from 'antd';
 import {getUsersByRole, setRole} from '../../features/admin/actions';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {Role} from '../../features/admin/interface';
 import {User} from '../../features/group/interface';
 
+const {Panel} = Collapse;
 const {Option} = Select;
 
 type AdminProps = {
@@ -23,8 +24,10 @@ const AdminPage: React.FC<AdminProps> = (props) => {
 
     return (
         <div className='admin-page'>
-            <div className='user-role-control'>
-                <Tooltip title='Select Role'>
+            <Collapse defaultActiveKey={['userRoles', 'lockUsers']}>
+                <Panel header="User Roles" key="userRoles">
+                    <div className='user-role-control'>
+                        <Tooltip title='Select Role'>
                     <span>
                        <Select
                            className='role-dropdown'
@@ -42,49 +45,53 @@ const AdminPage: React.FC<AdminProps> = (props) => {
                         })}
                        </Select>
                     </span>
-                </Tooltip>
-                <Input
-                    allowClear={true}
-                    style={{width: '180px'}}
-                    value={username}
-                    placeholder='Username'
-                    onChange={(e: any) => {
-                        setUsername(e.target.value);
-                    }}
-                />
-                {' '}
-                <Button
-                    className='button'
-                    type='primary'
-                    onClick={() => {
-                        setRole(username, roleLevel);
-                    }}
-                >
-                    Set Role
-                </Button>
-                <Button
-                    className='button'
-                    type='primary'
-                    onClick={() => {
-                        getUsersByRole(roleLevel);
-                    }}
-                >
-                    Get Users by Role
-                </Button>
-            </div>
-            {usersByRole && usersByRole.length === 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/> : (
-                <div className='users-with-role'>
-                    {usersByRole.map((u) => {
-                        return (
-                            <span style={{marginBottom: '20px'}} key={u.name}>
+                        </Tooltip>
+                        <Input
+                            allowClear={true}
+                            style={{width: '180px'}}
+                            value={username}
+                            placeholder='Username'
+                            onChange={(e: any) => {
+                                setUsername(e.target.value);
+                            }}
+                        />
+                        {' '}
+                        <Button
+                            className='button'
+                            type='primary'
+                            onClick={() => {
+                                setRole(username, roleLevel);
+                            }}
+                        >
+                            Set Role
+                        </Button>
+                        <Button
+                            className='button'
+                            type='primary'
+                            onClick={() => {
+                                getUsersByRole(roleLevel);
+                            }}
+                        >
+                            Get Users by Role
+                        </Button>
+                    </div>
+                    {usersByRole && usersByRole.length === 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/> : (
+                        <div className='users-with-role'>
+                            {usersByRole.map((u) => {
+                                return (
+                                    <span style={{marginBottom: '20px'}} key={u.name}>
                                 <Avatar src={u.avatar}/>
-                                &nbsp;&nbsp;
-                                {u.name}
+                                        &nbsp;&nbsp;
+                                        {u.name}
                             </span>
-                        );
-                    })}
-                </div>
-            )}
+                                );
+                            })}
+                        </div>
+                    )}
+                </Panel>
+                <Panel header="Lock Users" key="lockUsers">
+                </Panel>
+            </Collapse>
         </div>
     );
 };
