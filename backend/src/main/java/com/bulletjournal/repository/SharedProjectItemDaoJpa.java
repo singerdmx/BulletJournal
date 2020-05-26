@@ -121,8 +121,8 @@ public class SharedProjectItemDaoJpa {
                 default:
                     throw new IllegalArgumentException();
             }
-            sharedProjectItem = this.sharedProjectItemsRepository.save(sharedProjectItem);
-            Event event = new Event(user, sharedProjectItem.getId(), projectItem.getName());
+            this.sharedProjectItemsRepository.save(sharedProjectItem);
+            Event event = new Event(user, projectItem.getId(), projectItem.getName());
             events.add(event);
         }
         return new ShareProjectItemEvent(events, requester, projectItem.getContentType());

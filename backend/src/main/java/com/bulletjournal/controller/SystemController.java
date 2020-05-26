@@ -177,7 +177,7 @@ public class SystemController {
             if (StringUtils.isBlank(originalUser)) {
                 throw new UnAuthorizedException("User not logged in");
             }
-            Long id = Long.parseLong(itemId.substring(4));
+            Long id = Long.parseLong(itemId.substring(4)); // both NOTE and TASK are 4 letters
             if (itemId.startsWith(ProjectItemType.TASK.name())) {
                 if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.TODO)
                         .stream().anyMatch(m -> m.getId().equals(id))) {
