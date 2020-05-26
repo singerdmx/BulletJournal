@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, Empty, Tooltip, Checkbox } from 'antd';
+import React, {useState} from 'react';
+import { Modal, Empty, Tooltip, Checkbox, message } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
@@ -12,6 +12,7 @@ import {
   CheckCircleTwoTone,
   DeleteTwoTone,
 } from '@ant-design/icons';
+import {call} from "redux-saga/effects";
 
 type TasksByAssigneeProps = {
   tasksByAssignee: Task[];
@@ -22,12 +23,27 @@ type TasksByAssigneeProps = {
 
 const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   const { visible, assignee, tasksByAssignee } = props;
+  const [checkboxVisible, setCheckboxVisible] = useState(false);
+  const [checked, setChecked] = useState([] as number[]);
+  const onCheck = (id : number) => {
+    if (checked.includes(id)) {
+      setChecked(checked.filter(c => c !== id));
+      return;
+    }
+
+    setChecked(checked.concat([id]));
+  };
 
   const getList = () => {
     return tasksByAssignee.map((task, index) => {
       return (
         <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-          <Checkbox key={task.id} style={{ marginRight: '0.5rem' }} />
+          {checkboxVisible && <Checkbox
+              checked={checked.includes(task.id)}
+              key={task.id}
+              style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
+              onChange={(e) => onCheck(task.id)}
+          />}
           <TaskItem
             task={task}
             isComplete={false}
@@ -41,13 +57,29 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
     });
   };
 
-  const selectAll = () => {};
+  const selectAll = () => {
+    setCheckboxVisible(true);
+    setChecked(tasksByAssignee.map((task) => task.id));
+  };
 
-  const clearAll = () => {};
+  const clearAll = () => {
+    setCheckboxVisible(true);
+    setChecked([]);
+  };
 
-  const completeAll = () => {};
+  const completeAll = () => {
+    if (checked.length === 0) {
+      message.error('No Selection');
+      return;
+    }
+  };
 
-  const deleteAll = () => {};
+  const deleteAll = () => {
+    if (checked.length === 0) {
+      message.error('No Selection');
+      return;
+    }
+  };
 
   return (
     <Modal
