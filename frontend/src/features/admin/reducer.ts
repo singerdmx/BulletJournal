@@ -8,7 +8,7 @@ export type setRoleAction = {
 };
 
 export type UserRolesAction = {
-  userRoles: User[];
+  usersByRole: User[];
 };
 
 export type GetUsersByRoleAction = {
@@ -16,7 +16,7 @@ export type GetUsersByRoleAction = {
 };
 
 let initialState = {
-  userRoles: [] as User[],
+  usersByRole: [] as User[],
 };
 
 const slice = createSlice({
@@ -25,8 +25,8 @@ const slice = createSlice({
   reducers: {
     setRole: (state, action: PayloadAction<setRoleAction>) => state,
     userRolesReceived: (state, action: PayloadAction<UserRolesAction>) => {
-      const { userRoles } = action.payload;
-      state.userRoles = userRoles;
+      const { usersByRole } = action.payload;
+      state.usersByRole = usersByRole;
     },
     getUsersByRole: (state, action: PayloadAction<GetUsersByRoleAction>) =>
       state,
