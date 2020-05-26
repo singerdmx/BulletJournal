@@ -51,7 +51,7 @@ public class AdminController {
     @GetMapping(USERS_ROUTE)
     public List<User> getUsersByRole(@RequestParam Role role) {
         validateRequester();
-        return this.userDaoJpa.getUserRoles(role).stream().map(u -> this.userClient.getUser(u.getName()))
+        return this.userDaoJpa.getUsersByRole(role).stream().map(u -> this.userClient.getUser(u.getName()))
                 .collect(Collectors.toList());
     }
 }

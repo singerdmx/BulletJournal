@@ -101,8 +101,8 @@ public class UserDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<User> getUserRoles(Role role) {
-        List<User> users = this.userRepository.getUserByRoles(role.getValue());
+    public List<User> getUsersByRole(Role role) {
+        List<User> users = this.userRepository.getUsersByRole(role.getValue());
         return users;
     }
 }
