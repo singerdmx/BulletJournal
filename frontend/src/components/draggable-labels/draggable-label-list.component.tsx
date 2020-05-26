@@ -19,7 +19,7 @@ import {
 } from 'react-beautiful-dnd';
 import { IState } from '../../store';
 import { ProjectItem } from '../../features/myBuJo/interface';
-import {Project} from "../../features/project/interface";
+import { Project } from '../../features/project/interface';
 
 type DraggableLabelsProps = {
   mode: ProjectType;
@@ -134,9 +134,9 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   };
 
   return (
-    <div className="note-labels">
+    <div className='note-labels'>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable" direction="horizontal">
+        <Droppable droppableId='droppable' direction='horizontal'>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -159,7 +159,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                       >
                         <Tag
                           key={label.id}
-                          className="labels"
+                          className='labels'
                           color={stringToRGB(label.value)}
                           closable={editable}
                           onClose={() => handleLabelDelete(label.id)}
@@ -187,10 +187,10 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
               {editable ? (
                 showAdd ? (
                   <Select
-                    mode="multiple"
+                    mode='multiple'
                     style={{ height: '70%', width: 100 }}
                     value={selectedLabels}
-                    size="small"
+                    size='small'
                     onBlur={handleSubmit}
                     onChange={handleChange}
                   >
@@ -207,7 +207,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                   </Select>
                 ) : (
                   <Tag
-                    className="site-tag-plus"
+                    className='site-tag-plus'
                     style={{ height: '70%' }}
                     onClick={() => setShowAdd(true)}
                   >
@@ -228,7 +228,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
 
 const mapStateToProps = (state: IState) => ({
   labelOptions: state.label.labelOptions,
-  project: state.project.project
+  project: state.project.project,
 });
 
 export default connect(mapStateToProps, {

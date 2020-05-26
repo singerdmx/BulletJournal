@@ -86,7 +86,8 @@ export const createTask = (
   dueDate?: string,
   dueTime?: string,
   duration?: number,
-  recurrenceRule?: string
+  recurrenceRule?: string,
+  labels?: number[]
 ) => {
   const postBody = JSON.stringify({
     name: name,
@@ -97,6 +98,7 @@ export const createTask = (
     reminderSetting: reminderSetting,
     recurrenceRule: recurrenceRule,
     timezone: timezone,
+    labels: labels,
   });
   return doPost(`/api/projects/${projectId}/tasks`, postBody)
     .then((res) => res.json())

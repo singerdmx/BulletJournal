@@ -46,6 +46,7 @@ export type CreateTask = {
   dueTime?: string;
   duration?: number;
   recurrenceRule?: string;
+  labels?: number[];
 };
 
 export type ContentsAction = {

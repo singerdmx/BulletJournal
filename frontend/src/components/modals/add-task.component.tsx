@@ -13,6 +13,7 @@ import {
   Popover,
   Button,
 } from 'antd';
+import { useParams } from 'react-router-dom';
 import {
   PlusOutlined,
   CheckSquareTwoTone,
@@ -29,9 +30,12 @@ import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
 import { convertToTextWithTime } from '../../features/recurrence/actions';
+import { labelsUpdate } from '../../features/label/actions';
 import { ReminderSetting } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
-import {Project} from "../../features/project/interface";
+import { Project } from '../../features/project/interface';
+import { Label } from '../../features/label/interface';
+import { getIcon } from '../draggable-labels/draggable-label-list.component';
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -65,10 +69,12 @@ interface TaskCreateFormProps {
     duration: number,
     reminderSetting: ReminderSetting,
     recurrenceRule: string,
-    timezone: string
+    timezone: string,
+    labels: number[]
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   convertToTextWithTime: (start: any, repeat: any, end: any) => string;
+  labelOptions: Label[];
   timezone: string;
   myself: string;
   before: number;
@@ -80,6 +86,7 @@ interface TaskCreateFormProps {
   rRuleString: any;
   addTaskVisible: boolean;
   updateTaskVisible: (addTaskVisible: boolean) => void;
+  labelsUpdate: (projectId: number | undefined) => void;
 }
 
 const AddTask: React.FC<
@@ -92,6 +99,17 @@ const AddTask: React.FC<
   const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
   const [recurrenceVisible, setRecurrenceVisible] = useState(false);
   const [remindButton, setRemindButton] = useState('remindBefore');
+  const { projectId } = useParams();
+
+  useEffect(() => {
+    if (projectId) {
+      console.log('insdie ');
+      props.labelsUpdate(parseInt(projectId));
+    }
+  }, []);
+
+  useEffect(() => {}, [props.labelOptions]);
+
   const addTask = (values: any) => {
     //convert time object to string
     let dueDate = values.dueDate
@@ -128,15 +146,16 @@ const AddTask: React.FC<
 
     if (props.project) {
       props.createTask(
-          props.project.id,
-          values.taskName,
-          assignees,
-          dueDate,
-          dueTime,
-          values.duration,
-          reminderSetting,
-          recurrence,
-          timezone
+        props.project.id,
+        values.taskName,
+        assignees,
+        dueDate,
+        dueTime,
+        values.duration,
+        reminderSetting,
+        recurrence,
+        timezone,
+        values.labels
       );
     }
     props.updateTaskVisible(false);
@@ -148,7 +167,12 @@ const AddTask: React.FC<
   const selectAll = () => {
     if (props.group) {
       form.setFields([
-        {name: 'assignees', value: props.group.users.filter(u => u.accepted).map((user) => user.name)},
+        {
+          name: 'assignees',
+          value: props.group.users
+            .filter((u) => u.accepted)
+            .map((user) => user.name),
+        },
       ]);
     }
   };
@@ -178,146 +202,147 @@ const AddTask: React.FC<
       return null;
     }
     return (
-        <Select
-            mode='multiple'
-            defaultValue={props.myself}
-            style={{ width: '100%' }}
-        >
-          {props.group.users.filter(u => u.accepted).map((user) => {
+      <Select
+        mode='multiple'
+        defaultValue={props.myself}
+        style={{ width: '100%' }}
+      >
+        {props.group.users
+          .filter((u) => u.accepted)
+          .map((user) => {
             return (
-                <Option value={user.name} key={user.name}>
-                  <Avatar size='small' src={user.avatar} />
-                  &nbsp;&nbsp; <strong>{user.alias}</strong>
-                </Option>
+              <Option value={user.name} key={user.name}>
+                <Avatar size='small' src={user.avatar} />
+                &nbsp;&nbsp; <strong>{user.alias}</strong>
+              </Option>
             );
           })}
-        </Select>
-    )
+      </Select>
+    );
   };
 
   const getModal = () => {
-    return <Modal
+    return (
+      <Modal
         title='Create New Task'
         visible={props.addTaskVisible}
         okText='Create'
         onCancel={onCancel}
         onOk={() => {
           form
-              .validateFields()
-              .then((values) => {
-                console.log(values);
-                form.resetFields();
-                addTask(values);
-              })
-              .catch((info) => console.log(info));
+            .validateFields()
+            .then((values) => {
+              console.log(values);
+              form.resetFields();
+              addTask(values);
+            })
+            .catch((info) => console.log(info));
         }}
-    >
-      <Form form={form} layout='vertical'>
-        {/* form for name */}
-        <Form.Item
+      >
+        <Form form={form} layout='vertical'>
+          {/* form for name */}
+          <Form.Item
             name='taskName'
             label='Name'
             rules={[{ required: true, message: 'Missing Task Name!' }]}
-        >
-          <Input placeholder='Enter Task Name' allowClear />
-        </Form.Item>
-        {/* form for Assignees */}
-        <Form.Item
+          >
+            <Input placeholder='Enter Task Name' allowClear />
+          </Form.Item>
+          {/* form for Assignees */}
+          <Form.Item
             name='assignees'
             label={
               <span>
-                  Assignees{' '}
+                Assignees{' '}
                 <Tooltip title='Select All'>
-                    <CheckSquareTwoTone
-                        onClick={selectAll}
-                        style={{ cursor: 'pointer' }}
-                    />
-                  </Tooltip>
-                  <Tooltip title='Clear All'>
-                    <CloseSquareTwoTone
-                        onClick={clearAll}
-                        style={{ cursor: 'pointer' }}
-                    />
-                  </Tooltip>
-                </span>
+                  <CheckSquareTwoTone
+                    onClick={selectAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Tooltip>
+                <Tooltip title='Clear All'>
+                  <CloseSquareTwoTone
+                    onClick={clearAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Tooltip>
+              </span>
             }
-        >
-          {getSelections()}
-        </Form.Item>
-        {/* due type */}
-        <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
-              Due&nbsp;&nbsp;
-            </span>
-        <Radio.Group
+          >
+            {getSelections()}
+          </Form.Item>
+          {/* due type */}
+          <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Due&nbsp;&nbsp;</span>
+          <Radio.Group
             defaultValue={'dueByTime'}
             onChange={(e) => setDueType(e.target.value)}
             buttonStyle='solid'
             style={{ marginBottom: 18 }}
-        >
-          <Radio.Button value={'dueByTime'}>Date (Time)</Radio.Button>
-          <Radio.Button
+          >
+            <Radio.Button value={'dueByTime'}>Date (Time)</Radio.Button>
+            <Radio.Button
               value={'dueByRec'}
               onClick={() => {
                 //force remind option to be before
                 setRemindButton('remindBefore');
                 setReminderType('remindBefore');
               }}
-          >
-            Recurrence
-          </Radio.Button>
-        </Radio.Group>
-        <div style={{ display: 'flex' }}>
-          <div style={{ display: 'flex', flex: 1 }}>
-            <Tooltip title='Select Due Date' placement='left'>
-              <Form.Item name='dueDate' style={{ width: '100%' }}>
-                <DatePicker
+            >
+              Recurrence
+            </Radio.Button>
+          </Radio.Group>
+          <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', flex: 1 }}>
+              <Tooltip title='Select Due Date' placement='left'>
+                <Form.Item name='dueDate' style={{ width: '100%' }}>
+                  <DatePicker
                     allowClear={true}
                     style={{ width: '100%' }}
                     placeholder='Due Date'
                     disabled={dueType !== 'dueByTime'}
                     onChange={(value) => setDueTimeVisible(value !== null)}
-                />
-              </Form.Item>
-            </Tooltip>
-            {dueTimeVisible && (
+                  />
+                </Form.Item>
+              </Tooltip>
+              {dueTimeVisible && (
                 <Tooltip title='Select Due Time' placement='right'>
                   <Form.Item name='dueTime' style={{ width: '210px' }}>
                     <TimePicker
-                        allowClear={true}
-                        format='HH:mm'
-                        placeholder='Due Time'
-                        disabled={dueType !== 'dueByTime'}
+                      allowClear={true}
+                      format='HH:mm'
+                      placeholder='Due Time'
+                      disabled={dueType !== 'dueByTime'}
                     />
                   </Form.Item>
                 </Tooltip>
-            )}
-          </div>
-          <Form.Item style={{ flex: 1 }}>
-            <Tooltip title={rRuleText} placement='bottom'>
-              <Popover
+              )}
+            </div>
+            <Form.Item style={{ flex: 1 }}>
+              <Tooltip title={rRuleText} placement='bottom'>
+                <Popover
                   content={<ReactRRuleGenerator />}
                   title={
                     <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: '0.5em',
-                        }}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '0.5em',
+                      }}
                     >
                       <div className='recurrence-title'>
                         <div>{rRuleTextList && rRuleTextList[0]}</div>
                         {rRuleTextList &&
-                        rRuleTextList.length > 1 &&
-                        rRuleTextList
+                          rRuleTextList.length > 1 &&
+                          rRuleTextList
                             .slice(1)
                             .map((text, index) => (
-                                <div key={index}>{text}</div>
+                              <div key={index}>{text}</div>
                             ))}
                       </div>
                       <Button
-                          onClick={() => setRecurrenceVisible(false)}
-                          type='primary'
+                        onClick={() => setRecurrenceVisible(false)}
+                        type='primary'
                       >
                         Done
                       </Button>
@@ -329,54 +354,51 @@ const AddTask: React.FC<
                   }}
                   trigger='click'
                   placement='top'
-              >
-                <Button type='default' disabled={dueType !== 'dueByRec'}>
-                  <p className='marquee'>{rRuleText}</p>
-                </Button>
-              </Popover>
-            </Tooltip>
-          </Form.Item>
-        </div>
-        <Form.Item
-            label='Time Zone and Duration'
-            style={{ marginBottom: 0 }}
-        >
-          <Tooltip title='Time Zone' placement='bottom'>
-            <Form.Item
+                >
+                  <Button type='default' disabled={dueType !== 'dueByRec'}>
+                    <p className='marquee'>{rRuleText}</p>
+                  </Button>
+                </Popover>
+              </Tooltip>
+            </Form.Item>
+          </div>
+          <Form.Item label='Time Zone and Duration' style={{ marginBottom: 0 }}>
+            <Tooltip title='Time Zone' placement='bottom'>
+              <Form.Item
                 name='timezone'
                 style={{ display: 'inline-block', width: '70%' }}
-            >
-              <Select
+              >
+                <Select
                   showSearch={true}
                   placeholder='Select Time Zone'
                   defaultValue={props.timezone ? props.timezone : ''}
-              >
-                {zones.map((zone: string, index: number) => (
+                >
+                  {zones.map((zone: string, index: number) => (
                     <Option key={zone} value={zone}>
                       <Tooltip title={zone} placement='right'>
                         {<span>{zone}</span>}
                       </Tooltip>
                     </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Tooltip>
-          <Form.Item
+                  ))}
+                </Select>
+              </Form.Item>
+            </Tooltip>
+            <Form.Item
               name='duration'
               rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Duration' }]}
               style={{ display: 'inline-block', width: '30%' }}
-          >
-            <AutoComplete placeholder='Duration' options={options}>
-              <Input suffix='Minutes' />
-            </AutoComplete>
+            >
+              <AutoComplete placeholder='Duration' options={options}>
+                <Input suffix='Minutes' />
+              </AutoComplete>
+            </Form.Item>
           </Form.Item>
-        </Form.Item>
 
-        {/* reminder */}
-        <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
-              Reminder&nbsp;&nbsp;
-            </span>
-        <Radio.Group
+          {/* reminder */}
+          <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+            Reminder&nbsp;&nbsp;
+          </span>
+          <Radio.Group
             value={remindButton}
             onChange={(e) => {
               setRemindButton(e.target.value);
@@ -384,36 +406,34 @@ const AddTask: React.FC<
             }}
             buttonStyle='solid'
             style={{ marginBottom: 18 }}
-        >
-          <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
-          <Radio.Button
+          >
+            <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
+            <Radio.Button
               value={'reminderDate'}
               disabled={dueType === 'dueByRec'}
-          >
-            Date (Time)
-          </Radio.Button>
-        </Radio.Group>
-        <div style={{ display: 'flex' }}>
-          <Form.Item name='remindBefore'>
-            <Select
+            >
+              Date (Time)
+            </Radio.Button>
+          </Radio.Group>
+          <div style={{ display: 'flex' }}>
+            <Form.Item name='remindBefore'>
+              <Select
                 defaultValue={ReminderBeforeTaskText[props.before]}
                 disabled={reminderType !== 'remindBefore'}
                 style={{ width: '180px' }}
                 placeholder='Reminder Before Task'
-            >
-              {ReminderBeforeTaskText.map(
-                  (before: string, index: number) => (
-                      <Option key={index} value={index}>
-                        {before}
-                      </Option>
-                  )
-              )}
-            </Select>
-          </Form.Item>
-          <div style={{ display: 'flex' }}>
-            <Tooltip title='Reminder Date' placement='bottom'>
-              <Form.Item name='reminderDate'>
-                <DatePicker
+              >
+                {ReminderBeforeTaskText.map((before: string, index: number) => (
+                  <Option key={index} value={index}>
+                    {before}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <div style={{ display: 'flex' }}>
+              <Tooltip title='Reminder Date' placement='bottom'>
+                <Form.Item name='reminderDate'>
+                  <DatePicker
                     placeholder='Date'
                     disabled={reminderType !== 'reminderDate'}
                     allowClear={true}
@@ -424,32 +444,54 @@ const AddTask: React.FC<
                         setReminderTimeVisible(true);
                       }
                     }}
-                />
-              </Form.Item>
-            </Tooltip>
-            {reminderTimeVisible && (
+                  />
+                </Form.Item>
+              </Tooltip>
+              {reminderTimeVisible && (
                 <Tooltip title='Reminder Time' placement='bottom'>
                   <Form.Item name='reminderTime' style={{ width: '100px' }}>
                     <TimePicker
-                        allowClear={true}
-                        format='HH:mm'
-                        placeholder='Time'
-                        disabled={reminderType !== 'reminderDate'}
+                      allowClear={true}
+                      format='HH:mm'
+                      placeholder='Time'
+                      disabled={reminderType !== 'reminderDate'}
                     />
                   </Form.Item>
                 </Tooltip>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </Form>
-    </Modal>
+
+          {/* label */}
+          <div>
+            <Form.Item name='labels' label='Labels'>
+              <Select mode='multiple'>
+                {props.labelOptions &&
+                  props.labelOptions.length &&
+                  props.labelOptions.map((l) => {
+                    return (
+                      <Option value={l.id} key={l.id}>
+                        {getIcon(l.icon)} &nbsp;{l.value}
+                      </Option>
+                    );
+                  })}
+              </Select>
+            </Form.Item>
+          </div>
+        </Form>
+      </Modal>
+    );
   };
 
   if (props.mode === 'button') {
-    return <div className='add-task'>
-      <Button type="primary" onClick={openModal}>Create New Task</Button>
-      {getModal()}
-    </div>;
+    return (
+      <div className='add-task'>
+        <Button type='primary' onClick={openModal}>
+          Create New Task
+        </Button>
+        {getModal()}
+      </div>
+    );
   }
 
   return (
@@ -479,6 +521,7 @@ const mapStateToProps = (state: IState) => ({
   end: state.rRule.end,
   rRuleString: state.rRule.rRuleString,
   addTaskVisible: state.task.addTaskVisible,
+  labelOptions: state.label.labelOptions,
 });
 
 export default connect(mapStateToProps, {
@@ -486,4 +529,5 @@ export default connect(mapStateToProps, {
   updateExpandedMyself,
   convertToTextWithTime,
   updateTaskVisible,
+  labelsUpdate,
 })(withRouter(AddTask));

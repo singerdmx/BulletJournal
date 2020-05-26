@@ -174,6 +174,7 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       reminderSetting,
       recurrenceRule,
       timezone,
+      labels,
     } = action.payload;
     yield call(
       createTask,
@@ -185,7 +186,8 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       dueDate,
       dueTime,
       duration,
-      recurrenceRule
+      recurrenceRule,
+      labels
     );
     yield put(updateTasks(projectId));
   } catch (error) {
@@ -440,11 +442,13 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
         })
       );
     }
-    const searchCompletedTasks = state.task.searchCompletedTasks.filter((t) => t.id !== taskId);
+    const searchCompletedTasks = state.task.searchCompletedTasks.filter(
+      (t) => t.id !== taskId
+    );
     yield put(
-        tasksActions.searchCompletedTasksReceived({
-          searchCompletedTasks: searchCompletedTasks,
-        })
+      tasksActions.searchCompletedTasksReceived({
+        searchCompletedTasks: searchCompletedTasks,
+      })
     );
   } catch (error) {
     yield call(message.error, `Uncomplete Task Error Received: ${error}`);
@@ -517,11 +521,13 @@ function* deleteCompletedTask(action: PayloadAction<CompleteTask>) {
     );
 
     const state: IState = yield select();
-    const searchCompletedTasks = state.task.searchCompletedTasks.filter((t) => t.id !== taskId);
+    const searchCompletedTasks = state.task.searchCompletedTasks.filter(
+      (t) => t.id !== taskId
+    );
     yield put(
-        tasksActions.searchCompletedTasksReceived({
-          searchCompletedTasks: searchCompletedTasks,
-        })
+      tasksActions.searchCompletedTasksReceived({
+        searchCompletedTasks: searchCompletedTasks,
+      })
     );
   } catch (error) {
     yield call(message.error, `Delete Completed Task Error Received: ${error}`);

@@ -21,6 +21,8 @@ public class CreateTaskParams {
 
     private List<String> assignees;
 
+    private List<Long> labels;
+
     @NotBlank
     @Size(min = 1, max = 100)
     private String timezone;
@@ -30,15 +32,9 @@ public class CreateTaskParams {
     public CreateTaskParams() {
     }
 
-    public CreateTaskParams(
-            @NotBlank @Size(min = 1, max = 100) String name,
-            String dueDate,
-            String dueTime,
-            Integer duration,
-            ReminderSetting reminderSetting,
-            List<String> assignees,
-            @NotBlank @Size(min = 1, max = 100) String timezone,
-            String recurrenceRule) {
+    public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name, String dueDate, String dueTime,
+            Integer duration, ReminderSetting reminderSetting, List<String> assignees,
+            @NotBlank @Size(min = 1, max = 100) String timezone, String recurrenceRule) {
         this.name = name;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -119,5 +115,13 @@ public class CreateTaskParams {
 
     public void setAssignees(List<String> assignees) {
         this.assignees = assignees;
+    }
+
+    public List<Long> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Long> labels) {
+        this.labels = labels;
     }
 }
