@@ -12,7 +12,6 @@ import {
   CheckCircleTwoTone,
   DeleteTwoTone,
 } from '@ant-design/icons';
-import {call} from "redux-saga/effects";
 
 type TasksByAssigneeProps = {
   tasksByAssignee: Task[];
@@ -68,6 +67,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   };
 
   const completeAll = () => {
+    setCheckboxVisible(true);
     if (checked.length === 0) {
       message.error('No Selection');
       return;
@@ -75,6 +75,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   };
 
   const deleteAll = () => {
+    setCheckboxVisible(true);
     if (checked.length === 0) {
       message.error('No Selection');
       return;
