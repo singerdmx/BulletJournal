@@ -48,7 +48,7 @@ const AdminPage: React.FC<AdminProps> = (props) => {
                         </Tooltip>
                         <Input
                             allowClear={true}
-                            style={{width: '180px'}}
+                            style={{width: '120px'}}
                             value={username}
                             placeholder='Username'
                             onChange={(e: any) => {
