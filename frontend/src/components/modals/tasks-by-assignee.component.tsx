@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, Empty, Tooltip, Checkbox} from 'antd';
+import { Modal, Empty, Tooltip, Checkbox } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
@@ -10,7 +10,7 @@ import {
   CheckSquareTwoTone,
   CloseSquareTwoTone,
   CheckCircleTwoTone,
-  DeleteTwoTone
+  DeleteTwoTone,
 } from '@ant-design/icons';
 
 type TasksByAssigneeProps = {
@@ -26,32 +26,28 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   const getList = () => {
     return tasksByAssignee.map((task, index) => {
       return (
-          <div key={index}>
-            {/*<Checkbox key={task.id}/>*/}
-              <TaskItem
-                  task={task}
-                  isComplete={false}
-                  readOnly={false}
-                  inModal={true}
-                  inProject={false}
-                  completeOnlyOccurrence={false}
-              />
-          </div>
+        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+          <Checkbox key={task.id} style={{ marginRight: '0.5rem' }} />
+          <TaskItem
+            task={task}
+            isComplete={false}
+            readOnly={false}
+            inModal={true}
+            inProject={false}
+            completeOnlyOccurrence={false}
+          />
+        </div>
       );
-    })
+    });
   };
 
-  const selectAll = () => {
-  };
+  const selectAll = () => {};
 
-  const clearAll = () => {
-  };
+  const clearAll = () => {};
 
-  const completeAll = () => {
-  };
+  const completeAll = () => {};
 
-  const deleteAll = () => {
-  };
+  const deleteAll = () => {};
 
   return (
     <Modal
@@ -63,33 +59,26 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
       {tasksByAssignee.length === 0 ? (
         <Empty />
       ) : (
-          <div>
-            <div className='checkbox-actions'>
-              <Tooltip title='Select All'>
-                <CheckSquareTwoTone
-                    onClick={selectAll}
-                />
-              </Tooltip>
-              <Tooltip title='Clear All'>
-                <CloseSquareTwoTone
-                    onClick={clearAll}
-                />
-              </Tooltip>
-              <Tooltip title='Complete All'>
-                <CheckCircleTwoTone
-                    twoToneColor='#52c41a'
-                    onClick={completeAll}
-                />
-              </Tooltip>
-              <Tooltip title='Delete All'>
-                <DeleteTwoTone
-                    twoToneColor='#f5222d'
-                    onClick={deleteAll}
-                />
-              </Tooltip>
-            </div>
-            <div>{getList()}</div>
+        <div>
+          <div className="checkbox-actions">
+            <Tooltip title="Select All">
+              <CheckSquareTwoTone onClick={selectAll} />
+            </Tooltip>
+            <Tooltip title="Clear All">
+              <CloseSquareTwoTone onClick={clearAll} />
+            </Tooltip>
+            <Tooltip title="Complete All">
+              <CheckCircleTwoTone
+                twoToneColor="#52c41a"
+                onClick={completeAll}
+              />
+            </Tooltip>
+            <Tooltip title="Delete All">
+              <DeleteTwoTone twoToneColor="#f5222d" onClick={deleteAll} />
+            </Tooltip>
           </div>
+          <div>{getList()}</div>
+        </div>
       )}
     </Modal>
   );
