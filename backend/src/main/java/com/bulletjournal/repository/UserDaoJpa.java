@@ -99,4 +99,10 @@ public class UserDaoJpa {
         user.setRole(role.getValue());
         this.userRepository.save(user);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<User> getUserRoles(Role role) {
+        List<User> users = this.userRepository.getUserByRoles(role.getValue());
+        return users;
+    }
 }

@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 
 import './admin.styles.less';
-import { Select, Button, Input } from 'antd';
-import { setRole } from '../../features/admin/actions';
+import { Select, Button, Input, Avatar } from 'antd';
+import { setRole, getUsersByRole } from '../../features/admin/actions';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { Role } from '../../features/admin/interface';
+import { User } from '../../features/group/interface';
 const { Option } = Select;
 
 type AdminProps = {
+  userRoles: User[];
   setRole: (username: string, role: Role) => void;
+  getUsersByRole: (role: Role) => void;
 };
 
 const AdminPage: React.FC<AdminProps> = (props) => {
-  const { setRole } = props;
+  const { setRole, userRoles, getUsersByRole } = props;
   const [username, setUsername] = useState('');
   const [roleLevel, setRoleLevel] = useState('BASIC' as Role);
 
@@ -45,6 +48,7 @@ const AdminPage: React.FC<AdminProps> = (props) => {
       </div>
       <div>
         <Button
+          className='button'
           type='primary'
           onClick={() => {
             setRole(username, roleLevel);
@@ -52,13 +56,39 @@ const AdminPage: React.FC<AdminProps> = (props) => {
         >
           set
         </Button>
+        <Button
+          className='button'
+          type='primary'
+          onClick={() => {
+            getUsersByRole(roleLevel);
+          }}
+        >
+          get
+        </Button>
       </div>
+      {userRoles && userRoles.length > 0 && (
+        <div>
+          <div>All users with selected Role</div>
+          {userRoles.map((u) => {
+            return (
+              <div style={{ marginBottom: '20px' }}>
+                <Avatar src={u.avatar} />
+                &nbsp;&nbsp;
+                {u.name}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
 
-const mapStateToProps = (state: IState) => ({});
+const mapStateToProps = (state: IState) => ({
+  userRoles: state.admin.userRoles,
+});
 
 export default connect(mapStateToProps, {
   setRole,
+  getUsersByRole,
 })(AdminPage);
