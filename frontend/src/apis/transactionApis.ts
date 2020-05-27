@@ -52,6 +52,7 @@ export const createTransaction = (
   transactionType: number,
   date: string,
   timezone: string,
+  labels?: number[],
   time?: string
 ) => {
   const postBody = JSON.stringify({
@@ -61,6 +62,7 @@ export const createTransaction = (
     transactionType: transactionType,
     date: date,
     time: time,
+    labels: labels,
     timezone: timezone,
   });
   return doPost(`/api/projects/${projectId}/transactions`, postBody)

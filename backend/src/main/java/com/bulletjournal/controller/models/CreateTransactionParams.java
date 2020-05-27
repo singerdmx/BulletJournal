@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,18 +31,14 @@ public class CreateTransactionParams {
     @NotNull
     private Integer transactionType;
 
+    private List<Long> labels;
+
     public CreateTransactionParams() {
     }
 
-
-    public CreateTransactionParams(
-            @NotBlank @Size(min = 1, max = 100) String name,
-            @NotBlank String payer,
-            @NotNull Double amount,
-            @NotBlank @Size(min = 10, max = 10) String date,
-            String time,
-            @NotBlank String timezone,
-            @NotNull Integer transactionType) {
+    public CreateTransactionParams(@NotBlank @Size(min = 1, max = 100) String name, @NotBlank String payer,
+            @NotNull Double amount, @NotBlank @Size(min = 10, max = 10) String date, String time,
+            @NotBlank String timezone, @NotNull Integer transactionType) {
         this.name = name;
         this.payer = payer;
         this.amount = amount;
@@ -104,5 +102,13 @@ public class CreateTransactionParams {
 
     public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public List<Long> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Long> labels) {
+        this.labels = labels;
     }
 }

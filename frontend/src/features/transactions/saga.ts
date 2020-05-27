@@ -89,6 +89,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       transactionType,
       date,
       timezone,
+      labels,
       time,
     } = action.payload;
     yield call(
@@ -100,6 +101,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       transactionType,
       date,
       timezone,
+      labels,
       time
     );
 
@@ -212,9 +214,13 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     });
     yield put(updateItemsByLabels(labelItems));
 
-    const transactionsByPayer = state.transaction.transactionsByPayer.filter(t => t.id !== transactionId);
+    const transactionsByPayer = state.transaction.transactionsByPayer.filter(
+      (t) => t.id !== transactionId
+    );
     yield put(
-        transactionsActions.transactionsByPayerReceived({transactionsByPayer: transactionsByPayer})
+      transactionsActions.transactionsByPayerReceived({
+        transactionsByPayer: transactionsByPayer,
+      })
     );
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);

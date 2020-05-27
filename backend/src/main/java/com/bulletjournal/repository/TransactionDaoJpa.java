@@ -59,7 +59,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Transaction> getTransactions(Long projectId,
-                                                                                 ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
+            ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
 
         return this.transactionRepository
@@ -121,6 +121,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setTime(createTransaction.getTime());
         transaction.setTimezone(createTransaction.getTimezone());
         transaction.setTransactionType(TransactionType.getType(createTransaction.getTransactionType()));
+        if (createTransaction.getLabels() != null && !createTransaction.getLabels().isEmpty()) {
+            transaction.setLabels(createTransaction.getLabels());
+        }
 
         String date = createTransaction.getDate();
         String time = createTransaction.getTime();
@@ -133,7 +136,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Transaction> getTransactionsByPayer(Long projectId,
-                                                                                        String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+            String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
             return Collections.emptyList();
@@ -150,7 +153,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Pair<List<Event>, Transaction> partialUpdate(String requester, Long transactionId,
-                                                        UpdateTransactionParams updateTransactionParams) {
+            UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
@@ -196,7 +199,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     private List<Event> updatePayer(String requester, Long transactionId,
-                                    UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+            UpdateTransactionParams updateTransactionParams, Transaction transaction) {
         List<Event> events = new ArrayList<>();
 
         if (!updateTransactionParams.hasPayer())
@@ -271,4 +274,3 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         return transactionRepository.findUniqueLabelsByProject(project.getId());
     }
 }
-

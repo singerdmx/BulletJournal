@@ -26,6 +26,7 @@ export const createTransaction = (
   date: string,
   transactionType: number,
   timezone: string,
+  labels: number[],
   time?: string
 ) =>
   actions.TransactionsCreate({
@@ -36,6 +37,7 @@ export const createTransaction = (
     date: date,
     transactionType: transactionType,
     timezone: timezone,
+    labels: labels,
     time: time,
   });
 export const getTransaction = (transactionId: number) =>

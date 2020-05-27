@@ -107,8 +107,6 @@ const AddTask: React.FC<
     }
   }, []);
 
-  useEffect(() => {}, [props.labelOptions]);
-
   const addTask = (values: any) => {
     //convert time object to string
     let dueDate = values.dueDate

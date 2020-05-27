@@ -63,6 +63,7 @@ export type CreateTransaction = {
   transactionType: number;
   date: string;
   timezone: string;
+  labels: number[];
   time?: string;
 };
 
