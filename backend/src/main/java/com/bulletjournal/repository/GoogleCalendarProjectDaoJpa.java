@@ -58,8 +58,8 @@ public class GoogleCalendarProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<CalendarWatchedProject> getAll() {
-        List<GoogleCalendarProject> calendarProjects = this.googleCalendarProjectRepository.findAll();
+    public List<CalendarWatchedProject> getByOwner(String owner) {
+        List<GoogleCalendarProject> calendarProjects = this.googleCalendarProjectRepository.findByOwner(owner);
 
         List<CalendarWatchedProject> calendarWatchedProjects = calendarProjects.stream().map(calendarProject ->
                 new CalendarWatchedProject(calendarProject.getId(), calendarProject.getProject().toPresentationModel()))

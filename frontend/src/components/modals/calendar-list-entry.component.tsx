@@ -12,6 +12,7 @@ import {
   Select,
   Tooltip,
   Tabs,
+  Badge,
 } from 'antd';
 import { iconMapper } from '../side-menu/side-menu.component';
 import AddProject from './add-project.component';
@@ -261,234 +262,236 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   };
 
   return (
-    <Card
-      key={calendar.id}
-      onClick={(e) => handleOpen(e)}
-      hoverable
-      className='card-style'
-      style={{
-        borderRadius: '15px'
-      }}
-    >
-      <Card.Grid style={{ borderRadius: '15px', width: '85%' }}>
-        <Meta title={calendar.summary} description={syncedBuJo ? (`Synced with BuJo ${syncedBuJo!.name}`) : "Choose a BuJo to import calendar events"} />
-      </Card.Grid>
-      <Card.Grid style={{ backgroundColor: calendar.backgroundColor, borderRadius: '15px', width: '10%' }} />
+    <div>
+      <Badge dot color={calendar.backgroundColor} offset={[4, 6]}>
+        <a href="#" className="head-example" />
+      </Badge>
 
-      <Modal
-        footer={false}
-        destroyOnClose
-        centered
-        title={`Sync Calendar "${calendar.summary}"`}
-        visible={visible}
-        onCancel={(e) => handleCancel(e)}
+      <Card
+        key={calendar.id}
+        onClick={(e) => handleOpen(e)}
+        hoverable
+        className='card-style'
+        style={{
+          borderRadius: '15px'
+        }}
       >
-        <div>
-          <Tabs defaultActiveKey={syncedBuJo ? 'sync' : 'pull'} tabPosition={'left'} type='card'>
-            {/* sync */}
-            <TabPane
-              key='sync'
-              tab={
-                <Tooltip title='Sync Calendar with BuJo' placement='left'>
-                  <RetweetOutlined className='large-icon' />
-                </Tooltip>
-              }
-            >
-              <div className='sync-tab'>
-                <div className='sync-tab-title'>
-                  {watchedProject ? (
-                    <div>
-                      <b>
-                        Synced with
+        <Meta title={calendar.summary} description={syncedBuJo ? (`Synced with BuJo ${syncedBuJo!.name}`) : "Choose a BuJo to import calendar events"} />
+        <Modal
+          footer={false}
+          destroyOnClose
+          centered
+          title={`Sync Calendar "${calendar.summary}"`}
+          visible={visible}
+          onCancel={(e) => handleCancel(e)}
+        >
+          <div>
+            <Tabs defaultActiveKey={syncedBuJo ? 'sync' : 'pull'} tabPosition={'left'} type='card'>
+              {/* sync */}
+              <TabPane
+                key='sync'
+                tab={
+                  <Tooltip title='Sync Calendar with BuJo' placement='left'>
+                    <RetweetOutlined className='large-icon' />
+                  </Tooltip>
+                }
+              >
+                <div className='sync-tab'>
+                  <div className='sync-tab-title'>
+                    {watchedProject ? (
+                      <div>
+                        <b>
+                          Synced with
                         <span
-                          onClick={handleOnclick}
-                          style={{ cursor: 'pointer', color: '#2593FC' }}
-                        >
-                          &nbsp;&nbsp;
+                            onClick={handleOnclick}
+                            style={{ cursor: 'pointer', color: '#2593FC' }}
+                          >
+                            &nbsp;&nbsp;
                           {iconMapper[watchedProject.projectType]}
                           &nbsp; <strong>{watchedProject!.name}</strong>
                           &nbsp; (Group{' '}
-                          <strong>{watchedProject!.group.name}</strong>)
+                            <strong>{watchedProject!.group.name}</strong>)
                         </span>
-                      </b>
-                    </div>
-                  ) : (
-                      <div>
-                        <b>{syncing ? 'Syncing...' : 'Choose a BuJo to sync'}</b>
+                        </b>
                       </div>
-                    )}
-                </div>
-                <div className='sync-tab-selections'>
-                  {getProjectSelections()}
-                  <div className='sync-tab-confirm'>{projectKeepInSync()}</div>
-                </div>
-              </div>
-            </TabPane>
-            {/* pull */}
-            <TabPane
-              key='pull'
-              tab={
-                <Tooltip title='Import Events from Calendar' placement='left'>
-                  <CloudDownloadOutlined className='large-icon' />
-                </Tooltip>
-              }
-            >
-              <Form form={form} labelAlign='left'>
-                <div className='pull-tab'>
-                  <div className='pull-tab-title'>
-                    <div>
-                      <b>Choose a BuJo to import</b>
-                    </div>
+                    ) : (
+                        <div>
+                          <b>{syncing ? 'Syncing...' : 'Choose a BuJo to sync'}</b>
+                        </div>
+                      )}
                   </div>
-                  <div className='pull-tab-selections'>
-                    {projects && projects[0] && (
-                      <Tooltip title='Choose BuJo' placement='topLeft'>
-                        <Select
-                          style={{ width: '85%' }}
-                          placeholder='Choose BuJo'
-                          value={importProjectId}
-                          onChange={(value: any) => {
-                            setImportProjectId(value);
-                          }}
-                        >
-                          {projects.map((project) => {
-                            return (
-                              <Option value={project.id} key={project.id}>
-                                <Tooltip
-                                  title={`${aliases[project.owner] ? aliases[project.owner] : project.owner}`}
-                                  placement='right'
-                                >
-                                  <span>
-                                    <Avatar
-                                      size='small'
-                                      src={project.ownerAvatar}
-                                    />
+                  <div className='sync-tab-selections'>
+                    {getProjectSelections()}
+                    <div className='sync-tab-confirm'>{projectKeepInSync()}</div>
+                  </div>
+                </div>
+              </TabPane>
+              {/* pull */}
+              <TabPane
+                key='pull'
+                tab={
+                  <Tooltip title='Import Events from Calendar' placement='left'>
+                    <CloudDownloadOutlined className='large-icon' />
+                  </Tooltip>
+                }
+              >
+                <Form form={form} labelAlign='left'>
+                  <div className='pull-tab'>
+                    <div className='pull-tab-title'>
+                      <div>
+                        <b>Choose a BuJo to import</b>
+                      </div>
+                    </div>
+                    <div className='pull-tab-selections'>
+                      {projects && projects[0] && (
+                        <Tooltip title='Choose BuJo' placement='topLeft'>
+                          <Select
+                            style={{ width: '85%' }}
+                            placeholder='Choose BuJo'
+                            value={importProjectId}
+                            onChange={(value: any) => {
+                              setImportProjectId(value);
+                            }}
+                          >
+                            {projects.map((project) => {
+                              return (
+                                <Option value={project.id} key={project.id}>
+                                  <Tooltip
+                                    title={`${aliases[project.owner] ? aliases[project.owner] : project.owner}`}
+                                    placement='right'
+                                  >
+                                    <span>
+                                      <Avatar
+                                        size='small'
+                                        src={project.ownerAvatar}
+                                      />
                                     &nbsp; {iconMapper[project.projectType]}
                                     &nbsp; <strong>{project.name}</strong>
                                     &nbsp; (Group{' '}
-                                    <strong>{project.group.name}</strong>)
+                                      <strong>{project.group.name}</strong>)
                                   </span>
-                                </Tooltip>
+                                  </Tooltip>
+                                </Option>
+                              );
+                            })}
+                          </Select>
+                        </Tooltip>
+                      )}
+                      <div className='pull-tab-selections-confirm'>
+                        {events.length > 0 ? (
+                          <Button
+                            type='primary'
+                            onClick={() => {
+                              form
+                                .validateFields()
+                                .then((values) => {
+                                  console.log(values);
+                                  importTask(events, importProjectId);
+                                })
+                                .catch((info) => console.log(info));
+                            }}
+                          >
+                            Import
+                          </Button>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className='pull-tab-date'>
+                      <Form.Item name='startEndDates'>
+                        <RangePicker
+                          ranges={{
+                            Today: [moment(), moment()],
+                            'This Week': [
+                              moment().startOf('week'),
+                              moment().endOf('week'),
+                            ],
+                            'This Month': [
+                              moment().startOf('month'),
+                              moment().endOf('month'),
+                            ],
+                          }}
+                          size='small'
+                          allowClear={true}
+                          format={dateFormat}
+                          placeholder={['Start Date', 'End Date']}
+                        />
+                      </Form.Item>
+                      <div className='pull-tab-date-button'>
+                        <Tooltip title='Pull'>
+                          <DownCircleFilled
+                            onClick={(e) => handlePullEvents(e)}
+                          />
+                        </Tooltip>
+                      </div>
+                    </div>
+                    <div className='pull-tab-eventList'>
+                      <span>
+                        Event&nbsp;&nbsp;
+                      <Tooltip title='Select All'>
+                          <CheckSquareTwoTone
+                            onClick={selectAll}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        </Tooltip>
+                        <Tooltip title='Clear All'>
+                          <CloseSquareTwoTone
+                            onClick={clearAll}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        </Tooltip>
+                      </span>
+                      <Select
+                        mode='multiple'
+                        style={{ width: '100%' }}
+                        value={events}
+                        onChange={(e: any) => {
+                          setEvents(e);
+                        }}
+                      >
+                        {eventList &&
+                          eventList.map((event, index) => {
+                            return (
+                              <Option value={event.eventId} key={index}>
+                                <div>
+                                  <div className='name-container'>
+                                    <div className='reminder'>
+                                      <Tooltip
+                                        title={getReminderSettingString(
+                                          event.task.reminderSetting
+                                        )}
+                                      >
+                                        <AlertOutlined />
+                                      </Tooltip>
+                                    </div>
+                                    <div className='name'>
+                                      <Tooltip
+                                        title={
+                                          event.content && event.content.text
+                                        }
+                                      >
+                                        <div>{event.task.name}</div>
+                                      </Tooltip>
+                                    </div>
+                                  </div>
+                                  <div className='time-container'>
+                                    <div className='due-time'>
+                                      {getDueDateTime(event.task)}
+                                    </div>
+                                  </div>
+                                </div>
                               </Option>
                             );
                           })}
-                        </Select>
-                      </Tooltip>
-                    )}
-                    <div className='pull-tab-selections-confirm'>
-                      {events.length > 0 ? (
-                        <Button
-                          type='primary'
-                          onClick={() => {
-                            form
-                              .validateFields()
-                              .then((values) => {
-                                console.log(values);
-                                importTask(events, importProjectId);
-                              })
-                              .catch((info) => console.log(info));
-                          }}
-                        >
-                          Import
-                        </Button>
-                      ) : null}
+                      </Select>
                     </div>
                   </div>
-                  <div className='pull-tab-date'>
-                    <Form.Item name='startEndDates'>
-                      <RangePicker
-                        ranges={{
-                          Today: [moment(), moment()],
-                          'This Week': [
-                            moment().startOf('week'),
-                            moment().endOf('week'),
-                          ],
-                          'This Month': [
-                            moment().startOf('month'),
-                            moment().endOf('month'),
-                          ],
-                        }}
-                        size='small'
-                        allowClear={true}
-                        format={dateFormat}
-                        placeholder={['Start Date', 'End Date']}
-                      />
-                    </Form.Item>
-                    <div className='pull-tab-date-button'>
-                      <Tooltip title='Pull'>
-                        <DownCircleFilled
-                          onClick={(e) => handlePullEvents(e)}
-                        />
-                      </Tooltip>
-                    </div>
-                  </div>
-                  <div className='pull-tab-eventList'>
-                    <span>
-                      Event&nbsp;&nbsp;
-                      <Tooltip title='Select All'>
-                        <CheckSquareTwoTone
-                          onClick={selectAll}
-                          style={{ cursor: 'pointer' }}
-                        />
-                      </Tooltip>
-                      <Tooltip title='Clear All'>
-                        <CloseSquareTwoTone
-                          onClick={clearAll}
-                          style={{ cursor: 'pointer' }}
-                        />
-                      </Tooltip>
-                    </span>
-                    <Select
-                      mode='multiple'
-                      style={{ width: '100%' }}
-                      value={events}
-                      onChange={(e: any) => {
-                        setEvents(e);
-                      }}
-                    >
-                      {eventList &&
-                        eventList.map((event, index) => {
-                          return (
-                            <Option value={event.eventId} key={index}>
-                              <div>
-                                <div className='name-container'>
-                                  <div className='reminder'>
-                                    <Tooltip
-                                      title={getReminderSettingString(
-                                        event.task.reminderSetting
-                                      )}
-                                    >
-                                      <AlertOutlined />
-                                    </Tooltip>
-                                  </div>
-                                  <div className='name'>
-                                    <Tooltip
-                                      title={
-                                        event.content && event.content.text
-                                      }
-                                    >
-                                      <div>{event.task.name}</div>
-                                    </Tooltip>
-                                  </div>
-                                </div>
-                                <div className='time-container'>
-                                  <div className='due-time'>
-                                    {getDueDateTime(event.task)}
-                                  </div>
-                                </div>
-                              </div>
-                            </Option>
-                          );
-                        })}
-                    </Select>
-                  </div>
-                </div>
-              </Form>
-            </TabPane>
-          </Tabs>
-        </div>
-      </Modal>
-    </Card>
+                </Form>
+              </TabPane>
+            </Tabs>
+          </div>
+        </Modal>
+      </Card>
+    </div>
   );
 };
 

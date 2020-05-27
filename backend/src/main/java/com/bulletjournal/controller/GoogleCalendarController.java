@@ -254,7 +254,8 @@ public class GoogleCalendarController {
 
     @GetMapping("/api/calendar/google/calendars/watchedProjects")
     public List<CalendarWatchedProject> getWatchedProjects() {
-        return this.googleCalendarProjectDaoJpa.getAll();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.googleCalendarProjectDaoJpa.getByOwner(username);
     }
 
     @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")

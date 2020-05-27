@@ -18,4 +18,6 @@ public interface GoogleCalendarProjectRepository extends JpaRepository<GoogleCal
     @Modifying
     @Transactional
     List<GoogleCalendarProject> getByExpirationBefore(Timestamp expiryTime);
+
+    List<GoogleCalendarProject> findByOwner(String owner);
 }
