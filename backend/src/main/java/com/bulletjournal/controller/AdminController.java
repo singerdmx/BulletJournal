@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.LockedUsersAndIPs;
 import com.bulletjournal.controller.models.SetRoleParams;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -26,6 +27,7 @@ import javax.validation.constraints.NotNull;
 public class AdminController {
     public static final String SET_ROLE_ROUTE = "/api/users/{username}/setRole";
     public static final String USERS_ROUTE = "/api/users";
+    public static final String LOCKED_USERS_ROUTE = "/api/lockedUsers";
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -53,5 +55,11 @@ public class AdminController {
         validateRequester();
         return this.userDaoJpa.getUsersByRole(role).stream().map(u -> this.userClient.getUser(u.getName()))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping(LOCKED_USERS_ROUTE)
+    public List<LockedUsersAndIPs> getLockedUsers() {
+        validateRequester();
+        return null;
     }
 }
