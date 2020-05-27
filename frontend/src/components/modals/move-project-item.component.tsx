@@ -72,7 +72,7 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
     let updateProjects = [] as Project[];
     updateProjects = flattenOwnedProject(props.ownedProjects, updateProjects);
     updateProjects = flattenSharedProject(props.sharedProjects, updateProjects);
-    updateProjects.filter((p) => {
+    updateProjects = updateProjects.filter((p) => {
       if (!props.project) {
         return true;
       }
