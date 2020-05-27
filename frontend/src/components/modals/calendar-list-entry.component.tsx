@@ -19,6 +19,7 @@ import { useHistory } from 'react-router-dom';
 import {
   CalendarListEntry,
   GoogleCalendarEvent,
+  CalendarWatchedProject,
 } from '../../features/calendarSync/interface';
 import {
   googleCalendarEventListReceived,
@@ -53,6 +54,7 @@ type ModalProps = {
   calendar: CalendarListEntry;
   aliases: any;
   watchedProject: Project | undefined;
+  watchedProjects: CalendarWatchedProject[];
   eventList: GoogleCalendarEvent[];
   syncing: boolean;
   updateWatchedProject: (calendarId: string) => void;
@@ -75,6 +77,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     calendar,
     aliases,
     watchedProject,
+    watchedProjects,
     projects,
     eventList,
     googleCalendarEventListReceived,
@@ -83,6 +86,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   } = props;
   const [visible, setVisible] = useState(false);
   const [isSync, setIsSync] = useState(false);
+  const [syncedBuJo, setSyncedBuJo] = useState(undefined as Project | undefined);
   const history = useHistory();
   const [form] = Form.useForm();
   const [projectId, setProjectId] = useState(-1);
@@ -116,6 +120,12 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     else setIsSync(false);
   }, [watchedProject]);
 
+  useEffect(() => {
+    watchedProjects.forEach((calendarWatchedProject: CalendarWatchedProject) => {
+      if (calendar.id === calendarWatchedProject.calendarId) setSyncedBuJo(calendarWatchedProject.project);
+    });
+  }, [watchedProjects])
+
   const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
     calendar && calendar.id && props.updateWatchedProject(calendar.id);
@@ -140,6 +150,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   ) => {
     e.stopPropagation();
     props.unwatchCalendar(calendar.id);
+    setSyncedBuJo(undefined);
   };
 
   const handlePullEvents = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -260,7 +271,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
       }}
     >
       <Card.Grid style={{ borderRadius: '15px', width: '85%' }}>
-        <Meta title={calendar.summary} description={watchedProject ? (`Synced with BuJo ${watchedProject!.name}`) : "Choose a BuJo to import calendar events"} />
+        <Meta title={calendar.summary} description={syncedBuJo ? (`Synced with BuJo ${syncedBuJo!.name}`) : "Choose a BuJo to import calendar events"} />
       </Card.Grid>
       <Card.Grid style={{ backgroundColor: calendar.backgroundColor, borderRadius: '15px', width: '10%' }} />
 
@@ -273,7 +284,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
         onCancel={(e) => handleCancel(e)}
       >
         <div>
-          <Tabs defaultActiveKey={watchedProject ? 'sync' : 'pull'} tabPosition={'left'} type='card'>
+          <Tabs defaultActiveKey={syncedBuJo ? 'sync' : 'pull'} tabPosition={'left'} type='card'>
             {/* sync */}
             <TabPane
               key='sync'
@@ -477,12 +488,13 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
           </Tabs>
         </div>
       </Modal>
-    </Card >
+    </Card>
   );
 };
 
 const mapStateToProps = (state: IState) => ({
   watchedProject: state.calendarSync.watchedProject,
+  watchedProjects: state.calendarSync.watchedProjects,
   eventList: state.calendarSync.googleCalendarEventList,
   syncing: state.calendarSync.syncing,
   aliases: state.system.aliases

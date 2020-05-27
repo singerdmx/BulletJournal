@@ -74,6 +74,16 @@ export const getWatchedProject = (calendarId: string) => {
     });
 };
 
+export const getWatchedProjects = () => {
+  return doFetch(
+    '/api/calendar/google/calendars/watchedProjects'
+  )
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};
+
 export const watchCalendar = (calendarId: string, projectId: number) => {
   const postBody = JSON.stringify({
     projectId: projectId,

@@ -252,6 +252,11 @@ public class GoogleCalendarController {
         }
     }
 
+    @GetMapping("/api/calendar/google/calendars/watchedProjects")
+    public List<CalendarWatchedProject> getWatchedProjects() {
+        return this.googleCalendarProjectDaoJpa.getAll();
+    }
+
     @PostMapping("/api/calendar/google/calendars/{calendarId}/unwatch")
     public Project unwatchCalendar(@NotNull @PathVariable String calendarId) throws IOException {
         GoogleCalendarProject googleCalendarProject = this.googleCalendarProjectDaoJpa.get(calendarId);

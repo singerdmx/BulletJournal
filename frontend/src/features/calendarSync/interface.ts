@@ -1,5 +1,6 @@
-import {Task} from "../tasks/interface";
-import {Content} from "../myBuJo/interface";
+import { Task } from "../tasks/interface";
+import { Content } from "../myBuJo/interface";
+import { Project } from '../project/interface';
 
 export interface LoginStatus {
     loggedIn: boolean;
@@ -15,6 +16,11 @@ export interface CalendarListEntry {
     timeZone: string;
     primary: boolean;
     selected: boolean;
+}
+
+export interface CalendarWatchedProject {
+    calendarId: string;
+    project: Project;
 }
 
 export interface GoogleCalendarEvent {

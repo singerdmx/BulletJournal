@@ -17,6 +17,7 @@ import {
   getGoogleCalendarList,
   getGoogleCalendarLoginStatus,
   getWatchedProject,
+  getWatchedProjects,
   unwatchCalendar,
   watchCalendar,
   importEventsToProject as importEventsApi,
@@ -25,6 +26,7 @@ import {
   CalendarListEntry,
   LoginStatus,
   GoogleCalendarEvent,
+  CalendarWatchedProject,
 } from './interface';
 import { Project } from '../project/interface';
 import { IState } from '../../store';
@@ -49,6 +51,12 @@ function* googleTokenExpirationTimeUpdate(
       yield put(
         calendarSyncActions.googleCalendarListReceived({
           calendarList: calendarList,
+        })
+      );
+      const projects: CalendarWatchedProject[] = yield call(getWatchedProjects);
+      yield put(
+        calendarSyncActions.watchedProjectsReceived({
+          projects: projects
         })
       );
     }
@@ -130,6 +138,13 @@ function* watchCalendarChannel(action: PayloadAction<WatchedCalendarAction>) {
     const project: Project = yield call(watchCalendar, calendarId, projectId);
 
     yield put(calendarSyncActions.watchedProjectReceived({ project: project }));
+
+    const projects: CalendarWatchedProject[] = yield call(getWatchedProjects);
+    yield put(
+      calendarSyncActions.watchedProjectsReceived({
+        projects: projects
+      })
+    );
   } catch (error) {
     yield call(message.error, `watchCalendarChannel Error Received: ${error}`);
   }
@@ -144,6 +159,13 @@ function* unwatchCalendarChannel(
     yield call(unwatchCalendar, calendarId);
     yield put(
       calendarSyncActions.watchedProjectReceived({ project: undefined })
+    );
+
+    const projects: CalendarWatchedProject[] = yield call(getWatchedProjects);
+    yield put(
+      calendarSyncActions.watchedProjectsReceived({
+        projects: projects
+      })
     );
   } catch (error) {
     yield call(message.error, `watchCalendarChannel Error Received: ${error}`);

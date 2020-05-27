@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.calendars.google.CalendarWatchedProject;
 import com.bulletjournal.calendars.google.Util;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.controller.models.ProjectType;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Repository
 public class GoogleCalendarProjectDaoJpa {
@@ -53,6 +55,17 @@ public class GoogleCalendarProjectDaoJpa {
         GoogleCalendarProject calendarProject = this.googleCalendarProjectRepository.findById(calendarId)
                 .orElseThrow(() -> new ResourceNotFoundException("Calendar " + calendarId + " not found"));
         return calendarProject;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<CalendarWatchedProject> getAll() {
+        List<GoogleCalendarProject> calendarProjects = this.googleCalendarProjectRepository.findAll();
+
+        List<CalendarWatchedProject> calendarWatchedProjects = calendarProjects.stream().map(calendarProject ->
+                new CalendarWatchedProject(calendarProject.getId(), calendarProject.getProject().toPresentationModel()))
+                .collect(Collectors.toList());
+
+        return calendarWatchedProjects;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

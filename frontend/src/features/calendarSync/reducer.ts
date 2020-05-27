@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { CalendarListEntry, GoogleCalendarEvent } from './interface';
+import { CalendarListEntry, GoogleCalendarEvent, CalendarWatchedProject } from './interface';
 import { Project } from '../project/interface';
 
 export type ExpirationTimeAction = {
@@ -43,6 +43,10 @@ export type WatchedProjectAction = {
   project: Project | undefined;
 };
 
+export type WatchedProjectsAction = {
+  projects: CalendarWatchedProject[];
+};
+
 export type UpdateExpirationTimeAction = {};
 
 export type ImportEventsToProjectAction = {
@@ -59,6 +63,7 @@ let initialState = {
   googleCalendarList: [] as CalendarListEntry[],
   googleCalendarEventList: [] as GoogleCalendarEvent[],
   watchedProject: undefined as Project | undefined,
+  watchedProjects: [] as CalendarWatchedProject[],
   syncing: false as boolean,
 };
 
@@ -97,6 +102,13 @@ const slice = createSlice({
     ) => {
       const { project } = action.payload;
       state.watchedProject = project;
+    },
+    watchedProjectsReceived: (
+      state,
+      action: PayloadAction<WatchedProjectsAction>
+    ) => {
+      const { projects } = action.payload;
+      state.watchedProjects = projects;
     },
     googleTokenExpirationTimeUpdate: (
       state,
