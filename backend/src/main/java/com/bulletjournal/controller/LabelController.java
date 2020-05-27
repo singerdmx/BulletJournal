@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -66,14 +64,19 @@ public class LabelController {
     @GetMapping(LABELS_ROUTE)
     public ResponseEntity<List<Label>> getLabels(@RequestParam(name = "projectId", required = false) Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Label> labels = this.labelDaoJpa.getLabels(username).stream().map(label -> label.toPresentationModel())
-                .collect(Collectors.toList());
+        final Set<String> projectLabelValues = new HashSet<>();
+        List<Label> labelsForProject = Collections.emptyList();
         if (projectId != null) {
-            List<Label> labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
+            labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
             if (labelsForProject != null) {
-                labels.addAll(labelsForProject);
+                labelsForProject.forEach(l -> projectLabelValues.add(l.getValue()));
             }
         }
+        List<Label> labels = this.labelDaoJpa.getLabels(username).stream()
+                .map(label -> label.toPresentationModel())
+                .filter(label -> !projectLabelValues.contains(label.getValue())) // label in project take precedence
+                .collect(Collectors.toList());
+        labels.addAll(labelsForProject);
         labels = new ArrayList<>(new HashSet<>(labels));
         String labelsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, labels);
