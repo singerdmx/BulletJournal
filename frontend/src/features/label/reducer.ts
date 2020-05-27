@@ -71,37 +71,51 @@ const slice = createSlice({
       if (etag && etag.length > 0) {
         state.etag = etag;
       }
+
       const labelOptions = [...labels];
-      state.labelsSelected.forEach(label => {
+
+      state.labelsSelected.forEach((label) => {
         if (!labelOptions.includes(label)) {
           labelOptions.unshift(label);
         }
       });
-      state.labelOptions = labelOptions;
+      let s = new Set();
+      let array = [] as Label[];
+      labelOptions.forEach((l) => {
+        if (!s.has(l.id)) {
+          array.unshift(l);
+          s.add(l.id);
+        }
+      });
+      state.labelOptions = array;
+
+      s = new Set();
+      array = [] as Label[];
+      state.labelsSelected.forEach((l) => {
+        if (!s.has(l.id)) {
+          array.unshift(l);
+          s.add(l.id);
+        }
+      });
+
+      state.labelsSelected = array;
     },
-    projectLabelsReceived: (state, action: PayloadAction<ProjectLabelsAction>) => {
+    projectLabelsReceived: (
+      state,
+      action: PayloadAction<ProjectLabelsAction>
+    ) => {
       const { labels } = action.payload;
       state.projectLabels = labels;
     },
     setSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
       const { label } = action.payload;
-      state.labelsSelected = [label];
-    },
-    removeSelectedLabel: (
-      state,
-      action: PayloadAction<SelectedLabelAction>
-    ) => {
-      const { label } = action.payload;
-      const selectedLabel = state.labelsSelected.filter(
-        l => l.value === label.value
-      )[0];
-      state.labelOptions.unshift(selectedLabel);
-      state.labelsSelected = state.labelsSelected.filter(
-        l => l.value !== label.value
-      );
+      const array = [] as Label[];
+      array.unshift(label);
+      state.labelsSelected = array;
     },
     labelsUpdate: (state, action: PayloadAction<UpdateLabels>) => state,
-    projectLabelsUpdate: (state, action: PayloadAction<UpdateProjectLabels>) => state,
+    projectLabelsUpdate: (state, action: PayloadAction<UpdateProjectLabels>) =>
+      state,
     labelsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) =>
       state,
     createLabel: (state, action: PayloadAction<LabelCreateAction>) => state,
@@ -115,8 +129,8 @@ const slice = createSlice({
     ) => {
       const { items } = action.payload;
       state.items = items;
-    }
-  }
+    },
+  },
 });
 
 export const reducer = slice.reducer;
