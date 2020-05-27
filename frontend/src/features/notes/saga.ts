@@ -180,8 +180,8 @@ function* getNotesByOrder(action: PayloadAction<GetNotesByOrder>) {
 
 function* noteCreate(action: PayloadAction<CreateNote>) {
   try {
-    const { projectId, name } = action.payload;
-    yield call(createNote, projectId, name);
+    const { projectId, name, labels } = action.payload;
+    yield call(createNote, projectId, name, labels);
     yield put(updateNotes(projectId));
   } catch (error) {
     yield call(message.error, `Note Error Received: ${error}`);

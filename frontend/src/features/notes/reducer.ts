@@ -30,6 +30,7 @@ export type updateVisibleAction = {
 export type CreateNote = {
   projectId: number;
   name: string;
+  labels?: number[];
 };
 
 export type CreateContent = {

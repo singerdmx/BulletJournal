@@ -103,7 +103,6 @@ const AddTask: React.FC<
 
   useEffect(() => {
     if (projectId) {
-      console.log('insdie ');
       props.labelsUpdate(parseInt(projectId));
     }
   }, []);

@@ -1,6 +1,7 @@
 import { actions } from './reducer';
 import { Note } from './interface';
 import { History } from 'history';
+import { Label } from '../label/interface';
 
 export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });
@@ -16,8 +17,8 @@ export const updateNoteContentRevision = (
     contentId: contentId,
     revisionId: revisionId,
   });
-export const createNote = (projectId: number, name: string) =>
-  actions.NotesCreate({ projectId: projectId, name: name });
+export const createNote = (projectId: number, name: string, labels: number[]) =>
+  actions.NotesCreate({ projectId: projectId, name: name, labels: labels });
 export const createContent = (noteId: number, text: string) =>
   actions.NoteContentCreate({ noteId: noteId, text: text });
 export const getNote = (noteId: number) => actions.NoteGet({ noteId: noteId });

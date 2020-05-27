@@ -39,9 +39,14 @@ export const deleteNoteById = (noteId: number) => {
     });
 };
 
-export const createNote = (projectId: number, name: string) => {
+export const createNote = (
+  projectId: number,
+  name: string,
+  labels?: number[]
+) => {
   const postBody = JSON.stringify({
     name: name,
+    labels: labels,
   });
   return doPost(`/api/projects/${projectId}/notes`, postBody)
     .then((res) => res.json())
