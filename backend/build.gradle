@@ -55,6 +55,9 @@ dependencies {
     compile group: 'com.google.apis', name: 'google-api-services-calendar', version: 'v3-rev411-1.25.0'
     compile group: 'com.google.api-client', name: 'google-api-client-gson', version: '1.30.9'
     compile group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.10.0'
+    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
+    compile group: 'org.springframework', name: 'spring-aop', version: '5.2.5.RELEASE'
+
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'

@@ -2,7 +2,9 @@ package com.bulletjournal.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 
+@EnableRetry
 @Configuration
 @ConfigurationProperties(prefix = "revision")
 public class ContentRevisionConfig {

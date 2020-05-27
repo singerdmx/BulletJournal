@@ -33,6 +33,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +93,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      *         model tasks with labels
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Retryable(
+            value = { Exception.class },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100))
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
