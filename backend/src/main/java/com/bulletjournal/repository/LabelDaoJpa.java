@@ -196,6 +196,10 @@ public class LabelDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItem> List<T> getLabelsForProjectItemList(List<T> projectItems) {
+        if (projectItems == null || projectItems.isEmpty()) {
+            return projectItems;
+        }
+
         Set<Long> labelIds = new HashSet<>();
         projectItems.forEach(item -> labelIds.addAll(item.getLabels().stream().map(l -> l.getId()).collect(Collectors.toList())));
 
@@ -209,6 +213,9 @@ public class LabelDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     protected List<com.bulletjournal.controller.models.Label> getLabels(
             final List<Long> labels) {
+        if (labels == null || labels.isEmpty()) {
+            return Collections.emptyList();
+        }
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
         if (labels != null && !labels.isEmpty()) {
             labelsForPresentation = this.labelRepository.findAllById(labels).stream()
