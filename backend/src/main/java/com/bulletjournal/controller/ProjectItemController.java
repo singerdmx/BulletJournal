@@ -7,7 +7,10 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
-import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.ProjectItemModel;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.repository.models.User;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,9 +141,7 @@ public class ProjectItemController {
         Timestamp startTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(startDate, null, timezone).toInstant());
         Timestamp endTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(endDate, null, timezone).toInstant());
         final List<ProjectItem> projectItems = new LinkedList<>();
-
-        types.forEach(type -> addToProjectItems(
-                projectItems, type, this.daos.get(type).getRecentProjectItemsBetween(startTime, endTime)));
+        types.forEach(type -> addRecentProjectItems(startTime, endTime, projectItems, type));
 
         this.labelDaoJpa.getLabelsForProjectItemList(projectItems);
         projectItems.sort((t1, t2) -> t2.getUpdatedAt().compareTo(t1.getUpdatedAt()));
@@ -148,8 +149,10 @@ public class ProjectItemController {
         return projectItems;
     }
 
-    private <T extends ProjectItemModel> void addToProjectItems(
-            List<ProjectItem> projectItems, final ProjectType projectType, final List<T> items) {
+    private <T extends ProjectItemModel> void addRecentProjectItems(
+            Timestamp startTime, Timestamp endTime,
+            List<ProjectItem> projectItems, final ProjectType projectType) {
+        final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime);
         projectItems.addAll(items.stream()
                 .map(t -> t.toPresentationModel(getAliases(projectType, items)))
                 .collect(Collectors.toList()));
