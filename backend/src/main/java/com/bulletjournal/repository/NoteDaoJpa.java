@@ -276,4 +276,16 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     List<Long> findItemLabelsByProject(Project project) {
         return noteRepository.findUniqueLabelsByProject(project.getId());
     }
+
+    @Override
+    List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
+        List<ProjectItemModel> result = new ArrayList<>();
+        result.addAll(this.noteRepository.findRecentNotesBetween(startTime, endTime));
+        return result;
+    }
+
+    @Override
+    List<NoteContent> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime) {
+        return this.noteContentRepository.findRecentNoteContentsBetween(startTime, endTime);
+    }
 }

@@ -278,28 +278,19 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 .collect(Collectors.toList());
     }
 
+    abstract List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime);
+
+    abstract List<K> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime);
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> List<ProjectItemModel> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, ProjectType type) {
         Map<Long, ProjectItemModel> projectItemIdMap = new HashMap<>();
         List<ProjectItemModel> projectItemModels = new LinkedList<>();
         List<ContentModel> projectItemContentModels = new LinkedList<>();
-        switch (type) {
-            case TODO:
-                projectItemModels.addAll(this.taskRepository.findRecentTasksBetween(startTime, endTime));
-                projectItemContentModels.addAll(this.taskContentRepository.findRecentTaskContentsBetween(startTime, endTime));
-                break;
-            case NOTE:
-                projectItemModels.addAll(this.noteRepository.findRecentNotesBetween(startTime, endTime));
-                projectItemContentModels.addAll(this.noteContentRepository.findRecentNoteContentsBetween(startTime, endTime));
-                break;
-            case LEDGER:
-                projectItemModels.addAll(this.transactionRepository.findRecentTransactionsBetween(startTime, endTime));
-                projectItemContentModels.addAll(this.transactionContentRepository.findRecentTransactionContentsBetween(startTime, endTime));
-                break;
-            default:
-                throw new IllegalArgumentException();
 
-        }
+        projectItemModels.addAll(this.findRecentProjectItemsBetween(startTime, endTime));
+        projectItemContentModels.addAll(this.findRecentProjectItemContentsBetween(startTime, endTime));
+
         projectItemModels.forEach(pi -> projectItemIdMap.put(pi.getId(), pi));
         projectItemContentModels
                 .forEach(projectItemContent -> {

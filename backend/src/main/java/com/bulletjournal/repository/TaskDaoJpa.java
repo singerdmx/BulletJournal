@@ -128,7 +128,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasksByAssignee(Long projectId, String requester,
-            String assignee) {
+                                                                             String assignee) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
             return Collections.emptyList();
@@ -144,7 +144,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getTasksByOrder(Long projectId, String requester,
-            String startDate, String endDate, String timezone) {
+                                                                          String startDate, String endDate, String timezone) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
             return Collections.emptyList();
@@ -177,7 +177,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return com.bulletjournal.controller.models.Task - task instance with labels
      */
     private com.bulletjournal.controller.models.Task addLabels(com.bulletjournal.controller.models.Task task,
-            Map<Long, Task> tasksMap) {
+                                                               Map<Long, Task> tasksMap) {
         List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(tasksMap.get(task.getId()));
         task.setLabels(labels);
         for (com.bulletjournal.controller.models.Task subTask : task.getSubTasks()) {
@@ -281,7 +281,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(final String assignee,
-            final ZonedDateTime now) {
+                                                                                        final ZonedDateTime now) {
         ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
         return this.getRecurringTasks(assignee, now, maxRemindingTime).stream()
                 .filter(t -> t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now))
@@ -430,7 +430,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     private ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
-            String recurrenceRule, ReminderSetting reminderSetting) {
+                                               String recurrenceRule, ReminderSetting reminderSetting) {
         if (dueDate != null) {
             task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(dueDate, time, timezone).toInstant()));
             task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(dueDate, time, timezone).toInstant()));
@@ -460,7 +460,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams,
-            List<UpdateTaskAssigneeEvent> events) {
+                              List<UpdateTaskAssigneeEvent> events) {
 
         Task task = this.getProjectItem(taskId, requester);
 
@@ -519,7 +519,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<Event> - a list of events for users notification
      */
     private List<UpdateTaskAssigneeEvent> updateAssignees(String requester, UpdateTaskParams updateTaskParams,
-            Task task, List<UpdateTaskAssigneeEvent> events) {
+                                                          Task task, List<UpdateTaskAssigneeEvent> events) {
         if (updateTaskParams.getAssignees() == null) {
             return events;
         }
@@ -667,7 +667,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @retVal Project
      */
     private Project deleteTaskAndAdjustRelations(String requester, Task task, Consumer<List<Task>> targetTasksOperator,
-            Consumer<HierarchyItem> targetOperator) {
+                                                 Consumer<HierarchyItem> targetOperator) {
         Project project = task.getProject();
         Long projectId = project.getId();
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
@@ -757,7 +757,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> getCompletedTasksBetween(Long projectId, String assignee, String requester,
-            String startDate, String endDate, String timezone) {
+                                                        String startDate, String endDate, String timezone) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
@@ -889,5 +889,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Timestamp latestContentTime = contents.get(0).getUpdatedAt();
 
         return latestContentTime.getTime() - task.getUpdatedAt().getTime() > 30000;
+    }
+    @Override
+    List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
+        List<ProjectItemModel> result = new ArrayList<>();
+        result.addAll(this.taskRepository.findRecentTasksBetween(startTime, endTime));
+        return result;
+    }
+
+    @Override
+    List<TaskContent> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime) {
+        return this.taskContentRepository.findRecentTaskContentsBetween(startTime, endTime);
     }
 }

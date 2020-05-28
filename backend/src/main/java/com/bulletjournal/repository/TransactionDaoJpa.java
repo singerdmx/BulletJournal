@@ -273,4 +273,16 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     List<Long> findItemLabelsByProject(Project project) {
         return transactionRepository.findUniqueLabelsByProject(project.getId());
     }
+
+    @Override
+    List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
+        List<ProjectItemModel> result = new ArrayList<>();
+        result.addAll(this.transactionRepository.findRecentTransactionsBetween(startTime, endTime));
+        return result;
+    }
+
+    @Override
+    List<TransactionContent> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime) {
+        return this.transactionContentRepository.findRecentTransactionContentsBetween(startTime, endTime);
+    }
 }
