@@ -4,15 +4,16 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 
 import javax.persistence.*;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class is for ProjectType.NOTE
  */
 @Entity
 @Table(name = "notes")
-public class Note extends ProjectItemModel {
+public class Note extends ProjectItemModel<com.bulletjournal.controller.models.Note> {
     @Id
     @GeneratedValue(generator = "note_generator")
     @SequenceGenerator(
@@ -30,12 +31,16 @@ public class Note extends ProjectItemModel {
         this.id = id;
     }
 
-    public com.bulletjournal.controller.models.Note toPresentationModel() {
-        return toPresentationModel(Collections.emptyList());
+    @Override
+    public com.bulletjournal.controller.models.Note toPresentationModel(Map<String, String> aliases) {
+        return toPresentationModel(this.getLabels().stream()
+                .map(Label::new)
+                .collect(Collectors.toList()), aliases);
     }
 
+    @Override
     public com.bulletjournal.controller.models.Note toPresentationModel(
-            List<Label> labels) {
+            List<Label> labels, Map<String, String> aliases) {
         return new com.bulletjournal.controller.models.Note(
                 this.getId(),
                 this.getOwner(),

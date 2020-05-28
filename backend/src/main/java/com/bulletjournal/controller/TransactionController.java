@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,15 +108,14 @@ public class TransactionController {
     public Transaction createTransaction(@NotNull @PathVariable Long projectId,
                                          @Valid @RequestBody CreateTransactionParams createTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Pair<com.bulletjournal.repository.models.Transaction, com.bulletjournal.repository.models.Project> res = transactionDaoJpa
+        com.bulletjournal.repository.models.Transaction createdTransaction = transactionDaoJpa
                 .create(projectId, username, createTransactionParams);
-        Transaction createdTransaction = res.getLeft().toPresentationModel();
-        String projectName = res.getRight().getName();
+        String projectName = createdTransaction.getProject().getName();
 
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Transaction ##" + createdTransaction.getName() + "## in BuJo ##" + projectName + "##",
                 username, createdTransaction.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TRANSACTION));
-        return createdTransaction;
+        return createdTransaction.toPresentationModel(Collections.emptyMap());
     }
 
     @GetMapping(TRANSACTION_ROUTE)

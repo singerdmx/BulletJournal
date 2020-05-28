@@ -9,15 +9,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class is for ProjectType.LEDGER
  */
 @Entity
 @Table(name = "transactions")
-public class Transaction extends ProjectItemModel {
+public class Transaction extends ProjectItemModel<com.bulletjournal.controller.models.Transaction> {
     @Id
     @GeneratedValue(generator = "transaction_generator")
     @SequenceGenerator(
@@ -131,12 +132,16 @@ public class Transaction extends ProjectItemModel {
         this.endTime = endTime;
     }
 
-    public com.bulletjournal.controller.models.Transaction toPresentationModel() {
-        return this.toPresentationModel(Collections.emptyList());
+    @Override
+    public com.bulletjournal.controller.models.Transaction toPresentationModel(Map<String, String> aliases) {
+        return this.toPresentationModel(this.getLabels().stream()
+                .map(Label::new)
+                .collect(Collectors.toList()), aliases);
     }
 
+    @Override
     public com.bulletjournal.controller.models.Transaction toPresentationModel(
-            List<Label> labels) {
+            List<Label> labels, Map<String, String> aliases) {
         return new com.bulletjournal.controller.models.Transaction(
                 this.getId(),
                 this.getOwner(),

@@ -7,10 +7,8 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
-import com.bulletjournal.repository.models.Note;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.*;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,32 +23,51 @@ import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProjectItemController {
 
     public static final String RECENT_ITEMS_ROUTE = "/api/recentItems";
     protected static final String PROJECT_ITEMS_ROUTE = "/api/projectItems";
-    @Autowired
-    private TaskDaoJpa taskDaoJpa;
+
+    private final TaskDaoJpa taskDaoJpa;
+
+    private final TransactionDaoJpa transactionDaoJpa;
+
+    private final NoteDaoJpa noteDaoJpa;
+
+    private final LabelDaoJpa labelDaoJpa;
+
+    private final UserDaoJpa userDaoJpa;
+
+    private final UserAliasDaoJpa userAliasDaoJpa;
+
+    private final UserClient userClient;
+
+    private final Map<ProjectType, ProjectItemDaoJpa> daos;
 
     @Autowired
-    private TransactionDaoJpa transactionDaoJpa;
-
-    @Autowired
-    private NoteDaoJpa noteDaoJpa;
-
-    @Autowired
-    private LabelDaoJpa labelDaoJpa;
-
-    @Autowired
-    private UserDaoJpa userDaoJpa;
-
-    @Autowired
-    private UserAliasDaoJpa userAliasDaoJpa;
-
-    @Autowired
-    private UserClient userClient;
+    public ProjectItemController(
+            TaskDaoJpa taskDaoJpa,
+            TransactionDaoJpa transactionDaoJpa,
+            NoteDaoJpa noteDaoJpa,
+            LabelDaoJpa labelDaoJpa,
+            UserDaoJpa userDaoJpa,
+            UserAliasDaoJpa userAliasDaoJpa,
+            UserClient userClient) {
+        this.taskDaoJpa = taskDaoJpa;
+        this.transactionDaoJpa = transactionDaoJpa;
+        this.noteDaoJpa = noteDaoJpa;
+        this.daos = ImmutableMap.of(
+                ProjectType.TODO, taskDaoJpa,
+                ProjectType.NOTE, noteDaoJpa,
+                ProjectType.LEDGER, transactionDaoJpa);
+        this.labelDaoJpa = labelDaoJpa;
+        this.userDaoJpa = userDaoJpa;
+        this.userAliasDaoJpa = userAliasDaoJpa;
+        this.userClient = userClient;
+    }
 
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
@@ -120,28 +137,29 @@ public class ProjectItemController {
 
         Timestamp startTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(startDate, null, timezone).toInstant());
         Timestamp endTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(endDate, null, timezone).toInstant());
-        List<ProjectItem> projectItems = new LinkedList<>();
-        String username = MDC.get(UserClient.USER_NAME_KEY);
+        final List<ProjectItem> projectItems = new LinkedList<>();
 
-        if (types.contains(ProjectType.TODO)) {
-            List<Task> tasks = taskDaoJpa.getRecentProjectItemsBetween(startTime, endTime);
-            if (!tasks.isEmpty()) {
-                Map<String, String> aliases = userAliasDaoJpa.getAliases(username);
-                projectItems.addAll(ProjectItemsGrouper.addLabelsToTasks(tasks, aliases));
-            }
-        }
-        if (types.contains(ProjectType.LEDGER)) {
-            List<Transaction> transactions = transactionDaoJpa.getRecentProjectItemsBetween(startTime, endTime);
-            projectItems.addAll(ProjectItemsGrouper.addLabelsToTransactions(transactions));
-        }
-        if (types.contains(ProjectType.NOTE)) {
-            List<Note> notes = noteDaoJpa.getRecentProjectItemsBetween(startTime, endTime);
-            projectItems.addAll(ProjectItemsGrouper.addLabelsToNotes(notes));
-        }
+        types.forEach(type -> addToProjectItems(
+                projectItems, type, this.daos.get(type).getRecentProjectItemsBetween(startTime, endTime)));
 
-        projectItems = this.labelDaoJpa.getLabelsForProjectItemList(projectItems);
+        this.labelDaoJpa.getLabelsForProjectItemList(projectItems);
         projectItems.sort((t1, t2) -> t2.getUpdatedAt().compareTo(t1.getUpdatedAt()));
 
         return projectItems;
+    }
+
+    private <T extends ProjectItemModel> void addToProjectItems(
+            List<ProjectItem> projectItems, final ProjectType projectType, final List<T> items) {
+        projectItems.addAll(items.stream()
+                .map(t -> t.toPresentationModel(getAliases(projectType, items)))
+                .collect(Collectors.toList()));
+    }
+
+    private <T extends ProjectItemModel> Map<String, String> getAliases(ProjectType projectType, List<T> items) {
+        if (ProjectType.TODO.equals(projectType) && !items.isEmpty()) {
+            return userAliasDaoJpa.getAliases(MDC.get(UserClient.USER_NAME_KEY));
+        }
+
+        return Collections.emptyMap();
     }
 }

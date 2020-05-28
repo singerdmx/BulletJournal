@@ -24,9 +24,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -109,16 +107,13 @@ public class NoteController {
     @ResponseStatus(HttpStatus.CREATED)
     public Note createNote(@NotNull @PathVariable Long projectId, @Valid @RequestBody CreateNoteParams note) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Pair<com.bulletjournal.repository.models.Note, com.bulletjournal.repository.models.Project> res = noteDaoJpa
-                .create(projectId, username, note);
-        Note createdNote = res.getLeft().toPresentationModel();
-        String projectName = res.getRight().getName();
-        searchService.saveToES(createdNote);
+        com.bulletjournal.repository.models.Note createdNote = noteDaoJpa.create(projectId, username, note);
+        String projectName = createdNote.getProject().getName();
 
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Note ##" + createdNote.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_NOTE));
-        return createdNote;
+        return createdNote.toPresentationModel(Collections.emptyMap());
     }
 
     @GetMapping(NOTE_ROUTE)
@@ -133,12 +128,12 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.repository.models.Note updatedNote = this.noteDaoJpa.partialUpdate(username, noteId,
                 updateNoteParams);
-        Note note = updatedNote.toPresentationModel();
+        Long projectId = updatedNote.getProject().getId();
         String projectName = updatedNote.getProject().getName();
-        this.notificationService.trackActivity(new Auditable(note.getProjectId(),
-                "updated note ##" + note.getName() + "## in BuJo " + projectName + "##", username, noteId,
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "updated note ##" + updatedNote.getName() + "## in BuJo " + projectName + "##", username, noteId,
                 Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE));
-        return getNotes(note.getProjectId(), null, null, null, null, null);
+        return getNotes(projectId, null, null, null, null, null);
     }
 
     @DeleteMapping(NOTE_ROUTE)

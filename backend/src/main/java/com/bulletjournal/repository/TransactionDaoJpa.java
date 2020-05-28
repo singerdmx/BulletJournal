@@ -85,7 +85,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     private com.bulletjournal.controller.models.Transaction addLabels(Transaction transaction) {
         List<Label> labels = this.getLabelsToProjectItem(transaction);
-        return transaction.toPresentationModel(labels);
+        return transaction.toPresentationModel(labels, Collections.emptyMap());
     }
 
     /**
@@ -105,7 +105,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Pair<Transaction, Project> create(Long projectId, String owner, CreateTransactionParams createTransaction) {
+    public Transaction create(Long projectId, String owner, CreateTransactionParams createTransaction) {
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.LEDGER.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be LEDGER while request is " + project.getType());
@@ -131,7 +131,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
         transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
 
-        return Pair.of(this.transactionRepository.save(transaction), project);
+        return this.transactionRepository.save(transaction);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -147,7 +147,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transactions.sort(ProjectItemsGrouper.TRANSACTION_COMPARATOR);
         return transactions.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, Collections.emptyMap());
         }).collect(Collectors.toList());
     }
 

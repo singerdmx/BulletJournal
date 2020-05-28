@@ -1,7 +1,7 @@
 package com.bulletjournal.repository.models;
 
-import com.bulletjournal.controller.models.Before;
-import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.google.common.base.Preconditions;
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @MappedSuperclass
-public abstract class TaskModel extends ProjectItemModel {
+public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.controller.models.Task> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskModel.class);
 
     @Column(name = "due_date", length = 15)
@@ -259,14 +259,14 @@ public abstract class TaskModel extends ProjectItemModel {
         return Timestamp.from(reminderInstant);
     }
 
-    public com.bulletjournal.controller.models.Task toPresentationModel() {
-        return toPresentationModel(Collections.emptyList(), Collections.emptyMap());
-    }
-
+    @Override
     public com.bulletjournal.controller.models.Task toPresentationModel(Map<String, String> aliases) {
-        return toPresentationModel(Collections.emptyList(), aliases);
+        return toPresentationModel(this.getLabels().stream()
+                .map(Label::new)
+                .collect(Collectors.toList()), aliases);
     }
 
+    @Override
     public com.bulletjournal.controller.models.Task toPresentationModel(
             List<com.bulletjournal.controller.models.Label> labels, Map<String, String> aliases) {
 

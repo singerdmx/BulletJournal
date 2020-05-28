@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.ProjectType;
@@ -28,6 +29,7 @@ import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -78,6 +80,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
+
+    @Autowired
+    private LabelDaoJpa labelDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -150,7 +155,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             return Collections.emptyList();
         }
 
-        List<Task> tasks = Collections.emptyList();
+        List<Task> tasks;
         if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
             tasks = this.taskRepository.findTaskByProject(project);
         } else {
@@ -237,17 +242,18 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         // Subtract current time by 10 minutes to compare with task's starting time
         Timestamp startTime = Timestamp.from(now.minusMinutes(REMINDING_TASK_BUFFER_IN_MINS).toInstant());
 
+        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(MDC.get(UserClient.USER_NAME_KEY));
         // Fetch regular reminding tasks
         List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
                 .findRemindingTasks(assignee, currentTime.toString(), startTime.toString()).stream()
-                .map(TaskModel::toPresentationModel).collect(Collectors.toList());
+                .map(t -> t.toPresentationModel(aliases)).collect(Collectors.toList());
 
         // Fetch recurring reminding tasks
         List<com.bulletjournal.controller.models.Task> recurringTask = getRecurringTaskNeedReminding(assignee, now);
 
         // Append recurring reminding tasks to regular reminding tasks
         regularTasks.addAll(recurringTask);
-        return regularTasks;
+        return this.labelDaoJpa.getLabelsForProjectItemList(regularTasks);
     }
 
     /**
@@ -283,10 +289,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(final String assignee,
                                                                                         final ZonedDateTime now) {
         ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
+        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(MDC.get(UserClient.USER_NAME_KEY));
         return this.getRecurringTasks(assignee, now, maxRemindingTime).stream()
                 .filter(t -> t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now))
                         && t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
-                .map(TaskModel::toPresentationModel).collect(Collectors.toList());
+                .map(t -> t.toPresentationModel(aliases)).collect(Collectors.toList());
     }
 
     /**
@@ -358,7 +365,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return Task - A repository task model
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Pair<Task, Project> create(Long projectId, String owner, CreateTaskParams createTaskParams) {
+    public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
 
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
@@ -393,7 +400,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         projectTasks.setProjectId(projectId);
         projectTasks.setTasks(newRelations);
         this.projectTasksRepository.save(projectTasks);
-        return Pair.of(task, project);
+        return task;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -404,7 +411,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             return;
         }
 
-        Task task = create(projectId, owner, createTaskParams).getLeft();
+        Task task = create(projectId, owner, createTaskParams);
         task.setGoogleCalendarEventId(eventId);
         task = this.taskRepository.save(task);
         LOGGER.info("Created task {}", task);
@@ -797,7 +804,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 Operation.UPDATE, project.getId(), task.getProject().getOwner());
         List<TaskContent> contents = getCompletedTaskContents(taskId, requester);
         this.completedTaskRepository.delete(task);
-        Long newId = create(project.getId(), task.getOwner(), getCreateTaskParams(task)).getLeft().getId();
+        Long newId = create(project.getId(), task.getOwner(), getCreateTaskParams(task)).getId();
         Collections.reverse(contents);
         // we order contents by getUpdatedAt in descending order
         for (TaskContent content : contents) {

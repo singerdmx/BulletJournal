@@ -25,10 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -123,9 +120,7 @@ public class TaskController {
 
     @GetMapping(COMPLETED_TASK_ROUTE)
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
-
         String username = MDC.get(UserClient.USER_NAME_KEY);
-
         return addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username)
                 .toPresentationModel(this.userAliasDaoJpa.getAliases(username)));
     }
@@ -134,36 +129,34 @@ public class TaskController {
     @ResponseStatus(HttpStatus.CREATED)
     public Task createTask(@NotNull @PathVariable Long projectId, @Valid @RequestBody CreateTaskParams task) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Pair<com.bulletjournal.repository.models.Task, com.bulletjournal.repository.models.Project> res = taskDaoJpa
-                .create(projectId, username, task);
-        Task createdTask = res.getLeft().toPresentationModel();
-        String projectName = res.getRight().getName();
+        com.bulletjournal.repository.models.Task createdTask = taskDaoJpa.create(projectId, username, task);
+        String projectName = createdTask.getProject().getName();
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Task ##" + createdTask.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdTask.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TASK));
-        return createdTask;
+        return createdTask.toPresentationModel(this.userAliasDaoJpa.getAliases(username));
 
     }
 
     @PatchMapping(TASK_ROUTE)
     public ResponseEntity<List<Task>> updateTask(@NotNull @PathVariable Long taskId,
-            @Valid @RequestBody UpdateTaskParams updateTaskParams) {
+                                                 @Valid @RequestBody UpdateTaskParams updateTaskParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<UpdateTaskAssigneeEvent> events = new ArrayList<>();
 
         com.bulletjournal.repository.models.Task updatedTask = this.taskDaoJpa.partialUpdate(username, taskId,
                 updateTaskParams, events);
 
-        Task task = updatedTask.toPresentationModel();
+        Long projectId = updatedTask.getProject().getId();
         String projectName = updatedTask.getProject().getName();
         if (!events.isEmpty()) {
             events.forEach((event) -> notificationService.inform(event));
         }
 
-        this.notificationService.trackActivity(new Auditable(task.getProjectId(),
-                "updated Task ##" + task.getName() + "## in BuJo ##" + projectName + "##", username, task.getId(),
+        this.notificationService.trackActivity(new Auditable(projectId,
+                "updated Task ##" + updatedTask.getName() + "## in BuJo ##" + projectName + "##", username, updatedTask.getId(),
                 Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
-        return getTasks(task.getProjectId(), null, null, null, null, null);
+        return getTasks(projectId, null, null, null, null, null);
     }
 
     @PutMapping(TASKS_ROUTE)
@@ -220,16 +213,19 @@ public class TaskController {
         }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(username);
         return this.taskDaoJpa.getCompletedTasks(projectId, username, pageNo, pageSize).stream()
-                .map(t -> addAvatar(t.toPresentationModel(this.userAliasDaoJpa.getAliases(username))))
+                .map(t -> addAvatar(t.toPresentationModel(aliases)))
                 .collect(Collectors.toList());
     }
 
     private List<Task> getCompletedTasksBetween(Long projectId, String assignee, String startDate, String endDate,
-            String timezone) {
+                                                String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(username);
         return this.taskDaoJpa.getCompletedTasksBetween(projectId, assignee, username, startDate, endDate, timezone)
-                .stream().map(t -> addAvatar(t.toPresentationModel())).collect(Collectors.toList());
+                .stream().map(t -> addAvatar(t.toPresentationModel(aliases)))
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping(TASK_ROUTE)

@@ -1,11 +1,7 @@
 package com.bulletjournal.controller.utils;
 
-import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.repository.models.AuditModel;
-import com.bulletjournal.repository.models.Note;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.repository.models.*;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
@@ -108,21 +104,13 @@ public class ProjectItemsGrouper {
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Transaction> transactions = transactionsMap.get(zonedDateTime);
             transactions.sort(TRANSACTION_COMPARATOR);
-            projectItem.setTransactions(addLabelsToTransactions(transactions));
+            projectItem.setTransactions(transactions
+                    .stream()
+                    .map(t -> t.toPresentationModel(Collections.emptyMap()))
+                    .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
-    }
-
-    public static List<com.bulletjournal.controller.models.Transaction> addLabelsToTransactions(
-            List<Transaction> transactions) {
-        return transactions
-                .stream()
-                .map(t -> t.toPresentationModel(t.getLabels()
-                        .stream()
-                        .map(Label::new)
-                        .collect(Collectors.toList())))
-                .collect(Collectors.toList());
     }
 
     /*
@@ -144,17 +132,12 @@ public class ProjectItemsGrouper {
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort(TASK_COMPARATOR);
-            projectItem.setTasks(addLabelsToTasks(tasks, aliases));
+            projectItem.setTasks(tasks.stream().map(t ->
+                    t.toPresentationModel(aliases))
+                    .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
-    }
-
-    public static List<com.bulletjournal.controller.models.Task> addLabelsToTasks(
-            List<Task> tasks, Map<String, String> aliases) {
-        return tasks.stream().map(t ->
-                t.toPresentationModel(t.getLabels().stream().map(Label::new).collect(Collectors.toList()), aliases))
-                .collect(Collectors.toList());
     }
 
     /*
@@ -176,17 +159,12 @@ public class ProjectItemsGrouper {
 
             // Sort note by update time
             notes.sort(NOTE_COMPARATOR);
-            projectItem.setNotes(addLabelsToNotes(notes));
+            projectItem.setNotes(notes.stream().map(n ->
+                    n.toPresentationModel(Collections.emptyMap()))
+                    .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
         return mergedMap;
-    }
-
-    public static List<com.bulletjournal.controller.models.Note> addLabelsToNotes(List<Note> notes) {
-        return notes.stream().map(n ->
-                n.toPresentationModel(
-                        n.getLabels().stream().map(Label::new).collect(Collectors.toList())))
-                .collect(Collectors.toList());
     }
 
     /*
@@ -198,9 +176,7 @@ public class ProjectItemsGrouper {
         List<Map.Entry<ZonedDateTime, ProjectItems>> entries = new ArrayList<>(mergedMap.entrySet());
         entries.sort(Map.Entry.comparingByKey());
         List<ProjectItems> projectItems = new ArrayList<>();
-        entries.forEach(e -> {
-            projectItems.add(e.getValue());
-        });
+        entries.forEach(e -> projectItems.add(e.getValue()));
         return projectItems;
     }
 }

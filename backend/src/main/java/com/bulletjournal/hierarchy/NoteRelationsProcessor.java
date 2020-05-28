@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class NoteRelationsProcessor {
     }
 
     private static Note merge(Map<Long, com.bulletjournal.repository.models.Note> noteMap, Note cur) {
-        cur.clone(noteMap.get(cur.getId()).toPresentationModel());
+        cur.clone(noteMap.get(cur.getId()).toPresentationModel(Collections.emptyMap()));
         for (Note subNote : cur.getSubNotes()) {
             merge(noteMap, subNote);
         }

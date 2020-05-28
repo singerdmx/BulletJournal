@@ -7,10 +7,7 @@ import com.bulletjournal.repository.utils.StringArrayType;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Parent class for items under a project.
@@ -30,7 +27,7 @@ import java.util.Objects;
         ),
 })
 @MappedSuperclass
-public abstract class ProjectItemModel extends OwnedModel {
+public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
@@ -63,7 +60,10 @@ public abstract class ProjectItemModel extends OwnedModel {
         this.project = project;
     }
 
-    public abstract <T extends ProjectItem> T toPresentationModel();
+    public abstract T toPresentationModel(Map<String, String> aliases);
+
+    public abstract T toPresentationModel(
+            List<com.bulletjournal.controller.models.Label> labels, Map<String, String> aliases);
 
     public abstract ContentType getContentType();
 

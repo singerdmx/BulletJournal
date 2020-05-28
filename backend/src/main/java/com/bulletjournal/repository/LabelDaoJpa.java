@@ -195,18 +195,14 @@ public class LabelDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<ProjectItem> getLabelsForProjectItemList(List<ProjectItem> projectItems) {
+    public <T extends ProjectItem> List<T> getLabelsForProjectItemList(List<T> projectItems) {
         Set<Long> labelIds = new HashSet<>();
-        projectItems.forEach(item -> {
-            labelIds.addAll(item.getLabels().stream().map(l -> l.getId()).collect(Collectors.toList()));
-        });
+        projectItems.forEach(item -> labelIds.addAll(item.getLabels().stream().map(l -> l.getId()).collect(Collectors.toList())));
 
         Map<Long, com.bulletjournal.controller.models.Label> m = getLabels(new ArrayList<>(labelIds)).stream()
                 .collect(Collectors.toMap(com.bulletjournal.controller.models.Label::getId, l -> l));
 
-        projectItems.forEach(item -> {
-            item.setLabels(item.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList()));
-        });
+        projectItems.forEach(item -> item.setLabels(item.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
         return projectItems;
     }
 

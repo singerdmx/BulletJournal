@@ -32,7 +32,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-abstract class ProjectItemDaoJpa<K extends ContentModel> {
+public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     private static final Gson GSON = new Gson();

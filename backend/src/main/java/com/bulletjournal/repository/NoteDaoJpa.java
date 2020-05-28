@@ -111,12 +111,12 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
         return notes.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, Collections.emptyMap());
         }).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Pair<Note, Project> create(Long projectId, String owner, CreateNoteParams createNoteParams) {
+    public Note create(Long projectId, String owner, CreateNoteParams createNoteParams) {
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.NOTE.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be NOTE while request is " + project.getType());
@@ -134,7 +134,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         projectNotes.setNotes(newRelations);
         projectNotes.setProjectId(projectId);
         projectNotesRepository.save(projectNotes);
-        return Pair.of(note, project);
+        return note;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -154,7 +154,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public com.bulletjournal.controller.models.Note getNote(String requester, Long id) {
         Note note = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(note);
-        return note.toPresentationModel(labels);
+        return note.toPresentationModel(labels, Collections.emptyMap());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -169,7 +169,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
         return notes.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, Collections.emptyMap());
         }).collect(Collectors.toList());
     }
 
