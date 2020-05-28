@@ -5,6 +5,10 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.LockedUsersAndIPs;
 import com.bulletjournal.controller.models.SetRoleParams;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.redis.LockedIP;
+import com.bulletjournal.redis.LockedUser;
+import com.bulletjournal.redis.RedisLockedIPRepository;
+import com.bulletjournal.redis.RedisLockedUserRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.controller.models.User;
 
@@ -35,6 +39,12 @@ public class AdminController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private RedisLockedUserRepository redisLockedUserRepository;
+
+    @Autowired
+    private RedisLockedIPRepository redisLockedIPRepository;
+
     @PostMapping(SET_ROLE_ROUTE)
     public void setRole(@NotBlank @PathVariable String username, @NotNull @RequestBody SetRoleParams setRoleParams) {
         validateRequester();
@@ -58,8 +68,14 @@ public class AdminController {
     }
 
     @GetMapping(LOCKED_USERS_ROUTE)
-    public List<LockedUsersAndIPs> getLockedUsers() {
+    public LockedUsersAndIPs getLockedUsers() {
         validateRequester();
-        return null;
+        LockedUsersAndIPs lockedUserAndIPs = new LockedUsersAndIPs();
+        Iterable<LockedIP> IPs = redisLockedIPRepository.findAll();
+        Iterable<LockedUser> users = redisLockedUserRepository.findAll();
+        lockedUserAndIPs.setIps(IPs);
+        lockedUserAndIPs.setUsers(users);
+
+        return lockedUserAndIPs;
     }
 }
