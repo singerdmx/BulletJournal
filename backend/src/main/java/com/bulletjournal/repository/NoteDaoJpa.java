@@ -278,10 +278,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Override
-    List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
-        List<ProjectItemModel> result = new ArrayList<>();
-        result.addAll(this.noteRepository.findRecentNotesBetween(startTime, endTime));
-        return result;
+    List<Note> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
+        return this.noteRepository.findRecentNotesBetween(startTime, endTime);
     }
 
     @Override

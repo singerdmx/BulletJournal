@@ -891,10 +891,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return latestContentTime.getTime() - task.getUpdatedAt().getTime() > 30000;
     }
     @Override
-    List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
-        List<ProjectItemModel> result = new ArrayList<>();
-        result.addAll(this.taskRepository.findRecentTasksBetween(startTime, endTime));
-        return result;
+    List<Task> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
+        return this.taskRepository.findRecentTasksBetween(startTime, endTime);
     }
 
     @Override

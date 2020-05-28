@@ -278,33 +278,25 @@ abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 .collect(Collectors.toList());
     }
 
-    abstract List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime);
+    abstract <T extends ProjectItemModel> List<T> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime);
 
     abstract List<K> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> List<ProjectItemModel> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, ProjectType type) {
-        Map<Long, ProjectItemModel> projectItemIdMap = new HashMap<>();
-        List<ProjectItemModel> projectItemModels = new LinkedList<>();
-        List<ContentModel> projectItemContentModels = new LinkedList<>();
+    public <T extends ProjectItemModel> List<T> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
+        final Map<Long, T> projectItemIdMap = new HashMap<>();
+        List<T> projectItemModels = this.findRecentProjectItemsBetween(startTime, endTime);
+        projectItemModels.forEach((item) -> projectItemIdMap.put(item.getId(), item));
 
-        projectItemModels.addAll(this.findRecentProjectItemsBetween(startTime, endTime));
-        projectItemContentModels.addAll(this.findRecentProjectItemContentsBetween(startTime, endTime));
+        List<K> projectItemContentModels = this.findRecentProjectItemContentsBetween(startTime, endTime);
+        projectItemContentModels.forEach(projectItemContent -> {
+            T item = (T) projectItemContent.getProjectItem();
+            T existingItem = projectItemIdMap.computeIfAbsent(item.getId(), k -> item);
+            if (existingItem.getUpdatedAt().compareTo(item.getUpdatedAt()) < 0) {
+                existingItem.setUpdatedAt(item.getUpdatedAt());
+            }
+        });
 
-        projectItemModels.forEach(pi -> projectItemIdMap.put(pi.getId(), pi));
-        projectItemContentModels
-                .forEach(projectItemContent -> {
-                    if (projectItemIdMap.containsKey(projectItemContent.getProjectItem().getId())) {
-                        ProjectItemModel projectItem = projectItemIdMap.get(projectItemContent.getProjectItem().getId());
-                        projectItem.setUpdatedAt(
-                                projectItem.getUpdatedAt().compareTo(projectItemContent.getUpdatedAt()) > 0
-                                        ? projectItem.getUpdatedAt()
-                                        : projectItemContent.getUpdatedAt()
-                        );
-                    } else {
-                        projectItemIdMap.put(projectItemContent.getProjectItem().getId(), projectItemContent.getProjectItem());
-                    }
-                });
         return new ArrayList<>(projectItemIdMap.values());
     }
 }

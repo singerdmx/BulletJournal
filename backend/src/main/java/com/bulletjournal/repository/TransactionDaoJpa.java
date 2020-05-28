@@ -275,10 +275,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Override
-    List<ProjectItemModel> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
-        List<ProjectItemModel> result = new ArrayList<>();
-        result.addAll(this.transactionRepository.findRecentTransactionsBetween(startTime, endTime));
-        return result;
+    List<Transaction> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
+        return this.transactionRepository.findRecentTransactionsBetween(startTime, endTime);
     }
 
     @Override
