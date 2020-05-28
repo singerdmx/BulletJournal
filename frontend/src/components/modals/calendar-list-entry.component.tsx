@@ -191,7 +191,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
             {projects.map((project) => {
               return (
                 <Option value={project.id} key={project.id}>
-                  <Tooltip title={`${aliases[project.owner] ? aliases[project.owner] : project.owner}`} placement='right'>
+                  <Tooltip title={`${project.name} (Group ${project.group.name})`} placement='right'>
                     <span>
                       <Avatar size='small' src={project.ownerAvatar} />
                       &nbsp; {iconMapper[project.projectType]}
@@ -346,7 +346,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                       {projects && projects[0] && (
                         <Tooltip title='Choose BuJo' placement='topLeft'>
                           <Select
-                            style={{ width: '85%' }}
+                            style={{ width: '65%' }}
                             placeholder='Choose BuJo'
                             value={importProjectId}
                             onChange={(value: any) => {
@@ -357,7 +357,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                               return (
                                 <Option value={project.id} key={project.id}>
                                   <Tooltip
-                                    title={`${aliases[project.owner] ? aliases[project.owner] : project.owner}`}
+                                    title={`${project.name} (Group ${project.group.name})`}
                                     placement='right'
                                   >
                                     <span>
