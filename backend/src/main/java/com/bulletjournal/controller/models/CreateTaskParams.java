@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Collections;
 import java.util.List;
 
 public class CreateTaskParams {
@@ -32,9 +33,17 @@ public class CreateTaskParams {
     public CreateTaskParams() {
     }
 
-    public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name, String dueDate, String dueTime,
+    public CreateTaskParams(
+            @NotBlank @Size(min = 1, max = 100) String name, String dueDate, String dueTime,
             Integer duration, ReminderSetting reminderSetting, List<String> assignees,
             @NotBlank @Size(min = 1, max = 100) String timezone, String recurrenceRule) {
+        this(name, dueDate, dueTime, duration, reminderSetting, assignees, timezone, recurrenceRule, Collections.emptyList());
+    }
+
+    public CreateTaskParams(
+            @NotBlank @Size(min = 1, max = 100) String name, String dueDate, String dueTime,
+            Integer duration, ReminderSetting reminderSetting, List<String> assignees,
+            @NotBlank @Size(min = 1, max = 100) String timezone, String recurrenceRule, List<Long> labels) {
         this.name = name;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -43,6 +52,7 @@ public class CreateTaskParams {
         this.assignees = assignees;
         this.timezone = timezone;
         this.recurrenceRule = recurrenceRule;
+        this.labels = labels;
     }
 
     public String getDueDate() {
