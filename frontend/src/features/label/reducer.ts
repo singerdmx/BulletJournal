@@ -109,9 +109,7 @@ const slice = createSlice({
     },
     setSelectedLabel: (state, action: PayloadAction<SelectedLabelAction>) => {
       const { label } = action.payload;
-      const array = [] as Label[];
-      array.unshift(label);
-      state.labelsSelected = array;
+      state.labelsSelected = [label];
     },
     labelsUpdate: (state, action: PayloadAction<UpdateLabels>) => state,
     projectLabelsUpdate: (state, action: PayloadAction<UpdateProjectLabels>) =>
