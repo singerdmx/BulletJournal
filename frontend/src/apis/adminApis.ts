@@ -17,3 +17,11 @@ export const fetchUsersByRole = (role: Role) => {
       throw Error(err.message);
     });
 };
+
+export const fetchBlockedUsersAndIPs = () => {
+  return doFetch(`/api/lockedUsers`)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};
