@@ -25,3 +25,13 @@ export const fetchBlockedUsersAndIPs = () => {
       throw Error(err.message);
     });
 };
+
+export const unlockUserAndIP = (name: string, ip: string) => {
+  const postBody = JSON.stringify({
+    name: name,
+    ip: ip,
+  });
+  return doPost(`/api/admin/unlock`, postBody).catch((err) => {
+    throw Error(err.message);
+  });
+};

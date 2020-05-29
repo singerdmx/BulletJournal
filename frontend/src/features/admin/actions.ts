@@ -8,3 +8,6 @@ export const getUsersByRole = (role: Role) =>
   actions.getUsersByRole({ role: role });
 
 export const getBlockedUsersAndIPs = () => actions.getBlockedUsersAndIPs({});
+
+export const unlockUserandIP = (name: string, ip: string) =>
+  actions.unlockUserandIP({ name: name, ip: ip });

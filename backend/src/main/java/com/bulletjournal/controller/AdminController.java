@@ -4,6 +4,7 @@ import com.bulletjournal.authz.Role;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.LockedUsersAndIPs;
 import com.bulletjournal.controller.models.SetRoleParams;
+import com.bulletjournal.controller.models.UnlockUserParams;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.LockedIP;
 import com.bulletjournal.redis.LockedUser;
@@ -32,6 +33,7 @@ public class AdminController {
     public static final String SET_ROLE_ROUTE = "/api/users/{username}/setRole";
     public static final String USERS_ROUTE = "/api/users";
     public static final String LOCKED_USERS_ROUTE = "/api/lockedUsers";
+    public static final String UNBLOCK_USER_ROUTE = "/api/admin/unlock";
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -70,6 +72,7 @@ public class AdminController {
     @GetMapping(LOCKED_USERS_ROUTE)
     public LockedUsersAndIPs getLockedUsers() {
         validateRequester();
+
         LockedUsersAndIPs lockedUserAndIPs = new LockedUsersAndIPs();
         Iterable<LockedIP> ips = redisLockedIPRepository.findAll();
         Iterable<LockedUser> users = redisLockedUserRepository.findAll();
@@ -77,5 +80,19 @@ public class AdminController {
         lockedUserAndIPs.setUsers(users);
 
         return lockedUserAndIPs;
+    }
+
+    @PostMapping(UNBLOCK_USER_ROUTE)
+    public void unblockUser(@NotNull @RequestBody UnlockUserParams unlockUserParams) {
+        validateRequester();
+        String ip = unlockUserParams.getIp();
+        String name = unlockUserParams.getName();
+
+        if (ip != null) {
+            redisLockedIPRepository.delete(new LockedIP(ip, null));
+        }
+        if (name != null) {
+            redisLockedUserRepository.delete(new LockedUser(name, null));
+        }
     }
 }

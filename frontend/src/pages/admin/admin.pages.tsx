@@ -17,6 +17,7 @@ import {
   getUsersByRole,
   setRole,
   getBlockedUsersAndIPs,
+  unlockUserandIP,
 } from '../../features/admin/actions';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
@@ -35,6 +36,7 @@ type AdminProps = {
   setRole: (username: string, role: Role) => void;
   getUsersByRole: (role: Role) => void;
   getBlockedUsersAndIPs: () => void;
+  unlockUserandIP: (name: string, ip: string) => void;
 };
 
 const AdminPage: React.FC<AdminProps> = (props) => {
@@ -45,6 +47,7 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     usersByRole,
     getUsersByRole,
     getBlockedUsersAndIPs,
+    unlockUserandIP,
   } = props;
   const [username, setUsername] = useState('');
   const [roleLevel, setRoleLevel] = useState('BASIC' as Role);
@@ -65,12 +68,16 @@ const AdminPage: React.FC<AdminProps> = (props) => {
       key: 'expirationInHour',
     },
     {
-      title: 'Remove',
+      title: '',
       dataIndex: 'remove',
       key: 'remove',
       render: (a: any) => (
         <Tooltip placement='left' title='Unblock User'>
-          <DeleteOutlined />
+          <DeleteOutlined
+            onClick={() => {
+              unlockUserandIP(a.name, '');
+            }}
+          />
         </Tooltip>
       ),
     },
@@ -92,12 +99,16 @@ const AdminPage: React.FC<AdminProps> = (props) => {
       key: 'expirationInHour',
     },
     {
-      title: 'Remove',
+      title: '',
       dataIndex: '',
       key: '',
       render: (a: any) => (
         <Tooltip placement='left' title='Unblock User'>
-          <DeleteOutlined />
+          <DeleteOutlined
+            onClick={() => {
+              unlockUserandIP('', a.ip);
+            }}
+          />
         </Tooltip>
       ),
     },
@@ -199,4 +210,5 @@ export default connect(mapStateToProps, {
   setRole,
   getUsersByRole,
   getBlockedUsersAndIPs,
+  unlockUserandIP,
 })(AdminPage);

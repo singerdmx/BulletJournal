@@ -23,6 +23,11 @@ export type LockedIPsAction = {
   lockedIPs: LockedIP[];
 };
 
+export type UnlockUserAndIPAction = {
+  name: string;
+  ip: string;
+};
+
 export type GetBlockedUsersAndIPsAction = {};
 
 let initialState = {
@@ -54,6 +59,8 @@ const slice = createSlice({
       state,
       action: PayloadAction<GetBlockedUsersAndIPsAction>
     ) => state,
+    unlockUserandIP: (state, action: PayloadAction<UnlockUserAndIPAction>) =>
+      state,
   },
 });
 

@@ -7,11 +7,13 @@ import {
   setRoleAction,
   GetUsersByRoleAction,
   GetBlockedUsersAndIPsAction,
+  UnlockUserAndIPAction,
 } from './reducer';
 import {
   setRole,
   fetchUsersByRole,
   fetchBlockedUsersAndIPs,
+  unlockUserAndIP,
 } from '../../apis/adminApis';
 
 function* setUserRole(action: PayloadAction<setRoleAction>) {
@@ -51,6 +53,22 @@ function* getBlockedUsersAndIPs(
   }
 }
 
+function* unlockUserandIP(action: PayloadAction<UnlockUserAndIPAction>) {
+  const { name, ip } = action.payload;
+  try {
+    yield call(unlockUserAndIP, name, ip);
+
+    //refresh block users list
+    const data = yield call(fetchBlockedUsersAndIPs);
+    if (name && name.length > 0)
+      yield put(adminActions.lockedUsersReceived({ lockedUsers: data.users }));
+    if (ip && ip.length > 0)
+      yield put(adminActions.lockedIPsReceived({ lockedIPs: data.ips }));
+  } catch (error) {
+    yield call(message.error, `get user rolse Error Received: ${error}`);
+  }
+}
+
 export default function* AdminSagas() {
   yield all([yield takeLatest(adminActions.setRole.type, setUserRole)]);
   yield all([
@@ -61,5 +79,8 @@ export default function* AdminSagas() {
       adminActions.getBlockedUsersAndIPs.type,
       getBlockedUsersAndIPs
     ),
+  ]);
+  yield all([
+    yield takeLatest(adminActions.unlockUserandIP.type, unlockUserandIP),
   ]);
 }
