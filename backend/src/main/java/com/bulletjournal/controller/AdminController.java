@@ -71,9 +71,9 @@ public class AdminController {
     public LockedUsersAndIPs getLockedUsers() {
         validateRequester();
         LockedUsersAndIPs lockedUserAndIPs = new LockedUsersAndIPs();
-        Iterable<LockedIP> IPs = redisLockedIPRepository.findAll();
+        Iterable<LockedIP> ips = redisLockedIPRepository.findAll();
         Iterable<LockedUser> users = redisLockedUserRepository.findAll();
-        lockedUserAndIPs.setIps(IPs);
+        lockedUserAndIPs.setIps(ips);
         lockedUserAndIPs.setUsers(users);
 
         return lockedUserAndIPs;
