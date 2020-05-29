@@ -34,6 +34,12 @@ const App: React.FC<RootProps> = (props) => {
     window.less.modifyVars(vars).then(() => {
       console.log('Theme updated at first successfully', vars);
     });
+    const app = document.querySelector('div.App');
+    console.log(app);
+    if (!app) {
+      console.log('reloading');
+      window.location.reload();
+    }
   }, [props.theme]);
 
   return props.loading ? (
