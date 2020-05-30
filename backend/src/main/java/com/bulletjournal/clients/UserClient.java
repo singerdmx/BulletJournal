@@ -75,13 +75,14 @@ public class UserClient {
         Optional<User> userOptional = redisUserRepository.findById(username);
         if (userOptional.isPresent()) {
             user = userOptional.get();
+            user.setAlias(user.getName()); // disable caching user alias
             return this.userAliasDaoJpa.updateUserAlias(user);
         }
 
         LinkedHashMap userInfo;
         try {
             userInfo = getSSOUserInfo(username);
-            user = this.userAliasDaoJpa.updateUserAlias(getUser(username, userInfo));
+            user = getUser(username, userInfo);
         } catch (HttpClientErrorException ex) {
             throw new ResourceNotFoundException("Unable to find user " + username, ex);
         }
@@ -93,7 +94,7 @@ public class UserClient {
         }
 
         redisUserRepository.save(user);
-        return user;
+        return this.userAliasDaoJpa.updateUserAlias(user);
     }
 
     private String getUserTimeZone(LinkedHashMap userInfo) {

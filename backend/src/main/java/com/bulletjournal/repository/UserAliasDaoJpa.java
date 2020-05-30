@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -28,7 +29,11 @@ public class UserAliasDaoJpa {
     public void changeAlias(String requester, String targetUser, String alias) {
         UserAlias userAlias = userAliasRepository.findById(requester).orElse(new UserAlias(requester));
         Map<String, String> aliases = GSON.fromJson(userAlias.getAliases(), Map.class);
-        aliases.put(targetUser, alias);
+        if (Objects.equals(targetUser, alias)) {
+            aliases.remove(targetUser);
+        } else {
+            aliases.put(targetUser, alias);
+        }
         userAlias.setAliases(GSON.toJson(aliases));
         this.userAliasRepository.save(userAlias);
     }

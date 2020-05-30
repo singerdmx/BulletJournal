@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
@@ -15,6 +16,7 @@ public class User implements Serializable {
     private Integer id;
     @Id
     private String name;
+    @Transient
     private String alias;
     private String thumbnail;
     private String avatar;
