@@ -1,7 +1,6 @@
 import { actions } from './reducer';
 import { Note } from './interface';
 import { History } from 'history';
-import { Label } from '../label/interface';
 
 export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });

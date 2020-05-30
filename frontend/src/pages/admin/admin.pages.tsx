@@ -10,7 +10,6 @@ import {
   Select,
   Tooltip,
   Table,
-  Form,
   Tabs,
 } from 'antd';
 import {

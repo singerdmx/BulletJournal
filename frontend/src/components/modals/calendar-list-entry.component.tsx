@@ -76,7 +76,6 @@ type ModalProps = {
 const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   const {
     calendar,
-    aliases,
     watchedProject,
     watchedProjects,
     projects,
