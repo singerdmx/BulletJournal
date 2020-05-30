@@ -12,7 +12,7 @@ import './styles/main.less';
 import { connect } from 'react-redux';
 import { IState } from './store';
 
-const Loading = () => (
+export const Loading = () => (
   <div className="loading">
     <ReactLoading type="bubbles" color="#0984e3" height="75" width="75" />
   </div>
