@@ -2,6 +2,8 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.User;
+import com.bulletjournal.redis.RedisUserAliasesRepository;
+import com.bulletjournal.redis.UserAliases;
 import com.bulletjournal.repository.models.UserAlias;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -25,6 +27,9 @@ public class UserAliasDaoJpa {
     @Autowired
     private UserAliasRepository userAliasRepository;
 
+    @Autowired
+    private RedisUserAliasesRepository redisUserAliasesRepository;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void changeAlias(String requester, String targetUser, String alias) {
         UserAlias userAlias = userAliasRepository.findById(requester).orElse(new UserAlias(requester));
@@ -36,17 +41,23 @@ public class UserAliasDaoJpa {
         }
         userAlias.setAliases(GSON.toJson(aliases));
         this.userAliasRepository.save(userAlias);
+        this.redisUserAliasesRepository.save(new UserAliases(requester, aliases));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Map<String, String> getAliases(String requester) {
-        Optional<UserAlias> userAlias = userAliasRepository.findById(requester);
-        if (!userAlias.isPresent()) {
-            LOGGER.info("getAliases for " + requester);
-            return Collections.emptyMap();
+        Map<String, String> aliases = Collections.emptyMap();
+        Optional<UserAliases> userAliases = this.redisUserAliasesRepository.findById(requester);
+        if (userAliases.isPresent()) {
+            aliases = userAliases.get().getAliases();
+            return aliases == null ? Collections.emptyMap() : aliases;
         }
-        Map<String, String> aliases = GSON.fromJson(userAlias.get().getAliases(), Map.class);
+        Optional<UserAlias> userAlias = userAliasRepository.findById(requester);
+        if (userAlias.isPresent()) {
+            aliases = GSON.fromJson(userAlias.get().getAliases(), Map.class);
+        }
         LOGGER.info("getAliases for " + requester + ": " + aliases);
+        this.redisUserAliasesRepository.save(new UserAliases(requester, aliases));
         return aliases;
     }
 
