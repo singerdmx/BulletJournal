@@ -1,17 +1,18 @@
 version: '2.1'
 services:
- controller:
-   image: mwangxx/bulletjournal-backend:latest
-   container_name: springboot_app
-   ports:
-     - "8080:8080"
-   environment:
-     spring_profiles_active: dev
-   volumes:
-     - $HOME/docker/volumes/log:/var/log
-   depends_on:
-     database:
-       condition: service_healthy
+
+  controller:
+    image: mwangxx/bulletjournal-backend:latest
+    container_name: springboot_app
+    ports:
+      - "8080:8080"
+    environment:
+      spring_profiles_active: dev
+    volumes:
+      - $HOME/docker/volumes/log:/var/log
+    depends_on:
+      database:
+        condition: service_healthy
 
   cache:
     image: mwangxx/redis:5.0.8
