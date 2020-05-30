@@ -78,6 +78,7 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
           <Form.Item name="group">
             <Select
               placeholder="Choose Group"
+              style={{maxWidth: '300px'}}
               defaultValue={groupsWithOwner[0].groups[0].id}
             >
               {groupsWithOwner.map(
@@ -111,7 +112,7 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
                   .catch((info) => console.log(info))
               }
             >
-              Submit
+              Share
             </Button>
           </Form.Item>
         </Form>

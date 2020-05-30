@@ -77,11 +77,11 @@ public class AuthFilter implements Filter {
         }
 
         if (username == null) {
-            if (shouldBypass(request.getRequestURI())) {
-                LOGGER.info("Bypassing AuthFilter");
-            } else if (this.authConfig.isEnableDefaultUser()) {
+            if (this.authConfig.isEnableDefaultUser()) {
                 username = this.authConfig.getDefaultUsername();
                 MDC.put(UserClient.USER_NAME_KEY, username);
+            } else if (shouldBypass(request.getRequestURI())) {
+                LOGGER.info("Bypassing AuthFilter");
             } else {
                 LOGGER.error(request.getRequestURI() + ": user not logged in");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);

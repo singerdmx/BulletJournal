@@ -25,7 +25,7 @@ export type PublicProjectItemUpdate = {
   publicNote?: Note;
   publicTask?: Task;
   contents: Content[];
-  contentType: ContentType;
+  contentType: ContentType | undefined;
 };
 
 export type GetPublicProjectItem = {
@@ -44,7 +44,7 @@ let initialState = {
   publicTask: {} as Task,
   reminders: [] as Task[],
   contents: [] as Array<Content>,
-  contentType: ContentType.NOTE,
+  contentType: undefined as ContentType | undefined,
 };
 
 const slice = createSlice({

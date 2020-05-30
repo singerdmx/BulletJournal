@@ -90,12 +90,13 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
     if (this.props.sharedProjects.length === 0) {
       return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
     }
+    let i = 0;
     return (
       <div className="draggable-projects">
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="project-droppable">
             {(provided, snapshot) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
+              <div {...provided.droppableProps} ref={provided.innerRef} key={i++}>
                 {this.props.sharedProjects.map((item, index) => {
                   const treeNode = getTree(
                     item.projects,

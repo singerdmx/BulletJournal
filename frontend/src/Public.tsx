@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { IState } from './store';
 import { connect } from 'react-redux';
@@ -15,17 +15,21 @@ import NoteDetailPage from './pages/note/note-detail.pages';
 type PageProps = {
   note: Note;
   task: Task;
-  contentType: ContentType;
+  contentType: ContentType | undefined;
   contents: Content[];
   getPublicItem: (itemId: string) => void;
 };
 
 const PublicPage: React.FC<PageProps> = (props) => {
-  const { note, task, contentType, contents } = props;
+  const { note, task, contentType, contents, getPublicItem } = props;
   const { itemId } = useParams();
-  React.useEffect(() => {
-    props.getPublicItem(itemId!);
+  useEffect(() => {
+    getPublicItem(itemId!);
   }, []);
+
+  if (!contentType) {
+    return null;
+  }
 
   if (contentType === ContentType.TASK) {
     return (

@@ -25,6 +25,7 @@ type ContentProps = {
   deleteNoteContent: (noteId: number, contentId: number) => void;
   deleteTaskContent: (taskId: number, contentId: number) => void;
   deleteTransactionContent: (transactionId: number, contentId: number) => void;
+  getProject: (projectId: number) => void;
 };
 
 export const isContentEditable = (project: Project, projectItem: ProjectItem, content: Content, myself: string) => {
@@ -42,6 +43,7 @@ const ContentItem: React.FC<ContentProps> = ({
   deleteNoteContent,
   deleteTaskContent,
   deleteTransactionContent,
+  getProject
 }) => {
   const contentState = BraftEditor.createEditorState(content.text);
   const contentText = contentState.toText();
@@ -104,7 +106,10 @@ const ContentItem: React.FC<ContentProps> = ({
         <ZoomInOutlined onClick={handleOpen} />
       </Tooltip>,
     ];
-    if (contentEditable !== false && project && isContentEditable(project, projectItem, content, myself)) {
+    if (!project && !window.location.pathname.startsWith('/public/item')) {
+      getProject(projectItem.projectId);
+    }
+    if (contentEditable !== false && project && !project.shared && isContentEditable(project, projectItem, content, myself)) {
       actions.push(
           <Tooltip title="Edit">
             <EditOutlined onClick={handleEdit} />

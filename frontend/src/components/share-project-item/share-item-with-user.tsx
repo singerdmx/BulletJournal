@@ -102,14 +102,13 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
                       .catch((info) => console.log(info))
                   }
                 >
-                  Submit
+                  Share
                 </Button>,
               ]}
             >
               <List.Item.Meta
                 avatar={<Avatar src={user.avatar} />}
                 title={user.name}
-                description={'Click on submit to share'}
               />
             </List.Item>
           </List>
