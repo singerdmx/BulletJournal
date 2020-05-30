@@ -38,7 +38,6 @@ const App: React.FC<RootProps> = (props) => {
     console.log(app);
     if (!app) {
       console.log('reloading');
-      window.location.reload();
     }
   }, [props.theme]);
 
