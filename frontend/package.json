@@ -2,6 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "main": "./electron.js",
   "dependencies": {
     "@ant-design/compatible": "0.0.1-rc.0",

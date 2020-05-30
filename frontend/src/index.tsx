@@ -3,26 +3,26 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import createStore from './store';
 import { Provider } from 'react-redux';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { HashRouter, Switch, Route } from 'react-router-dom';
 import { unregister } from './serviceWorker';
 import PublicPage from './Public';
 import PrivacyPage from './Privacy';
 import TermsOfServicePage from './TermsOfService';
-import FeaturePage from "./Feature";
+import FeaturePage from './Feature';
 
 const store = createStore();
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <HashRouter>
       <Switch>
         <Route path="/public/privacy" component={PrivacyPage} />
         <Route path="/public/tos" component={TermsOfServicePage} />
         <Route path="/public/items/:itemId" component={PublicPage} />
-          <Route path="/public" component={FeaturePage} />
+        <Route path="/public" component={FeaturePage} />
         <Route path="/" component={App} />
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   </Provider>,
   document.getElementById('root')
 );
