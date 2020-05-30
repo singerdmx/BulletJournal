@@ -246,7 +246,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void move(String requester, Long projectItemId, Long targetProject) {
+    public Pair<Transaction, Project> move(String requester, Long projectItemId, Long targetProject) {
         Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
         Transaction projectItem = this.getProjectItem(projectItemId, requester);
@@ -257,6 +257,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 ContentType.TRANSACTION, Operation.UPDATE, targetProject, project.getOwner());
         projectItem.setProject(project);
         this.getJpaRepository().save(projectItem);
+        return Pair.of(projectItem, project);
     }
 
     @Override

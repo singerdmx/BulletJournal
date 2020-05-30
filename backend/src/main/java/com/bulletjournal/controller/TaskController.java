@@ -24,7 +24,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -60,9 +63,9 @@ public class TaskController {
 
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId,
-            @RequestParam(required = false) String assignee, @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate, @RequestParam(required = false) Boolean order,
-            @RequestParam(required = false) String timezone) {
+                                               @RequestParam(required = false) String assignee, @RequestParam(required = false) String startDate,
+                                               @RequestParam(required = false) String endDate, @RequestParam(required = false) Boolean order,
+                                               @RequestParam(required = false) String timezone) {
         if (StringUtils.isNotBlank(assignee)) {
             return getTasksByAssignee(projectId, assignee);
         }
@@ -89,7 +92,7 @@ public class TaskController {
     }
 
     private ResponseEntity<List<Task>> getTasksByOrder(Long projectId, String startDate, String endDate,
-            String timezone) {
+                                                       String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Task> tasks = this.taskDaoJpa.getTasksByOrder(projectId, username, startDate, endDate, timezone);
         return ResponseEntity.ok().body(ProjectItem.addAvatar(tasks, this.userClient));
@@ -144,7 +147,7 @@ public class TaskController {
 
     @PutMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> updateTaskRelations(@NotNull @PathVariable Long projectId,
-            @Valid @RequestBody List<Task> tasks, @RequestHeader(IF_NONE_MATCH) Optional<String> tasksEtag) {
+                                                          @Valid @RequestBody List<Task> tasks, @RequestHeader(IF_NONE_MATCH) Optional<String> tasksEtag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         if (tasksEtag.isPresent()) {
             List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
@@ -186,10 +189,10 @@ public class TaskController {
 
     @GetMapping(COMPLETED_TASKS_ROUTE)
     public List<Task> getCompletedTasks(@NotNull @PathVariable Long projectId,
-            @RequestParam(required = false, defaultValue = "0") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "50") Integer pageSize,
-            @RequestParam(required = false) String assignee, @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate, @RequestParam(required = false) String timezone) {
+                                        @RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                                        @RequestParam(required = false, defaultValue = "50") Integer pageSize,
+                                        @RequestParam(required = false) String assignee, @RequestParam(required = false) String startDate,
+                                        @RequestParam(required = false) String endDate, @RequestParam(required = false) String timezone) {
 
         if (StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)) {
             return getCompletedTasksBetween(projectId, assignee, startDate, endDate, timezone);
@@ -247,14 +250,22 @@ public class TaskController {
 
     @PostMapping(MOVE_TASK_ROUTE)
     public void moveTask(@NotNull @PathVariable Long taskId,
-            @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+                         @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.move(username, taskId, moveProjectItemParams.getTargetProject());
+        Pair<com.bulletjournal.repository.models.Task, com.bulletjournal.repository.models.Project> res =
+                this.taskDaoJpa.move(username, taskId, moveProjectItemParams.getTargetProject());
+        com.bulletjournal.repository.models.Task task = res.getLeft();
+        com.bulletjournal.repository.models.Project targetProject = res.getRight();
+        this.notificationService.trackActivity(
+                new Auditable(task.getProject().getId(),
+                        "moved Task ##" + task.getName() + "## to BuJo ##" + targetProject.getName() + "##",
+                        username, task.getId(), Timestamp.from(Instant.now()), ContentAction.MOVE_TASK)
+        );
     }
 
     @PostMapping(SHARE_TASK_ROUTE)
     public SharableLink shareTask(@NotNull @PathVariable Long taskId,
-            @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+                                  @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         if (shareProjectItemParams.isGenerateLink()) {
             return this.taskDaoJpa.generatePublicItemLink(taskId, username, shareProjectItemParams.getTtl());
@@ -277,14 +288,14 @@ public class TaskController {
 
     @PostMapping(REVOKE_SHARABLE_ROUTE)
     public void revokeSharable(@NotNull @PathVariable Long taskId,
-            @NotNull @RequestBody RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
+                               @NotNull @RequestBody RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.taskDaoJpa.revokeSharable(taskId, username, revokeProjectItemSharableParams);
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)
     public Content addContent(@NotNull @PathVariable Long taskId,
-            @NotNull @RequestBody CreateContentParams createContentParams) {
+                              @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         Pair<ContentModel, ProjectItemModel> res = this.taskDaoJpa.addContent(taskId, username,
@@ -306,7 +317,7 @@ public class TaskController {
     public List<Content> getContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return Content.addOwnerAvatar(this.taskDaoJpa.getContents(taskId, username)
-                .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()),
+                        .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()),
                 this.userClient);
     }
 
@@ -332,7 +343,7 @@ public class TaskController {
 
     @PatchMapping(CONTENT_ROUTE)
     public List<Content> updateContent(@NotNull @PathVariable Long taskId, @NotNull @PathVariable Long contentId,
-            @NotNull @RequestBody UpdateContentParams updateContentParams) {
+                                       @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         ProjectItemModel task = this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams)
                 .getRight();
@@ -346,7 +357,7 @@ public class TaskController {
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
     public Revision getContentRevision(@NotNull @PathVariable Long taskId, @NotNull @PathVariable Long contentId,
-            @NotNull @PathVariable Long revisionId) {
+                                       @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);

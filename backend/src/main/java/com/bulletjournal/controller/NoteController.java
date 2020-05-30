@@ -170,7 +170,15 @@ public class NoteController {
     public void moveNote(@NotNull @PathVariable Long noteId,
                          @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.move(username, noteId, moveProjectItemParams.getTargetProject());
+        Pair<com.bulletjournal.repository.models.Note, com.bulletjournal.repository.models.Project> res =
+                this.noteDaoJpa.move(username, noteId, moveProjectItemParams.getTargetProject());
+        com.bulletjournal.repository.models.Note note = res.getLeft();
+        com.bulletjournal.repository.models.Project targetProject = res.getRight();
+        this.notificationService.trackActivity(
+                new Auditable(note.getProject().getId(),
+                        "moved Note ##" + note.getName() + "## to BuJo ##" + targetProject.getName() + "##",
+                        username, note.getId(), Timestamp.from(Instant.now()), ContentAction.MOVE_NOTE)
+        );
     }
 
     @PostMapping(SHARE_NOTE_ROUTE)

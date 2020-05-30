@@ -172,7 +172,15 @@ public class TransactionController {
     public void moveTransaction(@NotNull @PathVariable Long transactionId,
                                 @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
+        Pair<com.bulletjournal.repository.models.Transaction, com.bulletjournal.repository.models.Project> res =
+                this.transactionDaoJpa.move(username, transactionId, moveProjectItemParams.getTargetProject());
+        com.bulletjournal.repository.models.Transaction transaction = res.getLeft();
+        com.bulletjournal.repository.models.Project targetProject = res.getRight();
+        this.notificationService.trackActivity(
+                new Auditable(transaction.getProject().getId(),
+                        "moved Transaction ##" + transaction.getName() + "## to BuJo ##" + targetProject.getName() + "##",
+                        username, transaction.getId(), Timestamp.from(Instant.now()), ContentAction.MOVE_TRANSACTION)
+        );
     }
 
     @Deprecated

@@ -829,7 +829,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @param targetProject the target project where the task moves to
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void move(String requester, Long taskId, Long targetProject) {
+    public Pair<Task, Project> move(String requester, Long taskId, Long targetProject) {
         final Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
         Task task = this.getProjectItem(taskId, requester);
@@ -852,6 +852,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             projectTasks.setProjectId(targetProject);
             this.projectTasksRepository.save(projectTasks);
         });
+
+        return Pair.of(task, project);
     }
 
     /**

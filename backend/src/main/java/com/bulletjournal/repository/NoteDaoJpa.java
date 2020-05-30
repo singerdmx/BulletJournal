@@ -237,7 +237,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void move(String requester, Long noteId, Long targetProject) {
+    public Pair<Note, Project> move(String requester, Long noteId, Long targetProject) {
         final Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
         Note note = this.getProjectItem(noteId, requester);
@@ -260,6 +260,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             projectNotes.setProjectId(targetProject);
             this.projectNotesRepository.save(projectNotes);
         });
+
+        return Pair.of(note, project);
     }
 
     @Override
