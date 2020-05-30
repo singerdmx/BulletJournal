@@ -193,10 +193,10 @@ class SideMenu extends React.Component<
               <Menu.Item key={`group${group.id}`}>
                 <span className='group-title'>
                   <span>
-                    <Avatar size='small' src={group.ownerAvatar} />
+                    <Avatar size='small' src={group.owner.avatar} />
                     <Tooltip
                       placement='right'
-                      title={`Group "${group.name}" (owner "${group.owner}")`}
+                      title={`Group "${group.name}" (owner "${group.owner.alias}")`}
                     >
                       <span className='group-name'>{group.name}</span>
                     </Tooltip>

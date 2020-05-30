@@ -6,7 +6,6 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
 import com.bulletjournal.controller.models.LoginStatus;
 import com.bulletjournal.controller.models.Project;
-import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
@@ -143,17 +142,9 @@ public class GoogleCalendarController {
             list.setTimeMax(DateTime.parseRfc3339(endDate));
         }
         List<Event> events = list.execute().getItems();
-        return events.stream()
-                .map(e -> {
-                    GoogleCalendarEvent event = Converter.toTask(e, timezone);
-                    Task task = event.getTask();
-                    task.setOwner(this.userClient.getUser(task.getOwner().getName()));
-                    task.getAssignees().forEach((assignee) -> {
-                        assignee.setAvatar(this.userClient.getUser(assignee.getName()).getAvatar());
-                    });
-                    return event;
-                })
-                .collect(Collectors.toList());
+        return GoogleCalendarEvent.addAvatar(events.stream()
+                .map(e -> Converter.toTask(e, timezone))
+                .collect(Collectors.toList()), this.userClient);
     }
 
     @PostMapping("/api/calendar/google/events")

@@ -305,24 +305,17 @@ public class TaskController {
     @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.getContents(taskId, username).stream().map(t -> {
-            Content content = t.toPresentationModel();
-            content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
-            for (Revision revision : content.getRevisions()) {
-                revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
-            }
-            return content;
-        }).collect(Collectors.toList());
+        return Content.addOwnerAvatar(this.taskDaoJpa.getContents(taskId, username)
+                .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()),
+                this.userClient);
     }
 
     @GetMapping(COMPLETED_TASK_CONTENTS_ROUTE)
     public List<Content> getCompletedTaskContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.taskDaoJpa.getCompletedTaskContents(taskId, username).stream().map(t -> {
-            Content content = t.toPresentationModel();
-            content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
-            return content;
-        }).collect(Collectors.toList());
+        return Content.addOwnerAvatar(this.taskDaoJpa
+                .getCompletedTaskContents(taskId, username).stream()
+                .map(t -> t.toPresentationModel()).collect(Collectors.toList()), this.userClient);
     }
 
     @DeleteMapping(CONTENT_ROUTE)
@@ -356,7 +349,6 @@ public class TaskController {
             @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
-        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
-        return revision;
+        return Revision.addAvatar(revision, this.userClient);
     }
 }

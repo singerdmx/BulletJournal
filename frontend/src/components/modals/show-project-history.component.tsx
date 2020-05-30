@@ -39,7 +39,6 @@ type ShowProjectHistoryProps = {
   project: Project | undefined;
   ownedProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
-  aliases: any;
   group: Group | undefined;
   timezone: string;
   projectHistory: Activity[];
@@ -78,7 +77,6 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   project,
   ownedProjects,
   sharedProjects,
-  aliases,
   group,
   projectHistory,
   timezone,
@@ -202,7 +200,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                           placement='left'
                         >
                           <span>
-                            <Avatar size='small' src={project.ownerAvatar} />
+                            <Avatar size='small' src={project.owner.avatar} />
                             &nbsp; {iconMapper[project.projectType]}
                             &nbsp; <strong>{project.name}</strong>
                             &nbsp; (Group <strong>{project.group.name}</strong>)
@@ -283,7 +281,6 @@ const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   ownedProjects: state.project.owned,
   sharedProjects: state.project.shared,
-  aliases: state.system.aliases,
   group: state.group.group,
   projectHistory: state.project.projectHistory,
   timezone: state.myself.timezone,

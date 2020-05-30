@@ -6,16 +6,14 @@ export interface Project {
   group: Group;
   id: number;
   name: string;
-  owner: string;
-  ownerAvatar: string;
+  owner: User;
   projectType: ProjectType;
   subProjects: Project[];
   shared: boolean;
 }
 
 export interface ProjectsWithOwner {
-  owner: string;
-  ownerAvatar: string;
+  owner: User;
   projects: Project[];
 }
 

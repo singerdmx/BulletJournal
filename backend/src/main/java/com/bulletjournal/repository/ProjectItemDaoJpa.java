@@ -260,7 +260,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
         }
         String diff = contentDiffTool.computeDiff(content.getText(), newText);
-        Revision newRevision = new Revision(nextRevisionId, diff, Instant.now().toEpochMilli(), requester);
+        Revision newRevision = new Revision(nextRevisionId, diff, Instant.now().toEpochMilli(), new User(requester));
         revisionList.offerLast(newRevision);
         content.setRevisions(GSON.toJson(revisionList));
     }

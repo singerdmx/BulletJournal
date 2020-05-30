@@ -1,19 +1,15 @@
 package com.bulletjournal.controller.models;
 
-import javax.validation.constraints.NotBlank;
+import com.bulletjournal.clients.UserClient;
+
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class GroupsWithOwner {
 
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String owner;
-
-    private String ownerAvatar;
+    private User owner;
 
     @NotNull
     private List<Group> groups = new ArrayList<>();
@@ -21,16 +17,27 @@ public class GroupsWithOwner {
     public GroupsWithOwner() {
     }
 
-    public GroupsWithOwner(String owner, List<Group> groups) {
+    public GroupsWithOwner(User owner, List<Group> groups) {
         this.owner = owner;
         this.groups = groups;
     }
 
-    public String getOwner() {
+    public static List<GroupsWithOwner> addOwnerAvatar(List<GroupsWithOwner> groups, UserClient userClient) {
+        groups.forEach(g -> addOwnerAvatar(g, userClient));
+        return groups;
+    }
+
+    public static GroupsWithOwner addOwnerAvatar(GroupsWithOwner groups, UserClient userClient) {
+        groups.setOwner(userClient.getUser(groups.getOwner().getName()));
+        Group.addOwnerAvatar(groups.groups, userClient);
+        return groups;
+    }
+
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 
@@ -40,14 +47,6 @@ public class GroupsWithOwner {
 
     public void setGroups(List<Group> groups) {
         this.groups = groups;
-    }
-
-    public String getOwnerAvatar() {
-        return ownerAvatar;
-    }
-
-    public void setOwnerAvatar(String ownerAvatar) {
-        this.ownerAvatar = ownerAvatar;
     }
 
     @Override

@@ -391,10 +391,10 @@ public class ProjectItemControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals(projectName, created.getName());
-        assertEquals(sampleUsers[0], created.getOwner());
+        assertEquals(sampleUsers[0], created.getOwner().getName());
         assertEquals(type, created.getProjectType());
         assertEquals("Group_ProjectItem", created.getGroup().getName());
-        assertEquals(sampleUsers[0], created.getGroup().getOwner());
+        assertEquals(sampleUsers[0], created.getGroup().getOwner().getName());
         assertEquals("d14", created.getDescription());
         return created;
     }
@@ -412,7 +412,7 @@ public class ProjectItemControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals("Group_ProjectItem", created.getName());
-        assertEquals(sampleUsers[0], created.getOwner());
+        assertEquals(sampleUsers[0], created.getOwner().getName());
 
         return created;
     }

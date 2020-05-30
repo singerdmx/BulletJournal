@@ -139,7 +139,8 @@ public class ProjectDaoJpa {
             return null;
         }
 
-        ProjectsWithOwner projectsWithOwner = new ProjectsWithOwner(user.getName(),
+        ProjectsWithOwner projectsWithOwner = new ProjectsWithOwner(
+                new com.bulletjournal.controller.models.User(user.getName()),
                 projects.stream().map(p -> p.toPresentationModel()).collect(Collectors.toList()));
         return projectsWithOwner;
     }
@@ -161,7 +162,7 @@ public class ProjectDaoJpa {
             return;
         }
 
-        result.add(new ProjectsWithOwner(o, l));
+        result.add(new ProjectsWithOwner(new com.bulletjournal.controller.models.User(o), l));
     }
 
     private List<com.bulletjournal.controller.models.Project> getOwnerProjects(UserProjects userProjects,

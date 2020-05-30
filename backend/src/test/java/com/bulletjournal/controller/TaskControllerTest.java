@@ -321,7 +321,7 @@ public class TaskControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals("Group_ProjectItem", created.getName());
-        assertEquals(USER, created.getOwner());
+        assertEquals(USER, created.getOwner().getName());
 
         return created;
     }
@@ -339,10 +339,10 @@ public class TaskControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals(projectName, created.getName());
-        assertEquals(USER, created.getOwner());
+        assertEquals(USER, created.getOwner().getName());
         assertEquals(type, created.getProjectType());
         assertEquals(g.getName(), created.getGroup().getName());
-        assertEquals(USER, created.getGroup().getOwner());
+        assertEquals(USER, created.getGroup().getOwner().getName());
         assertEquals(project.getDescription(), created.getDescription());
         return created;
     }

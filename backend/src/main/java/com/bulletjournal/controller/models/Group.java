@@ -1,8 +1,10 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.clients.UserClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
@@ -15,11 +17,8 @@ public class Group {
     @Size(min = 1, max = 100)
     private String name;
 
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String owner;
-
-    private String ownerAvatar;
+    @NotNull
+    private User owner;
 
     private List<UserGroup> users;
 
@@ -30,10 +29,20 @@ public class Group {
 
     public Group(Long id,
                  @NotBlank @Size(min = 1, max = 100) String name,
-                 @NotBlank @Size(min = 1, max = 100) String owner) {
+                 @NotNull User owner) {
         this.id = id;
         this.name = name;
         this.owner = owner;
+    }
+
+    public static List<Group> addOwnerAvatar(List<Group> groups, UserClient userClient) {
+        groups.forEach(g -> addOwnerAvatar(g, userClient));
+        return groups;
+    }
+
+    public static Group addOwnerAvatar(Group group, UserClient userClient) {
+        group.setOwner(userClient.getUser(group.getOwner().getName()));
+        return group;
     }
 
     public Long getId() {
@@ -52,14 +61,6 @@ public class Group {
         this.name = name;
     }
 
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
     public List<UserGroup> getUsers() {
         return users;
     }
@@ -76,12 +77,12 @@ public class Group {
         isDefault = aDefault;
     }
 
-    public String getOwnerAvatar() {
-        return ownerAvatar;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setOwnerAvatar(String ownerAvatar) {
-        this.ownerAvatar = ownerAvatar;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     @Override

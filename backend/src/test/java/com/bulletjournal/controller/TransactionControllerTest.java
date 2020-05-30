@@ -216,9 +216,7 @@ public class TransactionControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals("Group_ProjectItem", created.getName());
-        assertEquals("hero", created.getOwner());
-//        assertEquals(1, created.getUsers().size());
-
+        assertEquals("hero", created.getOwner().getName());
         return created;
     }
 
@@ -235,10 +233,10 @@ public class TransactionControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals(projectName, created.getName());
-        assertEquals("hero", created.getOwner());
+        assertEquals("hero", created.getOwner().getName());
         assertEquals(type, created.getProjectType());
         assertEquals("Group_ProjectItem", created.getGroup().getName());
-        assertEquals("hero", created.getGroup().getOwner());
+        assertEquals("hero", created.getGroup().getOwner().getName());
         assertEquals("d14", created.getDescription());
         return created;
     }

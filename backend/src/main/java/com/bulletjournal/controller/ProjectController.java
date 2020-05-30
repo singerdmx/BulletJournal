@@ -59,28 +59,14 @@ public class ProjectController {
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(ownedProjectsEtag + "|" + sharedProjectsEtag);
-
-        projects.getOwned().forEach((p) -> addOwnerAvatar(p));
-        projects.getShared().forEach((p) -> {
-            p.setOwnerAvatar(this.userClient.getUser(p.getOwner()).getAvatar());
-            p.getProjects().forEach((pp) -> addOwnerAvatar(pp));
-        });
-        return ResponseEntity.ok().headers(responseHeader).body(projects);
+        return ResponseEntity.ok().headers(responseHeader).body(Projects.addOwnerAvatar(projects, this.userClient));
     }
 
     @GetMapping(PROJECT_ROUTE)
     public Project getProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Project project = this.projectDaoJpa.getProject(projectId, username).toVerbosePresentationModel();
-        return addOwnerAvatar(project);
-    }
-
-    private Project addOwnerAvatar(Project project) {
-        project.setOwnerAvatar(this.userClient.getUser(project.getOwner()).getAvatar());
-        for (Project child : project.getSubProjects()) {
-            addOwnerAvatar(child);
-        }
-        return project;
+        return Project.addOwnerAvatar(project, this.userClient);
     }
 
     @PostMapping(PROJECTS_ROUTE)

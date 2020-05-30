@@ -124,7 +124,6 @@ type ProjectPageProps = {
 
 type MyselfProps = {
   myself: string;
-  aliases: any;
 };
 
 class ProjectPage extends React.Component<
@@ -421,7 +420,7 @@ class ProjectPage extends React.Component<
 
     let editContent = null;
     let deleteContent = null;
-    if (project && myself === project.owner) {
+    if (project && myself === project.owner.name) {
       editContent = <EditProject project={project} />;
       deleteContent = (
         <Popconfirm
@@ -464,7 +463,7 @@ class ProjectPage extends React.Component<
       editContent = null;
       deleteContent = null;
       if (groupUsers) {
-        groupUsers = groupUsers.filter((u) => u.name === project.owner);
+        groupUsers = groupUsers.filter((u) => u.name === project.owner.name);
       }
     }
 
@@ -490,15 +489,11 @@ class ProjectPage extends React.Component<
       <div className='project'>
         <Tooltip
           placement='top'
-          title={`${
-            this.props.aliases[project.owner]
-              ? this.props.aliases[project.owner]
-              : project.owner
-          }`}
+          title={project.owner.alias}
           className='project-avatar'
         >
           <span>
-            <Avatar size='large' src={project.ownerAvatar} />
+            <Avatar size='large' src={project.owner.avatar} />
           </span>
         </Tooltip>
         <div className='project-header'>
@@ -551,7 +546,6 @@ const mapStateToProps = (state: IState) => ({
   groups: state.group.groups,
   myself: state.myself.username,
   completedTaskPageNo: state.task.completedTaskPageNo,
-  aliases: state.system.aliases,
   transactionTimezone: state.transaction.timezone,
   transactionFrequencyType: state.transaction.frequencyType,
   transactionStartDate: state.transaction.startDate,

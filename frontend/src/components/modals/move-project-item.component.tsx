@@ -27,7 +27,6 @@ const { Option } = Select;
 
 type ProjectItemProps = {
   mode: string;
-  aliases: any;
   type: ProjectType;
   projectItemId: number;
   project: Project | undefined;
@@ -118,15 +117,11 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
                   return (
                     <Option value={project.id} key={project.id}>
                       <Tooltip
-                        title={`${
-                          props.aliases[project.owner]
-                            ? props.aliases[project.owner]
-                            : project.owner
-                        }`}
+                        title={project.owner.alias}
                         placement='right'
                       >
                         <span>
-                          <Avatar size='small' src={project.ownerAvatar} />
+                          <Avatar size='small' src={project.owner.avatar} />
                           &nbsp; {iconMapper[project.projectType]}
                           &nbsp; <strong>{project.name}</strong>
                           &nbsp; (Group <strong>{project.group.name}</strong>)
@@ -199,7 +194,6 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases,
   groups: state.group.groups,
   project: state.project.project,
   ownedProjects: state.project.owned,

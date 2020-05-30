@@ -26,18 +26,16 @@ export interface ProjectItem {
 
 export interface Content {
   id: number;
-  owner: string;
+  owner: User;
   text: string;
   createdAt: number;
   updatedAt: number;
   revisions: Revision[];
-  ownerAvatar: string;
 }
 
 export interface Revision {
   id: number;
   createdAt: number;
-  user: string;
+  user: User;
   content?: string;
-  userAvatar?: string;
 }

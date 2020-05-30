@@ -1,9 +1,11 @@
 package com.bulletjournal.controller.models;
 
 
+import com.bulletjournal.clients.UserClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Revision {
@@ -19,19 +21,27 @@ public class Revision {
     private Long createdAt;
 
     @NotNull
-    private String user;
-
-    private String userAvatar;
+    private User user;
 
     public Revision() {
 
     }
 
-    public Revision(@NotNull Long id, String diff, @NotNull Long createdAt, @NotNull String username) {
+    public Revision(@NotNull Long id, String diff, @NotNull Long createdAt, @NotNull User user) {
         this.id = id;
         this.diff = diff;
         this.createdAt = createdAt;
-        this.user = username;
+        this.user = user;
+    }
+
+    public static List<Revision> addAvatar(List<Revision> revisions, UserClient userClient) {
+        revisions.forEach(r -> addAvatar(r, userClient));
+        return revisions;
+    }
+
+    public static Revision addAvatar(Revision revision, UserClient userClient) {
+        revision.setUser(userClient.getUser(revision.getUser().getName()));
+        return revision;
     }
 
     public Long getId() {
@@ -58,11 +68,11 @@ public class Revision {
         this.createdAt = createdAt;
     }
 
-    public String getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -74,11 +84,4 @@ public class Revision {
         this.content = content;
     }
 
-    public String getUserAvatar() {
-        return userAvatar;
-    }
-
-    public void setUserAvatar(String userAvatar) {
-        this.userAvatar = userAvatar;
-    }
 }

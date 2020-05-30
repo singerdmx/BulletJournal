@@ -29,7 +29,6 @@ import { changeAlias } from "../../features/user/actions";
 type GroupProps = {
   group: Group;
   myself: MyselfWithAvatar;
-  aliases: any;
   deleteGroup: (
     groupId: number,
     groupName: string,
@@ -52,7 +51,7 @@ type GroupState = {
 };
 
 function getGroupUserTitle(user: User, group: Group): string {
-  if (user.name === group.owner) {
+  if (user.name === group.owner.name) {
     return "Owner";
   }
   return user.accepted ? `${user.name} Joined` : `${user.name} Not Joined`;
@@ -88,14 +87,10 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
   }
 
   getGroupUserSpan(user: User, group: Group): JSX.Element {
-    if (user.name === group.owner) {
+    if (user.name === group.owner.name) {
       return (
         <span className="group-user-info">
-          <strong>{`${
-            this.props.aliases[user.name]
-              ? this.props.aliases[user.name]
-              : user.name
-          }`}</strong>
+          <strong>{user.alias}</strong>
         </span>
       );
     }
@@ -138,7 +133,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
 
   render() {
     const { group } = this.props;
-    const isEditable = group.owner === this.props.myself.username;
+    const isEditable = group.owner.name === this.props.myself.username;
     return (
       <div className="group-card">
         <div className="group-title">
@@ -153,7 +148,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
               <UserOutlined />
               {group.users && group.users.length}
             </span>
-            {group.owner === this.props.myself.username && !group.default && (
+            {group.owner.name === this.props.myself.username && !group.default && (
               <Popconfirm
                 title="Are you sure?"
                 okText="Yes"
@@ -181,15 +176,15 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
                       >
                         <Badge dot={!item.accepted}>
                           <Avatar
-                            size={item.name === group.owner ? "large" : "default"}
+                            size={item.name === group.owner.name ? "large" : "default"}
                             src={item.avatar}
                           />
                         </Badge>
                       </Tooltip>
                       {this.getGroupUserSpan(item, group)}
                     </div>
-                  {item.name !== group.owner &&
-                    group.owner === this.props.myself.username && (
+                  {item.name !== group.owner.name &&
+                    group.owner.name === this.props.myself.username && (
                       <Tooltip
                         placement="right"
                         title={item.accepted ? "Remove" : "Cancel Invitation"}
@@ -210,7 +205,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
             }}
           />
         </div>
-        {group.owner === this.props.myself.username && (
+        {group.owner.name === this.props.myself.username && (
           <AddUser groupId={group.id} groupName={group.name} />
         )}
       </div>
@@ -220,7 +215,6 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
 
 const mapStateToProps = (state: IState) => ({
   myself: state.myself,
-  aliases: state.system.aliases,
 });
 
 export default connect(mapStateToProps, {

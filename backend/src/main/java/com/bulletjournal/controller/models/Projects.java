@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.clients.UserClient;
+
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,12 @@ public class Projects {
 
     @NotNull
     private List<ProjectsWithOwner> shared = new ArrayList<>();
+
+    public static Projects addOwnerAvatar(Projects projects, UserClient userClient) {
+        projects.owned.forEach(p -> Project.addOwnerAvatar(p, userClient));
+        ProjectsWithOwner.addOwnerAvatar(projects.shared, userClient);
+        return projects;
+    }
 
     public List<Project> getOwned() {
         return owned;

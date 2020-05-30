@@ -10,14 +10,12 @@ export interface User {
 export interface Group {
   id: number;
   name: string;
-  owner: string;
-  ownerAvatar: string;
+  owner: User;
   users: User[];
   default: boolean;
 }
 
 export interface GroupsWithOwner {
-  owner: string;
-  ownerAvatar: string;
+  owner: User;
   groups: Group[];
 }

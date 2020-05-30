@@ -73,12 +73,12 @@ public class Group extends OwnedModel {
 
     public com.bulletjournal.controller.models.Group toPresentationModel() {
         return new com.bulletjournal.controller.models.Group(
-                this.getId(), this.getName(), this.getOwner());
+                this.getId(), this.getName(), new com.bulletjournal.controller.models.User(this.getOwner()));
     }
 
     public com.bulletjournal.controller.models.Group toVerbosePresentationModel() {
         com.bulletjournal.controller.models.Group group = new com.bulletjournal.controller.models.Group(
-                this.getId(), this.getName(), this.getOwner());
+                this.getId(), this.getName(), new com.bulletjournal.controller.models.User(this.getOwner()));
         group.setUsers(this.getUsers()
                 .stream()
                 .map(ug -> new com.bulletjournal.controller.models.UserGroup(ug.getUser().getName(), ug.isAccepted()))

@@ -121,7 +121,7 @@ function* updateSharedProjectOwnersOrder(
           .slice()
           .sort(
             (p1, p2) =>
-              projectOwners.indexOf(p1.owner) - projectOwners.indexOf(p2.owner)
+              projectOwners.indexOf(p1.owner.name) - projectOwners.indexOf(p2.owner.name)
           ),
       })
     );

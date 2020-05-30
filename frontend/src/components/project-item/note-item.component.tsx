@@ -29,7 +29,6 @@ import {
   getIcon,
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
-import { IState } from '../../store';
 import { User } from '../../features/group/interface';
 
 type ProjectProps = {

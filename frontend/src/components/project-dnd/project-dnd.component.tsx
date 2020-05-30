@@ -12,7 +12,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
 import {clearCompletedTasks} from "../../features/tasks/actions";
-import {IState} from "../../store";
+import {User} from "../../features/group/interface";
 
 export const iconMapper = {
   TODO: <CarryOutOutlined />,
@@ -21,9 +21,8 @@ export const iconMapper = {
 };
 
 const getTree = (
-  aliases: any,
   data: Project[],
-  owner: string,
+  owner: User,
   index: number,
   onClick: Function
 ): TreeNodeNormal[] => {
@@ -31,13 +30,13 @@ const getTree = (
   data.forEach((item: Project) => {
     const node = {} as TreeNodeNormal;
     if (item.subProjects && item.subProjects.length) {
-      node.children = getTree(aliases, item.subProjects, owner, index, onClick);
+      node.children = getTree(item.subProjects, owner, index, onClick);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
     if (item.owner) {
       node.title = (
-        <Tooltip placement="right" title={`Owner: ${aliases[item.owner] ? aliases[item.owner] : item.owner}`}>
+        <Tooltip placement="right" title={`Owner: ${item.owner.alias}`}>
           <span
             onClick={e => onClick(item.id)}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
@@ -65,7 +64,7 @@ const reorder = (
   startIndex: number,
   endIndex: number
 ) => {
-  const result = projects.map(item => item.owner);
+  const result = projects.map(item => item.owner.name);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
 
@@ -73,7 +72,6 @@ const reorder = (
 };
 
 type ProjectProps = {
-  aliases: any;
   sharedProjects: ProjectsWithOwner[];
   updateSharedProjectsOrder: (projectOwners: string[]) => void;
   clearCompletedTasks: () => void;
@@ -100,7 +98,6 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {this.props.sharedProjects.map((item, index) => {
                   const treeNode = getTree(
-                    this.props.aliases,
                     item.projects,
                     item.owner,
                     index,
@@ -141,10 +138,6 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
   }
 }
 
-const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases
-});
-
-export default connect(mapStateToProps, { updateSharedProjectsOrder, clearCompletedTasks })(
+export default connect(null, { updateSharedProjectsOrder, clearCompletedTasks })(
   withRouter(ProjectDnd)
 );

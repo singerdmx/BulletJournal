@@ -75,7 +75,7 @@ public class Converter {
 
         Content content = new Content();
         content.setText(text.toString());
-        content.setOwner(username);
+        content.setOwner(new User(username));
 
         return new GoogleCalendarEvent(task, content, event.getId());
     }

@@ -131,7 +131,7 @@ public class ProjectControllerTest {
         p8 = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Default", p8.getGroup().getName());
-        assertEquals(expectedOwner, p8.getOwner());
+        assertEquals(expectedOwner, p8.getOwner().getName());
         assertEquals(98L, (long) p8.getGroup().getId());
         return p8;
     }
@@ -747,16 +747,16 @@ public class ProjectControllerTest {
         List<ProjectsWithOwner> sharedProjects = getProjectsResponse.getBody().getShared();
         assertEquals(2, sharedProjects.size());
         ProjectsWithOwner sharedProject = sharedProjects.get(0);
-        assertEquals(targetUser, sharedProject.getOwner());
+        assertEquals(targetUser, sharedProject.getOwner().getName());
         assertEquals("https://1o24bbs.com/user_avatar/1o24bbs.com/mqm/75/1671_2.png",
-                sharedProject.getOwnerAvatar());
+                sharedProject.getOwner().getAvatar());
         assertEquals(1, sharedProject.getProjects().size());
         Project p = sharedProject.getProjects().get(0);
         Group g = p.getGroup();
         assertEquals("Shared TODO", p.getName());
         assertEquals("Default", g.getName());
         assertEquals(ProjectType.TODO, p.getProjectType());
-        assertEquals(targetUser, g.getOwner());
+        assertEquals(targetUser, g.getOwner().getName());
 
         // Get Tasks
         ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
@@ -925,7 +925,7 @@ public class ProjectControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
-        assertEquals(expectedOwner, content.getOwner());
+        assertEquals(expectedOwner, content.getOwner().getName());
         assertEquals(text, content.getText());
         assertNotNull(content.getId());
         getTaskContents(task, ImmutableList.of(content), text);
@@ -943,7 +943,7 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, updateResponse.getStatusCode());
         content = Arrays.stream(updateResponse.getBody())
                 .filter(c -> c.getId().equals(contentId)).findFirst().orElse(null);
-        assertEquals(expectedOwner, content.getOwner());
+        assertEquals(expectedOwner, content.getOwner().getName());
         assertEquals(text, content.getText());
         assertNotNull(content.getId());
         getTaskContents(task, ImmutableList.of(content), text);
@@ -963,7 +963,7 @@ public class ProjectControllerTest {
         Content[] contents = response.getBody();
         assertEquals(expectedContents.size(), contents.length);
         for (int i = 0; i < contents.length; i++) {
-            assertEquals(expectedOwner, contents[i].getOwner());
+            assertEquals(expectedOwner, contents[i].getOwner().getName());
             assertEquals(text, contents[i].getText());
             assertNotNull(contents[i].getId());
         }
@@ -1146,7 +1146,7 @@ public class ProjectControllerTest {
         List<ProjectsWithOwner> l = updateProjectRelationsResponse.getBody().getShared();
         assertEquals(2, l.size());
         projects = l.get(0).getProjects();
-        assertEquals("Scarlet", l.get(0).getOwner());
+        assertEquals("Scarlet", l.get(0).getOwner().getName());
         assertEquals(2, projects.size());
         assertEquals("P1", projects.get(0).getName());
         assertEquals("P5", projects.get(1).getName());
@@ -1159,7 +1159,7 @@ public class ProjectControllerTest {
         assertEquals("P3", projects.get(0).getSubProjects().get(0).getSubProjects().get(0).getName());
 
         projects = l.get(1).getProjects();
-        assertEquals("lsx9981", l.get(1).getOwner());
+        assertEquals("lsx9981", l.get(1).getOwner().getName());
         assertEquals(1, projects.size());
         assertEquals("P1", projects.get(0).getName());
 
@@ -1181,11 +1181,11 @@ public class ProjectControllerTest {
         l = projectsResponse.getBody().getShared();
         assertEquals(2, l.size());
         projects = l.get(0).getProjects();
-        assertEquals("lsx9981", l.get(0).getOwner());
+        assertEquals("lsx9981", l.get(0).getOwner().getName());
         assertEquals(1, projects.size());
 
         projects = l.get(1).getProjects();
-        assertEquals("Scarlet", l.get(1).getOwner());
+        assertEquals("Scarlet", l.get(1).getOwner().getName());
         assertEquals(2, projects.size());
 
 
@@ -1236,9 +1236,9 @@ public class ProjectControllerTest {
         p1 = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(projectNewName, p1.getName());
-        assertEquals(expectedOwner, p1.getOwner());
+        assertEquals(expectedOwner, p1.getOwner().getName());
         assertEquals(ProjectType.TODO, p1.getProjectType());
-        assertEquals(expectedOwner, p1.getGroup().getOwner());
+        assertEquals(expectedOwner, p1.getGroup().getOwner().getName());
         return p1;
     }
 
@@ -1280,10 +1280,10 @@ public class ProjectControllerTest {
     private List<GroupsWithOwner> createGroups(String owner) {
         List<GroupsWithOwner> groups = getGroups();
         Group g = groups.get(0).getGroups().get(0);
-        assertEquals(expectedOwner, g.getOwner());
+        assertEquals(expectedOwner, g.getOwner().getName());
         assertEquals(6, g.getUsers().size());
         Group secondOwnedGroup = groups.get(0).getGroups().get(1);
-        assertEquals(expectedOwner, secondOwnedGroup.getOwner());
+        assertEquals(expectedOwner, secondOwnedGroup.getOwner().getName());
         assertEquals(1, secondOwnedGroup.getUsers().size());
         Group invitedToJoin = groups.get(2).getGroups().get(0);
         assertTrue(invitedToJoin.getUsers().size() >= 2);
@@ -1343,7 +1343,7 @@ public class ProjectControllerTest {
                 new HttpEntity<>(addUserGroupsParams),
                 GroupsWithOwner[].class);
         List<GroupsWithOwner> groups = Arrays.asList(groupsResponse.getBody());
-        Group updated = groups.stream().filter(g -> group.getOwner().equals(g.getOwner()))
+        Group updated = groups.stream().filter(g -> group.getOwner().getName().equals(g.getOwner().getName()))
                 .findFirst().get().getGroups()
                 .stream().filter(g -> group.getName().equals(g.getName())).findFirst().get();
         assertEquals(usernames.size() + 1, updated.getUsers().size());
@@ -1380,7 +1380,7 @@ public class ProjectControllerTest {
                 null,
                 GroupsWithOwner[].class);
         List<GroupsWithOwner> groupsWithOwners = Arrays.asList(groupsResponse.getBody());
-        Group resultGroup = groupsWithOwners.stream().filter(g -> group.getOwner().equals(g.getOwner()))
+        Group resultGroup = groupsWithOwners.stream().filter(g -> group.getOwner().getName().equals(g.getOwner().getName()))
                 .findFirst().get().getGroups()
                 .stream().filter(g -> group.getId().equals(g.getId())).findFirst().get();
         assertEquals(count, resultGroup.getUsers().size());
@@ -1401,7 +1401,7 @@ public class ProjectControllerTest {
                 GroupsWithOwner[].class);
 
         List<GroupsWithOwner> groupsWithOwners = Arrays.asList(groupsResponse.getBody());
-        Group resultGroup = groupsWithOwners.stream().filter(g -> group.getOwner().equals(g.getOwner()))
+        Group resultGroup = groupsWithOwners.stream().filter(g -> group.getOwner().getName().equals(g.getOwner().getName()))
                 .findFirst().get().getGroups()
                 .stream().filter(g -> group.getId().equals(g.getId())).findFirst().get();
         assertEquals(count, resultGroup.getUsers().size());
@@ -1417,7 +1417,7 @@ public class ProjectControllerTest {
         Group created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(groupName, created.getName());
-        assertEquals(expectedOwner, created.getOwner());
+        assertEquals(expectedOwner, created.getOwner().getName());
 
         return created;
     }
@@ -1433,9 +1433,9 @@ public class ProjectControllerTest {
         Project created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(projectName, created.getName());
-        assertEquals(expectedOwner, created.getOwner());
+        assertEquals(expectedOwner, created.getOwner().getName());
         assertEquals(projectType, created.getProjectType());
-        assertEquals(expectedOwner, created.getGroup().getOwner());
+        assertEquals(expectedOwner, created.getGroup().getOwner().getName());
         return created;
     }
 }

@@ -226,14 +226,9 @@ public class NoteController {
     @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.noteDaoJpa.getContents(noteId, username).stream().map(t -> {
-            Content content = t.toPresentationModel();
-            content.setOwnerAvatar(this.userClient.getUser(content.getOwner()).getAvatar());
-            for (Revision revision : content.getRevisions()) {
-                revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
-            }
-            return content;
-        }).collect(Collectors.toList());
+        return Content.addOwnerAvatar(this.noteDaoJpa.getContents(noteId, username).stream()
+                .map(t -> t.toPresentationModel())
+                .collect(Collectors.toList()), this.userClient);
     }
 
     @DeleteMapping(CONTENT_ROUTE)
@@ -267,7 +262,6 @@ public class NoteController {
                                        @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
-        revision.setUserAvatar(this.userClient.getUser(revision.getUser()).getAvatar());
-        return revision;
+        return Revision.addAvatar(revision, this.userClient);
     }
 }

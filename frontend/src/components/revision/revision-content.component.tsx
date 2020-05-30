@@ -155,10 +155,10 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
         <div className="revision-header">
           <div>
             {getRollbackButton()} Revision {revisionIndex}{' '}
-            {revisions[revisionIndex].userAvatar && (
-              <Tooltip title={`Edited by ${revisions[revisionIndex].user}`}>
+            {revisions[revisionIndex].user.avatar && (
+              <Tooltip title={`Edited by ${revisions[revisionIndex].user.alias}`}>
                 <Avatar
-                  src={revisions[revisionIndex].userAvatar}
+                  src={revisions[revisionIndex].user.avatar}
                   style={{ marginRight: '1rem' }}
                   size="small"
                 />
@@ -175,15 +175,13 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
         <div className="revision-header">
           <div>
             Current version{' '}
-            {content.ownerAvatar && (
-              <Tooltip title={`Edited by ${content.owner}`}>
-                <Avatar
-                  src={content.ownerAvatar}
+            <Tooltip title={`Edited by ${content.owner.alias}`}>
+              <Avatar
+                  src={content.owner.avatar}
                   style={{ marginRight: '1rem' }}
                   size="small"
-                />
-              </Tooltip>
-            )}
+              />
+            </Tooltip>
           </div>
           <span>{moment(content.updatedAt).fromNow()}</span>
         </div>

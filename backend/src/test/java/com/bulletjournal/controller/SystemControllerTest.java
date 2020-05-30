@@ -238,7 +238,7 @@ public class SystemControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals("Group_SystemControl", created.getName());
-        assertEquals("Michael_Zhou", created.getOwner());
+        assertEquals("Michael_Zhou", created.getOwner().getName());
 
         return created;
     }
@@ -256,10 +256,10 @@ public class SystemControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals(projectName, created.getName());
-        assertEquals("Michael_Zhou", created.getOwner());
+        assertEquals("Michael_Zhou", created.getOwner().getName());
         assertEquals(type, created.getProjectType());
         assertEquals("Group_SystemControl", created.getGroup().getName());
-        assertEquals("Michael_Zhou", created.getGroup().getOwner());
+        assertEquals("Michael_Zhou", created.getGroup().getOwner().getName());
         assertEquals("d15", created.getDescription());
         return created;
     }

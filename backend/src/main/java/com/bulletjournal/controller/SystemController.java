@@ -69,9 +69,6 @@ public class SystemController {
     private TokenBucket tokenBucket;
 
     @Autowired
-    private UserAliasDaoJpa userAliasDaoJpa;
-
-    @Autowired
     private UserClient userClient;
 
     @GetMapping(UPDATES_ROUTE)
@@ -91,7 +88,6 @@ public class SystemController {
         String groupsEtag = null;
         String remindingTaskEtag = null;
         List<Task> remindingTasks = null;
-        Map<String, String> aliases = Collections.emptyMap();
 
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
             Projects projects = this.projectDaoJpa.getProjects(username);
@@ -144,9 +140,6 @@ public class SystemController {
                 remindingTasks = null;
             }
         }
-        if (targetEtags == null || targetEtags.contains("aliases")) {
-            aliases = this.userAliasDaoJpa.getAliases(username);
-        }
 
         SystemUpdates systemUpdates = new SystemUpdates();
         systemUpdates.setOwnedProjectsEtag(ownedProjectsEtag);
@@ -157,7 +150,6 @@ public class SystemController {
         systemUpdates.setGroupsEtag(groupsEtag);
         systemUpdates.setReminders(remindingTasks);
         systemUpdates.setRemindingTaskEtag(remindingTaskEtag);
-        systemUpdates.setAliases(aliases);
         return systemUpdates;
     }
 

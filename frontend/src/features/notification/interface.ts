@@ -1,17 +1,12 @@
-export interface Originator {
-    id: number;
-    name: string;
-    thumbnail: string;
-    avatar: string;
-  }
-  
-  export interface Notification {
+import {User} from "../group/interface";
+
+export interface Notification {
     id: number;
     title: string;
     content: string;
     timestamp: number;
-    originator: Originator;
+    originator: User;
     actions: Array<string>;
     type: string;
     link: string;
-  }
+}

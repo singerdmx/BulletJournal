@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.clients.UserClient;
 import com.google.gson.annotations.Expose;
 
 import javax.validation.Valid;
@@ -18,11 +19,8 @@ public class Project {
     @Size(min = 1, max = 100)
     private String name;
 
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String owner;
-
-    private String ownerAvatar;
+    @NotNull
+    private User owner;
 
     private boolean shared;
 
@@ -46,7 +44,7 @@ public class Project {
         this.id = id;
     }
 
-    public Project(Long id, String name, String owner, ProjectType projectType,
+    public Project(Long id, String name, User owner, ProjectType projectType,
                    Group group, String description, boolean shared) {
         this.id = id;
         this.name = name;
@@ -55,6 +53,19 @@ public class Project {
         this.group = group;
         this.description = description;
         this.shared = shared;
+    }
+
+    public static List<Project> addOwnerAvatar(List<Project> projects, UserClient userClient) {
+        projects.forEach(p -> addOwnerAvatar(p, userClient));
+        return projects;
+    }
+
+    public static Project addOwnerAvatar(Project project, UserClient userClient) {
+        project.setOwner(userClient.getUser(project.getOwner().getName()));
+        for (Project child : project.getSubProjects()) {
+            addOwnerAvatar(child, userClient);
+        }
+        return project;
     }
 
     public Long getId() {
@@ -73,11 +84,11 @@ public class Project {
         this.name = name;
     }
 
-    public String getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 
@@ -115,14 +126,6 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getOwnerAvatar() {
-        return ownerAvatar;
-    }
-
-    public void setOwnerAvatar(String ownerAvatar) {
-        this.ownerAvatar = ownerAvatar;
     }
 
     public boolean isShared() {
