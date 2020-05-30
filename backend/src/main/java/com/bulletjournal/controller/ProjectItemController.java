@@ -93,7 +93,7 @@ public class ProjectItemController {
         Map<ZonedDateTime, ProjectItems> projectItemsMap =
                 getZonedDateTimeProjectItemsMap(types, username, startTime, endTime);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
-        return ProjectItems.addOwnerAvatar(
+        return ProjectItems.addAvatar(
                 this.labelDaoJpa.getLabelsForProjectItems(projectItems),
                 this.userClient);
     }
@@ -120,7 +120,7 @@ public class ProjectItemController {
         }
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
-        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, taskMap, userAliasDaoJpa.getAliases(username));
+        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, taskMap);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionMap);
 
         return projectItemsMap;
@@ -154,15 +154,8 @@ public class ProjectItemController {
             List<ProjectItem> projectItems, final ProjectType projectType) {
         final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime);
         projectItems.addAll(items.stream()
-                .map(t -> t.toPresentationModel(getAliases(projectType, items)))
+                .map(t -> t.toPresentationModel())
                 .collect(Collectors.toList()));
     }
 
-    private <T extends ProjectItemModel> Map<String, String> getAliases(ProjectType projectType, List<T> items) {
-        if (ProjectType.TODO.equals(projectType) && !items.isEmpty()) {
-            return userAliasDaoJpa.getAliases(MDC.get(UserClient.USER_NAME_KEY));
-        }
-
-        return Collections.emptyMap();
-    }
 }

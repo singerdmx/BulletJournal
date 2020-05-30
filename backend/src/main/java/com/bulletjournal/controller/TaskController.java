@@ -7,7 +7,6 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -59,9 +58,6 @@ public class TaskController {
     @Autowired
     private UserClient userClient;
 
-    @Autowired
-    private UserAliasDaoJpa userAliasDaoJpa;
-
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId,
             @RequestParam(required = false) String assignee, @RequestParam(required = false) String startDate,
@@ -83,46 +79,33 @@ public class TaskController {
         responseHeader.setETag(tasksEtag);
 
         return ResponseEntity.ok().headers(responseHeader)
-                .body(tasks.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
+                .body(ProjectItem.addAvatar(tasks, this.userClient));
     }
 
     private ResponseEntity<List<Task>> getTasksByAssignee(Long projectId, String assignee) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Task> tasks = this.taskDaoJpa.getTasksByAssignee(projectId, username, assignee);
-        return ResponseEntity.ok().body(tasks.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
+        return ResponseEntity.ok().body(ProjectItem.addAvatar(tasks, this.userClient));
     }
 
     private ResponseEntity<List<Task>> getTasksByOrder(Long projectId, String startDate, String endDate,
             String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Task> tasks = this.taskDaoJpa.getTasksByOrder(projectId, username, startDate, endDate, timezone);
-        return ResponseEntity.ok().body(tasks.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
-    }
-
-    private Task addAvatar(Task task) {
-        task.setOwnerAvatar(this.userClient.getUser(task.getOwner()).getAvatar());
-        task.getAssignees().forEach((assignee) -> {
-            assignee.setAvatar(this.userClient.getUser(assignee.getName()).getAvatar());
-        });
-        if (task.getSubTasks() != null) {
-            for (Task subTask : task.getSubTasks()) {
-                addAvatar(subTask);
-            }
-        }
-        return task;
+        return ResponseEntity.ok().body(ProjectItem.addAvatar(tasks, this.userClient));
     }
 
     @GetMapping(TASK_ROUTE)
     public Task getTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return addAvatar(this.taskDaoJpa.getTask(username, taskId));
+        return ProjectItem.addAvatar(this.taskDaoJpa.getTask(username, taskId), this.userClient);
     }
 
     @GetMapping(COMPLETED_TASK_ROUTE)
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username)
-                .toPresentationModel(this.userAliasDaoJpa.getAliases(username)));
+        return ProjectItem.addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username)
+                .toPresentationModel(), this.userClient);
     }
 
     @PostMapping(TASKS_ROUTE)
@@ -134,7 +117,7 @@ public class TaskController {
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Task ##" + createdTask.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdTask.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TASK));
-        return createdTask.toPresentationModel(this.userAliasDaoJpa.getAliases(username));
+        return createdTask.toPresentationModel();
 
     }
 
@@ -213,18 +196,16 @@ public class TaskController {
         }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(username);
         return this.taskDaoJpa.getCompletedTasks(projectId, username, pageNo, pageSize).stream()
-                .map(t -> addAvatar(t.toPresentationModel(aliases)))
+                .map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
                 .collect(Collectors.toList());
     }
 
     private List<Task> getCompletedTasksBetween(Long projectId, String assignee, String startDate, String endDate,
                                                 String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(username);
         return this.taskDaoJpa.getCompletedTasksBetween(projectId, assignee, username, startDate, endDate, timezone)
-                .stream().map(t -> addAvatar(t.toPresentationModel(aliases)))
+                .stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
                 .collect(Collectors.toList());
     }
 

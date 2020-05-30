@@ -19,11 +19,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class Transaction extends ProjectItem {
-    @NotBlank
-    @Size(min = 2, max = 100)
-    private String payer;
 
-    private String payerAvatar;
+    @NotNull
+    private User payer;
 
     @NotNull
     private Double amount;
@@ -45,10 +43,10 @@ public class Transaction extends ProjectItem {
     }
 
     public Transaction(Long id,
-                       @NotBlank String owner,
+                       @NotNull User owner,
                        @NotBlank String name,
                        @NotNull Project project,
-                       @NotBlank String payer,
+                       @NotNull User payer,
                        @NotNull Double amount,
                        @NotNull String date,
                        String time,
@@ -73,20 +71,12 @@ public class Transaction extends ProjectItem {
         return ContentType.TRANSACTION;
     }
 
-    public String getPayer() {
+    public User getPayer() {
         return payer;
     }
 
-    public void setPayer(String payer) {
+    public void setPayer(User payer) {
         this.payer = payer;
-    }
-
-    public String getPayerAvatar() {
-        return payerAvatar;
-    }
-
-    public void setPayerAvatar(String payerAvatar) {
-        this.payerAvatar = payerAvatar;
     }
 
     public Double getAmount() {

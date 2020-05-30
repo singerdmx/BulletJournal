@@ -30,27 +30,14 @@ public class ProjectItems {
     @NotNull
     private DayOfWeek dayOfWeek;
 
-    public static List<ProjectItems> addOwnerAvatar(
+    public static List<ProjectItems> addAvatar(
             List<ProjectItems> projectItems, final UserClient userClient) {
         projectItems.forEach(items -> {
-            items.getNotes().forEach(item -> addOwnerAvatar(item, userClient));
-            items.getTransactions().forEach(item -> addOwnerAvatar(item, userClient));
-            items.getTasks().forEach(item -> addOwnerAvatar(item, userClient));
+            ProjectItem.addAvatar(items.getNotes(), userClient);
+            ProjectItem.addAvatar(items.getTasks(), userClient);
+            ProjectItem.addAvatar(items.getTransactions(), userClient);
         });
         return projectItems;
-    }
-
-    private static void addOwnerAvatar(ProjectItem projectItem, UserClient userClient) {
-        projectItem.setOwnerAvatar(userClient.getUser(projectItem.getOwner()).getAvatar());
-        if (projectItem instanceof Transaction) {
-            Transaction transaction = ((Transaction) projectItem);
-            transaction.setPayerAvatar(userClient.getUser(transaction.getPayer()).getAvatar());
-        } else if (projectItem instanceof Task) {
-            Task task = ((Task) projectItem);
-            task.getAssignees().forEach((assignee) -> {
-                assignee.setAvatar(userClient.getUser(assignee.getName()).getAvatar());
-            });
-        }
     }
 
     public List<Task> getTasks() {

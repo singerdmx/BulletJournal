@@ -30,7 +30,7 @@ type ContentProps = {
 
 export const isContentEditable = (project: Project, projectItem: ProjectItem, content: Content, myself: string) => {
   return project.owner === myself ||
-      projectItem.owner === myself ||
+      projectItem.owner.name === myself ||
       (content && content.owner === myself)
 };
 

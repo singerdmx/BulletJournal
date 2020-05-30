@@ -2,6 +2,7 @@ package com.bulletjournal.repository.models;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.ledger.TransactionType;
 
 import javax.persistence.*;
@@ -10,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -133,21 +133,20 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     }
 
     @Override
-    public com.bulletjournal.controller.models.Transaction toPresentationModel(Map<String, String> aliases) {
+    public com.bulletjournal.controller.models.Transaction toPresentationModel() {
         return this.toPresentationModel(this.getLabels().stream()
                 .map(Label::new)
-                .collect(Collectors.toList()), aliases);
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public com.bulletjournal.controller.models.Transaction toPresentationModel(
-            List<Label> labels, Map<String, String> aliases) {
+    public com.bulletjournal.controller.models.Transaction toPresentationModel(List<Label> labels) {
         return new com.bulletjournal.controller.models.Transaction(
                 this.getId(),
-                this.getOwner(),
+                new User(this.getOwner()),
                 this.getName(),
                 this.getProject(),
-                this.getPayer(),
+                new User(this.getPayer()),
                 this.getAmount(),
                 this.getDate(),
                 this.getTime(),

@@ -28,7 +28,7 @@ interface TaskPageHandler {
 }
 
 const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
-  const { task, contents, aliases, uncompleteTask } = props;
+  const { task, contents, uncompleteTask } = props;
   // get id of task from router
   const { taskId } = useParams();
   // hook history in router
@@ -45,9 +45,9 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const taskOperation = () => {
     return (
       <div className='task-operation'>
-        <Tooltip title={`Created by ${task.owner && aliases[task.owner] ? aliases[task.owner] : task?.owner}`}>
+        <Tooltip title={`Created by ${task.owner.alias}`}>
           <div className='task-owner'>
-            <Avatar src={task.ownerAvatar} />
+            <Avatar src={task.owner.avatar} />
           </div>
         </Tooltip>
         <Tooltip title='Uncomplete Task'>
@@ -80,13 +80,11 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
       createContentElem={null}
       taskEditorElem={null}
       contentEditable={false}
-      aliases={aliases}
     />
   );
 };
 
 const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases,
   task: state.task.task,
   contents: state.task.contents,
 });

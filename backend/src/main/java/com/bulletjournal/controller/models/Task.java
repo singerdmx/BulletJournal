@@ -37,7 +37,7 @@ public class Task extends ProjectItem {
     }
 
     public Task(Long id,
-                @NotBlank String owner,
+                @NotNull User owner,
                 List<User> assignees,
                 String dueDate,
                 String dueTime,

@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class ProjectItem {
 
@@ -22,9 +24,8 @@ public abstract class ProjectItem {
     @NotNull
     protected Long projectId;
 
-    protected String owner;
-
-    protected String ownerAvatar;
+    @NotNull
+    protected User owner;
 
     protected List<Label> labels;
 
@@ -35,13 +36,52 @@ public abstract class ProjectItem {
     public ProjectItem() {
     }
 
-    public ProjectItem(Long id, @NotBlank @Size(min = 1, max = 100) String name, String owner,
+    public ProjectItem(Long id, @NotBlank @Size(min = 1, max = 100) String name, @NotNull User owner,
                        @NotNull Project project, List<Label> labels) {
         this.id = id;
         this.name = name;
         this.owner = owner;
         this.projectId = project.getId();
         this.labels = labels;
+    }
+
+    public static <T extends ProjectItem> List<T> addAvatar(
+            List<T> projectItems, final UserClient userClient) {
+        projectItems.forEach(item -> addAvatar(item, userClient));
+        return projectItems;
+    }
+
+    public static <T extends ProjectItem> T addAvatar(T projectItem, UserClient userClient) {
+        projectItem.setOwner(userClient.getUser(projectItem.getOwner().getName()));
+        switch (projectItem.getContentType()) {
+            case TRANSACTION:
+                Transaction transaction = ((Transaction) projectItem);
+                transaction.setPayer(userClient.getUser(transaction.getPayer().getName()));
+                break;
+            case TASK:
+                Task task = ((Task) projectItem);
+                task.setAssignees(
+                        task.getAssignees().stream()
+                                .map(a -> userClient.getUser(a.getName())).collect(Collectors.toList()));
+                if (task.getSubTasks() != null) {
+                    for (Task subTask : task.getSubTasks()) {
+                        addAvatar(subTask, userClient);
+                    }
+                }
+                break;
+            case NOTE:
+                Note note = (Note) projectItem;
+                if (note.getSubNotes() != null) {
+                    for (Note subNote : note.getSubNotes()) {
+                        addAvatar(subNote, userClient);
+                    }
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid ContentType: " + projectItem.getContentType());
+        }
+
+        return projectItem;
     }
 
     public abstract ContentType getContentType();
@@ -78,20 +118,12 @@ public abstract class ProjectItem {
         this.labels = labels;
     }
 
-    public String getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
-    }
-
-    public String getOwnerAvatar() {
-        return ownerAvatar;
-    }
-
-    public void setOwnerAvatar(String ownerAvatar) {
-        this.ownerAvatar = ownerAvatar;
     }
 
     public Long getUpdatedAt() {
@@ -133,7 +165,6 @@ public abstract class ProjectItem {
         this.setProjectId(projectItem.getProjectId());
         this.setLabels(projectItem.getLabels());
         this.setOwner(projectItem.getOwner());
-        this.setOwnerAvatar(projectItem.getOwnerAvatar());
         this.setUpdatedAt(projectItem.getUpdatedAt());
         this.setCreatedAt(projectItem.getCreatedAt());
     }

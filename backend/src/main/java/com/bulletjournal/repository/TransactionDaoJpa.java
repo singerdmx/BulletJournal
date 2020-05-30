@@ -85,7 +85,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     private com.bulletjournal.controller.models.Transaction addLabels(Transaction transaction) {
         List<Label> labels = this.getLabelsToProjectItem(transaction);
-        return transaction.toPresentationModel(labels, Collections.emptyMap());
+        return transaction.toPresentationModel(labels);
     }
 
     /**
@@ -147,7 +147,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transactions.sort(ProjectItemsGrouper.TRANSACTION_COMPARATOR);
         return transactions.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels, Collections.emptyMap());
+            return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
     }
 

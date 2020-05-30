@@ -97,7 +97,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             return Collections.emptyList();
         }
 
-        List<Note> notes = Collections.emptyList();
+        List<Note> notes;
         if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
             notes = this.noteRepository.findNoteByProject(project);
         } else {
@@ -111,7 +111,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
         return notes.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels, Collections.emptyMap());
+            return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
     }
 
@@ -154,7 +154,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public com.bulletjournal.controller.models.Note getNote(String requester, Long id) {
         Note note = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(note);
-        return note.toPresentationModel(labels, Collections.emptyMap());
+        return note.toPresentationModel(labels);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -169,7 +169,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
         return notes.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels, Collections.emptyMap());
+            return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
     }
 

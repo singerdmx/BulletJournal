@@ -77,30 +77,20 @@ public class NoteController {
         responseHeader.setETag(notesEtag);
 
         return ResponseEntity.ok().headers(responseHeader)
-                .body(notes.stream().map(n -> addAvatar(n)).collect(Collectors.toList()));
+                .body(ProjectItem.addAvatar(notes, this.userClient));
     }
 
     private ResponseEntity<List<Note>> getNotesByOwner(Long projectId, String owner) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Note> notes = this.noteDaoJpa.getNotesByOwner(projectId, username, owner);
-        return ResponseEntity.ok().body(notes.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
+        return ResponseEntity.ok().body(ProjectItem.addAvatar(notes, this.userClient));
     }
 
     private ResponseEntity<List<Note>> getNotesByOrder(Long projectId, String startDate, String endDate,
                                                        String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Note> notes = this.noteDaoJpa.getNotesByOrder(projectId, username, startDate, endDate, timezone);
-        return ResponseEntity.ok().body(notes.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
-    }
-
-    private Note addAvatar(Note note) {
-        note.setOwnerAvatar(this.userClient.getUser(note.getOwner()).getAvatar());
-        if (note.getSubNotes() != null) {
-            for (Note subNote : note.getSubNotes()) {
-                addAvatar(subNote);
-            }
-        }
-        return note;
+        return ResponseEntity.ok().body(ProjectItem.addAvatar(notes, this.userClient));
     }
 
     @PostMapping(NOTES_ROUTE)
@@ -113,13 +103,13 @@ public class NoteController {
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Note ##" + createdNote.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_NOTE));
-        return createdNote.toPresentationModel(Collections.emptyMap());
+        return createdNote.toPresentationModel();
     }
 
     @GetMapping(NOTE_ROUTE)
     public Note getNote(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return addAvatar(this.noteDaoJpa.getNote(username, noteId));
+        return ProjectItem.addAvatar(this.noteDaoJpa.getNote(username, noteId), this.userClient);
     }
 
     @PatchMapping(NOTE_ROUTE)

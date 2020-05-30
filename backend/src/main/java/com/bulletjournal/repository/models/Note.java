@@ -2,10 +2,10 @@ package com.bulletjournal.repository.models;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
+import com.bulletjournal.controller.models.User;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,18 +32,17 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
     }
 
     @Override
-    public com.bulletjournal.controller.models.Note toPresentationModel(Map<String, String> aliases) {
+    public com.bulletjournal.controller.models.Note toPresentationModel() {
         return toPresentationModel(this.getLabels().stream()
                 .map(Label::new)
-                .collect(Collectors.toList()), aliases);
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public com.bulletjournal.controller.models.Note toPresentationModel(
-            List<Label> labels, Map<String, String> aliases) {
+    public com.bulletjournal.controller.models.Note toPresentationModel(List<Label> labels) {
         return new com.bulletjournal.controller.models.Note(
                 this.getId(),
-                this.getOwner(),
+                new User(this.getOwner()),
                 this.getName(),
                 this.getProject(),
                 labels,

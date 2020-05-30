@@ -21,7 +21,7 @@ public class Note extends ProjectItem {
     }
 
     public Note(Long id,
-                @NotBlank String owner,
+                @NotNull User owner,
                 @NotBlank String name,
                 @NotNull Project project,
                 List<Label> labels,

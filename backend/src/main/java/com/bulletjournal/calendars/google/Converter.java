@@ -24,7 +24,7 @@ public class Converter {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         Task task = new Task();
-        task.setOwner(username);
+        task.setOwner(new User(username));
         task.setAssignees(ImmutableList.of(new User(username)));
         task.setName(event.getSummary());
         task.setTimezone(timezone);

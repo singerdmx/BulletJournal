@@ -51,7 +51,6 @@ type TransactionProps = {
   currency: string;
   transaction: Transaction | undefined;
   contents: Content[];
-  aliases: any;
   deleteTransaction: (transactionId: number) => void;
   updateTransactionContents: (transactionId: number) => void;
 };
@@ -67,7 +66,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     transaction,
     deleteTransaction,
     currency,
-    aliases,
     contents,
     updateTransactionContents,
     getTransaction
@@ -138,7 +136,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
         className='transaction-avatar'
       >
         <span>
-          <Avatar size='large' src={transaction.payerAvatar} />
+          <Avatar size='large' src={transaction.payer.avatar} />
         </span>
       </Tooltip>
       <div className='transaction-title'>
@@ -152,9 +150,9 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           />
         </div>
         <div className='transaction-operation'>
-          <Tooltip title={`Created by ${transaction.owner && aliases[transaction.owner] ? aliases[transaction.owner] : transaction.owner}`}>
+          <Tooltip title={`Created by ${transaction.owner.alias}`}>
             <div className='transaction-owner'>
-              <Avatar src={transaction.ownerAvatar} />
+              <Avatar src={transaction.owner.avatar} />
             </div>
           </Tooltip>
           <LabelManagement
@@ -247,7 +245,6 @@ const mapStateToProps = (state: IState) => ({
   transaction: state.transaction.transaction,
   currency: state.myself.currency,
   contents: state.transaction.contents,
-  aliases: state.system.aliases
 });
 
 export default connect(mapStateToProps, {

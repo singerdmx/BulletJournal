@@ -34,7 +34,6 @@ import { User } from '../../features/group/interface';
 
 type ProjectProps = {
   readOnly: boolean;
-  aliases: any;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
 };
@@ -117,7 +116,6 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   const {
     note,
     deleteNote,
-    aliases,
     inModal,
     inProject,
     showModal,
@@ -218,20 +216,9 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
       <div className='project-control'>
         <div className='project-item-owner'>
           <Tooltip
-            title={
-              note.owner && aliases[note.owner]
-                ? aliases[note.owner]
-                : note.owner
-            }
+            title={note.owner.alias}
           >
-            {getAvatar({
-              accepted: true,
-              avatar: note.ownerAvatar ? note.ownerAvatar : '',
-              id: 0,
-              name: note.owner ? note.owner : '',
-              alias: note.owner ? note.owner : '',
-              thumbnail: '',
-            })}
+            {getAvatar(note.owner)}
           </Tooltip>
         </div>
         <div>
@@ -249,10 +236,6 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   );
 };
 
-const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases,
-});
-
-export default connect(mapStateToProps, { deleteNote, setSelectedLabel })(
+export default connect(null, { deleteNote, setSelectedLabel })(
   NoteItem
 );

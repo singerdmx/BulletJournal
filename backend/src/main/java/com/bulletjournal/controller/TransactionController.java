@@ -30,7 +30,6 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,8 +73,8 @@ public class TransactionController {
         }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Transaction> transactions = this.transactionDaoJpa.getTransactions(projectId, startTime, endTime, username)
-                .stream().map(t -> addAvatar(t)).collect(Collectors.toList());
+        List<Transaction> transactions = ProjectItem.addAvatar(
+                this.transactionDaoJpa.getTransactions(projectId, startTime, endTime, username), this.userClient);
 
         String transactionsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, transactions);
@@ -94,13 +93,7 @@ public class TransactionController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Transaction> transactions = this.transactionDaoJpa.getTransactionsByPayer(projectId, username, payer,
                 startTime, endTime);
-        return ResponseEntity.ok().body(transactions.stream().map(t -> addAvatar(t)).collect(Collectors.toList()));
-    }
-
-    private Transaction addAvatar(Transaction transaction) {
-        transaction.setOwnerAvatar(this.userClient.getUser(transaction.getOwner()).getAvatar());
-        transaction.setPayerAvatar(this.userClient.getUser(transaction.getPayer()).getAvatar());
-        return transaction;
+        return ResponseEntity.ok().body(ProjectItem.addAvatar(transactions, this.userClient));
     }
 
     @PostMapping(TRANSACTIONS_ROUTE)
@@ -115,16 +108,14 @@ public class TransactionController {
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Transaction ##" + createdTransaction.getName() + "## in BuJo ##" + projectName + "##",
                 username, createdTransaction.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TRANSACTION));
-        return createdTransaction.toPresentationModel(Collections.emptyMap());
+        return createdTransaction.toPresentationModel();
     }
 
     @GetMapping(TRANSACTION_ROUTE)
     public Transaction getTransaction(@NotNull @PathVariable Long transactionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Transaction transaction = this.transactionDaoJpa.getTransaction(username, transactionId);
-        transaction.setOwnerAvatar(this.userClient.getUser(transaction.getOwner()).getAvatar());
-        transaction.setPayerAvatar(this.userClient.getUser(transaction.getPayer()).getAvatar());
-        return transaction;
+        return ProjectItem.addAvatar(transaction, this.userClient);
     }
 
     @PatchMapping(TRANSACTION_ROUTE)

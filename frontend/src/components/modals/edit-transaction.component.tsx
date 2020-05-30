@@ -75,7 +75,7 @@ const EditTransaction: React.FC<
   const [visible, setVisible] = useState(false);
 
   const [transactionName, setTransactionName] = useState(transaction.name);
-  const [payerName, setPayerName] = useState(transaction.payer);
+  const [payerName, setPayerName] = useState(transaction.payer.name);
   const [amount, setAmount] = useState(transaction.amount);
   const [transactionType, setTransactionType] = useState(
     transaction.transactionType
@@ -118,7 +118,7 @@ const EditTransaction: React.FC<
     setAmount(props.transaction.amount);
     setTransactionType(props.transaction.transactionType);
     setTransTimezone(props.transaction.timezone);
-    setPayerName(props.transaction.payer);
+    setPayerName(props.transaction.payer.name);
   }, [props.transaction]);
 
   const getSelections = () => {

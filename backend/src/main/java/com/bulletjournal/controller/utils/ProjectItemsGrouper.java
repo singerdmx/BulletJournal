@@ -106,7 +106,7 @@ public class ProjectItemsGrouper {
             transactions.sort(TRANSACTION_COMPARATOR);
             projectItem.setTransactions(transactions
                     .stream()
-                    .map(t -> t.toPresentationModel(Collections.emptyMap()))
+                    .map(t -> t.toPresentationModel())
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
@@ -119,8 +119,7 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeTasksMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap,
-                                                                 Map<String, String> aliases) {
+                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap) {
         if (tasksMap == null) {
             return mergedMap;
         }
@@ -133,7 +132,7 @@ public class ProjectItemsGrouper {
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort(TASK_COMPARATOR);
             projectItem.setTasks(tasks.stream().map(t ->
-                    t.toPresentationModel(aliases))
+                    t.toPresentationModel())
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
@@ -160,7 +159,7 @@ public class ProjectItemsGrouper {
             // Sort note by update time
             notes.sort(NOTE_COMPARATOR);
             projectItem.setNotes(notes.stream().map(n ->
-                    n.toPresentationModel(Collections.emptyMap()))
+                    n.toPresentationModel())
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });

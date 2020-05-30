@@ -30,7 +30,6 @@ const LocaleCurrency = require('locale-currency'); //currency code
 type TransactionProps = {
   inProject: boolean;
   currency: string;
-  aliases: any;
   setSelectedLabel: (label: Label) => void;
   showModal?: (user: User) => void;
 };
@@ -97,7 +96,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
     props.setSelectedLabel(label);
     history.push('/labels/search');
   };
-  const { transaction, deleteTransaction, aliases, inModal, inProject, showModal } = props;
+  const { transaction, deleteTransaction, inModal, inProject, showModal } = props;
 
   const getPaymentDateTime = () => {
     if (!transaction.date) {
@@ -199,38 +198,16 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
       <div className='project-control'>
         <div className='project-item-owner'>
           <Tooltip
-            title={`Created by ${
-              aliases[transaction.owner]
-                ? aliases[transaction.owner]
-                : transaction.owner
-            }`}
+            title={`Created by ${transaction.owner.alias}`}
           >
-            {getAvatar({
-              accepted: true,
-              avatar: transaction.ownerAvatar ? transaction.ownerAvatar : '',
-              id: 0,
-              name: transaction.owner ? transaction.owner : '',
-              alias: transaction.owner ? transaction.owner : '',
-              thumbnail: '',
-            })}
+            {getAvatar(transaction.owner)}
           </Tooltip>
         </div>
         <div className='project-item-owner'>
           <Tooltip
-            title={`Payer ${
-              aliases[transaction.payer]
-                ? aliases[transaction.payer]
-                : transaction.payer
-            }`}
+            title={`Payer ${transaction.payer.alias}`}
           >
-            {getAvatar({
-              accepted: true,
-              avatar: transaction.payerAvatar ? transaction.payerAvatar : '',
-              id: 0,
-              name: transaction.payer ? transaction.payer : '',
-              alias: transaction.payer ? transaction.payer : '',
-              thumbnail: '',
-            })}
+            {getAvatar(transaction.payer)}
           </Tooltip>
         </div>
         <div className='project-item-owner'>
@@ -260,7 +237,6 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
 
 const mapStateToProps = (state: IState) => ({
   currency: state.myself.currency,
-  aliases: state.system.aliases,
 });
 
 export default connect(mapStateToProps, {

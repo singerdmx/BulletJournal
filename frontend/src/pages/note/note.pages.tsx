@@ -44,7 +44,7 @@ interface NotePageHandler {
 const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   // hook history in router
   const history = useHistory();
-  const { note, deleteNote, contents, getNote, updateNoteContents, aliases } = props;
+  const { note, deleteNote, contents, getNote, updateNoteContents } = props;
   // get id of note from router
   const { noteId } = useParams();
   // state control drawer displaying
@@ -150,7 +150,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   return (
     <NoteDetailPage
       note={note}
-      aliases={aliases}
       labelEditable={labelEditable}
       noteOperation={noteOperation}
       createContentElem={createContentElem}
@@ -161,7 +160,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases,
   note: state.note.note,
   contents: state.note.contents,
 });

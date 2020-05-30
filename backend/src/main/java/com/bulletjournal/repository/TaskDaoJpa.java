@@ -2,7 +2,6 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
-import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateTaskParams;
 import com.bulletjournal.controller.models.ProjectType;
@@ -29,7 +28,6 @@ import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -116,7 +114,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         final Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project).stream()
                 .collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor
-                .processRelations(tasksMap, projectTasks.getTasks(), this.userAliasDaoJpa.getAliases(requester))
+                .processRelations(tasksMap, projectTasks.getTasks())
                 .stream().map(task -> addLabels(task, tasksMap)).collect(Collectors.toList());
     }
 
@@ -143,7 +141,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
         return tasks.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels, this.userAliasDaoJpa.getAliases(requester));
+            return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
     }
 
@@ -169,7 +167,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
         return tasks.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels, this.userAliasDaoJpa.getAliases(requester));
+            return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
     }
 
@@ -205,7 +203,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public com.bulletjournal.controller.models.Task getTask(String requester, Long id) {
         Task task = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
-        return task.toPresentationModel(labels, this.userAliasDaoJpa.getAliases(requester));
+        return task.toPresentationModel(labels);
     }
 
     /**
@@ -242,11 +240,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         // Subtract current time by 10 minutes to compare with task's starting time
         Timestamp startTime = Timestamp.from(now.minusMinutes(REMINDING_TASK_BUFFER_IN_MINS).toInstant());
 
-        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(MDC.get(UserClient.USER_NAME_KEY));
         // Fetch regular reminding tasks
         List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
                 .findRemindingTasks(assignee, currentTime.toString(), startTime.toString()).stream()
-                .map(t -> t.toPresentationModel(aliases)).collect(Collectors.toList());
+                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
 
         // Fetch recurring reminding tasks
         List<com.bulletjournal.controller.models.Task> recurringTask = getRecurringTaskNeedReminding(assignee, now);
@@ -289,11 +286,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(final String assignee,
                                                                                         final ZonedDateTime now) {
         ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
-        Map<String, String> aliases = this.userAliasDaoJpa.getAliases(MDC.get(UserClient.USER_NAME_KEY));
         return this.getRecurringTasks(assignee, now, maxRemindingTime).stream()
                 .filter(t -> t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now))
                         && t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
-                .map(t -> t.toPresentationModel(aliases)).collect(Collectors.toList());
+                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 
     /**

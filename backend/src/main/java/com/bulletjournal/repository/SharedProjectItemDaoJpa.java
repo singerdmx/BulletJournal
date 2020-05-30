@@ -55,7 +55,7 @@ public class SharedProjectItemDaoJpa {
             }
 
             if (projectType == null || projectType.getValue() == projectItem.getProject().getType().intValue()) {
-                T target = (T) projectItem.toPresentationModel(Collections.emptyMap());
+                T target = (T) projectItem.toPresentationModel();
                 result.add(target);
             }
         });

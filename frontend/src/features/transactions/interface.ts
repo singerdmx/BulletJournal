@@ -1,11 +1,10 @@
 import { ProjectItem } from '../myBuJo/interface';
+import {User} from "../group/interface";
 
 export interface Transaction extends ProjectItem {
   amount: number;
-  owner: string;
-  payer: string;
+  payer: User;
   date: string;
-  payerAvatar?: string;
   time: string;
   timezone: string;
   transactionType: number;

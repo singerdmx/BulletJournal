@@ -81,7 +81,7 @@ public class LedgerSummaryCalculator {
                 break;
             case PAYER:
                 processTransaction(transactions, total, (t -> {
-                    Transactions tran = m.computeIfAbsent(t.getPayer(), k -> new Transactions());
+                    Transactions tran = m.computeIfAbsent(t.getPayer().getName(), k -> new Transactions());
                     double amount = t.getAmount();
                     switch (TransactionType.getType(t.getTransactionType())) {
                         case INCOME:

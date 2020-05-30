@@ -32,7 +32,6 @@ const PublicPage: React.FC<PageProps> = (props) => {
       <div>
         <TaskDetailPage
           task={task}
-          aliases={{}}
           labelEditable={false}
           taskOperation={() => null}
           contents={contents}
@@ -48,7 +47,6 @@ const PublicPage: React.FC<PageProps> = (props) => {
       <div>
         <NoteDetailPage
           note={note}
-          aliases={{}}
           labelEditable={false}
           createContentElem={null}
           noteOperation={() => null}

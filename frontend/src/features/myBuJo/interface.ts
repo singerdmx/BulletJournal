@@ -3,6 +3,7 @@ import { Note } from '../notes/interface';
 import { Transaction } from '../transactions/interface';
 import { Label } from '../label/interface';
 import { ContentType } from '../myBuJo/constants';
+import {User} from "../group/interface";
 
 export interface ProjectItems {
   tasks: Task[];
@@ -15,8 +16,7 @@ export interface ProjectItems {
 export interface ProjectItem {
   id: number;
   name: string;
-  owner?: string;
-  ownerAvatar?: string;
+  owner: User;
   projectId: number;
   labels: Label[];
   contentType: ContentType;

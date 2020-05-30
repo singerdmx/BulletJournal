@@ -42,7 +42,7 @@ interface TaskPageHandler {
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
-  const { task, deleteTask, updateTaskContents, getTask, contents, aliases, completeTask } = props;
+  const { task, deleteTask, updateTaskContents, getTask, contents, completeTask } = props;
   // get id of task from router
   const { taskId } = useParams();
   // state control drawer displaying
@@ -201,7 +201,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   return (
     <TaskDetailPage
       task={task}
-      aliases={aliases}
       labelEditable={labelEditable}
       taskOperation={taskOperation}
       contents={contents}
@@ -212,7 +211,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases,
   task: state.task.task,
   contents: state.task.contents,
 });

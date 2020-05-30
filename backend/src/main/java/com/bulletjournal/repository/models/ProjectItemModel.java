@@ -60,10 +60,10 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel
         this.project = project;
     }
 
-    public abstract T toPresentationModel(Map<String, String> aliases);
+    public abstract T toPresentationModel();
 
     public abstract T toPresentationModel(
-            List<com.bulletjournal.controller.models.Label> labels, Map<String, String> aliases);
+            List<com.bulletjournal.controller.models.Label> labels);
 
     public abstract ContentType getContentType();
 

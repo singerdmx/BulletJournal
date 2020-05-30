@@ -30,7 +30,6 @@ import {
   getItemIcon,
 } from '../draggable-labels/draggable-label-list.component';
 import { setSelectedLabel } from '../../features/label/actions';
-import { IState } from '../../store';
 import { User } from '../../features/group/interface';
 
 type ProjectProps = {
@@ -52,7 +51,6 @@ type ManageTaskProps = {
 };
 
 type TaskProps = {
-  aliases: any;
   inProject: boolean;
 };
 
@@ -299,7 +297,6 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     uncompleteTask,
     deleteTask,
     deleteCompletedTask,
-    aliases,
     showModal,
     showOrderModal,
   } = props;
@@ -413,20 +410,9 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
       <div className='project-control'>
         <div className='project-item-owner'>
           <Tooltip
-            title={`Created by ${
-              task.owner && aliases[task.owner]
-                ? aliases[task.owner]
-                : task.owner
-            }`}
+            title={`Created by ${task.owner.alias}`}
           >
-            {getAvatar({
-              accepted: true,
-              avatar: task.ownerAvatar ? task.ownerAvatar : '',
-              id: 0,
-              name: task.owner ? task.owner : '',
-              alias: task.owner ? task.owner : '',
-              thumbnail: '',
-            })}
+            {getAvatar(task.owner)}
           </Tooltip>
         </div>
         <div className='project-item-assignee'>{getAssignees()}</div>
@@ -441,11 +427,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   );
 };
 
-const mapStateToProps = (state: IState) => ({
-  aliases: state.system.aliases,
-});
-
-export default connect(mapStateToProps, {
+export default connect(null, {
   completeTask,
   uncompleteTask,
   deleteTask,
