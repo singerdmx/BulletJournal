@@ -164,6 +164,12 @@ public class TransactionController {
                         transactionId, Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
     }
 
+    @DeleteMapping(TRANSACTIONS_ROUTE)
+    public void deleteTransactions(
+            @NotNull @PathVariable Long projectId, @NotNull @RequestParam List<Long> transactions) {
+        // curl -X DELETE "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14" -H "accept: */*"
+    }
+
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
     public Transaction setLabels(@NotNull @PathVariable Long transactionId, @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

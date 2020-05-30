@@ -13,6 +13,7 @@ import com.bulletjournal.redis.RedisLockedUserRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.controller.models.User;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -88,10 +89,10 @@ public class AdminController {
         String ip = unlockUserParams.getIp();
         String name = unlockUserParams.getName();
 
-        if (ip != null) {
+        if (StringUtils.isNotBlank(ip)) {
             redisLockedIPRepository.delete(new LockedIP(ip, null));
         }
-        if (name != null) {
+        if (StringUtils.isNotBlank(name)) {
             redisLockedUserRepository.delete(new LockedUser(name, null));
         }
     }
