@@ -44,6 +44,23 @@ export const deleteTransactionById = (transactionId: number) => {
   });
 };
 
+export const deleteTransactions = (
+  projectId: number,
+  transactionsId: number[]
+) => {
+  let url = `/api/projects/${projectId}/transactions`;
+  if (transactionsId && transactionsId.length > 0) {
+    url += `?transactions=${transactionsId[0]}`;
+
+    for (var i = 1; i < transactionsId.length; i++) {
+      url += `&transactions=${transactionsId[i]}`;
+    }
+  }
+  return doDelete(url).catch((err) => {
+    throw Error(err.message);
+  });
+};
+
 export const createTransaction = (
   projectId: number,
   amount: number,

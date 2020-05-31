@@ -17,6 +17,7 @@ import {
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
   GetTransactionsByPayer,
+  DeleteTransactions,
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -26,6 +27,7 @@ import {
   getTransactionById,
   updateTransaction,
   deleteTransactionById,
+  deleteTransactions as deleteTransactionsApi,
   moveToTargetProject,
   setTransactionLabels,
   shareTransactionWithOther,
@@ -216,6 +218,66 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
     const transactionsByPayer = state.transaction.transactionsByPayer.filter(
       (t) => t.id !== transactionId
+    );
+    yield put(
+      transactionsActions.transactionsByPayerReceived({
+        transactionsByPayer: transactionsByPayer,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Delete Transaction Error Received: ${error}`);
+  }
+}
+
+function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
+  try {
+    const { projectId, transactionsId } = action.payload;
+    const state: IState = yield select();
+
+    yield put(
+      transactionsActions.transactionReceived({ transaction: undefined })
+    );
+    yield call(deleteTransactionsApi, projectId, transactionsId);
+
+    const data = yield call(
+      fetchTransactions,
+      projectId,
+      state.transaction.timezone,
+      state.transaction.ledgerSummaryType,
+      state.transaction.frequencyType,
+      state.transaction.startDate,
+      state.transaction.endDate
+    );
+    const ledgerSummary: LedgerSummary = yield data.json();
+    yield put(
+      transactionsActions.transactionsReceived({
+        ledgerSummary: ledgerSummary,
+      })
+    );
+
+    yield put(
+      getProjectItemsAfterUpdateSelect(
+        state.myBuJo.todoSelected,
+        state.myBuJo.ledgerSelected,
+        state.myBuJo.noteSelected,
+        'today'
+      )
+    );
+
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.transactions) {
+        projectItem.transactions = projectItem.transactions.filter(
+          (transaction) => !transactionsId.includes(transaction.id)
+        );
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
+
+    const transactionsByPayer = state.transaction.transactionsByPayer.filter(
+      (t) => !transactionsId.includes(t.id)
     );
     yield put(
       transactionsActions.transactionsByPayerReceived({
@@ -497,6 +559,10 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.TransactionDelete.type,
       deleteTransaction
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionsDelete.type,
+      deleteTransactions
     ),
     yield takeLatest(
       transactionsActions.TransactionSetLabels.type,

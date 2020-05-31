@@ -83,6 +83,11 @@ export type DeleteTransaction = {
   transactionId: number;
 };
 
+export type DeleteTransactions = {
+  projectId: number;
+  transactionsId: number[];
+};
+
 export type updateFrequencyAction = {
   frequencyType: string;
 };
@@ -195,6 +200,8 @@ const slice = createSlice({
       state,
     TransactionGet: (state, action: PayloadAction<GetTransaction>) => state,
     TransactionDelete: (state, action: PayloadAction<DeleteTransaction>) =>
+      state,
+    TransactionsDelete: (state, action: PayloadAction<DeleteTransactions>) =>
       state,
     TransactionPatch: (state, action: PayloadAction<PatchTransaction>) => state,
     TransactionMove: (state, action: PayloadAction<MoveTransaction>) => state,

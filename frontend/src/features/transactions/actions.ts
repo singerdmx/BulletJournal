@@ -44,6 +44,14 @@ export const getTransaction = (transactionId: number) =>
   actions.TransactionGet({ transactionId: transactionId });
 export const deleteTransaction = (transactionId: number) =>
   actions.TransactionDelete({ transactionId: transactionId });
+export const deleteTransactions = (
+  projectId: number,
+  transactionsId: number[]
+) =>
+  actions.TransactionsDelete({
+    projectId: projectId,
+    transactionsId: transactionsId,
+  });
 export const patchTransaction = (
   transactionId: number,
   amount: number,
