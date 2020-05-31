@@ -8,6 +8,8 @@ import com.bulletjournal.es.SearchService;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.NoteDaoJpa;
+import com.bulletjournal.repository.NoteRepository;
+import com.bulletjournal.repository.ProjectItemDaoJpa;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -56,11 +58,14 @@ public class NoteController {
     @Autowired
     private SearchService searchService;
 
+    @Autowired
+    private NoteRepository noteRepository;
+
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId,
-                                               @RequestParam(required = false) String owner, @RequestParam(required = false) String startDate,
-                                               @RequestParam(required = false) String endDate, @RequestParam(required = false) Boolean order,
-                                               @RequestParam(required = false) String timezone) {
+            @RequestParam(required = false) String owner, @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate, @RequestParam(required = false) Boolean order,
+            @RequestParam(required = false) String timezone) {
         if (StringUtils.isNotBlank(owner)) {
             return getNotesByOwner(projectId, owner);
         }
@@ -76,8 +81,7 @@ public class NoteController {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(notesEtag);
 
-        return ResponseEntity.ok().headers(responseHeader)
-                .body(ProjectItem.addAvatar(notes, this.userClient));
+        return ResponseEntity.ok().headers(responseHeader).body(ProjectItem.addAvatar(notes, this.userClient));
     }
 
     private ResponseEntity<List<Note>> getNotesByOwner(Long projectId, String owner) {
@@ -87,7 +91,7 @@ public class NoteController {
     }
 
     private ResponseEntity<List<Note>> getNotesByOrder(Long projectId, String startDate, String endDate,
-                                                       String timezone) {
+            String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Note> notes = this.noteDaoJpa.getNotesByOrder(projectId, username, startDate, endDate, timezone);
         return ResponseEntity.ok().body(ProjectItem.addAvatar(notes, this.userClient));
@@ -114,15 +118,15 @@ public class NoteController {
 
     @PatchMapping(NOTE_ROUTE)
     public ResponseEntity<List<Note>> updateNote(@NotNull @PathVariable Long noteId,
-                                                 @Valid @RequestBody UpdateNoteParams updateNoteParams) {
+            @Valid @RequestBody UpdateNoteParams updateNoteParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.repository.models.Note updatedNote = this.noteDaoJpa.partialUpdate(username, noteId,
                 updateNoteParams);
         Long projectId = updatedNote.getProject().getId();
         String projectName = updatedNote.getProject().getName();
-        this.notificationService.trackActivity(new Auditable(projectId,
-                "updated note ##" + updatedNote.getName() + "## in BuJo " + projectName + "##", username, noteId,
-                Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE));
+        this.notificationService.trackActivity(
+                new Auditable(projectId, "updated note ##" + updatedNote.getName() + "## in BuJo " + projectName + "##",
+                        username, noteId, Timestamp.from(Instant.now()), ContentAction.UPDATE_NOTE));
         return getNotes(projectId, null, null, null, null, null);
     }
 
@@ -143,9 +147,22 @@ public class NoteController {
         return getNotes(note.getProjectId(), null, null, null, null, null);
     }
 
+    @DeleteMapping(NOTES_ROUTE)
+    public void deleteNotes(@NotNull @PathVariable Long projectId, @NotNull @RequestParam List<Long> notes) {
+        // curl -X DELETE
+        // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
+        // -H "accept: */*"
+
+        notes.forEach(n -> {
+            if (this.noteRepository.existsById(n)) {
+                this.deleteNote(n);
+            }
+        });
+    }
+
     @PutMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> updateNoteRelations(@NotNull @PathVariable Long projectId,
-                                                          @Valid @RequestBody List<Note> notes, @RequestHeader(IF_NONE_MATCH) Optional<String> notesEtag) {
+            @Valid @RequestBody List<Note> notes, @RequestHeader(IF_NONE_MATCH) Optional<String> notesEtag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         if (notesEtag.isPresent()) {
             List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
@@ -168,22 +185,20 @@ public class NoteController {
 
     @PostMapping(MOVE_NOTE_ROUTE)
     public void moveNote(@NotNull @PathVariable Long noteId,
-                         @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
+            @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Pair<com.bulletjournal.repository.models.Note, com.bulletjournal.repository.models.Project> res =
-                this.noteDaoJpa.move(username, noteId, moveProjectItemParams.getTargetProject());
+        Pair<com.bulletjournal.repository.models.Note, com.bulletjournal.repository.models.Project> res = this.noteDaoJpa
+                .move(username, noteId, moveProjectItemParams.getTargetProject());
         com.bulletjournal.repository.models.Note note = res.getLeft();
         com.bulletjournal.repository.models.Project targetProject = res.getRight();
-        this.notificationService.trackActivity(
-                new Auditable(note.getProject().getId(),
-                        "moved Note ##" + note.getName() + "## to BuJo ##" + targetProject.getName() + "##",
-                        username, note.getId(), Timestamp.from(Instant.now()), ContentAction.MOVE_NOTE)
-        );
+        this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
+                "moved Note ##" + note.getName() + "## to BuJo ##" + targetProject.getName() + "##", username,
+                note.getId(), Timestamp.from(Instant.now()), ContentAction.MOVE_NOTE));
     }
 
     @PostMapping(SHARE_NOTE_ROUTE)
     public SharableLink shareNote(@NotNull @PathVariable Long noteId,
-                                  @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
+            @NotNull @RequestBody ShareProjectItemParams shareProjectItemParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         if (shareProjectItemParams.isGenerateLink()) {
             return this.noteDaoJpa.generatePublicItemLink(noteId, username, shareProjectItemParams.getTtl());
@@ -206,14 +221,14 @@ public class NoteController {
 
     @PostMapping(REVOKE_SHARABLE_ROUTE)
     public void revokeSharable(@NotNull @PathVariable Long noteId,
-                               @NotNull @RequestBody RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
+            @NotNull @RequestBody RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.revokeSharable(noteId, username, revokeProjectItemSharableParams);
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)
     public Content addContent(@NotNull @PathVariable Long noteId,
-                              @NotNull @RequestBody CreateContentParams createContentParams) {
+            @NotNull @RequestBody CreateContentParams createContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         Pair<ContentModel, ProjectItemModel> res = this.noteDaoJpa.addContent(noteId, username,
@@ -235,8 +250,7 @@ public class NoteController {
     public List<Content> getContents(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return Content.addOwnerAvatar(this.noteDaoJpa.getContents(noteId, username).stream()
-                .map(t -> t.toPresentationModel())
-                .collect(Collectors.toList()), this.userClient);
+                .map(t -> t.toPresentationModel()).collect(Collectors.toList()), this.userClient);
     }
 
     @DeleteMapping(CONTENT_ROUTE)
@@ -253,7 +267,7 @@ public class NoteController {
 
     @PatchMapping(CONTENT_ROUTE)
     public List<Content> updateContent(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId,
-                                       @NotNull @RequestBody UpdateContentParams updateContentParams) {
+            @NotNull @RequestBody UpdateContentParams updateContentParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         ProjectItemModel note = this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams)
                 .getRight();
@@ -267,7 +281,7 @@ public class NoteController {
 
     @GetMapping(CONTENT_REVISIONS_ROUTE)
     public Revision getContentRevision(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId,
-                                       @NotNull @PathVariable Long revisionId) {
+            @NotNull @PathVariable Long revisionId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);

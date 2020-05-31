@@ -25,6 +25,11 @@ export const putNote = (projectId: number, notes: Note[]) =>
   actions.NotePut({ projectId: projectId, notes: notes });
 export const deleteNote = (noteId: number) =>
   actions.NoteDelete({ noteId: noteId });
+export const deleteNotes = (projectId: number, notesId: number[]) =>
+  actions.NotesDelete({
+    projectId: projectId,
+    notesId: notesId,
+  });
 export const deleteContent = (noteId: number, contentId: number) =>
   actions.NoteContentDelete({ noteId: noteId, contentId: contentId });
 export const patchNote = (noteId: number, name: string) =>

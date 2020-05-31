@@ -39,6 +39,20 @@ export const deleteNoteById = (noteId: number) => {
     });
 };
 
+export const deleteNotes = (projectId: number, notesId: number[]) => {
+  let url = `/api/projects/${projectId}/notes`;
+  if (notesId && notesId.length > 0) {
+    url += `?notes=${notesId[0]}`;
+
+    for (var i = 1; i < notesId.length; i++) {
+      url += `&notes=${notesId[i]}`;
+    }
+  }
+  return doDelete(url).catch((err) => {
+    throw Error(err.message);
+  });
+};
+
 export const createNote = (
   projectId: number,
   name: string,

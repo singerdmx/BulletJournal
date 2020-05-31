@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Modal, Empty, Tooltip, Checkbox, message } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
@@ -24,9 +24,9 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   const { visible, assignee, tasksByAssignee } = props;
   const [checkboxVisible, setCheckboxVisible] = useState(false);
   const [checked, setChecked] = useState([] as number[]);
-  const onCheck = (id : number) => {
+  const onCheck = (id: number) => {
     if (checked.includes(id)) {
-      setChecked(checked.filter(c => c !== id));
+      setChecked(checked.filter((c) => c !== id));
       return;
     }
 
@@ -37,12 +37,14 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
     return tasksByAssignee.map((task, index) => {
       return (
         <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-          {checkboxVisible && <Checkbox
+          {checkboxVisible && (
+            <Checkbox
               checked={checked.includes(task.id)}
               key={task.id}
               style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
               onChange={(e) => onCheck(task.id)}
-          />}
+            />
+          )}
           <TaskItem
             task={task}
             isComplete={false}
@@ -79,6 +81,8 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
     if (checked.length === 0) {
       message.error('No Selection');
       return;
+    } else {
+      setChecked([] as number[]);
     }
   };
 
@@ -93,21 +97,21 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
         <Empty />
       ) : (
         <div>
-          <div className="checkbox-actions">
-            <Tooltip title="Select All">
+          <div className='checkbox-actions'>
+            <Tooltip title='Select All'>
               <CheckSquareTwoTone onClick={selectAll} />
             </Tooltip>
-            <Tooltip title="Clear All">
+            <Tooltip title='Clear All'>
               <CloseSquareTwoTone onClick={clearAll} />
             </Tooltip>
-            <Tooltip title="Complete All">
+            <Tooltip title='Complete All'>
               <CheckCircleTwoTone
-                twoToneColor="#52c41a"
+                twoToneColor='#52c41a'
                 onClick={completeAll}
               />
             </Tooltip>
-            <Tooltip title="Delete All">
-              <DeleteTwoTone twoToneColor="#f5222d" onClick={deleteAll} />
+            <Tooltip title='Delete All'>
+              <DeleteTwoTone twoToneColor='#f5222d' onClick={deleteAll} />
             </Tooltip>
           </div>
           <div>{getList()}</div>

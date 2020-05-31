@@ -1,21 +1,89 @@
-import React from 'react';
-import { Modal, Empty } from 'antd';
+import React, { useState } from 'react';
+import { Modal, Empty, Tooltip, message, Checkbox } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
 import NoteItem from '../project-item/note-item.component';
 import { Note } from '../../features/notes/interface';
 import { User } from '../../features/group/interface';
+import {
+  CheckSquareTwoTone,
+  CloseSquareTwoTone,
+  DeleteTwoTone,
+} from '@ant-design/icons';
+import { deleteNotes } from '../../features/notes/actions';
+import { Project } from '../../features/project/interface';
 
 type NotesByOwnerProps = {
+  project: Project | undefined;
   notesByOwner: Note[];
   visible: boolean;
   owner: User | undefined;
   onCancel: () => void;
+  deleteNotes: (projectId: number, notesId: number[]) => void;
 };
 
 const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
-  const { visible, owner, notesByOwner } = props;
+  const { project, visible, owner, notesByOwner, deleteNotes } = props;
+
+  const [checkboxVisible, setCheckboxVisible] = useState(false);
+  const [checked, setChecked] = useState([] as number[]);
+  const onCheck = (id: number) => {
+    if (checked.includes(id)) {
+      setChecked(checked.filter((c) => c !== id));
+      return;
+    }
+
+    setChecked(checked.concat([id]));
+  };
+
+  const getList = () => {
+    return notesByOwner.map((note, index) => {
+      return (
+        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+          {checkboxVisible && (
+            <Checkbox
+              checked={checked.includes(note.id)}
+              key={note.id}
+              style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
+              onChange={(e) => onCheck(note.id)}
+            />
+          )}
+          <NoteItem
+            note={note}
+            readOnly={false}
+            inProject={false}
+            inModal={true}
+          />
+        </div>
+      );
+    });
+  };
+
+  const selectAll = () => {
+    setCheckboxVisible(true);
+    setChecked(notesByOwner.map((n) => n.id));
+  };
+
+  const clearAll = () => {
+    setCheckboxVisible(true);
+    setChecked([]);
+  };
+
+  const deleteAll = () => {
+    if (project === undefined) {
+      return;
+    }
+
+    setCheckboxVisible(true);
+    if (checked.length === 0) {
+      message.error('No Selection');
+    } else {
+      deleteNotes(project.id, checked);
+      setChecked([] as number[]);
+    }
+  };
+
   return (
     <Modal
       title={`Note(s) created by ${owner ? owner.alias : ''}`}
@@ -26,13 +94,20 @@ const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
       {notesByOwner.length === 0 ? (
         <Empty />
       ) : (
-        notesByOwner.map((note, index) => {
-          return (
-            <div key={index}>
-              <NoteItem note={note} readOnly={false} inProject={false} inModal={true}/>
-            </div>
-          );
-        })
+        <div>
+          <div className='checkbox-actions'>
+            <Tooltip title='Select All'>
+              <CheckSquareTwoTone onClick={selectAll} />
+            </Tooltip>
+            <Tooltip title='Clear All'>
+              <CloseSquareTwoTone onClick={clearAll} />
+            </Tooltip>
+            <Tooltip title='Delete All'>
+              <DeleteTwoTone twoToneColor='#f5222d' onClick={deleteAll} />
+            </Tooltip>
+          </div>
+          {getList()}
+        </div>
       )}
     </Modal>
   );
@@ -40,6 +115,7 @@ const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   notesByOwner: state.note.notesByOwner,
+  project: state.project.project,
 });
 
-export default connect(mapStateToProps, {})(NotesByOwner);
+export default connect(mapStateToProps, { deleteNotes })(NotesByOwner);

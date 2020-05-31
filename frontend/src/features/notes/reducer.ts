@@ -108,6 +108,11 @@ export type ContentsAction = {
   contents: Content[];
 };
 
+export type DeleteNotes = {
+  projectId: number;
+  notesId: number[];
+};
+
 export type ShareLinkAction = {
   link: string;
 };
@@ -211,6 +216,7 @@ const slice = createSlice({
     NotePut: (state, action: PayloadAction<PutNote>) => state,
     NoteGet: (state, action: PayloadAction<GetNote>) => state,
     NoteDelete: (state, action: PayloadAction<DeleteNote>) => state,
+    NotesDelete: (state, action: PayloadAction<DeleteNotes>) => state,
     NoteContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
     NotePatch: (state, action: PayloadAction<PatchNote>) => {
       state.patchLoading = false;

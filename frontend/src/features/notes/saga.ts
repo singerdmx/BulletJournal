@@ -21,6 +21,7 @@ import {
   UpdateNotes,
   GetNotesByOwner,
   GetNotesByOrder,
+  DeleteNotes,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -40,12 +41,14 @@ import {
   shareNoteWithOther,
   updateContent,
   updateNote,
+  deleteNotes as deleteNotesApi,
 } from '../../apis/noteApis';
 import { IState } from '../../store';
 import { updateNoteContents, updateNotes } from './actions';
 import { Content, ProjectItems, Revision } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
 import { actions as SystemActions } from '../system/reducer';
+import { Note } from './interface';
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -332,6 +335,44 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
   }
 }
 
+function* notesDelete(action: PayloadAction<DeleteNotes>) {
+  try {
+    const { projectId, notesId } = action.payload;
+    yield call(deleteNotesApi, projectId, notesId);
+
+    const data = yield call(fetchNotes, projectId);
+    const notes: Note[] = yield data.json();
+    yield put(
+      notesActions.notesReceived({
+        notes: notes,
+      })
+    );
+
+    yield put(notesActions.noteReceived({ note: undefined }));
+    const state: IState = yield select();
+
+    const notesByOwner = state.note.notesByOwner.filter(
+      (n) => !notesId.includes(n.id)
+    );
+    yield put(
+      notesActions.notesByOwnerReceived({
+        notesByOwner: notesByOwner,
+      })
+    );
+
+    const notesByOrder = state.note.notesByOrder.filter(
+      (n) => !notesId.includes(n.id)
+    );
+    yield put(
+      notesActions.notesByOrderReceived({
+        notesByOrder: notesByOrder,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Delete Note Error Received: ${error}`);
+  }
+}
+
 function* deleteNoteContent(action: PayloadAction<DeleteContent>) {
   try {
     const { noteId, contentId } = action.payload;
@@ -459,5 +500,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NoteRevokeSharable.type, revokeNoteSharable),
     yield takeLatest(notesActions.getNotesByOwner.type, getNotesByOwner),
     yield takeLatest(notesActions.getNotesByOrder.type, getNotesByOrder),
+    yield takeLatest(notesActions.NotesDelete.type, notesDelete),
   ]);
 }

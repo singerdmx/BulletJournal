@@ -85,6 +85,7 @@ const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
       return;
     } else {
       deleteTransactions(project.id, checked);
+      setChecked([] as number[]);
     }
   };
 

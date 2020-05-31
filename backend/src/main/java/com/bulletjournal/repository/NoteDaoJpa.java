@@ -55,10 +55,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         return this.noteRepository;
     }
 
-    @Retryable(
-            value = { Exception.class },
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 100))
+    @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 100))
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
