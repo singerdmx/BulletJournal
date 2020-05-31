@@ -338,9 +338,7 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
 function* notesDelete(action: PayloadAction<DeleteNotes>) {
   try {
     const { projectId, notesId } = action.payload;
-    yield call(deleteNotesApi, projectId, notesId);
-
-    const data = yield call(fetchNotes, projectId);
+    const data = yield call(deleteNotesApi, projectId, notesId);
     const notes: Note[] = yield data.json();
     yield put(
       notesActions.notesReceived({

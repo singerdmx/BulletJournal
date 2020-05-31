@@ -9,7 +9,6 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
-import com.bulletjournal.repository.ProjectItemDaoJpa;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -148,16 +147,17 @@ public class NoteController {
     }
 
     @DeleteMapping(NOTES_ROUTE)
-    public void deleteNotes(@NotNull @PathVariable Long projectId, @NotNull @RequestParam List<Long> notes) {
+    public ResponseEntity<List<Note>> deleteNotes(@NotNull @PathVariable Long projectId,
+            @NotNull @RequestParam List<Long> notes) {
         // curl -X DELETE
         // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
         // -H "accept: */*"
-
         notes.forEach(n -> {
             if (this.noteRepository.existsById(n)) {
                 this.deleteNote(n);
             }
         });
+        return getNotes(projectId, null, null, null, null, null);
     }
 
     @PutMapping(NOTES_ROUTE)
