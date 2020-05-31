@@ -234,6 +234,14 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
     const { projectId, transactionsId } = action.payload;
     const state: IState = yield select();
 
+    const transactionsByPayer = state.transaction.transactionsByPayer.filter(
+        (t) => !transactionsId.includes(t.id)
+    );
+    yield put(
+        transactionsActions.transactionsByPayerReceived({
+          transactionsByPayer: transactionsByPayer,
+        })
+    );
     yield put(
       transactionsActions.transactionReceived({ transaction: undefined })
     );
@@ -252,36 +260,6 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
     yield put(
       transactionsActions.transactionsReceived({
         ledgerSummary: ledgerSummary,
-      })
-    );
-
-    yield put(
-      getProjectItemsAfterUpdateSelect(
-        state.myBuJo.todoSelected,
-        state.myBuJo.ledgerSelected,
-        state.myBuJo.noteSelected,
-        'today'
-      )
-    );
-
-    const labelItems: ProjectItems[] = [];
-    state.label.items.forEach((projectItem: ProjectItems) => {
-      projectItem = { ...projectItem };
-      if (projectItem.transactions) {
-        projectItem.transactions = projectItem.transactions.filter(
-          (transaction) => !transactionsId.includes(transaction.id)
-        );
-      }
-      labelItems.push(projectItem);
-    });
-    yield put(updateItemsByLabels(labelItems));
-
-    const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-      (t) => !transactionsId.includes(t.id)
-    );
-    yield put(
-      transactionsActions.transactionsByPayerReceived({
-        transactionsByPayer: transactionsByPayer,
       })
     );
   } catch (error) {
