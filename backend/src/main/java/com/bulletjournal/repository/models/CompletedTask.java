@@ -40,7 +40,6 @@ public class CompletedTask extends TaskModel {
         this.setReminderDateTime(task.getReminderDateTime());
         this.setCreatedAt(task.getCreatedAt());
         this.setUpdatedAt(task.getUpdatedAt());
-        this.setLabels(task.getLabels());
         this.setRecurrenceRule(task.getRecurrenceRule());
         this.setContents(contents);
         this.setGoogleCalendarEventId(task.getGoogleCalendarEventId());

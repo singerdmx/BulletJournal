@@ -77,9 +77,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
     @Autowired
-    private UserAliasDaoJpa userAliasDaoJpa;
-
-    @Autowired
     private LabelDaoJpa labelDaoJpa;
 
     @Override
@@ -218,6 +215,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         CompletedTask task = this.completedTaskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + id + " not found"));
         this.authorizationService.validateRequesterInProjectGroup(requester, task.getProject());
+        task.setLabels(Collections.emptyList());
         return task;
     }
 
@@ -753,7 +751,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
 
         List<CompletedTask> completedTasks = this.completedTaskRepository.findCompletedTaskByProject(project, paging);
-
+        completedTasks.forEach(t -> t.setLabels(Collections.emptyList()));
         return completedTasks.stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
                 .collect(Collectors.toList());
     }
@@ -775,6 +773,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                     Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
         }
 
+        completedTasks.forEach(t -> t.setLabels(Collections.emptyList()));
         return completedTasks.stream().sorted((c1, c2) -> c2.getUpdatedAt().compareTo(c1.getUpdatedAt()))
                 .collect(Collectors.toList());
     }
