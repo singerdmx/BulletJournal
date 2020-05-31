@@ -290,10 +290,10 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         List<K> projectItemContentModels = this.findRecentProjectItemContentsBetween(startTime, endTime);
         projectItemContentModels.forEach(projectItemContent -> {
-            T item = (T) projectItemContent.getProjectItem();
-            T existingItem = projectItemIdMap.computeIfAbsent(item.getId(), k -> item);
-            if (existingItem.getUpdatedAt().compareTo(item.getUpdatedAt()) < 0) {
-                existingItem.setUpdatedAt(item.getUpdatedAt());
+            T projectItem = (T) projectItemContent.getProjectItem();
+            T existingProjectItem = projectItemIdMap.computeIfAbsent(projectItem.getId(), k -> projectItem);
+            if (existingProjectItem.getUpdatedAt().compareTo(projectItemContent.getUpdatedAt()) < 0) {
+                existingProjectItem.setUpdatedAt(projectItemContent.getUpdatedAt());
             }
         });
 
