@@ -169,9 +169,7 @@ public class TransactionController {
                 // curl -X DELETE
                 // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
                 // -H "accept: */*"
-                transactions.forEach(id -> {
-                        this.deleteTransaction(id);
-                });
+                transactions.forEach(id -> this.deleteTransaction(id));
         }
 
         @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
