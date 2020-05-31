@@ -7,6 +7,20 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+# generate docker-compose.yml
+
+git pull
+
+sed "s/BULLETJOURNAL_VERSION/$1/g" docker-compose-TEMPLATE.yml > docker-compose.yml
+
+git add docker-compose.yml
+
+git commit -m "release $1"
+
+git push
+
+# build images
+
 # cd ../discourse-auth-proxy
 # docker build -t xcode1024/auth-proxy .
 
