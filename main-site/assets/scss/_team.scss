@@ -1,0 +1,114 @@
+/* Team Item */
+.team-item:hover{
+	box-shadow: 0 20px 30px 0 rgba(0, 0, 0, 0.08);
+}
+.team-item{
+	margin: 15px 0;
+	border-radius: 0px;
+	box-shadow: 0px 0px 40px 0px rgba(0,0,0,0.1);
+	transition: all 0.3s ease-in-out 0s;
+    -moz-transition: all 0.3s ease-in-out 0s;
+    -webkit-transition: all 0.3s ease-in-out 0s;
+    -o-transition: all 0.3s ease-in-out 0s;
+	.team-img{
+		position: relative;
+		cursor: pointer;
+		overflow: hidden;
+		border-radius: 0px;
+	}
+	.team-overlay{
+		height: 100%;
+	    position: absolute;
+	    top: 0;
+	    background: rgba(255,255,255,.8 );
+	    opacity: 0;
+	    width: 100%;
+	    border-radius: 0px;
+	    transition: all 0.3s ease-in-out 0s;
+	    -moz-transition: all 0.3s ease-in-out 0s;
+	    -webkit-transition: all 0.3s ease-in-out 0s;
+	    -o-transition: all 0.3s ease-in-out 0s;
+	}
+	.overlay-social-icon{
+	    color: #fff;
+	    top: 45%;
+	    position: absolute;
+	    display: table-cell;
+	    margin: 0 auto;
+	    width: 100%;
+	    transition: all 0.3s ease-in-out 0s;
+	    -moz-transition: all 0.3s ease-in-out 0s;
+	    -webkit-transition: all 0.3s ease-in-out 0s;
+	    -o-transition: all 0.3s ease-in-out 0s;
+		.social-icons{
+			padding-left: 0;
+		    transition: all 0.3s ease-in-out 0s;
+		    -moz-transition: all 0.3s ease-in-out 0s;
+		    -webkit-transition: all 0.3s ease-in-out 0s;
+		    -o-transition: all 0.3s ease-in-out 0s;
+		    li{
+		    	display: inline-block;
+		    	margin: 0 4px;
+			    a{
+				    letter-spacing: 0px;
+				    outline: 0 !important;
+				    i{
+				    	font-size: 20px;
+					    color: #fff;
+					    width: 36px;
+					    height: 36px;
+					    background: $preset;
+					    display: block;
+					    border-radius: 30px;
+					    line-height: 36px;
+					    transition: all 0.3s ease-in-out 0s;
+					    -moz-transition: all 0.3s ease-in-out 0s;
+					    -webkit-transition: all 0.3s ease-in-out 0s;
+					    -o-transition: all 0.3s ease-in-out 0s;
+					}
+			    }
+			    a:hover .lni-facebook-filled{
+			    	background: #3B5998;
+			    }
+			    a:hover .lni-twitter-filled{
+			    	background: #00aced;
+			    }
+			    a:hover .lni-instagram-filled{
+			    	background: #fb3958;
+			    }
+		    }
+		}
+	}
+	.info-text{
+		padding: 15px 20px;
+		background: #fff;
+	    h3{
+	    	font-size: 16px;
+		    text-transform: uppercase;
+		    font-weight: 700;
+		    margin-bottom: 5px;
+		    a{
+		    	color: #333;
+			    &:hover{
+			    	color: $preset;
+			    }
+		    }
+	    }
+	    p{
+	    	margin: 0;
+	    	color: #888;
+	    }
+	}
+}
+.team-item:hover .team-overlay{
+  opacity: 1;
+}
+
+
+
+
+
+
+
+
+

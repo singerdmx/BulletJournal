@@ -1,0 +1,93 @@
+/* ==========================================================================
+   Pricing Table Style
+   ========================================================================== */
+   #pricing{
+    text-align: center;
+    .title{
+        padding-top: 25px;
+        padding-bottom: 25px;
+        background: $preset;
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+        h3{
+          text-transform: uppercase;
+          color: #fff;
+          font-size: 18px;
+          margin-bottom: 0px;
+        }
+    }
+    .table{
+        margin-top: 15px;
+        padding-bottom: 30px;
+        border-radius: 4px;
+        box-shadow: 0px 0px 40px 0px rgba(0,0,0,0.1);
+        -webkit-transition: all .3s linear;
+        -moz-transition: all .3s linear;
+        -ms-transition: all .3s linear;
+        -o-transition: all .3s linear;
+        transition: all .3s linear;
+        .icon{
+          padding-top: 30px;
+           i{
+              color: $preset;
+              font-size: 42px;
+           }
+        }
+        .pricing-header{
+            position: relative;
+            padding-bottom: 20px;
+            text-align: center;
+            .price-value{
+                font-family: 'Titillium Web', sans-serif;
+                font-size: 30px;
+                color: #222222;
+                position: relative;
+                text-align: center;
+                font-weight: 700;
+                padding: 30px 0;
+                border-bottom: 1px solid #f1f1f1;
+                sup{
+                  font-size: 18px;
+                  font-weight: 600;
+                  top: -18px;
+                }
+                span{
+                  font-size: 14px;
+                  font-weight: 600;
+                }
+            }
+        }
+        .description{
+            text-align: center;
+            padding: 0px 50px;
+            margin-bottom: 20px;
+            li{
+              font-size: 14px;
+              font-weight: 400;
+              color: #abacae;
+              padding-bottom: 15px;            
+            }
+        }
+    } 
+    .table:hover{
+      background: #ffffff;
+      box-shadow: 0 20px 30px 0 rgba(0, 0, 0, 0.08);
+    }
+    #active-tb{
+      background: #ffffff;
+      box-shadow: 0 20px 30px 0 rgba(0, 0, 0, 0.08);
+      .title{
+        background: #222222;
+      }
+      .price-value{
+        color: $preset;
+      }
+      .btn-common{
+        background: #222222;
+      }
+    }
+    .active{
+      z-index: 99999;
+    }
+  }
+

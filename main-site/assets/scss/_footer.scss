@@ -1,0 +1,63 @@
+/* Footer Area Start */
+.footer-area{
+	background: #34363a;
+	.footer-titel{
+		font-size: 20px;
+		color: #fff;
+	    font-weight: 700;
+	    padding-bottom: 10px;
+	    letter-spacing: 0.5px;
+	}
+	ul{
+		li{
+			margin-bottom: 10px;
+			a{
+				color: #ccc;
+				font-size: 14px;
+				font-weight: 400;
+				&:hover{
+					color: $preset;
+				}
+			}
+		}
+	}
+	#subscribe-form{
+		margin-top: 15px;
+		.form-group{
+			position: relative;
+			.btn-common{
+				position: absolute;
+			    top: 0;
+			    right: 0;
+			    padding: 7px 15px;
+			    height: 39px;
+			    border-radius: 0;
+			    background: transparent;
+			    color: $preset;
+			    border-left: 1px solid #ddd;
+			}
+		}
+	}
+}
+.copyright{
+	background: #34363a;
+	.footer-logo{
+		margin-top: 13px;
+		img{
+			width: 80%;
+		}
+	}
+	p{
+		line-height: 60px;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+		a{
+			color: #fff;
+			&:hover{
+				color: $preset;
+			}
+		}
+	}
+}
+

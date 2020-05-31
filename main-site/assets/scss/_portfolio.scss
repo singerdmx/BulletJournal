@@ -1,0 +1,105 @@
+ /* ==========================================================================
+   Portfolio Section
+   ========================================================================== */
+  #portfolios{
+     background: #f9f9f9;
+    .mix{
+      padding: 0px;
+    }
+    .portfolio-item{
+       padding: 10px;
+    }
+  }
+  #portfolio .mix{
+    display: none;
+  }
+  .controls{
+    text-align: center;
+    padding: 0px 0px 20px;  
+    .active{
+      color: $preset!important;
+      border-color: $preset;
+      background: transparent;
+    }
+    .btn{
+      text-transform: uppercase;
+      margin: 2px;
+    }
+    &:hover{
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+  .shot-item{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    img{
+      width: 100%;
+      height: 100%;
+      transition: all .6s ease;
+      -moz-transition: all .6s ease;
+      -webkit-transition: all .6s ease;
+    }
+    .single-content{
+      background-color: rgba(22, 26, 39, 0.7);
+      height: 100%;
+      left: 0;
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      transition: all .6s ease;
+      -moz-transition: all .6s ease;
+      -webkit-transition: all .6s ease;
+      width: 100%;
+      .fancy-table{
+        display: table;
+        height: 100%;
+        left: 0;
+        position: relative;
+        top: 0;
+        width: 100%;
+        z-index: 2;
+        .table-cell{
+          display: table-cell;
+          vertical-align: middle;
+          text-align: center;
+        }
+      }
+      .zoom-icon{
+        margin-bottom: 15px;
+       a{
+        i{
+          color: #fff;
+          font-size: 22px;
+          background: $preset;
+          width: 48px;
+          height: 48px;
+          display: block;
+          line-height: 48px;
+          margin: 0 auto;
+          border-radius: 30px;
+        }
+       }
+      }
+      a{
+        color: #fff;
+        text-transform: uppercase;
+        font-size: 20px;
+        font-weight: 600;
+        font-family: 'Titillium Web', sans-serif;
+      }
+    }
+  }
+  .shot-item:hover img {
+    -webkit-transform: scale(1.10);
+    -ms-transform: scale(1.10);
+    transform: scale(1.10);
+  }
+  .shot-item:hover .single-content{
+      opacity: 1;
+  }
+  .shot-item:hover .single-content a{
+      margin-bottom: 0;
+  }
