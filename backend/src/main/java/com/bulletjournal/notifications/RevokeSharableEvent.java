@@ -18,7 +18,7 @@ public class RevokeSharableEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginatorAlias() + "## stopped sharing " + contentType.name() +
+        return "##" + event.getOriginatorAlias() + "## stopped sharing " + contentType.name() +
                 " ##" + event.getContentName() + "## with you";
     }
 

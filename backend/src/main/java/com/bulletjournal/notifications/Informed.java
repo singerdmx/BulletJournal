@@ -1,6 +1,7 @@
 package com.bulletjournal.notifications;
 
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.models.Notification;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
@@ -15,7 +16,6 @@ public abstract class Informed {
     private static final Gson GSON = new Gson();
     private List<Event> events;
     private String originator;
-    private String originatorAlias;
 
     public Informed(Event event, String originator) {
         this.events = ImmutableList.of(event);
@@ -37,14 +37,17 @@ public abstract class Informed {
 
     public abstract String getLink(Long contentId);
 
-    public List<Notification> toNotifications() {
+    public List<Notification> toNotifications(final UserAliasDaoJpa userAliasDaoJpa) {
         return this.getEvents().stream()
                 .map(event -> {
+                    String targetUser = event.getTargetUser();
+                    event.setOriginatorAlias(userAliasDaoJpa.getAliases(targetUser).getOrDefault(
+                            this.getOriginator(), this.getOriginator()));
                     Notification notification = new Notification(
                             this.getOriginator(),
                             this.getEventTitle(event),
                             this.getEventContent(event),
-                            event.getTargetUser(),
+                            targetUser,
                             this.getEventType(),
                             event.getContentId(),
                             this.getLink(event.getContentId()));
@@ -79,14 +82,6 @@ public abstract class Informed {
 
     public String getOriginator() {
         return this.originator;
-    }
-
-    public String getOriginatorAlias() {
-        return originatorAlias == null ? originator : originatorAlias;
-    }
-
-    public void setOriginatorAlias(String originatorAlias) {
-        this.originatorAlias = originatorAlias;
     }
 
     @Override

@@ -8,6 +8,8 @@ public class Event {
 
     private String contentName;
 
+    private String originatorAlias;
+
     public Event(String targetUser, Long contentId, String contentName) {
         this.targetUser = targetUser;
         this.contentId = contentId;
@@ -36,6 +38,14 @@ public class Event {
 
     public void setContentName(String contentName) {
         this.contentName = contentName;
+    }
+
+    public String getOriginatorAlias() {
+        return originatorAlias;
+    }
+
+    public void setOriginatorAlias(String originatorAlias) {
+        this.originatorAlias = originatorAlias;
     }
 
     @Override

@@ -21,7 +21,7 @@ public class RemoveTaskEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginatorAlias() + "## removed Task ##" + event.getContentName() + "##";
+        return "##" + event.getOriginatorAlias() + "## removed Task ##" + event.getContentName() + "##";
     }
 
     @Override

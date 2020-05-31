@@ -12,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
@@ -56,13 +54,9 @@ public class NotificationDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<Informed> events) {
-        final Map<String, Map<String, String>> cache = new HashMap<>();
-        events.forEach(event -> {
-            String originator = event.getOriginator();
-            Map<String, String> aliases = cache.computeIfAbsent(originator, k -> this.userAliasDaoJpa.getAliases(k));
-            event.setOriginatorAlias(aliases.get(originator));
-            event.toNotifications().forEach(n -> this.notificationRepository.save(n));
-        });
+        events.forEach(event -> event.toNotifications(userAliasDaoJpa).forEach(n -> {
+            this.notificationRepository.save(n);
+        }));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

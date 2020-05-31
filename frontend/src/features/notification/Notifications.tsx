@@ -20,7 +20,7 @@ type NotificationsProps = {
 const getNotification = (item: Notification) => {
   let meta = (
     <List.Item.Meta
-      avatar={<TitleAvatar source={item.originator.avatar} type={item.type} />}
+        avatar={<TitleAvatar source={item.originator.avatar} type={item.type} originator={item.originator.alias}/>}
       title={
         <ListTitle title={item.title} type={item.type} time={item.timestamp} />
       }
@@ -29,7 +29,7 @@ const getNotification = (item: Notification) => {
   );
 
   if (item.link) {
-    meta = <Link to={item.link}>{meta}</Link>;
+    meta = <Tooltip title='Click to view'><Link to={item.link}>{meta}</Link></Tooltip>;
   }
   return (
     <List.Item

@@ -21,7 +21,7 @@ public class JoinProjectEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "You've been added to ##" + event.getContentName() + "## by ##" + this.getOriginatorAlias() + "##";
+        return "You've been added to ##" + event.getContentName() + "## by ##" + event.getOriginatorAlias() + "##";
     }
 
     @Override

@@ -15,15 +15,16 @@ import {
   UsergroupDeleteOutlined
 } from '@ant-design/icons';
 
-import {Avatar, Badge} from 'antd';
+import {Avatar, Badge, Tooltip} from 'antd';
 import {EventType} from '../../features/notification/constants'
 
 type titleAvatarProps = {
   source: string;
   type: string;
+  originator: string;
 };
 
-const TitleAvatar = ({source, type}: titleAvatarProps) => {
+const TitleAvatar = ({source, type, originator}: titleAvatarProps) => {
   let icon = null;
   switch (type) {
     case EventType.JoinGroupEvent:
@@ -72,7 +73,7 @@ const TitleAvatar = ({source, type}: titleAvatarProps) => {
         <Badge
             count={icon}
         >
-          <Avatar src={source}/>
+          <Tooltip title={originator} placement={"left"}><Avatar src={source}/></Tooltip>
         </Badge>
       </div>
   );

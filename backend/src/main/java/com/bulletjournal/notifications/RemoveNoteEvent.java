@@ -21,7 +21,7 @@ public class RemoveNoteEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + this.getOriginatorAlias() + "## removed Note ##" + event.getContentName() + "##";
+        return "##" + event.getOriginatorAlias() + "## removed Note ##" + event.getContentName() + "##";
     }
 
     @Override
