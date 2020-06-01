@@ -143,7 +143,7 @@ class SideMenu extends React.Component<
           title={
             <span>
               <FolderOutlined />
-              <span>Bullet Journal</span>
+              <span>Journals</span>
             </span>
           }
           onTitleClick={this.onGroupsClick}
