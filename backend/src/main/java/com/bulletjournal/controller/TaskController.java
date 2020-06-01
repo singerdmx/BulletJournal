@@ -216,6 +216,11 @@ public class TaskController {
 
     @DeleteMapping(TASK_ROUTE)
     public ResponseEntity<List<Task>> deleteTask(@NotNull @PathVariable Long taskId) {
+        Long projectId = deleteSingleTask(taskId);
+        return getTasks(projectId, null, null, null, null, null);
+    }
+
+    private Long deleteSingleTask(Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         Pair<List<Event>, com.bulletjournal.repository.models.Task> res = this.taskDaoJpa.deleteTask(username, taskId);
@@ -229,7 +234,7 @@ public class TaskController {
         this.notificationService.trackActivity(
                 new Auditable(projectId, "deleted Task ##" + taskName + "## in BuJo ##" + projectName + "##", username,
                         taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
-        return getTasks(projectId, null, null, null, null, null);
+        return projectId;
     }
 
     @DeleteMapping(TASKS_ROUTE)
@@ -240,7 +245,7 @@ public class TaskController {
         // -H "accept: */*"
         tasks.forEach(t -> {
             if (this.taskRepository.existsById(t)) {
-                this.deleteTask(t);
+                this.deleteSingleTask(t);
             }
         });
         return getTasks(projectId, null, null, null, null, null);
