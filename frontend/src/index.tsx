@@ -8,6 +8,7 @@ import { unregister } from './serviceWorker';
 import PublicPage from './Public';
 import PrivacyPage from './Privacy';
 import TermsOfServicePage from './TermsOfService';
+import TemplatesPage from './templates';
 
 const store = createStore();
 
@@ -20,6 +21,7 @@ function listen() {
             <Route path="/public/privacy" component={PrivacyPage} />
             <Route path="/public/tos" component={TermsOfServicePage} />
             <Route path="/public/items/:itemId" component={PublicPage} />
+            <Route path="/public/templates" component={TemplatesPage} />
             <Route path="/" component={App} />
           </Switch>
         </HashRouter>
