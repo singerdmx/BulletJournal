@@ -23,3 +23,10 @@ docker push mwangxx/bulletjournal-backend:latest
 - report location: build/reports
 
 Note: bring up redis container in order for tests to pass.
+
+## Upgrade Gradle
+
+```
+./gradlew wrapper --gradle-version 6.4.1
+./gradlew --version
+```
