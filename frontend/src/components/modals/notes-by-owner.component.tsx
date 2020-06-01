@@ -20,7 +20,7 @@ type NotesByOwnerProps = {
   visible: boolean;
   owner: User | undefined;
   onCancel: () => void;
-  deleteNotes: (projectId: number, notesId: number[]) => void;
+  deleteNotes: (projectId: number, notesId: number[], type: string) => void;
 };
 
 const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
@@ -79,7 +79,7 @@ const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
     if (checked.length === 0) {
       message.error('No Selection');
     } else {
-      deleteNotes(project.id, checked);
+      deleteNotes(project.id, checked, 'owner');
       setChecked([] as number[]);
     }
   };

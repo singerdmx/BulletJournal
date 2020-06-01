@@ -35,7 +35,7 @@ type NotesByOrderProps = {
     startDate?: string,
     endDate?: string
   ) => void;
-  deleteNotes: (projectId: number, notesId: number[]) => void;
+  deleteNotes: (projectId: number, notesId: number[], type: string) => void;
 };
 
 const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
@@ -104,7 +104,7 @@ const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
     if (checked.length === 0) {
       message.error('No Selection');
     } else {
-      deleteNotes(projectId, checked);
+      deleteNotes(projectId, checked, 'order');
       setChecked([] as number[]);
     }
   };

@@ -337,7 +337,7 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
 
 function* notesDelete(action: PayloadAction<DeleteNotes>) {
   try {
-    const { projectId, notesId } = action.payload;
+    const { projectId, notesId, type } = action.payload;
     const data = yield call(deleteNotesApi, projectId, notesId);
     const notes: Note[] = yield data.json();
     yield put(
@@ -349,25 +349,29 @@ function* notesDelete(action: PayloadAction<DeleteNotes>) {
     yield put(notesActions.noteReceived({ note: undefined }));
     const state: IState = yield select();
 
-    const notesByOwner = state.note.notesByOwner.filter(
-      (n) => !notesId.includes(n.id)
-    );
-    yield put(
-      notesActions.notesByOwnerReceived({
-        notesByOwner: notesByOwner,
-      })
-    );
+    if (type === 'owner') {
+      const notesByOwner = state.note.notesByOwner.filter(
+          (n) => !notesId.includes(n.id)
+      );
+      yield put(
+          notesActions.notesByOwnerReceived({
+            notesByOwner: notesByOwner,
+          })
+      );
+    }
 
-    const notesByOrder = state.note.notesByOrder.filter(
-      (n) => !notesId.includes(n.id)
-    );
-    yield put(
-      notesActions.notesByOrderReceived({
-        notesByOrder: notesByOrder,
-      })
-    );
+    if (type === 'order') {
+      const notesByOrder = state.note.notesByOrder.filter(
+          (n) => !notesId.includes(n.id)
+      );
+      yield put(
+          notesActions.notesByOrderReceived({
+            notesByOrder: notesByOrder,
+          })
+      );
+    }
   } catch (error) {
-    yield call(message.error, `Delete Note Error Received: ${error}`);
+    yield call(message.error, `Delete Notes Error Received: ${error}`);
   }
 }
 
