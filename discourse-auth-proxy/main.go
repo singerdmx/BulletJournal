@@ -82,6 +82,12 @@ func main() {
 	httpSrv := http.Server{
 		Addr: ":80",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger.Printf("Port 80: Request %s %s", r.Host, r.URL)
+			if (r.Host == "home.bulletjournal.us") {
+				logger.Printf("Port 80: Bypassing Auth Proxy: %s", r.RequestURI)
+				handler.ServeHTTP(w, r)
+				return
+			}
 			http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 		}),
 	}
@@ -90,7 +96,7 @@ func main() {
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Printf("Request %s", r.RequestURI)
+		logger.Printf("Request %s %s", r.Host, r.URL)
 		if checkWhitelist(handler, r, w) {
 			return
 		}
@@ -215,7 +221,8 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		return
 	}
 
-	if (strings.HasPrefix(r.RequestURI, "/api/public/") ||
+	if (r.Host == "home.bulletjournal.us" ||
+		strings.HasPrefix(r.RequestURI, "/api/public/") ||
 		strings.HasPrefix(r.RequestURI, "/public/") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/channel/notifications") ||
