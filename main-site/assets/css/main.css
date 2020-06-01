@@ -1908,19 +1908,16 @@ textarea {
 .copyright {
   background: #34363a;
   padding: 15px;
-}
-
-.copyright p {
   line-height: 60px;
   color: #fff;
   text-align: center;
   margin: 0;
 }
 
-.copyright p a {
+.copyright a {
   color: #fff;
 }
 
-.copyright p a:hover {
+.copyright a:hover {
   color: #3d60f4;
 }
