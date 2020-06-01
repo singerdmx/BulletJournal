@@ -25,6 +25,7 @@ import {
   GetTasksByAssignee,
   GetTasksByOrder,
   GetSearchCompletedTasks,
+  DeleteTasks,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -50,6 +51,7 @@ import {
   getContentRevision,
   updateContent,
   getCompletedTaskContents,
+  deleteTasks as deleteTasksApi,
 } from '../../apis/taskApis';
 import {
   updateTasks,
@@ -62,6 +64,7 @@ import { Content, Revision, ProjectItems } from '../myBuJo/interface';
 import { updateItemsByLabels } from '../label/actions';
 import { actions as SystemActions } from '../system/reducer';
 import { completedTaskPageSize } from '../project/constants';
+import { Task } from './interface';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -509,6 +512,44 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
   }
 }
 
+function* deleteTasks(action: PayloadAction<DeleteTasks>) {
+  try {
+    const { projectId, tasksId } = action.payload;
+
+    const data = yield call(deleteTasksApi, projectId, tasksId);
+    const tasks: Task[] = yield data.json();
+
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: tasks,
+      })
+    );
+
+    yield put(tasksActions.taskReceived({ task: undefined }));
+    const state: IState = yield select();
+
+    const tasksByAssignee = state.task.tasksByAssignee.filter(
+      (t) => !tasksId.includes(t.id)
+    );
+    yield put(
+      tasksActions.tasksByAssigneeReceived({
+        tasksByAssignee: tasksByAssignee,
+      })
+    );
+
+    const tasksByOrder = state.task.tasksByOrder.filter(
+      (t) => !tasksId.includes(t.id)
+    );
+    yield put(
+      tasksActions.tasksByOrderReceived({
+        tasksByOrder: tasksByOrder,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `Delete Task Error Received: ${error}`);
+  }
+}
+
 function* deleteCompletedTask(action: PayloadAction<CompleteTask>) {
   try {
     const { taskId } = action.payload;
@@ -847,5 +888,6 @@ export default function* taskSagas() {
       tasksActions.getSearchCompletedTasks.type,
       getSearchCompletedTasks
     ),
+    yield takeLatest(tasksActions.TasksDelete.type, deleteTasks),
   ]);
 }

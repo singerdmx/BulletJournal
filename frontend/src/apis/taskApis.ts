@@ -69,6 +69,20 @@ export const deleteTaskById = (taskId: number) => {
     });
 };
 
+export const deleteTasks = (projectId: number, tasksId: number[]) => {
+  let url = `/api/projects/${projectId}/tasks`;
+  if (tasksId && tasksId.length > 0) {
+    url += `?tasks=${tasksId[0]}`;
+
+    for (var i = 1; i < tasksId.length; i++) {
+      url += `&tasks=${tasksId[i]}`;
+    }
+  }
+  return doDelete(url).catch((err) => {
+    throw Error(err.message);
+  });
+};
+
 export const deleteCompletedTaskById = (taskId: number) => {
   return doDelete(`/api/completedTasks/${taskId}`)
     .then((res) => res)

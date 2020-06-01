@@ -12,16 +12,20 @@ import {
   CheckCircleTwoTone,
   DeleteTwoTone,
 } from '@ant-design/icons';
+import { deleteTasks } from '../../features/tasks/actions';
+import { Project } from '../../features/project/interface';
 
 type TasksByAssigneeProps = {
+  project: Project | undefined;
   tasksByAssignee: Task[];
   visible: boolean;
   assignee: User | undefined;
   onCancel: () => void;
+  deleteTasks: (projectId: number, tasksId: number[]) => void;
 };
 
 const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
-  const { visible, assignee, tasksByAssignee } = props;
+  const { project, visible, assignee, tasksByAssignee, deleteTasks } = props;
   const [checkboxVisible, setCheckboxVisible] = useState(false);
   const [checked, setChecked] = useState([] as number[]);
   const onCheck = (id: number) => {
@@ -77,11 +81,16 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   };
 
   const deleteAll = () => {
+    if (project === undefined) {
+      return;
+    }
+
     setCheckboxVisible(true);
     if (checked.length === 0) {
       message.error('No Selection');
       return;
     } else {
+      deleteTasks(project.id, checked);
       setChecked([] as number[]);
     }
   };
@@ -123,6 +132,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   tasksByAssignee: state.task.tasksByAssignee,
+  project: state.project.project,
 });
 
-export default connect(mapStateToProps, {})(TasksByAssignee);
+export default connect(mapStateToProps, { deleteTasks })(TasksByAssignee);
