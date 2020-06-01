@@ -166,14 +166,19 @@ public class TaskController {
 
     @PostMapping(COMPLETE_TASK_ROUTE)
     public Task completeTask(@NotNull @PathVariable Long taskId, @RequestBody Optional<String> dateTime) {
+        CompletedTask task = completeSingleTask(taskId, dateTime.orElse(null));
+
+        return getCompletedTask(task.getId());
+    }
+
+    private CompletedTask completeSingleTask(Long taskId, String dateTime) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        CompletedTask task = this.taskDaoJpa.complete(username, taskId, dateTime.orElse(null));
+        CompletedTask task = this.taskDaoJpa.complete(username, taskId, dateTime);
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
                 "completed Task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##", username,
                 task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
-
-        return getCompletedTask(task.getId());
+        return task;
     }
 
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
