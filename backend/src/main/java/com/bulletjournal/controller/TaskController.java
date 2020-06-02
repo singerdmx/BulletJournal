@@ -6,7 +6,6 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
-import com.bulletjournal.repository.CompletedTaskRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
 import com.bulletjournal.repository.models.CompletedTask;
