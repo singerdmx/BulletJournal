@@ -38,13 +38,9 @@ public class ProjectItemController {
 
     private final TransactionDaoJpa transactionDaoJpa;
 
-    private final NoteDaoJpa noteDaoJpa;
-
     private final LabelDaoJpa labelDaoJpa;
 
     private final UserDaoJpa userDaoJpa;
-
-    private final UserAliasDaoJpa userAliasDaoJpa;
 
     private final UserClient userClient;
 
@@ -57,18 +53,15 @@ public class ProjectItemController {
             NoteDaoJpa noteDaoJpa,
             LabelDaoJpa labelDaoJpa,
             UserDaoJpa userDaoJpa,
-            UserAliasDaoJpa userAliasDaoJpa,
             UserClient userClient) {
         this.taskDaoJpa = taskDaoJpa;
         this.transactionDaoJpa = transactionDaoJpa;
-        this.noteDaoJpa = noteDaoJpa;
         this.daos = ImmutableMap.of(
                 ProjectType.TODO, taskDaoJpa,
                 ProjectType.NOTE, noteDaoJpa,
                 ProjectType.LEDGER, transactionDaoJpa);
         this.labelDaoJpa = labelDaoJpa;
         this.userDaoJpa = userDaoJpa;
-        this.userAliasDaoJpa = userAliasDaoJpa;
         this.userClient = userClient;
     }
 
