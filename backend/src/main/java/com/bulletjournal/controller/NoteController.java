@@ -131,6 +131,11 @@ public class NoteController {
 
     @DeleteMapping(NOTE_ROUTE)
     public ResponseEntity<List<Note>> deleteNote(@NotNull @PathVariable Long noteId) {
+        Note note = deleteSingleNote(noteId);
+        return getNotes(note.getProjectId(), null, null, null, null, null);
+    }
+
+    private Note deleteSingleNote(Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note note = getNote(noteId);
         Pair<List<Event>, com.bulletjournal.repository.models.Note> res = this.noteDaoJpa.deleteNote(username, noteId);
@@ -143,7 +148,7 @@ public class NoteController {
         }
         this.notificationService.trackActivity(new Auditable(projectId, "deleted note ##" + noteName + "##", username,
                 noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
-        return getNotes(note.getProjectId(), null, null, null, null, null);
+        return note;
     }
 
     @DeleteMapping(NOTES_ROUTE)
@@ -154,7 +159,7 @@ public class NoteController {
         // -H "accept: */*"
         notes.forEach(n -> {
             if (this.noteRepository.existsById(n)) {
-                this.deleteNote(n);
+                this.deleteSingleNote(n);
             }
         });
         return getNotes(projectId, null, null, null, null, null);
