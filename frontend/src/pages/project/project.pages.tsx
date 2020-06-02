@@ -399,15 +399,16 @@ class ProjectPage extends React.Component<
             onCancel={() => {
               this.setState({ tasksByUsersShown: false });
             }}
+            hideCompletedTask={() => this.setState({ completeTasksShown: false })}
           />
         );
         projectItemsByOrder = (
           <TasksByOrder
-            projectId={project.id}
             visible={this.state.tasksByOrderShown}
             onCancel={() => {
               this.setState({ tasksByOrderShown: false });
             }}
+            hideCompletedTask={() => this.setState({ completeTasksShown: false })}
           />
         );
         break;

@@ -192,7 +192,7 @@ public class TaskController {
 
         tasks.forEach(n -> {
             if (!this.completedTaskRepository.existsById(n)) {
-                this.completeSingleTask(n, "");
+                this.completeSingleTask(n, null);
             }
         });
 

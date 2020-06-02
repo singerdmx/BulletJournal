@@ -23,6 +23,7 @@ type TasksByAssigneeProps = {
   onCancel: () => void;
   deleteTasks: (projectId: number, tasksId: number[]) => void;
   completeTasks: (projectId: number, tasksId: number[]) => void;
+  hideCompletedTask: () => void;
 };
 
 const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
@@ -33,6 +34,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
     tasksByAssignee,
     deleteTasks,
     completeTasks,
+    hideCompletedTask
   } = props;
   const [checkboxVisible, setCheckboxVisible] = useState(false);
   const [checked, setChecked] = useState([] as number[]);
@@ -89,10 +91,12 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
     if (checked.length === 0) {
       message.error('No Selection');
       return;
-    } else {
-      completeTasks(project.id, checked);
-      setChecked([] as number[]);
     }
+
+    completeTasks(project.id, checked);
+    setChecked([] as number[]);
+    hideCompletedTask();
+    props.onCancel();
   };
 
   const deleteAll = () => {
@@ -104,10 +108,11 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
     if (checked.length === 0) {
       message.error('No Selection');
       return;
-    } else {
-      deleteTasks(project.id, checked);
-      setChecked([] as number[]);
     }
+
+    deleteTasks(project.id, checked);
+    setChecked([] as number[]);
+    props.onCancel();
   };
 
   return (

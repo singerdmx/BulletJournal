@@ -103,10 +103,12 @@ const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
     setCheckboxVisible(true);
     if (checked.length === 0) {
       message.error('No Selection');
-    } else {
-      deleteNotes(projectId, checked, 'order');
-      setChecked([] as number[]);
+      return;
     }
+
+    deleteNotes(projectId, checked, 'order');
+    setChecked([] as number[]);
+    props.onCancel();
   };
 
   return (

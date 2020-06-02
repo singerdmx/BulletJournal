@@ -15,7 +15,7 @@ import TaskItem from '../project-item/task-item.component';
 import moment from 'moment';
 import { Task } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
-import { getTasksByOrder, deleteTasks } from '../../features/tasks/actions';
+import {getTasksByOrder, deleteTasks, completeTasks} from '../../features/tasks/actions';
 import {
   SyncOutlined,
   CloseSquareTwoTone,
@@ -23,11 +23,12 @@ import {
   CheckSquareTwoTone,
   DeleteTwoTone,
 } from '@ant-design/icons';
+import {Project} from "../../features/project/interface";
 
 const { RangePicker } = DatePicker;
 
 type TasksByOrderProps = {
-  projectId: number;
+  project: Project | undefined;
   timezone: string;
   tasksByOrder: Task[];
   visible: boolean;
@@ -39,16 +40,20 @@ type TasksByOrderProps = {
     endDate?: string
   ) => void;
   deleteTasks: (projectId: number, tasksId: number[]) => void;
+  completeTasks: (projectId: number, tasksId: number[]) => void;
+  hideCompletedTask: () => void;
 };
 
 const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
   const {
     visible,
     tasksByOrder,
-    projectId,
+    project,
     timezone,
     getTasksByOrder,
     deleteTasks,
+    completeTasks,
+    hideCompletedTask
   } = props;
   const [dateArray, setDateArray] = useState(['', '']);
   const [checkboxVisible, setCheckboxVisible] = useState(false);
@@ -98,29 +103,45 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
   };
 
   const completeAll = () => {
+    if (!project) {
+      return;
+    }
+
     setCheckboxVisible(true);
     if (checked.length === 0) {
       message.error('No Selection');
       return;
     }
+
+    completeTasks(project.id, checked);
+    setChecked([] as number[]);
+    props.onCancel();
+    hideCompletedTask();
   };
 
   const deleteAll = () => {
+    if (!project) {
+      return;
+    }
     setCheckboxVisible(true);
     if (checked.length === 0) {
       message.error('No Selection');
       return;
-    } else {
-      deleteTasks(projectId, checked);
-      setChecked([] as number[]);
     }
+
+    deleteTasks(project.id, checked);
+    setChecked([] as number[]);
+    props.onCancel();
   };
 
   const handleRangeChange = (dates: any, dateStrings: string[]) => {
     setDateArray([dateStrings[0], dateStrings[1]]);
   };
   const handleUpdate = () => {
-    getTasksByOrder(projectId, timezone, dateArray[0], dateArray[1]);
+    if (!project) {
+      return;
+    }
+    getTasksByOrder(project.id, timezone, dateArray[0], dateArray[1]);
   };
   return (
     <Modal
@@ -191,6 +212,6 @@ const mapStateToProps = (state: IState) => ({
   project: state.project.project,
 });
 
-export default connect(mapStateToProps, { getTasksByOrder, deleteTasks })(
+export default connect(mapStateToProps, { getTasksByOrder, deleteTasks, completeTasks })(
   TasksByOrder
 );

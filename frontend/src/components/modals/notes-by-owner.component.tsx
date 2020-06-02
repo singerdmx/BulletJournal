@@ -78,10 +78,12 @@ const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
     setCheckboxVisible(true);
     if (checked.length === 0) {
       message.error('No Selection');
-    } else {
-      deleteNotes(project.id, checked, 'owner');
-      setChecked([] as number[]);
+      return;
     }
+
+    deleteNotes(project.id, checked, 'owner');
+    setChecked([] as number[]);
+    props.onCancel();
   };
 
   return (

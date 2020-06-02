@@ -111,7 +111,7 @@ export type ContentsAction = {
 export type DeleteNotes = {
   projectId: number;
   notesId: number[];
-  type: strng;
+  type: string;
 };
 
 export type ShareLinkAction = {
