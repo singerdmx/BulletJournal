@@ -4,7 +4,7 @@ import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner, User } from '../../features/group/interface';
-import {Avatar, Popconfirm, Popover, Tag, Tooltip, Collapse} from 'antd';
+import { Avatar, Popconfirm, Popover, Tag, Tooltip, Collapse } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
 import {
@@ -12,7 +12,7 @@ import {
   TeamOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  SyncOutlined
+  SyncOutlined,
 } from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
@@ -45,9 +45,12 @@ import {
   FrequencyType,
   LedgerSummaryType,
 } from '../../features/transactions/interface';
-import {projectLabelsUpdate, setSelectedLabel} from "../../features/label/actions";
-import {Label, stringToRGB} from "../../features/label/interface";
-import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
+import {
+  projectLabelsUpdate,
+  setSelectedLabel,
+} from '../../features/label/actions';
+import { Label, stringToRGB } from '../../features/label/interface';
+import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
 
 const { Panel } = Collapse;
 
@@ -287,29 +290,39 @@ class ProjectPage extends React.Component<
       return null;
     }
 
-    return <Collapse
-        defaultActiveKey={['Labels']}
-        expandIconPosition='right'
-    >
-      <Panel header="Labels in BuJo" key="Labels" extra={
-        <Tooltip title='Refresh BuJo Labels'>
-          <SyncOutlined onClick={event => {
-            event.stopPropagation();
-            const projectId = parseInt(this.props.match.params.projectId);
-            this.props.projectLabelsUpdate(projectId);
-          }}/>
-        </Tooltip>}>
-        <div className="project-labels">
-          {this.props.projectLabels.map((label, index) =>
-              (<Tag
-                  key={label.id}
-                  color={stringToRGB(label.value)}
-                  onClick={() => this.toLabelSearching(label)}>
-                <span>{getIcon(label.icon)} &nbsp;{label.value}</span>
-              </Tag>))}
-        </div>
-      </Panel>
-    </Collapse>
+    return (
+      <Collapse defaultActiveKey={['Labels']} expandIconPosition='right'>
+        <Panel
+          header='Labels in BuJo'
+          key='Labels'
+          extra={
+            <Tooltip title='Refresh BuJo Labels'>
+              <SyncOutlined
+                onClick={(event) => {
+                  event.stopPropagation();
+                  const projectId = parseInt(this.props.match.params.projectId);
+                  this.props.projectLabelsUpdate(projectId);
+                }}
+              />
+            </Tooltip>
+          }
+        >
+          <div className='project-labels'>
+            {this.props.projectLabels.map((label, index) => (
+              <Tag
+                key={label.id}
+                color={stringToRGB(label.value)}
+                onClick={() => this.toLabelSearching(label)}
+              >
+                <span>
+                  {getIcon(label.icon)} &nbsp;{label.value}
+                </span>
+              </Tag>
+            ))}
+          </div>
+        </Panel>
+      </Collapse>
+    );
   };
 
   render() {
@@ -552,7 +565,7 @@ const mapStateToProps = (state: IState) => ({
   transactionEndDate: state.transaction.endDate,
   transactionLedgerSummaryType: state.transaction.ledgerSummaryType,
   timezone: state.settings.timezone,
-  projectLabels: state.label.projectLabels
+  projectLabels: state.label.projectLabels,
 });
 
 export default connect(mapStateToProps, {
@@ -567,5 +580,5 @@ export default connect(mapStateToProps, {
   getTasksByOrder,
   updateExpandedMyself,
   projectLabelsUpdate,
-  setSelectedLabel
+  setSelectedLabel,
 })(ProjectPage);

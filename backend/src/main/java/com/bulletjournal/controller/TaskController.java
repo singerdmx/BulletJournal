@@ -6,6 +6,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.repository.CompletedTaskRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
 import com.bulletjournal.repository.models.CompletedTask;
@@ -39,6 +40,7 @@ public class TaskController {
     protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
     protected static final String COMPLETED_TASK_ROUTE = "/api/completedTasks/{taskId}";
+    protected static final String COMPLETE_TASKS_ROUTE = "/api/projects/{projectId}/complete";
     protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
     protected static final String UNCOMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/uncomplete";
     protected static final String COMPLETED_TASKS_ROUTE = "/api/projects/{projectId}/completedTasks";
@@ -58,6 +60,9 @@ public class TaskController {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private CompletedTaskRepository completedTaskRepository;
 
     @Autowired
     private NotificationService notificationService;
@@ -181,6 +186,19 @@ public class TaskController {
         return task;
     }
 
+    @PostMapping(COMPLETE_TASKS_ROUTE)
+    public ResponseEntity<List<Task>> completeTasks(@NotNull @PathVariable Long projectId,
+            @RequestParam List<Long> tasks) {
+
+        tasks.forEach(n -> {
+            if (!this.completedTaskRepository.existsById(n)) {
+                this.completeSingleTask(n, "");
+            }
+        });
+
+        return getTasks(projectId, null, null, null, null, null);
+    }
+
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
     public Task uncompleteTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -264,7 +282,7 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
-        return getCompletedTasks(task.getProjectId(), 0, 50, null, null, null, null);
+        return getCompletedTasks(task.getProjectId(), null, null, null, null, null, null);
     }
 
     @PutMapping(TASK_SET_LABELS_ROUTE)

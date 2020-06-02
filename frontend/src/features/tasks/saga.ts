@@ -26,6 +26,7 @@ import {
   GetTasksByOrder,
   GetSearchCompletedTasks,
   DeleteTasks,
+  CompleteTasks,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -52,6 +53,7 @@ import {
   updateContent,
   getCompletedTaskContents,
   deleteTasks as deleteTasksApi,
+  completeTasks as completeTasksApi,
 } from '../../apis/taskApis';
 import {
   updateTasks,
@@ -546,7 +548,50 @@ function* deleteTasks(action: PayloadAction<DeleteTasks>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `Delete Task Error Received: ${error}`);
+    yield call(message.error, `Delete Tasks Error Received: ${error}`);
+  }
+}
+
+function* completeTasks(action: PayloadAction<CompleteTasks>) {
+  try {
+    const { projectId, tasksId } = action.payload;
+    const state: IState = yield select();
+    const data = yield call(completeTasksApi, projectId, tasksId);
+    const tasks: Task[] = yield data.json();
+
+    yield put(
+      tasksActions.tasksReceived({
+        tasks: tasks,
+      })
+    );
+
+    //refetch completed tasks
+    yield put(
+      tasksActions.updateCompletedTaskPageNo({ completedTaskPageNo: 0 })
+    );
+    yield put(tasksActions.completedTasksReceived({ tasks: [] }));
+
+    yield put(tasksActions.taskReceived({ task: undefined }));
+
+    const tasksByAssignee = state.task.tasksByAssignee.filter(
+      (t) => !tasksId.includes(t.id)
+    );
+    yield put(
+      tasksActions.tasksByAssigneeReceived({
+        tasksByAssignee: tasksByAssignee,
+      })
+    );
+
+    const tasksByOrder = state.task.tasksByOrder.filter(
+      (t) => !tasksId.includes(t.id)
+    );
+    yield put(
+      tasksActions.tasksByOrderReceived({
+        tasksByOrder: tasksByOrder,
+      })
+    );
+  } catch (error) {
+    yield call(message.error, `complete Tasks Error Received: ${error}`);
   }
 }
 
@@ -889,5 +934,6 @@ export default function* taskSagas() {
       getSearchCompletedTasks
     ),
     yield takeLatest(tasksActions.TasksDelete.type, deleteTasks),
+    yield takeLatest(tasksActions.TasksComplete.type, completeTasks),
   ]);
 }

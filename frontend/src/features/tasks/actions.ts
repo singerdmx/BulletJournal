@@ -42,6 +42,11 @@ export const deleteTasks = (projectId: number, tasksId: number[]) =>
     projectId: projectId,
     tasksId: tasksId,
   });
+export const completeTasks = (projectId: number, tasksId: number[]) =>
+  actions.TasksComplete({
+    projectId: projectId,
+    tasksId: tasksId,
+  });
 export const deleteCompletedTask = (taskId: number) =>
   actions.CompletedTaskDelete({ taskId: taskId });
 export const patchTask = (
