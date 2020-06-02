@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   auth-proxy:
-    image: xcode1024/auth-proxy:v15
+    image: xcode1024/auth-proxy:v17
     container_name: auth-proxy
     ports:
       - "80:80"
@@ -12,7 +12,7 @@ services:
       - frontend
 
   frontend:
-    image: mwangxx/bulletjournal-frontend:1.1.37
+    image: mwangxx/bulletjournal-frontend:1.1.38
     container_name: react_app
     ports:
       - "3000:3000"
@@ -20,7 +20,7 @@ services:
       - controller
 
   controller:
-    image: mwangxx/bulletjournal-backend:1.1.37
+    image: mwangxx/bulletjournal-backend:1.1.38
     container_name: springboot_app
     ports:
       - "8080:8080"
