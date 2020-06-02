@@ -62,9 +62,6 @@ public class TaskController {
     private TaskRepository taskRepository;
 
     @Autowired
-    private CompletedTaskRepository completedTaskRepository;
-
-    @Autowired
     private NotificationService notificationService;
 
     @Autowired
@@ -190,9 +187,9 @@ public class TaskController {
     public ResponseEntity<List<Task>> completeTasks(@NotNull @PathVariable Long projectId,
             @RequestParam List<Long> tasks) {
 
-        tasks.forEach(n -> {
-            if (!this.completedTaskRepository.existsById(n)) {
-                this.completeSingleTask(n, null);
+        tasks.forEach(t -> {
+            if (this.taskRepository.existsById(t)) {
+                this.completeSingleTask(t, null);
             }
         });
 
