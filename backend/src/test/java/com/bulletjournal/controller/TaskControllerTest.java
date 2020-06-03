@@ -176,7 +176,8 @@ public class TaskControllerTest {
     private void testUpdateAssignees(Project p1, Task task, List<String> users) {
         users.remove("xlf");
         UpdateTaskParams updateTaskParams = new UpdateTaskParams(
-                task.getDueDate(), task.getDueTime(), task.getName(), null, task.getReminderSetting(), users, TIMEZONE, null);
+                task.getDueDate(), task.getDueTime(), task.getName(), null,
+                task.getReminderSetting(), users, TIMEZONE, null, null);
         ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,
@@ -199,7 +200,8 @@ public class TaskControllerTest {
 
         users.add("xlf");
         updateTaskParams = new UpdateTaskParams(
-                task.getDueDate(), task.getDueTime(), task.getName(), null, task.getReminderSetting(), users, TIMEZONE, null);
+                task.getDueDate(), task.getDueTime(), task.getName(), null,
+                task.getReminderSetting(), users, TIMEZONE, null, null);
         response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,

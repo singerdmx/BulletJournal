@@ -973,7 +973,7 @@ public class ProjectControllerTest {
                             String dueTime, String name, ReminderSetting reminderSetting, List<String> assignees, String expectedName) {
         //update task parameter
         UpdateTaskParams updateTaskParams = new UpdateTaskParams(
-                dueDate, dueTime, name, null, reminderSetting, assignees, TIMEZONE, null);
+                dueDate, dueTime, name, null, reminderSetting, assignees, TIMEZONE, null, null);
         ResponseEntity<Task[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASK_ROUTE,
                 HttpMethod.PATCH,
