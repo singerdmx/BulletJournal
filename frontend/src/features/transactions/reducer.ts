@@ -101,6 +101,7 @@ export type PatchTransaction = {
   date?: string;
   time?: string;
   timezone?: string;
+  labels?: number[];
 };
 
 export type MoveTransaction = {

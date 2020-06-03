@@ -194,6 +194,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
                 transaction::setEndTime);
 
+        if (updateTransactionParams.hasLabels()) {
+            transaction.setLabels(updateTransactionParams.getLabels());
+        }
+
         this.transactionRepository.save(transaction);
         return Pair.of(events, transaction);
     }

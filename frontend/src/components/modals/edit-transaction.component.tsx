@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { EditTwoTone } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { RouteComponentProps, withRouter, useParams } from 'react-router';
 import { IState } from '../../store';
 import './modals.styles.less';
 import { Transaction } from '../../features/transactions/interface';
@@ -24,6 +24,9 @@ import { zones } from '../settings/constants';
 import { dateFormat } from '../../features/myBuJo/constants';
 import moment from 'moment';
 import { patchTransaction } from '../../features/transactions/actions';
+import { getIcon } from '../draggable-labels/draggable-label-list.component';
+import { Label } from '../../features/label/interface';
+import { labelsUpdate } from '../../features/label/actions';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -61,10 +64,13 @@ interface TransactionEditFormProps {
     date: string,
     time: string,
     transactionType: number,
-    timezone: string
+    timezone: string,
+    labels?: number[]
   ) => void;
   currency: string;
   myself: string;
+  labelOptions: Label[];
+  labelsUpdate: (projectId: number | undefined) => void;
 }
 
 const EditTransaction: React.FC<
@@ -81,6 +87,14 @@ const EditTransaction: React.FC<
     transaction.transactionType
   );
   const [transTimezone, setTransTimezone] = useState(transaction.timezone);
+  const { projectId } = useParams();
+
+  useEffect(() => {
+    if (projectId) {
+      props.labelsUpdate(parseInt(projectId));
+    }
+  }, []);
+
   const editTransaction = (values: any) => {
     //convert time object to format string
     const date_value = values.date
@@ -96,7 +110,8 @@ const EditTransaction: React.FC<
       date_value,
       time_value,
       values.transactionType,
-      values.timezone
+      values.timezone,
+      values.labels
     );
     setVisible(false);
   };
@@ -126,21 +141,23 @@ const EditTransaction: React.FC<
       return null;
     }
     return (
-        <Select
-            style={{ marginLeft: '-8px' }}
-            value={payerName}
-            onChange={(e: any) => setPayerName(e)}
-        >
-          {props.group.users.filter(u => u.accepted).map((user) => {
+      <Select
+        style={{ marginLeft: '-8px' }}
+        value={payerName}
+        onChange={(e: any) => setPayerName(e)}
+      >
+        {props.group.users
+          .filter((u) => u.accepted)
+          .map((user) => {
             return (
-                <Option value={user.name} key={user.name}>
-                  <Avatar size='small' src={user.avatar} />
-                  &nbsp;&nbsp; <strong>{user.alias}</strong>
-                </Option>
+              <Option value={user.name} key={user.name}>
+                <Avatar size='small' src={user.avatar} />
+                &nbsp;&nbsp; <strong>{user.alias}</strong>
+              </Option>
             );
           })}
-        </Select>
-    )
+      </Select>
+    );
   };
 
   const getModal = () => {
@@ -283,6 +300,27 @@ const EditTransaction: React.FC<
               </Form.Item>
             </Tooltip>
           </div>
+          {/* label */}
+          <div>
+            <Form.Item name='labels' label='Labels'>
+              <Select
+                mode='multiple'
+                defaultValue={transaction.labels.map((l) => {
+                  return l.id;
+                })}
+              >
+                {props.labelOptions &&
+                  props.labelOptions.length &&
+                  props.labelOptions.map((l) => {
+                    return (
+                      <Option value={l.id} key={l.id}>
+                        {getIcon(l.icon)} &nbsp;{l.value}
+                      </Option>
+                    );
+                  })}
+              </Select>
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
     );
@@ -316,11 +354,12 @@ const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   group: state.group.group,
   currency: state.settings.currency,
-
+  labelOptions: state.label.labelOptions,
   myself: state.myself.username,
 });
 
 export default connect(mapStateToProps, {
   updateExpandedMyself,
   patchTransaction,
+  labelsUpdate,
 })(withRouter(EditTransaction));

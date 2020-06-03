@@ -235,12 +235,12 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
     const state: IState = yield select();
 
     const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-        (t) => !transactionsId.includes(t.id)
+      (t) => !transactionsId.includes(t.id)
     );
     yield put(
-        transactionsActions.transactionsByPayerReceived({
-          transactionsByPayer: transactionsByPayer,
-        })
+      transactionsActions.transactionsByPayerReceived({
+        transactionsByPayer: transactionsByPayer,
+      })
     );
     yield put(
       transactionsActions.transactionReceived({ transaction: undefined })
@@ -278,6 +278,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       date,
       time,
       timezone,
+      labels,
     } = action.payload;
     const data = yield call(
       updateTransaction,
@@ -288,7 +289,8 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       transactionType,
       date,
       time,
-      timezone
+      timezone,
+      labels
     );
     const projectId = data.projectId;
     const state: IState = yield select();

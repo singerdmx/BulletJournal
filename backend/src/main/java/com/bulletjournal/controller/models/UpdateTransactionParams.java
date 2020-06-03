@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import java.util.List;
+
 public class UpdateTransactionParams {
 
     private String name;
@@ -16,16 +18,13 @@ public class UpdateTransactionParams {
 
     private Integer transactionType;
 
+    private List<Long> labels;
+
     public UpdateTransactionParams() {
     }
 
-    public UpdateTransactionParams(String name,
-                                   String payer,
-                                   Double amount,
-                                   String date,
-                                   String time,
-                                   String timezone,
-                                   Integer transactionType) {
+    public UpdateTransactionParams(String name, String payer, Double amount, String date, String time, String timezone,
+            Integer transactionType) {
         this.name = name;
         this.payer = payer;
         this.amount = amount;
@@ -34,7 +33,6 @@ public class UpdateTransactionParams {
         this.timezone = timezone;
         this.transactionType = transactionType;
     }
-
 
     public String getPayer() {
         return payer;
@@ -136,4 +134,15 @@ public class UpdateTransactionParams {
         return this.hasTimezone() ? this.getTimezone() : defaultTimezone;
     }
 
+    public List<Long> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Long> labels) {
+        this.labels = labels;
+    }
+
+    public boolean hasLabels() {
+        return this.labels != null;
+    }
 }

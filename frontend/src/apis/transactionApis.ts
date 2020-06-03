@@ -97,7 +97,8 @@ export const updateTransaction = (
   transactionType: number,
   date?: string,
   time?: string,
-  timezone?: string
+  timezone?: string,
+  labels?: number[]
 ) => {
   const patchBody = JSON.stringify({
     amount: amount,
@@ -107,6 +108,7 @@ export const updateTransaction = (
     date: date,
     time: time,
     timezone: timezone,
+    labels: labels,
   });
   return doPatch(`/api/transactions/${transactionId}`, patchBody)
     .then((res) => res.json())

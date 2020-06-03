@@ -60,7 +60,8 @@ export const patchTransaction = (
   date: string,
   time: string,
   transactionType: number,
-  timezone: string
+  timezone: string,
+  labels?: number[]
 ) =>
   actions.TransactionPatch({
     transactionId: transactionId,
@@ -71,6 +72,7 @@ export const patchTransaction = (
     time: time,
     transactionType: transactionType,
     timezone: timezone,
+    labels: labels,
   });
 export const setTransactionLabels = (transactionId: number, labels: number[]) =>
   actions.TransactionSetLabels({
