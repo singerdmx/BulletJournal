@@ -58,7 +58,8 @@ export const patchTask = (
   dueTime?: string,
   duration?: number,
   reminderSetting?: ReminderSetting,
-  recurrenceRule?: string
+  recurrenceRule?: string,
+  labels?: number[]
 ) =>
   actions.TaskPatch({
     taskId: taskId,
@@ -70,6 +71,7 @@ export const patchTask = (
     duration: duration,
     reminderSetting: reminderSetting,
     recurrenceRule: recurrenceRule,
+    labels: labels,
   });
 export const completeTask = (taskId: number, dateTime?: string) =>
   actions.TaskComplete({ taskId: taskId, dateTime: dateTime });

@@ -19,7 +19,7 @@ import {
   CloseSquareTwoTone,
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { RouteComponentProps, withRouter, useParams } from 'react-router';
 import { patchTask } from '../../features/tasks/actions';
 import { IState } from '../../store';
 import './modals.styles.less';
@@ -28,6 +28,7 @@ import { Group } from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
+import { labelsUpdate } from '../../features/label/actions';
 import {
   convertToTextWithRRule,
   convertToTextWithTime,
@@ -35,7 +36,9 @@ import {
 import { ReminderSetting, Task } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
 import moment from 'moment';
-import {Project} from "../../features/project/interface";
+import { Project } from '../../features/project/interface';
+import { Label } from '../../features/label/interface';
+import { getIcon } from '../draggable-labels/draggable-label-list.component';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -71,7 +74,8 @@ interface TaskEditFormProps {
     dueTime?: string,
     duration?: number,
     reminderSetting?: ReminderSetting,
-    recurrenceRule?: string
+    recurrenceRule?: string,
+    labels?: number[]
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   convertToTextWithTime: (start: any, repeat: any, end: any) => string;
@@ -84,6 +88,8 @@ interface TaskEditFormProps {
   startTime: string;
   startDate: string;
   rRuleString: any;
+  labelOptions: Label[];
+  labelsUpdate: (projectId: number | undefined) => void;
 }
 
 const EditTask: React.FC<
@@ -106,10 +112,18 @@ const EditTask: React.FC<
   const rRuleTextList = rRuleText.match(
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
+  const { projectId } = useParams();
+
+  useEffect(() => {
+    if (projectId) {
+      props.labelsUpdate(parseInt(projectId));
+    }
+  }, []);
 
   const updateTask = (values: any) => {
     const { task } = props;
-
+    console.log('-=-=-=--=-=--=-');
+    console.log(values.labels);
     //convert time object to string
     let dueDate = values.dueDate
       ? values.dueDate.format(dateFormat)
@@ -160,7 +174,8 @@ const EditTask: React.FC<
       dueTime,
       values.duration,
       reminderSetting,
-      recurrence
+      recurrence,
+      values.labels
     );
   };
 
@@ -176,7 +191,12 @@ const EditTask: React.FC<
   const selectAll = () => {
     if (props.group) {
       form.setFields([
-        {name: 'assignees', value: props.group.users.filter(u => u.accepted).map((user) => user.name)},
+        {
+          name: 'assignees',
+          value: props.group.users
+            .filter((u) => u.accepted)
+            .map((user) => user.name),
+        },
       ]);
     }
   };
@@ -222,23 +242,23 @@ const EditTask: React.FC<
       return null;
     }
     return (
-        <Select
-            mode='multiple'
-            defaultValue={
-              task.assignees ? task.assignees.map((u) => u.name) : []
-            }
-            style={{ width: '100%' }}
-        >
-          {props.group.users.filter(u => u.accepted).map((user) => {
+      <Select
+        mode='multiple'
+        defaultValue={task.assignees ? task.assignees.map((u) => u.name) : []}
+        style={{ width: '100%' }}
+      >
+        {props.group.users
+          .filter((u) => u.accepted)
+          .map((user) => {
             return (
-                <Option value={user.name} key={user.name}>
-                  <Avatar size='small' src={user.avatar} />
-                  &nbsp;&nbsp; <strong>{user.alias}</strong>
-                </Option>
+              <Option value={user.name} key={user.name}>
+                <Avatar size='small' src={user.avatar} />
+                &nbsp;&nbsp; <strong>{user.alias}</strong>
+              </Option>
             );
           })}
-        </Select>
-    )
+      </Select>
+    );
   };
 
   const getModal = () => {
@@ -512,6 +532,27 @@ const EditTask: React.FC<
               )}
             </div>
           </div>
+          {/* label */}
+          <div>
+            <Form.Item name='labels' label='Labels'>
+              <Select
+                mode='multiple'
+                defaultValue={task.labels.map((l) => {
+                  return l.id;
+                })}
+              >
+                {props.labelOptions &&
+                  props.labelOptions.length &&
+                  props.labelOptions.map((l) => {
+                    return (
+                      <Option value={l.id} key={l.id}>
+                        {getIcon(l.icon)} &nbsp;{l.value}
+                      </Option>
+                    );
+                  })}
+              </Select>
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
     );
@@ -553,10 +594,12 @@ const mapStateToProps = (state: IState) => ({
   repeat: state.rRule.repeat,
   end: state.rRule.end,
   rRuleString: state.rRule.rRuleString,
+  labelOptions: state.label.labelOptions,
 });
 
 export default connect(mapStateToProps, {
   patchTask,
   updateExpandedMyself,
   convertToTextWithTime,
+  labelsUpdate,
 })(withRouter(EditTask));

@@ -153,7 +153,8 @@ export const updateTask = (
   duration?: number,
   timezone?: string,
   reminderSetting?: ReminderSetting,
-  recurrenceRule?: string
+  recurrenceRule?: string,
+  labels?: number[]
 ) => {
   const patchBody = JSON.stringify({
     name: name,
@@ -164,6 +165,7 @@ export const updateTask = (
     timezone: timezone,
     reminderSetting: reminderSetting,
     recurrenceRule: recurrenceRule,
+    labels: labels,
   });
   return doPatch(`/api/tasks/${taskId}`, patchBody)
     .then((res) => res.json())

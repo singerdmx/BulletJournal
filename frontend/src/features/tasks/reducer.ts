@@ -136,6 +136,7 @@ export type PatchTask = {
   duration?: number;
   reminderSetting?: ReminderSetting;
   recurrenceRule?: string;
+  labels?: number[];
 };
 
 export type CompleteTask = {

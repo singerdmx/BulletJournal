@@ -493,6 +493,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
                 updateTaskParams.getRecurrenceRule(), updateTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
+
+        if (updateTaskParams.hasLabels()) {
+            task.setLabels(updateTaskParams.getLabels());
+        }
+
         return this.taskRepository.save(task);
     }
 

@@ -21,11 +21,14 @@ public class UpdateTaskParams {
 
     private List<String> assignees;
 
+    private List<Long> labels;
+
     public UpdateTaskParams() {
     }
 
     public UpdateTaskParams(String dueDate, String dueTime, String name, Integer duration,
-                            ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule) {
+            ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule,
+            List<Long> labels) {
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;
@@ -34,6 +37,7 @@ public class UpdateTaskParams {
         this.assignees = assignees;
         this.timezone = timezone;
         this.recurrenceRule = recurrenceRule;
+        this.labels = labels;
     }
 
     public String getDueDate() {
@@ -127,4 +131,17 @@ public class UpdateTaskParams {
     public void setAssignees(List<String> assignees) {
         this.assignees = assignees;
     }
+
+    public List<Long> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<Long> labels) {
+        this.labels = labels;
+    }
+
+    public boolean hasLabels() {
+        return this.labels != null;
+    }
+
 }
