@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.bulletjournal.exceptions.BadRequestException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -25,7 +26,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class ProjectController {
@@ -86,7 +90,7 @@ public class ProjectController {
 
     @PatchMapping(PROJECT_ROUTE)
     public Project updateProject(@NotNull @PathVariable Long projectId,
-                                 @Valid @RequestBody UpdateProjectParams updateProjectParams) {
+            @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> joined = new ArrayList<>();
         List<Event> removed = new ArrayList<>();
@@ -130,16 +134,28 @@ public class ProjectController {
     }
 
     @PutMapping(PROJECTS_ROUTE)
-    public ResponseEntity<Projects> updateProjectRelations(@Valid @RequestBody List<Project> projects) {
+    public ResponseEntity<Projects> updateProjectRelations(@Valid @RequestBody List<Project> projects,
+            @RequestHeader(IF_NONE_MATCH) Optional<String> projectsEtag) {
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        if (projectsEtag.isPresent()) {
+            List<Project> projectsList = this.projectDaoJpa.getProjects(username).getOwned();
+            String expectedEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE, projectsList);
+
+            if (!Objects.equals(expectedEtag, projectsEtag.get())) {
+                throw new BadRequestException("Invalid Etag");
+            }
+        }
+
         this.projectDaoJpa.updateUserOwnedProjects(username, projects);
         return getProjects();
     }
 
     @GetMapping(PROJECT_HISTORY_ROUTE)
     public List<Activity> getHistory(@NotNull @PathVariable Long projectId, @NotBlank @RequestParam String timezone,
-                                     @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
-                                     @RequestParam @NotNull ContentAction action, @RequestParam @NotBlank String username) {
+            @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
+            @RequestParam @NotNull ContentAction action, @RequestParam @NotBlank String username) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         return this.auditableDaoJpa.getHistory(projectId, timezone, startDate, endDate, action, username, requester)
                 .stream().map(a -> {
