@@ -90,7 +90,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
                   note={projectItem as Note}
                   readOnly={false}
                   inProject={false}
-                  inModal={true}
+                  inModal={false}
                 />
               );
             }
@@ -98,7 +98,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
               return (
                 <TransactionItem
                   transaction={projectItem as Transaction}
-                  inModal={true}
+                  inModal={false}
                   inProject={false}
                 />
               );
