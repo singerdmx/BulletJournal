@@ -78,9 +78,10 @@ export const putNotes = (projectId: number, notes: Note[], etag: string) => {
   );
 };
 
-export const updateNote = (noteId: number, name: string) => {
+export const updateNote = (noteId: number, name: string, labels?: number[]) => {
   const patchBody = JSON.stringify({
     name: name,
+    labels: labels,
   });
   return doPatch(`/api/notes/${noteId}`, patchBody)
     .then((res) => res.json())

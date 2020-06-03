@@ -234,8 +234,8 @@ function* getNote(action: PayloadAction<GetNote>) {
 
 function* patchNote(action: PayloadAction<PatchNote>) {
   try {
-    const { noteId, name } = action.payload;
-    const data = yield call(updateNote, noteId, name);
+    const { noteId, name, labels } = action.payload;
+    const data = yield call(updateNote, noteId, name, labels);
     yield put(
       notesActions.notesReceived({
         notes: data,
@@ -351,23 +351,23 @@ function* notesDelete(action: PayloadAction<DeleteNotes>) {
 
     if (type === 'owner') {
       const notesByOwner = state.note.notesByOwner.filter(
-          (n) => !notesId.includes(n.id)
+        (n) => !notesId.includes(n.id)
       );
       yield put(
-          notesActions.notesByOwnerReceived({
-            notesByOwner: notesByOwner,
-          })
+        notesActions.notesByOwnerReceived({
+          notesByOwner: notesByOwner,
+        })
       );
     }
 
     if (type === 'order') {
       const notesByOrder = state.note.notesByOrder.filter(
-          (n) => !notesId.includes(n.id)
+        (n) => !notesId.includes(n.id)
       );
       yield put(
-          notesActions.notesByOrderReceived({
-            notesByOrder: notesByOrder,
-          })
+        notesActions.notesByOrderReceived({
+          notesByOrder: notesByOrder,
+        })
       );
     }
   } catch (error) {

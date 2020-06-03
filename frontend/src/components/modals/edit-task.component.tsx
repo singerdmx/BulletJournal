@@ -122,8 +122,6 @@ const EditTask: React.FC<
 
   const updateTask = (values: any) => {
     const { task } = props;
-    console.log('-=-=-=--=-=--=-');
-    console.log(values.labels);
     //convert time object to string
     let dueDate = values.dueDate
       ? values.dueDate.format(dateFormat)

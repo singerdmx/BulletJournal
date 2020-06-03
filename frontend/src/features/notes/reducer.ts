@@ -67,6 +67,7 @@ export type DeleteContent = {
 export type PatchNote = {
   noteId: number;
   name: string;
+  labels?: number[];
 };
 
 export type PatchContent = {

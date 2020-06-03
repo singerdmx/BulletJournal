@@ -142,6 +142,10 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         DaoHelper.updateIfPresent(updateNoteParams.hasName(), updateNoteParams.getName(),
                 (value) -> note.setName(value));
 
+        if (updateNoteParams.hasLabels()) {
+            note.setLabels(updateNoteParams.getLabels());
+        }
+
         return this.noteRepository.save(note);
     }
 
