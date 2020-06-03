@@ -29,6 +29,8 @@ public class Task extends ProjectItem {
 
     private String recurrenceRule;
 
+    private TaskStatus status;
+
     @Expose
     @Valid
     private List<Task> subTasks = new ArrayList<>();
@@ -36,26 +38,17 @@ public class Task extends ProjectItem {
     public Task() {
     }
 
-    public Task(Long id,
-                @NotNull User owner,
-                List<User> assignees,
-                String dueDate,
-                String dueTime,
-                @NotBlank String timezone,
-                @NotNull String name,
-                Integer duration,
-                @NotNull Project project,
-                List<Label> labels,
-                ReminderSetting reminderSetting,
-                String recurrenceRule,
-                Long createdAt,
-                Long updatedAt) {
+    public Task(Long id, @NotNull User owner, List<User> assignees, String dueDate, String dueTime,
+            @NotBlank String timezone, @NotNull String name, Integer duration, @NotNull Project project,
+            List<Label> labels, ReminderSetting reminderSetting, String recurrenceRule, Long createdAt, Long updatedAt,
+            TaskStatus status) {
         super(id, name, owner, project, labels);
         this.assignees = assignees;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.timezone = timezone;
         this.duration = duration;
+        this.status = status;
         if (reminderSetting.hasBefore() || reminderSetting.hasDate()) {
             this.reminderSetting = reminderSetting;
         }
@@ -141,25 +134,35 @@ public class Task extends ProjectItem {
         this.assignees = assignees;
     }
 
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Task))
+            return false;
+        if (!super.equals(o))
+            return false;
         Task task = (Task) o;
-        return Objects.equals(getAssignees(), task.getAssignees()) &&
-                Objects.equals(getDueDate(), task.getDueDate()) &&
-                Objects.equals(getDueTime(), task.getDueTime()) &&
-                Objects.equals(getTimezone(), task.getTimezone()) &&
-                Objects.equals(getDuration(), task.getDuration()) &&
-                Objects.equals(getReminderSetting(), task.getReminderSetting()) &&
-                Objects.equals(getRecurrenceRule(), task.getRecurrenceRule()) &&
-                Objects.equals(getSubTasks(), task.getSubTasks());
+        return Objects.equals(getAssignees(), task.getAssignees()) && Objects.equals(getDueDate(), task.getDueDate())
+                && Objects.equals(getDueTime(), task.getDueTime()) && Objects.equals(getTimezone(), task.getTimezone())
+                && Objects.equals(getDuration(), task.getDuration())
+                && Objects.equals(getReminderSetting(), task.getReminderSetting())
+                && Objects.equals(getRecurrenceRule(), task.getRecurrenceRule())
+                && Objects.equals(getSubTasks(), task.getSubTasks());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getAssignees(), getDueDate(), getDueTime(), getTimezone(), getDuration(), getReminderSetting(), getRecurrenceRule(), getSubTasks());
+        return Objects.hash(super.hashCode(), getAssignees(), getDueDate(), getDueTime(), getTimezone(), getDuration(),
+                getReminderSetting(), getRecurrenceRule(), getSubTasks());
     }
 
     public void clone(Task task) {
@@ -168,11 +171,13 @@ public class Task extends ProjectItem {
         this.setDueTime(task.getDueTime());
         this.setTimezone(task.getTimezone());
         this.setDuration(task.getDuration());
-        if (task.hasReminderSetting() &&
-                (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate())) {
+        this.setStatus(task.getStatus());
+        if (task.hasReminderSetting()
+                && (task.getReminderSetting().hasBefore() || task.getReminderSetting().hasDate())) {
             this.setReminderSetting(task.getReminderSetting());
         }
         this.setRecurrenceRule(task.getRecurrenceRule());
         this.setAssignees(task.getAssignees());
     }
+
 }

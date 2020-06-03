@@ -63,10 +63,7 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
     private String googleCalendarEventId;
 
     @Type(type = "string-array")
-    @Column(
-            name = "assignees",
-            columnDefinition = "text[]"
-    )
+    @Column(name = "assignees", columnDefinition = "text[]")
     private String[] assignees;
 
     public Timestamp getStartTime() {
@@ -197,8 +194,8 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
             this.setReminderTime(reminderSetting.getTime());
         }
 
-        ZonedDateTime reminderZonedDateTime =
-                ZonedDateTimeHelper.getStartTime(this.getReminderDate(), this.getReminderTime(), this.getTimezone());
+        ZonedDateTime reminderZonedDateTime = ZonedDateTimeHelper.getStartTime(this.getReminderDate(),
+                this.getReminderTime(), this.getTimezone());
         this.setReminderDateTime(Timestamp.from(reminderZonedDateTime.toInstant()));
     }
 
@@ -260,9 +257,7 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
 
     @Override
     public com.bulletjournal.controller.models.Task toPresentationModel() {
-        return toPresentationModel(this.getLabels().stream()
-                .map(Label::new)
-                .collect(Collectors.toList()));
+        return toPresentationModel(this.getLabels().stream().map(Label::new).collect(Collectors.toList()));
     }
 
     @Override
@@ -278,39 +273,21 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
             reminderSetting.setBefore(this.getReminderBeforeTask());
         }
 
-        return new com.bulletjournal.controller.models.Task(
-                this.getId(),
-                new User(this.getOwner()),
-                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
-                this.getDueDate(),
-                this.getDueTime(),
-                this.getTimezone(),
-                this.getName(),
-                this.getDuration(),
-                this.getProject(),
-                labels,
-                reminderSetting,
-                this.getRecurrenceRule(),
-                this.getCreatedAt().getTime(),
-                this.getUpdatedAt().getTime());
+        return new com.bulletjournal.controller.models.Task(this.getId(), new User(this.getOwner()),
+                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()), this.getDueDate(),
+                this.getDueTime(), this.getTimezone(), this.getName(), this.getDuration(), this.getProject(), labels,
+                reminderSetting, this.getRecurrenceRule(), this.getCreatedAt().getTime(), this.getUpdatedAt().getTime(),
+                null);
+
     }
 
     @Override
     public String toString() {
-        return "TaskModel{" +
-                "dueDate='" + dueDate + '\'' +
-                ", dueTime='" + dueTime + '\'' +
-                ", timezone='" + timezone + '\'' +
-                ", duration=" + duration +
-                ", reminderDate='" + reminderDate + '\'' +
-                ", reminderTime='" + reminderTime + '\'' +
-                ", reminderBeforeTask=" + reminderBeforeTask +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", reminderDateTime=" + reminderDateTime +
-                ", recurrenceRule='" + recurrenceRule + '\'' +
-                ", googleCalendarEventId='" + googleCalendarEventId + '\'' +
-                ", assignees=" + Arrays.toString(assignees) +
-                '}';
+        return "TaskModel{" + "dueDate='" + dueDate + '\'' + ", dueTime='" + dueTime + '\'' + ", timezone='" + timezone
+                + '\'' + ", duration=" + duration + ", reminderDate='" + reminderDate + '\'' + ", reminderTime='"
+                + reminderTime + '\'' + ", reminderBeforeTask=" + reminderBeforeTask + ", startTime=" + startTime
+                + ", endTime=" + endTime + ", reminderDateTime=" + reminderDateTime + ", recurrenceRule='"
+                + recurrenceRule + '\'' + ", googleCalendarEventId='" + googleCalendarEventId + '\'' + ", assignees="
+                + Arrays.toString(assignees) + '}';
     }
 }

@@ -38,6 +38,7 @@ public class TaskController {
 
     protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
+    protected static final String SET_TASKSTATUS_ROUTE = "/api/tasks/{taskId}/setStatus";
     protected static final String COMPLETED_TASK_ROUTE = "/api/completedTasks/{taskId}";
     protected static final String COMPLETE_TASKS_ROUTE = "/api/projects/{projectId}/complete";
     protected static final String COMPLETE_TASK_ROUTE = "/api/tasks/{taskId}/complete";
@@ -193,6 +194,14 @@ public class TaskController {
         });
 
         return getTasks(projectId, null, null, null, null, null);
+    }
+
+    @PostMapping(SET_TASKSTATUS_ROUTE)
+    public void setTaskStatus(@NotNull @PathVariable Long taskId,
+            @RequestBody SetTaskStatusParams setTaskStatusParams) {
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.setTaskStatus(setTaskStatusParams.getStatus(), taskId, username);
     }
 
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
@@ -398,4 +407,5 @@ public class TaskController {
         Revision revision = this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);
     }
+
 }
