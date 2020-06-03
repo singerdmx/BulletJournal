@@ -147,7 +147,7 @@ public class ProjectItemController {
             List<ProjectItem> projectItems, final ProjectType projectType) {
         final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime);
         projectItems.addAll(items.stream()
-                .map(t -> t.toPresentationModel())
+                .map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
                 .collect(Collectors.toList()));
     }
 
