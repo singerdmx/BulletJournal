@@ -47,19 +47,12 @@ public class ProjectItemController {
     private final Map<ProjectType, ProjectItemDaoJpa> daos;
 
     @Autowired
-    public ProjectItemController(
-            TaskDaoJpa taskDaoJpa,
-            TransactionDaoJpa transactionDaoJpa,
-            NoteDaoJpa noteDaoJpa,
-            LabelDaoJpa labelDaoJpa,
-            UserDaoJpa userDaoJpa,
-            UserClient userClient) {
+    public ProjectItemController(TaskDaoJpa taskDaoJpa, TransactionDaoJpa transactionDaoJpa, NoteDaoJpa noteDaoJpa,
+            LabelDaoJpa labelDaoJpa, UserDaoJpa userDaoJpa, UserClient userClient) {
         this.taskDaoJpa = taskDaoJpa;
         this.transactionDaoJpa = transactionDaoJpa;
-        this.daos = ImmutableMap.of(
-                ProjectType.TODO, taskDaoJpa,
-                ProjectType.NOTE, noteDaoJpa,
-                ProjectType.LEDGER, transactionDaoJpa);
+        this.daos = ImmutableMap.of(ProjectType.TODO, taskDaoJpa, ProjectType.NOTE, noteDaoJpa, ProjectType.LEDGER,
+                transactionDaoJpa);
         this.labelDaoJpa = labelDaoJpa;
         this.userDaoJpa = userDaoJpa;
         this.userClient = userClient;
@@ -67,10 +60,8 @@ public class ProjectItemController {
 
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
-    public List<ProjectItems> getProjectItems(
-            @Valid @RequestParam List<ProjectType> types,
-            @NotBlank @RequestParam String startDate,
-            @NotBlank @RequestParam String endDate,
+    public List<ProjectItems> getProjectItems(@Valid @RequestParam List<ProjectType> types,
+            @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
 
         if (types.isEmpty()) {
@@ -83,17 +74,15 @@ public class ProjectItemController {
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
 
-        Map<ZonedDateTime, ProjectItems> projectItemsMap =
-                getZonedDateTimeProjectItemsMap(types, username, startTime, endTime);
+        Map<ZonedDateTime, ProjectItems> projectItemsMap = getZonedDateTimeProjectItemsMap(types, username, startTime,
+                endTime);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
-        return ProjectItems.addAvatar(
-                this.labelDaoJpa.getLabelsForProjectItems(projectItems),
-                this.userClient);
+        return ProjectItems.addAvatar(this.labelDaoJpa.getLabelsForProjectItems(projectItems), this.userClient);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(
-            List<ProjectType> types, String username, ZonedDateTime startTime, ZonedDateTime endTime) {
+    protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(List<ProjectType> types, String username,
+            ZonedDateTime startTime, ZonedDateTime endTime) {
 
         Map<ZonedDateTime, List<Task>> taskMap = null;
         Map<ZonedDateTime, List<Transaction>> transactionMap = null;
@@ -107,7 +96,8 @@ public class ProjectItemController {
         }
         // Ledger query
         if (types.contains(ProjectType.LEDGER)) {
-            List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(user.getName(), startTime, endTime);
+            List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(user.getName(), startTime,
+                    endTime);
             // Group transaction by date
             transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
         }
@@ -121,10 +111,8 @@ public class ProjectItemController {
 
     @GetMapping(RECENT_ITEMS_ROUTE)
     @ResponseBody
-    public List<ProjectItem> getRecentProjectItems(
-            @Valid @RequestParam List<ProjectType> types,
-            @NotBlank @RequestParam String startDate,
-            @NotBlank @RequestParam String endDate,
+    public List<ProjectItem> getRecentProjectItems(@Valid @RequestParam List<ProjectType> types,
+            @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
             @NotBlank @RequestParam String timezone) {
 
         if (types.isEmpty()) {
@@ -142,13 +130,12 @@ public class ProjectItemController {
         return projectItems;
     }
 
-    private <T extends ProjectItemModel> void addRecentProjectItems(
-            Timestamp startTime, Timestamp endTime,
+    private <T extends ProjectItemModel> void addRecentProjectItems(Timestamp startTime, Timestamp endTime,
             List<ProjectItem> projectItems, final ProjectType projectType) {
         final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime);
-        projectItems.addAll(items.stream()
-                .map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
+        projectItems.addAll(items.stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
                 .collect(Collectors.toList()));
+
     }
 
 }
