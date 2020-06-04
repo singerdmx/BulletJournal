@@ -72,9 +72,9 @@ export const updateProject = (
     });
 };
 
-export const updateProjectRelations = (projects: Project[]) => {
+export const updateProjectRelations = (projects: Project[], etag: string) => {
   const putBody = JSON.stringify(projects);
-  return doPut('/api/projects', putBody)
+  return doPut('/api/projects', putBody, etag)
     .then((res) => res)
     .catch((err) => {
       throw Error(err.message);

@@ -121,7 +121,8 @@ function* updateSharedProjectOwnersOrder(
           .slice()
           .sort(
             (p1, p2) =>
-              projectOwners.indexOf(p1.owner.name) - projectOwners.indexOf(p2.owner.name)
+              projectOwners.indexOf(p1.owner.name) -
+              projectOwners.indexOf(p2.owner.name)
           ),
       })
     );
@@ -183,7 +184,11 @@ function* putProjectRelations(
     const { projects } = action.payload;
     const state = yield select();
     const systemState = state.system;
-    const data = yield call(updateProjectRelations, projects);
+    const data = yield call(
+      updateProjectRelations,
+      projects,
+      systemState.ownedProjectsEtag
+    );
     const updatedProjects = yield data.json();
     const etags = (data.headers.get('Etag') || '').split('|');
     if (etags.length === 2) {
