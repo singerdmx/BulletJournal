@@ -38,7 +38,7 @@ const EditNote: React.FC<NoteProps> = (props) => {
 
   useEffect(() => {
     if (projectId) {
-      props.labelsUpdate(parseInt(projectId));
+      labelsUpdate(parseInt(projectId));
     }
   }, []);
 
