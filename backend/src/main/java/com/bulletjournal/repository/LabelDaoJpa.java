@@ -25,7 +25,7 @@ public class LabelDaoJpa {
 
     private static final Map<String, String> DEFAULT_LABELS = new HashMap<String, String>() {
         {
-            put("Utility", "ApiOutlined");
+            put("Utility", "BankOutlined");
             put("Grocery", "ShopOutlined");
             put("Restaurant", "HomeOutlined");
             put("Travel", "CarOutlined");

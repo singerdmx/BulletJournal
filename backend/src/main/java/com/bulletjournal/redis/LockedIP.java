@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.TimeToLive;
 import java.io.Serializable;
 import java.util.Objects;
 
-@RedisHash(value = "LockedIP", timeToLive = 86400)
+@RedisHash(value = "LockedIP")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LockedIP implements Serializable {
     @Id
