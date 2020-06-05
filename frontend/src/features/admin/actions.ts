@@ -7,7 +7,10 @@ export const setRole = (username: string, role: Role) =>
 export const getUsersByRole = (role: Role) =>
   actions.getUsersByRole({ role: role });
 
-export const getBlockedUsersAndIPs = () => actions.getBlockedUsersAndIPs({});
+export const getLockedUsersAndIPs = () => actions.getLockedUsersAndIPs({});
 
 export const unlockUserandIP = (name: string, ip: string) =>
   actions.unlockUserandIP({ name: name, ip: ip });
+
+export const lockUserandIP = (name: string, ip: string, reason: string) =>
+  actions.lockUserandIP({ name: name, ip: ip, reason: reason });
