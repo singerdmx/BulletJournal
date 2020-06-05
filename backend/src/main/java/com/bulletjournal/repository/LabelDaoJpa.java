@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Repository
 public class LabelDaoJpa {
 
-    HashMap<String, String> labelsMapping = new HashMap<String, String>() {
+    private static final Map<String, String> DEFAULT_LABELS = new HashMap<String, String>() {
         {
             put("Utility", "ApiOutlined");
             put("Grocery", "ShopOutlined");
@@ -52,14 +52,14 @@ public class LabelDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void createDefaultLabels(String owner) {
-        List<Label> default_labels = labelsMapping.entrySet().stream().map(l -> {
+        List<Label> defaultLabels = DEFAULT_LABELS.entrySet().stream().map(l -> {
             Label label = new Label();
             label.setName(l.getKey());
             label.setIcon(l.getValue());
             label.setOwner(owner);
             return label;
         }).collect(Collectors.toList());
-        this.labelRepository.saveAll(default_labels);
+        this.labelRepository.saveAll(defaultLabels);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
