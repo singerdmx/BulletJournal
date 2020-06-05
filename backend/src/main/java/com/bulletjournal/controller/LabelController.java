@@ -51,7 +51,7 @@ public class LabelController {
 
     @PatchMapping(LABEL_ROUTE)
     public Label updateLabel(@NotNull @PathVariable Long labelId,
-                             @Valid @RequestBody UpdateLabelParams updateLabelParams) {
+            @Valid @RequestBody UpdateLabelParams updateLabelParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return labelDaoJpa.partialUpdate(username, labelId, updateLabelParams).toPresentationModel();
     }
@@ -72,8 +72,7 @@ public class LabelController {
                 labelsForProject.forEach(l -> projectLabelValues.add(l.getValue()));
             }
         }
-        List<Label> labels = this.labelDaoJpa.getLabels(username).stream()
-                .map(label -> label.toPresentationModel())
+        List<Label> labels = this.labelDaoJpa.getLabels(username).stream().map(label -> label.toPresentationModel())
                 .filter(label -> !projectLabelValues.contains(label.getValue())) // label in project take precedence
                 .collect(Collectors.toList());
         labels.addAll(labelsForProject);
@@ -87,8 +86,7 @@ public class LabelController {
     }
 
     @GetMapping(PROJECT_LABELS_ROUTE)
-    public ResponseEntity<List<Label>> getProjectLabels(
-            @NotNull @PathVariable Long projectId) {
+    public ResponseEntity<List<Label>> getProjectLabels(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Label> labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
         return ResponseEntity.ok().body(labelsForProject);

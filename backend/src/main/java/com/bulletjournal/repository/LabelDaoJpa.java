@@ -23,15 +23,17 @@ import java.util.stream.Collectors;
 @Repository
 public class LabelDaoJpa {
 
-//    private static Map<String, String> default_labels = ImmutableMap.of(
-//            "Utility", "",
-//            "Grocery", "",
-//            "Restaurant", "",
-//            "Travel", "",
-//            "Entertainment", "",
-//            "Favorite", "",
-//            "Star",""
-//    );
+    HashMap<String, String> labelsMapping = new HashMap<String, String>() {
+        {
+            put("Utility", "ApiOutlined");
+            put("Grocery", "ShopOutlined");
+            put("Restaurant", "HomeOutlined");
+            put("Travel", "CarOutlined");
+            put("Entertainment", "CustomerServiceOutlined");
+            put("Favorite", "HeartOutlined");
+            put("Star", "StarOutlined");
+        }
+    };
 
     @Autowired
     private LabelRepository labelRepository;
@@ -50,8 +52,14 @@ public class LabelDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void createDefaultLabels(String owner) {
-//        default_labels.entrySet().stream();
-//        this.labelRepository.saveAll();
+        List<Label> default_labels = labelsMapping.entrySet().stream().map(l -> {
+            Label label = new Label();
+            label.setName(l.getKey());
+            label.setIcon(l.getValue());
+            label.setOwner(owner);
+            return label;
+        }).collect(Collectors.toList());
+        this.labelRepository.saveAll(default_labels);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -74,23 +82,21 @@ public class LabelDaoJpa {
         Label label = this.labelRepository.findById(labelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Label" + labelId + "not found"));
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                label.getOwner(), requester, ContentType.LABEL, Operation.UPDATE, labelId);
+        this.authorizationService.checkAuthorizedToOperateOnContent(label.getOwner(), requester, ContentType.LABEL,
+                Operation.UPDATE, labelId);
 
         if (Objects.equals(label.getName(), updateLabelParams.getValue())) {
             return label;
         }
 
         if (!this.labelRepository.findByNameAndOwner(updateLabelParams.getValue(), requester).isEmpty()) {
-            throw new ResourceAlreadyExistException("Label with name " + updateLabelParams.getValue()
-                    + " already exists");
+            throw new ResourceAlreadyExistException(
+                    "Label with name " + updateLabelParams.getValue() + " already exists");
         }
 
-        DaoHelper.updateIfPresent(updateLabelParams.hasValue(), updateLabelParams.getValue(),
-                label::setName);
+        DaoHelper.updateIfPresent(updateLabelParams.hasValue(), updateLabelParams.getValue(), label::setName);
 
-        DaoHelper.updateIfPresent(updateLabelParams.hasIcon(), updateLabelParams.getIcon(),
-                label::setIcon);
+        DaoHelper.updateIfPresent(updateLabelParams.hasIcon(), updateLabelParams.getIcon(), label::setIcon);
 
         return this.labelRepository.save(label);
     }
@@ -104,10 +110,8 @@ public class LabelDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Label> getLabels(String owner) {
-        List<Label> labels = this.labelRepository.findByOwner(owner)
-                .stream()
-                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
-                .collect(Collectors.toList());
+        List<Label> labels = this.labelRepository.findByOwner(owner).stream()
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt())).collect(Collectors.toList());
         return labels;
     }
 
@@ -116,42 +120,33 @@ public class LabelDaoJpa {
         Label label = this.labelRepository.findById(labelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Label" + labelId + "not found"));
 
-        this.authorizationService.checkAuthorizedToOperateOnContent(label.getOwner(), requester,
-                ContentType.LABEL, Operation.DELETE, labelId);
+        this.authorizationService.checkAuthorizedToOperateOnContent(label.getOwner(), requester, ContentType.LABEL,
+                Operation.DELETE, labelId);
 
         this.labelRepository.delete(label);
 
         List<Task> tasks = this.taskRepository.findTasksByLabelId(labelId);
-        tasks.stream().forEach(
-                task -> task.setLabels(
-                        task.getLabels().stream().filter(id
-                                -> id != labelId).collect(Collectors.toList())));
+        tasks.stream().forEach(task -> task
+                .setLabels(task.getLabels().stream().filter(id -> id != labelId).collect(Collectors.toList())));
         this.taskRepository.saveAll(tasks);
 
         List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelId(labelId);
-        transactions.stream().forEach(
-                transaction -> transaction.setLabels(
-                        transaction.getLabels().stream().filter(id
-                                -> id != labelId).collect(Collectors.toList())));
+        transactions.stream().forEach(transaction -> transaction
+                .setLabels(transaction.getLabels().stream().filter(id -> id != labelId).collect(Collectors.toList())));
         this.transactionRepository.saveAll(transactions);
 
         List<Note> notes = this.noteRepository.findNotesByLabelId(labelId);
-        notes.stream().forEach(
-                note -> note.setLabels(
-                        note.getLabels().stream().filter(id
-                                -> id != labelId).collect(Collectors.toList())));
+        notes.stream().forEach(note -> note
+                .setLabels(note.getLabels().stream().filter(id -> id != labelId).collect(Collectors.toList())));
         this.noteRepository.saveAll(notes);
     }
 
     /**
      * Retrieves project items by a list of labels
      * <p>
-     * Steps:
-     * 1. Fetch project items with custom query of labels
-     * 2. Group project items by date
-     * 3. Sort project items groups by date
-     * 4. Attach project items' labels to themselves
-     * 5. Convert to presentation model and return
+     * Steps: 1. Fetch project items with custom query of labels 2. Group project
+     * items by date 3. Sort project items groups by date 4. Attach project items'
+     * labels to themselves 5. Convert to presentation model and return
      *
      * @param timezone  the timezone of requester
      * @param labels    a list of labels
@@ -175,7 +170,8 @@ public class LabelDaoJpa {
         // Group project items by date
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
-        Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
+        Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper
+                .groupTransactionsByDate(transactions);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
@@ -184,15 +180,13 @@ public class LabelDaoJpa {
 
     }
 
-    private <T extends ProjectItemModel> List<T> filter(
-            List<T> projectItems, String requester, Map<Long, Boolean> cache) {
-        return projectItems.stream().filter(
-                item -> {
-                    Long projectId = item.getProject().getId();
-                    return cache.computeIfAbsent(projectId,
-                            k -> item.getProject().getGroup().getAcceptedUsers()
-                                    .stream().anyMatch(u -> requester.equals(u.getUser().getName())));
-                }).collect(Collectors.toList());
+    private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester,
+            Map<Long, Boolean> cache) {
+        return projectItems.stream().filter(item -> {
+            Long projectId = item.getProject().getId();
+            return cache.computeIfAbsent(projectId, k -> item.getProject().getGroup().getAcceptedUsers().stream()
+                    .anyMatch(u -> requester.equals(u.getUser().getName())));
+        }).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -214,18 +208,19 @@ public class LabelDaoJpa {
         }
 
         Set<Long> labelIds = new HashSet<>();
-        projectItems.forEach(item -> labelIds.addAll(item.getLabels().stream().map(l -> l.getId()).collect(Collectors.toList())));
+        projectItems.forEach(
+                item -> labelIds.addAll(item.getLabels().stream().map(l -> l.getId()).collect(Collectors.toList())));
 
         Map<Long, com.bulletjournal.controller.models.Label> m = getLabels(new ArrayList<>(labelIds)).stream()
                 .collect(Collectors.toMap(com.bulletjournal.controller.models.Label::getId, l -> l));
 
-        projectItems.forEach(item -> item.setLabels(item.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
+        projectItems.forEach(item -> item
+                .setLabels(item.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
         return projectItems;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected List<com.bulletjournal.controller.models.Label> getLabels(
-            final List<Long> labels) {
+    protected List<com.bulletjournal.controller.models.Label> getLabels(final List<Long> labels) {
         if (labels == null || labels.isEmpty()) {
             return Collections.emptyList();
         }
@@ -233,8 +228,7 @@ public class LabelDaoJpa {
         if (labels != null && !labels.isEmpty()) {
             labelsForPresentation = this.labelRepository.findAllById(labels).stream()
                     .sorted(Comparator.comparingInt(label -> labels.indexOf(label.getId())))
-                    .map(Label::toPresentationModel)
-                    .collect(Collectors.toList());
+                    .map(Label::toPresentationModel).collect(Collectors.toList());
         }
         return labelsForPresentation;
     }
