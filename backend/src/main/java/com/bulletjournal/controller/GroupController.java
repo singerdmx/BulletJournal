@@ -190,11 +190,12 @@ public class GroupController {
     }
 
     @PostMapping(REMOVE_USER_GROUP_ROUTE)
-    public void removeUserGroup(@Valid @RequestBody RemoveUserGroupParams removeUserGroupParams) {
+    public Group removeUserGroup(@Valid @RequestBody RemoveUserGroupParams removeUserGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> events = this.groupDaoJpa.removeUserGroups(username, ImmutableList.of(removeUserGroupParams));
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveUserFromGroupEvent(events, username));
         }
+        return getGroup(removeUserGroupParams.getGroupId());
     }
 }
