@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.LockUserParams;
 import com.bulletjournal.controller.models.LockedUsersAndIPs;
 import com.bulletjournal.controller.models.SetRoleParams;
 import com.bulletjournal.controller.models.UnlockUserParams;
@@ -34,7 +35,8 @@ public class AdminController {
     public static final String SET_ROLE_ROUTE = "/api/users/{username}/setRole";
     public static final String USERS_ROUTE = "/api/users";
     public static final String LOCKED_USERS_ROUTE = "/api/lockedUsers";
-    public static final String UNBLOCK_USER_ROUTE = "/api/admin/unlock";
+    public static final String UNLOCK_USER_ROUTE = "/api/admin/unlock";
+    public static final String LOCK_USER_ROUTE = "/api/admin/lock";
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -83,8 +85,8 @@ public class AdminController {
         return lockedUserAndIPs;
     }
 
-    @PostMapping(UNBLOCK_USER_ROUTE)
-    public void unblockUser(@NotNull @RequestBody UnlockUserParams unlockUserParams) {
+    @PostMapping(UNLOCK_USER_ROUTE)
+    public void unlockUser(@NotNull @RequestBody UnlockUserParams unlockUserParams) {
         validateRequester();
         String ip = unlockUserParams.getIp();
         String name = unlockUserParams.getName();
@@ -94,6 +96,21 @@ public class AdminController {
         }
         if (StringUtils.isNotBlank(name)) {
             redisLockedUserRepository.delete(new LockedUser(name, null));
+        }
+    }
+
+    @PostMapping(LOCK_USER_ROUTE)
+    public void lockUser(@NotNull @RequestBody LockUserParams lockUserParams) {
+        validateRequester();
+        String ip = lockUserParams.getIp();
+        String name = lockUserParams.getName();
+        String reason = lockUserParams.getReason();
+
+        if (StringUtils.isNotBlank(ip)) {
+            redisLockedIPRepository.save(new LockedIP(ip, reason));
+        }
+        if (StringUtils.isNotBlank(name)) {
+            redisLockedUserRepository.save(new LockedUser(name, reason));
         }
     }
 }
