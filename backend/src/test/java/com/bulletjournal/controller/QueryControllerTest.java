@@ -1,10 +1,8 @@
 package com.bulletjournal.controller;
 
-
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.google.common.collect.ImmutableList;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +16,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -28,9 +25,8 @@ import static org.junit.Assert.assertNotNull;
 public class QueryControllerTest {
     private static final String ROOT_URL = "http://localhost:";
 
-    private static final String USER_0518 = "bbs1024";
+    private static final String USER = "bbs1024";
     private static String TIMEZONE = "America/Los_Angeles";
-
 
     @LocalServerPort
     int randomServerPort;
@@ -41,19 +37,11 @@ public class QueryControllerTest {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
-
-    @After
-    public void teardown() {
-
-    }
-
     @Test
-    public void test() {
-        Group group = createGroup(USER_0518);
+    public void testQuery() {
+        Group group = createGroup(USER);
         Project p2 = createProject("p_ProjectItem_Task", group, ProjectType.TODO);
         addTasks(p2);
-
-
     }
 
     private Project createProject(String projectName, Group g, ProjectType type) {
@@ -63,16 +51,16 @@ public class QueryControllerTest {
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.POST,
-                TestHelpers.actAsOtherUser(project, USER_0518),
+                TestHelpers.actAsOtherUser(project, USER),
                 Project.class);
         Project created = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(created);
         assertEquals(projectName, created.getName());
-        assertEquals(USER_0518, created.getOwner().getName());
+        assertEquals(USER, created.getOwner().getName());
         assertEquals(type, created.getProjectType());
         assertEquals("Group_ProjectItem", created.getGroup().getName());
-        assertEquals(USER_0518, created.getGroup().getOwner().getName());
+        assertEquals(USER, created.getGroup().getOwner().getName());
         assertEquals("d14", created.getDescription());
         return created;
     }
@@ -98,20 +86,19 @@ public class QueryControllerTest {
     private void addTasks(Project p) {
         Task t1 = createTask(p, "hello world", "2020-02-29");
         Task t2 = createTask(p, "love", "2020-03-01");
-        addRecentTaskContents(t1, "hello world a test hello worold work");
-        addRecentTaskContents(t1, "I love you don't love me");
-
+        addTaskContents(t1, "hello world a test hello worold work");
+        addTaskContents(t1, "I love you don't love me");
     }
 
     private Task createTask(Project project, String name, String date) {
         CreateTaskParams task =
                 new CreateTaskParams(name, date, null, 10,
-                        new ReminderSetting(), ImmutableList.of(USER_0518), TIMEZONE, null);
+                        new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
-                TestHelpers.actAsOtherUser(task, USER_0518),
+                TestHelpers.actAsOtherUser(task, USER),
                 Task.class,
                 project.getId());
 
@@ -123,19 +110,19 @@ public class QueryControllerTest {
         return created;
     }
 
-    private Content addRecentTaskContents(Task task, String text) {
+    private Content addTaskContents(Task task, String text) {
         CreateContentParams params = new CreateContentParams(text);
         ResponseEntity<Content> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.ADD_CONTENT_ROUTE,
                 HttpMethod.POST,
-                TestHelpers.actAsOtherUser(params, USER_0518),
+                TestHelpers.actAsOtherUser(params, USER),
                 Content.class,
                 task.getId()
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
-        assertEquals(USER_0518, content.getOwner().getName());
+        assertEquals(USER, content.getOwner().getName());
         assertEquals(params.getText(), content.getText());
         assertNotNull(content.getId());
         return content;
