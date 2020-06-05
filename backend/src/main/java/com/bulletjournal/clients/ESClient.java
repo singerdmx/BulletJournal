@@ -7,10 +7,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
+import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ESClient {
+public class ESClient extends AbstractElasticsearchConfiguration {
 
     private static final String DEFAULT_CLIENT_VALUE = "spring.elasticsearch.rest.enable";
 
@@ -19,8 +20,9 @@ public class ESClient {
 
     @Bean
     @ConditionalOnProperty(value = DEFAULT_CLIENT_VALUE, havingValue = "true", matchIfMissing = false)
-    RestHighLevelClient client() {
-        ClientConfiguration clientConfiguration = ClientConfiguration.builder()
+    @Override
+    public RestHighLevelClient elasticsearchClient() {
+        final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
                 .connectedTo(springESConfig.getUris())
                 .withBasicAuth(springESConfig.getUsername(), springESConfig.getPassword())
                 .build();
@@ -28,3 +30,4 @@ public class ESClient {
         return RestClients.create(clientConfiguration).rest();
     }
 }
+

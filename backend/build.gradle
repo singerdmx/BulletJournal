@@ -50,7 +50,7 @@ dependencies {
     compile group: 'org.dmfs', name: 'lib-recur', version: '0.11.4'
     compile group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '1.0.0'
     compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.163'
-    compile group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '3.2.6.RELEASE'
+    compile group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '4.0.0.RELEASE'
     compile group: 'org.dmfs', name: 'rfc5545-datetime', version: '0.2.4'
     compile group: 'com.google.apis', name: 'google-api-services-calendar', version: 'v3-rev411-1.25.0'
     compile group: 'com.google.api-client', name: 'google-api-client-gson', version: '1.30.9'
