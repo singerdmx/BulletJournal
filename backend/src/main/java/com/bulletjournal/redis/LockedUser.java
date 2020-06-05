@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 
-@RedisHash(value = "LockedUser", timeToLive = 86400)
+@RedisHash(value = "LockedUser")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LockedUser implements Serializable {
 
