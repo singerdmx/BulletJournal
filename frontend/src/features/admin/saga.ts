@@ -5,14 +5,16 @@ import {
   actions as adminActions,
   setRoleAction,
   GetUsersByRoleAction,
-  GetBlockedUsersAndIPsAction,
+  GetLockedUsersAndIPsAction,
   UnlockUserAndIPAction,
+  LockUserAndIPAction,
 } from './reducer';
 import {
   setRole,
   fetchUsersByRole,
   fetchBlockedUsersAndIPs,
   unlockUserAndIP,
+  lockUserAndIP,
 } from '../../apis/adminApis';
 
 function* setUserRole(action: PayloadAction<setRoleAction>) {
@@ -40,13 +42,13 @@ function* getUsersByRole(action: PayloadAction<GetUsersByRoleAction>) {
 }
 
 function* getBlockedUsersAndIPs(
-    action: PayloadAction<GetBlockedUsersAndIPsAction>
+  action: PayloadAction<GetLockedUsersAndIPsAction>
 ) {
   try {
     const data = yield call(fetchBlockedUsersAndIPs);
 
-    yield put(adminActions.lockedUsersReceived({lockedUsers: data.users}));
-    yield put(adminActions.lockedIPsReceived({lockedIPs: data.ips}));
+    yield put(adminActions.lockedUsersReceived({ lockedUsers: data.users }));
+    yield put(adminActions.lockedIPsReceived({ lockedIPs: data.ips }));
   } catch (error) {
     yield call(message.error, `getBlockedUsersAndIPs Error Received: ${error}`);
   }
@@ -68,6 +70,15 @@ function* unlockUsersAndIPs(action: PayloadAction<UnlockUserAndIPAction>) {
   }
 }
 
+function* lockUsersAndIPs(action: PayloadAction<LockUserAndIPAction>) {
+  const { name, ip, reason } = action.payload;
+  try {
+    yield call(lockUserAndIP, name, ip, reason);
+  } catch (error) {
+    yield call(message.error, `unlockUserandIP Error Received: ${error}`);
+  }
+}
+
 export default function* AdminSagas() {
   yield all([yield takeLatest(adminActions.setRole.type, setUserRole)]);
   yield all([
@@ -75,11 +86,14 @@ export default function* AdminSagas() {
   ]);
   yield all([
     yield takeLatest(
-      adminActions.getBlockedUsersAndIPs.type,
+      adminActions.getLockedUsersAndIPs.type,
       getBlockedUsersAndIPs
     ),
   ]);
   yield all([
     yield takeLatest(adminActions.unlockUserandIP.type, unlockUsersAndIPs),
+  ]);
+  yield all([
+    yield takeLatest(adminActions.lockUserandIP.type, lockUsersAndIPs),
   ]);
 }

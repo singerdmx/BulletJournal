@@ -35,3 +35,14 @@ export const unlockUserAndIP = (name: string, ip: string) => {
     throw Error(err.message);
   });
 };
+
+export const lockUserAndIP = (name: string, ip: string, reason: string) => {
+  const postBody = JSON.stringify({
+    name: name,
+    ip: ip,
+    reason: reason,
+  });
+  return doPost(`/api/admin/lock`, postBody).catch((err) => {
+    throw Error(err.message);
+  });
+};

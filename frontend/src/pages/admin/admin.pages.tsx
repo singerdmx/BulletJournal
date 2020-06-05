@@ -15,8 +15,9 @@ import {
 import {
   getUsersByRole,
   setRole,
-  getBlockedUsersAndIPs,
+  getLockedUsersAndIPs,
   unlockUserandIP,
+  lockUserandIP,
 } from '../../features/admin/actions';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
@@ -34,8 +35,9 @@ type AdminProps = {
   lockedIPs: LockedIP[];
   setRole: (username: string, role: Role) => void;
   getUsersByRole: (role: Role) => void;
-  getBlockedUsersAndIPs: () => void;
+  getLockedUsersAndIPs: () => void;
   unlockUserandIP: (name: string, ip: string) => void;
+  lockUserandIP: (name: string, ip: string, reason: string) => void;
 };
 
 const AdminPage: React.FC<AdminProps> = (props) => {
@@ -45,11 +47,15 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     lockedIPs,
     usersByRole,
     getUsersByRole,
-    getBlockedUsersAndIPs,
+    getLockedUsersAndIPs,
     unlockUserandIP,
+    lockUserandIP,
   } = props;
   const [username, setUsername] = useState('');
   const [roleLevel, setRoleLevel] = useState('BASIC' as Role);
+  const [lockName, setLockName] = useState('');
+  const [lockIP, setLockIP] = useState('');
+  const [lockReason, setLockReason] = useState('');
   const columns = [
     {
       title: 'User',
@@ -68,8 +74,8 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     },
     {
       title: '',
-      dataIndex: 'remove',
-      key: 'remove',
+      dataIndex: '',
+      key: '',
       render: (a: any) => (
         <Tooltip placement='left' title='Unblock User'>
           <DeleteOutlined
@@ -112,6 +118,13 @@ const AdminPage: React.FC<AdminProps> = (props) => {
       ),
     },
   ];
+
+  const handleLockUsers = () => {
+    lockUserandIP(lockName, lockIP, lockReason);
+    setLockIP('');
+    setLockName('');
+    setLockReason('');
+  };
 
   return (
     <div className='admin-page'>
@@ -182,9 +195,49 @@ const AdminPage: React.FC<AdminProps> = (props) => {
           )}
         </Panel>
         <Panel header='Lock Users' key='lockUsers'>
-          <Button type='primary' onClick={getBlockedUsersAndIPs}>
-            Get Blocked Users
-          </Button>
+          <div className='lock-user-row'>
+            <Input
+              disabled={lockIP.length > 0}
+              style={{ width: '170px' }}
+              value={lockName}
+              placeholder='Username'
+              onChange={(e: any) => {
+                setLockName(e.target.value);
+              }}
+            />
+            &nbsp;&nbsp;&nbsp;OR&nbsp;&nbsp;&nbsp;
+            <Input
+              disabled={lockName.length > 0}
+              style={{ width: '170px' }}
+              value={lockIP}
+              placeholder='IP'
+              onChange={(e: any) => {
+                setLockIP(e.target.value);
+              }}
+            />
+            <Button
+              type='primary'
+              onClick={handleLockUsers}
+              style={{ marginLeft: '20px' }}
+            >
+              Lock User
+            </Button>
+          </div>
+          <div className='lock-user-row'>
+            <Input
+              placeholder='Reason'
+              style={{ width: '500px' }}
+              value={lockReason}
+              onChange={(e: any) => {
+                setLockReason(e.target.value);
+              }}
+            />
+          </div>
+          <div className='lock-user-row'>
+            <Button type='primary' onClick={getLockedUsersAndIPs}>
+              Get Blocked Users
+            </Button>
+          </div>
           <Tabs defaultActiveKey={'user'}>
             <TabPane tab={<span>Users</span>} key='users'>
               <Table columns={columns} dataSource={lockedUsers} />
@@ -208,6 +261,7 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   setRole,
   getUsersByRole,
-  getBlockedUsersAndIPs,
+  getLockedUsersAndIPs,
   unlockUserandIP,
+  lockUserandIP,
 })(AdminPage);

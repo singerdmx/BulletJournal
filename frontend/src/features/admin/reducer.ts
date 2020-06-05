@@ -28,7 +28,13 @@ export type UnlockUserAndIPAction = {
   ip: string;
 };
 
-export type GetBlockedUsersAndIPsAction = {};
+export type LockUserAndIPAction = {
+  name: string;
+  ip: string;
+  reason: string;
+};
+
+export type GetLockedUsersAndIPsAction = {};
 
 let initialState = {
   usersByRole: [] as User[],
@@ -55,12 +61,13 @@ const slice = createSlice({
       const { lockedIPs } = action.payload;
       state.lockedIPs = lockedIPs;
     },
-    getBlockedUsersAndIPs: (
+    getLockedUsersAndIPs: (
       state,
-      action: PayloadAction<GetBlockedUsersAndIPsAction>
+      action: PayloadAction<GetLockedUsersAndIPsAction>
     ) => state,
     unlockUserandIP: (state, action: PayloadAction<UnlockUserAndIPAction>) =>
       state,
+    lockUserandIP: (state, action: PayloadAction<LockUserAndIPAction>) => state,
   },
 });
 
