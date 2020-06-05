@@ -29,6 +29,9 @@ public class UserDaoJpa {
     @Autowired
     private UserGroupRepository userGroupRepository;
 
+    @Autowired
+    private LabelDaoJpa labelDaoJpa;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
         List<User> userList = this.userRepository.findByName(name);
@@ -53,6 +56,7 @@ public class UserDaoJpa {
 
         user.addGroup(group);
         this.userGroupRepository.save(new UserGroup(user, group, true));
+        this.labelDaoJpa.createDefaultLabels(name);
         return this.userRepository.save(user);
     }
 

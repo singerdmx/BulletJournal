@@ -23,6 +23,16 @@ import java.util.stream.Collectors;
 @Repository
 public class LabelDaoJpa {
 
+//    private static Map<String, String> default_labels = ImmutableMap.of(
+//            "Utility", "",
+//            "Grocery", "",
+//            "Restaurant", "",
+//            "Travel", "",
+//            "Entertainment", "",
+//            "Favorite", "",
+//            "Star",""
+//    );
+
     @Autowired
     private LabelRepository labelRepository;
 
@@ -38,8 +48,11 @@ public class LabelDaoJpa {
     @Autowired
     private AuthorizationService authorizationService;
 
-    @Autowired
-    private UserAliasDaoJpa userAliasDaoJpa;
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void createDefaultLabels(String owner) {
+//        default_labels.entrySet().stream();
+//        this.labelRepository.saveAll();
+    }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Label create(String name, String owner, String icon) {
