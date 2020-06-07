@@ -1,5 +1,4 @@
 import React from 'react';
-import {History} from 'history';
 import {Empty, Tree} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
@@ -17,18 +16,19 @@ export const iconMapper = {
 
 const getTree = (
     data: Project[],
-    index: number
+    index: number,
+    onClick: Function
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Project) => {
         const node = {} as TreeNodeNormal;
         if (item.subProjects && item.subProjects.length) {
-            node.children = getTree(item.subProjects, index);
+            node.children = getTree(item.subProjects, index, onClick);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
         node.title = (
-            <span style={{width: '100%'}}>
+            <span onClick={e => onClick(item.id)} style={{width: '100%'}}>
             {iconMapper[item.projectType]}&nbsp;{item.name}
           </span>
         );
@@ -97,7 +97,7 @@ const DropProjectById = (projects: Project[], dropId: number, dropProject: Proje
 };
 
 const onDrop = (projects: Project[], updateProject: Function) => (info: any) => {
-    const projectId = parseInt(info.dragNode.key)
+    const projectId = parseInt(info.dragNode.key);
     const targetProject = findProjectById(projects, projectId);
     const dropPos = info.node.props.pos.split('-');
     const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
@@ -121,28 +121,25 @@ const onDrop = (projects: Project[], updateProject: Function) => (info: any) => 
 
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
     const {ownProjects, history, id, updateProjectRelations} = props;
-    const treeNode = getTree(ownProjects, id);
 
-    const onClick = (history: History<History.PoorMansUnknown>) => (e: any) => {
-        if (e.length) {
-            props.clearCompletedTasks();
-            history.push(`/projects/${e[0]}`)
-        }
-    };
+    const treeNode = getTree(ownProjects, id, (itemId: number) => {
+        clearCompletedTasks();
+        history.push(`/projects/${itemId}`);
+    });
 
     if (ownProjects.length === 0) {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
     }
 
-    return (<div style={{marginLeft: '20%'}}><Tree
-        className="ant-tree"
-        draggable
-        blockNode
-        onDragEnter={onDragEnter}
-        selectable={true}
-        onSelect={onClick(history)}
-        onDrop={onDrop(ownProjects, updateProjectRelations)}
-        treeData={treeNode}/></div>);
+    return (<div style={{marginLeft: '20%'}}>
+        <Tree
+            className="ant-tree"
+            draggable
+            defaultExpandAll
+            onDragEnter={onDragEnter}
+            selectable={false}
+            onDrop={onDrop(ownProjects, updateProjectRelations)}
+            treeData={treeNode}/></div>);
 };
 
 export default connect(null, {updateProjectRelations, clearCompletedTasks})(
