@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
+@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }) })
 public class User extends NamedModel {
     @Id
     @GeneratedValue(generator = "user_generator")
@@ -17,6 +17,9 @@ public class User extends NamedModel {
 
     @Column(nullable = false)
     private Integer role = 0;
+
+    @Column(nullable = false)
+    private Integer points = 0;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
@@ -189,4 +192,13 @@ public class User extends NamedModel {
     public void setRole(Integer role) {
         this.role = role;
     }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
 }

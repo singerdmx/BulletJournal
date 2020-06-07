@@ -5,6 +5,7 @@ import {
   SettingOutlined,
   UserOutlined,
   MailOutlined,
+  SketchOutlined,
 } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { logoutUser } from '../../apis/myselfApis';
@@ -12,6 +13,8 @@ import { History } from 'history';
 
 import './dropdown-menu.component.styles.less';
 import ContactUs from '../modals/contact-us.component';
+import { connect } from 'react-redux';
+import { IState } from '../../store';
 
 const handleLogout = () => {
   logoutUser().then((res) => {
@@ -20,6 +23,7 @@ const handleLogout = () => {
 };
 
 type menuProps = {
+  points: number;
   username: string;
   showContactUs: boolean;
   history: History<History.PoorMansUnknown>;
@@ -33,6 +37,7 @@ const onClickSetting = (history: History<History.PoorMansUnknown>) => {
 
 const DropdownMenu = ({
   username,
+  points,
   showContactUs,
   history,
   onCancelShowContactUs,
@@ -42,6 +47,10 @@ const DropdownMenu = ({
     <Menu.Item className='modified-item' style={{ cursor: 'default' }}>
       <UserOutlined />
       {username}
+    </Menu.Item>
+    <Menu.Item className='modified-item'>
+      <SketchOutlined />
+      Points&nbsp;&nbsp;{points}
     </Menu.Item>
     <Menu.Item
       className='modified-item'
@@ -71,4 +80,8 @@ const DropdownMenu = ({
   </Menu>
 );
 
-export default DropdownMenu;
+const mapStateToProps = (state: IState) => ({
+  points: state.myself.points,
+});
+
+export default connect(mapStateToProps, {})(DropdownMenu);

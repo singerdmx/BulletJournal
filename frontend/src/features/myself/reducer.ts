@@ -7,6 +7,7 @@ export type MyselfWithAvatar = {
   before?: number;
   currency?: string;
   theme?: string;
+  points?: number;
 };
 
 export type MyselfApiErrorAction = {
@@ -23,7 +24,7 @@ export type UpdateExpandedMyself = {
 
 export type ExpandedMyselfLoading = {
   loading: boolean;
-}
+};
 
 export type PatchMyself = {
   timezone?: string;
@@ -39,7 +40,8 @@ let initialState = {
   before: 0,
   currency: '',
   theme: 'LIGHT',
-  loading: false
+  loading: false,
+  points: 0,
 };
 
 const slice = createSlice({
@@ -47,13 +49,22 @@ const slice = createSlice({
   initialState,
   reducers: {
     myselfDataReceived: (state, action: PayloadAction<MyselfWithAvatar>) => {
-      const { username, avatar, timezone, before, currency, theme } = action.payload;
+      const {
+        username,
+        avatar,
+        timezone,
+        before,
+        currency,
+        theme,
+        points,
+      } = action.payload;
       if (username && username.length > 0) state.username = username;
       if (avatar && avatar.length > 0) state.avatar = avatar;
       if (timezone && timezone.length > 0) state.timezone = timezone;
       if (before || before === 0) state.before = before!;
       if (currency && currency.length > 0) state.currency = currency;
       if (theme) state.theme = theme;
+      if (points) state.points = points;
     },
     myselfApiErrorReceived: (
       state,
@@ -62,15 +73,18 @@ const slice = createSlice({
     themeUpdate: (state, action: PayloadAction<ThemeUpdate>) => state,
     myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state,
     patchMyself: (state, action: PayloadAction<PatchMyself>) => state,
-    expandedMyselfLoading: (state, action: PayloadAction<ExpandedMyselfLoading>) => {
+    expandedMyselfLoading: (
+      state,
+      action: PayloadAction<ExpandedMyselfLoading>
+    ) => {
       const { loading } = action.payload;
       state.loading = loading;
     },
     expandedMyselfUpdate: (
       state,
       action: PayloadAction<UpdateExpandedMyself>
-    ) => state
-  }
+    ) => state,
+  },
 });
 
 export const reducer = slice.reducer;

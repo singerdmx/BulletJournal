@@ -13,10 +13,13 @@ public class Myself extends User {
 
     private String theme;
 
+    private Integer points;
+
     public Myself() {
     }
 
-    public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme) {
+    public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme,
+            Integer points) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
         if (reminderBeforeTask != null) {
@@ -24,6 +27,7 @@ public class Myself extends User {
         }
         this.currency = currency;
         this.theme = theme;
+        this.points = points;
     }
 
     public String getTimezone() {
@@ -64,5 +68,13 @@ public class Myself extends User {
 
     public void setTheme(String theme) {
         this.theme = theme;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
     }
 }

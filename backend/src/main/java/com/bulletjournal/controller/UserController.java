@@ -51,16 +51,17 @@ public class UserController {
         Before before = null;
         String currency = null;
         String theme = null;
+        Integer points = 0;
         if (Objects.equals(expand, TRUE)) {
-            com.bulletjournal.repository.models.User user =
-                    this.userDaoJpa.getByName(username);
+            com.bulletjournal.repository.models.User user = this.userDaoJpa.getByName(username);
             timezone = user.getTimezone();
             before = user.getReminderBeforeTask();
             currency = user.getCurrency();
             theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
+            points = user.getPoints();
         }
         User self = userClient.getUser(username);
-        return new Myself(self, timezone, before, currency, theme);
+        return new Myself(self, timezone, before, currency, theme, points);
     }
 
     @PatchMapping(MYSELF_ROUTE)
@@ -92,8 +93,7 @@ public class UserController {
     }
 
     @PostMapping(CHANGE_ALIAS_ROUTE)
-    public ResponseEntity<?> changeAlias(
-            @NotNull @PathVariable String username,
+    public ResponseEntity<?> changeAlias(@NotNull @PathVariable String username,
             @Valid @RequestBody ChangeAliasParams changeAliasParams) {
         LOGGER.info("Changing " + username + "'s alias to " + changeAliasParams.getAlias());
         String requester = MDC.get(UserClient.USER_NAME_KEY);

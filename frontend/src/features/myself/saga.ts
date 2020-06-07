@@ -43,6 +43,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
         before: data.reminderBeforeTask,
         currency: data.currency,
         theme: data.theme,
+        points: data.points,
       })
     );
     const state: IState = yield select();
