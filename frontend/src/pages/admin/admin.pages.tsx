@@ -15,6 +15,7 @@ import {
 import {
   getUsersByRole,
   setRole,
+  changePoints,
   getLockedUsersAndIPs,
   unlockUserandIP,
   lockUserandIP,
@@ -34,6 +35,7 @@ type AdminProps = {
   lockedUsers: LockedUser[];
   lockedIPs: LockedIP[];
   setRole: (username: string, role: Role) => void;
+  changePoints: (username: string, points: number) => void;
   getUsersByRole: (role: Role) => void;
   getLockedUsersAndIPs: () => void;
   unlockUserandIP: (name: string, ip: string) => void;
@@ -43,6 +45,7 @@ type AdminProps = {
 const AdminPage: React.FC<AdminProps> = (props) => {
   const {
     setRole,
+    changePoints,
     lockedUsers,
     lockedIPs,
     usersByRole,
@@ -53,6 +56,8 @@ const AdminPage: React.FC<AdminProps> = (props) => {
   } = props;
   const [username, setUsername] = useState('');
   const [roleLevel, setRoleLevel] = useState('BASIC' as Role);
+  const [pointsName, changePointsName] = useState('');
+  const [userPoints, setUserPoints] = useState(0);
   const [lockName, setLockName] = useState('');
   const [lockIP, setLockIP] = useState('');
   const [lockReason, setLockReason] = useState('');
@@ -128,7 +133,7 @@ const AdminPage: React.FC<AdminProps> = (props) => {
 
   return (
     <div className='admin-page'>
-      <Collapse defaultActiveKey={['userRoles', 'lockUsers']}>
+      <Collapse defaultActiveKey={['userRoles', 'lockUsers', 'userPoints']}>
         <Panel header='User Roles' key='userRoles'>
           <div className='user-role-control'>
             <Tooltip title='Select Role'>
@@ -247,6 +252,38 @@ const AdminPage: React.FC<AdminProps> = (props) => {
             </TabPane>
           </Tabs>
         </Panel>
+        <Panel header='User Points' key='userPoints'>
+          <Input
+            style={{ width: '150px', marginRight: '30px' }}
+            placeholder='Username'
+            value={pointsName}
+            onChange={(e) => {
+              changePointsName(e.target.value);
+            }}
+          />
+          <Tooltip title='type a positive number to add points or a negetive number to minus'>
+            <Input
+              style={{ width: '150px', marginRight: '30px' }}
+              placeholder='Points'
+              value={userPoints}
+              onChange={(e) => {
+                console.log(e.target.value);
+                const n = e.target.value;
+                if (n && !isNaN(parseInt(n))) {
+                  setUserPoints(parseInt(n));
+                } else setUserPoints(0);
+              }}
+            />
+          </Tooltip>
+          <Button
+            type='primary'
+            onClick={() => {
+              changePoints(pointsName, userPoints);
+            }}
+          >
+            Change Points
+          </Button>
+        </Panel>
       </Collapse>
     </div>
   );
@@ -264,4 +301,5 @@ export default connect(mapStateToProps, {
   getLockedUsersAndIPs,
   unlockUserandIP,
   lockUserandIP,
+  changePoints,
 })(AdminPage);

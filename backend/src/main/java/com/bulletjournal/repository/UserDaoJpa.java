@@ -109,4 +109,12 @@ public class UserDaoJpa {
         List<User> users = this.userRepository.getUsersByRole(role.getValue());
         return users;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void changeUserPoints(String username, Integer points) {
+        User user = this.getByName(username);
+        Integer pts = user.getPoints() + points;
+        user.setPoints(pts);
+        this.userRepository.save(user);
+    }
 }

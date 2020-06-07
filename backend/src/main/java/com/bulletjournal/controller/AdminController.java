@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.ChangePointsParams;
 import com.bulletjournal.controller.models.LockUserParams;
 import com.bulletjournal.controller.models.LockedUsersAndIPs;
 import com.bulletjournal.controller.models.SetRoleParams;
@@ -33,6 +34,7 @@ import javax.validation.constraints.NotNull;
 @RestController
 public class AdminController {
     public static final String SET_ROLE_ROUTE = "/api/users/{username}/setRole";
+    public static final String CHANGE_POINTS_ROUTE = "/api/users/{username}/changePoints";
     public static final String USERS_ROUTE = "/api/users";
     public static final String LOCKED_USERS_ROUTE = "/api/lockedUsers";
     public static final String UNLOCK_USER_ROUTE = "/api/admin/unlock";
@@ -112,5 +114,13 @@ public class AdminController {
         if (StringUtils.isNotBlank(name)) {
             redisLockedUserRepository.save(new LockedUser(name, reason));
         }
+    }
+
+    @PostMapping(CHANGE_POINTS_ROUTE)
+    public void changePoints(@NotBlank @PathVariable String username,
+            @NotNull @RequestBody ChangePointsParams changePointsParams) {
+        validateRequester();
+        Integer points = changePointsParams.getPoints();
+        this.userDaoJpa.changeUserPoints(username, points);
     }
 }

@@ -10,6 +10,17 @@ export const setRole = (username: string, role: Role) => {
   });
 };
 
+export const changePoints = (username: string, points: number) => {
+  const postBody = JSON.stringify({
+    points: points,
+  });
+  return doPost(`/api/users/${username}/changePoints`, postBody).catch(
+    (err) => {
+      throw Error(err.message);
+    }
+  );
+};
+
 export const fetchUsersByRole = (role: Role) => {
   return doFetch(`/api/users?role=${role}`)
     .then((res) => res.json())

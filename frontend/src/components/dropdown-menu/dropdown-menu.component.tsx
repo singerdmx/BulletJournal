@@ -5,7 +5,7 @@ import {
   SettingOutlined,
   UserOutlined,
   MailOutlined,
-  SketchOutlined,
+  WalletOutlined,
 } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { logoutUser } from '../../apis/myselfApis';
@@ -49,8 +49,8 @@ const DropdownMenu = ({
       {username}
     </Menu.Item>
     <Menu.Item className='modified-item'>
-      <SketchOutlined />
-      Points&nbsp;&nbsp;{points}
+      <WalletOutlined />
+      Points&nbsp;({points})
     </Menu.Item>
     <Menu.Item
       className='modified-item'

@@ -8,9 +8,11 @@ import {
   GetLockedUsersAndIPsAction,
   UnlockUserAndIPAction,
   LockUserAndIPAction,
+  changePointsAction,
 } from './reducer';
 import {
   setRole,
+  changePoints,
   fetchUsersByRole,
   fetchBlockedUsersAndIPs,
   unlockUserAndIP,
@@ -28,6 +30,24 @@ function* setUserRole(action: PayloadAction<setRoleAction>) {
     yield call(message.success, `User ${username} is set to ${role}`);
   } catch (error) {
     yield call(message.error, `setRole Error Received: ${error}`);
+  }
+}
+
+function* changeUserPoints(action: PayloadAction<changePointsAction>) {
+  try {
+    const { username, points } = action.payload;
+    if (!username) {
+      yield call(message.error, 'Missing Username');
+      return;
+    }
+    yield call(changePoints, username, points);
+
+    yield call(
+      message.success,
+      `User ${username} changed(+/-) points ${points}`
+    );
+  } catch (error) {
+    yield call(message.error, `set Points Error Received: ${error}`);
   }
 }
 
@@ -81,6 +101,9 @@ function* lockUsersAndIPs(action: PayloadAction<LockUserAndIPAction>) {
 
 export default function* AdminSagas() {
   yield all([yield takeLatest(adminActions.setRole.type, setUserRole)]);
+  yield all([
+    yield takeLatest(adminActions.changePoints.type, changeUserPoints),
+  ]);
   yield all([
     yield takeLatest(adminActions.getUsersByRole.type, getUsersByRole),
   ]);

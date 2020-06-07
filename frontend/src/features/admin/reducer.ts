@@ -7,6 +7,11 @@ export type setRoleAction = {
   role: Role;
 };
 
+export type changePointsAction = {
+  username: string;
+  points: number;
+};
+
 export type UserRolesAction = {
   usersByRole: User[];
 };
@@ -47,6 +52,7 @@ const slice = createSlice({
   initialState,
   reducers: {
     setRole: (state, action: PayloadAction<setRoleAction>) => state,
+    changePoints: (state, action: PayloadAction<changePointsAction>) => state,
     userRolesReceived: (state, action: PayloadAction<UserRolesAction>) => {
       const { usersByRole } = action.payload;
       state.usersByRole = usersByRole;

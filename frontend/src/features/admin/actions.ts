@@ -4,6 +4,9 @@ import { Role } from './interface';
 export const setRole = (username: string, role: Role) =>
   actions.setRole({ username: username, role: role });
 
+export const changePoints = (username: string, points: number) =>
+  actions.changePoints({ username: username, points: points });
+
 export const getUsersByRole = (role: Role) =>
   actions.getUsersByRole({ role: role });
 
