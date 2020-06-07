@@ -50,7 +50,7 @@ const DropdownMenu = ({
     </Menu.Item>
     <Menu.Item className='modified-item'>
       <WalletOutlined />
-      Points&nbsp;({points})
+        Points&nbsp;<strong>{points}</strong>
     </Menu.Item>
     <Menu.Item
       className='modified-item'
