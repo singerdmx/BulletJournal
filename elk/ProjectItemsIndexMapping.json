@@ -1,6 +1,4 @@
-Before running logstash, need to create index mapping:
-```
-curl --user elastic:changeme -XPUT "http://localhost:9200/project_items" -' -d'{tent-Type: application/json'
+{
   "mappings": {
     "properties": {
       "@timestamp": {
@@ -17,7 +15,7 @@ curl --user elastic:changeme -XPUT "http://localhost:9200/project_items" -' -d'{
       },
       "value": {
         "type": "text",
-        "analyzer": "standard",
+        "analyzer": "standard", 
         "fields": {
           "keyword": {
             "type": "keyword"
@@ -29,5 +27,4 @@ curl --user elastic:changeme -XPUT "http://localhost:9200/project_items" -' -d'{
       }
     }
   }
-}'
-```
+}
