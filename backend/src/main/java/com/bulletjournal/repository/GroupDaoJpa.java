@@ -16,6 +16,7 @@ import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.UserGroupKey;
+import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -43,6 +44,9 @@ public class GroupDaoJpa {
 
     @Autowired
     private AuthorizationService authorizationService;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Group create(String name, String owner) {
@@ -250,9 +254,24 @@ public class GroupDaoJpa {
             UserGroup userGroup = this.userGroupRepository.findById(userGroupKey)
                     .orElseThrow(() ->
                             new ResourceNotFoundException("UserGroupKey not found"));
+
             this.userGroupRepository.delete(userGroup);
+
+            this.assignProjectsToOwnerDefaultGroup(user);
+
             events.add(new Event(username, groupId, group.getName()));
         }
         return events;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void assignProjectsToOwnerDefaultGroup(User user) {
+
+        List<Project> projects = this.projectRepository.findByOwner(user.getName());
+        Group group = this.getDefaultGroup(user.getName());
+        for (Project project : projects) {
+            project.setGroup(group);
+            this.projectRepository.save(project);
+        }
     }
 }
