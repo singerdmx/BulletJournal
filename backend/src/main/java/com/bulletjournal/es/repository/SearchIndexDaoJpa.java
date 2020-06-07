@@ -1,11 +1,8 @@
 package com.bulletjournal.es.repository;
 
 import com.bulletjournal.es.repository.models.SearchIndex;
-import com.bulletjournal.repository.UserGroupRepository;
-import com.bulletjournal.repository.UserRepository;
-import com.bulletjournal.repository.models.Group;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
-import com.bulletjournal.repository.models.UserGroup;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -17,7 +14,10 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
@@ -34,11 +34,7 @@ public class SearchIndexDaoJpa {
 
 
     @Autowired
-    private UserGroupRepository userGroupRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
+    private UserDaoJpa userDaoJpa;
 
     private ElasticsearchOperations elasticsearchOperations;
 
@@ -47,11 +43,11 @@ public class SearchIndexDaoJpa {
     }
 
     public SearchHits<SearchIndex> search(String username, String term) {
-        List<Long> groupIdList = getUserGroups(username);
+        List<Long> projectIdList = getUserProjects(username);
 
         BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
-        for (long groupId : groupIdList) {
-            queryBuilder.should(QueryBuilders.termQuery("groupId", groupId));
+        for (long pid : projectIdList) {
+            queryBuilder.should(QueryBuilders.termQuery("projectId", pid));
         }
         queryBuilder.minimumShouldMatch(1)
                 .must(QueryBuilders.matchQuery(SEARCH_FIELD, term)
@@ -67,20 +63,19 @@ public class SearchIndexDaoJpa {
                 .fragmentSize(FRAGMENT_SIZE)
                 .numOfFragments(NUM_OF_FRAGMENTS).highlighterType(HIGHLIGHTER_TYPE);
 
-        NativeSearchQuery query = new NativeSearchQueryBuilder().withQuery(queryBuilder).withHighlightBuilder(highlightBuilder).build();
-         return elasticsearchOperations.search(query, SearchIndex.class);
+        NativeSearchQuery query = new NativeSearchQueryBuilder()
+                .withQuery(queryBuilder).withHighlightBuilder(highlightBuilder).build();
+        return elasticsearchOperations.search(query, SearchIndex.class);
     }
 
-    public List<Long> getUserGroups(String username) {
-        List<User> userList = this.userRepository.findByName(username);
-        List<Long> userIdList = userList.stream().map(User::getId).collect(Collectors.toList());
-        return this.userGroupRepository
-                .findAllByUserId(userIdList.get(0))
-                .stream()
-                .map(UserGroup::getGroup)
-                .map(Group::getId)
-                .collect(Collectors.toList());
+    private List<Long> getUserProjects(String username) {
+        final Set<Long> set = new HashSet<>();
+        User user = this.userDaoJpa.getByName(username);
+        user.getGroups().stream().filter(u -> u.isAccepted()).forEach((u) -> set.addAll(
+                u.getGroup().getProjects().stream()
+                        .filter(p -> !p.isShared())
+                        .map(p -> p.getId()).collect(Collectors.toList())));
+        return new ArrayList<>(set);
     }
-
 
 }
