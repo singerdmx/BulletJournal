@@ -12,11 +12,7 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.JoinGroupEvent;
-import com.bulletjournal.repository.models.Group;
-import com.bulletjournal.repository.models.User;
-import com.bulletjournal.repository.models.UserGroup;
-import com.bulletjournal.repository.models.UserGroupKey;
-import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -255,9 +251,8 @@ public class GroupDaoJpa {
                     .orElseThrow(() ->
                             new ResourceNotFoundException("UserGroupKey not found"));
 
+            this.assignProjectsToOwnerDefaultGroup(username, userGroup);
             this.userGroupRepository.delete(userGroup);
-
-            this.assignProjectsToOwnerDefaultGroup(user);
 
             events.add(new Event(username, groupId, group.getName()));
         }
@@ -265,11 +260,12 @@ public class GroupDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void assignProjectsToOwnerDefaultGroup(User user) {
+    public void assignProjectsToOwnerDefaultGroup(String username, UserGroup userGroup) {
 
-        List<Project> projects = this.projectRepository.findByOwner(user.getName());
-        Group group = this.getDefaultGroup(user.getName());
-        for (Project project : projects) {
+        Group group = this.getDefaultGroup(username);
+        for (Project project : userGroup.getGroup().getProjects()
+                .stream().filter(p -> p.getOwner().equals(username)).collect(Collectors.toList())
+        ) {
             project.setGroup(group);
             this.projectRepository.save(project);
         }
