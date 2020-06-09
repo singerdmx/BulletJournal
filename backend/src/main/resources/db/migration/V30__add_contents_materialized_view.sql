@@ -3,6 +3,7 @@ create materialized view IF NOT exists task_contents_matview as
 select task_contents.id,
        task_contents.text                           as value,
        task_contents.task_id                        as parent_id,
+       task_contents.updated_at,
        tasks.project_id,
        extract(epoch from task_contents.updated_at) as unix_ts_in_secs
 from task_contents
@@ -13,6 +14,7 @@ create materialized view IF NOT exists note_contents_matview as
 select note_contents.id,
        note_contents.text                           as value,
        note_contents.note_id                        as parent_id,
+       note_contents.updated_at,
        notes.project_id,
        extract(epoch from note_contents.updated_at) as unix_ts_in_secs
 from note_contents
@@ -23,6 +25,7 @@ create materialized view IF NOT exists transaction_contents_matview as
 select transaction_contents.id,
        transaction_contents.text                           as value,
        transaction_contents.transaction_id                 as parent_id,
+       transaction_contents.updated_at,
        transactions.project_id,
        extract(epoch from transaction_contents.updated_at) as unix_ts_in_secs
 from transaction_contents
