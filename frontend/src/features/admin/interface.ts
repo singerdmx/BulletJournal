@@ -23,11 +23,7 @@ export interface LockedIP {
 export interface UserInfo {
   id: number;
   name: string;
-  alias: string;
-  thumbnail: string;
-  avatar: string;
   timezone: string;
-  reminderBeforeTask: number;
   currency: string;
   theme: string;
   points: number;

@@ -33,7 +33,11 @@ import {
   UserInfo,
 } from '../../features/admin/interface';
 import { User } from '../../features/group/interface';
-import { DeleteOutlined, FormOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  FormOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -190,7 +194,15 @@ const AdminPage: React.FC<AdminProps> = (props) => {
                 title={
                   <div>
                     User Info&nbsp;&nbsp;
-                    <FormOutlined onClick={handleChangeMode} />
+                    {mode === 'edit' ? (
+                      <Tooltip title='Cancel'>
+                        <CloseCircleOutlined onClick={handleChangeMode} />
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title='Edit'>
+                        <FormOutlined onClick={handleChangeMode} />
+                      </Tooltip>
+                    )}
                     <Button
                       style={{ marginLeft: '340px' }}
                       type='primary'

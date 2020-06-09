@@ -52,7 +52,7 @@ function* changeUserPoints(action: PayloadAction<ChangePointsAction>) {
       `User ${username} changed(+/-) points ${points}`
     );
   } catch (error) {
-    yield call(message.error, `set Points Error Received: ${error}`);
+    yield call(message.error, `Change Points Error Received: ${error}`);
   }
 }
 
@@ -90,18 +90,14 @@ function* getUserInfo(action: PayloadAction<GetUserInfoAction>) {
     const userInfo = {
       id: data.id,
       name: data.name,
-      alias: data.alias,
-      thumbnail: data.thumbnail,
-      avatar: data.avatar,
       timezone: data.timezone,
-      reminderBeforeTask: data.before,
       currency: data.currency,
       theme: data.theme,
       points: data.points,
     } as UserInfo;
     yield put(adminActions.userInfoReceived({ userInfo: userInfo }));
   } catch (error) {
-    yield call(message.error, `getUsersByRole Error Received: ${error}`);
+    yield call(message.error, `get User Info Error Received: ${error}`);
   }
 }
 
