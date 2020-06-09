@@ -21,6 +21,15 @@ export const changePoints = (username: string, points: number) => {
   );
 };
 
+export const setPoints = (username: string, points: number) => {
+  const postBody = JSON.stringify({
+    points: points,
+  });
+  return doPost(`/api/users/${username}/setPoints`, postBody).catch((err) => {
+    throw Error(err.message);
+  });
+};
+
 export const fetchUsersByRole = (role: Role) => {
   return doFetch(`/api/users?role=${role}`)
     .then((res) => res.json())
@@ -56,4 +65,12 @@ export const lockUserAndIP = (name: string, ip: string, reason: string) => {
   return doPost(`/api/admin/lock`, postBody).catch((err) => {
     throw Error(err.message);
   });
+};
+
+export const fetchUserInfo = (username: string) => {
+  return doFetch(`api/admin/users/${username}`)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
 };

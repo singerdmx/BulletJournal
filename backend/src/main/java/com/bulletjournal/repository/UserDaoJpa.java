@@ -117,4 +117,11 @@ public class UserDaoJpa {
         user.setPoints(pts);
         this.userRepository.save(user);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void setUserPoints(String username, Integer points) {
+        User user = this.getByName(username);
+        user.setPoints(points);
+        this.userRepository.save(user);
+    }
 }

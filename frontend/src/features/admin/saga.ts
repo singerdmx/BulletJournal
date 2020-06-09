@@ -8,7 +8,9 @@ import {
   GetLockedUsersAndIPsAction,
   UnlockUserAndIPAction,
   LockUserAndIPAction,
-  changePointsAction,
+  ChangePointsAction,
+  SetPointsAction,
+  GetUserInfoAction,
 } from './reducer';
 import {
   setRole,
@@ -17,7 +19,10 @@ import {
   fetchBlockedUsersAndIPs,
   unlockUserAndIP,
   lockUserAndIP,
+  fetchUserInfo,
+  setPoints,
 } from '../../apis/adminApis';
+import { UserInfo } from './interface';
 
 function* setUserRole(action: PayloadAction<setRoleAction>) {
   try {
@@ -33,7 +38,7 @@ function* setUserRole(action: PayloadAction<setRoleAction>) {
   }
 }
 
-function* changeUserPoints(action: PayloadAction<changePointsAction>) {
+function* changeUserPoints(action: PayloadAction<ChangePointsAction>) {
   try {
     const { username, points } = action.payload;
     if (!username) {
@@ -51,11 +56,50 @@ function* changeUserPoints(action: PayloadAction<changePointsAction>) {
   }
 }
 
+function* setUserPoints(action: PayloadAction<SetPointsAction>) {
+  try {
+    const { username, points } = action.payload;
+    if (!username) {
+      yield call(message.error, 'Missing Username');
+      return;
+    }
+    yield call(setPoints, username, points);
+    yield put(adminActions.userInfoPointsReceived({ points: points }));
+
+    yield call(message.success, `User ${username} set points to ${points}`);
+  } catch (error) {
+    yield call(message.error, `set Points Error Received: ${error}`);
+  }
+}
+
 function* getUsersByRole(action: PayloadAction<GetUsersByRoleAction>) {
   try {
     const { role } = action.payload;
     const data = yield call(fetchUsersByRole, role);
     yield put(adminActions.userRolesReceived({ usersByRole: data }));
+  } catch (error) {
+    yield call(message.error, `getUsersByRole Error Received: ${error}`);
+  }
+}
+
+function* getUserInfo(action: PayloadAction<GetUserInfoAction>) {
+  try {
+    const { username } = action.payload;
+    const data = yield call(fetchUserInfo, username);
+
+    const userInfo = {
+      id: data.id,
+      name: data.name,
+      alias: data.alias,
+      thumbnail: data.thumbnail,
+      avatar: data.avatar,
+      timezone: data.timezone,
+      reminderBeforeTask: data.before,
+      currency: data.currency,
+      theme: data.theme,
+      points: data.points,
+    } as UserInfo;
+    yield put(adminActions.userInfoReceived({ userInfo: userInfo }));
   } catch (error) {
     yield call(message.error, `getUsersByRole Error Received: ${error}`);
   }
@@ -119,4 +163,6 @@ export default function* AdminSagas() {
   yield all([
     yield takeLatest(adminActions.lockUserandIP.type, lockUsersAndIPs),
   ]);
+  yield all([yield takeLatest(adminActions.getUserInfo.type, getUserInfo)]);
+  yield all([yield takeLatest(adminActions.setPoints.type, setUserPoints)]);
 }

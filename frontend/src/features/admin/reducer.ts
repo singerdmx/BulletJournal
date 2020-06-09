@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Role, LockedUser, LockedIP } from './interface';
+import { Role, LockedUser, LockedIP, UserInfo } from './interface';
 import { User } from '../group/interface';
 
 export type setRoleAction = {
@@ -7,7 +7,12 @@ export type setRoleAction = {
   role: Role;
 };
 
-export type changePointsAction = {
+export type ChangePointsAction = {
+  username: string;
+  points: number;
+};
+
+export type SetPointsAction = {
   username: string;
   points: number;
 };
@@ -18,6 +23,10 @@ export type UserRolesAction = {
 
 export type GetUsersByRoleAction = {
   role: Role;
+};
+
+export type GetUserInfoAction = {
+  username: string;
 };
 
 export type LockedUsersAction = {
@@ -39,26 +48,48 @@ export type LockUserAndIPAction = {
   reason: string;
 };
 
+export type UserInfoAction = {
+  userInfo: UserInfo;
+};
+
+export type UserInfoPointsAction = {
+  points: number;
+};
+
 export type GetLockedUsersAndIPsAction = {};
 
 let initialState = {
   usersByRole: [] as User[],
   lockedUsers: [] as LockedUser[],
   lockedIPs: [] as LockedIP[],
+  userInfo: {} as UserInfo,
 };
 
 const slice = createSlice({
   name: 'admin',
   initialState,
   reducers: {
+    userInfoReceived: (state, action: PayloadAction<UserInfoAction>) => {
+      const { userInfo } = action.payload;
+      state.userInfo = userInfo;
+    },
+    userInfoPointsReceived: (
+      state,
+      action: PayloadAction<UserInfoPointsAction>
+    ) => {
+      const { points } = action.payload;
+      state.userInfo.points = points;
+    },
     setRole: (state, action: PayloadAction<setRoleAction>) => state,
-    changePoints: (state, action: PayloadAction<changePointsAction>) => state,
+    changePoints: (state, action: PayloadAction<ChangePointsAction>) => state,
+    setPoints: (state, action: PayloadAction<SetPointsAction>) => state,
     userRolesReceived: (state, action: PayloadAction<UserRolesAction>) => {
       const { usersByRole } = action.payload;
       state.usersByRole = usersByRole;
     },
     getUsersByRole: (state, action: PayloadAction<GetUsersByRoleAction>) =>
       state,
+    getUserInfo: (state, action: PayloadAction<GetUserInfoAction>) => state,
     lockedUsersReceived: (state, action: PayloadAction<LockedUsersAction>) => {
       const { lockedUsers } = action.payload;
       state.lockedUsers = lockedUsers;

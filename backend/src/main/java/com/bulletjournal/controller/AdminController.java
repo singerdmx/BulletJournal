@@ -2,10 +2,14 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.ChangePointsParams;
 import com.bulletjournal.controller.models.LockUserParams;
 import com.bulletjournal.controller.models.LockedUsersAndIPs;
+import com.bulletjournal.controller.models.Myself;
+import com.bulletjournal.controller.models.SetPointsParams;
 import com.bulletjournal.controller.models.SetRoleParams;
+import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UnlockUserParams;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.LockedIP;
@@ -34,7 +38,9 @@ import javax.validation.constraints.NotNull;
 @RestController
 public class AdminController {
     public static final String SET_ROLE_ROUTE = "/api/users/{username}/setRole";
+    public static final String USER_ROUTE = "/api/admin/users/{username}";
     public static final String CHANGE_POINTS_ROUTE = "/api/users/{username}/changePoints";
+    public static final String SET_POINTS_ROUTE = "/api/users/{username}/setPoints";
     public static final String USERS_ROUTE = "/api/users";
     public static final String LOCKED_USERS_ROUTE = "/api/lockedUsers";
     public static final String UNLOCK_USER_ROUTE = "/api/admin/unlock";
@@ -123,4 +129,33 @@ public class AdminController {
         Integer points = changePointsParams.getPoints();
         this.userDaoJpa.changeUserPoints(username, points);
     }
+
+    @PostMapping(SET_POINTS_ROUTE)
+    public void setPoints(@NotBlank @PathVariable String username,
+            @NotNull @RequestBody SetPointsParams setPointsParams) {
+        validateRequester();
+        Integer points = setPointsParams.getPoints();
+        this.userDaoJpa.setUserPoints(username, points);
+    }
+
+    @GetMapping(USER_ROUTE)
+    public Myself getUser(@NotBlank @PathVariable String username) {
+        validateRequester();
+        String timezone = null;
+        Before before = null;
+        String currency = null;
+        String theme = null;
+        Integer points = 0;
+
+        com.bulletjournal.repository.models.User user = this.userDaoJpa.getByName(username);
+        timezone = user.getTimezone();
+        before = user.getReminderBeforeTask();
+        currency = user.getCurrency();
+        theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
+        points = user.getPoints();
+
+        User self = userClient.getUser(username);
+        return new Myself(self, timezone, before, currency, theme, points);
+    }
+
 }

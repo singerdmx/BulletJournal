@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import './admin.styles.less';
 import {
@@ -11,6 +11,8 @@ import {
   Tooltip,
   Table,
   Tabs,
+  Descriptions,
+  InputNumber,
 } from 'antd';
 import {
   getUsersByRole,
@@ -19,22 +21,32 @@ import {
   getLockedUsersAndIPs,
   unlockUserandIP,
   lockUserandIP,
+  getUserInfo,
+  setPoints,
 } from '../../features/admin/actions';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Role, LockedUser, LockedIP } from '../../features/admin/interface';
+import {
+  Role,
+  LockedUser,
+  LockedIP,
+  UserInfo,
+} from '../../features/admin/interface';
 import { User } from '../../features/group/interface';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, FormOutlined } from '@ant-design/icons';
 
 const { Panel } = Collapse;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
 type AdminProps = {
+  userInfo: UserInfo;
   usersByRole: User[];
   lockedUsers: LockedUser[];
   lockedIPs: LockedIP[];
+  getUserInfo: (username: string) => void;
   setRole: (username: string, role: Role) => void;
+  setPoints: (username: string, points: number) => void;
   changePoints: (username: string, points: number) => void;
   getUsersByRole: (role: Role) => void;
   getLockedUsersAndIPs: () => void;
@@ -46,6 +58,8 @@ const AdminPage: React.FC<AdminProps> = (props) => {
   const {
     setRole,
     changePoints,
+    getUserInfo,
+    userInfo,
     lockedUsers,
     lockedIPs,
     usersByRole,
@@ -53,14 +67,17 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     getLockedUsersAndIPs,
     unlockUserandIP,
     lockUserandIP,
+    setPoints,
   } = props;
   const [username, setUsername] = useState('');
   const [roleLevel, setRoleLevel] = useState('BASIC' as Role);
-  const [pointsName, changePointsName] = useState('');
+  const [searchName, changePointsName] = useState('');
   const [userPoints, setUserPoints] = useState(0);
+  const [inputPoints, setInputPoints] = useState(0);
   const [lockName, setLockName] = useState('');
   const [lockIP, setLockIP] = useState('');
   const [lockReason, setLockReason] = useState('');
+  const [mode, setMode] = useState('display');
   const columns = [
     {
       title: 'User',
@@ -124,6 +141,10 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     },
   ];
 
+  useEffect(() => {
+    setInputPoints(userInfo.points);
+  }, [userInfo.points]);
+
   const handleLockUsers = () => {
     lockUserandIP(lockName, lockIP, lockReason);
     setLockIP('');
@@ -131,9 +152,92 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     setLockReason('');
   };
 
+  const handleChangeMode = () => {
+    if (mode == 'edit') {
+      setMode('display');
+      setInputPoints(userInfo.points);
+    } else {
+      setMode('edit');
+    }
+  };
+
   return (
     <div className='admin-page'>
-      <Collapse defaultActiveKey={['userRoles', 'lockUsers', 'userPoints']}>
+      <Collapse defaultActiveKey={['userRoles', 'lockUsers', 'userInfo']}>
+        <Panel header='User Info' key='userInfo'>
+          <div className='admin-row'>
+            <Input
+              style={{ width: '150px', marginRight: '20px' }}
+              placeholder='Username'
+              value={searchName}
+              onChange={(e) => {
+                changePointsName(e.target.value);
+              }}
+            />
+            <Button
+              type='primary'
+              onClick={() => {
+                if (!searchName) return;
+                getUserInfo(searchName);
+              }}
+            >
+              Get User Info
+            </Button>
+          </div>
+          {userInfo.id && (
+            <div>
+              <Descriptions
+                title={
+                  <div>
+                    User Info&nbsp;&nbsp;
+                    <FormOutlined onClick={handleChangeMode} />
+                    <Button
+                      style={{ marginLeft: '340px' }}
+                      type='primary'
+                      onClick={() => {
+                        setPoints(searchName, inputPoints);
+                        setMode('display');
+                      }}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                }
+                bordered
+                size='small'
+                column={2}
+              >
+                <Descriptions.Item label='Id'>{userInfo.id}</Descriptions.Item>
+                <Descriptions.Item label='Name'>
+                  {userInfo.name}
+                </Descriptions.Item>
+                <Descriptions.Item label='TimeZone' span={2}>
+                  {userInfo.timezone}
+                </Descriptions.Item>
+                <Descriptions.Item label='Currency'>
+                  {userInfo.currency}
+                </Descriptions.Item>
+                <Descriptions.Item label='Theme'>
+                  {userInfo.theme}
+                </Descriptions.Item>
+                <Descriptions.Item label='Points'>
+                  {mode === 'display' && userInfo.points}
+                  {mode === 'edit' && (
+                    <InputNumber
+                      style={{ width: '70px' }}
+                      placeholder='Points'
+                      value={inputPoints}
+                      onChange={(value) => {
+                        if (!value || isNaN(value)) setInputPoints(0);
+                        else setInputPoints(value);
+                      }}
+                    />
+                  )}
+                </Descriptions.Item>
+              </Descriptions>
+            </div>
+          )}
+        </Panel>
         <Panel header='User Roles' key='userRoles'>
           <div className='user-role-control'>
             <Tooltip title='Select Role'>
@@ -252,38 +356,6 @@ const AdminPage: React.FC<AdminProps> = (props) => {
             </TabPane>
           </Tabs>
         </Panel>
-        <Panel header='User Points' key='userPoints'>
-          <Input
-            style={{ width: '150px', marginRight: '30px' }}
-            placeholder='Username'
-            value={pointsName}
-            onChange={(e) => {
-              changePointsName(e.target.value);
-            }}
-          />
-          <Tooltip title='type a positive number to add points or a negetive number to minus'>
-            <Input
-              style={{ width: '150px', marginRight: '30px' }}
-              placeholder='Points'
-              value={userPoints}
-              onChange={(e) => {
-                console.log(e.target.value);
-                const n = e.target.value;
-                if (n && !isNaN(parseInt(n))) {
-                  setUserPoints(parseInt(n));
-                } else setUserPoints(0);
-              }}
-            />
-          </Tooltip>
-          <Button
-            type='primary'
-            onClick={() => {
-              changePoints(pointsName, userPoints);
-            }}
-          >
-            Change Points
-          </Button>
-        </Panel>
       </Collapse>
     </div>
   );
@@ -293,6 +365,7 @@ const mapStateToProps = (state: IState) => ({
   usersByRole: state.admin.usersByRole,
   lockedUsers: state.admin.lockedUsers,
   lockedIPs: state.admin.lockedIPs,
+  userInfo: state.admin.userInfo,
 });
 
 export default connect(mapStateToProps, {
@@ -302,4 +375,6 @@ export default connect(mapStateToProps, {
   unlockUserandIP,
   lockUserandIP,
   changePoints,
+  getUserInfo,
+  setPoints,
 })(AdminPage);
