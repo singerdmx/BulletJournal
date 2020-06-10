@@ -23,7 +23,7 @@ export enum ReminderBeforeTask {
   THIRTY_MIN_BEFORE = 3,
   ONE_HR_BEFORE = 4,
   TWO_HR_BEFORE = 5,
-  NONE = 6
+  NONE = 6,
 }
 
 export const ReminderBeforeTaskText = [
@@ -33,14 +33,14 @@ export const ReminderBeforeTaskText = [
   '30 minutes before',
   '1 hour before',
   '2 hours before',
-  'No reminder'
+  'No Reminder',
 ];
 
 let initialState = {
   timezone: '',
   before: 0,
   currency: '',
-  theme: 'LIGHT'
+  theme: 'LIGHT',
 };
 
 const slice = createSlice({
@@ -62,8 +62,8 @@ const slice = createSlice({
     updateTheme: (state, action: PayloadAction<ThemeAction>) => {
       const { theme } = action.payload;
       state.theme = theme;
-    }
-  }
+    },
+  },
 });
 
 export const reducer = slice.reducer;

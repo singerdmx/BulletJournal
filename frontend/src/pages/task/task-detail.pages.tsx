@@ -62,7 +62,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   const [inputStatus, setInputStatus] = useState('');
 
   useEffect(() => {
-    if (task && task.status) setInputStatus(task.status);
+    if (task) {
+      setInputStatus(task.status);
+    }
   }, [task]);
 
   const getDueDateTime = (task: Task) => {
@@ -72,6 +74,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
           <Tooltip title='Recurring'>
             <ClockCircleOutlined />
           </Tooltip>
+          Due Time:
           {convertToTextWithRRule(task.recurrenceRule)}
         </div>
       );
@@ -97,34 +100,58 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   };
 
   const getRemind = (task: Task) => {
+    const text = getReminderSettingString(task.reminderSetting);
+    if (text === 'No Reminder') return null;
     return (
-      <>
+      <div>
         <Tooltip title='Reminder'>
           <AlertOutlined />
         </Tooltip>
-        <span>{getReminderSettingString(task.reminderSetting)}</span>
-      </>
+        <span>{text}</span>
+      </div>
     );
   };
 
   const getTaskStatusDropdown = (task: Task) => {
+    if (inputStatus) {
+      return (
+        <div>
+          <Select
+            style={{ width: '180px' }}
+            value={inputStatus}
+            onChange={(value: string) => {
+              setInputStatus(value);
+            }}
+          >
+            {Object.values(TaskStatus).map((s: string) => {
+              return (
+                <Option value={s} key={s}>
+                  {s.replace(/_/g, ' ')}
+                </Option>
+              );
+            })}
+          </Select>
+        </div>
+      );
+    }
     return (
-      <Select
-        style={{ width: '180px' }}
-        value={inputStatus}
-        onChange={(value) => {
-          console.log(value);
-          setInputStatus(value);
-        }}
-      >
-        {Object.values(TaskStatus).map((s: string) => {
-          return (
-            <Option value={s} key={s}>
-              {s.replace(/_/g, ' ')}
-            </Option>
-          );
-        })}
-      </Select>
+      <div>
+        <Select
+          style={{ width: '180px' }}
+          placeholder='Select Task Status'
+          onChange={(value: string) => {
+            setInputStatus(value);
+          }}
+        >
+          {Object.values(TaskStatus).map((s: string) => {
+            return (
+              <Option value={s} key={s}>
+                {s.replace(/_/g, ' ')}
+              </Option>
+            );
+          })}
+        </Select>
+      </div>
     );
   };
 
@@ -141,23 +168,22 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         </span>
       </Tooltip>
       <div className='task-title'>
-        <div className='label-and-name'>
-          {task.name}
-          <DraggableLabelsList
-            mode={ProjectType.TODO}
-            labels={task.labels}
-            editable={labelEditable}
-            itemId={task.id}
-          />
-        </div>
-
+        <div className='label-and-name'>{task.name}</div>
         {taskOperation()}
+      </div>
+      <div className='title-labels'>
+        <DraggableLabelsList
+          mode={ProjectType.TODO}
+          labels={task.labels}
+          editable={labelEditable}
+          itemId={task.id}
+        />
       </div>
       <Divider />
       <div className='task-statistic-card'>
-        {getTaskStatusDropdown(task)}
         {getDueDateTime(task)}
         {getRemind(task)}
+        {getTaskStatusDropdown(task)}
       </div>
       <Divider />
       <div className='content'>
