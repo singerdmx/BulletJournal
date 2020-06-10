@@ -17,6 +17,14 @@ export interface Task extends ProjectItem {
   timezone: string;
   reminderSetting: ReminderSetting;
   recurrenceRule: string;
+  status: TaskStatus;
+}
+
+export enum TaskStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  NEXT_TO_DO = 'NEXT_TO_DO',
+  READY = 'READY',
+  ON_HOLD = 'ON_HOLD',
 }
 
 export const getReminderSettingString = (reminderSetting: ReminderSetting) => {
