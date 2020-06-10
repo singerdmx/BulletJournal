@@ -1,11 +1,24 @@
 // page display contents of tasks
 // react imports
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 // features
 //actions
-import { getReminderSettingString, Task } from '../../features/tasks/interface';
+import {
+  getReminderSettingString,
+  Task,
+  TaskStatus,
+} from '../../features/tasks/interface';
 // antd imports
-import { Avatar, Card, Col, Divider, Row, Statistic, Tooltip } from 'antd';
+import {
+  Avatar,
+  Card,
+  Col,
+  Divider,
+  Row,
+  Statistic,
+  Tooltip,
+  Select,
+} from 'antd';
 import {
   AlertOutlined,
   ClockCircleOutlined,
@@ -21,6 +34,7 @@ import DraggableLabelsList from '../../components/draggable-labels/draggable-lab
 import { Content } from '../../features/myBuJo/interface';
 // components
 import TaskContentList from '../../components/content/content-list.component';
+const { Option } = Select;
 
 export type TaskProps = {
   task: Task | undefined;
@@ -45,19 +59,21 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     contents,
     contentEditable,
   } = props;
-  if (!task) return null;
+  const [inputStatus, setInputStatus] = useState('');
+
+  useEffect(() => {
+    if (task && task.status) setInputStatus(task.status);
+  }, [task]);
+
   const getDueDateTime = (task: Task) => {
     if (task.recurrenceRule) {
       return (
-        <Col span={12}>
-          <Card>
-            <Statistic
-              title='Recurring'
-              value={convertToTextWithRRule(task.recurrenceRule)}
-              prefix={<ClockCircleOutlined />}
-            />
-          </Card>
-        </Col>
+        <div>
+          <Tooltip title='Recurring'>
+            <ClockCircleOutlined />
+          </Tooltip>
+          {convertToTextWithRRule(task.recurrenceRule)}
+        </div>
       );
     }
 
@@ -71,18 +87,48 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     }
 
     return (
-      <Col span={12}>
-        <Card>
-          <Statistic
-            title={`Due ${dueDateTitle}`}
-            value={`${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
-            prefix={<FileDoneOutlined />}
-          />
-        </Card>
-      </Col>
+      <div>
+        <Tooltip title={'due' + dueDateTitle}>
+          <ClockCircleOutlined />
+        </Tooltip>
+        {`${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
+      </div>
     );
   };
 
+  const getRemind = (task: Task) => {
+    return (
+      <>
+        <Tooltip title='Reminder'>
+          <AlertOutlined />
+        </Tooltip>
+        <span>{getReminderSettingString(task.reminderSetting)}</span>
+      </>
+    );
+  };
+
+  const getTaskStatusDropdown = (task: Task) => {
+    return (
+      <Select
+        style={{ width: '180px' }}
+        value={inputStatus}
+        onChange={(value) => {
+          console.log(value);
+          setInputStatus(value);
+        }}
+      >
+        {Object.values(TaskStatus).map((s: string) => {
+          return (
+            <Option value={s} key={s}>
+              {s.replace(/_/g, ' ')}
+            </Option>
+          );
+        })}
+      </Select>
+    );
+  };
+
+  if (!task) return null;
   return (
     <div className='task-page'>
       <Tooltip
@@ -109,18 +155,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       </div>
       <Divider />
       <div className='task-statistic-card'>
-        <Row gutter={10}>
-          {getDueDateTime(task)}
-          <Col span={12}>
-            <Card>
-              <Statistic
-                title='Reminder'
-                value={getReminderSettingString(task.reminderSetting)}
-                prefix={<AlertOutlined />}
-              />
-            </Card>
-          </Col>
-        </Row>
+        {getTaskStatusDropdown(task)}
+        {getDueDateTime(task)}
+        {getRemind(task)}
       </div>
       <Divider />
       <div className='content'>
