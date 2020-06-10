@@ -44,7 +44,7 @@ public class GroupController {
     public Group createGroup(@Valid @RequestBody CreateGroupParams group) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return Group.addOwnerAvatar(
-                groupDaoJpa.create(group.getName(), username).toPresentationModel(), this.userClient);
+                groupDaoJpa.create(group.getName(), username).toVerbosePresentationModel(), this.userClient);
     }
 
     @DeleteMapping(GROUP_ROUTE)
