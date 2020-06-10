@@ -43,8 +43,7 @@ public class GroupController {
     @ResponseStatus(HttpStatus.CREATED)
     public Group createGroup(@Valid @RequestBody CreateGroupParams group) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return Group.addOwnerAvatar(
-                groupDaoJpa.create(group.getName(), username).toVerbosePresentationModel(), this.userClient);
+        return getGroup(groupDaoJpa.create(group.getName(), username).getId());
     }
 
     @DeleteMapping(GROUP_ROUTE)
