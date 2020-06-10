@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Task, ReminderSetting } from './interface';
+import { Task, ReminderSetting, TaskStatus } from './interface';
 import { History } from 'history';
 import { User } from '../group/interface';
 import { Content } from '../myBuJo/interface';
@@ -196,6 +196,11 @@ export type GetSearchCompletedTasks = {
   timezone: string;
 };
 
+export type SetTaskStatus = {
+  taskId: number;
+  taskStatus: TaskStatus;
+};
+
 let initialState = {
   addTaskVisible: false,
   contents: [] as Array<Content>,
@@ -342,6 +347,7 @@ const slice = createSlice({
     TaskContentCreate: (state, action: PayloadAction<CreateContent>) => state,
     TaskContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
     TaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
+    TaskStatusSet: (state, action: PayloadAction<SetTaskStatus>) => state,
   },
 });
 

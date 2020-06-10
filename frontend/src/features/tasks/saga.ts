@@ -27,6 +27,7 @@ import {
   GetSearchCompletedTasks,
   DeleteTasks,
   CompleteTasks,
+  SetTaskStatus,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -54,6 +55,7 @@ import {
   getCompletedTaskContents,
   deleteTasks as deleteTasksApi,
   completeTasks as completeTasksApi,
+  setTaskStatus as setTaskStatusApi,
 } from '../../apis/taskApis';
 import {
   updateTasks,
@@ -813,6 +815,15 @@ function* patchContent(action: PayloadAction<PatchContent>) {
   }
 }
 
+function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
+  try {
+    const { taskId, taskStatus } = action.payload;
+    yield call(setTaskStatusApi, taskId, taskStatus);
+  } catch (error) {
+    yield call(message.error, `set Task Error Received: ${error}`);
+  }
+}
+
 function* deleteTaskContent(action: PayloadAction<DeleteContent>) {
   try {
     const { taskId, contentId } = action.payload;
@@ -937,5 +948,6 @@ export default function* taskSagas() {
     ),
     yield takeLatest(tasksActions.TasksDelete.type, deleteTasks),
     yield takeLatest(tasksActions.TasksComplete.type, completeTasks),
+    yield takeLatest(tasksActions.TaskStatusSet.type, setTaskStatus),
   ]);
 }

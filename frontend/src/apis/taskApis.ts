@@ -1,5 +1,5 @@
 import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
-import { Task, ReminderSetting } from '../features/tasks/interface';
+import { Task, ReminderSetting, TaskStatus } from '../features/tasks/interface';
 
 export const fetchTasks = (
   projectId: number,
@@ -318,4 +318,14 @@ export const getContentRevision = (
     .catch((err) => {
       throw Error(err.message);
     });
+};
+
+export const setTaskStatus = (taskId: number, taskStatus: TaskStatus) => {
+  const postBody = JSON.stringify({
+    status: taskStatus,
+  });
+
+  return doPost(`/api/tasks/${taskId}/setStatus`, postBody).catch((err) => {
+    throw Error(err);
+  });
 };

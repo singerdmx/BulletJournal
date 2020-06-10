@@ -9,16 +9,7 @@ import {
   TaskStatus,
 } from '../../features/tasks/interface';
 // antd imports
-import {
-  Avatar,
-  Card,
-  Col,
-  Divider,
-  Row,
-  Statistic,
-  Tooltip,
-  Select,
-} from 'antd';
+import { Avatar, Divider, Tooltip, Select } from 'antd';
 import {
   AlertOutlined,
   ClockCircleOutlined,
@@ -34,12 +25,18 @@ import DraggableLabelsList from '../../components/draggable-labels/draggable-lab
 import { Content } from '../../features/myBuJo/interface';
 // components
 import TaskContentList from '../../components/content/content-list.component';
+//redux
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+//action
+import { setTaskStatus } from '../../features/tasks/actions';
 const { Option } = Select;
 
 export type TaskProps = {
   task: Task | undefined;
   contents: Content[];
   contentEditable?: boolean;
+  setTaskStatus: (taskId: number, taskStatus: TaskStatus) => void;
 };
 
 type TaskDetailProps = {
@@ -58,8 +55,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     taskEditorElem,
     contents,
     contentEditable,
+    setTaskStatus,
   } = props;
-  const [inputStatus, setInputStatus] = useState('');
+  const [inputStatus, setInputStatus] = useState('' as TaskStatus);
 
   useEffect(() => {
     if (task) {
@@ -119,8 +117,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
           <Select
             style={{ width: '180px' }}
             value={inputStatus}
-            onChange={(value: string) => {
+            onChange={(value: TaskStatus) => {
               setInputStatus(value);
+              setTaskStatus(task.id, value);
             }}
           >
             {Object.values(TaskStatus).map((s: string) => {
@@ -139,8 +138,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         <Select
           style={{ width: '180px' }}
           placeholder='Select Task Status'
-          onChange={(value: string) => {
+          onChange={(value: TaskStatus) => {
             setInputStatus(value);
+            setTaskStatus(task.id, value);
           }}
         >
           {Object.values(TaskStatus).map((s: string) => {
@@ -201,4 +201,8 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   );
 };
 
-export default TaskDetailPage;
+const mapStateToProps = (state: IState) => ({});
+
+export default connect(mapStateToProps, {
+  setTaskStatus,
+})(TaskDetailPage);

@@ -1,5 +1,5 @@
 import { actions } from './reducer';
-import { Task, ReminderSetting } from './interface';
+import { Task, ReminderSetting, TaskStatus } from './interface';
 import { History } from 'history';
 
 export const updateTasks = (projectId: number) =>
@@ -182,4 +182,10 @@ export const getSearchCompletedTasks = (
     startDate: startDate,
     endDate: endDate,
     timezone: timezone,
+  });
+
+export const setTaskStatus = (taskId: number, taskStatus: TaskStatus) =>
+  actions.TaskStatusSet({
+    taskId: taskId,
+    taskStatus: taskStatus,
   });
