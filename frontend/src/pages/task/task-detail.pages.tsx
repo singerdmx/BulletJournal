@@ -68,13 +68,13 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   const getDueDateTime = (task: Task) => {
     if (task.recurrenceRule) {
       return (
-        <div>
           <Tooltip title='Recurring'>
-            <ClockCircleOutlined />
+            <span>
+                <ClockCircleOutlined />
+                {' '}Due Time:
+              {convertToTextWithRRule(task.recurrenceRule)}
+            </span>
           </Tooltip>
-          Due Time:
-          {convertToTextWithRRule(task.recurrenceRule)}
-        </div>
       );
     }
 
@@ -88,32 +88,32 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     }
 
     return (
-      <div>
-        <Tooltip title={'due' + dueDateTitle}>
-          <ClockCircleOutlined />
+        <Tooltip title={'due ' + dueDateTitle}>
+          <span>
+              <ClockCircleOutlined />
+              {` ${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
+          </span>
         </Tooltip>
-        {`${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
-      </div>
     );
   };
 
-  const getRemind = (task: Task) => {
+  const getReminder = (task: Task) => {
     const text = getReminderSettingString(task.reminderSetting);
     if (text === 'No Reminder') return null;
     return (
-      <div>
+      <span>
         <Tooltip title='Reminder'>
           <AlertOutlined />
         </Tooltip>
-        <span>{text}</span>
-      </div>
+        <span>{' '}{text}</span>
+      </span>
     );
   };
 
   const getTaskStatusDropdown = (task: Task) => {
     if (inputStatus) {
       return (
-        <div>
+        <span>
           <Select
             style={{ width: '180px' }}
             value={inputStatus}
@@ -130,14 +130,14 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
               );
             })}
           </Select>
-        </div>
+        </span>
       );
     }
     return (
       <div>
         <Select
           style={{ width: '180px' }}
-          placeholder='Select Task Status'
+          placeholder='Set Task Status'
           onChange={(value: TaskStatus) => {
             setInputStatus(value);
             setTaskStatus(task.id, value);
@@ -182,7 +182,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       <Divider />
       <div className='task-statistic-card'>
         {getDueDateTime(task)}
-        {getRemind(task)}
+        {getReminder(task)}
         {getTaskStatusDropdown(task)}
       </div>
       <Divider />
