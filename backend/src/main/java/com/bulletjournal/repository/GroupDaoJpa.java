@@ -14,6 +14,7 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.JoinGroupEvent;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -56,7 +57,9 @@ public class GroupDaoJpa {
             throw new ResourceAlreadyExistException("Group with name " + name + " already exists");
         }
         group = this.groupRepository.save(group);
-        this.userGroupRepository.save(new UserGroup(user, group, true));
+        UserGroup userGroup = new UserGroup(user, group, true);
+        this.userGroupRepository.save(userGroup);
+        group.setUsers(ImmutableSet.of(userGroup));
         return group;
     }
 
