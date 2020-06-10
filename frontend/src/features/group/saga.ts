@@ -167,7 +167,11 @@ function* patchGroup(action: PayloadAction<PatchGroupAction>) {
     yield put(groupsActions.groupReceived({group: group}));
     yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
-    yield call(message.error, `Patch group Fail: ${error}`);
+    if (error.message === '400') {
+      yield call(message.error, `Group with name "${name}" already exists`);
+    } else {
+      yield call(message.error, `Patch group Fail: ${error}`);
+    }
   }
 }
 
