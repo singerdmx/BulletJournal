@@ -32,7 +32,6 @@ public class SearchIndexDaoJpa {
     private static final Integer FRAGMENT_SIZE = 300;
     private static final Integer NUM_OF_FRAGMENTS = 1;
 
-
     @Autowired
     private UserDaoJpa userDaoJpa;
 
@@ -78,4 +77,21 @@ public class SearchIndexDaoJpa {
         return new ArrayList<>(set);
     }
 
+    /**
+     * Delete target search index from elastic search jpa
+     *
+     * @param searchIndex target search index
+     */
+    private void deleteSearchIndex(SearchIndex searchIndex) {
+        this.elasticsearchOperations.delete(searchIndex);
+    }
+
+    /**
+     * Delete a list of search indices through delete search index api
+     *
+     * @param searchIndices a list of search indices
+     */
+    public void deleteSearchIndices(List<SearchIndex> searchIndices) {
+        searchIndices.forEach(this::deleteSearchIndex);
+    }
 }
