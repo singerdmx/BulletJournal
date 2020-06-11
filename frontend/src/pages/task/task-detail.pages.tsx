@@ -9,7 +9,7 @@ import {
   TaskStatus,
 } from '../../features/tasks/interface';
 // antd imports
-import { Avatar, Divider, Tooltip, Select } from 'antd';
+import { Avatar, Divider, Tooltip, Select, Tag } from 'antd';
 import {
   AlertOutlined,
   ClockCircleOutlined,
@@ -89,10 +89,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
     return (
         <Tooltip title={'due ' + dueDateTitle}>
-          <span>
-              <ClockCircleOutlined />
-              {` ${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
-          </span>
+            <Tag icon={<ClockCircleOutlined />}>
+                {`${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
+            </Tag>
         </Tooltip>
     );
   };
@@ -101,11 +100,12 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     const text = getReminderSettingString(task.reminderSetting);
     if (text === 'No Reminder') return null;
     return (
-      <span>
+        <span>
         <Tooltip title='Reminder'>
-          <AlertOutlined />
+            <Tag icon={<AlertOutlined />}>
+                {text}
+            </Tag>
         </Tooltip>
-        <span>{' '}{text}</span>
       </span>
     );
   };
@@ -136,8 +136,8 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     return (
       <div>
         <Select
-          style={{ width: '180px' }}
-          placeholder='Set Task Status'
+          style={{ width: '118px' }}
+          placeholder='Set Status'
           onChange={(value: TaskStatus) => {
             setInputStatus(value);
             setTaskStatus(task.id, value);
