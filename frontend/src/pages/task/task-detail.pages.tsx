@@ -68,11 +68,10 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     if (task.recurrenceRule) {
       return (
           <Tooltip title='Recurring'>
-            <span>
-                <ClockCircleOutlined />
-                {' '}Due Time:{' '}
-              {convertToTextWithRRule(task.recurrenceRule)}
-            </span>
+              <Tag icon={<ClockCircleOutlined />}>
+                  Due Time:{' '}
+                  {convertToTextWithRRule(task.recurrenceRule)}
+              </Tag>
           </Tooltip>
       );
     }
