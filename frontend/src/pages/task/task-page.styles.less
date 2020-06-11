@@ -55,9 +55,17 @@
   }
 
   .task-statistic-card {
-    padding: 3px;
     display: flex;
     justify-content: space-evenly;
+
+    > span {
+      height: 32px;
+      max-width: 180px;
+      padding-top: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 15px;
+    }
   }
 
   .title-labels {
