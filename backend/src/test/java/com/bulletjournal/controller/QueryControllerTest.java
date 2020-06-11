@@ -10,19 +10,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class QueryControllerTest {
+
     private static final String ROOT_URL = "http://localhost:";
 
     private static final String USER = "bbs1024";
@@ -40,13 +38,59 @@ public class QueryControllerTest {
     @Test
     public void testQuery() {
         Group group = createGroup(USER);
-        Project p2 = createProject("p_ProjectItem_Task", group, ProjectType.TODO);
-        addTasks(p2);
+        Project p1 = createProject("for_es_p_ProjectItem_Task", group, ProjectType.TODO);
+        addTasks(p1);
+
+        Project p2 = createProject("for_es_p_ProjectItem_Note", group, ProjectType.NOTE);
+        addNotes(p2);
+
+        Project p3 = createProject("for_es_p_ProjectItem_Ledger", group, ProjectType.LEDGER);
+        addTransactions(p3);
+
+    }
+
+    private void addTransactions(Project p) {
+        createTransaction(p, "for_es_T1", "2020-02-29");
+        createTransaction(p, "for_es_T2", "2020-03-01");
+        createTransaction(p, "for_es_T3", "2020-03-02");
+        createTransaction(p, "for_es_T4", "2020-03-02");
+        createTransaction(p, "for_es_T5", "2020-03-04");
+    }
+
+    private Transaction createTransaction(Project project, String name, String date) {
+        CreateTransactionParams transaction =
+                new CreateTransactionParams(name, USER, 1000.0,
+                        date, null, TIMEZONE, 1);
+
+        ResponseEntity<Transaction> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(transaction, USER),
+                Transaction.class,
+                project.getId());
+        Transaction created = response.getBody();
+        return created;
+    }
+
+    private void addNotes(Project p) {
+        createNote(p, "for_es_n1", "2020-05-26");
+    }
+
+    private Note createNote(Project project, String name, String date) {
+        CreateNoteParams note = new CreateNoteParams(name);
+        ResponseEntity<Note> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.NOTES_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(note, USER),
+                Note.class,
+                project.getId());
+        Note created = response.getBody();
+        return created;
     }
 
     private Project createProject(String projectName, Group g, ProjectType type) {
         CreateProjectParams project = new CreateProjectParams(
-                projectName, type, "d14", g.getId());
+                projectName, type, "for_es_d14", g.getId());
 
         ResponseEntity<Project> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
@@ -54,19 +98,11 @@ public class QueryControllerTest {
                 TestHelpers.actAsOtherUser(project, USER),
                 Project.class);
         Project created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals(projectName, created.getName());
-        assertEquals(USER, created.getOwner().getName());
-        assertEquals(type, created.getProjectType());
-        assertEquals("Group_ProjectItem", created.getGroup().getName());
-        assertEquals(USER, created.getGroup().getOwner().getName());
-        assertEquals("d14", created.getDescription());
         return created;
     }
 
     private Group createGroup(String user) {
-        CreateGroupParams group = new CreateGroupParams("Group_ProjectItem");
+        CreateGroupParams group = new CreateGroupParams("for_es_Group_ProjectItem");
 
         ResponseEntity<Group> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
@@ -75,19 +111,14 @@ public class QueryControllerTest {
                 Group.class);
         Group created = response.getBody();
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals("Group_ProjectItem", created.getName());
-        assertEquals(user, created.getOwner().getName());
-
         return created;
     }
 
     private void addTasks(Project p) {
-        Task t1 = createTask(p, "hello world", "2020-02-29");
-        Task t2 = createTask(p, "love", "2020-03-01");
-        addTaskContents(t1, "hello world a test hello worold work");
-        addTaskContents(t1, "I love you don't love me");
+        Task t1 = createTask(p, "for es hello world", "2020-02-29");
+        Task t2 = createTask(p, "for es love", "2020-03-01");
+        addTaskContents(t1, "for es hello world a test hello worold work");
+        addTaskContents(t2, "for es I love you don't love me");
     }
 
     private Task createTask(Project project, String name, String date) {
@@ -103,10 +134,6 @@ public class QueryControllerTest {
                 project.getId());
 
         Task created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals(name, created.getName());
-        assertEquals(project.getId(), created.getProjectId());
         return created;
     }
 
@@ -120,11 +147,7 @@ public class QueryControllerTest {
                 task.getId()
         );
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
-        assertEquals(USER, content.getOwner().getName());
-        assertEquals(params.getText(), content.getText());
-        assertNotNull(content.getId());
         return content;
     }
 }
