@@ -479,11 +479,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String time = updateTaskParams.getDueTime();
         String timezone = updateTaskParams.getTimezone();
 
-        DaoHelper.updateIfPresent(updateTaskParams.hasDueDate(), date, task::setDueDate);
-        DaoHelper.updateIfPresent(updateTaskParams.hasDueTime(), time, task::setDueTime);
+        task.setDueDate(date);
+        task.setDueTime(time);
+        task.setRecurrenceRule(updateTaskParams.getRecurrenceRule());
+
         DaoHelper.updateIfPresent(updateTaskParams.hasTimezone(), timezone, task::setTimezone);
-        DaoHelper.updateIfPresent(updateTaskParams.hasRecurrenceRule(), updateTaskParams.getRecurrenceRule(),
-                task::setRecurrenceRule);
         DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(), task::setDuration);
 
         if (updateTaskParams.hasTimezone()) {
