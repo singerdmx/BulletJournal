@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotNull;
 
 @Component
 public class ESClient extends AbstractElasticsearchConfiguration {
@@ -28,6 +31,13 @@ public class ESClient extends AbstractElasticsearchConfiguration {
                 .build();
 
         return RestClients.create(clientConfiguration).rest();
+    }
+
+
+    @Bean
+    @ConditionalOnProperty(value = DEFAULT_CLIENT_VALUE, havingValue = "true", matchIfMissing = false)
+    ElasticsearchRestTemplate elasticsearchRestTemplate() {
+        return new ElasticsearchRestTemplate(elasticsearchClient());
     }
 }
 
