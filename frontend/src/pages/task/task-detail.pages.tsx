@@ -13,7 +13,6 @@ import { Avatar, Divider, Tooltip, Select, Tag } from 'antd';
 import {
   AlertOutlined,
   ClockCircleOutlined,
-  FileDoneOutlined,
 } from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
@@ -115,7 +114,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       return (
         <span>
           <Select
-            style={{ width: '180px' }}
+            style={{ width: '135px' }}
             value={inputStatus}
             onChange={(value: TaskStatus) => {
               setInputStatus(value);

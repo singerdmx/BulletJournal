@@ -61,7 +61,6 @@ type AdminProps = {
 const AdminPage: React.FC<AdminProps> = (props) => {
   const {
     setRole,
-    changePoints,
     getUserInfo,
     userInfo,
     lockedUsers,
@@ -76,7 +75,6 @@ const AdminPage: React.FC<AdminProps> = (props) => {
   const [username, setUsername] = useState('');
   const [roleLevel, setRoleLevel] = useState('BASIC' as Role);
   const [searchName, changePointsName] = useState('');
-  const [userPoints, setUserPoints] = useState(0);
   const [inputPoints, setInputPoints] = useState(0);
   const [lockName, setLockName] = useState('');
   const [lockIP, setLockIP] = useState('');
@@ -157,7 +155,7 @@ const AdminPage: React.FC<AdminProps> = (props) => {
   };
 
   const handleChangeMode = () => {
-    if (mode == 'edit') {
+    if (mode === 'edit') {
       setMode('display');
       setInputPoints(userInfo.points);
     } else {
