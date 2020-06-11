@@ -10,17 +10,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class QueryControllerTest {
-
     private static final String ROOT_URL = "http://localhost:";
 
     private static final String USER = "bbs1024";
@@ -98,6 +100,14 @@ public class QueryControllerTest {
                 TestHelpers.actAsOtherUser(project, USER),
                 Project.class);
         Project created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+        assertEquals(projectName, created.getName());
+        assertEquals(USER, created.getOwner().getName());
+        assertEquals(type, created.getProjectType());
+        assertEquals("for_es_Group_ProjectItem", created.getGroup().getName());
+        assertEquals(USER, created.getGroup().getOwner().getName());
+        assertEquals("for_es_d14", created.getDescription());
         return created;
     }
 
@@ -111,14 +121,19 @@ public class QueryControllerTest {
                 Group.class);
         Group created = response.getBody();
 
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+        assertEquals("for_es_Group_ProjectItem", created.getName());
+        assertEquals(user, created.getOwner().getName());
+
         return created;
     }
 
     private void addTasks(Project p) {
-        Task t1 = createTask(p, "for es hello world", "2020-02-29");
-        Task t2 = createTask(p, "for es love", "2020-03-01");
-        addTaskContents(t1, "for es hello world a test hello worold work");
-        addTaskContents(t2, "for es I love you don't love me");
+        Task t1 = createTask(p, "hello world", "2020-02-29");
+        Task t2 = createTask(p, "love", "2020-03-01");
+        addTaskContents(t1, "hello world a test hello worold work");
+        addTaskContents(t1, "I love you don't love me");
     }
 
     private Task createTask(Project project, String name, String date) {
@@ -134,6 +149,10 @@ public class QueryControllerTest {
                 project.getId());
 
         Task created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+        assertEquals(name, created.getName());
+        assertEquals(project.getId(), created.getProjectId());
         return created;
     }
 
@@ -147,7 +166,11 @@ public class QueryControllerTest {
                 task.getId()
         );
 
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
+        assertEquals(USER, content.getOwner().getName());
+        assertEquals(params.getText(), content.getText());
+        assertNotNull(content.getId());
         return content;
     }
 }
