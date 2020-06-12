@@ -70,7 +70,7 @@ public class LabelDaoJpa {
         label.setIcon(icon);
 
         if (!this.labelRepository.findByNameAndOwner(name, owner).isEmpty()) {
-            throw new ResourceAlreadyExistException("Label with name " + name + " already exists");
+            throw new ResourceAlreadyExistException("Label with name \"" + name + "\" already exists");
         }
 
         label = this.labelRepository.save(label);
@@ -91,7 +91,7 @@ public class LabelDaoJpa {
 
         if (!this.labelRepository.findByNameAndOwner(updateLabelParams.getValue(), requester).isEmpty()) {
             throw new ResourceAlreadyExistException(
-                    "Label with name " + updateLabelParams.getValue() + " already exists");
+                    "Label with name \"" + updateLabelParams.getValue() + "\" already exists");
         }
 
         DaoHelper.updateIfPresent(updateLabelParams.hasValue(), updateLabelParams.getValue(), label::setName);

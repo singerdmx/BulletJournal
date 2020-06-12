@@ -179,7 +179,7 @@ public class ProjectDaoJpa {
     public Project create(CreateProjectParams createProjectParams, String owner, List<Event> events) {
         String name = createProjectParams.getName();
         if (!this.projectRepository.findByNameAndOwner(name, owner).isEmpty()) {
-            throw new ResourceAlreadyExistException("Project with name " + name + " already exists");
+            throw new ResourceAlreadyExistException("Project with name \"" + name + "\" already exists");
         }
         Long groupId = createProjectParams.getGroupId();
         Project project = new Project();

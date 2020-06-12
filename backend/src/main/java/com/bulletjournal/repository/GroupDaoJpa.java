@@ -54,7 +54,7 @@ public class GroupDaoJpa {
         group.addUser(user);
 
         if (!this.groupRepository.findByNameAndOwner(name, owner).isEmpty()) {
-            throw new ResourceAlreadyExistException("Group with name " + name + " already exists");
+            throw new ResourceAlreadyExistException("Group with name \"" + name + "\" already exists");
         }
         group = this.groupRepository.save(group);
         UserGroup userGroup = new UserGroup(user, group, true);
@@ -110,8 +110,8 @@ public class GroupDaoJpa {
         }
 
         if (!this.groupRepository.findByNameAndOwner(updateGroupParams.getName(), requester).isEmpty()) {
-            throw new ResourceAlreadyExistException("Group with name " + updateGroupParams.getName()
-                    + " already exists");
+            throw new ResourceAlreadyExistException("Group with name \"" + updateGroupParams.getName()
+                    + "\" already exists");
         }
 
         DaoHelper.updateIfPresent(
