@@ -11,8 +11,6 @@ import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfig
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
-
 @Component
 public class ESClient extends AbstractElasticsearchConfiguration {
 
