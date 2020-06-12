@@ -10,10 +10,7 @@ import {
 } from '../../features/tasks/interface';
 // antd imports
 import { Avatar, Divider, Tooltip, Select, Tag } from 'antd';
-import {
-  AlertOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
+import { AlertOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
@@ -66,13 +63,11 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
   const getDueDateTime = (task: Task) => {
     if (task.recurrenceRule) {
-        const taskDue = convertToTextWithRRule(task.recurrenceRule);
-        return (
-          <Tooltip title={taskDue}>
-              <Tag icon={<ClockCircleOutlined />}>
-                  {`Recurring: ${taskDue}`}
-              </Tag>
-          </Tooltip>
+      const taskDue = convertToTextWithRRule(task.recurrenceRule);
+      return (
+        <Tooltip title={taskDue}>
+          <Tag icon={<ClockCircleOutlined />}>{`Recurring: ${taskDue}`}</Tag>
+        </Tooltip>
       );
     }
 
@@ -87,11 +82,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
     const taskDue = `${task.dueDate} ${task.dueTime ? task.dueTime : ''}`;
     return (
-        <Tooltip title={`Due ${taskDue}, ${dueDateTitle}`}>
-            <Tag icon={<ClockCircleOutlined />}>
-                {taskDue}
-            </Tag>
-        </Tooltip>
+      <Tooltip title={`Due ${taskDue}, ${dueDateTitle}`}>
+        <Tag icon={<ClockCircleOutlined />}>{taskDue}</Tag>
+      </Tooltip>
     );
   };
 
@@ -99,42 +92,18 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     const text = getReminderSettingString(task.reminderSetting);
     if (text === 'No Reminder') return null;
     return (
-        <Tooltip title={text}>
-            <Tag icon={<AlertOutlined />}>
-                {text.replace('Reminder: ', '')}
-            </Tag>
-        </Tooltip>
+      <Tooltip title={text}>
+        <Tag icon={<AlertOutlined />}>{text.replace('Reminder: ', '')}</Tag>
+      </Tooltip>
     );
   };
 
   const getTaskStatusDropdown = (task: Task) => {
     if (inputStatus) {
       return (
-        <span>
-          <Select
-            style={{ width: '135px' }}
-            value={inputStatus}
-            onChange={(value: TaskStatus) => {
-              setInputStatus(value);
-              setTaskStatus(task.id, value);
-            }}
-          >
-            {Object.values(TaskStatus).map((s: string) => {
-              return (
-                <Option value={s} key={s}>
-                  {s.replace(/_/g, ' ')}
-                </Option>
-              );
-            })}
-          </Select>
-        </span>
-      );
-    }
-    return (
-      <div>
         <Select
-          style={{ width: '118px' }}
-          placeholder='Set Status'
+          style={{ width: '135px' }}
+          value={inputStatus}
           onChange={(value: TaskStatus) => {
             setInputStatus(value);
             setTaskStatus(task.id, value);
@@ -148,27 +117,45 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
             );
           })}
         </Select>
-      </div>
+      );
+    }
+    return (
+      <Select
+        style={{ width: '118px' }}
+        placeholder="Set Status"
+        onChange={(value: TaskStatus) => {
+          setInputStatus(value);
+          setTaskStatus(task.id, value);
+        }}
+      >
+        {Object.values(TaskStatus).map((s: string) => {
+          return (
+            <Option value={s} key={s}>
+              {s.replace(/_/g, ' ')}
+            </Option>
+          );
+        })}
+      </Select>
     );
   };
 
   if (!task) return null;
   return (
-    <div className='task-page'>
+    <div className="task-page">
       <Tooltip
-        placement='top'
+        placement="top"
         title={`Created by ${task.owner.alias}`}
-        className='task-avatar'
+        className="task-avatar"
       >
         <span>
-          <Avatar size='large' src={task.owner.avatar} />
+          <Avatar size="large" src={task.owner.avatar} />
         </span>
       </Tooltip>
-      <div className='task-title'>
-        <div className='label-and-name'>{task.name}</div>
+      <div className="task-title">
+        <div className="label-and-name">{task.name}</div>
         {taskOperation()}
       </div>
-      <div className='title-labels'>
+      <div className="title-labels">
         <DraggableLabelsList
           mode={ProjectType.TODO}
           labels={task.labels}
@@ -177,14 +164,14 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         />
       </div>
       <Divider />
-      <div className='task-statistic-card'>
+      <div className="task-statistic-card">
         {getDueDateTime(task)}
         {getReminder(task)}
         {getTaskStatusDropdown(task)}
       </div>
       <Divider />
-      <div className='content'>
-        <div className='content-list'>
+      <div className="content">
+        <div className="content-list">
           <TaskContentList
             projectItem={task}
             contents={contents}
