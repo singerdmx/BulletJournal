@@ -201,7 +201,20 @@ public class TaskController {
             @RequestBody SetTaskStatusParams setTaskStatusParams) {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.setTaskStatus(setTaskStatusParams.getStatus(), taskId, username);
+        Pair<com.bulletjournal.repository.models.Task, List<Event>> res = this.taskDaoJpa
+                .setTaskStatus(setTaskStatusParams.getStatus(), taskId, username);
+        com.bulletjournal.repository.models.Task updatedTask = res.getLeft();
+        List<Event> events = res.getRight();
+
+        if (!events.isEmpty()) {
+            this.notificationService.inform(new SetTaskStatusEvent(events, username));
+        }
+
+        this.notificationService.trackActivity(new Auditable(updatedTask.getProject().getId(),
+                "set Task ##" + updatedTask.getName() + "## Status to ##"
+                        + setTaskStatusParams.toText(setTaskStatusParams.getStatus()) + "## in BuJo ##"
+                        + updatedTask.getProject().getName() + "##",
+                username, updatedTask.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
     }
 
     @PostMapping(UNCOMPLETE_TASK_ROUTE)

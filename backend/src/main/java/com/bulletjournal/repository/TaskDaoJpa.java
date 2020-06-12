@@ -183,10 +183,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return task;
     }
 
-    public void setTaskStatus(TaskStatus taskStatus, Long taskId, String requester) {
+    public Pair<Task, List<Event>> setTaskStatus(TaskStatus taskStatus, Long taskId, String requester) {
         Task task = this.getProjectItem(taskId, requester);
         task.setStatus(taskStatus.getValue());
         this.taskRepository.save(task);
+        return Pair.of(task, generateEvents(task, requester, task.getProject()));
     }
 
     /**
