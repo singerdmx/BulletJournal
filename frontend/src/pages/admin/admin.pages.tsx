@@ -354,7 +354,7 @@ const AdminPage: React.FC<AdminProps> = (props) => {
           </div>
           <div className='lock-user-row'>
             <Button type='primary' onClick={getLockedUsersAndIPs}>
-              Get Blocked Users
+              Get Locked Users
             </Button>
           </div>
           <Tabs defaultActiveKey={'user'}>
