@@ -24,6 +24,21 @@ public enum TaskStatus {
         }
     }
 
+    public static String toText(TaskStatus status) {
+        switch (status) {
+            case IN_PROGRESS:
+                return "IN PROGRESS";
+            case NEXT_TO_DO:
+                return "NEXT TO DO";
+            case ON_HOLD:
+                return "ON HOLD";
+            case READY:
+                return "READY";
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public int getValue() {
         return value;
     }

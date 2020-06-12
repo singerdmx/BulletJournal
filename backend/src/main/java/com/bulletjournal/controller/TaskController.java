@@ -211,8 +211,8 @@ public class TaskController {
         }
 
         this.notificationService.trackActivity(new Auditable(updatedTask.getProject().getId(),
-                "set Task ##" + updatedTask.getName() + "## Status to ##"
-                        + setTaskStatusParams.toText(setTaskStatusParams.getStatus()) + "## in BuJo ##"
+                "set Task ##" + updatedTask.getName() + "## to ##"
+                        + TaskStatus.toText(setTaskStatusParams.getStatus()) + "## in BuJo ##"
                         + updatedTask.getProject().getName() + "##",
                 username, updatedTask.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
     }
