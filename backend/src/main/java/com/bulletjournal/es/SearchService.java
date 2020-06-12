@@ -25,6 +25,9 @@ public class SearchService {
      * @param searchIndices a list of search indices
      */
     public void removeInvalidSearchResults(List<SearchIndex> searchIndices) {
+        if (searchIndices.size() == 0)
+            return;
+
         this.searchIndexDaoJpa.deleteSearchIndices(searchIndices);
     }
 }

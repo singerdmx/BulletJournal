@@ -66,13 +66,12 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
   const getDueDateTime = (task: Task) => {
     if (task.recurrenceRule) {
-      return (
-          <Tooltip title='Recurring'>
-            <span>
-                <ClockCircleOutlined />
-                {' '}Due Time:{' '}
-              {convertToTextWithRRule(task.recurrenceRule)}
-            </span>
+        const taskDue = convertToTextWithRRule(task.recurrenceRule);
+        return (
+          <Tooltip title={taskDue}>
+              <Tag icon={<ClockCircleOutlined />}>
+                  {`Recurring: ${taskDue}`}
+              </Tag>
           </Tooltip>
       );
     }
@@ -86,10 +85,11 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       dueDateTitle += `, duration ${task.duration} minutes`;
     }
 
+    const taskDue = `${task.dueDate} ${task.dueTime ? task.dueTime : ''}`;
     return (
-        <Tooltip title={'due ' + dueDateTitle}>
+        <Tooltip title={`Due ${taskDue}, ${dueDateTitle}`}>
             <Tag icon={<ClockCircleOutlined />}>
-                {`${task.dueDate} ${task.dueTime ? task.dueTime : ''}`}
+                {taskDue}
             </Tag>
         </Tooltip>
     );
@@ -99,13 +99,11 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     const text = getReminderSettingString(task.reminderSetting);
     if (text === 'No Reminder') return null;
     return (
-        <span>
-        <Tooltip title='Reminder'>
+        <Tooltip title={text}>
             <Tag icon={<AlertOutlined />}>
-                {text}
+                {text.replace('Reminder: ', '')}
             </Tag>
         </Tooltip>
-      </span>
     );
   };
 

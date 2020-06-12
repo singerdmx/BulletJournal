@@ -24,4 +24,12 @@ public class SearchResult {
     public void setHighlights(List<String> highlights) {
         this.highlights = highlights;
     }
+
+    public void setOrDefaultHighlights(List<String> highlights) {
+        if (this.highlights == null) {
+            setHighlights(highlights);
+            return;
+        }
+        this.highlights.addAll(highlights);
+    }
 }

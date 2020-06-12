@@ -127,22 +127,22 @@ const EditTask: React.FC<
       ? values.dueDate.format(dateFormat)
       : task.dueDate;
     if (values.dueDate === null) {
-      dueDate = undefined;
+      dueDate = task.dueDate;
     }
     let dueTime = values.dueTime
       ? values.dueTime.format('HH:mm')
       : task.dueTime;
     if (values.dueTime === null) {
-      dueTime = undefined;
+      dueTime = null;
     }
-    let recurrence: string | undefined = useTaskRecurrenceRule
+    let recurrence = useTaskRecurrenceRule
       ? props.task.recurrenceRule
       : props.rRuleString;
     if (dueType === 'dueByRec') {
-      dueDate = undefined;
-      dueTime = undefined;
+      dueDate = null;
+      dueTime = null;
     } else {
-      recurrence = undefined;
+      recurrence = null;
     }
     const assignees = values.assignees ? values.assignees : undefined;
     const timezone = values.timezone ? values.timezone : task.timezone;
@@ -154,7 +154,9 @@ const EditTask: React.FC<
         ? values.reminderTime.format('HH:mm')
         : undefined,
       before:
-        values.remindBefore === undefined ? props.before : values.remindBefore,
+        values.remindBefore === undefined
+          ? props.task.reminderSetting.before
+          : values.remindBefore,
     } as ReminderSetting;
     if (reminderType === 'remindBefore') {
       reminderSetting.date = undefined;

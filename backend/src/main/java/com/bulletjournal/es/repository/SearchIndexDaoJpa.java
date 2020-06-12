@@ -8,7 +8,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -35,11 +35,8 @@ public class SearchIndexDaoJpa {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
-    private ElasticsearchOperations elasticsearchOperations;
-
-    public SearchIndexDaoJpa(ElasticsearchOperations elasticsearchOperations) {
-        this.elasticsearchOperations = elasticsearchOperations;
-    }
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     public SearchHits<SearchIndex> search(String username, String term) {
         List<Long> projectIdList = getUserProjects(username);
@@ -64,7 +61,7 @@ public class SearchIndexDaoJpa {
 
         NativeSearchQuery query = new NativeSearchQueryBuilder()
                 .withQuery(queryBuilder).withHighlightBuilder(highlightBuilder).build();
-        return elasticsearchOperations.search(query, SearchIndex.class);
+        return elasticsearchRestTemplate.search(query, SearchIndex.class);
     }
 
     private List<Long> getUserProjects(String username) {
@@ -83,7 +80,7 @@ public class SearchIndexDaoJpa {
      * @param searchIndex target search index
      */
     private void deleteSearchIndex(SearchIndex searchIndex) {
-        this.elasticsearchOperations.delete(searchIndex);
+        this.elasticsearchRestTemplate.delete(searchIndex);
     }
 
     /**
