@@ -1,47 +1,50 @@
-import { takeLatest, call, all, put, select } from 'redux-saga/effects';
-import { message } from 'antd';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
 import {
   actions as transactionsActions,
-  TransactionApiErrorAction,
-  UpdateTransactions,
+  CreateContent,
   CreateTransaction,
+  DeleteContent,
+  DeleteTransaction,
+  DeleteTransactions,
   GetTransaction,
-  PatchTransaction,
+  GetTransactionsByPayer,
   MoveTransaction,
+  PatchContent,
+  PatchTransaction,
   SetTransactionLabels,
   ShareTransaction,
-  DeleteTransaction,
-  CreateContent,
-  DeleteContent,
-  PatchContent,
+  TransactionApiErrorAction,
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
-  GetTransactionsByPayer,
-  DeleteTransactions,
+  UpdateTransactions,
 } from './reducer';
-import { IState } from '../../store';
-import { PayloadAction } from 'redux-starter-kit';
+import {IState} from '../../store';
+import {PayloadAction} from 'redux-starter-kit';
 import {
-  fetchTransactions,
+  addContent,
   createTransaction,
-  getTransactionById,
-  updateTransaction,
+  deleteContent,
   deleteTransactionById,
   deleteTransactions as deleteTransactionsApi,
+  fetchTransactions,
+  getContentRevision,
+  getContents,
+  getTransactionById,
   moveToTargetProject,
   setTransactionLabels,
   shareTransactionWithOther,
-  deleteContent,
-  addContent,
-  getContents,
   updateContent,
-  getContentRevision,
+  updateTransaction,
 } from '../../apis/transactionApis';
-import { LedgerSummary } from './interface';
-import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
-import { updateTransactionContents } from './actions';
-import { Content, Revision, ProjectItems } from '../myBuJo/interface';
-import { updateItemsByLabels } from '../label/actions';
+import {LedgerSummary} from './interface';
+import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
+import {updateTransactionContents} from './actions';
+import {Content, ProjectItems, Revision} from '../myBuJo/interface';
+import {updateItemsByLabels} from '../label/actions';
+import {ProjectItemUIType} from "../project/constants";
+import {ContentType} from "../myBuJo/constants";
+import {recentItemsReceived} from "../recent/actions";
 
 function* transactionApiErrorReceived(
   action: PayloadAction<TransactionApiErrorAction>
@@ -171,7 +174,7 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
 
 function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
   try {
-    const { transactionId } = action.payload;
+    const { transactionId, type } = action.payload;
     const state: IState = yield select();
     const transaction = yield call(getTransactionById, transactionId);
 
@@ -180,50 +183,64 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     );
     yield call(deleteTransactionById, transactionId);
 
-    const data = yield call(
-      fetchTransactions,
-      transaction.projectId,
-      state.transaction.timezone,
-      state.transaction.ledgerSummaryType,
-      state.transaction.frequencyType,
-      state.transaction.startDate,
-      state.transaction.endDate
-    );
-    const ledgerSummary: LedgerSummary = yield data.json();
-    yield put(
-      transactionsActions.transactionsReceived({
-        ledgerSummary: ledgerSummary,
-      })
-    );
+    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER) {
+      const data = yield call(
+          fetchTransactions,
+          transaction.projectId,
+          state.transaction.timezone,
+          state.transaction.ledgerSummaryType,
+          state.transaction.frequencyType,
+          state.transaction.startDate,
+          state.transaction.endDate
+      );
+      const ledgerSummary: LedgerSummary = yield data.json();
+      yield put(
+          transactionsActions.transactionsReceived({
+            ledgerSummary: ledgerSummary,
+          })
+      );
+    }
 
-    yield put(
-      getProjectItemsAfterUpdateSelect(
-        state.myBuJo.todoSelected,
-        state.myBuJo.ledgerSelected,
-        state.myBuJo.noteSelected,
-        'today'
-      )
-    );
-    const labelItems: ProjectItems[] = [];
-    state.label.items.forEach((projectItem: ProjectItems) => {
-      projectItem = { ...projectItem };
-      if (projectItem.transactions) {
-        projectItem.transactions = projectItem.transactions.filter(
-          (transaction) => transaction.id !== transactionId
-        );
-      }
-      labelItems.push(projectItem);
-    });
-    yield put(updateItemsByLabels(labelItems));
+    if (type === ProjectItemUIType.TODAY) {
+      yield put(
+          getProjectItemsAfterUpdateSelect(
+              state.myBuJo.todoSelected,
+              state.myBuJo.ledgerSelected,
+              state.myBuJo.noteSelected,
+              'today'
+          )
+      );
+    }
 
-    const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-      (t) => t.id !== transactionId
-    );
-    yield put(
-      transactionsActions.transactionsByPayerReceived({
-        transactionsByPayer: transactionsByPayer,
-      })
-    );
+    if (type === ProjectItemUIType.LABEL) {
+      const labelItems: ProjectItems[] = [];
+      state.label.items.forEach((projectItem: ProjectItems) => {
+        projectItem = {...projectItem};
+        if (projectItem.transactions) {
+          projectItem.transactions = projectItem.transactions.filter(
+              (transaction) => transaction.id !== transactionId
+          );
+        }
+        labelItems.push(projectItem);
+      });
+      yield put(updateItemsByLabels(labelItems));
+    }
+
+    if (type === ProjectItemUIType.PAYER) {
+      const transactionsByPayer = state.transaction.transactionsByPayer.filter(
+          (t) => t.id !== transactionId
+      );
+      yield put(
+          transactionsActions.transactionsByPayerReceived({
+            transactionsByPayer: transactionsByPayer,
+          })
+      );
+    }
+
+    if (type === ProjectItemUIType.RECENT) {
+      const recentItems = state.recent.items.filter((t) => t.contentType !== ContentType.TRANSACTION || t.id !== transactionId);
+      yield put(recentItemsReceived(recentItems));
+    }
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
@@ -231,17 +248,20 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
 function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
   try {
-    const { projectId, transactionsId } = action.payload;
+    const { projectId, transactionsId, type } = action.payload;
     const state: IState = yield select();
 
-    const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-      (t) => !transactionsId.includes(t.id)
-    );
-    yield put(
-      transactionsActions.transactionsByPayerReceived({
-        transactionsByPayer: transactionsByPayer,
-      })
-    );
+    if (type === ProjectItemUIType.PAYER) {
+      const transactionsByPayer = state.transaction.transactionsByPayer.filter(
+          (t) => !transactionsId.includes(t.id)
+      );
+      yield put(
+          transactionsActions.transactionsByPayerReceived({
+            transactionsByPayer: transactionsByPayer,
+          })
+      );
+    }
+
     yield put(
       transactionsActions.transactionReceived({ transaction: undefined })
     );

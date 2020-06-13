@@ -1,24 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { connect } from 'react-redux';
-import { Avatar, DatePicker, Divider, Select, Tooltip } from 'antd';
-import {
-  TeamOutlined,
-  SyncOutlined,
-  UpSquareOutlined,
-} from '@ant-design/icons';
+import React, {useEffect, useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {IState} from '../../store';
+import {Project} from '../../features/project/interface';
+import {connect} from 'react-redux';
+import {Avatar, DatePicker, Divider, Select, Tooltip} from 'antd';
+import {SyncOutlined, TeamOutlined, UpSquareOutlined,} from '@ant-design/icons';
 import moment from 'moment';
-import { getGroup } from '../../features/group/actions';
-import { User, Group } from '../../features/group/interface';
-import { useParams } from 'react-router-dom';
-import { getProject } from '../../features/project/actions';
-import { getSearchCompletedTasks } from '../../features/tasks/actions';
-import { Task } from '../../features/tasks/interface';
+import {getGroup} from '../../features/group/actions';
+import {Group, User} from '../../features/group/interface';
+import {getProject} from '../../features/project/actions';
+import {getSearchCompletedTasks} from '../../features/tasks/actions';
+import {Task} from '../../features/tasks/interface';
 import TaskItem from '../../components/project-item/task-item.component';
 
 import './task.styles.less';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -145,6 +141,7 @@ const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (
               <div key={t.id}>
                 <TaskItem
                     task={t}
+                    type={ProjectItemUIType.COMPLETE_TASK}
                     isComplete={true}
                     readOnly={false}
                     inProject={false}

@@ -1,27 +1,16 @@
-import React, { useState } from 'react';
-import {
-  Modal,
-  Empty,
-  DatePicker,
-  Divider,
-  Tooltip,
-  Checkbox,
-  message,
-} from 'antd';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {Checkbox, DatePicker, Divider, Empty, message, Modal, Tooltip,} from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 import './modals.styles.less';
 import NoteItem from '../project-item/note-item.component';
 import moment from 'moment';
-import {
-  SyncOutlined,
-  CheckSquareTwoTone,
-  DeleteTwoTone,
-  CloseSquareTwoTone,
-} from '@ant-design/icons';
-import { Note } from '../../features/notes/interface';
-import { dateFormat } from '../../features/myBuJo/constants';
-import { getNotesByOrder, deleteNotes } from '../../features/notes/actions';
+import {CheckSquareTwoTone, CloseSquareTwoTone, DeleteTwoTone, SyncOutlined,} from '@ant-design/icons';
+import {Note} from '../../features/notes/interface';
+import {dateFormat} from '../../features/myBuJo/constants';
+import {deleteNotes, getNotesByOrder} from '../../features/notes/actions';
+import {ProjectItemUIType} from "../../features/project/constants";
+
 const { RangePicker } = DatePicker;
 type NotesByOrderProps = {
   timezone: string;
@@ -35,7 +24,7 @@ type NotesByOrderProps = {
     startDate?: string,
     endDate?: string
   ) => void;
-  deleteNotes: (projectId: number, notesId: number[], type: string) => void;
+  deleteNotes: (projectId: number, notesId: number[], type: ProjectItemUIType) => void;
 };
 
 const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
@@ -80,6 +69,7 @@ const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
           )}
           <NoteItem
             note={note}
+            type={ProjectItemUIType.ORDER}
             readOnly={false}
             inProject={false}
             inModal={true}
@@ -106,7 +96,7 @@ const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
       return;
     }
 
-    deleteNotes(projectId, checked, 'order');
+    deleteNotes(projectId, checked, ProjectItemUIType.ORDER);
     setChecked([] as number[]);
     props.onCancel();
   };

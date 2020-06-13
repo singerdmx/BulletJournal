@@ -1,45 +1,30 @@
 // react imports
-import React, { useState } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {connect} from 'react-redux';
 // features
-import { Transaction } from '../../features/transactions/interface';
-import { IState } from '../../store';
-import { ProjectType } from '../../features/project/constants';
-import {
-  getTransaction,
-  deleteTransaction,
-  updateTransactionContents,
-} from '../../features/transactions/actions';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {Transaction} from '../../features/transactions/interface';
+import {IState} from '../../store';
+import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
+import {deleteTransaction, getTransaction, updateTransactionContents,} from '../../features/transactions/actions';
+import {dateFormat} from '../../features/myBuJo/constants';
 // modals import
 import EditTransaction from '../../components/modals/edit-transaction.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
-
 // antd imports
+import {Avatar, Button, Card, Col, Divider, Popconfirm, Row, Statistic, Tooltip,} from 'antd';
 import {
-  Tooltip,
-  Avatar,
-  Divider,
-  Button,
-  Popconfirm,
-  Card,
-  Row,
-  Col,
-  Statistic,
-} from 'antd';
-import {
-  DeleteTwoTone,
-  PlusCircleTwoTone,
   AccountBookOutlined,
+  DeleteTwoTone,
   DollarCircleOutlined,
-  UpSquareOutlined,
+  PlusCircleTwoTone,
   SyncOutlined,
+  UpSquareOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 import TransactionContentList from '../../components/content/content-list.component';
-import { Content } from '../../features/myBuJo/interface';
+import {Content} from '../../features/myBuJo/interface';
 import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
@@ -51,7 +36,7 @@ type TransactionProps = {
   currency: string;
   transaction: Transaction | undefined;
   contents: Content[];
-  deleteTransaction: (transactionId: number) => void;
+  deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
   updateTransactionContents: (transactionId: number) => void;
 };
 
@@ -171,7 +156,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               okText='Yes'
               cancelText='No'
               onConfirm={() => {
-                deleteTransaction(transaction.id);
+                deleteTransaction(transaction.id, ProjectItemUIType.PAGE);
                 history.goBack();
               }}
               className='group-setting'

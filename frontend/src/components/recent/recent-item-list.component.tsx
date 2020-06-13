@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import moment from 'moment';
-import { dateFormat, ContentType } from '../../features/myBuJo/constants';
-import { DatePicker, Divider, Tooltip } from 'antd';
-import { Link } from 'react-router-dom';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import { updateRecentItemsDates } from '../../features/recent/actions';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { ProjectItem } from '../../features/myBuJo/interface';
+import {ContentType, dateFormat} from '../../features/myBuJo/constants';
+import {DatePicker, Divider, Tooltip} from 'antd';
+import {Link} from 'react-router-dom';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {updateRecentItemsDates} from '../../features/recent/actions';
+import {updateExpandedMyself} from '../../features/myself/actions';
+import {ProjectItem} from '../../features/myBuJo/interface';
 import TaskItem from '../project-item/task-item.component';
 import NoteItem from '../project-item/note-item.component';
-import { Task } from '../../features/tasks/interface';
-import { Note } from '../../features/notes/interface';
+import {Task} from '../../features/tasks/interface';
+import {Note} from '../../features/notes/interface';
 import TransactionItem from '../project-item/transaction-item.component';
-import { Transaction } from '../../features/transactions/interface';
+import {Transaction} from '../../features/transactions/interface';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 const { RangePicker } = DatePicker;
 
@@ -76,6 +77,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
               return (
                 <TaskItem
                   task={projectItem as Task}
+                  type={ProjectItemUIType.RECENT}
                   isComplete={false}
                   readOnly={false}
                   inModal={false}
@@ -88,6 +90,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
               return (
                 <NoteItem
                   note={projectItem as Note}
+                  type={ProjectItemUIType.RECENT}
                   readOnly={false}
                   inProject={false}
                   inModal={false}
@@ -97,6 +100,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
             case ContentType.TRANSACTION: {
               return (
                 <TransactionItem
+                  type={ProjectItemUIType.RECENT}
                   transaction={projectItem as Transaction}
                   inModal={false}
                   inProject={false}

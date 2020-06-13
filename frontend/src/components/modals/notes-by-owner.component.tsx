@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
-import { Modal, Empty, Tooltip, message, Checkbox } from 'antd';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {Checkbox, Empty, message, Modal, Tooltip} from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 import './modals.styles.less';
 import NoteItem from '../project-item/note-item.component';
-import { Note } from '../../features/notes/interface';
-import { User } from '../../features/group/interface';
-import {
-  CheckSquareTwoTone,
-  CloseSquareTwoTone,
-  DeleteTwoTone,
-} from '@ant-design/icons';
-import { deleteNotes } from '../../features/notes/actions';
-import { Project } from '../../features/project/interface';
+import {Note} from '../../features/notes/interface';
+import {User} from '../../features/group/interface';
+import {CheckSquareTwoTone, CloseSquareTwoTone, DeleteTwoTone,} from '@ant-design/icons';
+import {deleteNotes} from '../../features/notes/actions';
+import {Project} from '../../features/project/interface';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 type NotesByOwnerProps = {
   project: Project | undefined;
@@ -20,7 +17,7 @@ type NotesByOwnerProps = {
   visible: boolean;
   owner: User | undefined;
   onCancel: () => void;
-  deleteNotes: (projectId: number, notesId: number[], type: string) => void;
+  deleteNotes: (projectId: number, notesId: number[], type: ProjectItemUIType) => void;
 };
 
 const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
@@ -51,6 +48,7 @@ const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
           )}
           <NoteItem
             note={note}
+            type={ProjectItemUIType.OWNER}
             readOnly={false}
             inProject={false}
             inModal={true}
@@ -81,7 +79,7 @@ const NotesByOwner: React.FC<NotesByOwnerProps> = (props) => {
       return;
     }
 
-    deleteNotes(project.id, checked, 'owner');
+    deleteNotes(project.id, checked, ProjectItemUIType.OWNER);
     setChecked([] as number[]);
     props.onCancel();
   };

@@ -4,6 +4,7 @@ import { History } from 'history';
 import { Content } from '../myBuJo/interface';
 import { ProjectItemSharables, SharableLink } from '../system/interface';
 import { User } from '../group/interface';
+import {ProjectItemUIType} from "../project/constants";
 
 export type NoteApiErrorAction = {
   error: string;
@@ -57,6 +58,7 @@ export type PutNote = {
 
 export type DeleteNote = {
   noteId: number;
+  type: ProjectItemUIType;
 };
 
 export type DeleteContent = {
@@ -112,7 +114,7 @@ export type ContentsAction = {
 export type DeleteNotes = {
   projectId: number;
   notesId: number[];
-  type: string;
+  type: ProjectItemUIType;
 };
 
 export type ShareLinkAction = {

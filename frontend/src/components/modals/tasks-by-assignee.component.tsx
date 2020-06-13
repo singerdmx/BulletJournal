@@ -1,19 +1,15 @@
-import React, { useState } from 'react';
-import { Modal, Empty, Tooltip, Checkbox, message } from 'antd';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {Checkbox, Empty, message, Modal, Tooltip} from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 import './modals.styles.less';
 import TaskItem from '../project-item/task-item.component';
-import { Task } from '../../features/tasks/interface';
-import { User } from '../../features/group/interface';
-import {
-  CheckSquareTwoTone,
-  CloseSquareTwoTone,
-  CheckCircleTwoTone,
-  DeleteTwoTone,
-} from '@ant-design/icons';
-import { deleteTasks, completeTasks } from '../../features/tasks/actions';
-import { Project } from '../../features/project/interface';
+import {Task} from '../../features/tasks/interface';
+import {User} from '../../features/group/interface';
+import {CheckCircleTwoTone, CheckSquareTwoTone, CloseSquareTwoTone, DeleteTwoTone,} from '@ant-design/icons';
+import {completeTasks, deleteTasks} from '../../features/tasks/actions';
+import {Project} from '../../features/project/interface';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 type TasksByAssigneeProps = {
   project: Project | undefined;
@@ -21,8 +17,8 @@ type TasksByAssigneeProps = {
   visible: boolean;
   assignee: User | undefined;
   onCancel: () => void;
-  deleteTasks: (projectId: number, tasksId: number[]) => void;
-  completeTasks: (projectId: number, tasksId: number[]) => void;
+  deleteTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
+  completeTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
   hideCompletedTask: () => void;
 };
 
@@ -61,6 +57,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
           )}
           <TaskItem
             task={task}
+            type={ProjectItemUIType.ASSIGNEE}
             isComplete={false}
             readOnly={false}
             inModal={true}
@@ -93,7 +90,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
       return;
     }
 
-    completeTasks(project.id, checked);
+    completeTasks(project.id, checked, ProjectItemUIType.ASSIGNEE);
     setChecked([] as number[]);
     hideCompletedTask();
     props.onCancel();
@@ -110,7 +107,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
       return;
     }
 
-    deleteTasks(project.id, checked);
+    deleteTasks(project.id, checked, ProjectItemUIType.ASSIGNEE);
     setChecked([] as number[]);
     props.onCancel();
   };

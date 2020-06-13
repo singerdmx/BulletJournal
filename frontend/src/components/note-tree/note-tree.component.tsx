@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router';
-import { TreeNodeNormal } from 'antd/lib/tree/Tree';
-import { Tree, Result } from 'antd';
+import React, {useEffect} from 'react';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {TreeNodeNormal} from 'antd/lib/tree/Tree';
+import {Result, Tree} from 'antd';
 import TreeItem from '../project-item/note-item.component';
-import { putNote, updateNotes } from '../../features/notes/actions';
-import { Note } from '../../features/notes/interface';
-import { IState } from '../../store';
+import {putNote, updateNotes} from '../../features/notes/actions';
+import {Note} from '../../features/notes/interface';
+import {IState} from '../../store';
 import './note-tree.component.styles.less';
-import { Project } from '../../features/project/interface';
-import { User } from '../../features/group/interface';
-import {
-  FileAddOutlined
-} from '@ant-design/icons';
+import {Project} from '../../features/project/interface';
+import {User} from '../../features/group/interface';
+import {FileAddOutlined} from '@ant-design/icons';
 import AddNote from "../modals/add-note.component";
+import {ProjectItemUIType} from "../../features/project/constants";
 
 type NotesProps = {
   notes: Note[];
@@ -49,6 +48,7 @@ const getTree = (
     node.title = (
       <TreeItem
         note={item}
+        type={ProjectItemUIType.PROJECT}
         readOnly={readOnly}
         inProject={inProject}
         showModal={showModal}

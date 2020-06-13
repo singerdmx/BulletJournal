@@ -1,26 +1,15 @@
 // page display contents of tasks
 // react imports
-import React, { useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {connect} from 'react-redux';
 // features
 //actions
-import {
-  deleteTask,
-  getTask,
-  updateTaskContents,
-  completeTask
-} from '../../features/tasks/actions';
-import { IState } from '../../store';
+import {completeTask, deleteTask, getTask, updateTaskContents} from '../../features/tasks/actions';
+import {IState} from '../../store';
 // antd imports
-import { Avatar, Popconfirm, Tooltip, Button, Popover } from 'antd';
-import {
-  DeleteTwoTone,
-  UpSquareOutlined,
-  PlusCircleTwoTone,
-  SyncOutlined,
-  CheckCircleTwoTone
-} from '@ant-design/icons';
+import {Avatar, Button, Popconfirm, Popover, Tooltip} from 'antd';
+import {CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined} from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -28,17 +17,17 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
-import { ProjectType } from '../../features/project/constants';
+import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
 // components
-import TaskDetailPage, { TaskProps } from './task-detail.pages';
+import TaskDetailPage, {TaskProps} from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
 
 interface TaskPageHandler {
   getTask: (taskId: number) => void;
-  deleteTask: (taskId: number) => void;
+  deleteTask: (taskId: number, type: ProjectItemUIType) => void;
   updateTaskContents: (taskId: number) => void;
-  completeTask: (taskId: number, dateTime?: string) => void;
+  completeTask: (taskId: number, type: ProjectItemUIType, dateTime?: string) => void;
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
@@ -135,7 +124,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   };
 
   const handleCompleteTaskClick = () => {
-      completeTask(task.id);
+      completeTask(task.id, ProjectItemUIType.PAGE);
       history.push(`/projects/${task.projectId}`);
   };
 
@@ -165,7 +154,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             okText='Yes'
             cancelText='No'
             onConfirm={() => {
-              deleteTask(task.id);
+              deleteTask(task.id, ProjectItemUIType.PAGE);
               history.goBack();
             }}
             className='group-setting'

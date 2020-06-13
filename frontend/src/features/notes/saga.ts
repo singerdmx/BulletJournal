@@ -1,12 +1,15 @@
-import { all, call, put, select, takeLatest } from 'redux-saga/effects';
-import { message } from 'antd';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
 import {
   actions as notesActions,
   CreateContent,
   CreateNote,
   DeleteContent,
   DeleteNote,
+  DeleteNotes,
   GetNote,
+  GetNotesByOrder,
+  GetNotesByOwner,
   GetSharables,
   MoveNote,
   NoteApiErrorAction,
@@ -19,16 +22,14 @@ import {
   UpdateNoteContentRevision,
   UpdateNoteContents,
   UpdateNotes,
-  GetNotesByOwner,
-  GetNotesByOrder,
-  DeleteNotes,
 } from './reducer';
-import { PayloadAction } from 'redux-starter-kit';
+import {PayloadAction} from 'redux-starter-kit';
 import {
   addContent,
   createNote,
   deleteContent,
   deleteNoteById,
+  deleteNotes as deleteNotesApi,
   fetchNotes,
   getContentRevision,
   getContents,
@@ -41,14 +42,16 @@ import {
   shareNoteWithOther,
   updateContent,
   updateNote,
-  deleteNotes as deleteNotesApi,
 } from '../../apis/noteApis';
-import { IState } from '../../store';
-import { updateNoteContents, updateNotes } from './actions';
-import { Content, ProjectItems, Revision } from '../myBuJo/interface';
-import { updateItemsByLabels } from '../label/actions';
-import { actions as SystemActions } from '../system/reducer';
-import { Note } from './interface';
+import {IState} from '../../store';
+import {updateNoteContents, updateNotes} from './actions';
+import {Content, ProjectItems, Revision} from '../myBuJo/interface';
+import {updateItemsByLabels} from '../label/actions';
+import {actions as SystemActions} from '../system/reducer';
+import {Note} from './interface';
+import {ProjectItemUIType} from "../project/constants";
+import {ContentType} from "../myBuJo/constants";
+import {recentItemsReceived} from "../recent/actions";
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -295,7 +298,7 @@ function* noteSetLabels(action: PayloadAction<SetNoteLabels>) {
 
 function* noteDelete(action: PayloadAction<DeleteNote>) {
   try {
-    const { noteId } = action.payload;
+    const { noteId, type } = action.payload;
     const data = yield call(deleteNoteById, noteId);
     const notes = yield data.json();
     yield put(
@@ -305,31 +308,42 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
     );
     yield put(notesActions.noteReceived({ note: undefined }));
     const state: IState = yield select();
-    const labelItems: ProjectItems[] = [];
-    state.label.items.forEach((projectItem: ProjectItems) => {
-      projectItem = { ...projectItem };
-      if (projectItem.notes) {
-        projectItem.notes = projectItem.notes.filter(
-          (note) => note.id !== noteId
-        );
-      }
-      labelItems.push(projectItem);
-    });
-    yield put(updateItemsByLabels(labelItems));
+    if (type === ProjectItemUIType.LABEL) {
+      const labelItems: ProjectItems[] = [];
+      state.label.items.forEach((projectItem: ProjectItems) => {
+        projectItem = {...projectItem};
+        if (projectItem.notes) {
+          projectItem.notes = projectItem.notes.filter(
+              (note) => note.id !== noteId
+          );
+        }
+        labelItems.push(projectItem);
+      });
+      yield put(updateItemsByLabels(labelItems));
+    }
 
-    const notesByOwner = state.note.notesByOwner.filter((n) => n.id !== noteId);
-    yield put(
-      notesActions.notesByOwnerReceived({
-        notesByOwner: notesByOwner,
-      })
-    );
+    if (type === ProjectItemUIType.OWNER) {
+      const notesByOwner = state.note.notesByOwner.filter((n) => n.id !== noteId);
+      yield put(
+          notesActions.notesByOwnerReceived({
+            notesByOwner: notesByOwner,
+          })
+      );
+    }
 
-    const notesByOrder = state.note.notesByOrder.filter((n) => n.id !== noteId);
-    yield put(
-      notesActions.notesByOrderReceived({
-        notesByOrder: notesByOrder,
-      })
-    );
+    if (type === ProjectItemUIType.ORDER) {
+      const notesByOrder = state.note.notesByOrder.filter((n) => n.id !== noteId);
+      yield put(
+          notesActions.notesByOrderReceived({
+            notesByOrder: notesByOrder,
+          })
+      );
+    }
+
+    if (type === ProjectItemUIType.RECENT) {
+      const recentItems = state.recent.items.filter((t) => t.contentType !== ContentType.NOTE || t.id !== noteId);
+      yield put(recentItemsReceived(recentItems));
+    }
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
   }
@@ -349,7 +363,7 @@ function* notesDelete(action: PayloadAction<DeleteNotes>) {
     yield put(notesActions.noteReceived({ note: undefined }));
     const state: IState = yield select();
 
-    if (type === 'owner') {
+    if (type === ProjectItemUIType.OWNER) {
       const notesByOwner = state.note.notesByOwner.filter(
         (n) => !notesId.includes(n.id)
       );
@@ -360,7 +374,7 @@ function* notesDelete(action: PayloadAction<DeleteNotes>) {
       );
     }
 
-    if (type === 'order') {
+    if (type === ProjectItemUIType.ORDER) {
       const notesByOrder = state.note.notesByOrder.filter(
         (n) => !notesId.includes(n.id)
       );

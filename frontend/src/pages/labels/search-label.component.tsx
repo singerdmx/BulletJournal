@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { Button, Divider, Form, PageHeader, Select, Tooltip } from 'antd';
-import { Label } from '../../features/label/interface';
-import { getItemsByLabels } from '../../features/label/actions';
-import { IState } from '../../store';
-import { SearchOutlined } from '@ant-design/icons';
-import { ProjectItems } from '../../features/myBuJo/interface';
+import React, {useEffect} from 'react';
+import {connect} from 'react-redux';
+import {Button, Divider, Form, PageHeader, Select, Tooltip} from 'antd';
+import {Label} from '../../features/label/interface';
+import {getItemsByLabels} from '../../features/label/actions';
+import {IState} from '../../store';
+import {SearchOutlined} from '@ant-design/icons';
+import {ProjectItems} from '../../features/myBuJo/interface';
 import ProjectModelItems from '../../components/project-item/project-model-items.component';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 type LabelSearchProps = {
   labelOptions: Label[];
@@ -80,6 +81,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = (props) => {
         <ProjectModelItems
           projectItems={props.items}
           completeOnlyOccurrence={false}
+          type={ProjectItemUIType.LABEL}
         />
       </div>
     </div>

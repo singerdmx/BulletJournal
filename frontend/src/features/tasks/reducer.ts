@@ -4,6 +4,7 @@ import { History } from 'history';
 import { User } from '../group/interface';
 import { Content } from '../myBuJo/interface';
 import { ProjectItemSharables, SharableLink } from '../system/interface';
+import {ProjectItemUIType} from "../project/constants";
 
 export type TaskApiErrorAction = {
   error: string;
@@ -84,16 +85,23 @@ export type PutTask = {
 
 export type DeleteTask = {
   taskId: number;
+  type: ProjectItemUIType;
+};
+
+export type DeleteCompleteTask = {
+  taskId: number;
 };
 
 export type DeleteTasks = {
   projectId: number;
   tasksId: number[];
+  type: ProjectItemUIType;
 };
 
 export type CompleteTasks = {
   projectId: number;
   tasksId: number[];
+  type: ProjectItemUIType;
 };
 
 export type MoveTask = {
@@ -141,6 +149,7 @@ export type PatchTask = {
 
 export type CompleteTask = {
   taskId: number;
+  type: ProjectItemUIType;
   dateTime?: string;
 };
 
@@ -321,7 +330,7 @@ const slice = createSlice({
     TaskDelete: (state, action: PayloadAction<DeleteTask>) => state,
     TasksDelete: (state, action: PayloadAction<DeleteTasks>) => state,
     TasksComplete: (state, action: PayloadAction<CompleteTasks>) => state,
-    CompletedTaskDelete: (state, action: PayloadAction<DeleteTask>) => state,
+    CompletedTaskDelete: (state, action: PayloadAction<DeleteCompleteTask>) => state,
     TaskPatch: (state, action: PayloadAction<PatchTask>) => state,
     TaskComplete: (state, action: PayloadAction<CompleteTask>) => state,
     TaskUncomplete: (state, action: PayloadAction<UncompleteTask>) => state,

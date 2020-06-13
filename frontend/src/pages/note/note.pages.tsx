@@ -1,27 +1,18 @@
 // page display contents of notes
 // react imports
-import React, { useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {connect} from 'react-redux';
 // features
 //actions
-import {
-  deleteNote,
-  getNote,
-  updateNoteContents,
-} from '../../features/notes/actions';
+import {deleteNote, getNote, updateNoteContents,} from '../../features/notes/actions';
 
-import { IState } from '../../store';
+import {IState} from '../../store';
 // components
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
-import { Button, Popconfirm, Tooltip } from 'antd';
-import {
-  DeleteTwoTone,
-  PlusCircleTwoTone,
-  UpSquareOutlined,
-  SyncOutlined,
-} from '@ant-design/icons';
+import {Button, Popconfirm, Tooltip} from 'antd';
+import {DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined,} from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -29,13 +20,13 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
-import { ProjectType } from '../../features/project/constants';
-import NoteDetailPage, { NoteProps } from './note-detail.pages';
+import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
+import NoteDetailPage, {NoteProps} from './note-detail.pages';
 import LabelManagement from '../project/label-management.compoent';
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
-  deleteNote: (noteId: number) => void;
+  deleteNote: (noteId: number, type: ProjectItemUIType) => void;
   updateNoteContents: (noteId: number) => void;
 }
 
@@ -120,7 +111,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
             okText='Yes'
             cancelText='No'
             onConfirm={() => {
-              deleteNote(note.id);
+              deleteNote(note.id, ProjectItemUIType.PAGE);
               history.goBack();
             }}
             className='group-setting'

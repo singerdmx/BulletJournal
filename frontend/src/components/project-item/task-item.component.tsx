@@ -23,7 +23,7 @@ import { Label, stringToRGB } from '../../features/label/interface';
 import moment from 'moment-timezone';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
-import { ProjectType } from '../../features/project/constants';
+import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
 import { convertToTextWithRRule } from '../../features/recurrence/actions';
 import {
   getIcon,
@@ -41,13 +41,14 @@ type ProjectProps = {
 
 type ManageTaskProps = {
   task: Task;
+  type: ProjectItemUIType;
   inModal?: boolean;
   isComplete: boolean;
   completeOnlyOccurrence: boolean;
   uncompleteTask: (taskId: number) => void;
-  completeTask: (taskId: number, dateTime?: string) => void;
+  completeTask: (taskId: number, type: ProjectItemUIType, dateTime?: string) => void;
   deleteCompletedTask: (taskId: number) => void;
-  deleteTask: (taskId: number) => void;
+  deleteTask: (taskId: number, type: ProjectItemUIType) => void;
 };
 
 type TaskProps = {
@@ -57,6 +58,7 @@ type TaskProps = {
 const ManageTask: React.FC<ManageTaskProps> = (props) => {
   const {
     task,
+    type,
     inModal,
     isComplete,
     completeOnlyOccurrence,
@@ -94,9 +96,9 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
 
   const handleCompleteTaskClick = () => {
     if (completeOnlyOccurrence) {
-      completeTask(task.id, task.dueDate + ' ' + task.dueTime);
+      completeTask(task.id, type,task.dueDate + ' ' + task.dueTime);
     } else {
-      completeTask(task.id);
+      completeTask(task.id, type);
     }
   };
 
@@ -114,7 +116,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
           title='Deleting Task also deletes its child tasks. Are you sure?'
           okText='Yes'
           cancelText='No'
-          onConfirm={() => deleteTask(task.id)}
+          onConfirm={() => deleteTask(task.id, type)}
           className='group-setting'
           placement='bottom'
         >
@@ -151,7 +153,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
         title='Deleting Task also deletes its child tasks. Are you sure?'
         okText='Yes'
         cancelText='No'
-        onConfirm={() => deleteTask(task.id)}
+        onConfirm={() => deleteTask(task.id, type)}
         className='group-setting'
         placement='bottom'
       >
@@ -268,6 +270,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
         content={
           <ManageTask
             task={task}
+            type={type}
             inModal={inModal}
             isComplete={isComplete}
             completeOnlyOccurrence={completeOnlyOccurrence}
@@ -289,6 +292,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   const {
     task,
+    type,
     inProject,
     inModal,
     isComplete,

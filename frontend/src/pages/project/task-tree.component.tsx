@@ -1,23 +1,19 @@
-import React, { useEffect } from 'react';
-import { List, Divider, Tree, Empty, Tooltip, Button, Result } from 'antd';
-import { Task } from '../../features/tasks/interface';
+import React, {useEffect} from 'react';
+import {Button, Divider, Empty, List, Result, Tooltip, Tree} from 'antd';
+import {Task} from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
-import { TreeNodeNormal } from 'antd/lib/tree/Tree';
+import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import ReactLoading from 'react-loading';
-import {
-  putTask,
-  updateTasks,
-  updateCompletedTasks,
-} from '../../features/tasks/actions';
-import { connect } from 'react-redux';
-import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { CloudSyncOutlined, SearchOutlined } from '@ant-design/icons';
+import {putTask, updateCompletedTasks, updateTasks,} from '../../features/tasks/actions';
+import {connect} from 'react-redux';
+import {IState} from '../../store';
+import {Project} from '../../features/project/interface';
+import {CarryOutOutlined, CloudSyncOutlined, SearchOutlined} from '@ant-design/icons';
 import './task.styles.less';
-import { User } from '../../features/group/interface';
-import { useHistory } from 'react-router-dom';
+import {User} from '../../features/group/interface';
+import {useHistory} from 'react-router-dom';
 import AddTask from '../../components/modals/add-task.component';
-import { CarryOutOutlined } from '@ant-design/icons';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 type TasksProps = {
   showCompletedTask: boolean;
@@ -59,6 +55,7 @@ const getTree = (
     node.title = (
       <TreeItem
         task={item}
+        type={ProjectItemUIType.PROJECT}
         isComplete={false}
         readOnly={readOnly}
         inProject={inProject}
@@ -224,6 +221,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
                   <List.Item key={task.id}>
                     <TreeItem
                       task={task}
+                      type={ProjectItemUIType.COMPLETE_TASK}
                       isComplete={true}
                       readOnly={readOnly}
                       inProject={false}
