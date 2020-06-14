@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 import {
   AlertOutlined,
@@ -11,7 +11,6 @@ import {
 import {
   getReminderSettingString,
   Task,
-  TaskStatus,
   getTaskBackgroundColor,
 } from '../../features/tasks/interface';
 import { connect } from 'react-redux';

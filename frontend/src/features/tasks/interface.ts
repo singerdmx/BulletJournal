@@ -81,6 +81,7 @@ export const getTaskBackgroundColor = (
           };
         }
       }
+      break;
     case 'DARK':
       switch (taskStatus) {
         case TaskStatus.IN_PROGRESS: {

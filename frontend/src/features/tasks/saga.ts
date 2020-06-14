@@ -880,7 +880,7 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
   try {
     const state: IState = yield select();
     const { taskId, taskStatus } = action.payload;
-    yield call(setTaskStatusApi, taskId, taskStatus);
+    const data = yield call(setTaskStatusApi, taskId, taskStatus);
 
     let updateTask = {} as Task;
     let stateTask = state.task.task;
@@ -889,17 +889,24 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
       yield put(tasksActions.taskReceived({ task: updateTask }));
     }
 
-    let updateTasks = [] as Task[];
-    let stateTasks = state.task.tasks;
-    stateTasks.forEach((t) => {
-      let task = { ...t };
-      if (t.id === taskId) task.status = taskStatus;
-      updateTasks.push(task);
-    });
+    const tasks = yield data.json();
+    yield put(
+        tasksActions.tasksReceived({
+          tasks: tasks,
+        })
+    );
 
-    yield put(tasksActions.tasksReceived({ tasks: updateTasks }));
+    //get etag from header
+    const etag = data.headers.get('Etag')!;
+    const systemState = state.system;
+    yield put(
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag,
+        })
+    );
   } catch (error) {
-    yield call(message.error, `set Task Error Received: ${error}`);
+    yield call(message.error, `set Task Status Error Received: ${error}`);
   }
 }
 
