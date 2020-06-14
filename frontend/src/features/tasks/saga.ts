@@ -1,11 +1,12 @@
-import {all, call, put, select, takeLatest} from 'redux-saga/effects';
-import {message} from 'antd';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
+import { message } from 'antd';
 import {
   actions as tasksActions,
   CompleteTask,
   CompleteTasks,
   CreateContent,
-  CreateTask, DeleteCompleteTask,
+  CreateTask,
+  DeleteCompleteTask,
   DeleteContent,
   DeleteTask,
   DeleteTasks,
@@ -29,7 +30,7 @@ import {
   UpdateTaskContents,
   UpdateTasks,
 } from './reducer';
-import {PayloadAction} from 'redux-starter-kit';
+import { PayloadAction } from 'redux-starter-kit';
 import {
   addContent,
   completeTaskById,
@@ -57,16 +58,20 @@ import {
   updateContent,
   updateTask,
 } from '../../apis/taskApis';
-import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
-import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
-import {IState} from '../../store';
-import {Content, ProjectItems, Revision} from '../myBuJo/interface';
-import {updateItemsByLabels} from '../label/actions';
-import {actions as SystemActions} from '../system/reducer';
-import {completedTaskPageSize, ProjectItemUIType} from '../project/constants';
-import {Task} from './interface';
-import {recentItemsReceived} from "../recent/actions";
-import {ContentType} from "../myBuJo/constants";
+import {
+  updateLoadingCompletedTask,
+  updateTaskContents,
+  updateTasks,
+} from './actions';
+import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
+import { IState } from '../../store';
+import { Content, ProjectItems, Revision } from '../myBuJo/interface';
+import { updateItemsByLabels } from '../label/actions';
+import { actions as SystemActions } from '../system/reducer';
+import { completedTaskPageSize, ProjectItemUIType } from '../project/constants';
+import { Task } from './interface';
+import { recentItemsReceived } from '../recent/actions';
+import { ContentType } from '../myBuJo/constants';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -336,86 +341,88 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
       const data = yield call(fetchTasks, task.projectId);
       const tasks = yield data.json();
       yield put(
-          tasksActions.tasksReceived({
-            tasks: tasks,
-          })
+        tasksActions.tasksReceived({
+          tasks: tasks,
+        })
       );
 
       //get etag from header
       const etag = data.headers.get('Etag')!;
       const systemState = state.system;
       yield put(
-          SystemActions.systemUpdateReceived({
-            ...systemState,
-            tasksEtag: etag,
-          })
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag,
+        })
       );
 
       const completedTaskPageNo = state.task.completedTaskPageNo;
       if (completedTaskPageNo > 0) {
         const completedTasks = yield call(
-            fetchCompletedTasks,
-            task.projectId,
-            0,
-            completedTaskPageNo * completedTaskPageSize
+          fetchCompletedTasks,
+          task.projectId,
+          0,
+          completedTaskPageNo * completedTaskPageSize
         );
         yield put(
-            tasksActions.completedTasksReceived({
-              tasks: completedTasks,
-            })
+          tasksActions.completedTasksReceived({
+            tasks: completedTasks,
+          })
         );
         const tasks = yield call(
-            fetchCompletedTasks,
-            task.projectId,
-            completedTaskPageNo,
-            completedTaskPageSize
+          fetchCompletedTasks,
+          task.projectId,
+          completedTaskPageNo,
+          completedTaskPageSize
         );
         yield put(
-            tasksActions.nextCompletedTasksReceived({
-              tasks: tasks,
-            })
+          tasksActions.nextCompletedTasksReceived({
+            tasks: tasks,
+          })
         );
       }
     }
 
     if (type === ProjectItemUIType.TODAY) {
       yield put(
-          getProjectItemsAfterUpdateSelect(
-              state.myBuJo.todoSelected,
-              state.myBuJo.ledgerSelected,
-              state.myBuJo.noteSelected,
-              'today'
-          )
+        getProjectItemsAfterUpdateSelect(
+          state.myBuJo.todoSelected,
+          state.myBuJo.ledgerSelected,
+          state.myBuJo.noteSelected,
+          'today'
+        )
       );
     }
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-          (t) => t.id !== taskId
+        (t) => t.id !== taskId
       );
       yield put(
-          tasksActions.tasksByAssigneeReceived({
-            tasksByAssignee: tasksByAssignee,
-          })
+        tasksActions.tasksByAssigneeReceived({
+          tasksByAssignee: tasksByAssignee,
+        })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
-      const tasksByOrder = state.task.tasksByOrder.filter((t) => t.id !== taskId);
+      const tasksByOrder = state.task.tasksByOrder.filter(
+        (t) => t.id !== taskId
+      );
       yield put(
-          tasksActions.tasksByOrderReceived({
-            tasksByOrder: tasksByOrder,
-          })
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
       );
     }
 
     if (type === ProjectItemUIType.LABEL) {
       const labelItems: ProjectItems[] = [];
       state.label.items.forEach((projectItem: ProjectItems) => {
-        projectItem = {...projectItem};
+        projectItem = { ...projectItem };
         if (projectItem.tasks) {
           projectItem.tasks = projectItem.tasks.filter(
-              (task) => task.id !== taskId
+            (task) => task.id !== taskId
           );
         }
         labelItems.push(projectItem);
@@ -424,7 +431,9 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
     }
 
     if (type === ProjectItemUIType.RECENT) {
-      const recentItems = state.recent.items.filter((t) => t.contentType !== ContentType.TASK || t.id !== taskId);
+      const recentItems = state.recent.items.filter(
+        (t) => t.contentType !== ContentType.TASK || t.id !== taskId
+      );
       yield put(recentItemsReceived(recentItems));
     }
   } catch (error) {
@@ -506,22 +515,22 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
 
     if (type === ProjectItemUIType.TODAY) {
       yield put(
-          getProjectItemsAfterUpdateSelect(
-              state.myBuJo.todoSelected,
-              state.myBuJo.ledgerSelected,
-              state.myBuJo.noteSelected,
-              'today'
-          )
+        getProjectItemsAfterUpdateSelect(
+          state.myBuJo.todoSelected,
+          state.myBuJo.ledgerSelected,
+          state.myBuJo.noteSelected,
+          'today'
+        )
       );
     }
 
     if (type === ProjectItemUIType.LABEL) {
       const labelItems: ProjectItems[] = [];
       state.label.items.forEach((projectItem: ProjectItems) => {
-        projectItem = {...projectItem};
+        projectItem = { ...projectItem };
         if (projectItem.tasks) {
           projectItem.tasks = projectItem.tasks.filter(
-              (task) => task.id !== taskId
+            (task) => task.id !== taskId
           );
         }
         labelItems.push(projectItem);
@@ -531,26 +540,30 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-          (t) => t.id !== taskId
+        (t) => t.id !== taskId
       );
       yield put(
-          tasksActions.tasksByAssigneeReceived({
-            tasksByAssignee: tasksByAssignee,
-          })
+        tasksActions.tasksByAssigneeReceived({
+          tasksByAssignee: tasksByAssignee,
+        })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
-      const tasksByOrder = state.task.tasksByOrder.filter((t) => t.id !== taskId);
+      const tasksByOrder = state.task.tasksByOrder.filter(
+        (t) => t.id !== taskId
+      );
       yield put(
-          tasksActions.tasksByOrderReceived({
-            tasksByOrder: tasksByOrder,
-          })
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
       );
     }
 
     if (type === ProjectItemUIType.RECENT) {
-      const recentItems = state.recent.items.filter((t) => t.contentType !== ContentType.TASK || t.id !== taskId);
+      const recentItems = state.recent.items.filter(
+        (t) => t.contentType !== ContentType.TASK || t.id !== taskId
+      );
       yield put(recentItemsReceived(recentItems));
     }
   } catch (error) {
@@ -576,23 +589,23 @@ function* deleteTasks(action: PayloadAction<DeleteTasks>) {
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-          (t) => !tasksId.includes(t.id)
+        (t) => !tasksId.includes(t.id)
       );
       yield put(
-          tasksActions.tasksByAssigneeReceived({
-            tasksByAssignee: tasksByAssignee,
-          })
+        tasksActions.tasksByAssigneeReceived({
+          tasksByAssignee: tasksByAssignee,
+        })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
       const tasksByOrder = state.task.tasksByOrder.filter(
-          (t) => !tasksId.includes(t.id)
+        (t) => !tasksId.includes(t.id)
       );
       yield put(
-          tasksActions.tasksByOrderReceived({
-            tasksByOrder: tasksByOrder,
-          })
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
       );
     }
   } catch (error) {
@@ -623,23 +636,23 @@ function* completeTasks(action: PayloadAction<CompleteTasks>) {
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-          (t) => !tasksId.includes(t.id)
+        (t) => !tasksId.includes(t.id)
       );
       yield put(
-          tasksActions.tasksByAssigneeReceived({
-            tasksByAssignee: tasksByAssignee,
-          })
+        tasksActions.tasksByAssigneeReceived({
+          tasksByAssignee: tasksByAssignee,
+        })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
       const tasksByOrder = state.task.tasksByOrder.filter(
-          (t) => !tasksId.includes(t.id)
+        (t) => !tasksId.includes(t.id)
       );
       yield put(
-          tasksActions.tasksByOrderReceived({
-            tasksByOrder: tasksByOrder,
-          })
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
       );
     }
   } catch (error) {
@@ -865,8 +878,29 @@ function* patchContent(action: PayloadAction<PatchContent>) {
 
 function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
   try {
+    const state: IState = yield select();
     const { taskId, taskStatus } = action.payload;
     yield call(setTaskStatusApi, taskId, taskStatus);
+
+    let updateTask = {} as Task;
+    let stateTask = state.task.task;
+    if (stateTask) {
+      updateTask = { ...stateTask, status: taskStatus };
+      yield put(tasksActions.taskReceived({ task: updateTask }));
+    }
+
+    let updateTasks = [] as Task[];
+    let stateTasks = state.task.tasks;
+    stateTasks.forEach((t) => {
+      let task = { ...t };
+      updateTasks.push(task);
+    });
+
+    updateTasks.map((t) => {
+      if (t.id === taskId) t.status = taskStatus;
+      return t;
+    });
+    yield put(tasksActions.tasksReceived({ tasks: updateTasks }));
   } catch (error) {
     yield call(message.error, `set Task Error Received: ${error}`);
   }
