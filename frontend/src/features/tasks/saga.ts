@@ -893,13 +893,10 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
     let stateTasks = state.task.tasks;
     stateTasks.forEach((t) => {
       let task = { ...t };
+      if (t.id === taskId) task.status = taskStatus;
       updateTasks.push(task);
     });
 
-    updateTasks.map((t) => {
-      if (t.id === taskId) t.status = taskStatus;
-      return t;
-    });
     yield put(tasksActions.tasksReceived({ tasks: updateTasks }));
   } catch (error) {
     yield call(message.error, `set Task Error Received: ${error}`);
