@@ -72,26 +72,41 @@ public class QueryController {
      * <p>
      * Validate search results before response. If result is invalid, remove search index from
      * elastic search database and skip this result in the response.
+     * <p>
+     * SearchResult Model Structure
+     * - String ProjectItem Id
+     * - String ProjectItem Type
+     * - String ProjectItem Name
+     * - List[String] HighLights of Name
+     * - List[String] HighLights of Content
      *
      * @param term user input term to be searched in Elastic Search DB
-     * @return a list of returned SearchResult. Each search result contains id and list of highlights
-     * <p>
-     * SearchResult {
-     * String ProjectItem Id
-     * String ProjectItem Type
-     * String ProjectItem Name
-     * List[String] HighLights of Name
-     * List[String] HighLights of Content
-     * }
+     * @return a list of returned SearchResult. Search result contains id and matched highlights
      */
     @GetMapping(SEARCH_ROUTE)
     @ResponseStatus(HttpStatus.OK)
     public List<SearchResult> search(@Valid @RequestParam @NotBlank String term) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
+        List<SearchIndex> invalidResults = new ArrayList<>();
+        List<SearchResult> validResults = search(term, username, invalidResults);
+
+        // Batch remove all invalid results from ElasticSearch
+        searchService.removeInvalidSearchResults(invalidResults);
+        return validResults;
+    }
+
+    /**
+     * Search requested term in elastic search and add invalid results to invalid list
+     *
+     * @param term     requested term
+     * @param username requester username
+     * @param invalid  list of invalid search indices
+     * @return a list of search results with unique id
+     */
+    private List<SearchResult> search(String term, String username, List<SearchIndex> invalid) {
         // Created a Map to group search result to the same id
         Map<String, SearchResult> results = new HashMap<>();
-        List<SearchIndex> invalidResults = new ArrayList<>();
 
         searchIndexDaoJpa.search(username, term).getSearchHits().forEach(searchHit -> {
             SearchIndex index = searchHit.getContent();
@@ -101,7 +116,7 @@ public class QueryController {
             // If search result is not present in database, add result to invalid results list
             String projectItemName = validateSearchResult(index, username);
             if (projectItemName == null) {
-                invalidResults.add(index);
+                invalid.add(index);
                 return;
             }
 
@@ -118,6 +133,7 @@ public class QueryController {
             Map<String, List<String>> highlights = searchHit.getHighlightFields();
 
             if (isContent) {
+                // If matched search result is content, set content highlights
                 highlights.keySet().forEach(k -> searchResult.addOrDefaultContentHighlights(highlights.get(k)));
             } else {
                 highlights.keySet().forEach(k -> searchResult.addOrDefaultNameHighlights(highlights.get(k)));
@@ -125,9 +141,6 @@ public class QueryController {
 
             results.put(projectItemId, searchResult);
         });
-
-        // Batch remove all invalid results from ElasticSearch
-        searchService.removeInvalidSearchResults(invalidResults);
         return new ArrayList<>(results.values());
     }
 
@@ -161,7 +174,7 @@ public class QueryController {
                 searchIndexId = parseSearchIndexInfo(searchIndex.getParentId()).getSecond();
             }
 
-            // If resource not found or null pointer exception is thrown, program will return null
+            // If ResourceNotFound or NullPointer exception is thrown, return null
             return projectItemDaoJpa.getProjectItem(searchIndexId, username).getName();
         } catch (Exception ex) {
             return null;
