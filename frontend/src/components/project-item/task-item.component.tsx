@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 import {
   AlertOutlined,
@@ -8,7 +8,12 @@ import {
   DeleteTwoTone,
   MoreOutlined,
 } from '@ant-design/icons';
-import { getReminderSettingString, Task } from '../../features/tasks/interface';
+import {
+  getReminderSettingString,
+  Task,
+  TaskStatus,
+  getTaskBackgroundColor,
+} from '../../features/tasks/interface';
 import { connect } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import {
@@ -23,7 +28,10 @@ import { Label, stringToRGB } from '../../features/label/interface';
 import moment from 'moment-timezone';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
-import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
+import {
+  ProjectItemUIType,
+  ProjectType,
+} from '../../features/project/constants';
 import { convertToTextWithRRule } from '../../features/recurrence/actions';
 import {
   getIcon,
@@ -31,9 +39,11 @@ import {
 } from '../draggable-labels/draggable-label-list.component';
 import { setSelectedLabel } from '../../features/label/actions';
 import { User } from '../../features/group/interface';
+import { IState } from '../../store';
 
 type ProjectProps = {
   readOnly: boolean;
+  theme: string;
   setSelectedLabel: (label: Label) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
@@ -46,7 +56,11 @@ type ManageTaskProps = {
   isComplete: boolean;
   completeOnlyOccurrence: boolean;
   uncompleteTask: (taskId: number) => void;
-  completeTask: (taskId: number, type: ProjectItemUIType, dateTime?: string) => void;
+  completeTask: (
+    taskId: number,
+    type: ProjectItemUIType,
+    dateTime?: string
+  ) => void;
   deleteCompletedTask: (taskId: number) => void;
   deleteTask: (taskId: number, type: ProjectItemUIType) => void;
 };
@@ -96,7 +110,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
 
   const handleCompleteTaskClick = () => {
     if (completeOnlyOccurrence) {
-      completeTask(task.id, type,task.dueDate + ' ' + task.dueTime);
+      completeTask(task.id, type, task.dueDate + ' ' + task.dueTime);
     } else {
       completeTask(task.id, type);
     }
@@ -292,6 +306,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   const {
     task,
+    theme,
     type,
     inProject,
     inModal,
@@ -379,7 +394,10 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   };
 
   return (
-    <div className='project-item'>
+    <div
+      className='project-item'
+      style={getTaskBackgroundColor(task.status, theme)}
+    >
       <div className='project-item-content'>
         <Link to={taskLink}>
           <h3 className={taskStyle}>
@@ -413,9 +431,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip
-            title={`Created by ${task.owner.alias}`}
-          >
+          <Tooltip title={`Created by ${task.owner.alias}`}>
             {getAvatar(task.owner)}
           </Tooltip>
         </div>
@@ -430,8 +446,10 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     </div>
   );
 };
-
-export default connect(null, {
+const mapStateToProps = (state: IState) => ({
+  theme: state.myself.theme,
+});
+export default connect(mapStateToProps, {
   completeTask,
   uncompleteTask,
   deleteTask,
