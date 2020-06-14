@@ -884,7 +884,7 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
 
     let updateTask = {} as Task;
     let stateTask = state.task.task;
-    if (stateTask) {
+    if (stateTask && stateTask.id === taskId) {
       updateTask = { ...stateTask, status: taskStatus };
       yield put(tasksActions.taskReceived({ task: updateTask }));
     }
