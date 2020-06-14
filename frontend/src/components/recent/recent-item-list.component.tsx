@@ -1,20 +1,20 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import moment from 'moment';
-import {ContentType, dateFormat} from '../../features/myBuJo/constants';
-import {DatePicker, Divider, Tooltip} from 'antd';
-import {Link} from 'react-router-dom';
-import {IState} from '../../store';
-import {connect} from 'react-redux';
-import {updateRecentItemsDates} from '../../features/recent/actions';
-import {updateExpandedMyself} from '../../features/myself/actions';
-import {ProjectItem} from '../../features/myBuJo/interface';
+import { ContentType, dateFormat } from '../../features/myBuJo/constants';
+import { DatePicker, Divider, Tooltip } from 'antd';
+import { Link } from 'react-router-dom';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import { updateRecentItemsDates } from '../../features/recent/actions';
+import { updateExpandedMyself } from '../../features/myself/actions';
+import { ProjectItem } from '../../features/myBuJo/interface';
 import TaskItem from '../project-item/task-item.component';
 import NoteItem from '../project-item/note-item.component';
-import {Task} from '../../features/tasks/interface';
-import {Note} from '../../features/notes/interface';
+import { Task } from '../../features/tasks/interface';
+import { Note } from '../../features/notes/interface';
 import TransactionItem from '../project-item/transaction-item.component';
-import {Transaction} from '../../features/transactions/interface';
-import {ProjectItemUIType} from "../../features/project/constants";
+import { Transaction } from '../../features/transactions/interface';
+import { ProjectItemUIType } from '../../features/project/constants';
 
 const { RangePicker } = DatePicker;
 
@@ -43,6 +43,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
 }) => {
   useEffect(() => {
     updateExpandedMyself(true);
+    if (timezone) updateRecentItemsDates(startDate, endDate);
   }, []);
 
   const handleRangeChange = (dates: any, dateStrings: string[]) => {
