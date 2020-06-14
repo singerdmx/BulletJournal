@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SearchResult {
     private Long id;
-    private String type;
+    private ProjectItemType type;
     private String name;
     private List<String> nameHighlights;
     private List<String> contentHighlights;
@@ -20,11 +20,11 @@ public class SearchResult {
         this.id = id;
     }
 
-    public String getType() {
+    public ProjectItemType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ProjectItemType type) {
         this.type = type;
     }
 

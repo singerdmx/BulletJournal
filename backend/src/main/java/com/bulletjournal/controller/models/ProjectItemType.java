@@ -24,6 +24,19 @@ public enum ProjectItemType {
         }
     }
 
+    public static ProjectItemType getType(String type) {
+        switch (type.toLowerCase()) {
+            case "task":
+                return TASK;
+            case "note":
+                return NOTE;
+            case "TRANSACTION":
+                return TRANSACTION;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public int getValue() {
         return this.value;
     }

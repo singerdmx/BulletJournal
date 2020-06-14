@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.ProjectItemType;
 import com.bulletjournal.controller.models.SearchResult;
 import com.bulletjournal.es.SearchService;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
@@ -125,7 +126,7 @@ public class QueryController {
             // Check if map contains search result that has the same id.
             // If yes, reuse the same search result. Otherwise, create a new search result instance.
             SearchResult searchResult = results.getOrDefault(projectItemId, new SearchResult());
-            searchResult.setType(identifierPair.getFirst());
+            searchResult.setType(ProjectItemType.getType(identifierPair.getFirst()));
             searchResult.setId(identifierPair.getSecond());
             searchResult.setName(projectItemName);
 
