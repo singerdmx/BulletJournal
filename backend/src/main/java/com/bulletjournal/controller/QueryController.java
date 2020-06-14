@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,84 +49,131 @@ public class QueryController {
     private NoteDaoJpa noteDaoJpa;
 
     /**
+     * Parse Search Index identifier into type and id
+     *
+     * @param searchIndexInfo search index information
+     * @return a pair of type and id
+     */
+    private static Pair<String, Long> parseSearchIndexInfo(String searchIndexInfo) {
+        String type = searchIndexInfo.substring(0, searchIndexInfo.indexOf(SEARCH_INDEX_SPLITTER));
+        String id = searchIndexInfo.substring(searchIndexInfo.indexOf(SEARCH_INDEX_SPLITTER) + 1);
+
+        if (StringUtils.isBlank(type) || StringUtils.isBlank(id)) {
+            LOGGER.error("QueryController failed to parse search index information");
+            throw new IllegalStateException("Search Index Format is wrong");
+        }
+
+        return Pair.of(type, Long.parseLong(id));
+    }
+
+    /**
      * [Query Controller Search API] (Fuzziness Search)
-     * Search API takes a string of term and send a search query to Elastic Search JPA with
-     * requested term and username.
+     * Search API takes a string of term and username to query results from Elastic Search JPA.
      * <p>
      * Validate search results before response. If result is invalid, remove search index from
-     * elastic search database and skip this result.
+     * elastic search database and skip this result in the response.
      *
      * @param term user input term to be searched in Elastic Search DB
      * @return a list of returned SearchResult. Each search result contains id and list of highlights
+     * <p>
+     * SearchResult {
+     * String ProjectItem Id
+     * String ProjectItem Type
+     * String ProjectItem Name
+     * List[String] HighLights of Name
+     * List[String] HighLights of Content
+     * }
      */
     @GetMapping(SEARCH_ROUTE)
     @ResponseStatus(HttpStatus.OK)
     public List<SearchResult> search(@Valid @RequestParam @NotBlank String term) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
-        List<SearchResult> results = new ArrayList<>();
+        // Created a Map to group search result to the same id
+        Map<String, SearchResult> results = new HashMap<>();
         List<SearchIndex> invalidResults = new ArrayList<>();
 
         searchIndexDaoJpa.search(username, term).getSearchHits().forEach(searchHit -> {
             SearchIndex index = searchHit.getContent();
+            boolean isContent = index.getParentId() != null;
+            String projectItemId = isContent ? index.getParentId() : index.getId();
 
-            // If search result is not present in db, add result to invalid results list
-            if (!searchResultExists(index, username)) {
+            // If search result is not present in database, add result to invalid results list
+            String projectItemName = validateSearchResult(index, username);
+            if (projectItemName == null) {
                 invalidResults.add(index);
                 return;
             }
-            SearchResult searchResult = new SearchResult();
-            searchResult.setId(index.getId());
+
+            Pair<String, Long> identifierPair = parseSearchIndexInfo(projectItemId);
+
+            // Check if map contains search result that has the same id.
+            // If yes, reuse the same search result. Otherwise, create a new search result instance.
+            SearchResult searchResult = results.getOrDefault(projectItemId, new SearchResult());
+            searchResult.setType(identifierPair.getFirst());
+            searchResult.setId(identifierPair.getSecond());
+            searchResult.setName(projectItemName);
 
             // Iterate through highlights and add them to Search Result Highlights
             Map<String, List<String>> highlights = searchHit.getHighlightFields();
-            for (String keyword : highlights.keySet()) {
-                searchResult.setOrDefaultHighlights(highlights.get(keyword));
+
+            if (isContent) {
+                highlights.keySet().forEach(k -> searchResult.addOrDefaultContentHighlights(highlights.get(k)));
+            } else {
+                highlights.keySet().forEach(k -> searchResult.addOrDefaultNameHighlights(highlights.get(k)));
             }
-            results.add(searchResult);
+
+            results.put(projectItemId, searchResult);
         });
 
         // Batch remove all invalid results from ElasticSearch
         searchService.removeInvalidSearchResults(invalidResults);
-        return results;
+        return new ArrayList<>(results.values());
     }
 
     /**
      * Validate search result still exists.
      * <p>
-     * If the "resource not found" exception thrown by DaoJpa, return false to indicate resource not exist.
-     * Otherwise, return true only if result is not null.
+     * 1. Determine the search index type.
+     * - If type is NAME, search id in project item repo
+     * - If type is CONTENT, search content in project content repo and search its parent in project item repo
+     * 2. Return project item name, if result is valid. Otherwise, return null.
      *
-     * @param searchIndex target search index
-     * @param username    requester username
-     * @return true if search result is valid
+     * @param searchIndex the target search index
+     * @param username    the requester username
+     * @return the project item name of the search index
      */
-    private boolean searchResultExists(SearchIndex searchIndex, String username) {
-        String searchIndexId = searchIndex.getId();
-        String type = searchIndexId.substring(0, searchIndexId.indexOf(SEARCH_INDEX_SPLITTER));
-        String id = searchIndexId.substring(searchIndexId.indexOf(SEARCH_INDEX_SPLITTER) + 1);
+    private String validateSearchResult(SearchIndex searchIndex, String username) {
+        Pair<String, Long> searchIndexPair = parseSearchIndexInfo(searchIndex.getId());
+        String searchIndexType = searchIndexPair.getFirst();
+        Long searchIndexId = searchIndexPair.getSecond();
 
-        if (StringUtils.isBlank(type) || StringUtils.isBlank(id)) {
-            throw new IllegalStateException("Search Index Format is Incorrect");
-        }
+        // If content type contains suffix as CONTENT
+        boolean isContent = searchIndexType.endsWith(CONTENT_TYPE_SUFFIX);
 
-        boolean isContent = type.endsWith(CONTENT_TYPE_SUFFIX);
-
-        ProjectItemDaoJpa projectItemDaoJpa = getProjectItemDao(type);
+        ProjectItemDaoJpa projectItemDaoJpa = getProjectItemDao(searchIndexType);
 
         try {
-            return isContent ? projectItemDaoJpa.getContent(Long.parseLong(id), username) != null :
-                    projectItemDaoJpa.getProjectItem(Long.parseLong(id), username) != null;
+            if (isContent) {
+                if (projectItemDaoJpa.getContent(searchIndexId, username) == null)
+                    return null;
+
+                searchIndexId = parseSearchIndexInfo(searchIndex.getParentId()).getSecond();
+            }
+
+            // If resource not found or null pointer exception is thrown, program will return null
+            return projectItemDaoJpa.getProjectItem(searchIndexId, username).getName();
         } catch (Exception ex) {
-            return false;
+            return null;
         }
     }
 
     /**
-     * Get ProjectItemDaoJpa based on input type
+     * Get ProjectItemDaoJpa based on input type.
+     * Both ProjectItem and ProjectItem content return the same DaoJpa.
      *
-     * @param type requested dao type
-     * @return ProjectItemDao instance
+     * @param type the requested dao type
+     * @return the ProjectItemDao instance
      */
     private ProjectItemDaoJpa getProjectItemDao(String type) {
         switch (type) {
@@ -138,6 +187,7 @@ public class QueryController {
             case "note_content":
                 return noteDaoJpa;
             default:
+                LOGGER.error("QueryController failed to get Project Item Dao");
                 throw new IllegalArgumentException("Cannot recognize input type");
         }
     }

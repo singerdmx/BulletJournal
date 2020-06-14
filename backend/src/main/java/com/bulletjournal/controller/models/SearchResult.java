@@ -3,33 +3,69 @@ package com.bulletjournal.controller.models;
 import java.util.List;
 
 public class SearchResult {
-    private String id;
-    private List<String> highlights;
+    private Long id;
+    private String type;
+    private String name;
+    private List<String> nameHighlights;
+    private List<String> contentHighlights;
 
     public SearchResult() {
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public List<String> getHighlights() {
-        return highlights;
+    public String getType() {
+        return type;
     }
 
-    public void setHighlights(List<String> highlights) {
-        this.highlights = highlights;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void setOrDefaultHighlights(List<String> highlights) {
-        if (this.highlights == null) {
-            setHighlights(highlights);
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<String> getNameHighlights() {
+        return nameHighlights;
+    }
+
+    public void setNameHighlights(List<String> highlights) {
+        this.nameHighlights = highlights;
+    }
+
+    public void addOrDefaultNameHighlights(List<String> highlights) {
+        if (this.nameHighlights == null) {
+            setNameHighlights(highlights);
             return;
         }
-        this.highlights.addAll(highlights);
+        this.nameHighlights.addAll(highlights);
     }
+
+    public List<String> getContentHighlights() {
+        return contentHighlights;
+    }
+
+    public void setContentHighlights(List<String> contentHighlights) {
+        this.contentHighlights = contentHighlights;
+    }
+
+    public void addOrDefaultContentHighlights(List<String> highlights) {
+        if (this.contentHighlights == null) {
+            setContentHighlights(highlights);
+            return;
+        }
+        this.contentHighlights.addAll(highlights);
+    }
+
 }
