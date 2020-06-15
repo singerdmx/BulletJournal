@@ -30,7 +30,7 @@ public enum ProjectItemType {
                 return TASK;
             case "note":
                 return NOTE;
-            case "TRANSACTION":
+            case "transaction":
                 return TRANSACTION;
             default:
                 throw new IllegalArgumentException();
