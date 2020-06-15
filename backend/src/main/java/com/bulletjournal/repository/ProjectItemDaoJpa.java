@@ -288,6 +288,11 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> List<T> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, List<Long> projectIds) {
         Map<Long, T> projectItemIdMap = new HashMap<>();
+
+        List<T> projectItemModels = this.findRecentProjectItemsBetween(startTime, endTime,
+                projectRepository.findAllById(projectIds));
+        projectItemModels.forEach(item -> projectItemIdMap.put(item.getId(), item));
+
         List<Object[]> projectItemJoinContentModels = this.findRecentProjectItemContentsBetween(startTime, endTime, projectIds);
         projectItemJoinContentModels.forEach(item -> {
             Long projectItemId = null;
@@ -299,14 +304,14 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                     mostRecentTime = (Timestamp) o;
                 }
             }
-            T projectItem = (T) this.getJpaRepository().findById(projectItemId).get();
-            projectItem.setUpdatedAt(mostRecentTime);
-            projectItemIdMap.put(projectItemId, projectItem);
+            if (!projectItemIdMap.containsKey(projectItemId)) {
+                T projectItem = (T) this.getJpaRepository().findById(projectItemId).get();
+                projectItem.setUpdatedAt(mostRecentTime);
+                projectItemIdMap.put(projectItemId, projectItem);
+            } else if (projectItemIdMap.get(projectItemId).getUpdatedAt().compareTo(mostRecentTime) == -1)
+                projectItemIdMap.get(projectItemId).setUpdatedAt(mostRecentTime);
         });
 
-        List<T> projectItemModels = this.findRecentProjectItemsBetween(startTime, endTime,
-                projectRepository.findAllById(projectIds));
-        projectItemModels.forEach(item -> projectItemIdMap.putIfAbsent(item.getId(), item));
 
         return new ArrayList<>(projectItemIdMap.values());
     }

@@ -656,9 +656,9 @@ public class ProjectItemControllerTest {
 
         assertNotNull(projectItems);
         assertEquals(4, projectItems.size());
-        assertEquals(p1.getId().intValue(), projectItems.get(0).get("projectId"));
-        assertEquals(p3.getId().intValue(), projectItems.get(1).get("projectId"));
-        assertEquals(p2.getId().intValue(), projectItems.get(2).get("projectId"));
+        assertEquals(p3.getId().intValue(), projectItems.get(0).get("projectId"));
+        assertEquals(p2.getId().intValue(), projectItems.get(1).get("projectId"));
+        assertEquals(p1.getId().intValue(), projectItems.get(2).get("projectId"));
         assertEquals(p1.getId().intValue(), projectItems.get(3).get("projectId"));
     }
 }
