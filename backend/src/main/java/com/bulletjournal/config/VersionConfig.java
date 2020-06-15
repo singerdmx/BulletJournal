@@ -4,7 +4,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "api")
 public class VersionConfig {
 
     private String version;
@@ -13,7 +12,7 @@ public class VersionConfig {
     }
 
     public String getVersion() {
-        return version;
+        return System.getenv("API_VERSION");
     }
 
     public void setVersion(String version) {
