@@ -31,3 +31,8 @@ Next, you can look into the `docker-compose.yml` for detailed config parameters.
 Open the browser and enter `https://localhost` to see the UI interface.
 Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the API documentation.
 
+```batch
+Windows Scripts
+./buildImage.bat
+./start.bat
+```
