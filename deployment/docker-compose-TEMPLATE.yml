@@ -26,6 +26,7 @@ services:
       - "8080:8080"
     environment:
       spring_profiles_active: prod
+      API_VERSION: BULLETJOURNAL_VERSION
       SSO_API_KEY: "${SSO_API_KEY}"
       AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
