@@ -27,6 +27,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -37,6 +39,9 @@ import java.util.stream.Collectors;
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
     private static final Gson GSON = new Gson();
+
+    @PersistenceContext
+    EntityManager entityManager;
     @Autowired
     private NoteRepository noteRepository;
     @Autowired
@@ -279,12 +284,27 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Override
-    List<Note> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
-        return this.noteRepository.findRecentNotesBetween(startTime, endTime);
+    List<Task> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, List projects) {
+        return this.noteRepository.findNotesBetween(startTime, endTime, projects);
     }
 
     @Override
-    List<NoteContent> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime) {
-        return this.noteContentRepository.findRecentNoteContentsBetween(startTime, endTime);
+    public List<Object[]> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime, List projectIds) {
+        StringBuilder queryBuilder = new StringBuilder(
+                "SELECT notes_join_note_contents.id, notes_join_note_contents.most_recent_time " +
+                        "FROM notes_join_note_contents " +
+                        "WHERE notes_join_note_contents.most_recent_time >= ? " +
+                        "AND notes_join_note_contents.most_recent_time <= ? " +
+                        "AND notes_join_note_contents.project_id IN (");
+        projectIds.stream().forEach(pi -> queryBuilder.append(pi).append(","));
+        int tail = queryBuilder.length() - 1;
+        if (queryBuilder.charAt(tail) == ',') {
+            queryBuilder.deleteCharAt(tail);
+        }
+        queryBuilder.append(")");
+        return entityManager.createNativeQuery(queryBuilder.toString())
+                .setParameter(1, startTime)
+                .setParameter(2, endTime)
+                .getResultList();
     }
 }

@@ -34,7 +34,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                                                               @Param("project") Project project, @Param("startTime") Timestamp startTime,
                                                               @Param("endTime") Timestamp endTime);
 
-    @Query("SELECT transaction FROM Transaction transaction WHERE transaction.updatedAt >= :startTime AND transaction.updatedAt <= :endTime")
-    List<Transaction> findRecentTransactionsBetween(@Param("startTime") Timestamp startTime,
-                                                    @Param("endTime") Timestamp endTime);
+
+    @Query(value = "SELECT transaction FROM Transaction transaction WHERE " +
+            "transaction.project IN (:projects) AND transaction.updatedAt >= :startTime AND transaction.updatedAt <= :endTime")
+    List<Transaction> findTransactionsBetween(@Param("startTime") Timestamp startTime,
+                                              @Param("endTime") Timestamp endTime,
+                                              @Param("projects") List<Project> projects);
 }

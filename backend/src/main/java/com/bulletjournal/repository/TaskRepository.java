@@ -39,14 +39,17 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee, @Param("startTime") String startTime,
                                           @Param("endTime") String endTime);
 
-    @Query("SELECT task FROM Task task WHERE task.updatedAt >= :startTime AND task.updatedAt <= :endTime")
-    List<Task> findRecentTasksBetween(@Param("startTime") Timestamp startTime,
-                                      @Param("endTime") Timestamp endTime);
-
     @Query(value = "SELECT task FROM Task task WHERE task.project = :project AND "
             + "task.startTime IS NOT NULL AND task.endTime IS NOT NULL AND "
             + "((task.startTime >= :startTime AND task.startTime <= :endTime) OR "
             + "(task.endTime >= :startTime AND task.endTime <= :endTime))")
-    List<Task> findTasksBetween(@Param("project") Project project, @Param("startTime") Timestamp startTime,
+    List<Task> findTasksBetween(@Param("project") Project project,
+                                @Param("startTime") Timestamp startTime,
                                 @Param("endTime") Timestamp endTime);
+
+    @Query(value = "SELECT task FROM Task task WHERE " +
+            "task.project IN (:projects) AND task.updatedAt >= :startTime AND task.updatedAt <= :endTime")
+    List<Task> findTasksBetween(@Param("startTime") Timestamp startTime,
+                                @Param("endTime") Timestamp endTime,
+                                @Param("projects") List<Project> projects);
 }

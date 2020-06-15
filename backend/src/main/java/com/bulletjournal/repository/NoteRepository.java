@@ -24,9 +24,9 @@ public interface NoteRepository extends JpaRepository<Note, Long>, NoteRepositor
     List<Note> findNotesBetween(@Param("project") Project project, @Param("startTime") Timestamp startTime,
                                 @Param("endTime") Timestamp endTime);
 
-    @Query("SELECT note FROM Note note WHERE note.updatedAt >= :startTime AND note.updatedAt <= :endTime")
-    List<Note> findRecentNotesBetween(@Param("startTime") Timestamp startTime,
-                                      @Param("endTime") Timestamp endTime);
-
-
+    @Query(value = "SELECT note FROM Note note WHERE " +
+            "note.project IN (:projects) AND note.updatedAt >= :startTime AND note.updatedAt <= :endTime")
+    List<Note> findNotesBetween(@Param("startTime") Timestamp startTime,
+                                @Param("endTime") Timestamp endTime,
+                                @Param("projects") List<Project> projects);
 }

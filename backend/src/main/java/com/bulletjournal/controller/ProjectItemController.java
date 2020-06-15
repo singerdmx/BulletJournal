@@ -7,10 +7,7 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
-import com.bulletjournal.repository.models.ProjectItemModel;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.*;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +45,7 @@ public class ProjectItemController {
 
     @Autowired
     public ProjectItemController(TaskDaoJpa taskDaoJpa, TransactionDaoJpa transactionDaoJpa, NoteDaoJpa noteDaoJpa,
-            LabelDaoJpa labelDaoJpa, UserDaoJpa userDaoJpa, UserClient userClient) {
+                                 LabelDaoJpa labelDaoJpa, UserDaoJpa userDaoJpa, UserClient userClient) {
         this.taskDaoJpa = taskDaoJpa;
         this.transactionDaoJpa = transactionDaoJpa;
         this.daos = ImmutableMap.of(ProjectType.TODO, taskDaoJpa, ProjectType.NOTE, noteDaoJpa, ProjectType.LEDGER,
@@ -61,8 +58,8 @@ public class ProjectItemController {
     @GetMapping(PROJECT_ITEMS_ROUTE)
     @ResponseBody
     public List<ProjectItems> getProjectItems(@Valid @RequestParam List<ProjectType> types,
-            @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
-            @NotBlank @RequestParam String timezone) {
+                                              @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
+                                              @NotBlank @RequestParam String timezone) {
 
         if (types.isEmpty()) {
             return Collections.emptyList();
@@ -82,7 +79,7 @@ public class ProjectItemController {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(List<ProjectType> types, String username,
-            ZonedDateTime startTime, ZonedDateTime endTime) {
+                                                                               ZonedDateTime startTime, ZonedDateTime endTime) {
 
         Map<ZonedDateTime, List<Task>> taskMap = null;
         Map<ZonedDateTime, List<Transaction>> transactionMap = null;
@@ -112,12 +109,8 @@ public class ProjectItemController {
     @GetMapping(RECENT_ITEMS_ROUTE)
     @ResponseBody
     public List<ProjectItem> getRecentProjectItems(@Valid @RequestParam List<ProjectType> types,
-            @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
-            @NotBlank @RequestParam String timezone) {
-
-        if (types.isEmpty()) {
-            return Collections.emptyList();
-        }
+                                                   @NotBlank @RequestParam String startDate, @NotBlank @RequestParam String endDate,
+                                                   @NotBlank @RequestParam String timezone) {
 
         Timestamp startTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(startDate, null, timezone).toInstant());
         Timestamp endTime = Timestamp.from(ZonedDateTimeHelper.getStartTime(endDate, null, timezone).toInstant());
@@ -131,11 +124,19 @@ public class ProjectItemController {
     }
 
     private <T extends ProjectItemModel> void addRecentProjectItems(Timestamp startTime, Timestamp endTime,
-            List<ProjectItem> projectItems, final ProjectType projectType) {
-        final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime);
+                                                                    List<ProjectItem> projectItems, final ProjectType projectType) {
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        User user = this.userDaoJpa.getByName(username);
+        Set<Long> projectIds = new HashSet<>();
+        for (UserGroup userGroup : user.getGroups()) {
+            if (!userGroup.isAccepted()) continue;
+            Group group = userGroup.getGroup();
+            projectIds.addAll(group.getProjects().stream().map(Project::getId).collect(Collectors.toList()));
+        }
+        final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime, new ArrayList<>(projectIds));
+
         projectItems.addAll(items.stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
-                .collect(Collectors.toList()));
-
+                    .collect(Collectors.toList()));
     }
-
 }

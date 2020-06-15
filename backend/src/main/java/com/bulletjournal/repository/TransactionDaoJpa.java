@@ -21,6 +21,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
 @Repository
 public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
+    @PersistenceContext
+    EntityManager entityManager;
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
@@ -280,12 +284,27 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Override
-    List<Transaction> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
-        return this.transactionRepository.findRecentTransactionsBetween(startTime, endTime);
+    List<Transaction> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, List projects) {
+        return this.transactionRepository.findTransactionsBetween(startTime, endTime, projects);
     }
 
     @Override
-    List<TransactionContent> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime) {
-        return this.transactionContentRepository.findRecentTransactionContentsBetween(startTime, endTime);
+    public List<Object[]> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime, List projectIds) {
+        StringBuilder queryBuilder = new StringBuilder(
+                "SELECT transactions_join_transaction_contents.id, transactions_join_transaction_contents.most_recent_time " +
+                        "FROM transactions_join_transaction_contents " +
+                        "WHERE transactions_join_transaction_contents.most_recent_time >= ? " +
+                        "AND transactions_join_transaction_contents.most_recent_time <= ? " +
+                        "AND transactions_join_transaction_contents.project_id IN (");
+        projectIds.stream().forEach(pi -> queryBuilder.append(pi).append(","));
+        int tail = queryBuilder.length() - 1;
+        if (queryBuilder.charAt(tail) == ',') {
+            queryBuilder.deleteCharAt(tail);
+        }
+        queryBuilder.append(")");
+        return entityManager.createNativeQuery(queryBuilder.toString())
+                .setParameter(1, startTime)
+                .setParameter(2, endTime)
+                .getResultList();
     }
 }

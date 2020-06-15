@@ -27,6 +27,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
@@ -51,6 +52,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ContentRevisionConfig revisionConfig;
     @Autowired
     private ContentDiffTool contentDiffTool;
+    @Autowired
+    private ProjectRepository projectRepository;
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
@@ -278,24 +281,32 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 .collect(Collectors.toList());
     }
 
-    abstract <T extends ProjectItemModel> List<T> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime);
+    abstract <T extends ProjectItemModel> List<T> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, List projects);
 
-    abstract List<K> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime);
+    abstract List<Object[]> findRecentProjectItemContentsBetween(Timestamp startTime, Timestamp endTime, List projectIds);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> List<T> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime) {
-        final Map<Long, T> projectItemIdMap = new HashMap<>();
-        List<T> projectItemModels = this.findRecentProjectItemsBetween(startTime, endTime);
-        projectItemModels.forEach((item) -> projectItemIdMap.put(item.getId(), item));
-
-        List<K> projectItemContentModels = this.findRecentProjectItemContentsBetween(startTime, endTime);
-        projectItemContentModels.forEach(projectItemContent -> {
-            T projectItem = (T) projectItemContent.getProjectItem();
-            T existingProjectItem = projectItemIdMap.computeIfAbsent(projectItem.getId(), k -> projectItem);
-            if (existingProjectItem.getUpdatedAt().compareTo(projectItemContent.getUpdatedAt()) < 0) {
-                existingProjectItem.setUpdatedAt(projectItemContent.getUpdatedAt());
+    public <T extends ProjectItemModel> List<T> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, List<Long> projectIds) {
+        Map<Long, T> projectItemIdMap = new HashMap<>();
+        List<Object[]> projectItemJoinContentModels = this.findRecentProjectItemContentsBetween(startTime, endTime, projectIds);
+        projectItemJoinContentModels.forEach(item -> {
+            Long projectItemId = null;
+            Timestamp mostRecentTime = null;
+            for (Object o : item) {
+                if (projectItemId == null) {
+                    projectItemId = ((BigInteger) o).longValue();
+                } else {
+                    mostRecentTime = (Timestamp) o;
+                }
             }
+            T projectItem = (T) this.getJpaRepository().findById(projectItemId).get();
+            projectItem.setUpdatedAt(mostRecentTime);
+            projectItemIdMap.put(projectItemId, projectItem);
         });
+
+        List<T> projectItemModels = this.findRecentProjectItemsBetween(startTime, endTime,
+                projectRepository.findAllById(projectIds));
+        projectItemModels.forEach(item -> projectItemIdMap.putIfAbsent(item.getId(), item));
 
         return new ArrayList<>(projectItemIdMap.values());
     }

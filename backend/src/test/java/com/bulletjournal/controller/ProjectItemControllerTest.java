@@ -485,7 +485,6 @@ public class ProjectItemControllerTest {
                 "America/Los_Angeles",
                 types);
 
-        projectItems = filterByOwner(projectItems, USER_0518);
 
         assertNotNull(projectItems);
         assertEquals(2, projectItems.size());
@@ -515,14 +514,6 @@ public class ProjectItemControllerTest {
         assertNotNull(projectItems);
         assertEquals(1, projectItems.size());
         assertEquals(n1.getId().intValue(), projectItems.get(0).get("id"));
-    }
-
-    private List<LinkedHashMap> filterByOwner(List<LinkedHashMap> projectItems, String userName) {
-        return projectItems
-                .stream()
-                .filter(pi ->
-                        (((LinkedHashMap) pi.get("owner"))).get("name")
-                                .equals(userName)).collect(Collectors.toList());
     }
 
     private Content addRecentTaskContents(Task task, String text) {
@@ -599,8 +590,6 @@ public class ProjectItemControllerTest {
                 "America/Los_Angeles",
                 types);
 
-        projectItems = filterByOwner(projectItems, USER_0518);
-
         assertNotNull(projectItems);
         assertEquals(1, projectItems.size());
         assertEquals(tr1.getContentType().toString(), projectItems.get(0).get("contentType").toString());
@@ -665,13 +654,11 @@ public class ProjectItemControllerTest {
                 "America/Los_Angeles",
                 types);
 
-        projectItems = filterByOwner(projectItems, USER_0518);
-
         assertNotNull(projectItems);
         assertEquals(4, projectItems.size());
-        assertEquals(p3.getId().intValue(), projectItems.get(0).get("projectId"));
-        assertEquals(p2.getId().intValue(), projectItems.get(1).get("projectId"));
-        assertEquals(p1.getId().intValue(), projectItems.get(2).get("projectId"));
+        assertEquals(p1.getId().intValue(), projectItems.get(0).get("projectId"));
+        assertEquals(p3.getId().intValue(), projectItems.get(1).get("projectId"));
+        assertEquals(p2.getId().intValue(), projectItems.get(2).get("projectId"));
         assertEquals(p1.getId().intValue(), projectItems.get(3).get("projectId"));
     }
 }
