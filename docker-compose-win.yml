@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.8'
 services:
   auth-proxy:
     image: mwangxx/auth-proxy:latest
@@ -6,16 +6,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    depends_on:
-      - frontend
 
   frontend:
     image: mwangxx/bulletjournal-frontend:latest
     container_name: react_app
     ports:
       - "3000:3000"
-    depends_on:
-      - controller
 
   controller:
     image: mwangxx/bulletjournal-backend:latest
@@ -26,9 +22,6 @@ services:
       spring_profiles_active: dev
     volumes:
       - /d/docker/volumes/log:/var/log
-    depends_on:
-      database:
-        condition: service_healthy
 
   cache:
     image: mwangxx/redis:5.0.8
