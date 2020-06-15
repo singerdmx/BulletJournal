@@ -1,6 +1,7 @@
 import { actions } from './reducer';
 import { Note } from './interface';
 import { History } from 'history';
+import {ProjectItemUIType} from "../project/constants";
 
 export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });
@@ -23,12 +24,12 @@ export const createContent = (noteId: number, text: string) =>
 export const getNote = (noteId: number) => actions.NoteGet({ noteId: noteId });
 export const putNote = (projectId: number, notes: Note[]) =>
   actions.NotePut({ projectId: projectId, notes: notes });
-export const deleteNote = (noteId: number) =>
-  actions.NoteDelete({ noteId: noteId });
+export const deleteNote = (noteId: number, type: ProjectItemUIType) =>
+  actions.NoteDelete({ noteId: noteId, type: type });
 export const deleteNotes = (
   projectId: number,
   notesId: number[],
-  type: string
+  type: ProjectItemUIType
 ) =>
   actions.NotesDelete({
     projectId: projectId,

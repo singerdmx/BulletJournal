@@ -24,7 +24,7 @@ import ShareProjectItem from '../modals/share-project-item.component';
 import moment from 'moment';
 // assets import
 import './project-item.styles.less';
-import { ProjectType } from '../../features/project/constants';
+import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
 import {
   getIcon,
   getItemIcon,
@@ -45,11 +45,12 @@ type NoteProps = {
 type NoteManageProps = {
   note: Note;
   inModal?: boolean;
-  deleteNote: (noteId: number) => void;
+  type: ProjectItemUIType;
+  deleteNote: (noteId: number, type: ProjectItemUIType) => void;
 };
 
 const ManageNote: React.FC<NoteManageProps> = (props) => {
-  const { note, deleteNote, inModal } = props;
+  const { note, deleteNote, inModal, type } = props;
 
   if (inModal === true) {
     return (
@@ -58,7 +59,7 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
           title='Deleting Note also deletes its child notes. Are you sure?'
           okText='Yes'
           cancelText='No'
-          onConfirm={() => deleteNote(note.id)}
+          onConfirm={() => deleteNote(note.id, type)}
           className='group-setting'
           placement='bottom'
         >
@@ -88,7 +89,7 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
         title='Deleting Note also deletes its child notes. Are you sure?'
         okText='Yes'
         cancelText='No'
-        onConfirm={() => deleteNote(note.id)}
+        onConfirm={() => deleteNote(note.id, type)}
         className='group-setting'
         placement='bottom'
       >
@@ -114,6 +115,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
 
   const {
     note,
+    type,
     deleteNote,
     inModal,
     inProject,
@@ -133,7 +135,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
         placement='rightTop'
         overlayStyle={{ width: '150px' }}
         content={
-          <ManageNote note={note} deleteNote={deleteNote} inModal={inModal} />
+          <ManageNote note={note} deleteNote={deleteNote} inModal={inModal} type={type} />
         }
         trigger='click'
       >

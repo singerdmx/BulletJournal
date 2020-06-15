@@ -156,13 +156,14 @@ public class Task extends ProjectItem {
                 && Objects.equals(getDuration(), task.getDuration())
                 && Objects.equals(getReminderSetting(), task.getReminderSetting())
                 && Objects.equals(getRecurrenceRule(), task.getRecurrenceRule())
-                && Objects.equals(getSubTasks(), task.getSubTasks());
+                && Objects.equals(getSubTasks(), task.getSubTasks())
+                && Objects.equals(getStatus(), task.getStatus());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getAssignees(), getDueDate(), getDueTime(), getTimezone(), getDuration(),
-                getReminderSetting(), getRecurrenceRule(), getSubTasks());
+                getReminderSetting(), getRecurrenceRule(), getSubTasks(), getStatus());
     }
 
     public void clone(Task task) {

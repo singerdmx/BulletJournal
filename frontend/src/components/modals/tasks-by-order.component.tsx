@@ -1,29 +1,22 @@
-import React, { useState } from 'react';
-import {
-  Modal,
-  Empty,
-  DatePicker,
-  Divider,
-  Tooltip,
-  Checkbox,
-  message,
-} from 'antd';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {Checkbox, DatePicker, Divider, Empty, message, Modal, Tooltip,} from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 import './modals.styles.less';
 import TaskItem from '../project-item/task-item.component';
 import moment from 'moment';
-import { Task } from '../../features/tasks/interface';
-import { dateFormat } from '../../features/myBuJo/constants';
-import {getTasksByOrder, deleteTasks, completeTasks} from '../../features/tasks/actions';
+import {Task} from '../../features/tasks/interface';
+import {dateFormat} from '../../features/myBuJo/constants';
+import {completeTasks, deleteTasks, getTasksByOrder} from '../../features/tasks/actions';
 import {
-  SyncOutlined,
-  CloseSquareTwoTone,
   CheckCircleTwoTone,
   CheckSquareTwoTone,
+  CloseSquareTwoTone,
   DeleteTwoTone,
+  SyncOutlined,
 } from '@ant-design/icons';
 import {Project} from "../../features/project/interface";
+import {ProjectItemUIType} from "../../features/project/constants";
 
 const { RangePicker } = DatePicker;
 
@@ -39,8 +32,8 @@ type TasksByOrderProps = {
     startDate?: string,
     endDate?: string
   ) => void;
-  deleteTasks: (projectId: number, tasksId: number[]) => void;
-  completeTasks: (projectId: number, tasksId: number[]) => void;
+  deleteTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
+  completeTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
   hideCompletedTask: () => void;
 };
 
@@ -81,6 +74,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
           )}
           <TaskItem
             task={task}
+            type={ProjectItemUIType.ORDER}
             readOnly={false}
             inProject={false}
             inModal={true}
@@ -113,7 +107,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
       return;
     }
 
-    completeTasks(project.id, checked);
+    completeTasks(project.id, checked, ProjectItemUIType.ORDER);
     setChecked([] as number[]);
     props.onCancel();
     hideCompletedTask();
@@ -129,7 +123,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
       return;
     }
 
-    deleteTasks(project.id, checked);
+    deleteTasks(project.id, checked, ProjectItemUIType.ORDER);
     setChecked([] as number[]);
     props.onCancel();
   };

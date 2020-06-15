@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Cell,
   Legend,
@@ -11,18 +11,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 import {Carousel, DatePicker, Form, List, Radio, Result, Select, Tooltip} from 'antd';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 import './project.styles.less';
-import { zones } from '../../components/settings/constants';
-import {
-  updateTransactionForm,
-  updateTransactions,
-} from '../../features/transactions/actions';
-import { updateExpandedMyself } from '../../features/myself/actions';
+import {zones} from '../../components/settings/constants';
+import {updateTransactionForm, updateTransactions,} from '../../features/transactions/actions';
+import {updateExpandedMyself} from '../../features/myself/actions';
 import {
   FrequencyType,
   LedgerSummary,
@@ -32,13 +29,12 @@ import {
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
-import { RadioChangeEvent } from 'antd/lib/radio';
-import { Project } from '../../features/project/interface';
-import { User } from '../../features/group/interface';
-import {
-  AccountBookOutlined
-} from '@ant-design/icons';
+import {RadioChangeEvent} from 'antd/lib/radio';
+import {Project} from '../../features/project/interface';
+import {User} from '../../features/group/interface';
+import {AccountBookOutlined} from '@ant-design/icons';
 import AddTransaction from "../../components/modals/add-transaction.component";
+import {ProjectItemUIType} from "../../features/project/constants";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -643,6 +639,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           <List.Item key={item.id} className='transaction-list-item'>
             <TransactionItem
               transaction={item}
+              type={ProjectItemUIType.PROJECT}
               inProject={!project.shared}
               showModal={props.showModal}
             />

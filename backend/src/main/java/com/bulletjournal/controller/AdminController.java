@@ -2,38 +2,23 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.Before;
-import com.bulletjournal.controller.models.ChangePointsParams;
-import com.bulletjournal.controller.models.LockUserParams;
-import com.bulletjournal.controller.models.LockedUsersAndIPs;
-import com.bulletjournal.controller.models.Myself;
-import com.bulletjournal.controller.models.SetPointsParams;
-import com.bulletjournal.controller.models.SetRoleParams;
-import com.bulletjournal.controller.models.Theme;
-import com.bulletjournal.controller.models.UnlockUserParams;
+import com.bulletjournal.config.VersionConfig;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.LockedIP;
 import com.bulletjournal.redis.LockedUser;
 import com.bulletjournal.redis.RedisLockedIPRepository;
 import com.bulletjournal.redis.RedisLockedUserRepository;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.controller.models.User;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class AdminController {
@@ -45,6 +30,10 @@ public class AdminController {
     public static final String LOCKED_USERS_ROUTE = "/api/lockedUsers";
     public static final String UNLOCK_USER_ROUTE = "/api/admin/unlock";
     public static final String LOCK_USER_ROUTE = "/api/admin/lock";
+    public static final String VERSION_ROUTE = "/api/version";
+
+    @Autowired
+    private VersionConfig versionConfig;
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -124,7 +113,7 @@ public class AdminController {
 
     @PostMapping(CHANGE_POINTS_ROUTE)
     public void changePoints(@NotBlank @PathVariable String username,
-            @NotNull @RequestBody ChangePointsParams changePointsParams) {
+                             @NotNull @RequestBody ChangePointsParams changePointsParams) {
         validateRequester();
         Integer points = changePointsParams.getPoints();
         this.userDaoJpa.changeUserPoints(username, points);
@@ -132,7 +121,7 @@ public class AdminController {
 
     @PostMapping(SET_POINTS_ROUTE)
     public void setPoints(@NotBlank @PathVariable String username,
-            @NotNull @RequestBody SetPointsParams setPointsParams) {
+                          @NotNull @RequestBody SetPointsParams setPointsParams) {
         validateRequester();
         Integer points = setPointsParams.getPoints();
         this.userDaoJpa.setUserPoints(username, points);
@@ -156,6 +145,11 @@ public class AdminController {
 
         User self = userClient.getUser(username);
         return new Myself(self, timezone, before, currency, theme, points);
+    }
+
+    @GetMapping(VERSION_ROUTE)
+    public String getVersion() {
+        return this.versionConfig.getVersion();
     }
 
 }

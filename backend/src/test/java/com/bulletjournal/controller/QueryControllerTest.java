@@ -52,11 +52,28 @@ public class QueryControllerTest {
     }
 
     private void addTransactions(Project p) {
-        createTransaction(p, "for_es_T1", "2020-02-29");
-        createTransaction(p, "for_es_T2", "2020-03-01");
-        createTransaction(p, "for_es_T3", "2020-03-02");
-        createTransaction(p, "for_es_T4", "2020-03-02");
-        createTransaction(p, "for_es_T5", "2020-03-04");
+        Transaction t1 = createTransaction(p, "for_es_T1", "2020-02-29");
+        Transaction t2 = createTransaction(p, "for_es_T2", "2020-03-01");
+        addTransactionContents(t1, "Buy some food");
+        addTransactionContents(t2, "Buy some book");
+    }
+
+    Content addTransactionContents(Transaction transaction, String text) {
+        CreateContentParams params = new CreateContentParams(text);
+        ResponseEntity<Content> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TransactionController.ADD_CONTENT_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(params, USER),
+                Content.class,
+                transaction.getId()
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Content content = response.getBody();
+        assertEquals(USER, content.getOwner().getName());
+        assertEquals(params.getText(), content.getText());
+        assertNotNull(content.getId());
+        return content;
     }
 
     private Transaction createTransaction(Project project, String name, String date) {
@@ -75,7 +92,28 @@ public class QueryControllerTest {
     }
 
     private void addNotes(Project p) {
-        createNote(p, "for_es_n1", "2020-05-26");
+        Note n1 = createNote(p, "for_es_n1", "2020-05-26");
+        Note n2 = createNote(p, "for_es_n2", "2020-06-25");
+        addNoteContents(n1, "don't forget homework");
+        addNoteContents(n2, "don't forget to go to class");
+    }
+
+    private Content addNoteContents(Note note, String text) {
+        CreateContentParams params = new CreateContentParams(text);
+        ResponseEntity<Content> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + NoteController.ADD_CONTENT_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(params, USER),
+                Content.class,
+                note.getId()
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Content content = response.getBody();
+        assertEquals(USER, content.getOwner().getName());
+        assertEquals(params.getText(), content.getText());
+        assertNotNull(content.getId());
+        return content;
     }
 
     private Note createNote(Project project, String name, String date) {
@@ -132,7 +170,7 @@ public class QueryControllerTest {
     private void addTasks(Project p) {
         Task t1 = createTask(p, "hello world", "2020-02-29");
         Task t2 = createTask(p, "love", "2020-03-01");
-        addTaskContents(t1, "hello world a test hello worold work");
+        addTaskContents(t1, "hello world a test hello world work");
         addTaskContents(t1, "I love you don't love me");
     }
 

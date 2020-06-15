@@ -1,6 +1,7 @@
 import { actions } from './reducer';
 import { Task, ReminderSetting, TaskStatus } from './interface';
 import { History } from 'history';
+import {ProjectItemUIType} from "../project/constants";
 
 export const updateTasks = (projectId: number) =>
   actions.TasksUpdate({ projectId: projectId });
@@ -35,17 +36,19 @@ export const getCompletedTask = (taskId: number) =>
   actions.CompletedTaskGet({ taskId: taskId });
 export const putTask = (projectId: number, tasks: Task[]) =>
   actions.TaskPut({ projectId: projectId, tasks: tasks });
-export const deleteTask = (taskId: number) =>
-  actions.TaskDelete({ taskId: taskId });
-export const deleteTasks = (projectId: number, tasksId: number[]) =>
+export const deleteTask = (taskId: number, type: ProjectItemUIType) =>
+  actions.TaskDelete({ taskId: taskId, type: type });
+export const deleteTasks = (projectId: number, tasksId: number[], type: ProjectItemUIType) =>
   actions.TasksDelete({
     projectId: projectId,
     tasksId: tasksId,
+    type: type
   });
-export const completeTasks = (projectId: number, tasksId: number[]) =>
+export const completeTasks = (projectId: number, tasksId: number[], type: ProjectItemUIType) =>
   actions.TasksComplete({
     projectId: projectId,
     tasksId: tasksId,
+    type: type
   });
 export const deleteCompletedTask = (taskId: number) =>
   actions.CompletedTaskDelete({ taskId: taskId });
@@ -73,8 +76,8 @@ export const patchTask = (
     recurrenceRule: recurrenceRule,
     labels: labels,
   });
-export const completeTask = (taskId: number, dateTime?: string) =>
-  actions.TaskComplete({ taskId: taskId, dateTime: dateTime });
+export const completeTask = (taskId: number, type: ProjectItemUIType, dateTime?: string) =>
+  actions.TaskComplete({ taskId: taskId, type: type, dateTime: dateTime });
 export const uncompleteTask = (taskId: number) =>
   actions.TaskUncomplete({ taskId: taskId });
 export const setTaskLabels = (taskId: number, labels: number[]) =>

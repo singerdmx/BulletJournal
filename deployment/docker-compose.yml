@@ -12,7 +12,7 @@ services:
       - frontend
 
   frontend:
-    image: mwangxx/bulletjournal-frontend:1.1.43
+    image: mwangxx/bulletjournal-frontend:1.1.45
     container_name: react_app
     ports:
       - "3000:3000"
@@ -20,7 +20,7 @@ services:
       - controller
 
   controller:
-    image: mwangxx/bulletjournal-backend:1.1.43
+    image: mwangxx/bulletjournal-backend:1.1.45
     container_name: springboot_app
     ports:
       - "8080:8080"
@@ -31,6 +31,8 @@ services:
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
       GOOGLE_CALENDAR_CLIENT_ID: "${GOOGLE_CALENDAR_CLIENT_ID}"
       GOOGLE_CALENDAR_CLIENT_SECRET: "${GOOGLE_CALENDAR_CLIENT_SECRET}"
+      MJ_APIKEY_PRIVATE: "${MJ_APIKEY_PRIVATE}"
+      MJ_APIKEY_PUBLIC: "${MJ_APIKEY_PUBLIC}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
     depends_on:

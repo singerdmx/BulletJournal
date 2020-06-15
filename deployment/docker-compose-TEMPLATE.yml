@@ -31,6 +31,8 @@ services:
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
       GOOGLE_CALENDAR_CLIENT_ID: "${GOOGLE_CALENDAR_CLIENT_ID}"
       GOOGLE_CALENDAR_CLIENT_SECRET: "${GOOGLE_CALENDAR_CLIENT_SECRET}"
+      MJ_APIKEY_PRIVATE: "${MJ_APIKEY_PRIVATE}"
+      MJ_APIKEY_PUBLIC: "${MJ_APIKEY_PUBLIC}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
     depends_on:

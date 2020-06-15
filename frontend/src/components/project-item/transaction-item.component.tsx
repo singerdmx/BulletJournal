@@ -14,7 +14,7 @@ import { Transaction } from '../../features/transactions/interface';
 import './project-item.styles.less';
 import moment from 'moment-timezone';
 import { IState } from '../../store';
-import { ProjectType } from '../../features/project/constants';
+import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
 //import modal
 import MoveProjectItem from '../modals/move-project-item.component';
 import EditTransaction from '../modals/edit-transaction.component';
@@ -37,11 +37,12 @@ type TransactionProps = {
 type TransactionManageProps = {
   inModal?: boolean;
   transaction: Transaction;
-  deleteTransaction: (transactionId: number) => void;
+  type: ProjectItemUIType;
+  deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
 };
 
 const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
-  const { transaction, deleteTransaction, inModal } = props;
+  const { transaction, deleteTransaction, inModal, type } = props;
 
   if (inModal === true) {
     return (
@@ -52,7 +53,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
               cancelText='No'
               className='group-setting'
               placement='bottom'
-              onConfirm={() => deleteTransaction(transaction.id)}
+              onConfirm={() => deleteTransaction(transaction.id, type)}
           >
             <div className='popover-control-item'>
               <span>Delete</span>
@@ -77,7 +78,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
         cancelText='No'
         className='group-setting'
         placement='bottom'
-        onConfirm={() => deleteTransaction(transaction.id)}
+        onConfirm={() => deleteTransaction(transaction.id, type)}
       >
         <div className='popover-control-item'>
           <span>Delete</span>
@@ -96,7 +97,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
     props.setSelectedLabel(label);
     history.push('/labels/search');
   };
-  const { transaction, deleteTransaction, inModal, inProject, showModal } = props;
+  const { transaction, deleteTransaction, inModal, inProject, showModal, type } = props;
 
   const getPaymentDateTime = () => {
     if (!transaction.date) {
@@ -220,6 +221,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
           content={
             <ManageTransaction
               transaction={transaction}
+              type={type}
               deleteTransaction={deleteTransaction}
               inModal={inModal}
             />

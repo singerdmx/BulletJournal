@@ -17,6 +17,7 @@ import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -183,7 +184,9 @@ public class ProjectDaoJpa {
         }
         Long groupId = createProjectParams.getGroupId();
         Project project = new Project();
-        project.setDescription(createProjectParams.getDescription());
+        if (StringUtils.isNotBlank(createProjectParams.getDescription())) {
+            project.setDescription(createProjectParams.getDescription());
+        }
         project.setOwner(owner);
         project.setName(name);
         project.setType(createProjectParams.getProjectType().getValue());

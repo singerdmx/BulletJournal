@@ -1,6 +1,7 @@
 import { actions } from './reducer';
 import { History } from 'history';
 import { FrequencyType, LedgerSummaryType } from './interface';
+import {ProjectItemUIType} from "../project/constants";
 
 export const updateTransactions = (
   projectId: number,
@@ -42,15 +43,17 @@ export const createTransaction = (
   });
 export const getTransaction = (transactionId: number) =>
   actions.TransactionGet({ transactionId: transactionId });
-export const deleteTransaction = (transactionId: number) =>
-  actions.TransactionDelete({ transactionId: transactionId });
+export const deleteTransaction = (transactionId: number, type: ProjectItemUIType) =>
+  actions.TransactionDelete({ transactionId: transactionId, type: type });
 export const deleteTransactions = (
   projectId: number,
-  transactionsId: number[]
+  transactionsId: number[],
+  type: ProjectItemUIType
 ) =>
   actions.TransactionsDelete({
     projectId: projectId,
     transactionsId: transactionsId,
+    type: type
   });
 export const patchTransaction = (
   transactionId: number,

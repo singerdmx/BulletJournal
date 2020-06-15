@@ -8,7 +8,11 @@ import {
   DeleteTwoTone,
   MoreOutlined,
 } from '@ant-design/icons';
-import { getReminderSettingString, Task } from '../../features/tasks/interface';
+import {
+  getReminderSettingString,
+  Task,
+  getTaskBackgroundColor,
+} from '../../features/tasks/interface';
 import { connect } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import {
@@ -23,7 +27,10 @@ import { Label, stringToRGB } from '../../features/label/interface';
 import moment from 'moment-timezone';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
-import { ProjectType } from '../../features/project/constants';
+import {
+  ProjectItemUIType,
+  ProjectType,
+} from '../../features/project/constants';
 import { convertToTextWithRRule } from '../../features/recurrence/actions';
 import {
   getIcon,
@@ -31,9 +38,11 @@ import {
 } from '../draggable-labels/draggable-label-list.component';
 import { setSelectedLabel } from '../../features/label/actions';
 import { User } from '../../features/group/interface';
+import { IState } from '../../store';
 
 type ProjectProps = {
   readOnly: boolean;
+  theme: string;
   setSelectedLabel: (label: Label) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
@@ -41,13 +50,18 @@ type ProjectProps = {
 
 type ManageTaskProps = {
   task: Task;
+  type: ProjectItemUIType;
   inModal?: boolean;
   isComplete: boolean;
   completeOnlyOccurrence: boolean;
   uncompleteTask: (taskId: number) => void;
-  completeTask: (taskId: number, dateTime?: string) => void;
+  completeTask: (
+    taskId: number,
+    type: ProjectItemUIType,
+    dateTime?: string
+  ) => void;
   deleteCompletedTask: (taskId: number) => void;
-  deleteTask: (taskId: number) => void;
+  deleteTask: (taskId: number, type: ProjectItemUIType) => void;
 };
 
 type TaskProps = {
@@ -57,6 +71,7 @@ type TaskProps = {
 const ManageTask: React.FC<ManageTaskProps> = (props) => {
   const {
     task,
+    type,
     inModal,
     isComplete,
     completeOnlyOccurrence,
@@ -94,9 +109,9 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
 
   const handleCompleteTaskClick = () => {
     if (completeOnlyOccurrence) {
-      completeTask(task.id, task.dueDate + ' ' + task.dueTime);
+      completeTask(task.id, type, task.dueDate + ' ' + task.dueTime);
     } else {
-      completeTask(task.id);
+      completeTask(task.id, type);
     }
   };
 
@@ -114,7 +129,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
           title='Deleting Task also deletes its child tasks. Are you sure?'
           okText='Yes'
           cancelText='No'
-          onConfirm={() => deleteTask(task.id)}
+          onConfirm={() => deleteTask(task.id, type)}
           className='group-setting'
           placement='bottom'
         >
@@ -151,7 +166,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
         title='Deleting Task also deletes its child tasks. Are you sure?'
         okText='Yes'
         cancelText='No'
-        onConfirm={() => deleteTask(task.id)}
+        onConfirm={() => deleteTask(task.id, type)}
         className='group-setting'
         placement='bottom'
       >
@@ -268,6 +283,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
         content={
           <ManageTask
             task={task}
+            type={type}
             inModal={inModal}
             isComplete={isComplete}
             completeOnlyOccurrence={completeOnlyOccurrence}
@@ -289,6 +305,8 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   const {
     task,
+    theme,
+    type,
     inProject,
     inModal,
     isComplete,
@@ -375,7 +393,10 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   };
 
   return (
-    <div className='project-item'>
+    <div
+      className='project-item'
+      style={getTaskBackgroundColor(task.status, theme)}
+    >
       <div className='project-item-content'>
         <Link to={taskLink}>
           <h3 className={taskStyle}>
@@ -409,9 +430,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
       <div className='project-control'>
         <div className='project-item-owner'>
-          <Tooltip
-            title={`Created by ${task.owner.alias}`}
-          >
+          <Tooltip title={`Created by ${task.owner.alias}`}>
             {getAvatar(task.owner)}
           </Tooltip>
         </div>
@@ -426,8 +445,10 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     </div>
   );
 };
-
-export default connect(null, {
+const mapStateToProps = (state: IState) => ({
+  theme: state.myself.theme,
+});
+export default connect(mapStateToProps, {
   completeTask,
   uncompleteTask,
   deleteTask,

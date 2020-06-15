@@ -9,17 +9,20 @@ import { ProjectItems } from '../../features/myBuJo/interface';
 import NoteItem from './note-item.component';
 import TaskItem from './task-item.component';
 import TransactionItem from './transaction-item.component';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 const { Panel } = Collapse;
 
 type ProjectModelItemsProps = {
   projectItems: ProjectItems[];
   completeOnlyOccurrence: boolean;
+  type: ProjectItemUIType;
 };
 
 const getTasksPanel = (
   items: ProjectItems,
   index: number,
+  type: ProjectItemUIType,
   completeOnlyOccurrence: boolean
 ) => {
   if (items.tasks.length === 0) {
@@ -36,6 +39,7 @@ const getTasksPanel = (
           <div key={`task${item.id}#${index}`}>
             <TaskItem
               task={item}
+              type={type}
               isComplete={false}
               readOnly={false}
               inProject={false}
@@ -48,7 +52,7 @@ const getTasksPanel = (
   );
 };
 
-const getTransactionsPanel = (items: ProjectItems, index: number) => {
+const getTransactionsPanel = (items: ProjectItems, type: ProjectItemUIType, index: number) => {
   if (items.transactions.length === 0) {
     return null;
   }
@@ -62,7 +66,7 @@ const getTransactionsPanel = (items: ProjectItems, index: number) => {
         {items.transactions.map((item, index) => {
           return (
             <div key={`transactions${item.id}#${index}`}>
-              <TransactionItem transaction={item} inProject={false}/>
+              <TransactionItem transaction={item} inProject={false} type={type}/>
             </div>
           );
         })}
@@ -71,7 +75,7 @@ const getTransactionsPanel = (items: ProjectItems, index: number) => {
   );
 };
 
-const getNotesPanel = (items: ProjectItems, index: number) => {
+const getNotesPanel = (items: ProjectItems, index: number, type: ProjectItemUIType) => {
   if (items.notes.length === 0) {
     return null;
   }
@@ -85,7 +89,7 @@ const getNotesPanel = (items: ProjectItems, index: number) => {
         {items.notes.map((item, index) => {
           return (
             <div key={`note${item.id}#${index}`}>
-              <NoteItem note={item} readOnly={false} inProject={false}/>
+              <NoteItem note={item} readOnly={false} inProject={false} type={type}/>
             </div>
           );
         })}
@@ -114,9 +118,9 @@ const ProjectModelItems: React.FC<ProjectModelItemsProps> = (props) => {
                 'notes' + index,
               ]}
             >
-              {getTasksPanel(items, index, props.completeOnlyOccurrence)}
-              {getTransactionsPanel(items, index)}
-              {getNotesPanel(items, index)}
+              {getTasksPanel(items, index, props.type, props.completeOnlyOccurrence)}
+              {getTransactionsPanel(items, props.type, index)}
+              {getNotesPanel(items, index, props.type)}
             </Collapse>
           </Timeline.Item>
         );

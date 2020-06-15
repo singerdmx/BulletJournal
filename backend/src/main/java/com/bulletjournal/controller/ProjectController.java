@@ -85,7 +85,7 @@ public class ProjectController {
         this.notificationService
                 .trackActivity(new Auditable(createdProject.getId(), "created BuJo ##" + project.getName() + "##",
                         username, null, Timestamp.from(Instant.now()), ContentAction.ADD_PROJECT));
-        return createdProject;
+        return Project.addOwnerAvatar(createdProject, this.userClient);
     }
 
     @PatchMapping(PROJECT_ROUTE)

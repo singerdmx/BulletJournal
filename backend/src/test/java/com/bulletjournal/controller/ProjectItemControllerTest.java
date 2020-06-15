@@ -53,6 +53,10 @@ public class ProjectItemControllerTest {
     private static final String YESTERDAY = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     private static final String TOMORROW = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     private static final String ROOT_URL = "http://localhost:";
+    /**
+     * test recent project item
+     */
+    private static final String USER_0518 = "0518";
     private static String TIMEZONE = "America/Los_Angeles";
     private final String expectedOwner = "BulletJournal";
     private final String[] sampleUsers = {
@@ -72,11 +76,6 @@ public class ProjectItemControllerTest {
     public void teardown() {
 
     }
-
-    /**
-     * test recent project item
-     */
-    private static final String USER_0518 = "0518";
 
     private void deleteTask(Task task) {
         ResponseEntity<Task[]> response = this.restTemplate.exchange(

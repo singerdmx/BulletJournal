@@ -7,6 +7,7 @@ import {
 } from './interface';
 import { History } from 'history';
 import { Content } from '../myBuJo/interface';
+import {ProjectItemUIType} from "../project/constants";
 
 export type TransactionApiErrorAction = {
   error: string;
@@ -81,11 +82,13 @@ export type TransactionAction = {
 
 export type DeleteTransaction = {
   transactionId: number;
+  type: ProjectItemUIType;
 };
 
 export type DeleteTransactions = {
   projectId: number;
   transactionsId: number[];
+  type: ProjectItemUIType;
 };
 
 export type updateFrequencyAction = {

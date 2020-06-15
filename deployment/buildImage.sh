@@ -11,6 +11,8 @@ fi
 
 git pull
 
+echo "\n\n#Api version\napi.version=$1" >> ../backend/src/main/resources/application-prod.properties
+
 sed "s/BULLETJOURNAL_VERSION/$1/g" docker-compose-TEMPLATE.yml > docker-compose.yml
 
 git add docker-compose.yml

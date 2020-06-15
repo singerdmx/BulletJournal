@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
-import { Modal, Empty, Tooltip, Checkbox, message } from 'antd';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import React, {useState} from 'react';
+import {Checkbox, Empty, message, Modal, Tooltip} from 'antd';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 import './modals.styles.less';
 import TransactionItem from '../project-item/transaction-item.component';
-import { Transaction } from '../../features/transactions/interface';
-import { User } from '../../features/group/interface';
-import {
-  CheckSquareTwoTone,
-  CloseSquareTwoTone,
-  DeleteTwoTone,
-} from '@ant-design/icons';
-import { deleteTransactions } from '../../features/transactions/actions';
-import { Project } from '../../features/project/interface';
+import {Transaction} from '../../features/transactions/interface';
+import {User} from '../../features/group/interface';
+import {CheckSquareTwoTone, CloseSquareTwoTone, DeleteTwoTone,} from '@ant-design/icons';
+import {deleteTransactions} from '../../features/transactions/actions';
+import {Project} from '../../features/project/interface';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 type TransactionsByPayerProps = {
   project: Project | undefined;
@@ -20,7 +17,7 @@ type TransactionsByPayerProps = {
   visible: boolean;
   payer: User | undefined;
   onCancel: () => void;
-  deleteTransactions: (projectId: number, transactionsId: number[]) => void;
+  deleteTransactions: (projectId: number, transactionsId: number[], type: ProjectItemUIType) => void;
 };
 
 const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
@@ -56,6 +53,7 @@ const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
           )}
           <TransactionItem
             transaction={transaction}
+            type={ProjectItemUIType.PAYER}
             inModal={true}
             inProject={false}
           />
@@ -84,7 +82,7 @@ const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
       message.error('No Selection');
       return;
     } else {
-      deleteTransactions(project.id, checked);
+      deleteTransactions(project.id, checked, ProjectItemUIType.PAYER);
       setChecked([] as number[]);
     }
   };

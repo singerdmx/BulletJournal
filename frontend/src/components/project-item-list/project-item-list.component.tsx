@@ -1,14 +1,15 @@
 import React from 'react';
-import { DatePicker, Divider, Tooltip } from 'antd';
+import {DatePicker, Divider, Tooltip} from 'antd';
 import moment from 'moment';
-import { connect } from 'react-redux';
-import { IState } from '../../store';
-import { Link } from 'react-router-dom';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { dateFormat } from '../../features/myBuJo/constants';
-import { updateMyBuJoDates } from '../../features/myBuJo/actions';
-import { ProjectItems } from '../../features/myBuJo/interface';
+import {connect} from 'react-redux';
+import {IState} from '../../store';
+import {Link} from 'react-router-dom';
+import {updateExpandedMyself} from '../../features/myself/actions';
+import {dateFormat} from '../../features/myBuJo/constants';
+import {updateMyBuJoDates} from '../../features/myBuJo/actions';
+import {ProjectItems} from '../../features/myBuJo/interface';
 import ProjectModelItems from '../project-item/project-model-items.component';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 const { RangePicker } = DatePicker;
 
@@ -74,6 +75,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
           <ProjectModelItems
             projectItems={this.props.projectItems}
             completeOnlyOccurrence={true}
+            type={ProjectItemUIType.TODAY}
           />
         </div>
       </div>

@@ -7,6 +7,7 @@ import {
   getReminderSettingString,
   Task,
   TaskStatus,
+  getTaskBackgroundColor,
 } from '../../features/tasks/interface';
 // antd imports
 import { Avatar, Divider, Tooltip, Select, Tag } from 'antd';
@@ -30,6 +31,7 @@ const { Option } = Select;
 
 export type TaskProps = {
   task: Task | undefined;
+  theme: string;
   contents: Content[];
   contentEditable?: boolean;
   setTaskStatus: (taskId: number, taskStatus: TaskStatus) => void;
@@ -45,6 +47,7 @@ type TaskDetailProps = {
 const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   const {
     task,
+    theme,
     labelEditable,
     taskOperation,
     createContentElem,
@@ -122,7 +125,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     return (
       <Select
         style={{ width: '118px' }}
-        placeholder="Set Status"
+        placeholder='Set Status'
         onChange={(value: TaskStatus) => {
           setInputStatus(value);
           setTaskStatus(task.id, value);
@@ -141,21 +144,21 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
   if (!task) return null;
   return (
-    <div className="task-page">
+    <div className='task-page'>
       <Tooltip
-        placement="top"
+        placement='top'
         title={`Created by ${task.owner.alias}`}
-        className="task-avatar"
+        className='task-avatar'
       >
         <span>
-          <Avatar size="large" src={task.owner.avatar} />
+          <Avatar size='large' src={task.owner.avatar} />
         </span>
       </Tooltip>
-      <div className="task-title">
-        <div className="label-and-name">{task.name}</div>
+      <div className='task-title'>
+        <div className='label-and-name'>{task.name}</div>
         {taskOperation()}
       </div>
-      <div className="title-labels">
+      <div className='title-labels'>
         <DraggableLabelsList
           mode={ProjectType.TODO}
           labels={task.labels}
@@ -163,15 +166,18 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
           itemId={task.id}
         />
       </div>
-      <Divider />
-      <div className="task-statistic-card">
+      <Divider style={{ marginTop: '5px', marginBottom: '0px' }} />
+      <div
+        className='task-statistic-card'
+        style={getTaskBackgroundColor(task.status, theme)}
+      >
         {getDueDateTime(task)}
         {getReminder(task)}
         {getTaskStatusDropdown(task)}
       </div>
-      <Divider />
-      <div className="content">
-        <div className="content-list">
+      <Divider style={{ marginTop: '0px' }} />
+      <div className='content'>
+        <div className='content-list'>
           <TaskContentList
             projectItem={task}
             contents={contents}
@@ -185,7 +191,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   );
 };
 
-const mapStateToProps = (state: IState) => ({});
+const mapStateToProps = (state: IState) => ({
+  theme: state.myself.theme,
+});
 
 export default connect(mapStateToProps, {
   setTaskStatus,
