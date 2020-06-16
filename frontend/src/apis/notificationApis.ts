@@ -1,4 +1,4 @@
-import { doFetch, doPost } from './api-helper';
+import {doDelete, doFetch, doPost} from './api-helper';
 
 export const fetchNotifications = () => {
   return doFetch('/api/notifications')
@@ -19,4 +19,12 @@ export const answerNotification = (notificationId: number, action: string) => {
       throw Error(err.message);
     }
   );
+};
+
+export const deleteNotifications = () => {
+    return doDelete('/api/notifications')
+        .then(res => res)
+        .catch(err => {
+            throw Error(err.message);
+        });
 };

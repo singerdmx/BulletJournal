@@ -17,6 +17,9 @@ export type NotificationsAction = {
   notifications: Array<Notification>;
 };
 
+export type DeleteNotificationsAction = {
+};
+
 let initialState = {
   notifications: [] as Array<Notification>,
 };
@@ -40,6 +43,8 @@ const slice = createSlice({
       state,
     answerNotice: (state, action: PayloadAction<AnswerNotificationAction>) =>
       state,
+    deleteAllNotifications: (state, action: PayloadAction<DeleteNotificationsAction>) =>
+        state,
   },
 });
 

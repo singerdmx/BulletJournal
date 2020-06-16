@@ -11,3 +11,5 @@ export const answerNotice = (
     notificationId: notificationId,
     type: type,
   });
+
+export const deleteAllNotifications = () => actions.deleteAllNotifications({});

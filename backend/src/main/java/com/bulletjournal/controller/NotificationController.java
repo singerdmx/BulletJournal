@@ -50,7 +50,7 @@ public class NotificationController {
     private GroupRepository groupRepository;
 
     @GetMapping(NOTIFICATIONS_ROUTE)
-    public ResponseEntity<List<Notification>> getNotification() {
+    public ResponseEntity<List<Notification>> getNotifications() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Notification> notificationList = this.notificationDaoJpa.getNotifications(username);
 
@@ -82,10 +82,10 @@ public class NotificationController {
     }
 
     @DeleteMapping(NOTIFICATIONS_ROUTE)
-    public ResponseEntity<?> cleanNotifications() {
+    public ResponseEntity<List<Notification>> cleanNotifications() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.notificationRepository.deleteByTargetUser(username);
-        return ResponseEntity.ok().build();
+        return getNotifications();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
