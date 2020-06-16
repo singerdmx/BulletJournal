@@ -12,7 +12,7 @@ public class SearchIndex {
 
     private String type;
 
-    private Long groupId;
+    private Long projectId;
 
     private String value;
 
@@ -34,12 +34,12 @@ public class SearchIndex {
         this.type = type;
     }
 
-    public Long getGroupId() {
-        return groupId;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     public String getValue() {
