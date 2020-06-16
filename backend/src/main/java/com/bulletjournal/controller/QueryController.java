@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.ProjectItemType;
 import com.bulletjournal.controller.models.SearchResult;
+import com.bulletjournal.controller.models.SearchResultItem;
 import com.bulletjournal.es.SearchService;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.es.repository.models.SearchIndex;
@@ -15,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +36,7 @@ import java.util.Map;
 @RestController
 public class QueryController {
 
+    protected  static final String SEARCH_INIT_ROUTE = "/api/initquery";
     protected static final String SEARCH_ROUTE = "/api/query";
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
     private static final String CONTENT_TYPE_SUFFIX = "content";
@@ -86,15 +90,49 @@ public class QueryController {
      */
     @GetMapping(SEARCH_ROUTE)
     @ResponseStatus(HttpStatus.OK)
-    public List<SearchResult> search(@Valid @RequestParam @NotBlank String term) {
+    public SearchResult search(@Valid @RequestParam @NotBlank String scrollId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
+        SearchScrollHits<SearchIndex> scroll = searchIndexDaoJpa.search(scrollId);
+        List<SearchHit<SearchIndex>> searchResultList = new ArrayList<>();
+        if (scroll.hasSearchHits()) {
+            searchResultList.addAll(scroll.getSearchHits());
+        }
+
         List<SearchIndex> invalidResults = new ArrayList<>();
-        List<SearchResult> validResults = search(term, username, invalidResults);
+        List<SearchResultItem> validResults = search(username, invalidResults, searchResultList);
 
         // Batch remove all invalid results from ElasticSearch
         searchService.removeInvalidSearchResults(invalidResults);
-        return validResults;
+
+        SearchResult validSearchResult = new SearchResult();
+        validSearchResult.setScrollId(scrollId);
+        validSearchResult.setSearchResultItemList(validResults);
+        return validSearchResult;
+    }
+
+    @GetMapping(SEARCH_INIT_ROUTE)
+    @ResponseStatus(HttpStatus.OK)
+    public SearchResult searchInit(@Valid @RequestParam @NotBlank String term) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+
+        SearchScrollHits<SearchIndex> scroll = searchIndexDaoJpa.search(username, term);
+        String scrollId = scroll.getScrollId();
+        List<SearchHit<SearchIndex>> searchResultList = new ArrayList<>();
+        if (scroll.hasSearchHits()) {
+            searchResultList.addAll(scroll.getSearchHits());
+        }
+
+        List<SearchIndex> invalidResults = new ArrayList<>();
+        List<SearchResultItem> validResults = search(username, invalidResults, searchResultList);
+
+        // Batch remove all invalid results from ElasticSearch
+        searchService.removeInvalidSearchResults(invalidResults);
+
+        SearchResult validSearchResult = new SearchResult();
+        validSearchResult.setScrollId(scrollId);
+        validSearchResult.setSearchResultItemList(validResults);
+        return validSearchResult;
     }
 
     /**
@@ -105,11 +143,13 @@ public class QueryController {
      * @param invalid  list of invalid search indices
      * @return a list of search results with unique id
      */
-    private List<SearchResult> search(String term, String username, List<SearchIndex> invalid) {
+    private List<SearchResultItem> search(String username,
+                                      List<SearchIndex> invalid,
+                                      List<SearchHit<SearchIndex>> searchResultList) {
         // Created a Map to group search result to the same id
-        Map<String, SearchResult> results = new HashMap<>();
+        Map<String, SearchResultItem> results = new HashMap<>();
 
-        searchIndexDaoJpa.search(username, term).getSearchHits().forEach(searchHit -> {
+        searchResultList.forEach(searchHit -> {
             SearchIndex index = searchHit.getContent();
             boolean isContent = index.getParentId() != null;
             String projectItemId = isContent ? index.getParentId() : index.getId();
@@ -125,22 +165,22 @@ public class QueryController {
 
             // Check if map contains search result that has the same id.
             // If yes, reuse the same search result. Otherwise, create a new search result instance.
-            SearchResult searchResult = results.getOrDefault(projectItemId, new SearchResult());
-            searchResult.setType(ProjectItemType.getType(identifierPair.getFirst()));
-            searchResult.setId(identifierPair.getSecond());
-            searchResult.setName(projectItemName);
+            SearchResultItem searchResultItem = results.getOrDefault(projectItemId, new SearchResultItem());
+            searchResultItem.setType(ProjectItemType.getType(identifierPair.getFirst()));
+            searchResultItem.setId(identifierPair.getSecond());
+            searchResultItem.setName(projectItemName);
 
             // Iterate through highlights and add them to Search Result Highlights
             Map<String, List<String>> highlights = searchHit.getHighlightFields();
 
             if (isContent) {
                 // If matched search result is content, set content highlights
-                highlights.keySet().forEach(k -> searchResult.addOrDefaultContentHighlights(highlights.get(k)));
+                highlights.keySet().forEach(k -> searchResultItem.addOrDefaultContentHighlights(highlights.get(k)));
             } else {
-                highlights.keySet().forEach(k -> searchResult.addOrDefaultNameHighlights(highlights.get(k)));
+                highlights.keySet().forEach(k -> searchResultItem.addOrDefaultNameHighlights(highlights.get(k)));
             }
 
-            results.put(projectItemId, searchResult);
+            results.put(projectItemId, searchResultItem);
         });
         return new ArrayList<>(results.values());
     }
