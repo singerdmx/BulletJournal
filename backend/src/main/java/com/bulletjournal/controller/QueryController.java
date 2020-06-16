@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.SearchResult;
 import com.bulletjournal.controller.models.SearchResultItem;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.SearchService;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.es.repository.models.SearchIndex;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.util.Pair;
@@ -50,6 +52,9 @@ public class QueryController {
     private TransactionDaoJpa transactionDaoJpa;
     @Autowired
     private NoteDaoJpa noteDaoJpa;
+
+    @Value( "${spring.elasticsearch.rest.enable}" )
+    private Boolean elasticsearchToggle;
 
     /**
      * Parse Search Index identifier into type and id
@@ -100,6 +105,11 @@ public class QueryController {
                                @Valid @RequestParam @NotBlank String term,
                                @RequestParam(required = false, defaultValue = "0") Integer pageNo,
                                @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+
+        if (!elasticsearchToggle) {
+            return ESUtil.createMockSearchResult();
+        }
+
         String username = MDC.get(UserClient.USER_NAME_KEY);
         SearchScrollHits<SearchIndex> scroll;
         if (scrollId == null || scrollId.length() == 0) {

@@ -33,7 +33,6 @@ public class ESClient extends AbstractElasticsearchConfiguration {
 
 
     @Bean
-    @ConditionalOnProperty(value = DEFAULT_CLIENT_VALUE, havingValue = "true", matchIfMissing = false)
     ElasticsearchRestTemplate elasticsearchRestTemplate() {
         return new ElasticsearchRestTemplate(elasticsearchClient());
     }
