@@ -14,6 +14,7 @@ import { reducer as taskReducer } from '../features/tasks/reducer';
 import { reducer as calendarSyncReducer } from '../features/calendarSync/reducer';
 import { reducer as recent } from '../features/recent/reducer';
 import { reducer as admin } from '../features/admin/reducer';
+import { reducer as search } from '../features/search/reducer';
 
 export default {
   settings: settingsReducer,
@@ -32,4 +33,5 @@ export default {
   calendarSync: calendarSyncReducer,
   recent: recent,
   admin: admin,
+  search: search,
 };
