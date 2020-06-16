@@ -16,4 +16,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Modifying
     @Transactional
     void deleteByUpdatedAtBefore(Timestamp expiryTime);
+
+    @Modifying
+    @Transactional
+    void deleteByTargetUser(String target_user);
 }
