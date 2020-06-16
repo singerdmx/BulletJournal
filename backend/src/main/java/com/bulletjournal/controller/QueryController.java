@@ -27,16 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 @RestController
 public class QueryController {
 
-    protected  static final String SEARCH_INIT_ROUTE = "/api/initquery";
     protected static final String SEARCH_ROUTE = "/api/query";
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
     private static final String CONTENT_TYPE_SUFFIX = "content";
@@ -85,43 +80,28 @@ public class QueryController {
      * - List[String] HighLights of Name
      * - List[String] HighLights of Content
      *
+     * @param scrollId user uses scroll id to get next page
      * @param term user input term to be searched in Elastic Search DB
+     * @param pageSize user gives starting page number
+     * @param pageNo user gives size for each search
      * @return a list of returned SearchResult. Search result contains id and matched highlights
      */
     @GetMapping(SEARCH_ROUTE)
     @ResponseStatus(HttpStatus.OK)
-    public SearchResult search(@Valid @RequestParam @NotBlank String scrollId) {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-
-        SearchScrollHits<SearchIndex> scroll = searchIndexDaoJpa.search(scrollId);
-        List<SearchHit<SearchIndex>> searchResultList = new ArrayList<>();
-        if (scroll.hasSearchHits()) {
-            searchResultList.addAll(scroll.getSearchHits());
-        }
-
-        List<SearchIndex> invalidResults = new ArrayList<>();
-        List<SearchResultItem> validResults = search(username, invalidResults, searchResultList);
-
-        // Batch remove all invalid results from ElasticSearch
-        searchService.removeInvalidSearchResults(invalidResults);
-
-        SearchResult validSearchResult = new SearchResult();
-        validSearchResult.setScrollId(scrollId);
-        validSearchResult.setSearchResultItemList(validResults);
-        return validSearchResult;
-    }
-
-    @GetMapping(SEARCH_INIT_ROUTE)
-    @ResponseStatus(HttpStatus.OK)
-    public SearchResult searchInit(@Valid @RequestParam @NotBlank String term,
+    public SearchResult search(String scrollId,
+                                   @Valid @RequestParam @NotBlank String term,
                                    @RequestParam(required = false, defaultValue = "0") Integer pageNo,
                                    @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-
-        SearchScrollHits<SearchIndex> scroll = searchIndexDaoJpa.search(username, term, pageNo, pageSize);
-        String scrollId = scroll.getScrollId();
+        SearchScrollHits<SearchIndex> scroll;
+        if (scrollId == null || scrollId.length() == 0) {
+            scroll = searchIndexDaoJpa.search(username, term, pageNo, pageSize);
+            scrollId = scroll.getScrollId();
+        } else {
+            scroll = searchIndexDaoJpa.search(scrollId);
+        }
         List<SearchHit<SearchIndex>> searchResultList = new ArrayList<>();
-        if (scroll.hasSearchHits()) {
+        if (scroll != null && scroll.hasSearchHits()) {
             searchResultList.addAll(scroll.getSearchHits());
         }
 
@@ -140,9 +120,9 @@ public class QueryController {
     /**
      * Search requested term in elastic search and add invalid results to invalid list
      *
-     * @param term     requested term
      * @param username requester username
      * @param invalid  list of invalid search indices
+     * @param searchResultList list of search result
      * @return a list of search results with unique id
      */
     private List<SearchResultItem> search(String username,
