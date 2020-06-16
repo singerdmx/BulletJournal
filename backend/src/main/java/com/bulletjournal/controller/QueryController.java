@@ -88,10 +88,10 @@ public class QueryController {
      */
     @GetMapping(SEARCH_ROUTE)
     @ResponseStatus(HttpStatus.OK)
-    public SearchResult search(String scrollId,
-                                   @Valid @RequestParam @NotBlank String term,
-                                   @RequestParam(required = false, defaultValue = "0") Integer pageNo,
-                                   @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+    public SearchResult search(@RequestParam(required = false) String scrollId,
+                               @Valid @RequestParam @NotBlank String term,
+                               @RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                               @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         SearchScrollHits<SearchIndex> scroll;
         if (scrollId == null || scrollId.length() == 0) {
