@@ -81,6 +81,13 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping(NOTIFICATIONS_ROUTE)
+    public ResponseEntity<?> cleanNotifications() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.notificationRepository.deleteByTargetUser(username);
+        return ResponseEntity.ok().build();
+    }
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     void deleteNotification(com.bulletjournal.repository.models.Notification notification) {
         this.notificationRepository.delete(notification);
