@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import './search.styles.less';
 import {Empty, Result} from 'antd';
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {search} from "../../features/search/action";
+import {search, updateSearchTerm} from "../../features/search/action";
 import {RouteComponentProps, withRouter} from "react-router";
 import {useHistory, useParams} from "react-router-dom";
 import {SearchResult} from "../../features/search/interface";
@@ -15,6 +15,8 @@ type SearchProps = {
     searchResult: SearchResult | undefined;
     searching: boolean;
     search: (term: string, scrollId?: string) => void;
+    searchTerm: string;
+    updateSearchTerm: (term: string) => void;
 };
 
 const SearchPage: React.FC<SearchProps & RouteComponentProps> =
@@ -22,12 +24,18 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
          searchPageNo,
          searchResult,
          searching,
-         search
+         searchTerm,
+         search,
+         updateSearchTerm
      }) => {
+        const [first, setFirst] = useState(true);
         const history = useHistory();
         // get id of note from router
         const {term} = useParams();
-
+        if (term && first) {
+            updateSearchTerm(term);
+            setFirst(false);
+        }
         useEffect(() => {
             if (!term) {
                 return;
@@ -64,7 +72,8 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
 const mapStateToProps = (state: IState) => ({
     searchPageNo: state.search.searchPageNo,
     searchResult: state.search.searchResult,
-    searching: state.search.searching
+    searching: state.search.searching,
+    searchTerm: state.search.term,
 });
 
-export default connect(mapStateToProps, {search})(withRouter(SearchPage));
+export default connect(mapStateToProps, {search, updateSearchTerm})(withRouter(SearchPage));

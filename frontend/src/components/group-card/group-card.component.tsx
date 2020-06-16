@@ -46,10 +46,6 @@ type GroupProps = {
 
 type PathProps = RouteComponentProps;
 
-type GroupState = {
-  showModal: boolean;
-};
-
 function getGroupUserTitle(user: User, group: Group): string {
   if (user.name === group.owner.name) {
     return "Owner";
@@ -59,10 +55,7 @@ function getGroupUserTitle(user: User, group: Group): string {
 
 const { Title, Text } = Typography;
 
-class GroupCard extends React.Component<GroupProps & PathProps, GroupState> {
-  state: GroupState = {
-    showModal: false,
-  };
+class GroupCard extends React.Component<GroupProps & PathProps> {
 
   deleteUser = (groupId: number, username: string, groupName: string) => {
     this.props.removeUserGroupByUsername(groupId, username, groupName);

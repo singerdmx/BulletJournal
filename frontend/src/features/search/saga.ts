@@ -9,8 +9,8 @@ import {SearchResult, searchResultPageSize} from "./interface";
 function* search(action: PayloadAction<SearchAction>) {
     try {
         const {term, scrollId} = action.payload;
-        if (term.length === 0) {
-            yield call(message.error, 'Please enter what you want to search');
+        if (term.length < 3) {
+            yield call(message.error, 'Please enter at least 3 characters to search');
             return;
         }
         yield put(searchActions.updateSearching({searching: true}));

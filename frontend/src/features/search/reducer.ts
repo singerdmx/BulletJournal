@@ -18,10 +18,15 @@ export type UpdateSearchPageNoAction = {
     searchPageNo: number;
 };
 
+export type UpdateSearchTermAction = {
+    term: string;
+};
+
 let initialState = {
     searchResult: undefined as SearchResult | undefined,
     searchPageNo: 0,
     searching: false,
+    term: ''
 };
 
 const slice = createSlice({
@@ -41,6 +46,13 @@ const slice = createSlice({
         ) => {
             const {searchPageNo} = action.payload;
             state.searchPageNo = searchPageNo;
+        },
+        updateSearchTerm: (
+            state,
+            action: PayloadAction<UpdateSearchTermAction>
+        ) => {
+            const {term} = action.payload;
+            state.term = term;
         },
         updateSearching: (state, action: PayloadAction<UpdateSearchingAction>) => {
             const {searching} = action.payload;
