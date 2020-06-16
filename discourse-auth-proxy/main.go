@@ -97,6 +97,11 @@ func main() {
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("Request %s %s", r.Host, r.URL)
+		if (r.Host == "home.bulletjournal.us") {
+			logger.Printf("Port 434: Redirect to 80: %s", r.RequestURI)
+			http.Redirect(w, r, "http://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+			return
+		}
 		if checkWhitelist(handler, r, w) {
 			return
 		}
