@@ -10,6 +10,10 @@ export type SearchAction = {
     scrollId?: string;
 };
 
+export type UpdateSearchingAction = {
+    searching: boolean;
+};
+
 export type UpdateSearchPageNoAction = {
     searchPageNo: number;
 };
@@ -17,6 +21,7 @@ export type UpdateSearchPageNoAction = {
 let initialState = {
     searchResult: undefined as SearchResult | undefined,
     searchPageNo: 0,
+    searching: false,
 };
 
 const slice = createSlice({
@@ -36,6 +41,10 @@ const slice = createSlice({
         ) => {
             const {searchPageNo} = action.payload;
             state.searchPageNo = searchPageNo;
+        },
+        updateSearching: (state, action: PayloadAction<UpdateSearchingAction>) => {
+            const {searching} = action.payload;
+            state.searching = searching;
         },
         search: (state, action: PayloadAction<SearchAction>) => state,
     }
