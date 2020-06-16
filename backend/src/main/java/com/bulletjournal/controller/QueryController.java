@@ -1,7 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.ProjectItemType;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.SearchResult;
 import com.bulletjournal.controller.models.SearchResultItem;
 import com.bulletjournal.es.SearchService;
@@ -27,7 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class QueryController {
@@ -74,6 +77,11 @@ public class QueryController {
      * elastic search database and skip this result in the response.
      * <p>
      * SearchResult Model Structure
+     * - Long totalHits
+     * - String ScrollId
+     * - List[SearchResultItem] searchResultItemList
+     * <p>
+     * SearchResultItem Model Structure
      * - String ProjectItem Id
      * - String ProjectItem Type
      * - String ProjectItem Name
@@ -81,9 +89,9 @@ public class QueryController {
      * - List[String] HighLights of Content
      *
      * @param scrollId user uses scroll id to get next page
-     * @param term user input term to be searched in Elastic Search DB
-     * @param pageSize user gives starting page number
-     * @param pageNo user gives size for each search
+     * @param term     user input term to be searched in Elastic Search DB
+     * @param pageNo   user gives starting page number
+     * @param pageSize user gives size for each search
      * @return a list of returned SearchResult. Search result contains id and matched highlights
      */
     @GetMapping(SEARCH_ROUTE)
@@ -100,8 +108,13 @@ public class QueryController {
         } else {
             scroll = searchIndexDaoJpa.search(scrollId);
         }
+
+        if (scroll == null) {
+            throw new IllegalStateException("SearchScrollHits is null");
+        }
+
         List<SearchHit<SearchIndex>> searchResultList = new ArrayList<>();
-        if (scroll != null && scroll.hasSearchHits()) {
+        if (scroll.hasSearchHits()) {
             searchResultList.addAll(scroll.getSearchHits());
         }
 
@@ -114,20 +127,22 @@ public class QueryController {
         SearchResult validSearchResult = new SearchResult();
         validSearchResult.setScrollId(scrollId);
         validSearchResult.setSearchResultItemList(validResults);
+        validSearchResult.setTotalHits(scroll.getTotalHits());
+
         return validSearchResult;
     }
 
     /**
      * Search requested term in elastic search and add invalid results to invalid list
      *
-     * @param username requester username
-     * @param invalid  list of invalid search indices
+     * @param username         requester username
+     * @param invalid          list of invalid search indices
      * @param searchResultList list of search result
      * @return a list of search results with unique id
      */
     private List<SearchResultItem> search(String username,
-                                      List<SearchIndex> invalid,
-                                      List<SearchHit<SearchIndex>> searchResultList) {
+                                          List<SearchIndex> invalid,
+                                          List<SearchHit<SearchIndex>> searchResultList) {
         // Created a Map to group search result to the same id
         Map<String, SearchResultItem> results = new HashMap<>();
 
@@ -148,7 +163,7 @@ public class QueryController {
             // Check if map contains search result that has the same id.
             // If yes, reuse the same search result. Otherwise, create a new search result instance.
             SearchResultItem searchResultItem = results.getOrDefault(projectItemId, new SearchResultItem());
-            searchResultItem.setType(ProjectItemType.getType(identifierPair.getFirst()));
+            searchResultItem.setType(ContentType.getType(identifierPair.getFirst()));
             searchResultItem.setId(identifierPair.getSecond());
             searchResultItem.setName(projectItemName);
 

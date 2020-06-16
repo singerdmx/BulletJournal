@@ -1,10 +1,13 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.contents.ContentType;
+
 import java.util.List;
 
 public class SearchResultItem {
+
     private Long id;
-    private ProjectItemType type;
+    private ContentType type;
     private String name;
     private List<String> nameHighlights;
     private List<String> contentHighlights;
@@ -20,11 +23,11 @@ public class SearchResultItem {
         this.id = id;
     }
 
-    public ProjectItemType getType() {
+    public ContentType getType() {
         return type;
     }
 
-    public void setType(ProjectItemType type) {
+    public void setType(ContentType type) {
         this.type = type;
     }
 

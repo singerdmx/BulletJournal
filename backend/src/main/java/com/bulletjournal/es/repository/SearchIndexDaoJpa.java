@@ -3,7 +3,9 @@ package com.bulletjournal.es.repository;
 import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.es.repository.models.SearchIndex;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.UserGroup;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -31,9 +33,11 @@ public class SearchIndexDaoJpa {
     private static final String HIGHLIGHTER_TYPE = "unified";
     private static final String SEARCH_FIELD = "value";
     private static final String FRAGMENTER = "span";
+    private static final String SEARCH_INDEX_NAME = "project_items";
 
     private static final Integer FRAGMENT_SIZE = 300;
     private static final Integer NUM_OF_FRAGMENTS = 1;
+    private static final long SCROLL_TIME_IN_MILLIS = 3600000;
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -44,6 +48,18 @@ public class SearchIndexDaoJpa {
     @Autowired
     private SpringESConfig springESConfig;
 
+    /**
+     * Search term in ElasticSearch Database. Initialize search pagination with requested page number
+     * and page size.
+     * <p>
+     * Return the search results appeared first page, scrollId and total hits.
+     *
+     * @param username requested username
+     * @param term     search term
+     * @param pageNo   the page number
+     * @param pageSize the record count in one page
+     * @return SearchScrollHits contains the search results
+     */
     public SearchScrollHits<SearchIndex> search(String username, String term, int pageNo, int pageSize) {
         List<Long> projectIdList = getUserProjects(username);
 
@@ -70,24 +86,39 @@ public class SearchIndexDaoJpa {
                 .withHighlightBuilder(highlightBuilder)
                 .withPageable(PageRequest.of(pageNo, pageSize))
                 .build();
-        SearchScrollHits<SearchIndex> scroll = elasticsearchRestTemplate.searchScrollStart(3600000,
-                query, SearchIndex.class, IndexCoordinates.of("project_items"));
 
-        return scroll;
+        return elasticsearchRestTemplate.searchScrollStart(SCROLL_TIME_IN_MILLIS,
+                query,
+                SearchIndex.class,
+                IndexCoordinates.of(SEARCH_INDEX_NAME));
     }
 
+    /**
+     * Search results in next page with scrollId
+     *
+     * @param scrollId the scrollId for pagination
+     * @return SearchScrollHits contains the search results
+     */
     public SearchScrollHits<SearchIndex> search(String scrollId) {
         return elasticsearchRestTemplate.searchScrollContinue(scrollId,
-                3600000, SearchIndex.class, IndexCoordinates.of("project_items"));
+                SCROLL_TIME_IN_MILLIS,
+                SearchIndex.class,
+                IndexCoordinates.of(SEARCH_INDEX_NAME));
     }
 
+    /**
+     * Get request user's projects
+     *
+     * @param username the requested user's username
+     * @return a list of project Id
+     */
     private List<Long> getUserProjects(String username) {
         final Set<Long> set = new HashSet<>();
         User user = this.userDaoJpa.getByName(username);
-        user.getGroups().stream().filter(u -> u.isAccepted()).forEach((u) -> set.addAll(
+        user.getGroups().stream().filter(UserGroup::isAccepted).forEach((u) -> set.addAll(
                 u.getGroup().getProjects().stream()
                         .filter(p -> !p.isShared())
-                        .map(p -> p.getId()).collect(Collectors.toList())));
+                        .map(Project::getId).collect(Collectors.toList())));
         return new ArrayList<>(set);
     }
 
