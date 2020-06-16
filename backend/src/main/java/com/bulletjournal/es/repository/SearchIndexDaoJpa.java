@@ -1,5 +1,6 @@
 package com.bulletjournal.es.repository;
 
+import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.es.repository.models.SearchIndex;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
@@ -8,8 +9,10 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.SearchScrollHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Repository;
@@ -38,7 +41,10 @@ public class SearchIndexDaoJpa {
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
-    public SearchHits<SearchIndex> search(String username, String term) {
+    @Autowired
+    private SpringESConfig springESConfig;
+
+    public SearchScrollHits<SearchIndex> search(String username, String term) {
         List<Long> projectIdList = getUserProjects(username);
 
         BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
@@ -60,8 +66,19 @@ public class SearchIndexDaoJpa {
                 .numOfFragments(NUM_OF_FRAGMENTS).highlighterType(HIGHLIGHTER_TYPE);
 
         NativeSearchQuery query = new NativeSearchQueryBuilder()
-                .withQuery(queryBuilder).withHighlightBuilder(highlightBuilder).build();
-        return elasticsearchRestTemplate.search(query, SearchIndex.class);
+                .withQuery(queryBuilder)
+                .withHighlightBuilder(highlightBuilder)
+                .withPageable(PageRequest.of(springESConfig.getPage(), springESConfig.getSize()))
+                .build();
+        SearchScrollHits<SearchIndex> scroll = elasticsearchRestTemplate.searchScrollStart(3600000,
+                query, SearchIndex.class, IndexCoordinates.of("project_items"));
+
+        return scroll;
+    }
+
+    public SearchScrollHits<SearchIndex> search(String scrollId) {
+        return elasticsearchRestTemplate.searchScrollContinue(scrollId,
+                3600000, SearchIndex.class, IndexCoordinates.of("project_items"));
     }
 
     private List<Long> getUserProjects(String username) {
