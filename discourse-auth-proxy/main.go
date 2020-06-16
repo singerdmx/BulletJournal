@@ -85,7 +85,7 @@ func main() {
 			logger.Printf("Port 80: Request %s %s", r.Host, r.URL)
 			if (r.Host == "home.bulletjournal.us") {
 				logger.Printf("Port 80: Bypassing Auth Proxy: %s", r.RequestURI)
-				handler.ServeHTTP(w, r)
+				proxy.ServeHTTP(w, r)
 				return
 			}
 			http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
