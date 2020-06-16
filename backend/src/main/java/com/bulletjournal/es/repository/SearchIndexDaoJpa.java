@@ -44,7 +44,7 @@ public class SearchIndexDaoJpa {
     @Autowired
     private SpringESConfig springESConfig;
 
-    public SearchScrollHits<SearchIndex> search(String username, String term) {
+    public SearchScrollHits<SearchIndex> search(String username, String term, int pageNo, int pageSize) {
         List<Long> projectIdList = getUserProjects(username);
 
         BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
@@ -68,7 +68,7 @@ public class SearchIndexDaoJpa {
         NativeSearchQuery query = new NativeSearchQueryBuilder()
                 .withQuery(queryBuilder)
                 .withHighlightBuilder(highlightBuilder)
-                .withPageable(PageRequest.of(springESConfig.getPage(), springESConfig.getSize()))
+                .withPageable(PageRequest.of(pageNo, pageSize))
                 .build();
         SearchScrollHits<SearchIndex> scroll = elasticsearchRestTemplate.searchScrollStart(3600000,
                 query, SearchIndex.class, IndexCoordinates.of("project_items"));

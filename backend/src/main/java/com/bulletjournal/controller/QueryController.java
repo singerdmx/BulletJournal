@@ -113,10 +113,12 @@ public class QueryController {
 
     @GetMapping(SEARCH_INIT_ROUTE)
     @ResponseStatus(HttpStatus.OK)
-    public SearchResult searchInit(@Valid @RequestParam @NotBlank String term) {
+    public SearchResult searchInit(@Valid @RequestParam @NotBlank String term,
+                                   @RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                                   @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
-        SearchScrollHits<SearchIndex> scroll = searchIndexDaoJpa.search(username, term);
+        SearchScrollHits<SearchIndex> scroll = searchIndexDaoJpa.search(username, term, pageNo, pageSize);
         String scrollId = scroll.getScrollId();
         List<SearchHit<SearchIndex>> searchResultList = new ArrayList<>();
         if (scroll.hasSearchHits()) {
