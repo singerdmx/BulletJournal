@@ -19,24 +19,7 @@ public enum ContentType {
     }
 
     public static ContentType getType(String type) {
-        switch (type.toUpperCase()) {
-            case "PROJECT":
-                return PROJECT;
-            case "TASK":
-                return TASK;
-            case "NOTE":
-                return NOTE;
-            case "TRANSACTION":
-                return TRANSACTION;
-            case "GROUP":
-                return GROUP;
-            case "LABEL":
-                return LABEL;
-            case "CONTENT":
-                return CONTENT;
-            default:
-                throw new IllegalArgumentException("Invalid Input Type");
-        }
+        return ContentType.valueOf(type.toUpperCase());
     }
 
 }
