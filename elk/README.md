@@ -31,3 +31,9 @@ curl --user elastic:changeme -XPUT "http://localhost:9200/project_items" -' -d'{
   }
 }'
 ```
+
+## build image for logstash
+```
+cd logstash
+docker build -t mwangxx/logstash:7.6.0 .
+```
