@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
 
 import './search.styles.less';
-import {Empty, Result} from 'antd';
+import {Empty} from 'antd';
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {search, updateSearchTerm} from "../../features/search/action";
 import {RouteComponentProps, withRouter} from "react-router";
 import {useHistory, useParams} from "react-router-dom";
-import {SearchResult} from "../../features/search/interface";
+import {SearchResult, SearchResultItem} from "../../features/search/interface";
 import {Loading} from "../../App";
+import SearchResultItemElement from "./search-result-item";
 
 type SearchProps = {
     searchPageNo: number;
@@ -60,10 +61,9 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
         return (
             <div className='search-page'>
                 <div>
-                    <Result
-                        status='success'
-                        title={`${searchResult.totalHits} results found for "${term}"`}
-                    />
+                    {searchResult.searchResultItemList.map((item: SearchResultItem) => {
+                        return <SearchResultItemElement item={item}/>
+                    })}
                 </div>
             </div>
         );
