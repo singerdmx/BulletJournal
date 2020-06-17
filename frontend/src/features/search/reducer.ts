@@ -14,6 +14,10 @@ export type UpdateSearchingAction = {
     searching: boolean;
 };
 
+export type UpdateLoadingMoreAction = {
+    loadingMore: boolean;
+};
+
 export type UpdateSearchPageNoAction = {
     searchPageNo: number;
 };
@@ -26,6 +30,7 @@ let initialState = {
     searchResult: undefined as SearchResult | undefined,
     searchPageNo: 0,
     searching: false,
+    loadingMore: false,
     term: ''
 };
 
@@ -60,6 +65,10 @@ const slice = createSlice({
         updateSearching: (state, action: PayloadAction<UpdateSearchingAction>) => {
             const {searching} = action.payload;
             state.searching = searching;
+        },
+        updateLoadingMore: (state, action: PayloadAction<UpdateLoadingMoreAction>) => {
+            const {loadingMore} = action.payload;
+            state.loadingMore = loadingMore;
         },
         search: (state, action: PayloadAction<SearchAction>) => state,
     }
