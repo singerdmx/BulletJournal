@@ -15,8 +15,14 @@ function* search(action: PayloadAction<SearchAction>) {
         }
         yield put(searchActions.updateSearching({searching: true}));
         const state: IState = yield select();
-        const data: SearchResult = yield call(fetchSearchResults,
+        let data: SearchResult = yield call(fetchSearchResults,
             term, state.search.searchPageNo, searchResultPageSize, scrollId);
+        if (scrollId) {
+            const oldList = state.search.searchResult!.searchResultItemList;
+            const result =
+                data.searchResultItemList.concat(oldList);
+            data.searchResultItemList = result;
+        }
         yield put(searchActions.searchResultReceived({searchResult: data}));
         yield put(searchActions.updateSearching({searching: false}));
         yield put(searchActions.updateSearchPageNo({

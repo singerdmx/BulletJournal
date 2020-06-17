@@ -4,6 +4,7 @@ import {Card} from "antd";
 import {ContentType} from "../../features/myBuJo/constants";
 import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
 import {useHistory} from "react-router-dom";
+import './search.styles.less';
 
 const {Meta} = Card;
 
@@ -30,7 +31,8 @@ const SearchResultItemElement: React.FC<SearchResultItemProps> =
 
         const getDescription = (item: SearchResultItem) => {
             return item.nameHighlights.concat(item.contentHighlights).map((highlight) => {
-                return <div>{highlight}</div>;
+                return <div
+                    dangerouslySetInnerHTML={{__html: highlight}}/>;
             });
         };
 
