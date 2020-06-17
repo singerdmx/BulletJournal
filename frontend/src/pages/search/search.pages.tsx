@@ -1,15 +1,17 @@
 import React, {useEffect, useState} from 'react';
 
 import './search.styles.less';
-import {Empty} from 'antd';
+import {Empty, Tooltip} from 'antd';
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {search, updateSearchTerm} from "../../features/search/action";
 import {RouteComponentProps, withRouter} from "react-router";
 import {useHistory, useParams} from "react-router-dom";
-import {SearchResult, SearchResultItem} from "../../features/search/interface";
+import {SearchResult, SearchResultItem, searchResultPageSize} from "../../features/search/interface";
 import {Loading} from "../../App";
 import SearchResultItemElement from "./search-result-item";
+import {CloudSyncOutlined} from '@ant-design/icons';
+import ReactLoading from "react-loading";
 
 type SearchProps = {
     searchPageNo: number;
@@ -19,6 +21,12 @@ type SearchProps = {
     searchTerm: string;
     updateSearchTerm: (term: string) => void;
 };
+
+const LoadingIcon = () => (
+    <div className='loading'>
+        <ReactLoading type='bubbles' color='#0984e3' height='75' width='75'/>
+    </div>
+);
 
 const SearchPage: React.FC<SearchProps & RouteComponentProps> =
     ({
@@ -33,6 +41,13 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
         const history = useHistory();
         // get id of note from router
         const {term} = useParams();
+
+        const handleLoadMore = () => {
+            if (searchTerm) {
+                search(searchTerm, searchResult?.scrollId);
+            }
+        };
+
         if (term && first) {
             updateSearchTerm(term);
             setFirst(false);
@@ -65,6 +80,15 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
                         return <SearchResultItemElement item={item}/>
                     })}
                 </div>
+                {searching ? (
+                    <LoadingIcon/>
+                ) : searchResult.totalHits > searchPageNo * searchResultPageSize ? null : (
+                    <span className='load-more-button' onClick={handleLoadMore}>
+              <Tooltip title='Load More'>
+                <CloudSyncOutlined/>
+              </Tooltip>
+            </span>
+                )}
             </div>
         );
     };
