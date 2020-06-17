@@ -75,8 +75,8 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
         return (
             <div className='search-page'>
                 <div>
-                    {searchResult.searchResultItemList.map((item: SearchResultItem) => {
-                        return <SearchResultItemElement item={item}/>
+                    {searchResult.searchResultItemList.map((item: SearchResultItem, index: number) => {
+                        return <SearchResultItemElement item={item} index={index} key={index}/>
                     })}
                 </div>
                 {loadingMore ? (
