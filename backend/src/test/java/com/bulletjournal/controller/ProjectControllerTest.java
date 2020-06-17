@@ -1,5 +1,6 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.filters.rate.limiting.TokenBucket;
@@ -812,7 +813,7 @@ public class ProjectControllerTest {
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, targetUser),
                 Object.class,
-                ProjectItemType.TASK.name() + task.getId());
+                ContentType.TASK.name() + task.getId());
         assertEquals(HttpStatus.OK, publicProjectItemResponse.getStatusCode());
 
         shareProjectItemParams = new ShareProjectItemParams();

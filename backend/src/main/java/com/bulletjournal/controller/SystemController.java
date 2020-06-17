@@ -170,13 +170,13 @@ public class SystemController {
                 throw new UnAuthorizedException("User not logged in");
             }
             Long id = Long.parseLong(itemId.substring(4)); // both NOTE and TASK are 4 letters
-            if (itemId.startsWith(ProjectItemType.TASK.name())) {
+            if (itemId.startsWith(ContentType.TASK.name())) {
                 if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.TODO)
                         .stream().anyMatch(m -> m.getId().equals(id))) {
                     throw new UnAuthorizedException("Task not shared with user " + originalUser);
                 }
                 item = this.taskDaoJpa.getProjectItem(id, username);
-            } else if (itemId.startsWith(ProjectItemType.NOTE.name())) {
+            } else if (itemId.startsWith(ContentType.NOTE.name())) {
                 if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.NOTE)
                         .stream().anyMatch(m -> m.getId().equals(id))) {
                     throw new UnAuthorizedException("Note not shared with user " + originalUser);
@@ -218,7 +218,7 @@ public class SystemController {
             return false;
         }
 
-        if (itemId.startsWith(ProjectItemType.NOTE.name()) || itemId.startsWith(ProjectItemType.TASK.name())) {
+        if (itemId.startsWith(ContentType.NOTE.name()) || itemId.startsWith(ContentType.TASK.name())) {
             return !itemId.substring(4).chars().allMatch(Character::isDigit);
         }
 
