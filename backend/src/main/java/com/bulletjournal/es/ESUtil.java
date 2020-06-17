@@ -7,44 +7,37 @@ import com.bulletjournal.controller.models.SearchResultItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class ESUtil {
-    private static final long TOTAL_HITS = 3;
     private static final String SCROLL_ID = "unit-test-scroll-id";
+    private static final int TOTAL_HITS_BOUNDARY = 1000;
+
 
     public static SearchResult createMockSearchResult() {
+        long totalHits = new Random().nextInt(TOTAL_HITS_BOUNDARY);
+
         SearchResult mockData = new SearchResult();
         mockData.setScrollId(SCROLL_ID);
-        mockData.setTotalHits(TOTAL_HITS);
-        mockData.setSearchResultItemList(createMockSearchResultItemList());
+        mockData.setTotalHits(totalHits);
+        mockData.setHasSearchHits(!(new Random().nextDouble() > 0.5));
+        mockData.setSearchResultItemList(createMockSearchResultItemList(totalHits));
         return mockData;
     }
 
-    private static List<SearchResultItem> createMockSearchResultItemList() {
+    private static List<SearchResultItem> createMockSearchResultItemList(long totalHits) {
         List<SearchResultItem> mockList = new ArrayList<>();
-        SearchResultItem note = new SearchResultItem();
-        note.setId(100L);
-        note.setType(ContentType.NOTE);
-        note.setName("Note1");
-        note.setNameHighlights(Collections.singletonList("<em classname= 'highlight'>Note1</em>"));
-        note.setContentHighlights(Collections.singletonList("<em classname= 'highlight'>Note1</em>"));
-        mockList.add(note);
 
-        SearchResultItem task = new SearchResultItem();
-        task.setId(8L);
-        task.setType(ContentType.TASK);
-        task.setName("task8");
-        task.setNameHighlights(Collections.singletonList("<em classname= 'highlight'>task8</em>"));
-        task.setContentHighlights(Collections.singletonList("<em classname= 'highlight'>task8</em>"));
-        mockList.add(task);
+        for (int i = 1; i <= totalHits; i++) {
+            SearchResultItem note = new SearchResultItem();
+            note.setId((long) i);
+            note.setType(ContentType.NOTE);
+            note.setName("Note" + i);
+            note.setNameHighlights(Collections.singletonList("<em classname= 'highlight'>Note" + i + "</em>"));
+            note.setContentHighlights(Collections.singletonList("<em classname= 'highlight'>Note" + i + "</em>"));
+            mockList.add(note);
+        }
 
-        SearchResultItem transaction = new SearchResultItem();
-        transaction.setId(8L);
-        transaction.setType(ContentType.TRANSACTION);
-        transaction.setName("Payment8");
-        transaction.setNameHighlights(Collections.singletonList("<em classname= 'highlight'>Payment8</em>"));
-        transaction.setContentHighlights(Collections.singletonList("<em classname= 'highlight'>Payment8</em>"));
-        mockList.add(transaction);
 
         return mockList;
     }
