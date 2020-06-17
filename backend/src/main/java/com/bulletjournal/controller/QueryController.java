@@ -138,6 +138,7 @@ public class QueryController {
         validSearchResult.setScrollId(scrollId);
         validSearchResult.setSearchResultItemList(validResults);
         validSearchResult.setTotalHits(scroll.getTotalHits());
+        validSearchResult.setHasSearchHits(scroll.hasSearchHits());
 
         return validSearchResult;
     }

@@ -5,6 +5,7 @@ import java.util.List;
 public class SearchResult {
 
     private Long totalHits;
+    private Boolean hasSearchHits;
     private String scrollId;
     private List<SearchResultItem> searchResultItemList;
 
@@ -33,5 +34,13 @@ public class SearchResult {
 
     public void setSearchResultItemList(List<SearchResultItem> searchResultItemList) {
         this.searchResultItemList = searchResultItemList;
+    }
+
+    public Boolean getHasSearchHits() {
+        return hasSearchHits;
+    }
+
+    public void setHasSearchHits(Boolean hasSearchHits) {
+        this.hasSearchHits = hasSearchHits;
     }
 }
