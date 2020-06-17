@@ -33,8 +33,8 @@ public class ESUtil {
             note.setId((long) i);
             note.setType(ContentType.NOTE);
             note.setName("Note" + i);
-            note.setNameHighlights(Collections.singletonList("The quick brown <em classname= 'highlight'>fox</em> jumps over the lazy dog"));
-            note.setContentHighlights(Collections.singletonList("The quick brown <em classname= 'highlight'>fox</em> jumps over the lazy dog"));
+            note.setNameHighlights(Collections.singletonList("The quick brown <em class= 'highlight'>fox</em> jumps over the lazy dog"));
+            note.setContentHighlights(Collections.singletonList("The quick brown <em class= 'highlight'>fox</em> jumps over the lazy dog"));
             mockList.add(note);
         }
 
