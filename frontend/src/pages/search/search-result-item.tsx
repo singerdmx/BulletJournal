@@ -10,6 +10,7 @@ const {Meta} = Card;
 
 type SearchResultItemProps = {
     item: SearchResultItem;
+    index: number;
 }
 
 export const contentTypeIconMapper: { [key in ContentType]: React.ReactNode } = {
@@ -24,14 +25,15 @@ export const contentTypeIconMapper: { [key in ContentType]: React.ReactNode } = 
 
 const SearchResultItemElement: React.FC<SearchResultItemProps> =
     ({
-         item
+         item,
+         index
      }) => {
 
         const history = useHistory();
 
         const getDescription = (item: SearchResultItem) => {
-            return item.nameHighlights.concat(item.contentHighlights).map((highlight) => {
-                return <div
+            return item.nameHighlights.concat(item.contentHighlights).map((highlight, i) => {
+                return <p key={index.toString() + '#' + i.toString()}
                     dangerouslySetInnerHTML={{__html: highlight}}/>;
             });
         };
@@ -40,7 +42,7 @@ const SearchResultItemElement: React.FC<SearchResultItemProps> =
             history.push(`/${item.type.toString().toLowerCase()}/${item.id}`);
         };
 
-        return <div onClick={onClick} className='search-item'>
+        return <div onClick={onClick} className='search-item' key={index}>
             <Card hoverable
                   className='card-style'
                   style={{

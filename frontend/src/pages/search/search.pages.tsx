@@ -17,6 +17,7 @@ type SearchProps = {
     searchPageNo: number;
     searchResult: SearchResult | undefined;
     searching: boolean;
+    loadingMore: boolean;
     search: (term: string, scrollId?: string) => void;
     searchTerm: string;
     updateSearchTerm: (term: string) => void;
@@ -33,6 +34,7 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
          searchPageNo,
          searchResult,
          searching,
+         loadingMore,
          searchTerm,
          search,
          updateSearchTerm
@@ -73,11 +75,11 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
         return (
             <div className='search-page'>
                 <div>
-                    {searchResult.searchResultItemList.map((item: SearchResultItem) => {
-                        return <SearchResultItemElement item={item}/>
+                    {searchResult.searchResultItemList.map((item: SearchResultItem, index: number) => {
+                        return <SearchResultItemElement item={item} index={index} key={index}/>
                     })}
                 </div>
-                {searching ? (
+                {loadingMore ? (
                     <LoadingIcon/>
                 ) : searchResult.totalHits > searchPageNo * searchResultPageSize ? null : (
                     <span className='load-more-button' onClick={handleLoadMore}>
@@ -94,6 +96,7 @@ const mapStateToProps = (state: IState) => ({
     searchPageNo: state.search.searchPageNo,
     searchResult: state.search.searchResult,
     searching: state.search.searching,
+    loadingMore: state.search.loadingMore,
     searchTerm: state.search.term,
 });
 
