@@ -26,7 +26,6 @@ class HeaderLayout extends React.Component<HeaderProps & RouteComponentProps, He
 
     onChange = (e: any) => {
         this.setState({placeHolder: 'Search'});
-        console.log(e.target.value)
         this.props.updateSearchTerm(e.target.value);
     };
 

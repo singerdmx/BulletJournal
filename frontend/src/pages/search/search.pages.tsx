@@ -56,11 +56,8 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
             if (!term) {
                 return;
             }
-            if (searchResult && searchResult.scrollId) {
-                search(term, searchResult.scrollId);
-            } else {
-                search(term);
-            }
+
+            search(term);
         }, [term]);
 
         if (searching) {

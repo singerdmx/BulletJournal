@@ -46,6 +46,9 @@ const slice = createSlice({
         ) => {
             const {searchPageNo} = action.payload;
             state.searchPageNo = searchPageNo;
+            if (searchPageNo === 0) {
+                state.searchResult = undefined;
+            }
         },
         updateSearchTerm: (
             state,

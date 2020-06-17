@@ -41,7 +41,12 @@ const SearchResultItemElement: React.FC<SearchResultItemProps> =
         };
 
         return <div onClick={onClick} className='search-item'>
-            <Card>
+            <Card hoverable
+                  className='card-style'
+                  style={{
+                      borderRadius: '15px'
+                  }}
+            >
                 <Meta title={item.name}
                       avatar={contentTypeIconMapper[item.type]}
                       description={getDescription(item)}/>
