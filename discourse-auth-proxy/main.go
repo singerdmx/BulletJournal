@@ -83,7 +83,7 @@ func main() {
 		Addr: ":80",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logger.Printf("Port 80: Request %s %s", r.Host, r.URL)
-			if (r.Host == "home.bulletjournal.us") {
+			if (r.Host == "home.bulletjournal.us" || strings.HasPrefix(r.RequestURI, "/home")) {
 				logger.Printf("Port 80: Bypassing Auth Proxy: %s", r.RequestURI)
 				proxy.ServeHTTP(w, r)
 				return
@@ -227,6 +227,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 	}
 
 	if (r.Host == "home.bulletjournal.us" ||
+		strings.HasPrefix(r.RequestURI, "/home") ||
 		strings.HasPrefix(r.RequestURI, "/api/public/") ||
 		strings.HasPrefix(r.RequestURI, "/public/") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback") ||
