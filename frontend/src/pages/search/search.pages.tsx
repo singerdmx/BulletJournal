@@ -101,7 +101,7 @@ const mapStateToProps = (state: IState) => ({
     searchResult: state.search.searchResult,
     searching: state.search.searching,
     loadingMore: state.search.loadingMore,
-    searchTerm: state.search.term,
+    searchTerm: state.search.searchTerm,
 });
 
 export default connect(mapStateToProps, {search, updateSearchTerm})(withRouter(SearchPage));

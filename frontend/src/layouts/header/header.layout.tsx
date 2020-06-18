@@ -30,7 +30,6 @@ class HeaderLayout extends React.Component<HeaderProps & RouteComponentProps, He
     };
 
     onSearch = (term: string) => {
-        this.props.updateSearchPageNo(0);
         this.props.updateSearchTerm(term);
         if (term.length < 3) {
             this.setState({placeHolder: 'Enter at least 3 characters to search'});
@@ -57,7 +56,7 @@ class HeaderLayout extends React.Component<HeaderProps & RouteComponentProps, He
 }
 
 const mapStateToProps = (state: IState) => ({
-    term: state.search.term,
+    term: state.search.searchTerm,
 });
 
 export default connect(mapStateToProps, {updateSearchPageNo, updateSearchTerm})(withRouter(HeaderLayout));
