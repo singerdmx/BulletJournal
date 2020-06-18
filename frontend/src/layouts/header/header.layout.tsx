@@ -37,7 +37,7 @@ class HeaderLayout extends React.Component<HeaderProps & RouteComponentProps, He
             this.props.updateSearchTerm('');
             return;
         }
-        message.success('Searching');
+        message.success('Searching', 1);
         this.setState({placeHolder: 'Search'});
         this.props.history.push(`/search/${term}`);
     };
