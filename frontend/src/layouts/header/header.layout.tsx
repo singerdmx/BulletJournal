@@ -3,14 +3,13 @@ import {Input, Layout, message} from 'antd';
 import Myself from '../../features/myself/Myself';
 import {connect} from "react-redux";
 import {RouteComponentProps, withRouter} from 'react-router';
-import {updateSearchPageNo, updateSearchTerm} from "../../features/search/action";
+import {updateSearchTerm} from "../../features/search/action";
 import {IState} from "../../store";
 
 const {Header} = Layout;
 const {Search} = Input;
 
 type HeaderProps = {
-    updateSearchPageNo: (searchPageNo: number) => void;
     updateSearchTerm: (term: string) => void;
     term: string;
 }
@@ -59,4 +58,4 @@ const mapStateToProps = (state: IState) => ({
     term: state.search.searchTerm,
 });
 
-export default connect(mapStateToProps, {updateSearchPageNo, updateSearchTerm})(withRouter(HeaderLayout));
+export default connect(mapStateToProps, {updateSearchTerm})(withRouter(HeaderLayout));
