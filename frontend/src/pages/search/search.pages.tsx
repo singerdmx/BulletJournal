@@ -81,7 +81,7 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
                 </div>
                 {loadingMore ? (
                     <LoadingIcon/>
-                ) : searchResult.totalHits > searchPageNo * searchResultPageSize ? null : (
+                ) : searchResult.totalHits <= searchPageNo * searchResultPageSize ? null : (
                     <span className='load-more-button' onClick={handleLoadMore}>
               <Tooltip title='Load More'>
                 <CloudSyncOutlined/>
