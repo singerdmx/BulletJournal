@@ -31,7 +31,7 @@ let initialState = {
     searchPageNo: 0,
     searching: false,
     loadingMore: false,
-    term: ''
+    searchTerm: ''
 };
 
 const slice = createSlice({
@@ -60,7 +60,7 @@ const slice = createSlice({
             action: PayloadAction<UpdateSearchTermAction>
         ) => {
             const {term} = action.payload;
-            state.term = term;
+            state.searchTerm = term;
         },
         updateSearching: (state, action: PayloadAction<UpdateSearchingAction>) => {
             const {searching} = action.payload;
