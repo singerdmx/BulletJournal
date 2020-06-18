@@ -67,7 +67,7 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
         }
 
         if (!searchTerm) {
-            return <Empty/>
+            return <div className='search-page'><Empty/></div>
         }
 
         if (!searchResult || searchResult.totalHits === 0) {
