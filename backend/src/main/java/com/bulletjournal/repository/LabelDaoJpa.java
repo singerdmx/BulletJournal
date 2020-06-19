@@ -215,7 +215,10 @@ public class LabelDaoJpa {
                 .collect(Collectors.toMap(com.bulletjournal.controller.models.Label::getId, l -> l));
 
         projectItems.forEach(item -> item
-                .setLabels(item.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
+                .setLabels(item.getLabels().stream()
+                        .filter(l -> m.get(l.getId()) != null)
+                        .map(l -> m.get(l.getId()))
+                        .collect(Collectors.toList())));
         return projectItems;
     }
 
