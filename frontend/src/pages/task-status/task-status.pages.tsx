@@ -67,29 +67,14 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
         if (tasks.length === 0) {
             return null;
         }
-        if (!status) {
-            return <Panel header='' key='DEFAULT'>
-                {
-                    tasks.map((task, index) => {
-                        return (
-                            <div key={index} style={{display: 'flex', alignItems: 'center'}}>
-                                <TaskItem
-                                    task={task}
-                                    type={ProjectItemUIType.ORDER}
-                                    readOnly={false}
-                                    inProject={false}
-                                    inModal={false}
-                                    isComplete={false}
-                                    completeOnlyOccurrence={false}
-                                />
-                            </div>
-                        );
-                    })
-                }
-            </Panel>
+        let header = '';
+        let key = 'DEFAULT';
+        if (status) {
+            header = status.toString().replace(/_/g, ' ');
+            key = status.toString();
         }
 
-        return <Panel header={status.toString().replace(/_/g, ' ')} key={status.toString()}>
+        return <Panel header={header} key={key}>
             {
                 tasks.map((task, index) => {
                     return (
