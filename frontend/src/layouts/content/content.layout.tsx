@@ -16,6 +16,7 @@ import SearchCompletedTasksPage from '../../pages/project/search-completed-tasks
 import AdminPage from '../../pages/admin/admin.pages';
 import PunchCardPage from "../../pages/punch-card/punch-card.pages";
 import SearchPage from "../../pages/search/search.pages";
+import TaskStatusPage from "../../pages/task-status/task-status.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -28,6 +29,7 @@ class ContentLayout extends React.Component {
           <Route exact path='/settings' component={SettingPage} />
           <Route exact path='/projects' component={ProjectsPage} />
           <Route exact path='/projects/:projectId' component={ProjectPage} />
+          <Route exact path='/projects/:projectId/taskStatus' component={TaskStatusPage} />
           <Route exact path='/groups' component={GroupsPage} />
           <Route exact path='/groups/:groupId' component={GroupPage} />
           <Route exact path='/labels/:createOrSearch' component={LabelsPage} />

@@ -326,7 +326,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
         <FieldTimeOutlined onClick={handleShowTasksOrdered}/>
       </Tooltip>
       <Tooltip title='Tasks by Status'>
-        <UnorderedListOutlined/>
+        <UnorderedListOutlined onClick={() => history.push(`/projects/${project.id}/taskStatus`)}/>
       </Tooltip>
     </div>
   };
