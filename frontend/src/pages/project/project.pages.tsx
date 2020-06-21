@@ -381,6 +381,7 @@ class ProjectPage extends React.Component<
         createContent = <AddTask mode='icon' />;
         projectContent = (
           <TaskTree
+            timezone={this.props.timezone}
             showCompletedTask={this.state.completeTasksShown}
             readOnly={project.shared}
             showModal={(user: User) => {
@@ -389,6 +390,7 @@ class ProjectPage extends React.Component<
             showOrderModal={() => {
               handleGetProjectItemsByOrder();
             }}
+            hideCompletedTask={() => this.setState({ completeTasksShown: false })}
           />
         );
         showCompletedTasks = this.getShowCompletedTasksIcon();

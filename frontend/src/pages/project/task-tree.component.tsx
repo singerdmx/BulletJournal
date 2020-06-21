@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Divider, Empty, List, Result, Tooltip, Tree} from 'antd';
 import {Task} from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import ReactLoading from 'react-loading';
-import {putTask, updateCompletedTasks, updateTasks,} from '../../features/tasks/actions';
+import {getTasksByOrder, putTask, updateCompletedTasks, updateTasks,} from '../../features/tasks/actions';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
 import {Project} from '../../features/project/interface';
@@ -21,9 +21,11 @@ import {User} from '../../features/group/interface';
 import {useHistory} from 'react-router-dom';
 import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
+import TasksByOrder from "../../components/modals/tasks-by-order.component";
 
 type TasksProps = {
   showCompletedTask: boolean;
+  timezone: string;
   readOnly: boolean;
   project: Project | undefined;
   tasks: Task[];
@@ -35,6 +37,13 @@ type TasksProps = {
   putTask: (projectId: number, tasks: Task[]) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
+  getTasksByOrder: (
+      projectId: number,
+      timezone: string,
+      startDate?: string,
+      endDate?: string
+  ) => void;
+  hideCompletedTask: () => void;
 };
 
 const getTree = (
@@ -175,6 +184,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     nextCompletedTasks,
     showModal,
     showOrderModal,
+    getTasksByOrder,
+    timezone,
+    hideCompletedTask
   } = props;
 
   useEffect(() => {
@@ -184,6 +196,8 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   }, [project]);
 
   const history = useHistory();
+
+  const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
 
   const handleLoadMore = () => {
     if (project) {
@@ -271,17 +285,19 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     return null;
   };
 
+  const handleShowTasksOrdered = () => {
+    getTasksByOrder(project.id, timezone);
+    setTasksByOrderShown(true);
+  };
+
   const getTaskActions = () => {
-    if (tasks.length === 0) {
-      return null;
-    }
 
     return <div className='task-actions'>
       <Tooltip title='Show Completed Tasks'>
         <CheckCircleOutlined/>
       </Tooltip>
       <Tooltip title='Tasks Ordered by Due Date Time'>
-        <FieldTimeOutlined/>
+        <FieldTimeOutlined onClick={handleShowTasksOrdered}/>
       </Tooltip>
       <Tooltip title='Tasks by Status'>
         <UnorderedListOutlined/>
@@ -299,6 +315,13 @@ const TaskTree: React.FC<TasksProps> = (props) => {
 
   return (
       <div>
+        <div>
+          <TasksByOrder
+              visible={tasksByOrderShown}
+              onCancel={() => {setTasksByOrderShown(false)}}
+              hideCompletedTask={() => hideCompletedTask}
+          />
+        </div>
         {getTaskActions()}
         <div>
           {getAddTaskButton()}
@@ -328,4 +351,5 @@ export default connect(mapStateToProps, {
   updateTasks,
   updateCompletedTasks,
   putTask,
+  getTasksByOrder
 })(TaskTree);
