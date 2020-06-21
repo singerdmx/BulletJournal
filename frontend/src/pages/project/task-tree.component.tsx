@@ -8,7 +8,14 @@ import {putTask, updateCompletedTasks, updateTasks,} from '../../features/tasks/
 import {connect} from 'react-redux';
 import {IState} from '../../store';
 import {Project} from '../../features/project/interface';
-import {CarryOutOutlined, CloudSyncOutlined, SearchOutlined} from '@ant-design/icons';
+import {
+  CarryOutOutlined,
+  CheckCircleOutlined,
+  CloudSyncOutlined,
+  FieldTimeOutlined,
+  SearchOutlined,
+  UnorderedListOutlined
+} from '@ant-design/icons';
 import './task.styles.less';
 import {User} from '../../features/group/interface';
 import {useHistory} from 'react-router-dom';
@@ -31,38 +38,38 @@ type TasksProps = {
 };
 
 const getTree = (
-  inProject: boolean,
-  data: Task[],
-  readOnly: boolean,
-  showModal?: (user: User) => void,
-  showOrderModal?: () => void
+    inProject: boolean,
+    data: Task[],
+    readOnly: boolean,
+    showModal?: (user: User) => void,
+    showOrderModal?: () => void
 ): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Task) => {
     const node = {} as TreeNodeNormal;
     if (item.subTasks && item.subTasks.length) {
       node.children = getTree(
-        inProject,
-        item.subTasks,
-        readOnly,
-        showModal,
-        showOrderModal
+          inProject,
+          item.subTasks,
+          readOnly,
+          showModal,
+          showOrderModal
       );
     } else {
       node.children = [] as TreeNodeNormal[];
     }
 
     node.title = (
-      <TreeItem
-        task={item}
-        type={ProjectItemUIType.PROJECT}
-        isComplete={false}
-        readOnly={readOnly}
-        inProject={inProject}
-        completeOnlyOccurrence={false}
-        showModal={showModal}
-        showOrderModal={showOrderModal}
-      />
+        <TreeItem
+            task={item}
+            type={ProjectItemUIType.PROJECT}
+            isComplete={false}
+            readOnly={readOnly}
+            inProject={inProject}
+            completeOnlyOccurrence={false}
+            showModal={showModal}
+            showOrderModal={showOrderModal}
+        />
     );
     node.key = item.id.toString();
     res.push(node);
@@ -98,16 +105,16 @@ const dragTaskById = (tasks: Task[], taskId: number): Task[] => {
   tasks.forEach((item, index) => {
     let task = {} as Task;
     const subTasks = dragTaskById(item.subTasks, taskId);
-    task = { ...item, subTasks: subTasks };
+    task = {...item, subTasks: subTasks};
     if (task.id !== taskId) res.push(task);
   });
   return res;
 };
 
 const DropTaskById = (
-  tasks: Task[],
-  dropId: number,
-  dropTask: Task
+    tasks: Task[],
+    dropId: number,
+    dropTask: Task
 ): Task[] => {
   let res = [] as Task[];
   tasks.forEach((item, index) => {
@@ -119,14 +126,14 @@ const DropTaskById = (
     } else {
       subTasks = DropTaskById(item.subTasks, dropId, dropTask);
     }
-    task = { ...item, subTasks: subTasks };
+    task = {...item, subTasks: subTasks};
     res.push(task);
   });
   return res;
 };
 
 const onDrop = (tasks: Task[], putTask: Function, projectId: number) => (
-  info: any
+    info: any
 ) => {
   const targetTask = findTaskById(tasks, parseInt(info.dragNode.key));
   const dropPos = info.node.props.pos.split('-');
@@ -150,9 +157,9 @@ const onDrop = (tasks: Task[], putTask: Function, projectId: number) => (
 };
 
 const Loading = () => (
-  <div className='loading'>
-    <ReactLoading type='bubbles' color='#0984e3' height='75' width='75' />
-  </div>
+    <div className='loading'>
+      <ReactLoading type='bubbles' color='#0984e3' height='75' width='75'/>
+    </div>
 );
 
 const TaskTree: React.FC<TasksProps> = (props) => {
@@ -197,51 +204,51 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   if (props.showCompletedTask) {
     if (completedTasks.length === 0) {
       completedTaskList = (
-        <div>
-          <Divider />
-          <Empty />
-        </div>
+          <div>
+            <Divider/>
+            <Empty/>
+          </div>
       );
     } else {
       completedTaskList = (
-        <div>
-          <Divider />
-          <div className='search-completed-tasks-button'>
-            <Button
-              icon={<SearchOutlined />}
-              onClick={handleSearchCompletedTasksClick}
-            >
-              Search Completed Tasks
-            </Button>
-          </div>
-          <div className='completed-tasks'>
-            <List>
-              {completedTasks.map((task) => {
-                return (
-                  <List.Item key={task.id}>
-                    <TreeItem
-                      task={task}
-                      type={ProjectItemUIType.COMPLETE_TASK}
-                      isComplete={true}
-                      readOnly={readOnly}
-                      inProject={false}
-                      completeOnlyOccurrence={false}
-                    />
-                  </List.Item>
-                );
-              })}
-            </List>
-          </div>
-          {loadingCompletedTask ? (
-            <Loading />
-          ) : nextCompletedTasks.length === 0 ? null : (
-            <span className='load-more-button' onClick={handleLoadMore}>
+          <div>
+            <Divider/>
+            <div className='search-completed-tasks-button'>
+              <Button
+                  icon={<SearchOutlined/>}
+                  onClick={handleSearchCompletedTasksClick}
+              >
+                Search Completed Tasks
+              </Button>
+            </div>
+            <div className='completed-tasks'>
+              <List>
+                {completedTasks.map((task) => {
+                  return (
+                      <List.Item key={task.id}>
+                        <TreeItem
+                            task={task}
+                            type={ProjectItemUIType.COMPLETE_TASK}
+                            isComplete={true}
+                            readOnly={readOnly}
+                            inProject={false}
+                            completeOnlyOccurrence={false}
+                        />
+                      </List.Item>
+                  );
+                })}
+              </List>
+            </div>
+            {loadingCompletedTask ? (
+                <Loading/>
+            ) : nextCompletedTasks.length === 0 ? null : (
+                <span className='load-more-button' onClick={handleLoadMore}>
               <Tooltip title='Load More'>
-                <CloudSyncOutlined />
+                <CloudSyncOutlined/>
               </Tooltip>
             </span>
-          )}
-        </div>
+            )}
+          </div>
       );
     }
   }
@@ -252,39 +259,60 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   const getAddTaskButton = () => {
     if (tasks.length === 0) {
       return (
-        <div className='add-task-button'>
-          <Result
-            icon={<CarryOutOutlined />}
-            extra={<AddTask mode='button' />}
-          />
-        </div>
+          <div className='add-task-button'>
+            <Result
+                icon={<CarryOutOutlined/>}
+                extra={<AddTask mode='button'/>}
+            />
+          </div>
       );
     }
 
     return null;
   };
 
+  const getTaskActions = () => {
+    if (tasks.length === 0) {
+      return null;
+    }
+
+    return <div className='task-actions'>
+      <Tooltip title='Show Completed Tasks'>
+        <CheckCircleOutlined/>
+      </Tooltip>
+      <Tooltip title='Tasks Ordered by Due Date Time'>
+        <FieldTimeOutlined/>
+      </Tooltip>
+      <Tooltip title='Tasks by Status'>
+        <UnorderedListOutlined/>
+      </Tooltip>
+    </div>
+  };
+
   const treeTask = getTree(
-    !project.shared,
-    tasks,
-    readOnly,
-    showModal,
-    showOrderModal
+      !project.shared,
+      tasks,
+      readOnly,
+      showModal,
+      showOrderModal
   );
 
   return (
-    <div>
-      {getAddTaskButton()}
-      <Tree
-        className='ant-tree'
-        draggable
-        blockNode
-        onDragEnter={onDragEnter}
-        onDrop={onDrop(tasks, putTask, project.id)}
-        treeData={treeTask}
-      />
-      {completedTaskList}
-    </div>
+      <div>
+        {getTaskActions()}
+        <div>
+          {getAddTaskButton()}
+          <Tree
+              className='ant-tree'
+              draggable
+              blockNode
+              onDragEnter={onDragEnter}
+              onDrop={onDrop(tasks, putTask, project.id)}
+              treeData={treeTask}
+          />
+          {completedTaskList}
+        </div>
+      </div>
   );
 };
 
