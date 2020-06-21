@@ -4,7 +4,7 @@ import {Task} from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import ReactLoading from 'react-loading';
-import {getTasksByOrder, putTask, updateCompletedTasks, updateTasks,} from '../../features/tasks/actions';
+import {getTasksByOrder, putTask, updateCompletedTasks, updateTasks} from '../../features/tasks/actions';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
 import {Project} from '../../features/project/interface';
@@ -14,7 +14,8 @@ import {
   CloudSyncOutlined,
   FieldTimeOutlined,
   SearchOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import './task.styles.less';
 import {User} from '../../features/group/interface';
@@ -24,7 +25,8 @@ import {ProjectItemUIType} from "../../features/project/constants";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 
 type TasksProps = {
-  showCompletedTask: boolean;
+  completeTasksShown: boolean;
+  completedTaskPageNo: number;
   timezone: string;
   readOnly: boolean;
   project: Project | undefined;
@@ -37,13 +39,14 @@ type TasksProps = {
   putTask: (projectId: number, tasks: Task[]) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
+  hideCompletedTask: () => void;
+  showCompletedTask: () => void;
   getTasksByOrder: (
       projectId: number,
       timezone: string,
       startDate?: string,
       endDate?: string
   ) => void;
-  hideCompletedTask: () => void;
 };
 
 const getTree = (
@@ -186,7 +189,10 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     showOrderModal,
     getTasksByOrder,
     timezone,
-    hideCompletedTask
+    completedTaskPageNo,
+    completeTasksShown,
+    hideCompletedTask,
+    showCompletedTask
   } = props;
 
   useEffect(() => {
@@ -215,7 +221,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   };
 
   let completedTaskList = null;
-  if (props.showCompletedTask) {
+  if (completeTasksShown) {
     if (completedTasks.length === 0) {
       completedTaskList = (
           <div>
@@ -290,12 +296,32 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     setTasksByOrderShown(true);
   };
 
+  const handleClickShowCompletedTasksButton = () => {
+    if (completedTaskPageNo === 0) {
+      updateCompletedTasks(project.id);
+    }
+    showCompletedTask();
+    window.scrollTo(0, document.body.scrollHeight);
+  };
+
+  const getShowCompletedTasksIcon = () => {
+    if (completeTasksShown) {
+      return (
+          <Tooltip placement='top' title='Hide Completed Tasks'>
+              <CloseCircleOutlined onClick={hideCompletedTask}/>
+          </Tooltip>
+      );
+    }
+
+    return  <Tooltip title='Show Completed Tasks'>
+      <CheckCircleOutlined onClick={handleClickShowCompletedTasksButton}/>
+    </Tooltip>
+  };
+
   const getTaskActions = () => {
 
     return <div className='task-actions'>
-      <Tooltip title='Show Completed Tasks'>
-        <CheckCircleOutlined/>
-      </Tooltip>
+      {getShowCompletedTasksIcon()}
       <Tooltip title='Tasks Ordered by Due Date Time'>
         <FieldTimeOutlined onClick={handleShowTasksOrdered}/>
       </Tooltip>
@@ -319,7 +345,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
           <TasksByOrder
               visible={tasksByOrderShown}
               onCancel={() => {setTasksByOrderShown(false)}}
-              hideCompletedTask={() => hideCompletedTask}
+              hideCompletedTask={hideCompletedTask}
           />
         </div>
         {getTaskActions()}
@@ -340,6 +366,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
+  completedTaskPageNo: state.task.completedTaskPageNo,
   project: state.project.project,
   tasks: state.task.tasks,
   completedTasks: state.task.completedTasks,
@@ -351,5 +378,5 @@ export default connect(mapStateToProps, {
   updateTasks,
   updateCompletedTasks,
   putTask,
-  getTasksByOrder
+  getTasksByOrder,
 })(TaskTree);
