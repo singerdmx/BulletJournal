@@ -16,6 +16,7 @@ import {
   TeamOutlined,
   EditTwoTone,
   SyncOutlined,
+  RightCircleTwoTone
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { ContentAction } from '../../features/project/constants';
@@ -69,6 +70,9 @@ export const getIcon = (action: string) => {
   }
   if (action.startsWith('UNCOMPLETE')) {
     return <CloseCircleTwoTone />;
+  }
+  if (action.startsWith('MOVE')) {
+    return <RightCircleTwoTone />;
   }
   return <StarTwoTone />;
 };
