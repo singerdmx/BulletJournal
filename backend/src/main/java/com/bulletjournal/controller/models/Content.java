@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Content {
@@ -64,7 +66,9 @@ public class Content {
 
     public static Content addOwnerAvatar(Content content, UserClient userClient) {
         content.setOwner(userClient.getUser(content.getOwner().getName()));
-        Revision.addAvatar(Arrays.asList(content.revisions), userClient);
+        if (content.revisions != null ) {
+            Revision.addAvatar(Arrays.asList(content.revisions), userClient);
+        }
         return content;
     }
 
