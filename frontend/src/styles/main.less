@@ -203,3 +203,30 @@
     margin-left: 5px;
   }
 }
+
+/* ----------------------Big Calendar---------------------- */
+.rbc-event {
+	border: none;
+	box-sizing: border-box;
+	box-shadow: none;
+	margin: 0;
+	padding: 2px 5px;
+	background-color: @primary-color;
+	border-radius: 5px;
+	color: #fff;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	&:focus {
+		outline: 5px auto #3b99fc;
+	}
+}
+.rbc-event.rbc-selected {
+	background-color: @primary-color;
+}
+
+.rbc-title h2 {
+    text-align: center;
+    color: @primary-color;
+    font-size: 18px;
+}
