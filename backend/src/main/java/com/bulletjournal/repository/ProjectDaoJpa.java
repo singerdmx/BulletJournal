@@ -180,7 +180,7 @@ public class ProjectDaoJpa {
     public Project create(CreateProjectParams createProjectParams, String owner, List<Event> events) {
         String name = createProjectParams.getName();
         if (!this.projectRepository.findByNameAndOwner(name, owner).isEmpty()) {
-            throw new ResourceAlreadyExistException("Project with name \"" + name + "\" already exists");
+            throw new ResourceAlreadyExistException("BuJo with name \"" + name + "\" already exists");
         }
         Long groupId = createProjectParams.getGroupId();
         Project project = new Project();
@@ -224,13 +224,18 @@ public class ProjectDaoJpa {
     public Project partialUpdate(String requester, Long projectId, UpdateProjectParams updateProjectParams,
                                  List<Event> joined, List<Event> removed) {
         Project project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("BuJo " + projectId + " not found"));
 
         this.authorizationService.checkAuthorizedToOperateOnContent(project.getOwner(), requester, ContentType.PROJECT,
                 Operation.UPDATE, projectId);
 
-        DaoHelper.updateIfPresent(updateProjectParams.hasName(), updateProjectParams.getName(),
-                (value) -> project.setName(value));
+        if (updateProjectParams.hasName()) {
+            String name = updateProjectParams.getName();
+            if (!this.projectRepository.findByNameAndOwner(name, project.getOwner()).isEmpty()) {
+                throw new ResourceAlreadyExistException("BuJo with name \"" + name + "\" already exists");
+            }
+            project.setName(name);
+        }
 
         DaoHelper.updateIfPresent(updateProjectParams.hasDescription(), updateProjectParams.getDescription(),
                 (value) -> project.setDescription(value));
