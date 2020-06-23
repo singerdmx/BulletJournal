@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import com.bulletjournal.contents.ContentType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchResultItem {
@@ -9,8 +10,8 @@ public class SearchResultItem {
     private Long id;
     private ContentType type;
     private String name;
-    private List<String> nameHighlights;
-    private List<String> contentHighlights;
+    private List<String> nameHighlights = new ArrayList<>();
+    private List<String> contentHighlights = new ArrayList<>();
 
     public SearchResultItem() {
     }

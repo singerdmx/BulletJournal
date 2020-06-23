@@ -3,14 +3,13 @@ import {Input, Layout, message} from 'antd';
 import Myself from '../../features/myself/Myself';
 import {connect} from "react-redux";
 import {RouteComponentProps, withRouter} from 'react-router';
-import {updateSearchPageNo, updateSearchTerm} from "../../features/search/action";
+import {updateSearchTerm} from "../../features/search/action";
 import {IState} from "../../store";
 
 const {Header} = Layout;
 const {Search} = Input;
 
 type HeaderProps = {
-    updateSearchPageNo: (searchPageNo: number) => void;
     updateSearchTerm: (term: string) => void;
     term: string;
 }
@@ -26,19 +25,17 @@ class HeaderLayout extends React.Component<HeaderProps & RouteComponentProps, He
 
     onChange = (e: any) => {
         this.setState({placeHolder: 'Search'});
-        console.log(e.target.value)
         this.props.updateSearchTerm(e.target.value);
     };
 
     onSearch = (term: string) => {
-        this.props.updateSearchPageNo(0);
         this.props.updateSearchTerm(term);
         if (term.length < 3) {
             this.setState({placeHolder: 'Enter at least 3 characters to search'});
             this.props.updateSearchTerm('');
             return;
         }
-        message.success('Searching');
+        message.success('Searching', 1);
         this.setState({placeHolder: 'Search'});
         this.props.history.push(`/search/${term}`);
     };
@@ -58,7 +55,7 @@ class HeaderLayout extends React.Component<HeaderProps & RouteComponentProps, He
 }
 
 const mapStateToProps = (state: IState) => ({
-    term: state.search.term,
+    term: state.search.searchTerm,
 });
 
-export default connect(mapStateToProps, {updateSearchPageNo, updateSearchTerm})(withRouter(HeaderLayout));
+export default connect(mapStateToProps, {updateSearchTerm})(withRouter(HeaderLayout));

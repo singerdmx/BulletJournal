@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class SearchIndexDaoJpa {
-    private static final String PRE_TAG = "<em class= 'highlight'>";
+    private static final String PRE_TAG = "<em class='highlight'>";
     private static final String POST_TAG = "</em>";
     private static final String BOUNDARY_SCANNER_TYPE = "sentence";
     private static final String HIGHLIGHTER_TYPE = "unified";

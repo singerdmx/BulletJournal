@@ -17,6 +17,7 @@ type SearchProps = {
     searchPageNo: number;
     searchResult: SearchResult | undefined;
     searching: boolean;
+    loadingMore: boolean;
     search: (term: string, scrollId?: string) => void;
     searchTerm: string;
     updateSearchTerm: (term: string) => void;
@@ -33,6 +34,7 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
          searchPageNo,
          searchResult,
          searching,
+         loadingMore,
          searchTerm,
          search,
          updateSearchTerm
@@ -56,18 +58,19 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
             if (!term) {
                 return;
             }
-            if (searchResult && searchResult.scrollId) {
-                search(term, searchResult.scrollId);
-            } else {
-                search(term);
-            }
+
+            search(term);
         }, [term]);
 
         if (searching) {
             return <div className='search-page'><Loading/></div>;
         }
 
-        if (!searchResult || searchResult.totalHits === 0) {
+        if (!searchTerm || !searchResult) {
+            return <div className='search-page'><Empty/></div>
+        }
+
+        if (searchResult.totalHits === 0) {
             return <div className='search-page'><Empty
                 description={`No result found for "${term}"`}
             /></div>
@@ -76,13 +79,13 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
         return (
             <div className='search-page'>
                 <div>
-                    {searchResult.searchResultItemList.map((item: SearchResultItem) => {
-                        return <SearchResultItemElement item={item}/>
+                    {searchResult.searchResultItemList.map((item: SearchResultItem, index: number) => {
+                        return <SearchResultItemElement item={item} index={index} key={index}/>
                     })}
                 </div>
-                {searching ? (
+                {loadingMore ? (
                     <LoadingIcon/>
-                ) : searchResult.totalHits > searchPageNo * searchResultPageSize ? null : (
+                ) : searchResult.totalHits <= searchPageNo * searchResultPageSize ? null : (
                     <span className='load-more-button' onClick={handleLoadMore}>
               <Tooltip title='Load More'>
                 <CloudSyncOutlined/>
@@ -97,7 +100,8 @@ const mapStateToProps = (state: IState) => ({
     searchPageNo: state.search.searchPageNo,
     searchResult: state.search.searchResult,
     searching: state.search.searching,
-    searchTerm: state.search.term,
+    loadingMore: state.search.loadingMore,
+    searchTerm: state.search.searchTerm,
 });
 
 export default connect(mapStateToProps, {search, updateSearchTerm})(withRouter(SearchPage));

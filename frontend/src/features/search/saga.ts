@@ -13,10 +13,16 @@ function* search(action: PayloadAction<SearchAction>) {
             yield call(message.error, 'Please enter at least 3 characters to search');
             return;
         }
-        yield put(searchActions.updateSearching({searching: true}));
         const state: IState = yield select();
+        let pageNo = state.search.searchPageNo;
+        if (scrollId) {
+            yield put(searchActions.updateLoadingMore({loadingMore: true}));
+        } else {
+            pageNo = 0;
+            yield put(searchActions.updateSearching({searching: true}));
+        }
         let data: SearchResult = yield call(fetchSearchResults,
-            term, state.search.searchPageNo, searchResultPageSize, scrollId);
+            term, pageNo, searchResultPageSize, scrollId);
         if (scrollId) {
             const oldList = state.search.searchResult!.searchResultItemList;
             const result =
@@ -24,14 +30,14 @@ function* search(action: PayloadAction<SearchAction>) {
             data.searchResultItemList = result;
         }
         yield put(searchActions.searchResultReceived({searchResult: data}));
-        yield put(searchActions.updateSearching({searching: false}));
         yield put(searchActions.updateSearchPageNo({
-            searchPageNo: state.search.searchPageNo + 1
+            searchPageNo: pageNo + 1
         }));
     } catch (error) {
         yield call(message.error, `search Error Received: ${error}`);
     }
     yield put(searchActions.updateSearching({searching: false}));
+    yield put(searchActions.updateLoadingMore({loadingMore: false}));
 }
 
 export default function* searchSagas() {

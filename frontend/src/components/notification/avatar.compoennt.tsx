@@ -45,25 +45,26 @@ const TitleAvatar = ({source, type, originator}: titleAvatarProps) => {
       break;
     case EventType.UpdateTaskAssigneeEvent:
     case EventType.UpdateTransactionPayerEvent:
-      icon = <SolutionOutlined/>
+    case EventType.SetTaskStatusEvent:
+      icon = <SolutionOutlined/>;
       break;
     case EventType.CreateProjectEvent:
-      icon = <PlusSquareOutlined/>
+      icon = <PlusSquareOutlined/>;
       break;
     case EventType.JoinProjectEvent:
-      icon = <ContactsOutlined/>
+      icon = <ContactsOutlined/>;
       break;
     case EventType.RemoveFromProjectEvent:
-      icon = <UserDeleteOutlined/>
+      icon = <UserDeleteOutlined/>;
       break;
     case EventType.ShareProjectItemEvent:
-      icon = <ShareAltOutlined/>
+      icon = <ShareAltOutlined/>;
       break;
     case EventType.SetLabelEvent:
-      icon = <TagOutlined/>
+      icon = <TagOutlined/>;
       break;
     case EventType.RevokeSharableEvent:
-      icon = <StopOutlined/>
+      icon = <StopOutlined/>;
       break;
     default:
       icon = <EyeOutlined/>;

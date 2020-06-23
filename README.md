@@ -1,4 +1,4 @@
-<a href="https://bulletjournal.us"><img src=
+<a href="https://bulletjournal.us/home/index.html"><img src=
 "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png"
  width="150px" height="150px"></a>
 
@@ -28,11 +28,11 @@ Next, you can look into the `docker-compose.yml` for detailed config parameters.
 ./start.sh
 ```
 
-Open the browser and enter `https://localhost` to see the UI interface.
-Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the API documentation.
-
 ```batch
 Windows Scripts
 ./buildImage.bat
 ./start.bat
 ```
+
+Open the browser and enter `https://localhost` to see the UI interface.
+Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the API documentation.

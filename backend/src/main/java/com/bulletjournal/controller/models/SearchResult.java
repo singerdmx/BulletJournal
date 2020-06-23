@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchResult {
@@ -7,7 +8,7 @@ public class SearchResult {
     private Long totalHits;
     private Boolean hasSearchHits;
     private String scrollId;
-    private List<SearchResultItem> searchResultItemList;
+    private List<SearchResultItem> searchResultItemList = new ArrayList<>();
 
     public SearchResult() {
     }

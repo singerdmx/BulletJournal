@@ -21,7 +21,7 @@ public class SetTaskStatusEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + event.getOriginatorAlias() + "## just changed Task status of ##" + event.getContentName() + "##";
+        return "##" + event.getOriginatorAlias() + "## changed Task status of ##" + event.getContentName() + "##";
     }
 
     @Override

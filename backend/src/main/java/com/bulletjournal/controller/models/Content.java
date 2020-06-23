@@ -64,7 +64,9 @@ public class Content {
 
     public static Content addOwnerAvatar(Content content, UserClient userClient) {
         content.setOwner(userClient.getUser(content.getOwner().getName()));
-        Revision.addAvatar(Arrays.asList(content.revisions), userClient);
+        if (content.revisions != null ) {
+            Revision.addAvatar(Arrays.asList(content.revisions), userClient);
+        }
         return content;
     }
 

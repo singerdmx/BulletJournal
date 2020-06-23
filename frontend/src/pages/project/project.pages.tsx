@@ -10,8 +10,6 @@ import { iconMapper } from '../../components/side-menu/side-menu.component';
 import {
   DeleteOutlined,
   TeamOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
@@ -28,8 +26,6 @@ import { updateExpandedMyself } from '../../features/myself/actions';
 
 import './project.styles.less';
 import {
-  updateCompletedTasks,
-  updateCompletedTaskPageNo,
   getTasksByAssignee,
   getTasksByOrder,
 } from '../../features/tasks/actions';
@@ -82,7 +78,6 @@ type ProjectPageProps = {
   timezone: string;
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
-  completedTaskPageNo: number;
   transactionTimezone: string;
   transactionFrequencyType: FrequencyType;
   transactionStartDate: string;
@@ -95,8 +90,6 @@ type ProjectPageProps = {
     name: string,
     history: History<History.PoorMansUnknown>
   ) => void;
-  updateCompletedTasks: (projectId: number) => void;
-  updateCompletedTaskPageNo: (completedTaskPageNo: number) => void;
   getTasksByAssignee: (projectId: number, assignee: string) => void;
   getNotesByOwner: (projectId: number, owner: string) => void;
   getTransactionsByPayer: (
@@ -171,39 +164,6 @@ class ProjectPage extends React.Component<
 
   onClickGroup = (groupId: number) => {
     this.props.history.push(`/groups/group${groupId}`);
-  };
-
-  getShowCompletedTasksIcon = () => {
-    if (this.state.completeTasksShown) {
-      return (
-        <Tooltip placement='top' title='Hide Completed Tasks'>
-          <div onClick={(e) => this.setState({ completeTasksShown: false })}>
-            <CloseCircleOutlined
-              style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
-            />
-          </div>
-        </Tooltip>
-      );
-    }
-
-    return (
-      <Tooltip placement='top' title='Show Completed Tasks'>
-        <div onClick={this.handleClickShowCompletedTasksButton}>
-          <CheckCircleOutlined
-            style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
-          />
-        </div>
-      </Tooltip>
-    );
-  };
-
-  handleClickShowCompletedTasksButton = () => {
-    if (this.props.completedTaskPageNo === 0) {
-      const projectId = this.props.match.params.projectId;
-      this.props.updateCompletedTasks(parseInt(projectId));
-    }
-    this.setState({ completeTasksShown: true });
-    window.scrollTo(0, document.body.scrollHeight);
   };
 
   onCancel = () => {
@@ -340,7 +300,6 @@ class ProjectPage extends React.Component<
     ];
     let createContent = null;
     let projectContent = null;
-    let showCompletedTasks = null;
     let projectItemsByUser = null;
     let projectItemsByOrder = null;
 
@@ -381,7 +340,7 @@ class ProjectPage extends React.Component<
         createContent = <AddTask mode='icon' />;
         projectContent = (
           <TaskTree
-            showCompletedTask={this.state.completeTasksShown}
+            timezone={this.props.timezone}
             readOnly={project.shared}
             showModal={(user: User) => {
               handleGetProjectItemsByUser(user);
@@ -389,9 +348,11 @@ class ProjectPage extends React.Component<
             showOrderModal={() => {
               handleGetProjectItemsByOrder();
             }}
+            completeTasksShown={this.state.completeTasksShown}
+            hideCompletedTask={() => this.setState({ completeTasksShown: false })}
+            showCompletedTask={() => this.setState({ completeTasksShown: true })}
           />
         );
-        showCompletedTasks = this.getShowCompletedTasksIcon();
         projectItemsByUser = (
           <TasksByAssignee
             assignee={this.state.assignee}
@@ -473,7 +434,6 @@ class ProjectPage extends React.Component<
     let groupUsers = group ? group.users : [];
     if (project && project.shared) {
       createContent = null;
-      showCompletedTasks = null;
       editContent = null;
       deleteContent = null;
       if (groupUsers) {
@@ -536,7 +496,6 @@ class ProjectPage extends React.Component<
                 {group && groupUsers.length}
               </span>
             </Popover>
-            {showCompletedTasks}
             <ShowProjectHistory />
             {createContent}
             {editContent}
@@ -559,7 +518,6 @@ const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   groups: state.group.groups,
   myself: state.myself.username,
-  completedTaskPageNo: state.task.completedTaskPageNo,
   transactionTimezone: state.transaction.timezone,
   transactionFrequencyType: state.transaction.frequencyType,
   transactionStartDate: state.transaction.startDate,
@@ -572,8 +530,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   getProject,
   deleteProject,
-  updateCompletedTasks,
-  updateCompletedTaskPageNo,
   getTasksByAssignee,
   getNotesByOwner,
   getTransactionsByPayer,

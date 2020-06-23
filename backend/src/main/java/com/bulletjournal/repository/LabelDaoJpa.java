@@ -215,7 +215,10 @@ public class LabelDaoJpa {
                 .collect(Collectors.toMap(com.bulletjournal.controller.models.Label::getId, l -> l));
 
         projectItems.forEach(item -> item
-                .setLabels(item.getLabels().stream().map(l -> m.get(l.getId())).collect(Collectors.toList())));
+                .setLabels(item.getLabels().stream()
+                        .filter(l -> m.get(l.getId()) != null)
+                        .map(l -> m.get(l.getId()))
+                        .collect(Collectors.toList())));
         return projectItems;
     }
 
@@ -225,11 +228,10 @@ public class LabelDaoJpa {
             return Collections.emptyList();
         }
         List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
-        if (labels != null && !labels.isEmpty()) {
-            labelsForPresentation = this.labelRepository.findAllById(labels).stream()
-                    .sorted(Comparator.comparingInt(label -> labels.indexOf(label.getId())))
-                    .map(Label::toPresentationModel).collect(Collectors.toList());
-        }
+        labelsForPresentation = this.labelRepository.findAllById(labels).stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(label -> labels.indexOf(label.getId())))
+                .map(Label::toPresentationModel).collect(Collectors.toList());
         return labelsForPresentation;
     }
 }
