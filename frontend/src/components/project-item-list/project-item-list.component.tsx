@@ -244,10 +244,9 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
     return (
         <div className='todo-list'>
           <div className='todo-panel'>
-            {this.rangePicker(this.state.viewType)}
             <Tooltip title='Choose type of view'>
               <Radio.Group
-                  style={{paddingLeft: '2rem'}}
+                  style={{paddingRight: '2rem'}}
                   size='small'
                   buttonStyle='solid'
                   defaultValue='agenda'
@@ -259,6 +258,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
                 <Radio.Button value='week' className='view-type'>Week</Radio.Button>
               </Radio.Group>
             </Tooltip>
+            {this.rangePicker(this.state.viewType)}
             <Tooltip placement='top' title='Change Time Zone'>
               <Link to='/settings' style={{paddingLeft: '30px'}}>
                 {this.props.timezone}
