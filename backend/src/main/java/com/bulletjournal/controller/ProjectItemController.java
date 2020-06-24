@@ -78,10 +78,6 @@ public class ProjectItemController {
         Map<ZonedDateTime, ProjectItems> projectItemsMap = getZonedDateTimeProjectItemsMap(types, username, startTime,
                 endTime);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
-        projectItems.forEach(p -> {
-            p.getTasks().forEach(t -> t = TaskView.getView(t));
-            p.getTransactions().forEach(t -> t = TransactionView.getView(t));
-        });
         return ProjectItems.addAvatar(this.labelDaoJpa.getLabelsForProjectItems(projectItems), this.userClient);
     }
 

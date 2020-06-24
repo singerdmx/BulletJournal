@@ -3,7 +3,7 @@ package com.bulletjournal.controller.models;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests {@link TransactionViewTest}
@@ -13,7 +13,7 @@ public class TransactionViewTest {
 
     @Test
     public void getView() {
-        TransactionView view = TransactionView.getView(new TransactionStub());
+        Transaction view = Transaction.getView(new TransactionStub());
         assertNotNull(view.getPaymentTime());
     }
 

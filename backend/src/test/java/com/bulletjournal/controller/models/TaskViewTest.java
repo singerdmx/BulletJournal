@@ -13,55 +13,36 @@ public class TaskViewTest {
 
     @Test
     public void getView() {
-        TaskView view = TaskView.getView(new TaskStub());
+        Task view = Task.getView(new TaskStub());
         assertNotNull(view.getStartTime());
         assertNotNull(view.getEndTime());
     }
 
     @Test
     public void getViewNullDueDate() {
-        TaskView view = TaskView.getView(new TaskStubNullDueDate());
+        Task view = Task.getView(new TaskStubNullDueDate());
         assertNull(view.getStartTime());
         assertNull(view.getEndTime());
     }
 
     @Test
     public void getViewNullDueTime() {
-        TaskView view = TaskView.getView(new TaskStubNullDueTime());
+        Task view = Task.getView(new TaskStubNullDueTime());
         assertNotNull(view.getStartTime());
         assertNotNull(view.getEndTime());
     }
 
     @Test
     public void getViewNullDuration() {
-        TaskView view = TaskView.getView(new TaskStubNullDuration());
+        Task view = Task.getView(new TaskStubNullDuration());
         assertNotNull(view.getStartTime());
         assertNotNull(view.getEndTime());
         assertEquals(view.getStartTime(), view.getEndTime());
     }
 
     @Test
-    public void getStartTime() {
-        TaskView view = new TaskView(new TaskStub(), 1L, null);
-        assertEquals(Long.valueOf(1L), view.getStartTime());
-    }
-
-    @Test
-    public void setStartTime() {
-        TaskView view = new TaskView(new TaskStub(), 1L, null);
-        view.setStartTime(2L);
-        assertEquals(Long.valueOf(2L), view.getStartTime());
-    }
-
-    @Test
-    public void getEndTime() {
-        TaskView view = new TaskView(new TaskStub(), null, 1L);
-        assertEquals(Long.valueOf(1L), view.getEndTime());
-    }
-
-    @Test
     public void setEndTime() {
-        TaskView view = new TaskView(new TaskStub(), null, 1L);
+        Task view = new Task();
         view.setEndTime(2L);
         assertEquals(Long.valueOf(2L), view.getEndTime());
     }

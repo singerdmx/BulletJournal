@@ -38,6 +38,8 @@ public class Transaction extends ProjectItem {
     @NotBlank
     private String timezone;
 
+    private Long paymentTime;
+
 
     public Transaction() {
     }
@@ -64,6 +66,7 @@ public class Transaction extends ProjectItem {
         this.transactionType = transactionType;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        getView(this);
     }
 
     @Override
@@ -117,6 +120,14 @@ public class Transaction extends ProjectItem {
 
     public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public Long getPaymentTime() {
+        return paymentTime;
+    }
+
+    public void setPaymentTime(Long paymentTime) {
+        this.paymentTime = paymentTime;
     }
 
     public String getYear() {
@@ -182,5 +193,14 @@ public class Transaction extends ProjectItem {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getPayer(), getAmount(), getDate(), getTransactionType(), getTime(), getTimezone());
+    }
+
+    public static Transaction getView(Transaction transaction) {
+        String date = transaction.getDate();
+        String time = transaction.getTime();
+        String timezone = transaction.getTimezone();
+        Long paymentTime = ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant().toEpochMilli();
+        transaction.setPaymentTime(paymentTime);
+        return transaction;
     }
 }

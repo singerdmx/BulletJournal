@@ -1,17 +1,25 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Task extends ProjectItem {
+
+    protected static final int DEFAULT_DURATION_IN_DAYS = 1;
+
+    private Long startTime;
+
+    private Long endTime;
 
     private List<User> assignees = new ArrayList<>();
 
@@ -55,6 +63,7 @@ public class Task extends ProjectItem {
         this.recurrenceRule = recurrenceRule;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        getView(this);
     }
 
     @Override
@@ -142,6 +151,22 @@ public class Task extends ProjectItem {
         this.status = status;
     }
 
+    public Long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
+    }
+
+    public Long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Long endTime) {
+        this.endTime = endTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -181,4 +206,29 @@ public class Task extends ProjectItem {
         this.setAssignees(task.getAssignees());
     }
 
+    public static Task getView(Task task) {
+        String date = task.getDueDate();
+        if (Objects.isNull(date)) {
+            return task;
+        }
+
+        String time = task.getDueTime();
+        String timezone = task.getTimezone();
+        Integer duration = task.getDuration();
+        ZonedDateTime start = ZonedDateTimeHelper.getStartTime(date, time, timezone);
+        ZonedDateTime end = start;
+
+        if (Objects.isNull(time)) {
+            end = start.plusDays(DEFAULT_DURATION_IN_DAYS);
+        }
+        if (Objects.nonNull(time) && Objects.nonNull(duration)) {
+            end = start.plusMinutes(task.getDuration());
+        }
+
+        Long startTime = start.toInstant().toEpochMilli();
+        Long endTime = end.toInstant().toEpochMilli();
+        task.setStartTime(startTime);
+        task.setEndTime(endTime);
+        return task;
+    }
 }
