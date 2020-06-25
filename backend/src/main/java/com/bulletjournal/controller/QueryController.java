@@ -8,6 +8,8 @@ import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.SearchService;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.es.repository.models.SearchIndex;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.ProjectItemDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
@@ -52,6 +54,8 @@ public class QueryController {
     private TransactionDaoJpa transactionDaoJpa;
     @Autowired
     private NoteDaoJpa noteDaoJpa;
+    @Autowired
+    private NotificationService notificationService;
 
     @Value("${spring.elasticsearch.rest.enable}")
     private Boolean elasticsearchToggle;
@@ -131,8 +135,10 @@ public class QueryController {
         List<SearchIndex> invalidResults = new ArrayList<>();
         List<SearchResultItem> validResults = search(username, invalidResults, searchResultList);
 
-        // Batch remove all invalid results from ElasticSearch
-        searchService.removeInvalidSearchResults(invalidResults);
+        // Batch remove all invalid results from ElasticSearch using notification event queue
+        List<String> invalidResultIds = new ArrayList<>();
+        invalidResults.forEach(result -> invalidResultIds.add(result.getId()));
+        notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(invalidResultIds));
 
         SearchResult validSearchResult = new SearchResult();
         validSearchResult.setScrollId(scrollId);
