@@ -5,7 +5,6 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.SearchResult;
 import com.bulletjournal.controller.models.SearchResultItem;
 import com.bulletjournal.es.ESUtil;
-import com.bulletjournal.es.SearchService;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.es.repository.models.SearchIndex;
 import com.bulletjournal.notifications.NotificationService;
@@ -35,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class QueryController {
@@ -46,8 +46,6 @@ public class QueryController {
 
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
-    @Autowired
-    private SearchService searchService;
     @Autowired
     private TaskDaoJpa taskDaoJpa;
     @Autowired
@@ -136,9 +134,8 @@ public class QueryController {
         List<SearchResultItem> validResults = search(username, invalidResults, searchResultList);
 
         // Batch remove all invalid results from ElasticSearch using notification event queue
-        List<String> invalidResultIds = new ArrayList<>();
-        invalidResults.forEach(result -> invalidResultIds.add(result.getId()));
-        notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(invalidResultIds));
+        notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(
+                invalidResults.stream().map(r -> r.getId()).collect(Collectors.toList())));
 
         SearchResult validSearchResult = new SearchResult();
         validSearchResult.setScrollId(scrollId);
