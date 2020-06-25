@@ -1,5 +1,6 @@
 package com.bulletjournal.notifications;
 
+import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
@@ -21,12 +22,14 @@ public class NotificationService {
     private final BlockingQueue<Object> eventQueue;
     private final NotificationDaoJpa notificationDaoJpa;
     private final AuditableDaoJpa auditableDaoJpa;
+    private final SearchIndexDaoJpa searchIndexDaoJpa;
     private volatile boolean stop = false;
 
     @Autowired
-    public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa) {
+    public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa, SearchIndexDaoJpa searchIndexDaoJpa) {
         this.notificationDaoJpa = notificationDaoJpa;
         this.auditableDaoJpa = auditableDaoJpa;
+        this.searchIndexDaoJpa = searchIndexDaoJpa;
         this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("notification-service"));
         this.eventQueue = new LinkedBlockingQueue<>();
     }
@@ -52,6 +55,14 @@ public class NotificationService {
         this.eventQueue.offer(auditable);
     }
 
+    public void deleteESDocument(RemoveElasticsearchDocumentEvent removeElasticsearchDocumentEvent) {
+        LOGGER.info("Received removeESDocument: " + removeElasticsearchDocumentEvent);
+        if (removeElasticsearchDocumentEvent == null) {
+            return;
+        }
+        this.eventQueue.offer(removeElasticsearchDocumentEvent);
+    }
+
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Object> events = new ArrayList<>();
@@ -70,11 +81,14 @@ public class NotificationService {
             }
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
+            List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             events.stream().forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
                 } else if (e instanceof Auditable) {
                     auditables.add((Auditable) e);
+                } else if (e instanceof RemoveElasticsearchDocumentEvent) {
+                    removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
                 }
             });
             try {
@@ -90,6 +104,13 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on creating records in auditableDaoJpa", ex);
+            }
+            try {
+                if (!removeElasticsearchDocumentEvents.isEmpty()) {
+                    this.searchIndexDaoJpa.delete(removeElasticsearchDocumentEvents);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on deleting records in SearchIndexDaoJpa", ex);
             }
             events = new ArrayList<>();
         }

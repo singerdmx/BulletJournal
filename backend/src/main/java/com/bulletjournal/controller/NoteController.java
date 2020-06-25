@@ -138,6 +138,7 @@ public class NoteController {
     private Note deleteSingleNote(Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Note note = getNote(noteId);
+        List<String> deleteESDocumentIds = this.noteDaoJpa.getDeleteESDocumentIdsForProjectItem(username, noteId);
         Pair<List<Event>, com.bulletjournal.repository.models.Note> res = this.noteDaoJpa.deleteNote(username, noteId);
         List<Event> events = res.getLeft();
         Long projectId = res.getRight().getProject().getId();
@@ -146,6 +147,7 @@ public class NoteController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveNoteEvent(events, username));
         }
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
         this.notificationService.trackActivity(new Auditable(projectId, "deleted note ##" + noteName + "##", username,
                 noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
         return note;
@@ -261,11 +263,13 @@ public class NoteController {
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<String> deleteESDocumentIds = this.noteDaoJpa.getDeleteESDocumentIdsForContent(username, contentId);
         ProjectItemModel note = this.noteDaoJpa.deleteContent(contentId, noteId, username);
 
         this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
                 "deleted Content in Note ##" + note.getName() + "## under BuJo ##" + note.getProject().getName() + "##",
                 username, noteId, Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE_CONTENT));
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
 
         return getContents(noteId);
     }

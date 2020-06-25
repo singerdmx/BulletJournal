@@ -2,14 +2,16 @@ package com.bulletjournal.es.repository;
 
 import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.es.repository.models.SearchIndex;
-import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.User;
-import com.bulletjournal.repository.models.UserGroup;
+import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
+import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.*;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class SearchIndexDaoJpa {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchIndexDaoJpa.class);
     private static final String PRE_TAG = "<em class='highlight'>";
     private static final String POST_TAG = "</em>";
     private static final String BOUNDARY_SCANNER_TYPE = "sentence";
@@ -34,6 +37,9 @@ public class SearchIndexDaoJpa {
     private static final String SEARCH_FIELD = "value";
     private static final String FRAGMENTER = "span";
     private static final String SEARCH_INDEX_NAME = "project_items";
+    private static final char SEARCH_INDEX_SPLITTER = '@';
+    private static final String CONTENT_TYPE_SUFFIX = "_content";
+
 
     private static final Integer FRAGMENT_SIZE = 300;
     private static final Integer NUM_OF_FRAGMENTS = 1;
@@ -138,5 +144,60 @@ public class SearchIndexDaoJpa {
      */
     public void deleteSearchIndices(List<SearchIndex> searchIndices) {
         searchIndices.forEach(this::deleteSearchIndex);
+    }
+
+    /**
+     * Delete target document by id from elastic search jpa
+     *
+     * @param documentId target search index
+     */
+    public void deleteSearchIndexDocument(String documentId) {
+        this.elasticsearchRestTemplate.delete(documentId, IndexCoordinates.of(SEARCH_INDEX_NAME));
+    }
+
+    /**
+     * Delete target document by id from elastic search jpa
+     *
+     * @param documentIds target search index
+     */
+    public void deleteSearchIndexDocuments(List<String> documentIds) {
+        for (String s : documentIds) {
+            deleteSearchIndexDocument(s);
+        }
+    }
+
+    /**
+     * Delete target project by id from elastic search jpa
+     *
+     * @param projectId target search index
+     */
+    public void deleteSearchIndexProject(Long projectId) {
+        QueryBuilder matchQuery = QueryBuilders.matchQuery("projectId", projectId);
+        NativeSearchQuery query = new NativeSearchQueryBuilder().withQuery(matchQuery).build();
+        this.elasticsearchRestTemplate.delete(query, SearchIndex.class, IndexCoordinates.of(SEARCH_INDEX_NAME));
+    }
+    /**
+     * Return content's search index id
+     *
+     * @param content target content
+     * @return String- content id in search index format
+     */
+    public <K extends ContentModel> String getContentSearchIndexId(K content) {
+        return content.getProjectItem().getContentType().toString().toLowerCase() +
+                CONTENT_TYPE_SUFFIX + SEARCH_INDEX_SPLITTER + content.getId();
+    }
+
+    /**
+     * Return projectItem's search index id
+     *
+     * @param projectItem target projectItem
+     * @return String- projectItem id in search index format
+     */
+    public <T extends ProjectItemModel> String getProjectItemSearchIndexId(T projectItem) {
+        return projectItem.getContentType().toString().toLowerCase() + SEARCH_INDEX_SPLITTER + projectItem.getId();
+    }
+
+    public void delete(List<RemoveElasticsearchDocumentEvent> events) {
+        events.forEach(event -> this.deleteSearchIndexDocuments(event.getDocumentIds()));
     }
 }

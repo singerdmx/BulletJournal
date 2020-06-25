@@ -175,8 +175,12 @@ public class TaskController {
 
     private CompletedTask completeSingleTask(Long taskId, String dateTime) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+
+        List<String> deleteESDocumentIds = this.taskDaoJpa.getDeleteESDocumentIdsForProjectItem(username, taskId);
+
         CompletedTask task = this.taskDaoJpa.complete(username, taskId, dateTime);
 
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
                 "completed Task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##", username,
                 task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
@@ -266,6 +270,8 @@ public class TaskController {
     private Long deleteSingleTask(Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
+        List<String> deleteESDocumentIds = this.taskDaoJpa.getDeleteESDocumentIdsForProjectItem(username, taskId);
+
         Pair<List<Event>, com.bulletjournal.repository.models.Task> res = this.taskDaoJpa.deleteTask(username, taskId);
         List<Event> events = res.getLeft();
         String taskName = res.getRight().getName();
@@ -274,6 +280,7 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
         this.notificationService.trackActivity(
                 new Auditable(projectId, "deleted Task ##" + taskName + "## in BuJo ##" + projectName + "##", username,
                         taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
@@ -392,11 +399,13 @@ public class TaskController {
     @DeleteMapping(CONTENT_ROUTE)
     public List<Content> deleteContent(@NotNull @PathVariable Long taskId, @NotNull @PathVariable Long contentId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<String> deleteESDocumentIds = this.taskDaoJpa.getDeleteESDocumentIdsForContent(username, contentId);
         ProjectItemModel task = this.taskDaoJpa.deleteContent(contentId, taskId, username);
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
                 "Deleted Content in Task ##" + task.getName() + "## under BuJo ##" + task.getProject().getName() + "##",
                 username, taskId, Timestamp.from(Instant.now()), ContentAction.DELETE_TASK_CONTENT));
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
 
         return getContents(taskId);
     }

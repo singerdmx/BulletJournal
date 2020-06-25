@@ -150,6 +150,8 @@ public class TransactionController {
         public void deleteTransaction(@NotNull @PathVariable Long transactionId) {
                 String username = MDC.get(UserClient.USER_NAME_KEY);
 
+                List<String> deleteESDocumentIds = this.transactionDaoJpa.getDeleteESDocumentIdsForProjectItem(username, transactionId);
+
                 Pair<List<Event>, com.bulletjournal.repository.models.Transaction> res = this.transactionDaoJpa
                                 .delete(username, transactionId);
                 List<Event> events = res.getLeft();
@@ -158,6 +160,7 @@ public class TransactionController {
                 if (!events.isEmpty()) {
                         this.notificationService.inform(new RemoveTransactionEvent(events, username));
                 }
+                this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
                 this.notificationService.trackActivity(new Auditable(projectId,
                                 "deleted Transaction ##" + transactionName + "##", username, transactionId,
                                 Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
@@ -257,6 +260,8 @@ public class TransactionController {
         public List<Content> deleteContent(@NotNull @PathVariable Long transactionId,
                         @NotNull @PathVariable Long contentId) {
                 String username = MDC.get(UserClient.USER_NAME_KEY);
+                List<String> deleteESDocumentIds = this.transactionDaoJpa.getDeleteESDocumentIdsForContent(username, contentId);
+
                 ProjectItemModel transaction = this.transactionDaoJpa.deleteContent(contentId, transactionId, username);
 
                 this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
@@ -264,6 +269,7 @@ public class TransactionController {
                                                 + transaction.getProject().getName() + "##",
                                 username, transactionId, Timestamp.from(Instant.now()),
                                 ContentAction.DELETE_TRANSACTION_CONTENT));
+                this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
 
                 return getContents(transactionId);
         }

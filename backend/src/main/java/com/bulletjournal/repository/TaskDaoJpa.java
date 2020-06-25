@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -83,6 +84,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Autowired
     private LabelDaoJpa labelDaoJpa;
+
+    @Autowired
+    private SearchIndexDaoJpa searchIndexDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -932,5 +936,27 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .setParameter(1, startTime)
                 .setParameter(2, endTime)
                 .getResultList();
+    }
+
+
+    public List<String> getDeleteESDocumentIdsForProjectItem(String requester, Long taskId) {
+        List<String> deleteESDocumentIds = new ArrayList<>();
+        Task task = this.getProjectItem(taskId, requester);
+
+        deleteESDocumentIds.add(this.searchIndexDaoJpa.getProjectItemSearchIndexId(task));
+        List<TaskContent> taskContents = findContents(task);
+        for (TaskContent content : taskContents) {
+            deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));
+        }
+
+        return deleteESDocumentIds;
+    }
+
+    public List<String> getDeleteESDocumentIdsForContent(String requester, Long contentId) {
+        List<String> deleteESDocumentIds = new ArrayList<>();
+        TaskContent content = this.getContent(contentId, requester);
+        deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));
+
+        return deleteESDocumentIds;
     }
 }

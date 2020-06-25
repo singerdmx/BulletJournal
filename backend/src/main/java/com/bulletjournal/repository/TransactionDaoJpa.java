@@ -9,6 +9,7 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
@@ -44,6 +45,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private AuthorizationService authorizationService;
     @Autowired
     private TransactionContentRepository transactionContentRepository;
+    @Autowired
+    private SearchIndexDaoJpa searchIndexDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -306,5 +309,26 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 .setParameter(1, startTime)
                 .setParameter(2, endTime)
                 .getResultList();
+    }
+
+    public List<String> getDeleteESDocumentIdsForProjectItem(String requester, Long transactionId) {
+        List<String> deleteESDocumentIds = new ArrayList<>();
+        Transaction transaction = this.getProjectItem(transactionId, requester);
+
+        deleteESDocumentIds.add(this.searchIndexDaoJpa.getProjectItemSearchIndexId(transaction));
+        List<TransactionContent> transactionContents = findContents(transaction);
+        for (TransactionContent content : transactionContents) {
+            deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));
+        }
+
+        return deleteESDocumentIds;
+    }
+
+    public List<String> getDeleteESDocumentIdsForContent(String requester, Long contentId) {
+        List<String> deleteESDocumentIds = new ArrayList<>();
+        TransactionContent content = this.getContent(contentId, requester);
+        deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));
+
+        return deleteESDocumentIds;
     }
 }

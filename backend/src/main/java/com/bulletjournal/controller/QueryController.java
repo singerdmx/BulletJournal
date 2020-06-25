@@ -38,7 +38,7 @@ import java.util.Map;
 public class QueryController {
 
     protected static final String SEARCH_ROUTE = "/api/query";
-    private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryController.class);
     private static final String CONTENT_TYPE_SUFFIX = "content";
     private static final char SEARCH_INDEX_SPLITTER = '@';
 
