@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RedisNotificationsEtagRepository extends CrudRepository<Etag, String> {
-    Etag findByUsernameAndType(String username, String Type);
+    Etag findByIndex(String index);
 }
