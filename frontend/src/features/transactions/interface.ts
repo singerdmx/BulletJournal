@@ -10,6 +10,10 @@ export interface Transaction extends ProjectItem {
   transactionType: number;
 }
 
+export interface TransactionView extends Transaction {
+  paymentTime: number;
+}
+
 export interface TransactionsSummary {
   balance: number;
   expense: number;

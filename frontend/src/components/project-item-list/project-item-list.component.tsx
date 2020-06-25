@@ -12,8 +12,12 @@ import ProjectModelItems from '../project-item/project-model-items.component';
 import {ProjectItemUIType} from "../../features/project/constants";
 import {Calendar, momentLocalizer} from 'react-big-calendar';
 import './project-item-list.styles.less';
+import {RouteComponentProps, withRouter} from "react-router";
+
+type PathProps = RouteComponentProps;
 
 const {RangePicker} = DatePicker;
+const {WeekPicker} = DatePicker;
 const localizer = momentLocalizer(moment);
 
 type ProjectItemProps = {
@@ -33,7 +37,7 @@ type ProjectItemCalendarState = {
   calendarDate: Date;
 };
 
-class ProjectItemList extends React.Component<ProjectItemProps> {
+class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
   state: ProjectItemCalendarState = {
     viewType: 'agenda',
     calendarEvents: [],
@@ -60,21 +64,25 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
     let calendarEvents: any[] = [];
     this.props.projectItems.map((item, index) => {
       item.tasks.map((task, index) => {
-        if (task.dueDate) {
-          let dueDate = moment(task.dueDate).toDate();
-          if (task.dueTime) {
-            dueDate.setHours(parseInt(task.dueTime.split(':')[0], 10));
-            dueDate.setMinutes(parseInt(task.dueTime.split(':')[1], 10));
-          }
+        if (task.startTime && task.endTime) {
           calendarEvents.push({
             id: task.id,
             title: task.name,
-            allDay: task.dueTime ? false : true,
-            start: dueDate,
-            end: dueDate
+            start: new Date(task.startTime),
+            end: new Date(task.endTime),
+            resource: `/task/${task.id}`
           });
         }
-      })
+      });
+      item.transactions.map((transaction, index) => {
+        calendarEvents.push({
+          id: transaction.id,
+          title: transaction.name,
+          start: new Date(transaction.paymentTime),
+          end: new Date(transaction.paymentTime),
+          resource: `/transaction/${transaction.id}`
+        });
+      });
     });
     return this.setState({calendarEvents});
   };
@@ -105,6 +113,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
                   endAccessor='end'
                   timeslots={1}
                   step={60}
+                  onSelectEvent={(event, e) => this.props.history.push(event.resource)}
               />
             </div>);
       case 'week':
@@ -122,6 +131,7 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
                 endAccessor='end'
                 timeslots={1}
                 step={60}
+                onSelectEvent={(event, e) => this.props.history.push(event.resource)}
             />);
     }
   };
@@ -151,15 +161,20 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
     }
   };
 
-  handlePickerRangeChange = (dates: any, dateStrings: string[]) => {
+  handlePickerChange = (dates: any, dateString: string) => {
     const {viewType} = this.state;
-    if (viewType === 'agenda') {
-      this.props.updateMyBuJoDates(dateStrings[0], dateStrings[1]);
+
+    if (viewType === 'week') {
+      this.props.updateMyBuJoDates(
+          moment(dateString).startOf(viewType).format(dateFormat),
+          moment(dateString).endOf(viewType).format(dateFormat));
     } else if (viewType === 'day') {
-      this.props.updateMyBuJoDates(dateStrings[0], dateStrings[0]);
-    } else if (viewType === 'week') {
-      this.props.updateMyBuJoDates(dates[0].startOf(viewType).format(dateFormat), dates[0].endOf(viewType).format(dateFormat));
+      this.props.updateMyBuJoDates(dateString, dateString);
     }
+  };
+
+  handlePickerRangeChange = (dates: any, dateStrings: string[]) => {
+    this.props.updateMyBuJoDates(dateStrings[0], dateStrings[1]);
   };
 
   rangePicker = (type: string) => {
@@ -195,47 +210,32 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
             />);
       case 'day':
         return (
-            <RangePicker
+            <DatePicker
                 picker='date'
-                ranges={{
-                  Today: [moment(), moment()]
-                }}
                 allowClear={false}
-                value={[
+                value={
                   moment(
                       this.state.calendarDate
                           ? this.state.calendarDate
                           : new Date().toLocaleString('fr-CA'),
                       dateFormat
-                  ),
-                  moment(
-                      this.state.calendarDate
-                          ? this.state.calendarDate
-                          : new Date().toLocaleString('fr-CA'),
-                      dateFormat
-                  )
-                ]}
+                  )}
                 format={dateFormat}
-                onChange={this.handlePickerRangeChange}
+                onChange={this.handlePickerChange}
             />);
       case 'week':
         return (
-            <RangePicker
-                picker='week'
-                ranges={{
-                  'This Week': [moment().startOf('week'), moment().endOf('week')]
-                }}
+            <WeekPicker
                 allowClear={false}
-                value={[
-                  this.state.calendarDate
-                      ? moment(this.state.calendarDate).startOf('week')
-                      : moment().startOf('week'),
-                  this.state.calendarDate
-                      ? moment(this.state.calendarDate).endOf('week')
-                      : moment().endOf('week')
-                ]}
+                value={
+                  moment(
+                      this.state.calendarDate
+                          ? this.state.calendarDate
+                          : new Date().toLocaleString('fr-CA'),
+                      dateFormat
+                  )}
                 format={dateFormat}
-                onChange={this.handlePickerRangeChange}
+                onChange={this.handlePickerChange}
             />);
     }
   };
@@ -244,21 +244,21 @@ class ProjectItemList extends React.Component<ProjectItemProps> {
     return (
         <div className='todo-list'>
           <div className='todo-panel'>
-            {this.rangePicker(this.state.viewType)}
             <Tooltip title='Choose type of view'>
               <Radio.Group
-                  style={{paddingLeft: '2rem'}}
+                  style={{paddingRight: '2rem'}}
                   size='small'
                   buttonStyle='solid'
                   defaultValue='agenda'
                   value={this.state.viewType}
                   onChange={(e) => this.setState({viewType: e.target.value})}
               >
-                <Radio.Button value='agenda'>Agenda</Radio.Button>
-                <Radio.Button value='day'>Day</Radio.Button>
-                <Radio.Button value='week'>Week</Radio.Button>
+                <Radio.Button value='agenda' className='view-type'>Agenda</Radio.Button>
+                <Radio.Button value='day' className='view-type'>Day</Radio.Button>
+                <Radio.Button value='week' className='view-type'>Week</Radio.Button>
               </Radio.Group>
             </Tooltip>
+            {this.rangePicker(this.state.viewType)}
             <Tooltip placement='top' title='Change Time Zone'>
               <Link to='/settings' style={{paddingLeft: '30px'}}>
                 {this.props.timezone}
@@ -286,4 +286,4 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   updateExpandedMyself,
   updateMyBuJoDates,
-})(ProjectItemList);
+})(withRouter(ProjectItemList));

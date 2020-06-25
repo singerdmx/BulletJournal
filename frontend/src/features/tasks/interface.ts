@@ -20,6 +20,11 @@ export interface Task extends ProjectItem {
   status: TaskStatus;
 }
 
+export interface TaskView extends Task {
+  startTime?: number;
+  endTime?: number;
+}
+
 export enum TaskStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   NEXT_TO_DO = 'NEXT_TO_DO',

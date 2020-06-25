@@ -96,7 +96,7 @@ public class AuthFilter implements Filter {
             cookie.setHttpOnly(true);
             cookie.setMaxAge(0);
             response.addCookie(cookie);
-            response.addHeader("Location", this.ssoConfig.getEndpoint());
+            response.addHeader("Location", "https://bulletjournal.us/home/index.html");
         }
         chain.doFilter(req, res);
     }

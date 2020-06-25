@@ -7,11 +7,58 @@ type PageProps = {};
 const PrivacyPage: React.FC<PageProps> = (props) => {
   return <div style={{padding: '55px'}}>
     <h2><a href="#collect">What information do we collect?</a></h2>
-    <p>We do not collect information from you when you register on our site and when you use our site. Your data are personal
-    and private, and we guarantee nobody else has access to it.</p>
-    <p>When registering on our site, you may be asked to enter your name and e-mail address. You may, however, visit our
-      site without registering. Your e-mail address will be verified by an email containing a unique link. If that link
-      is visited, we know that you control the e-mail address.</p>
+    <p>1. When you give it to us or give us permission to obtain it
+      When you sign up for or use Bullet Journal, you voluntarily share certain information including your username,
+      email address, photos, and any other information you give us. You can also choose to share your precise location
+      using your device settings or through photos. We will still use your IP address, which is used to approximate your
+      location, even if you don't choose to share your precise location. You will also have the option to share other
+      information about yourself such as your preferred language.
+      If you connect your Facebook, Google(opens in a new window) or other third-party accounts to Bullet Journal, we
+      use information from those accounts (such as your google calendar information) to improve your Bullet Journal
+      experience. This is dependent on the privacy policies or settings for those accounts.
+    </p>
+    <p>
+      2. We also get technical information when you use Bullet Journal
+      When you use a website, mobile application or other internet service, certain internet and electronic network
+      activity information gets created and logged automatically. This is also true when you use Bullet Journal. Here
+      are some of the types of information we collect:
+      Log data. When you use Bullet Journal, our servers record information (“log data”), including information that
+      your browser automatically sends whenever you visit a website, or that your mobile app automatically sends when
+      you’re using it. This log data includes your Internet Protocol address (which we use to infer your approximate
+      location), the address of and activity on websites you visit that incorporate Bullet Journal features (like the
+      “Save” button—more details below), searches, browser type and settings, the date and time of your request, how you
+      used Bullet Journal, cookie data and device data. You can learn more about the log data we collect here.
+      Cookie data. We also use “cookies” (small text files sent by your computer each time you visit our website, unique
+      to your Bullet Journal account or your browser) or similar technologies to get log data. When we use cookies or
+      other similar technologies, we use session cookies (that last until you close your browser) or persistent cookies
+      (that last until you or your browser delete them). For example, we use cookies to store your language preferences
+      or other settings so you don‘t have to set them up every time you visit Bullet Journal. Some of the cookies we use
+      are associated with your Bullet Journal account (including information about you, such as the email address you
+      gave us) and other cookies are not. For more detailed information about how we use cookies, please review our
+      Cookie Policy(opens in a new window).
+      Device information. In addition to log data, we collect information about the device you’re using Bullet Journal
+      on, including the type of device, operating system, settings, unique device identifiers and crash data that helps
+      us understand when something breaks.
+      Clickstream data and inferences. When you’re on Bullet Journal, we use your activity—such as which Pins you click
+      on, boards you create, and any text that you add in a comment or description—along with information you provided
+      when you first signed up and information from our partners and advertisers to make inferences about you and your
+      preferences. For example, if you create a board about travel, we may infer you are a travel enthusiast. We may
+      also infer information about your education or professional experience based on your activity when you link your
+      account to accounts you have with third parties like Facebook or Google.
+    </p>
+
+    <p>3. Our partners and advertisers share information with us
+      We also get information about you and your activity outside Bullet Journal from our affiliates, advertisers,
+      partners and other third parties we work with. For example:
+      Some websites or apps use Bullet Journal features such as our “Save” button, or you may install our “Save” button
+      for your browser. If so, we collect log data from those sites or apps. You can learn more about these features at
+      our Help Center.
+      Online advertisers or third parties share information with us to measure, report on or improve the performance of
+      ads on Bullet Journal, or to figure out what kinds of ads to show you on or off of Bullet Journal. This includes
+      information about your visits to an advertiser's site or purchases you made from them, or information about your
+      interests from a third-party service, which we might use to help show you ads. Learn more about the types of
+      information advertisers or other third parties share with us.
+    </p>
     <h2><a href="#use">What do we use your information for?</a></h2>
     <p>Any of the information we collect from you may be used in one of the following ways:</p>
     <ul>
@@ -22,9 +69,8 @@ const PrivacyPage: React.FC<PageProps> = (props) => {
       <li>To improve customer service — your information helps us to more effectively respond to your customer service
         requests and support needs.
       </li>
-      <li>To send periodic emails — The email address you provide may be used to send you information, notifications
-        that you request about changes to topics or in response to your user name, respond to inquiries, and/or other
-        requests or questions.
+      <li>To send periodic emails — The email address you provide may be used to send you information, notifications or
+        in response to your user name, respond to inquiries, and/or other requests or questions.
       </li>
     </ul>
     <h2><a href="#protect">How do we protect your information?</a></h2>

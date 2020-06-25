@@ -3,7 +3,7 @@ import React, {useEffect} from 'react';
 import './task-status.styles.less';
 import {useHistory, useParams} from "react-router-dom";
 import {Collapse, Tooltip} from "antd";
-import {CaretRightOutlined, UpSquareOutlined} from '@ant-design/icons';
+import {CaretRightOutlined, SyncOutlined, UpSquareOutlined} from '@ant-design/icons';
 import {IState} from "../../store";
 import {getTasksByOrder} from "../../features/tasks/actions";
 import {connect} from "react-redux";
@@ -32,11 +32,16 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
     }) => {
     const {projectId} = useParams();
     const history = useHistory();
-    useEffect(() => {
+
+    const getTasksByStatus = () => {
         if (!projectId) {
             return;
         }
         getTasksByOrder(parseInt(projectId), timezone, undefined, undefined);
+    };
+
+    useEffect(() => {
+        getTasksByStatus();
     }, [projectId]);
 
     const inProgressTasks = [] as Task[];
@@ -99,12 +104,13 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
     return (
         <div className='task-status-page'>
             <div className='task-operation'>
+                <Tooltip title='Refresh'>
+                    <span><SyncOutlined onClick={getTasksByStatus}/></span>
+                </Tooltip>
                 <Tooltip title='Go to BuJo'>
-                    <div>
-                        <UpSquareOutlined
-                            onClick={(e) => history.push(`/projects/${projectId}`)}
-                        />
-                    </div>
+                        <span><UpSquareOutlined
+                            onClick={(e) => history.push(`/projects/${projectId}`)}/>
+                        </span>
                 </Tooltip>
             </div>
             <div>

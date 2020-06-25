@@ -1,14 +1,14 @@
-import { Task } from '../tasks/interface';
+import {TaskView} from '../tasks/interface';
 import { Note } from '../notes/interface';
-import { Transaction } from '../transactions/interface';
+import {TransactionView} from '../transactions/interface';
 import { Label } from '../label/interface';
 import { ContentType } from '../myBuJo/constants';
 import {User} from "../group/interface";
 
 export interface ProjectItems {
-  tasks: Task[];
+  tasks: TaskView[];
   notes: Note[];
-  transactions: Transaction[];
+  transactions: TransactionView[];
   date: string;
   dayOfWeek: string;
 }

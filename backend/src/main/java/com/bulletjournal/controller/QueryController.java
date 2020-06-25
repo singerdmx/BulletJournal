@@ -53,7 +53,7 @@ public class QueryController {
     @Autowired
     private NoteDaoJpa noteDaoJpa;
 
-    @Value( "${spring.elasticsearch.rest.enable}" )
+    @Value("${spring.elasticsearch.rest.enable}")
     private Boolean elasticsearchToggle;
 
     /**

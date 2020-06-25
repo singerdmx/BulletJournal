@@ -1,12 +1,16 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.ProjectItem;
-import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.Group;
+import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
+import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.MDC;
@@ -137,6 +141,6 @@ public class ProjectItemController {
         final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime, new ArrayList<>(projectIds));
 
         projectItems.addAll(items.stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
-                    .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
     }
 }
