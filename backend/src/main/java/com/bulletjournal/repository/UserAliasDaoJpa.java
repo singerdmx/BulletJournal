@@ -3,7 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.redis.RedisUserAliasesRepository;
-import com.bulletjournal.redis.UserAliases;
+import com.bulletjournal.redis.models.UserAliases;
 import com.bulletjournal.repository.models.UserAlias;
 import com.google.gson.Gson;
 import org.slf4j.Logger;

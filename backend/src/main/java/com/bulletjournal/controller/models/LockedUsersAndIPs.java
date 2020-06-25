@@ -1,7 +1,7 @@
 package com.bulletjournal.controller.models;
 
-import com.bulletjournal.redis.LockedIP;
-import com.bulletjournal.redis.LockedUser;
+import com.bulletjournal.redis.models.LockedIP;
+import com.bulletjournal.redis.models.LockedUser;
 
 public class LockedUsersAndIPs {
 

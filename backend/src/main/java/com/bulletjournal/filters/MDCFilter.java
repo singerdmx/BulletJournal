@@ -2,7 +2,7 @@ package com.bulletjournal.filters;
 
 import com.bulletjournal.config.AuthConfig;
 import com.bulletjournal.config.MDCConfig;
-import com.bulletjournal.redis.LockedIP;
+import com.bulletjournal.redis.models.LockedIP;
 import com.bulletjournal.redis.RedisLockedIPRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

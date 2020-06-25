@@ -6,7 +6,7 @@ import com.bulletjournal.config.SSOConfig;
 import com.bulletjournal.controller.GoogleCalendarController;
 import com.bulletjournal.controller.SystemController;
 import com.bulletjournal.controller.UserController;
-import com.bulletjournal.redis.LockedUser;
+import com.bulletjournal.redis.models.LockedUser;
 import com.bulletjournal.redis.RedisLockedUserRepository;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
