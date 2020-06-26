@@ -231,7 +231,8 @@ public class ProjectDaoJpa {
 
         if (updateProjectParams.hasName()) {
             String name = updateProjectParams.getName();
-            if (!this.projectRepository.findByNameAndOwner(name, project.getOwner()).isEmpty()) {
+            if (!Objects.equals(name, project.getName()) &&
+                    !this.projectRepository.findByNameAndOwner(name, project.getOwner()).isEmpty()) {
                 throw new ResourceAlreadyExistException("BuJo with name \"" + name + "\" already exists");
             }
             project.setName(name);
