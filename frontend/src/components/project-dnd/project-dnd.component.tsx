@@ -109,8 +109,8 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
                   );
                   return (
                     <Draggable
-                      key={`${item.owner}+${item.owner}`}
-                      draggableId={`${item.owner}+${item.owner}`}
+                      key={`${item.owner.name}+${item.owner.name}`}
+                      draggableId={`${item.owner.name}+${item.owner.name}`}
                       index={index}
                     >
                       {(provided, snapshot) => (
