@@ -42,17 +42,17 @@ public class Etag implements Serializable {
 
     public String getUsername() {
         int split = index.indexOf("@");
-        if(split == -1)
+        if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
         return index.substring(0, split);
     }
 
     public void setUsername(String username) {
-        if(Objects.isNull(index))
+        if (Objects.isNull(index))
             throw new IllegalStateException("Cannot set username with null index");
 
         int split = index.indexOf("@");
-        if(split == -1)
+        if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
 
         this.setIndex(index = username + index.substring(split));
@@ -60,17 +60,17 @@ public class Etag implements Serializable {
 
     public String getType() {
         int split = index.indexOf("@");
-        if(split == -1)
+        if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
         return index.substring(split + 1);
     }
 
     public void setType(String type) {
-        if(Objects.isNull(index))
+        if (Objects.isNull(index))
             throw new IllegalStateException("Cannot set type with null index");
 
         int split = index.indexOf("@");
-        if(split == -1)
+        if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
 
         this.setIndex(index.substring(0, split) + "@" + type);
