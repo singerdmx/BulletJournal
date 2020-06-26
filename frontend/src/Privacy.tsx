@@ -6,6 +6,14 @@ type PageProps = {};
 
 const PrivacyPage: React.FC<PageProps> = (props) => {
   return <div style={{padding: '55px'}}>
+    <h2><a href="#data">Who is requesting user data?</a></h2>
+    <p>
+      At Bullet Journal, we collect and manage user data according to the following Privacy Policy, with the goal of
+      incorporating our product values: transparency, accessibility, sanity, usability. By using <a
+        href="//bulletjournal.us">bulletjournal.us</a>, you agree to the terms of this Privacy Policy. Please read the
+      Privacy Policy entirety, and refer to
+      those for definitions and contacts.
+    </p>
     <h2><a href="#collect">What information do we collect?</a></h2>
     <p>1. When you give it to us or give us permission to obtain it
       When you sign up for or use Bullet Journal, you voluntarily share certain information including your username,
