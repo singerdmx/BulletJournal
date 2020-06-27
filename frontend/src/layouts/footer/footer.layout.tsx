@@ -12,10 +12,10 @@ class FooterLayout extends React.Component {
             <a href="https://1o24bbs.com/c/bulletjournal/108">1024 BBS</a>
           </div>
           <div className="col-lg-4 col-md-6 col-xs-12">
-            <a href="https://bulletjournal.us/public/privacy">Privacy Policy</a>
+            <a href="https://bulletjournal.us/#/public/privacy">Privacy Policy</a>
           </div>
           <div className="col-lg-4 col-md-6 col-xs-12">
-            <a href="https://bulletjournal.us/public/tos">Terms of Service</a>
+            <a href="https://bulletjournal.us/#/public/tos">Terms of Service</a>
           </div>
         </Footer>
     );
