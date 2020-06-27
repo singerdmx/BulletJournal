@@ -102,6 +102,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   };
 
   const getTaskStatusDropdown = (task: Task) => {
+    if (createContentElem === null) {
+      return null;
+    }
     if (inputStatus) {
       return (
         <Select
