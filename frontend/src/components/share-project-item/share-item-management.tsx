@@ -73,27 +73,27 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
     return <Empty />;
   };
 
+  const getSharableLink = (link: string) => {
+    return `${window.location.origin.toString()}/public/items/${link}`;
+  };
+
   const showSharedLinks = () => {
     if (sharedLinks && sharedLinks.length > 0) {
       return sharedLinks.map((l, index) => (
         <div key={index} className="row-item-has-space">
           <div className="row-item-left">
+            <a onClick={() => window.location.href = getSharableLink(l.link)}>
+              {' '}
+              {getSharableLink(l.link)}{' '}
+            </a>
             <Tooltip title="Click to Copy Link">
               <CopyToClipboard
-                text={`${window.location.origin.toString()}/public/items/${
-                  l.link
-                }`}
-                onCopy={() => message.success('Link copied to clipboard')}
+                  text={getSharableLink(l.link)}
+                  onCopy={() => message.success('Link copied to clipboard')}
               >
                 <LinkOutlined style={{ cursor: 'pointer' }} />
               </CopyToClipboard>
             </Tooltip>
-            <Link title={l.link} to={`/public/items/${l.link}`}>
-              {' '}
-              {`${window.location.origin.toString()}/public/items/${
-                l.link
-              }`}{' '}
-            </Link>
             <div className="sub-tag-list">
               <Tag color="blue">
                 {'Created ' + moment(l.createdAt).fromNow()}

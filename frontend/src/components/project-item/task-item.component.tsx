@@ -322,14 +322,18 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   const taskStyle = isComplete
     ? 'project-item-name completed-task'
     : 'project-item-name';
-  // if readOnly, link to public item page
-  // if isComplete, go to completedTask page
-  let taskLink = `/task/${task.id}`;
-  if (props.readOnly) {
-    taskLink = `/public/items/TASK${task.id}`;
-  } else if (isComplete) {
-    taskLink = `/completedTask/${task.id}`;
-  }
+
+  const handleClick = () => {
+    // if readOnly, link to public item page
+    if (props.readOnly) {
+      window.location.href = `${window.location.origin.toString()}/public/items/TASK${task.id}`;
+    } else if (isComplete) {
+      // if isComplete, go to completedTask page
+      history.push(`/completedTask/${task.id}`);
+    } else {
+      history.push(`/task/${task.id}`);
+    }
+  };
 
   const getAssignees = () => {
     if (!task.assignees || task.assignees.length === 0) {
@@ -398,11 +402,11 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
       style={getTaskBackgroundColor(task.status, theme)}
     >
       <div className='project-item-content'>
-        <Link to={taskLink}>
+        <a onClick={handleClick}>
           <h3 className={taskStyle}>
             {getItemIcon(task, <CarryOutOutlined />)} {task.name}
           </h3>
-        </Link>
+        </a>
         <div className='project-item-subs'>
           <div className='project-item-labels'>
             {task.labels &&

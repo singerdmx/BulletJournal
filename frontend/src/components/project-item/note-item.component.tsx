@@ -174,20 +174,24 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
     );
   };
 
-  // if readOnly, link to public item page
-  let noteLink = `/note/${note.id}`;
-  if (props.readOnly) {
-    noteLink = `/public/items/NOTE${note.id}`;
-  }
+  const handleClick = () => {
+    // if readOnly, link to public item page
+    if (props.readOnly) {
+      window.location.href = `${window.location.origin.toString()}/public/items/NOTE${note.id}`;
+    } else {
+      history.push(`/note/${note.id}`);
+    }
+  };
+
   return (
     <div className='project-item'>
       <div className='project-item-content'>
-        <Link to={noteLink}>
+        <a onClick={handleClick}>
           <h3 className='project-item-name'>
             {getItemIcon(note, <FileTextOutlined />)}&nbsp;
             {note.name}
           </h3>
-        </Link>
+        </a>
         <div className='project-item-subs'>
           <div className='project-item-labels'>
             {note.labels &&

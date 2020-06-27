@@ -84,7 +84,7 @@ const PrivacyPage: React.FC<PageProps> = (props) => {
     <h2>How do we protect your information?</h2>
     <p>We implement a variety of security measures to maintain the safety of your personal information when you enter,
       submit, or access your personal information.</p>
-    <h2><a href="#data-retention">What is your data retention policy?</a></h2>
+    <h2>What is your data retention policy?</h2>
     <p>We will make a good faith effort to:</p>
     <ul>
       <li>Retain server logs containing the IP address of all requests to this server no more than 90 days.</li>

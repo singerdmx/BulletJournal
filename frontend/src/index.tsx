@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App, {Loading} from './App';
 import createStore from './store';
 import {Provider} from 'react-redux';
-import {HashRouter, Route, Switch} from 'react-router-dom';
+import {BrowserRouter, HashRouter, Route, Switch} from 'react-router-dom';
 import {unregister} from './serviceWorker';
 import PublicPage from './Public';
 import PrivacyPage from './Privacy';
@@ -16,15 +16,19 @@ function listen() {
     if (document.readyState === 'complete') {
         ReactDOM.render(
             <Provider store={store}>
-                <HashRouter>
+                <BrowserRouter>
                     <Switch>
                         <Route path="/public/privacy" component={PrivacyPage}/>
                         <Route path="/public/tos" component={TermsOfServicePage}/>
-                        <Route path="/public/items/:itemId" component={PublicPage}/>
                         <Route path="/public/templates" component={TemplatesPage}/>
-                        <Route path="/" component={App}/>
+                        <Route path="/public/items/:itemId" component={PublicPage}/>
+                        <Route exact path="/">
+                            <HashRouter>
+                                <Route path="/" component={App}/>
+                            </HashRouter>
+                        </Route>
                     </Switch>
-                </HashRouter>
+                </BrowserRouter>
             </Provider>,
             document.getElementById('root')
         );
