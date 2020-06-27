@@ -10,6 +10,8 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.filters.rate.limiting.TokenBucketType;
+import com.bulletjournal.redis.RedisEtagRepository;
+import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
@@ -71,6 +73,9 @@ public class SystemController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private RedisEtagRepository redisEtagRepository;
+
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
                                     @RequestParam(name = "projectId", required = false) Long projectId,
@@ -99,10 +104,21 @@ public class SystemController {
                     projects.getShared());
         }
         if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
+
+            // Look up etag from cache
+            //Etag cache = redisEtagRepository.findByIndex(username);
+
+            // If cache missed, write new etag to redis
+            //if (Objects.isNull(cache)) {
             List<Notification> notificationList = this.notificationDaoJpa.getNotifications(username);
             notificationsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
                     notificationList);
+            Etag cached = new Etag(username, notificationsEtag);
+            redisEtagRepository.save(cached);
+            //} else {
+            //    notificationsEtag = cache.getEtag();
+            //}
         }
 
         if (projectId != null) {
@@ -196,13 +212,11 @@ public class SystemController {
         ContentType contentType = item.getContentType();
         switch (contentType) {
             case NOTE:
-                Note note = this.noteController.getNote(item.getId());
-                projectItem = note;
+                projectItem = this.noteController.getNote(item.getId());
                 contents = this.noteController.getContents(item.getId());
                 break;
             case TASK:
-                Task task = this.taskController.getTask(item.getId());
-                projectItem = task;
+                projectItem = this.taskController.getTask(item.getId());
                 contents = this.taskController.getContents(item.getId());
                 break;
             default:
