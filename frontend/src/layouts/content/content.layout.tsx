@@ -24,7 +24,7 @@ class ContentLayout extends React.Component {
     return (
       <Content className='content'>
         <Switch>
-          <Redirect exact from='/' to='/bujo/today' />
+          <Route exact path='/' component={BujoPage} />
           <Route exact path='/bujo/:category' component={BujoPage} />
           <Route exact path='/settings' component={SettingPage} />
           <Route exact path='/projects' component={ProjectsPage} />

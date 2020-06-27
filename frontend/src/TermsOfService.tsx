@@ -20,12 +20,12 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       terms and conditions of this agreement, then you may not access the Website or use any services. If these terms
       and conditions are considered an offer by bulletjournal, acceptance is expressly limited to these terms. The Website is
       available to individuals of any age.</p>
-    <h2><a href="#1">1. Your bulletjournal.us Account</a></h2>
+    <h2>1. Your bulletjournal.us Account</h2>
     <p>If you create an account on the Website, you are responsible for maintaining the security of your account and you
       are fully responsible for all activities that occur under the account. You must immediately notify bulletjournal of any
       unauthorized uses of your account or any other breaches of security. bulletjournal will not be liable for any acts or
       omissions by you, including any damages of any kind incurred as a result of such acts or omissions.</p>
-    <h2><a href="#2">2. Responsibility of Contributors</a></h2>
+    <h2>2. Responsibility of Contributors</h2>
     <p>If you post material to the Website, post links on the Website, or otherwise make (or allow any third party to
       make) material available by means of the Website (any such material, “Content”), You are entirely responsible for
       the content of, and any harm resulting from, that Content. That is the case regardless of whether the Content in
@@ -63,7 +63,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
         type, nature, uses and effects of the materials, whether requested to do so by bulletjournal or otherwise.
       </li>
     </ul>
-    <h2><a href="#3">3. User Content License</a></h2>
+    <h2>3. User Content License</h2>
     <p>User contributions are licensed under a <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US">Creative
       Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. Without limiting any of those
       representations or warranties, bulletjournal has the right (though not the obligation) to, in bulletjournal’s sole discretion
@@ -71,7 +71,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       way harmful or objectionable, or (ii) terminate or deny access to and use of the Website to any individual or
       entity for any reason, in bulletjournal’s sole discretion. bulletjournal will have no obligation to provide a refund of any
       amounts previously paid.</p>
-    <h2><a href="#4">4. Payment and Renewal</a></h2>
+    <h2>4. Payment and Renewal</h2>
     <h3>General Terms</h3>
     <p>Optional paid services or upgrades may be available on the Website. When utilizing an optional paid service or
       upgrade, you agree to pay bulletjournal the monthly or annual subscription fees indicated. Payments will be charged on a
@@ -82,7 +82,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       or upgrade, your subscription will automatically renew and you authorize us to collect the then-applicable annual
       or monthly subscription fee (as well as any taxes) using any credit card or other payment mechanism we have on
       record for you. Subscriptions can be canceled at any time.</p>
-    <h2><a href="#5">5. Services</a></h2>
+    <h2>5. Services</h2>
     <h3>Hosting, Support Services</h3>
     <p>Optional Hosting and Support services may be provided by bulletjournal under the terms and conditions for each such
       service. By signing up for a Hosting/Support or Support services account, you agree to abide by such terms and
@@ -91,7 +91,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
     <p>Enterprise Hosting services are provided by bulletjournal under the terms and conditions for each such service, which
       are determined by a customer-specific contract. By signing up for an Enterprise Hosting account you agree to abide
       by such terms and conditions.</p>
-    <h2><a href="#6">6. Responsibility of Website Visitors</a></h2>
+    <h2>6. Responsibility of Website Visitors</h2>
     <p>bulletjournal has not reviewed, and cannot review, all of the material, including computer software, posted to the
       Website, and cannot therefore be responsible for that material’s content, use or effects. By operating the
       Website, bulletjournal does not represent or imply that it endorses the material there posted, or that it believes such
@@ -103,7 +103,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       rights, of third parties, or the downloading, copying or use of which is subject to additional terms and
       conditions, stated or unstated. bulletjournal disclaims any responsibility for any harm resulting from the use by
       visitors of the Website, or from any downloading by those visitors of content there posted.</p>
-    <h2><a href="#7">7. Content Posted on Other Websites</a></h2>
+    <h2>7. Content Posted on Other Websites</h2>
     <p>We have not reviewed, and cannot review, all of the material, including computer software, made available through
       the websites and webpages to which <a href="//bulletjournal.us">bulletjournal.us</a> links, and that link to <a
           href="//bulletjournal.us">bulletjournal.us</a>. bulletjournal does not have any control over those <a
@@ -113,7 +113,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       precautions as necessary to protect yourself and your computer systems from viruses, worms, Trojan horses, and
       other harmful or destructive content. bulletjournal disclaims any responsibility for any harm resulting from your use
       of <a href="http://non-bulletjournal.us">non-bulletjournal.us</a> websites and webpages.</p>
-    <h2><a href="#8">8. Copyright Infringement and DMCA Policy</a></h2>
+    <h2>8. Copyright Infringement and DMCA Policy</h2>
     <p>As bulletjournal asks others to respect its intellectual property rights, it respects the intellectual property rights
       of others. If you believe that material located on or linked to by <a
           href="//bulletjournal.us">bulletjournal.us</a> violates your copyright, and if this website resides in the USA, you are
@@ -124,7 +124,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       visitor’s access to and use of the Website if, under appropriate circumstances, the visitor is determined to be a
       repeat infringer of the copyrights or other intellectual property rights of bulletjournal or others. In the case of such
       termination, bulletjournal will have no obligation to provide a refund of any amounts previously paid to bulletjournal.</p>
-    <h2><a href="#9">9. Intellectual Property</a></h2>
+    <h2>9. Intellectual Property</h2>
     <p>This Agreement does not transfer from bulletjournal to you any bulletjournal or third party intellectual property, and all
       right, title and interest in and to such property will remain (as between the parties) solely with bulletjournal.
       bulletjournal, <a href="//bulletjournal.us">bulletjournal.us</a>, the <a href="//bulletjournal.us">bulletjournal.us</a> logo, and all other
@@ -133,23 +133,23 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       marks, graphics and logos used in connection with the Website may be the trademarks of other third parties. Your
       use of the Website grants you no right or license to reproduce or otherwise use any bulletjournal or third-party
       trademarks.</p>
-    <h2><a href="#10">10. Attribution</a></h2>
+    <h2>10. Attribution</h2>
     <p>bulletjournal reserves the right to display attribution links such as ‘Powered by <a
         href="//bulletjournal.us">bulletjournal.us</a>,’ theme author, and font attribution in your content footer.</p>
-    <h2><a href="#11">11. Changes</a></h2>
+    <h2>11. Changes</h2>
     <p>bulletjournal reserves the right, at its sole discretion, to modify or replace any part of this Agreement. It is your
       responsibility to check this Agreement periodically for changes. Your continued use of or access to the Website
       following the posting of any changes to this Agreement constitutes acceptance of those changes. bulletjournal may also,
       in the future, offer new services and/or features through the Website (including, the release of new tools and
       resources). Such new features and/or services shall be subject to the terms and conditions of this Agreement.</p>
-    <h2><a href="#12">12. Termination</a></h2>
+    <h2>12. Termination</h2>
     <p>bulletjournal may terminate your access to all or any part of the Website at any time, with or without cause, with or
       without notice, effective immediately. If you wish to terminate this Agreement or your <a
           href="//bulletjournal.us">bulletjournal.us</a> account (if you have one), you may simply discontinue using the Website.
       All provisions of this Agreement which by their nature should survive termination shall survive termination,
       including, without limitation, ownership provisions, warranty disclaimers, indemnity and limitations of liability.
     </p>
-    <h2><a href="#13">13. Disclaimer of Warranties</a></h2>
+    <h2>13. Disclaimer of Warranties</h2>
     <p>The Website is provided “as is”. bulletjournal and its suppliers and licensors hereby disclaim all warranties of any
       kind, express or implied, including, without limitation, the warranties of merchantability, fitness for a
       particular purpose and non-infringement. Neither bulletjournal nor its suppliers and licensors, makes any warranty that
@@ -158,7 +158,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
           href="https://www.newyorker.com/online/blogs/shouts/2012/12/the-hundred-best-lists-of-all-time.html">a
         treat</a>. You understand that you download from, or otherwise obtain content or services through, the Website
       at your own discretion and risk.</p>
-    <h2><a href="#14">14. Limitation of Liability</a></h2>
+    <h2>14. Limitation of Liability</h2>
     <p>In no event will bulletjournal, or its suppliers or licensors, be liable with respect to any subject matter of this
       agreement under any contract, negligence, strict liability or other legal or equitable theory for: (i) any
       special, incidental or consequential damages; (ii) the cost of procurement for substitute products or services;
@@ -166,7 +166,7 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       you to bulletjournal under this agreement during the twelve (12) month period prior to the cause of action. bulletjournal
       shall have no liability for any failure or delay due to matters beyond their reasonable control. The foregoing
       shall not apply to the extent prohibited by applicable law.</p>
-    <h2><a href="#15">15. General Representation and Warranty</a></h2>
+    <h2>15. General Representation and Warranty</h2>
     <p>You represent and warrant that (i) your use of the Website will be in strict accordance with the bulletjournal <a
         href="/public/privacy">Privacy Policy</a>, <a href="/guidelines">Community Guidelines</a>, with this Agreement and with
       all applicable laws and regulations (including without limitation any local laws or regulations in your country,
@@ -174,11 +174,11 @@ const TermsOfServicePage: React.FC<PageProps> = (props) => {
       applicable laws regarding the transmission of technical data exported from the country in which this website
       resides or the country in which you reside) and (ii) your use of the Website will not infringe or misappropriate
       the intellectual property rights of any third party.</p>
-    <h2><a href="#16">16. Indemnification</a></h2>
+    <h2>16. Indemnification</h2>
     <p>You agree to indemnify and hold harmless bulletjournal, its contractors, and its licensors, and their respective
       directors, officers, employees and agents from and against any and all claims and expenses, including attorneys’
       fees, arising out of your use of the Website, including but not limited to your violation of this Agreement.</p>
-    <h2><a href="#17">17. Miscellaneous</a></h2>
+    <h2>17. Miscellaneous</h2>
     <p>This Agreement constitutes the entire agreement between bulletjournal and you concerning the subject matter hereof, and
       they may only be modified by a written amendment signed by an authorized executive of bulletjournal, or by the posting
       by bulletjournal of a revised version. Except to the extent applicable law, if any, provides otherwise, this Agreement,

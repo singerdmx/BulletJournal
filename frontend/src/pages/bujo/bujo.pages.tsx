@@ -110,7 +110,8 @@ class BujoPage extends React.Component<
   };
 
   render() {
-    const { category } = this.props.match.params;
+    const { category = 'today' } = this.props.match.params;
+
     let plusIcon;
     if (this.props.ownedProjects.length === 0) {
       plusIcon = <AddProject history={this.props.history} mode={'MyBuJo'} />;

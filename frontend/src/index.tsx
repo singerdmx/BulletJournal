@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App, { Loading } from './App';
+import App, {Loading} from './App';
 import createStore from './store';
-import { Provider } from 'react-redux';
-import { HashRouter, Switch, Route } from 'react-router-dom';
-import { unregister } from './serviceWorker';
+import {Provider} from 'react-redux';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {unregister} from './serviceWorker';
 import PublicPage from './Public';
 import PrivacyPage from './Privacy';
 import TermsOfServicePage from './TermsOfService';
@@ -13,29 +13,29 @@ import TemplatesPage from './templates';
 const store = createStore();
 
 function listen() {
-  if (document.readyState === 'complete') {
-    ReactDOM.render(
-      <Provider store={store}>
-        <HashRouter>
-          <Switch>
-            <Route path="/public/privacy" component={PrivacyPage} />
-            <Route path="/public/tos" component={TermsOfServicePage} />
-            <Route path="/public/items/:itemId" component={PublicPage} />
-            <Route path="/public/templates" component={TemplatesPage} />
-            <Route path="/" component={App} />
-          </Switch>
-        </HashRouter>
-      </Provider>,
-      document.getElementById('root')
-    );
-  } else {
-    ReactDOM.render(
-      <Provider store={store}>
-        <Loading />
-      </Provider>,
-      document.getElementById('root')
-    );
-  }
+    if (document.readyState === 'complete') {
+        ReactDOM.render(
+            <Provider store={store}>
+                <BrowserRouter>
+                    <Switch>
+                        <Route path="/public/privacy" component={PrivacyPage}/>
+                        <Route path="/public/tos" component={TermsOfServicePage}/>
+                        <Route path="/public/items/:itemId" component={PublicPage}/>
+                        <Route path="/public/templates" component={TemplatesPage}/>
+                        <Route path="/" component={App}/>
+                    </Switch>
+                </BrowserRouter>
+            </Provider>,
+            document.getElementById('root')
+        );
+    } else {
+        ReactDOM.render(
+            <Provider store={store}>
+                <Loading/>
+            </Provider>,
+            document.getElementById('root')
+        );
+    }
 }
 
 document.onreadystatechange = listen;
