@@ -18,11 +18,11 @@ function listen() {
             <Provider store={store}>
                 <BrowserRouter>
                     <Switch>
-                        <Route path="/public/privacy" component={PrivacyPage}/>
-                        <Route path="/public/tos" component={TermsOfServicePage}/>
-                        <Route path="/public/templates" component={TemplatesPage}/>
-                        <Route path="/public/items/:itemId" component={PublicPage}/>
-                        <Route exact path="/">
+                        <Route exact path="/public/privacy" component={PrivacyPage}/>
+                        <Route exact path="/public/tos" component={TermsOfServicePage}/>
+                        <Route exact path="/public/templates" component={TemplatesPage}/>
+                        <Route exact path="/public/items/:itemId" component={PublicPage}/>
+                        <Route path="/">
                             <HashRouter>
                                 <Route path="/" component={App}/>
                             </HashRouter>
