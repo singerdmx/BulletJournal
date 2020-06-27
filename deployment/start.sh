@@ -1,5 +1,7 @@
 #!/bin/sh
 
+git pull
+git reset --hard
 echo -e '\n==>step 1 / 2: create data volume mount points'
 mkdir -p "$HOME/docker/volumes/postgres"
 mkdir -p "$HOME/docker/volumes/log"
