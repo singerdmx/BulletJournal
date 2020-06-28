@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 public class GroupController {
@@ -65,7 +64,7 @@ public class GroupController {
     @GetMapping(GROUP_ROUTE)
     public Group getGroup(@NotNull @PathVariable Long groupId) {
         com.bulletjournal.repository.models.Group g = this.groupDaoJpa.getGroup(groupId);
-        Group group = sortGroup(addUserAvatarToGroup(g.toVerbosePresentationModel()));
+        Group group = sortGroup(g.toVerbosePresentationModel());
         if (g.isDefaultGroup()) {
             group.setDefault(true);
         }
@@ -79,7 +78,6 @@ public class GroupController {
         Long defaultGroupId = groups.get(0).getId();
         String groupsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, groups);
-        groups = addUserAvatarToGroups(groups);
         // owner name -> groups (order by owner)
         Map<String, List<Group>> m = new TreeMap<>();
         // group -> self accepted or not
@@ -143,22 +141,6 @@ public class GroupController {
         group.getUsers().remove(ownerUserGroup);
         group.getUsers().add(0, ownerUserGroup);
         return group;
-    }
-
-    private List<Group> addUserAvatarToGroups(List<Group> groups) {
-        groups.stream().forEach(g -> {
-            addUserAvatarToGroup(g);
-        });
-        return groups;
-    }
-
-    private Group addUserAvatarToGroup(Group g) {
-        List<UserGroup> users = g.getUsers().stream().map(user -> {
-            User u = this.userClient.getUser(user.getName());
-            return new UserGroup(u.getName(), u.getThumbnail(), u.getAvatar(), user.isAccepted(), u.getAlias());
-        }).collect(Collectors.toList());
-        g.setUsers(users);
-        return g;
     }
 
     @Deprecated
