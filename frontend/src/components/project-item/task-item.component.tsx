@@ -14,7 +14,7 @@ import {
   getTaskBackgroundColor,
 } from '../../features/tasks/interface';
 import { connect } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import {
   completeTask,
   deleteCompletedTask,
@@ -324,9 +324,9 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     : 'project-item-name';
 
   const handleClick = () => {
-    // if readOnly, link to public item page
     if (props.readOnly) {
-      window.location.href = `${window.location.origin.toString()}/public/items/TASK${task.id}`;
+      // if readOnly, link to public item page
+      history.push(`/public/items/TASK${task.id}`);
     } else if (isComplete) {
       // if isComplete, go to completedTask page
       history.push(`/completedTask/${task.id}`);

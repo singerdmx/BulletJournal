@@ -2,7 +2,7 @@
 // react import
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 // antd imports
 import {
   DeleteTwoTone,
@@ -175,9 +175,9 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   };
 
   const handleClick = () => {
-    // if readOnly, link to public item page
     if (props.readOnly) {
-      window.location.href = `${window.location.origin.toString()}/public/items/NOTE${note.id}`;
+      // if readOnly, link to public item page
+      history.push(`${window.location.origin.toString()}/public/items/NOTE${note.id}`);
     } else {
       history.push(`/note/${note.id}`);
     }

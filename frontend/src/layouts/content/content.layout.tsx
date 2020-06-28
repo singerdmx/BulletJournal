@@ -17,6 +17,7 @@ import AdminPage from '../../pages/admin/admin.pages';
 import PunchCardPage from "../../pages/punch-card/punch-card.pages";
 import SearchPage from "../../pages/search/search.pages";
 import TaskStatusPage from "../../pages/task-status/task-status.pages";
+import PublicPage from "../../Public";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -54,6 +55,7 @@ class ContentLayout extends React.Component {
             path='/transaction/:transactionId'
             component={TransactionPage}
           />
+          <Route exact path="/public/items/:itemId" component={PublicPage}/>
         </Switch>
       </Content>
     );
