@@ -161,6 +161,7 @@ public class GroupController {
         return g;
     }
 
+    @Deprecated
     @PostMapping(ADD_USER_GROUPS_ROUTE)
     public ResponseEntity<List<GroupsWithOwner>> addUserGroups(
             @Valid @RequestBody AddUserGroupsParams addUserGroupsParams) {
@@ -179,6 +180,7 @@ public class GroupController {
         return getGroup(addUserGroupParams.getGroupId());
     }
 
+    @Deprecated
     @PostMapping(REMOVE_USER_GROUPS_ROUTE)
     public void removeUserGroups(@Valid @RequestBody RemoveUserGroupsParams removeUserGroupsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
