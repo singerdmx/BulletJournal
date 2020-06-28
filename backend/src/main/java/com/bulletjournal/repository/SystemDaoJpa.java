@@ -20,9 +20,6 @@ public class SystemDaoJpa {
     private final Map<ProjectType, ProjectItemDaoJpa> daos;
 
     @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
     public SystemDaoJpa(
             ProjectDaoJpa projectDaoJpa, LabelDaoJpa labelDaoJpa, TaskDaoJpa taskDaoJpa,
             NoteDaoJpa noteDaoJpa, TransactionDaoJpa transactionDaoJpa) {
