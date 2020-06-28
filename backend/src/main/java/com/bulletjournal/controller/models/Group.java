@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import com.bulletjournal.clients.UserClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -41,7 +42,12 @@ public class Group {
     }
 
     public static Group addOwnerAvatar(Group group, UserClient userClient) {
-        group.setOwner(userClient.getUser(group.getOwner().getName()));
+        if (group == null) {
+            return null;
+        }
+        if (group.getOwner() != null && StringUtils.isNotBlank(group.getOwner().getName())) {
+            group.setOwner(userClient.getUser(group.getOwner().getName()));
+        }
         return group;
     }
 

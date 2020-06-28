@@ -65,6 +65,7 @@ public class Project {
         for (Project child : project.getSubProjects()) {
             addOwnerAvatar(child, userClient);
         }
+        Group.addOwnerAvatar(project.getGroup(), userClient);
         return project;
     }
 
