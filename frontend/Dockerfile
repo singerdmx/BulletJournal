@@ -10,7 +10,9 @@ RUN npm run build
 FROM nginx:1.15
 COPY --from=build-stage /app/build/ /usr/share/nginx/html
 RUN mkdir -p /usr/share/nginx/html/public/items/static
+RUN mkdir -p /usr/share/nginx/html/public/static
 COPY --from=build-stage /app/build/static/ /usr/share/nginx/html/public/items/static
+COPY --from=build-stage /app/build/static/ /usr/share/nginx/html/public/static
 # Copy the default nginx.conf provided by tiangolo/node-frontend
 # COPY --from=build-stage /nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /app/nginx.conf /etc/nginx/conf.d/default.conf
