@@ -48,6 +48,18 @@ public class Group {
         if (group.getOwner() != null && StringUtils.isNotBlank(group.getOwner().getName())) {
             group.setOwner(userClient.getUser(group.getOwner().getName()));
         }
+        if (group.getUsers() != null) {
+            for (UserGroup userGroup : group.getUsers()) {
+                String username = userGroup.getName();
+                if (StringUtils.isBlank(username)) {
+                    continue;
+                }
+                User user = userClient.getUser(username);
+                userGroup.setAlias(user.getAlias());
+                userGroup.setAvatar(user.getAvatar());
+                userGroup.setThumbnail(user.getThumbnail());
+            }
+        }
         return group;
     }
 
