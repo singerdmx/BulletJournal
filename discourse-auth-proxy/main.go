@@ -175,6 +175,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		username, groups, err = parseCookie(cookie.Value, config.CookieSecret)
 		if (err != nil) {
 			logger.Printf("parseCookie err: %v", err)
+			deleteCookie(w)
 		}
 	}
 
@@ -226,14 +227,14 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		return
 	}
 
-	if (r.Host == "home.bulletjournal.us" ||
+	if r.Host == "home.bulletjournal.us" ||
 		strings.HasPrefix(r.RequestURI, "/home") ||
 		strings.HasPrefix(r.RequestURI, "/api/public/") ||
 		strings.HasPrefix(r.RequestURI, "/public/") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/channel/notifications") ||
 		strings.HasSuffix(r.RequestURI, "/manifest.json") ||
-		strings.HasSuffix(r.RequestURI, ".ico")) {
+		strings.HasSuffix(r.RequestURI, ".ico") {
 		logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)
 		handler.ServeHTTP(w, r)
 		return
@@ -246,17 +247,20 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 	if len(sso) == 0 {
 		logger.Printf("Redirect %s to sso_provider, cookie %v", r.URL, cookie)
 		url := config.SSOURLString + "/session/sso_provider?" + sso_payload(config.SSOSecret, config.ProxyURLString, r.URL.String())
+		deleteCookie(w)
 		http.Redirect(w, r, url, 302)
 	} else {
 		decoded, err := base64.StdEncoding.DecodeString(sso)
 		if err != nil {
 			fail("invalid sso query parameter: %s", err)
+			deleteCookie(w)
 			return
 		}
 
 		parsedQuery, err := url.ParseQuery(string(decoded))
 		if err != nil {
 			fail("invalid sso query parameter: %s", err)
+			deleteCookie(w)
 			return
 		}
 
@@ -270,24 +274,29 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 
 		if len(nonce) == 0 {
 			fail("incomplete payload from sso provider: missing nonce")
+			deleteCookie(w)
 			return
 		}
 		if len(username) == 0 {
 			fail("incomplete payload from sso provider: missing username")
+			deleteCookie(w)
 			return
 		}
 		if len(admin) == 0 {
 			fail("incomplete payload from sso provider: missing admin")
+			deleteCookie(w)
 			return
 		}
 		if !(config.AllowAll || admin[0] == "true") {
 			writeHttpError(http.StatusForbidden)
+			deleteCookie(w)
 			return
 		}
 
 		returnUrl, err := getReturnUrl(config.SSOSecret, sso, sig, nonce[0])
 		if err != nil {
 			fail("failed to build return URL: %s", err)
+			deleteCookie(w)
 			return
 		}
 
@@ -301,6 +310,18 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		// works around weird safari stuff
 		fmt.Fprintf(w, "<html><head></head><body><script>window.location = '%v'</script></body>", returnUrl)
 	}
+}
+
+func deleteCookie(w http.ResponseWriter) {
+	c := &http.Cookie{
+		Name:    "__discourse_proxy",
+		Value:   "",
+		Path:    "/",
+		Expires: time.Unix(0, 0),
+		HttpOnly: true,
+	}
+
+	http.SetCookie(w, c)
 }
 
 func getReturnUrl(secret string, payload string, sig string, nonce string) (returnUrl string, err error) {
