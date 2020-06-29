@@ -4,7 +4,6 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.es.SearchService;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.NoteDaoJpa;
@@ -25,7 +24,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -53,9 +54,6 @@ public class NoteController {
 
     @Autowired
     private UserClient userClient;
-
-    @Autowired
-    private SearchService searchService;
 
     @Autowired
     private NoteRepository noteRepository;
