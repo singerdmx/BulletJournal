@@ -12,8 +12,37 @@ import TemplatesPage from './templates';
 
 const store = createStore();
 
+function getCookie(cname: string) {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 function listen() {
     if (document.readyState === 'complete') {
+        if (process.env.NODE_ENV === 'production') {
+            const loginCookie = getCookie('__discourse_proxy');
+            console.log('loginCookie ' + loginCookie);
+            if (!loginCookie) {
+                if (caches) {
+                    // Service worker cache should be cleared with caches.delete()
+                    caches.keys().then(function (names) {
+                        for (let name of names) caches.delete(name).then(r => console.log(r));
+                    });
+                }
+                window.location.reload();
+            }
+        }
         ReactDOM.render(
             <Provider store={store}>
                 <BrowserRouter>
