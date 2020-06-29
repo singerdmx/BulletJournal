@@ -304,7 +304,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 
 		cookieData := url.QueryEscape(username[0]) + "##" + url.QueryEscape(strings.Join(groupsArray, "|"))
-		cookie := http.Cookie{Name: "__discourse_proxy", Value: signCookie(cookieData, config.CookieSecret), Expires: expiration, HttpOnly: true, Path: "/"}
+		cookie := http.Cookie{Name: "__discourse_proxy", Value: signCookie(cookieData, config.CookieSecret), Expires: expiration, Path: "/"}
 		http.SetCookie(w, &cookie)
 
 		// works around weird safari stuff
@@ -318,7 +318,6 @@ func deleteCookie(w http.ResponseWriter) {
 		Value:   "",
 		Path:    "/",
 		Expires: time.Unix(0, 0),
-		HttpOnly: true,
 	}
 
 	http.SetCookie(w, c)
