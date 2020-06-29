@@ -33,15 +33,15 @@ function listen() {
         if (process.env.NODE_ENV === 'production') {
             const loginCookie = getCookie('__discourse_proxy');
             console.log('loginCookie ' + loginCookie);
-            if (!loginCookie) {
-                if (caches) {
-                    // Service worker cache should be cleared with caches.delete()
-                    caches.keys().then(function (names) {
-                        for (let name of names) caches.delete(name).then(r => console.log(r));
-                    });
-                }
-                window.location.reload();
-            }
+            // if (!loginCookie) {
+            //     if (caches) {
+            //         // Service worker cache should be cleared with caches.delete()
+            //         caches.keys().then(function (names) {
+            //             for (let name of names) caches.delete(name).then(r => console.log(r));
+            //         });
+            //     }
+            //     window.location.reload();
+            // }
         }
         ReactDOM.render(
             <Provider store={store}>
