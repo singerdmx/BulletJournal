@@ -9,7 +9,6 @@ import { ProjectType } from '../../features/project/constants';
 import { IState } from '../../store';
 import { User } from '../../features/group/interface';
 import { SharableLink } from '../../features/system/interface';
-import { Link } from 'react-router-dom';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
 const { Panel } = Collapse;

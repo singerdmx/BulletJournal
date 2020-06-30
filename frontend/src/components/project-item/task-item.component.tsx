@@ -194,7 +194,7 @@ const getCompletionTime = (task: Task) => {
   );
 };
 
-const getDuration = (minutes: number) => {
+export const getDuration = (minutes: number) => {
   let days = '';
   let hours = '';
   let mins = '';

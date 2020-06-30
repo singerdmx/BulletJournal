@@ -27,6 +27,7 @@ import { IState } from '../../store';
 import { connect } from 'react-redux';
 //action
 import { setTaskStatus } from '../../features/tasks/actions';
+import {getDuration} from "../../components/project-item/task-item.component";
 const { Option } = Select;
 
 export type TaskProps = {
@@ -66,7 +67,10 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
   const getDueDateTime = (task: Task) => {
     if (task.recurrenceRule) {
-      const taskDue = convertToTextWithRRule(task.recurrenceRule);
+      let taskDue = convertToTextWithRRule(task.recurrenceRule);
+      if (task.duration) {
+          taskDue += `, duration ${getDuration(task.duration)}`;
+      }
       return (
         <Tooltip title={taskDue}>
           <Tag icon={<ClockCircleOutlined />}>{`Recurring: ${taskDue}`}</Tag>
@@ -80,7 +84,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
     let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
     if (task.duration) {
-      dueDateTitle += `, duration ${task.duration} minutes`;
+      dueDateTitle += `, duration ${getDuration(task.duration)}`;
     }
 
     const taskDue = `${task.dueDate} ${task.dueTime ? task.dueTime : ''}`;

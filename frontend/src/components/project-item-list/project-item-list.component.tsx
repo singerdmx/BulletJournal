@@ -62,8 +62,8 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
 
   processCalendarEvents = () => {
     let calendarEvents: any[] = [];
-    this.props.projectItems.map((item, index) => {
-      item.tasks.map((task, index) => {
+    this.props.projectItems.forEach((item, index) => {
+      item.tasks.forEach((task, index) => {
         if (task.startTime && task.endTime) {
           calendarEvents.push({
             id: task.id,
@@ -74,7 +74,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
           });
         }
       });
-      item.transactions.map((transaction, index) => {
+      item.transactions.forEach((transaction, index) => {
         calendarEvents.push({
           id: transaction.id,
           title: transaction.name,
