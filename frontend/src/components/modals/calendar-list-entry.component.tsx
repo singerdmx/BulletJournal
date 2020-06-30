@@ -262,7 +262,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   return (
     <div>
       <Badge dot color={calendar.backgroundColor} offset={[4, 6]}>
-        <button className="head-example" />
+        <a href="#" className="head-example" />
       </Badge>
 
       <Card

@@ -186,12 +186,12 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   return (
     <div className='project-item'>
       <div className='project-item-content'>
-        <button onClick={handleClick}>
+        <a onClick={handleClick}>
           <h3 className='project-item-name'>
             {getItemIcon(note, <FileTextOutlined />)}&nbsp;
             {note.name}
           </h3>
-        </button>
+        </a>
         <div className='project-item-subs'>
           <div className='project-item-labels'>
             {note.labels &&

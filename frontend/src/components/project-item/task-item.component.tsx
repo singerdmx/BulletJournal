@@ -402,11 +402,11 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
       style={getTaskBackgroundColor(task.status, theme)}
     >
       <div className='project-item-content'>
-        <button onClick={handleClick}>
+        <a onClick={handleClick}>
           <h3 className={taskStyle}>
             {getItemIcon(task, <CarryOutOutlined />)} {task.name}
           </h3>
-        </button>
+        </a>
         <div className='project-item-subs'>
           <div className='project-item-labels'>
             {task.labels &&
