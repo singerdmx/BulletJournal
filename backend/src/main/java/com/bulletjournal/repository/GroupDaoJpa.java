@@ -203,14 +203,14 @@ public class GroupDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public JoinGroupEvent addUserGroup(
-            String owner,
+            String requester,
             AddUserGroupParams addUserGroupParams) {
 
         Long groupId = addUserGroupParams.getGroupId();
         Group group = this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
         this.authorizationService.checkAuthorizedToOperateOnContent(
-                group.getOwner(), owner, ContentType.GROUP, Operation.UPDATE, groupId);
+                group.getOwner(), requester, ContentType.GROUP, Operation.UPDATE, groupId);
         String username = addUserGroupParams.getUsername();
         User user = this.userDaoJpa.getByName(username);
         UserGroupKey key = new UserGroupKey(user.getId(), groupId);
@@ -219,7 +219,7 @@ public class GroupDaoJpa {
             this.userGroupRepository.save(new UserGroup(user, group, false));
         }
 
-        return new JoinGroupEvent(new Event(username, groupId, group.getName()), owner);
+        return new JoinGroupEvent(new Event(username, groupId, group.getName()), requester);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

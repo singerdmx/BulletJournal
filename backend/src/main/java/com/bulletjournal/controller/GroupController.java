@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.google.common.collect.ImmutableList;
@@ -155,6 +156,9 @@ public class GroupController {
     @PostMapping(ADD_USER_GROUP_ROUTE)
     public Group addUserGroup(@Valid @RequestBody AddUserGroupParams addUserGroupParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        if (Objects.equals(username, addUserGroupParams.getUsername())) {
+            throw new BadRequestException("Cannot add yourself to Group");
+        }
         Informed informed = this.groupDaoJpa.addUserGroup(username, addUserGroupParams);
         if (informed != null) {
             this.notificationService.inform(informed);
