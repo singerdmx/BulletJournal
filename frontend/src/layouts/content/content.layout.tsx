@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import SettingPage from '../../pages/settings/settings.page';
 import BujoPage from '../../pages/bujo/bujo.pages';
 import GroupPage from '../../pages/group/group.pages';

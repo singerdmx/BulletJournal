@@ -108,6 +108,8 @@ const RecentItemList: React.FC<RecentItemProps> = ({
                 />
               );
             }
+            default:
+              return null;
           }
         })}
       </div>

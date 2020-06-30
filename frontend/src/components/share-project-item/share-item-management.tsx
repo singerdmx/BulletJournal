@@ -81,10 +81,10 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
       return sharedLinks.map((l, index) => (
         <div key={index} className="row-item-has-space">
           <div className="row-item-left">
-            <a onClick={() => window.location.href = getSharableLink(l.link)}>
+            <button onClick={() => window.location.href = getSharableLink(l.link)}>
               {' '}
               {getSharableLink(l.link)}{' '}
-            </a>
+            </button>
             <Tooltip title="Click to Copy Link">
               <CopyToClipboard
                   text={getSharableLink(l.link)}

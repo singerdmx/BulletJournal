@@ -6,7 +6,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {search, updateSearchTerm} from "../../features/search/action";
 import {RouteComponentProps, withRouter} from "react-router";
-import {useHistory, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {SearchResult, SearchResultItem, searchResultPageSize} from "../../features/search/interface";
 import {Loading} from "../../App";
 import SearchResultItemElement from "./search-result-item";
@@ -40,7 +40,6 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
          updateSearchTerm
      }) => {
         const [first, setFirst] = useState(true);
-        const history = useHistory();
         // get id of note from router
         const {term} = useParams();
 
