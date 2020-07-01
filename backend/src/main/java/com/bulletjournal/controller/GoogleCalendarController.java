@@ -14,9 +14,7 @@ import com.bulletjournal.repository.models.GoogleCalendarProject;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
@@ -48,9 +46,8 @@ public class GoogleCalendarController {
     public static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
     private static final GsonFactory GSON = new GsonFactory();
 
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
-    private static final String GOOGLE_CALENDAR_PAGE_PATH = "/settings#google";
+    private static final String GOOGLE_CALENDAR_PAGE_PATH = "/#/googleCalendar";
     private static final String GOOGLE_CHANNEL_ID_HEADER = "x-goog-channel-id";
     @Autowired
     private GoogleCalConfig googleCalConfig;
@@ -90,7 +87,7 @@ public class GoogleCalendarController {
         }
 
         if (isProd()) {
-            return new RedirectView("https://bulletjournal.us/settings#google");
+            return new RedirectView("https://bulletjournal.us/#/googleCalendar");
         }
 
         return new RedirectView(GOOGLE_CALENDAR_PAGE_PATH);

@@ -13,18 +13,15 @@ type SettingProps = {};
 const SettingPage: React.FC<SettingProps> = (props) => {
   const location = useLocation();
 
-  let defaultKey = location.hash;
-  if (!defaultKey) {
-    defaultKey = 'Account'
-  }
-
+  const defaultKey = location.hash;
+  console.log(defaultKey);
   return (
       <div className='setting'>
         <Tabs defaultActiveKey={defaultKey}>
-          <TabPane tab={<span><DashboardOutlined />Account</span>} key='account'>
+          <TabPane tab={<span><DashboardOutlined />Account</span>} key='#/settings'>
             <Account/>
           </TabPane>
-          <TabPane tab={<span><GoogleOutlined />Sync Google Calendar</span>} key='#google'>
+          <TabPane tab={<span><GoogleOutlined />Sync Google Calendar</span>} key='#/googleCalendar'>
             <div>
               <GoogleCalendarSyncPage/>
             </div>
