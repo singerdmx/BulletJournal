@@ -6,7 +6,7 @@ import {
   logoutGoogleCalendar,
 } from '../../apis/calendarApis';
 import { googleTokenExpirationTimeUpdate } from '../../features/calendarSync/actions';
-import { DisconnectOutlined, SwapOutlined } from '@ant-design/icons';
+import { DisconnectOutlined } from '@ant-design/icons';
 import './calendar-sync.styles.less';
 import { IState } from '../../store';
 import { CalendarListEntry } from '../../features/calendarSync/interface';

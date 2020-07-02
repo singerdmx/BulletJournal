@@ -15,6 +15,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.common.collect.ImmutableList;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
 
 @Component
 public class GoogleCalClient {
@@ -53,7 +53,7 @@ public class GoogleCalClient {
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         DataStoreFactory dataStore = new GoogleCalendarDataStoreFactory(this.repository);
         this.flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets,
-                Collections.singleton(CalendarScopes.CALENDAR))
+                ImmutableList.of(CalendarScopes.CALENDAR_READONLY, CalendarScopes.CALENDAR_EVENTS_READONLY))
                 .setAccessType("offline")
                 .setApprovalPrompt("force")
                 .setDataStoreFactory(dataStore)
