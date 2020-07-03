@@ -1,30 +1,17 @@
 import React from "react";
-import { CloseOutlined, DeleteOutlined, UserOutlined } from "@ant-design/icons";
-import {
-  Button,
-  List,
-  Badge,
-  Avatar,
-  Typography,
-  Popconfirm,
-  Tooltip,
-} from "antd";
-import { connect } from "react-redux";
-import { withRouter, RouteComponentProps } from "react-router";
-import {
-  deleteGroup,
-  removeUserGroupByUsername,
-  getGroup,
-  patchGroup,
-} from "../../features/group/actions";
-import { Group, User } from "../../features/group/interface";
-import { MyselfWithAvatar } from "../../features/myself/reducer";
-import { IState } from "../../store";
+import {CloseOutlined, DeleteOutlined, UserOutlined} from "@ant-design/icons";
+import {Avatar, Badge, Button, List, Popconfirm, Tooltip, Typography,} from "antd";
+import {connect} from "react-redux";
+import {RouteComponentProps, withRouter} from "react-router";
+import {deleteGroup, getGroup, patchGroup, removeUserGroupByUsername,} from "../../features/group/actions";
+import {Group, User} from "../../features/group/interface";
+import {MyselfWithAvatar} from "../../features/myself/reducer";
+import {IState} from "../../store";
 
 import "./group-card.styles.less";
 import AddUser from "../modals/add-user.component";
-import { History } from "history";
-import { changeAlias } from "../../features/user/actions";
+import {History} from "history";
+import {changeAlias} from "../../features/user/actions";
 
 type GroupProps = {
   group: Group;
@@ -48,7 +35,7 @@ type PathProps = RouteComponentProps;
 
 function getGroupUserTitle(user: User, group: Group): string {
   if (user.name === group.owner.name) {
-    return "Owner";
+    return `Owner ${user.name}`;
   }
   return user.accepted ? `${user.name} Joined` : `${user.name} Not Joined`;
 }
@@ -80,13 +67,6 @@ class GroupCard extends React.Component<GroupProps & PathProps> {
   }
 
   getGroupUserSpan(user: User, group: Group): JSX.Element {
-    if (user.name === group.owner.name) {
-      return (
-        <span className="group-user-info">
-          <strong>{user.alias}</strong>
-        </span>
-      );
-    }
     if (this.props.myself.username === user.name) {
       return <span className="group-user-info">{user.name}</span>;
     }
@@ -127,6 +107,43 @@ class GroupCard extends React.Component<GroupProps & PathProps> {
   render() {
     const { group } = this.props;
     const isEditable = group.owner.name === this.props.myself.username;
+
+    const getUserOps = (user: User, groupOwner: string) => {
+      if (user.name !== groupOwner && groupOwner === this.props.myself.username) {
+        return <Tooltip
+            placement="right"
+            title={user.accepted ? "Remove" : "Cancel Invitation"}
+        >
+          <Button
+              type="link"
+              size="small"
+              onClick={() =>
+                  this.deleteUser(group.id, user.name, group.name)
+              }
+          >
+            <CloseOutlined/>
+          </Button>
+        </Tooltip>;
+      }
+      if (user.name !== groupOwner && user.name === this.props.myself.username) {
+        return <Tooltip
+            placement="right"
+            title='Leave'
+        >
+          <Button
+              type="link"
+              size="small"
+              onClick={() =>
+                  this.deleteUser(group.id, user.name, group.name)
+              }
+          >
+            <CloseOutlined/>
+          </Button>
+        </Tooltip>;
+      }
+      return null;
+    };
+
     return (
       <div className="group-card">
         <div className="group-title">
@@ -159,40 +176,24 @@ class GroupCard extends React.Component<GroupProps & PathProps> {
         <div className="group-users">
           <List
             dataSource={group.users}
-            renderItem={(item) => {
+            renderItem={(user) => {
               return (
-                <List.Item key={item.id}>
+                <List.Item key={user.id}>
                     <div className="group-user">
                       <Tooltip
                           placement="topLeft"
-                          title={getGroupUserTitle(item, group)}
+                          title={getGroupUserTitle(user, group)}
                       >
-                        <Badge dot={!item.accepted}>
+                        <Badge dot={!user.accepted}>
                           <Avatar
-                            size={item.name === group.owner.name ? "large" : "default"}
-                            src={item.avatar}
+                            size={user.name === group.owner.name ? "large" : "default"}
+                            src={user.avatar}
                           />
                         </Badge>
                       </Tooltip>
-                      {this.getGroupUserSpan(item, group)}
+                      {this.getGroupUserSpan(user, group)}
                     </div>
-                  {item.name !== group.owner.name &&
-                    group.owner.name === this.props.myself.username && (
-                      <Tooltip
-                        placement="right"
-                        title={item.accepted ? "Remove" : "Cancel Invitation"}
-                      >
-                        <Button
-                          type="link"
-                          size="small"
-                          onClick={() =>
-                            this.deleteUser(group.id, item.name, group.name)
-                          }
-                        >
-                          <CloseOutlined />
-                        </Button>
-                      </Tooltip>
-                    )}
+                  {getUserOps(user, group.owner.name)}
                 </List.Item>
               );
             }}

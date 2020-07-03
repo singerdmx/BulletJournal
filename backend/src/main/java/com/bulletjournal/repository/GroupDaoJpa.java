@@ -231,22 +231,23 @@ public class GroupDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> removeUserGroups(
-            String owner,
+            String requester,
             List<RemoveUserGroupParams> removeUserGroupsParams) {
 
         List<Event> events = new ArrayList<>();
         for (RemoveUserGroupParams removeUserGroupParams : removeUserGroupsParams) {
             String username = removeUserGroupParams.getUsername();
-            if (Objects.equals(username, owner)) {
-                throw new BadRequestException("can not remove owner");
-            }
 
             Long groupId = removeUserGroupParams.getGroupId();
             Group group = this.groupRepository.findById(groupId)
                     .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
 
-            this.authorizationService.checkAuthorizedToOperateOnContent(
-                    group.getOwner(), owner, ContentType.GROUP, Operation.UPDATE, groupId);
+            boolean authorized = Objects.equals(group.getOwner(), requester) && !Objects.equals(username, requester);
+            authorized = authorized || (!Objects.equals(group.getOwner(), requester) && Objects.equals(username, requester));
+
+            if (!authorized) {
+                throw new UnAuthorizedException("Not authorized");
+            }
 
             User user = this.userDaoJpa.getByName(username);
             UserGroupKey userGroupKey = new UserGroupKey(user.getId(), group.getId());
