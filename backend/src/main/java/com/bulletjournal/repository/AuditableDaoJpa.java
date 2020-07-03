@@ -27,7 +27,11 @@ public class AuditableDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<com.bulletjournal.notifications.Auditable> auditables) {
-        auditables.forEach(auditable -> this.auditableRepository.save(auditable.toRepositoryAuditable()));
+        this.auditableRepository.saveAll(
+                auditables.stream().map(
+                        auditable -> auditable.toRepositoryAuditable()
+                ).collect(Collectors.toList())
+        );
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

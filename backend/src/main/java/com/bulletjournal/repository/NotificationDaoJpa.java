@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,9 +56,9 @@ public class NotificationDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<Informed> events) {
-        events.forEach(event -> event.toNotifications(userAliasDaoJpa).forEach(n -> {
-            this.notificationRepository.save(n);
-        }));
+        List<Notification> notifications = new ArrayList<>();
+        events.forEach(event -> notifications.addAll(event.toNotifications(userAliasDaoJpa)));
+        this.notificationRepository.saveAll(notifications);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
