@@ -54,18 +54,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ContentDiffTool contentDiffTool;
     @Autowired
     private ProjectRepository projectRepository;
-    @Autowired
-    private TaskRepository taskRepository;
-    @Autowired
-    private TaskContentRepository taskContentRepository;
-    @Autowired
-    private NoteRepository noteRepository;
-    @Autowired
-    private NoteContentRepository noteContentRepository;
-    @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private TransactionContentRepository transactionContentRepository;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
