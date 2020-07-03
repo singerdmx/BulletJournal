@@ -1,5 +1,6 @@
 package com.bulletjournal.redis.models;
 
+import com.bulletjournal.controller.models.EtagType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -18,7 +19,13 @@ public class Etag implements Serializable {
     public Etag() {
     }
 
-    public Etag(String username, String type, String etag) {
+    public Etag(String username, EtagType type, String etag) {
+        this.index = username + "@" + type.toString();
+        this.etag = etag;
+    }
+
+    public Etag(String username, String type, String etag)
+    {
         this.index = username + "@" + type;
         this.etag = etag;
     }
@@ -38,6 +45,10 @@ public class Etag implements Serializable {
 
     public void setIndex(String username, String type) {
         this.index = username + "@" + type;
+    }
+
+    public void setIndex(String username, EtagType type) {
+        this.index = username + "@" + type.toString();
     }
 
     public String getUsername() {
@@ -74,6 +85,10 @@ public class Etag implements Serializable {
             throw new IllegalArgumentException("Illegal index format");
 
         this.setIndex(index.substring(0, split) + "@" + type);
+    }
+
+    public EtagType getEtagType() {
+        return EtagType.of(this.getType());
     }
 
     public String getEtag() {

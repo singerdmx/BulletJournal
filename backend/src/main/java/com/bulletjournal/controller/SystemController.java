@@ -114,7 +114,7 @@ public class SystemController {
             notificationsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
                     notificationList);
-            Etag cached = new Etag(username, notificationsEtag);
+            Etag cached = new Etag(username, EtagType.NOTIFICATION, notificationsEtag);
             redisEtagRepository.save(cached);
             //} else {
             //    notificationsEtag = cache.getEtag();
