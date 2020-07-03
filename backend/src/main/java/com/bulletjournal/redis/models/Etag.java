@@ -1,6 +1,5 @@
 package com.bulletjournal.redis.models;
 
-import com.bulletjournal.controller.models.EtagType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;

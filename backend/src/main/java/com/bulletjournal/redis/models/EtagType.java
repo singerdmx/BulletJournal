@@ -1,4 +1,4 @@
-package com.bulletjournal.controller.models;
+package com.bulletjournal.redis.models;
 
 public enum EtagType {
     NOTIFICATION(0, "Notification"),

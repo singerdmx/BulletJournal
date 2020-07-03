@@ -12,6 +12,7 @@ import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.filters.rate.limiting.TokenBucketType;
 import com.bulletjournal.redis.RedisEtagRepository;
 import com.bulletjournal.redis.models.Etag;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;

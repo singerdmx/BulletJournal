@@ -1,6 +1,6 @@
 package com.bulletjournal.redis;
 
-import com.bulletjournal.controller.models.EtagType;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.controller.models.Group;
 import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.models.Projects;
