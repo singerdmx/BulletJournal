@@ -1,6 +1,8 @@
 package com.bulletjournal.notifications;
 
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
+import com.bulletjournal.redis.RedisEtagDaoJpa;
+import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
@@ -23,13 +25,15 @@ public class NotificationService {
     private final NotificationDaoJpa notificationDaoJpa;
     private final AuditableDaoJpa auditableDaoJpa;
     private final SearchIndexDaoJpa searchIndexDaoJpa;
+    private final RedisEtagDaoJpa redisEtagDaoJpa;
     private volatile boolean stop = false;
 
     @Autowired
-    public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa, SearchIndexDaoJpa searchIndexDaoJpa) {
+    public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa, SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
         this.notificationDaoJpa = notificationDaoJpa;
         this.auditableDaoJpa = auditableDaoJpa;
         this.searchIndexDaoJpa = searchIndexDaoJpa;
+        this.redisEtagDaoJpa = redisEtagDaoJpa;
         this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("notification-service"));
         this.eventQueue = new LinkedBlockingQueue<>();
     }
@@ -63,6 +67,14 @@ public class NotificationService {
         this.eventQueue.offer(removeElasticsearchDocumentEvent);
     }
 
+    public void cacheEtag(Etag etag) {
+        LOGGER.info("Received etag: " + etag);
+        if (etag == null) {
+            return;
+        }
+        this.eventQueue.offer(etag);
+    }
+
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Object> events = new ArrayList<>();
@@ -82,13 +94,16 @@ public class NotificationService {
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
-            events.stream().forEach((e) -> {
+            List<Etag> etags = new ArrayList<>();
+            events.forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
                 } else if (e instanceof Auditable) {
                     auditables.add((Auditable) e);
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
+                } else if (e instanceof Etag) {
+                    etags.add((Etag) e);
                 }
             });
             try {
@@ -103,7 +118,7 @@ public class NotificationService {
                     this.auditableDaoJpa.create(auditables);
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error on creating records in auditableDaoJpa", ex);
+                LOGGER.error("Error on creating records in AuditableDaoJpa", ex);
             }
             try {
                 if (!removeElasticsearchDocumentEvents.isEmpty()) {
@@ -111,6 +126,13 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on deleting records in SearchIndexDaoJpa", ex);
+            }
+            try {
+                if (!etags.isEmpty()) {
+                    this.redisEtagDaoJpa.create(etags);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on deleting records in RedisEtagDaoJpa", ex);
             }
             events = new ArrayList<>();
         }
