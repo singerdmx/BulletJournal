@@ -30,7 +30,8 @@ function getCookie(cname: string) {
 
 function listen() {
     if (document.readyState === 'complete') {
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV === 'production' &&
+            !window.location.href.toLowerCase().includes('/public')) {
             const loginCookie = getCookie('__discourse_proxy');
             console.log('loginCookie ' + loginCookie);
             if (!loginCookie) {
