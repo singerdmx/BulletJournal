@@ -39,6 +39,7 @@ public class SearchIndexDaoJpa {
     private static final String SEARCH_INDEX_NAME = "project_items";
     private static final char SEARCH_INDEX_SPLITTER = '@';
     private static final String CONTENT_TYPE_SUFFIX = "_content";
+    private static final String PROJECT_ID = "projectId";
 
 
     private static final Integer FRAGMENT_SIZE = 300;
@@ -71,7 +72,7 @@ public class SearchIndexDaoJpa {
 
         BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
         for (long pid : projectIdList) {
-            queryBuilder.should(QueryBuilders.termQuery("projectId", pid));
+            queryBuilder.should(QueryBuilders.termQuery(PROJECT_ID, pid));
         }
         queryBuilder.minimumShouldMatch(1)
                 .must(QueryBuilders.matchQuery(SEARCH_FIELD, term)
@@ -172,7 +173,7 @@ public class SearchIndexDaoJpa {
      * @param projectId target search index
      */
     public void deleteSearchIndexProject(Long projectId) {
-        QueryBuilder matchQuery = QueryBuilders.matchQuery("projectId", projectId);
+        QueryBuilder matchQuery = QueryBuilders.matchQuery(PROJECT_ID, projectId);
         NativeSearchQuery query = new NativeSearchQueryBuilder().withQuery(matchQuery).build();
         this.elasticsearchRestTemplate.delete(query, SearchIndex.class, IndexCoordinates.of(SEARCH_INDEX_NAME));
     }
