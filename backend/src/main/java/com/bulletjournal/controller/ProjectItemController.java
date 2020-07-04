@@ -48,12 +48,11 @@ public class ProjectItemController {
     private final Map<ProjectType, ProjectItemDaoJpa> daos;
 
     @Autowired
-    public ProjectItemController(TaskDaoJpa taskDaoJpa, TransactionDaoJpa transactionDaoJpa, NoteDaoJpa noteDaoJpa,
-                                 LabelDaoJpa labelDaoJpa, UserDaoJpa userDaoJpa, UserClient userClient) {
+    public ProjectItemController(TaskDaoJpa taskDaoJpa, TransactionDaoJpa transactionDaoJpa, LabelDaoJpa labelDaoJpa,
+                                 UserDaoJpa userDaoJpa, UserClient userClient, ProjectItemDaos projectItemDaos) {
         this.taskDaoJpa = taskDaoJpa;
         this.transactionDaoJpa = transactionDaoJpa;
-        this.daos = ImmutableMap.of(ProjectType.TODO, taskDaoJpa, ProjectType.NOTE, noteDaoJpa, ProjectType.LEDGER,
-                transactionDaoJpa);
+        this.daos = projectItemDaos.getDaos();
         this.labelDaoJpa = labelDaoJpa;
         this.userDaoJpa = userDaoJpa;
         this.userClient = userClient;

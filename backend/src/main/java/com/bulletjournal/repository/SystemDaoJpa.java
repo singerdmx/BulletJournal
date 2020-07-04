@@ -21,15 +21,10 @@ public class SystemDaoJpa {
 
     @Autowired
     public SystemDaoJpa(
-            ProjectDaoJpa projectDaoJpa, LabelDaoJpa labelDaoJpa, TaskDaoJpa taskDaoJpa,
-            NoteDaoJpa noteDaoJpa, TransactionDaoJpa transactionDaoJpa) {
+            ProjectDaoJpa projectDaoJpa, LabelDaoJpa labelDaoJpa, ProjectItemDaos projectItemDaos) {
         this.projectDaoJpa = projectDaoJpa;
         this.labelDaoJpa = labelDaoJpa;
-        this.daos = ImmutableMap.of(
-                ProjectType.TODO, taskDaoJpa,
-                ProjectType.NOTE, noteDaoJpa,
-                ProjectType.LEDGER, transactionDaoJpa
-        );
+        this.daos = projectItemDaos.getDaos();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
