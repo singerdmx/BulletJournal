@@ -10,8 +10,7 @@ import { updateMyBuJoDates } from '../../features/myBuJo/actions';
 import { ProjectItems } from '../../features/myBuJo/interface';
 import ProjectModelItems from '../project-item/project-model-items.component';
 import { ProjectItemUIType } from "../../features/project/constants";
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import './project-item-list.styles.less';
+import TimeZoneAgnosticBigCalendar from '../../utils/react-big-calendar/calendar-wrapper';
 import { RouteComponentProps, withRouter } from "react-router";
 
 type PathProps = RouteComponentProps;
@@ -19,7 +18,6 @@ type PathProps = RouteComponentProps;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const { WeekPicker } = DatePicker;
-const localizer = momentLocalizer(moment);
 
 type ProjectItemProps = {
   todoSelected: boolean;
@@ -101,38 +99,34 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
         return (
           <div className='rbc-title'>
             <h2>{`${this.state.calendarDate.toDateString()}`}</h2>
-            <Calendar
+            <TimeZoneAgnosticBigCalendar
               selectable
               toolbar={false}
               events={this.state.calendarEvents}
-              localizer={localizer}
+              timeZoneName={this.props.timezone}
               view={'day'}
               date={this.state.calendarDate}
               onNavigate={this.handleNavigate}
               onView={this.handleViewChange}
-              startAccessor='start'
-              endAccessor='end'
               timeslots={1}
               step={60}
-              onSelectEvent={(event, e) => this.props.history.push(event.resource)}
+              onSelectEvent={(event: any, e: any) => this.props.history.push(event.resource)}
             />
           </div>);
       case 'week':
         return (
-          <Calendar
+          <TimeZoneAgnosticBigCalendar
             selectable
             toolbar={false}
             events={this.state.calendarEvents}
-            localizer={localizer}
+            timeZoneName={this.props.timezone}
             view={'week'}
             date={this.state.calendarDate}
             onNavigate={this.handleNavigate}
             onView={this.handleViewChange}
-            startAccessor='start'
-            endAccessor='end'
             timeslots={1}
             step={60}
-            onSelectEvent={(event, e) => this.props.history.push(event.resource)}
+            onSelectEvent={(event: any, e: any) => this.props.history.push(event.resource)}
           />);
     }
   };
@@ -216,6 +210,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
             style={{ width: '250px' }}
             picker='date'
             allowClear={false}
+            showToday={false}
             value={
               moment(
                 this.state.calendarDate
