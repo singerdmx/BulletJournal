@@ -82,6 +82,7 @@ public class UserClient {
         LinkedHashMap userInfo;
         try {
             userInfo = getSSOUserInfo(username);
+            username = (String) userInfo.get("username");
             user = getUser(username, userInfo);
         } catch (HttpClientErrorException ex) {
             throw new ResourceNotFoundException("Unable to find user " + username, ex);
