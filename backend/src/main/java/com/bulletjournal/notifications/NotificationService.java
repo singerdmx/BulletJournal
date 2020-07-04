@@ -1,5 +1,6 @@
 package com.bulletjournal.notifications;
 
+import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
@@ -29,8 +30,8 @@ public class NotificationService {
     private final RedisEtagDaoJpa redisEtagDaoJpa;
     private volatile boolean stop = false;
 
-    @Value("${spring.elasticsearch.rest.enable}")
-    private Boolean elasticsearchToggle;
+    @Autowired
+    private SpringESConfig springESConfig;
 
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa, SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
@@ -125,10 +126,8 @@ public class NotificationService {
                 LOGGER.error("Error on creating records in AuditableDaoJpa", ex);
             }
             try {
-                if (!removeElasticsearchDocumentEvents.isEmpty()) {
-                    if (elasticsearchToggle) {
-                        this.searchIndexDaoJpa.delete(removeElasticsearchDocumentEvents);
-                    }
+                if (!removeElasticsearchDocumentEvents.isEmpty() && this.springESConfig.getEnable()) {
+                    this.searchIndexDaoJpa.delete(removeElasticsearchDocumentEvents);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on deleting records in SearchIndexDaoJpa", ex);
