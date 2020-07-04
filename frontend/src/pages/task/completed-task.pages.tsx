@@ -10,7 +10,7 @@ import {
   updateCompleteTaskContents,
   uncompleteTask
 } from '../../features/tasks/actions';
-import { Avatar, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { UpSquareOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { IState } from '../../store';
 // antd imports
@@ -45,11 +45,6 @@ const CompletedTaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const taskOperation = () => {
     return (
       <div className='task-operation'>
-        <Tooltip title={`Created by ${task.owner.alias}`}>
-          <div className='task-owner'>
-            <Avatar src={task.owner.avatar} />
-          </div>
-        </Tooltip>
         <Tooltip title='Uncomplete Task'>
           <div>
             <CloseCircleOutlined

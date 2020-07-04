@@ -227,11 +227,11 @@ public class LabelDaoJpa {
         if (labels == null || labels.isEmpty()) {
             return Collections.emptyList();
         }
-        List<com.bulletjournal.controller.models.Label> labelsForPresentation = new ArrayList<>();
-        labelsForPresentation = this.labelRepository.findAllById(labels).stream()
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparingInt(label -> labels.indexOf(label.getId())))
-                .map(Label::toPresentationModel).collect(Collectors.toList());
+        List<com.bulletjournal.controller.models.Label> labelsForPresentation =
+                this.labelRepository.findAllById(labels).stream()
+                        .filter(Objects::nonNull)
+                        .sorted(Comparator.comparingInt(label -> labels.indexOf(label.getId())))
+                        .map(Label::toPresentationModel).collect(Collectors.toList());
         return labelsForPresentation;
     }
 }

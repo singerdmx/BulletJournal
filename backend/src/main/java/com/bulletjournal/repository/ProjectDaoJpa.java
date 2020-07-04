@@ -343,4 +343,11 @@ public class ProjectDaoJpa {
         return events;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Project getSharedProject(ContentType contentType, String owner) {
+        ProjectType projectType = ProjectType.fromContentType(contentType);
+        List<Project> projects = this.projectRepository.findByOwnerAndSharedTrue(owner);
+        return projects.stream().filter(p -> ProjectType.getType(p.getType()).equals(projectType))
+                .findAny().orElse(null);
+    }
 }

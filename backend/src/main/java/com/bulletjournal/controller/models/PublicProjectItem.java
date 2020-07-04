@@ -12,13 +12,16 @@ public class PublicProjectItem {
 
     private ProjectItem projectItem;
 
+    protected Long projectId;
+
     public PublicProjectItem() {
     }
 
-    public PublicProjectItem(ContentType contentType, List<Content> contents, ProjectItem projectItem) {
+    public PublicProjectItem(ContentType contentType, List<Content> contents, ProjectItem projectItem, Long projectId) {
         this.contentType = contentType;
         this.contents = contents;
         this.projectItem = projectItem;
+        this.projectId = projectId;
     }
 
     public List<Content> getContents() {
@@ -43,5 +46,13 @@ public class PublicProjectItem {
 
     public void setProjectItem(ProjectItem projectItem) {
         this.projectItem = projectItem;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 }

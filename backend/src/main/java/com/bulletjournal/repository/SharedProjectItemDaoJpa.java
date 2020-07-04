@@ -58,6 +58,7 @@ public class SharedProjectItemDaoJpa {
                 T target = (T) projectItem.toPresentationModel();
                 result.add(target);
             }
+            projectItem.setLabels(Collections.emptyList()); // TODO: set correct labels
         });
 
         return result.stream()

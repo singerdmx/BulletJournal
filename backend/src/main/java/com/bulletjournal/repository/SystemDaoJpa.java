@@ -3,7 +3,6 @@ package com.bulletjournal.repository;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.repository.models.Project;
-import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;

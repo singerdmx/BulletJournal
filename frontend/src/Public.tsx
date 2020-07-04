@@ -1,74 +1,114 @@
-import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { IState } from './store';
-import { connect } from 'react-redux';
-import { Note } from './features/notes/interface';
-import { Task } from './features/tasks/interface';
-import { ContentType } from './features/myBuJo/constants';
-import { Content } from './features/myBuJo/interface';
-import { getPublicItem } from './features/system/actions';
+import React, {useEffect} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {IState} from './store';
+import {connect} from 'react-redux';
+import {Note} from './features/notes/interface';
+import {Task} from './features/tasks/interface';
+import {ContentType} from './features/myBuJo/constants';
+import {Content} from './features/myBuJo/interface';
+import {getPublicItem} from './features/system/actions';
+import {CloseCircleOutlined, UpSquareOutlined} from '@ant-design/icons';
 
 import './styles/main.less';
+import './Public.styles.less';
 import TaskDetailPage from './pages/task/task-detail.pages';
 import NoteDetailPage from './pages/note/note-detail.pages';
+import {Tooltip} from "antd";
 
 type PageProps = {
-  note: Note;
-  task: Task;
-  contentType: ContentType | undefined;
-  contents: Content[];
-  getPublicItem: (itemId: string) => void;
+    note: Note | undefined;
+    task: Task | undefined;
+    projectId: number | undefined;
+    contentType: ContentType | undefined;
+    contents: Content[];
+    getPublicItem: (itemId: string) => void;
 };
 
 const PublicPage: React.FC<PageProps> = (props) => {
-  const { note, task, contentType, contents, getPublicItem } = props;
-  const { itemId } = useParams();
-  useEffect(() => {
-    getPublicItem(itemId!);
-  }, []);
+    const {note, task, contentType, contents, getPublicItem, projectId} = props;
+    const {itemId} = useParams();
+    const history = useHistory();
 
-  if (!contentType) {
+    useEffect(() => {
+        if (itemId) {
+            getPublicItem(itemId);
+        }
+    }, [itemId]);
+
+    if (!contentType || !itemId || !projectId) {
+        return null;
+    }
+
+    const getRemoveButton = (itemId: string, projectId: number) => {
+        if (!itemId.startsWith('TASK') && !itemId.startsWith('NOTE')) {
+            return null;
+        }
+        return <Tooltip title='Remove'>
+            <div>
+                <CloseCircleOutlined
+                    twoToneColor='#52c41a'
+                    onClick={() => {
+                        // revokeSharable(task.id);
+                        history.push(`/projects/${projectId}`);
+                    }}/>
+            </div>
+        </Tooltip>;
+    };
+
+    const itemOperation = (itemId: string, projectId: number) => {
+        return (
+            <div className='public-item-operation'>
+                {getRemoveButton(itemId, projectId)}
+                <Tooltip title='Go to Parent BuJo'>
+                    <div>
+                        <UpSquareOutlined
+                            onClick={(e) => history.push(`/projects/${projectId}`)}
+                        />
+                    </div>
+                </Tooltip>
+            </div>
+        );
+    };
+
+    if (contentType === ContentType.TASK) {
+        return (
+            <div>
+                <TaskDetailPage
+                    task={task}
+                    labelEditable={false}
+                    taskOperation={() => itemOperation(itemId, projectId)}
+                    contents={contents}
+                    createContentElem={null}
+                    taskEditorElem={null}
+                />
+            </div>
+        );
+    }
+
+    if (contentType === ContentType.NOTE) {
+        return (
+            <div>
+                <NoteDetailPage
+                    note={note}
+                    labelEditable={false}
+                    createContentElem={null}
+                    noteOperation={() => itemOperation(itemId, projectId)}
+                    noteEditorElem={null}
+                    contents={contents}
+                />
+            </div>
+        );
+    }
+
     return null;
-  }
-
-  if (contentType === ContentType.TASK) {
-    return (
-      <div>
-        <TaskDetailPage
-          task={task}
-          labelEditable={false}
-          taskOperation={() => null}
-          contents={contents}
-          createContentElem={null}
-          taskEditorElem={null}
-        />
-      </div>
-    );
-  }
-
-  if (contentType === ContentType.NOTE) {
-    return (
-      <div>
-        <NoteDetailPage
-          note={note}
-          labelEditable={false}
-          createContentElem={null}
-          noteOperation={() => null}
-          noteEditorElem={null}
-          contents={contents}
-        />
-      </div>
-    );
-  }
-
-  return null;
 };
 
 const mapStateToProps = (state: IState) => ({
-  note: state.system.publicNote,
-  task: state.system.publicTask,
-  contentType: state.system.contentType,
-  contents: state.system.contents,
+    note: state.system.publicNote,
+    task: state.system.publicTask,
+    projectId: state.system.publicItemProjectId,
+    contentType: state.system.contentType,
+    contents: state.system.contents,
 });
 
-export default connect(mapStateToProps, { getPublicItem })(PublicPage);
+export default connect(mapStateToProps, {getPublicItem})(PublicPage);

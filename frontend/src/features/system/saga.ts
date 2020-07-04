@@ -169,6 +169,7 @@ function* getPublicItem(action: PayloadAction<GetPublicProjectItem>) {
         contents: data.contents,
         publicNote: note,
         publicTask: task,
+        publicItemProjectId: data.projectId
       })
     );
   } catch (error) {

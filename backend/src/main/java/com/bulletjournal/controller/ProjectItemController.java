@@ -12,7 +12,6 @@ import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
-import com.google.common.collect.ImmutableMap;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;

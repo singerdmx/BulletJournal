@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import com.bulletjournal.contents.ContentType;
+
 public enum ProjectType {
     TODO(0),
     NOTE(1),
@@ -26,5 +28,18 @@ public enum ProjectType {
 
     public int getValue() {
         return this.value;
+    }
+
+    public static ProjectType fromContentType(ContentType contentType) {
+        switch (contentType) {
+            case TASK:
+                return TODO;
+            case NOTE:
+                return NOTE;
+            case TRANSACTION:
+                return LEDGER;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 }

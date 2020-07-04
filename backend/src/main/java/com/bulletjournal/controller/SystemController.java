@@ -225,7 +225,9 @@ public class SystemController {
         }
 
         contents.forEach(content -> content.setRevisions(new Revision[0])); // clear revisions
-        return ResponseEntity.ok().body(new PublicProjectItem(contentType, contents, projectItem));
+        com.bulletjournal.repository.models.Project project = projectDaoJpa.getSharedProject(contentType, originalUser);
+        return ResponseEntity.ok().body(
+                new PublicProjectItem(contentType, contents, projectItem, project != null ? project.getId() : null));
     }
 
     private boolean isUUID(String itemId) {

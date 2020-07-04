@@ -26,6 +26,7 @@ export type PublicProjectItemUpdate = {
   publicTask?: Task;
   contents: Content[];
   contentType: ContentType | undefined;
+  publicItemProjectId: number;
 };
 
 export type GetPublicProjectItem = {
@@ -40,11 +41,12 @@ let initialState = {
   ownedProjectsEtag: '',
   sharedProjectsEtag: '',
   remindingTaskEtag: '',
-  publicNote: {} as Note,
-  publicTask: {} as Task,
+  publicNote: undefined as Note | undefined,
+  publicTask: undefined as Task | undefined,
   reminders: [] as Task[],
   contents: [] as Array<Content>,
   contentType: undefined as ContentType | undefined,
+  publicItemProjectId: undefined as number | undefined
 };
 
 const slice = createSlice({
@@ -94,7 +96,7 @@ const slice = createSlice({
     systemUpdate: (state, action: PayloadAction<UpdateSystem>) => state,
     fetchPublicProjectItem: (state, action: PayloadAction<GetPublicProjectItem>) => state,
     publicProjectItemReceived: (state, action: PayloadAction<PublicProjectItemUpdate>) => {
-      const {contents, contentType, publicNote, publicTask} = action.payload;
+      const {contents, contentType, publicNote, publicTask, publicItemProjectId} = action.payload;
       state.contentType = contentType;
       state.contents = contents;
       if (publicNote) {
@@ -103,6 +105,7 @@ const slice = createSlice({
       if (publicTask) {
         state.publicTask = publicTask;
       }
+      state.publicItemProjectId = publicItemProjectId
     }
   }
 });

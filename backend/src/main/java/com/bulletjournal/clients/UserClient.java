@@ -82,6 +82,7 @@ public class UserClient {
         LinkedHashMap userInfo;
         try {
             userInfo = getSSOUserInfo(username);
+            // SSO is case-insensitive for username
             username = (String) userInfo.get("username");
             user = getUser(username, userInfo);
         } catch (HttpClientErrorException ex) {
