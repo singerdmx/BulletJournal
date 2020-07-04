@@ -35,7 +35,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
         }
     }, [itemId]);
 
-    if (!contentType || !itemId || !projectId) {
+    if (!contentType) {
         return null;
     }
 
@@ -76,7 +76,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
                 <TaskDetailPage
                     task={task}
                     labelEditable={false}
-                    taskOperation={() => itemOperation(itemId, projectId)}
+                    taskOperation={() => itemOperation(itemId!, projectId!)}
                     contents={contents}
                     createContentElem={null}
                     taskEditorElem={null}
@@ -92,7 +92,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
                     note={note}
                     labelEditable={false}
                     createContentElem={null}
-                    noteOperation={() => itemOperation(itemId, projectId)}
+                    noteOperation={() => itemOperation(itemId!, projectId!)}
                     noteEditorElem={null}
                     contents={contents}
                 />
