@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.SearchResult;
 import com.bulletjournal.controller.models.SearchResultItem;
@@ -18,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.util.Pair;
@@ -54,9 +54,8 @@ public class QueryController {
     private NoteDaoJpa noteDaoJpa;
     @Autowired
     private NotificationService notificationService;
-
-    @Value("${spring.elasticsearch.rest.enable}")
-    private Boolean elasticsearchToggle;
+    @Autowired
+    private SpringESConfig springESConfig;
 
     /**
      * Parse Search Index identifier into type and id
@@ -108,7 +107,7 @@ public class QueryController {
                                @RequestParam(required = false, defaultValue = "0") Integer pageNo,
                                @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
 
-        if (!elasticsearchToggle) {
+        if (!this.springESConfig.getEnable()) {
             return ESUtil.createMockSearchResult();
         }
 
