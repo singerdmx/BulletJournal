@@ -9,6 +9,7 @@ import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +28,9 @@ public class NotificationService {
     private final SearchIndexDaoJpa searchIndexDaoJpa;
     private final RedisEtagDaoJpa redisEtagDaoJpa;
     private volatile boolean stop = false;
+
+    @Value("${spring.elasticsearch.rest.enable}")
+    private Boolean elasticsearchToggle;
 
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa, SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
@@ -122,7 +126,9 @@ public class NotificationService {
             }
             try {
                 if (!removeElasticsearchDocumentEvents.isEmpty()) {
-                    this.searchIndexDaoJpa.delete(removeElasticsearchDocumentEvents);
+                    if (elasticsearchToggle) {
+                        this.searchIndexDaoJpa.delete(removeElasticsearchDocumentEvents);
+                    }
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on deleting records in SearchIndexDaoJpa", ex);
