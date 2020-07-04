@@ -97,7 +97,7 @@ public class SharedProjectItemDaoJpa {
                             targetUser.hasSharedNotesProject(),
                             projectType,
                             targetUser,
-                            (p) -> targetUser.setSharedNotesProject(p));
+                            targetUser::setSharedNotesProject);
                     sharedProjectItem.setNote((Note) projectItem);
                     break;
                 case TODO:
@@ -105,7 +105,7 @@ public class SharedProjectItemDaoJpa {
                             targetUser.hasSharedTasksProject(),
                             projectType,
                             targetUser,
-                            (p) -> targetUser.setSharedTasksProject(p));
+                            targetUser::setSharedTasksProject);
                     sharedProjectItem.setTask((Task) projectItem);
                     break;
                 case LEDGER:
@@ -113,7 +113,7 @@ public class SharedProjectItemDaoJpa {
                             targetUser.hasSharedTransactionsProject(),
                             projectType,
                             targetUser,
-                            (p) -> targetUser.setSharedTransactionsProject(p));
+                            targetUser::setSharedTransactionsProject);
                     sharedProjectItem.setTransaction((Transaction) projectItem);
                     break;
                 default:

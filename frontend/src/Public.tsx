@@ -39,10 +39,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
         return null;
     }
 
-    const getRemoveButton = (itemId: string, projectId: number) => {
-        if (!itemId.startsWith('TASK') && !itemId.startsWith('NOTE')) {
-            return null;
-        }
+    const getRemoveButton = (projectId: number) => {
         return <Tooltip title='Remove'>
             <div>
                 <CloseCircleOutlined
@@ -56,9 +53,12 @@ const PublicPage: React.FC<PageProps> = (props) => {
     };
 
     const itemOperation = (itemId: string, projectId: number) => {
+        if (!itemId.startsWith('TASK') && !itemId.startsWith('NOTE')) {
+            return null;
+        }
         return (
             <div className='public-item-operation'>
-                {getRemoveButton(itemId, projectId)}
+                {getRemoveButton(projectId)}
                 <Tooltip title='Go to Parent BuJo'>
                     <div>
                         <UpSquareOutlined
