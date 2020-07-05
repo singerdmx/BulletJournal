@@ -90,7 +90,7 @@ public class SharedProjectItemDaoJpa {
             }
 
             User targetUser = this.userDaoJpa.getByName(user);
-            SharedProjectItem sharedProjectItem = new SharedProjectItem(user);
+            SharedProjectItem sharedProjectItem = new SharedProjectItem(requester, user);
             switch (projectType) {
                 case NOTE:
                     checkSharedProjectExistence(

@@ -20,6 +20,9 @@ public class SharedProjectItem extends AuditModel {
 
     @Column
     private String username;
+    @Column
+    private String requester;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "task_id", nullable = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -36,7 +39,8 @@ public class SharedProjectItem extends AuditModel {
     public SharedProjectItem() {
     }
 
-    public SharedProjectItem(String username) {
+    public SharedProjectItem(String requester, String username) {
+        this.requester = requester;
         this.username = username;
     }
 
@@ -70,6 +74,14 @@ public class SharedProjectItem extends AuditModel {
 
     public Note getNote() {
         return note;
+    }
+
+    public String getRequester() {
+        return requester;
+    }
+
+    public void setRequester(String requester) {
+        this.requester = requester;
     }
 
     public void setNote(Note note) {
