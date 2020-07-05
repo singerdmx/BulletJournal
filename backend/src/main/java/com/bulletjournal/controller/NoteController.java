@@ -1,6 +1,5 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;

@@ -143,7 +143,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> void removeShared(Long projectItemId, String requester) {
-        T projectItem = getProjectItem(projectItemId, AuthorizationService.SUPER_USER);
+        T projectItem = getProjectItem(projectItemId, requester);
         this.sharedProjectItemDaoJpa.deleteSharedProjectItemWithUser(projectItem, requester);
     }
 
