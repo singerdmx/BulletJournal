@@ -1,4 +1,4 @@
-package com.bulletjournal.controller.models;
+package com.bulletjournal.daemon.models;
 
 import java.util.Objects;
 
