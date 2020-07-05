@@ -105,11 +105,25 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 100))
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-        if (project.isShared()) {
-            return this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, ProjectType.TODO);
-        }
 
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
+
+        if (project.isShared()) {
+            List<Task> tasks =  this.sharedProjectItemDaoJpa.
+                    getSharedProjectItems(requester, ProjectType.TODO).stream()
+                    .filter(obj -> obj instanceof Task)
+                    .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
+            if (!projectTasksOptional.isPresent()) {
+                return tasks.stream().map(
+                        task -> task.toPresentationModel()
+                ).collect(Collectors.toList());
+            }
+            ProjectTasks projectTasks = projectTasksOptional.get();
+            final Map<Long, Task> taskMap =  tasks.stream()
+                    .collect(Collectors.toMap(n -> n.getId(), n -> n));
+            return TaskRelationsProcessor.processRelations(taskMap, projectTasks.getTasks()).stream()
+                    .map(task -> addLabels(task, taskMap)).collect(Collectors.toList());
+        }
         if (!projectTasksOptional.isPresent()) {
             return Collections.emptyList();
         }

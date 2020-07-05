@@ -1,6 +1,5 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
@@ -38,9 +37,9 @@ public class SharedProjectItemDaoJpa {
     private GroupDaoJpa groupDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItem> List<T> getSharedProjectItems(
+    public List<ProjectItemModel> getSharedProjectItems(
             String user, final ProjectType projectType) {
-        List<T> result = new ArrayList<>();
+        List<ProjectItemModel> result = new ArrayList<>();
         List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(user);
         items.forEach(item -> {
             ProjectItemModel projectItem;
@@ -55,8 +54,7 @@ public class SharedProjectItemDaoJpa {
             }
 
             if (projectType == null || projectType.getValue() == projectItem.getProject().getType().intValue()) {
-                T target = (T) projectItem.toPresentationModel();
-                result.add(target);
+                result.add(projectItem);
             }
             projectItem.setLabels(Collections.emptyList()); // TODO: set correct labels
         });
@@ -67,19 +65,19 @@ public class SharedProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItem> List<T> getSharedProjectItems(String user) {
+    public List<ProjectItemModel> getSharedProjectItems(String user) {
         return getSharedProjectItems(user, null);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel, K extends ProjectItem> ShareProjectItemEvent save(
+    public <T extends ProjectItemModel> ShareProjectItemEvent save(
             ProjectType projectType, T projectItem, List<String> users, String requester) {
         List<Event> events = new ArrayList<>();
         for (String user : new HashSet<>(users)) {
             if (Objects.equals(user, requester)) {
                 continue;
             }
-            List<K> existingItems = this.getSharedProjectItems(user);
+            List<ProjectItemModel> existingItems = this.getSharedProjectItems(user);
             if (existingItems.stream().anyMatch(existingItem ->
                     Objects.equals(existingItem.getContentType(), projectItem.getContentType()) &&
                             Objects.equals(existingItem.getId(), projectItem.getId()))) {
