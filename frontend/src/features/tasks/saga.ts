@@ -1,5 +1,5 @@
-import { all, call, put, select, takeLatest } from 'redux-saga/effects';
-import { message } from 'antd';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
 import {
   actions as tasksActions,
   CompleteTask,
@@ -19,6 +19,7 @@ import {
   PatchContent,
   PatchTask,
   PutTask,
+  RemoveShared,
   RevokeSharable,
   SetTaskLabels,
   SetTaskStatus,
@@ -30,7 +31,7 @@ import {
   UpdateTaskContents,
   UpdateTasks,
 } from './reducer';
-import { PayloadAction } from 'redux-starter-kit';
+import {PayloadAction} from 'redux-starter-kit';
 import {
   addContent,
   completeTaskById,
@@ -50,6 +51,7 @@ import {
   getTaskById,
   moveToTargetProject,
   putTasks,
+  removeShared,
   revokeSharable,
   setTaskLabels,
   setTaskStatus as setTaskStatusApi,
@@ -58,20 +60,16 @@ import {
   updateContent,
   updateTask,
 } from '../../apis/taskApis';
-import {
-  updateLoadingCompletedTask,
-  updateTaskContents,
-  updateTasks,
-} from './actions';
-import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
-import { IState } from '../../store';
-import { Content, ProjectItems, Revision } from '../myBuJo/interface';
-import { updateItemsByLabels } from '../label/actions';
-import { actions as SystemActions } from '../system/reducer';
-import { completedTaskPageSize, ProjectItemUIType } from '../project/constants';
-import { Task } from './interface';
-import { recentItemsReceived } from '../recent/actions';
-import { ContentType } from '../myBuJo/constants';
+import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
+import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
+import {IState} from '../../store';
+import {Content, ProjectItems, Revision} from '../myBuJo/interface';
+import {updateItemsByLabels} from '../label/actions';
+import {actions as SystemActions} from '../system/reducer';
+import {completedTaskPageSize, ProjectItemUIType} from '../project/constants';
+import {Task} from './interface';
+import {recentItemsReceived} from '../recent/actions';
+import {ContentType} from '../myBuJo/constants';
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -767,6 +765,15 @@ function* revokeTaskSharable(action: PayloadAction<RevokeSharable>) {
   }
 }
 
+function* removeSharedTask(action: PayloadAction<RemoveShared>) {
+  try {
+    const {taskId} = action.payload;
+    yield call(removeShared, taskId);
+  } catch (error) {
+    yield call(message.error, `removeSharedTask Error Received: ${error}`);
+  }
+}
+
 function* createTaskContent(action: PayloadAction<CreateContent>) {
   try {
     const { taskId, text } = action.payload;
@@ -1010,6 +1017,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskShare.type, shareTask),
     yield takeLatest(tasksActions.TaskSharablesGet.type, getTaskSharables),
     yield takeLatest(tasksActions.TaskRevokeSharable.type, revokeTaskSharable),
+    yield takeLatest(tasksActions.TaskRemoveShared.type, removeSharedTask),
     yield takeLatest(
       tasksActions.CompletedTasksUpdate.type,
       completedTasksUpdate

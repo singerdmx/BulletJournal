@@ -30,7 +30,9 @@ public class AuthorizationService {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
     public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, T projectItem) {
-        if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).contains(projectItem)) {
+        if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).stream()
+                .anyMatch(item -> Objects.equals(item.getId(), projectItem.getId()) &&
+                        Objects.equals(item.getContentType(), projectItem.getContentType()))) {
             return;
         }
         validateRequesterInProjectGroup(requester, projectItem.getProject());

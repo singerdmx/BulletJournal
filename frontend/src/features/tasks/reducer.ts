@@ -134,6 +134,10 @@ export type RevokeSharable = {
   link?: string;
 };
 
+export type RemoveShared = {
+  taskId: number;
+};
+
 export type PatchTask = {
   taskId: number;
   timezone: string;
@@ -339,6 +343,7 @@ const slice = createSlice({
     TaskShare: (state, action: PayloadAction<ShareTask>) => state,
     TaskSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
     TaskRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
+    TaskRemoveShared: (state, action: PayloadAction<RemoveShared>) => state,
     taskContentsReceived: (state, action: PayloadAction<ContentsAction>) => {
       const { contents } = action.payload;
       state.contents = contents;

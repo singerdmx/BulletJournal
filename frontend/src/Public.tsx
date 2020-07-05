@@ -14,6 +14,8 @@ import './Public.styles.less';
 import TaskDetailPage from './pages/task/task-detail.pages';
 import NoteDetailPage from './pages/note/note-detail.pages';
 import {Tooltip} from "antd";
+import {removeSharedTask} from "./features/tasks/actions";
+import {removeSharedNote} from "./features/notes/actions";
 
 type PageProps = {
     note: Note | undefined;
@@ -22,10 +24,12 @@ type PageProps = {
     contentType: ContentType | undefined;
     contents: Content[];
     getPublicItem: (itemId: string) => void;
+    removeSharedTask: (taskId: number) => void;
+    removeSharedNote: (noteId: number) => void;
 };
 
 const PublicPage: React.FC<PageProps> = (props) => {
-    const {note, task, contentType, contents, getPublicItem, projectId} = props;
+    const {note, task, contentType, contents, getPublicItem, projectId, removeSharedTask, removeSharedNote} = props;
     const {itemId} = useParams();
     const history = useHistory();
 
@@ -45,7 +49,14 @@ const PublicPage: React.FC<PageProps> = (props) => {
                 <CloseCircleOutlined
                     twoToneColor='#52c41a'
                     onClick={() => {
-                        // revokeSharable(task.id);
+                        switch (contentType) {
+                            case ContentType.TASK:
+                                removeSharedTask(task!.id);
+                                break;
+                            case ContentType.NOTE:
+                                removeSharedNote(note!.id);
+                                break;
+                        }
                         history.push(`/projects/${projectId}`);
                     }}/>
             </div>
@@ -111,4 +122,4 @@ const mapStateToProps = (state: IState) => ({
     contents: state.system.contents,
 });
 
-export default connect(mapStateToProps, {getPublicItem})(PublicPage);
+export default connect(mapStateToProps, {getPublicItem, removeSharedTask, removeSharedNote})(PublicPage);

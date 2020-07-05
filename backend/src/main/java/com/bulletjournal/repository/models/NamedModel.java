@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 @MappedSuperclass
 public abstract class NamedModel extends AuditModel {
@@ -23,4 +24,16 @@ public abstract class NamedModel extends AuditModel {
 
     public abstract Long getId();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NamedModel)) return false;
+        NamedModel that = (NamedModel) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }

@@ -16,6 +16,7 @@ import {
   PatchContent,
   PatchNote,
   PutNote,
+  RemoveShared,
   RevokeSharable,
   SetNoteLabels,
   ShareNote,
@@ -37,11 +38,12 @@ import {
   getSharables,
   moveToTargetProject,
   putNotes,
+  removeShared,
   revokeSharable,
   setNoteLabels,
   shareNoteWithOther,
   updateContent,
-  updateNote,
+  updateNote
 } from '../../apis/noteApis';
 import {IState} from '../../store';
 import {updateNoteContents, updateNotes} from './actions';
@@ -489,6 +491,15 @@ function* revokeNoteSharable(action: PayloadAction<RevokeSharable>) {
   }
 }
 
+function* removeSharedNote(action: PayloadAction<RemoveShared>) {
+  try {
+    const {noteId} = action.payload;
+    yield call(removeShared, noteId);
+  } catch (error) {
+    yield call(message.error, `removeSharedNote Error Received: ${error}`);
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -514,6 +525,7 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NoteShare.type, shareNote),
     yield takeLatest(notesActions.NoteSharablesGet.type, getNoteSharables),
     yield takeLatest(notesActions.NoteRevokeSharable.type, revokeNoteSharable),
+    yield takeLatest(notesActions.NoteRemoveShared.type, removeSharedNote),
     yield takeLatest(notesActions.getNotesByOwner.type, getNotesByOwner),
     yield takeLatest(notesActions.getNotesByOrder.type, getNotesByOrder),
     yield takeLatest(notesActions.NotesDelete.type, notesDelete),

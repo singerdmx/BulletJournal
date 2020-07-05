@@ -255,6 +255,14 @@ export const revokeSharable = (
     });
 };
 
+export const removeShared = (taskId: number) => {
+  return doPost(`/api/tasks/${taskId}/removeShared`)
+      .then((res) => res)
+      .catch((err) => {
+        throw Error(err);
+      });
+};
+
 export const getContents = (taskId: number) => {
   return doFetch(`/api/tasks/${taskId}/contents`)
     .then((res) => res.json())

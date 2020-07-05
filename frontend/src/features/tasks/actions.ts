@@ -115,6 +115,8 @@ export const revokeTaskSharable = (
   user?: string,
   link?: string
 ) => actions.TaskRevokeSharable({ taskId: taskId, user: user, link: link });
+export const removeSharedTask = (taskId: number) =>
+    actions.TaskRemoveShared({taskId: taskId});
 export const updateTaskContents = (taskId: number) =>
   actions.TaskContentsUpdate({ taskId: taskId });
 export const updateCompleteTaskContents = (taskId: number) =>

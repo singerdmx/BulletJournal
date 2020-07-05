@@ -1,5 +1,5 @@
-import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
-import { Note } from '../features/notes/interface';
+import {doDelete, doFetch, doPatch, doPost, doPut} from './api-helper';
+import {Note} from '../features/notes/interface';
 
 export const fetchNotes = (
   projectId: number,
@@ -153,6 +153,14 @@ export const revokeSharable = (
     .catch((err) => {
       throw Error(err);
     });
+};
+
+export const removeShared = (noteId: number) => {
+  return doPost(`/api/notes/${noteId}/removeShared`)
+      .then((res) => res)
+      .catch((err) => {
+        throw Error(err);
+      });
 };
 
 export const getContents = (noteId: number) => {

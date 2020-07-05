@@ -72,7 +72,7 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel
         if (this == o) return true;
         if (!(o instanceof ProjectItemModel)) return false;
         ProjectItemModel that = (ProjectItemModel) o;
-        return Objects.equals(getProject(), that.getProject()) &&
+        return Objects.equals(getContentType(), that.getContentType()) &&
                 Objects.equals(getId(), that.getId()) &&
                 Objects.equals(getName(), that.getName()) &&
                 Objects.equals(getOwner(), that.getOwner());
@@ -80,6 +80,6 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel
 
     @Override
     public int hashCode() {
-        return Objects.hash(getProject(), getId(), getName(), getOwner());
+        return Objects.hash(getContentType(), getId(), getName(), getOwner());
     }
 }

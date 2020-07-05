@@ -1,6 +1,6 @@
-import { actions } from './reducer';
-import { Note } from './interface';
-import { History } from 'history';
+import {actions} from './reducer';
+import {Note} from './interface';
+import {History} from 'history';
 import {ProjectItemUIType} from "../project/constants";
 
 export const updateNotes = (projectId: number) =>
@@ -81,6 +81,9 @@ export const revokeNoteSharable = (
   user?: string,
   link?: string
 ) => actions.NoteRevokeSharable({ noteId: noteId, user: user, link: link });
+
+export const removeSharedNote = (noteId: number) =>
+    actions.NoteRemoveShared({noteId: noteId});
 
 export const getNotesByOwner = (projectId: number, owner: string) =>
   actions.getNotesByOwner({

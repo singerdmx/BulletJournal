@@ -107,6 +107,10 @@ export type RevokeSharable = {
   link?: string;
 };
 
+export type RemoveShared = {
+  noteId: number;
+};
+
 export type ContentsAction = {
   contents: Content[];
 };
@@ -231,6 +235,7 @@ const slice = createSlice({
     NoteShare: (state, action: PayloadAction<ShareNote>) => state,
     NoteSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
     NoteRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
+    NoteRemoveShared: (state, action: PayloadAction<RemoveShared>) => state,
   },
 });
 
