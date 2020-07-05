@@ -70,7 +70,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
 
         if (project.isShared()) {
-            List<Note> notes =  this.sharedProjectItemDaoJpa.
+            List<Note> notes = this.sharedProjectItemDaoJpa.
                     getSharedProjectItems(requester, ProjectType.NOTE).stream()
                     .filter(obj -> obj instanceof Note)
                     .map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList());
@@ -80,7 +80,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                 ).collect(Collectors.toList());
             }
             ProjectNotes projectNotes = projectNotesOptional.get();
-            final Map<Long, Note> notesMap =  notes.stream()
+            final Map<Long, Note> notesMap = notes.stream()
                     .collect(Collectors.toMap(n -> n.getId(), n -> n));
             return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes()).stream()
                     .map(note -> addLabels(note, notesMap)).collect(Collectors.toList());

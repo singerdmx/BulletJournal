@@ -109,7 +109,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
 
         if (project.isShared()) {
-            List<Task> tasks =  this.sharedProjectItemDaoJpa.
+            List<Task> tasks = this.sharedProjectItemDaoJpa.
                     getSharedProjectItems(requester, ProjectType.TODO).stream()
                     .filter(obj -> obj instanceof Task)
                     .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
@@ -119,7 +119,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 ).collect(Collectors.toList());
             }
             ProjectTasks projectTasks = projectTasksOptional.get();
-            final Map<Long, Task> taskMap =  tasks.stream()
+            final Map<Long, Task> taskMap = tasks.stream()
                     .collect(Collectors.toMap(n -> n.getId(), n -> n));
             return TaskRelationsProcessor.processRelations(taskMap, projectTasks.getTasks()).stream()
                     .map(task -> addLabels(task, taskMap)).collect(Collectors.toList());
