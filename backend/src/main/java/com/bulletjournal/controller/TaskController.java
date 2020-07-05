@@ -49,7 +49,7 @@ public class TaskController {
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
     protected static final String GET_SHARABLES_ROUTE = "/api/tasks/{taskId}/sharables";
     protected static final String REVOKE_SHARABLE_ROUTE = "/api/tasks/{taskId}/revokeSharable";
-    protected static final String REMOVE_SHARED_ROUTE = "/api/notes/{taskId}/removeShared";
+    protected static final String REMOVE_SHARED_ROUTE = "/api/tasks/{taskId}/removeShared";
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
