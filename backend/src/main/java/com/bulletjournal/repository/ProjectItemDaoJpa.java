@@ -3,14 +3,12 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.config.ContentRevisionConfig;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.RevokeSharableEvent;
-import com.bulletjournal.notifications.SetLabelEvent;
-import com.bulletjournal.notifications.ShareProjectItemEvent;
+import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -54,6 +52,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ContentDiffTool contentDiffTool;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -67,7 +67,14 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     public <T extends ProjectItemModel> SharableLink generatePublicItemLink(Long projectItemId, String requester,
                                                                             Long ttl) {
         T projectItem = getProjectItem(projectItemId, requester);
-        return this.publicProjectItemDaoJpa.generatePublicItemLink(projectItem, requester, ttl);
+        SharableLink sharableLink = this.publicProjectItemDaoJpa.generatePublicItemLink(projectItem, requester, ttl);
+        this.notificationService.trackActivity(
+                new Auditable(projectItem.getProject().getId(),
+                        "shared " + projectItem.getContentType() +
+                                " ##" + projectItem.getName() + "## in BuJo ##" + projectItem.getProject().getName() +
+                                "## with link ##" + sharableLink.getLink() + "##",
+                        requester, projectItemId, Timestamp.from(Instant.now()), ContentAction.SHARE));
+        return sharableLink;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -87,7 +94,17 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         ProjectType projectType = ProjectType.getType(projectItem.getProject().getType());
-        return this.sharedProjectItemDaoJpa.save(projectType, projectItem, users, requester);
+        ShareProjectItemEvent event = this.sharedProjectItemDaoJpa.save(projectType, projectItem, users, requester);
+        this.notificationService.trackActivity(new Auditable(
+                projectItem.getProject().getId(),
+                "shared " + projectItem.getContentType() +
+                        " ##" + projectItem.getName() + "## in BuJo ##" + projectItem.getProject().getName() +
+                        "## with " +
+                        (users.size() == 1 ? "user ##" + users.get(0) :
+                                "users ##" + users.toString().substring(1, users.toString().length() - 1))
+                        + "##",
+                requester, projectItemId, Timestamp.from(Instant.now()), ContentAction.SHARE));
+        return event;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
