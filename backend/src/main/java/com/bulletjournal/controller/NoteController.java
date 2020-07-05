@@ -1,5 +1,6 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
@@ -41,6 +42,7 @@ public class NoteController {
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
     protected static final String GET_SHARABLES_ROUTE = "/api/notes/{noteId}/sharables";
     protected static final String REVOKE_SHARABLE_ROUTE = "/api/notes/{noteId}/revokeSharable";
+    protected static final String REMOVE_SHARED_ROUTE = "/api/notes/{noteId}/removeShared";
     protected static final String ADD_CONTENT_ROUTE = "/api/notes/{noteId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
@@ -229,6 +231,12 @@ public class NoteController {
             @NotNull @RequestBody RevokeProjectItemSharableParams revokeProjectItemSharableParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.noteDaoJpa.revokeSharable(noteId, username, revokeProjectItemSharableParams);
+    }
+
+    @PostMapping(REMOVE_SHARED_ROUTE)
+    public void removeShared(@NotNull @PathVariable Long noteId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.removeShared(noteId, username);
     }
 
     @PostMapping(ADD_CONTENT_ROUTE)

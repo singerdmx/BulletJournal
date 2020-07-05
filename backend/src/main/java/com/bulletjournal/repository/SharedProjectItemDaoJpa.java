@@ -162,7 +162,7 @@ public class SharedProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> void revokeSharableWithUser(T projectItem, String user) {
+    public <T extends ProjectItemModel> void deleteSharedProjectItemWithUser(T projectItem, String user) {
         SharedProjectItem sharedProjectItem = this.getProjectItemSharedUsers(projectItem)
                 .stream()
                 .filter(item -> Objects.equals(item.getUsername(), user))

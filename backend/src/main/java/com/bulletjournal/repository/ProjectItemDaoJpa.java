@@ -133,12 +133,18 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         String user = revokeProjectItemSharableParams.getUser();
         if (user != null) {
-            this.sharedProjectItemDaoJpa.revokeSharableWithUser(projectItem, user);
+            this.sharedProjectItemDaoJpa.deleteSharedProjectItemWithUser(projectItem, user);
             return new RevokeSharableEvent(new Event(user, projectItemId, projectItem.getName()), requester,
                     projectItem.getContentType());
         }
 
         return null;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void removeShared(Long projectItemId, String requester) {
+        T projectItem = getProjectItem(projectItemId, AuthorizationService.SUPER_USER);
+        this.sharedProjectItemDaoJpa.deleteSharedProjectItemWithUser(projectItem, requester);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
