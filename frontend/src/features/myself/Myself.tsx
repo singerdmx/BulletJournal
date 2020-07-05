@@ -10,7 +10,7 @@ import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
 import { Project, ProjectsWithOwner } from '../project/interface';
 import { updateExpandedMyself, updateMyself } from './actions';
-import { groupUpdate, updateGroups } from '../group/actions';
+import { updateGroups } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
 import { updateSystem } from '../system/actions';
 
@@ -25,7 +25,6 @@ type MyselfProps = {
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateGroups: () => void;
   updateNotifications: () => void;
-  groupUpdate: () => void;
   updateSystem: () => void;
 };
 
@@ -124,6 +123,5 @@ export default connect(mapStateToProps, {
   updateExpandedMyself,
   updateGroups,
   updateNotifications,
-  groupUpdate,
   updateSystem,
 })(withRouter(Myself));
