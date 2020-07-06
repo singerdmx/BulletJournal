@@ -2,7 +2,6 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.repository.factory.Etaggable;
@@ -17,6 +16,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
@@ -69,11 +69,10 @@ public class NotificationDaoJpa implements Etaggable {
     }
 
     @Override
-    public List<String> findAffectedUsernames(String contentId) {
+    public List<String> findAffectedUsernames(Set<String> contentIds) {
         List<String> users = new ArrayList<>();
-        Notification notification = this.notificationRepository.findById(Long.valueOf(contentId))
-                .orElseThrow(() -> new ResourceNotFoundException("Notification " + contentId + " not found"));
-        users.add(notification.getTargetUser());
+        List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
+        this.notificationRepository.findAllById(ids).forEach(n -> users.add(n.getTargetUser()));
         return users;
     }
 

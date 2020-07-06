@@ -2,6 +2,7 @@ package com.bulletjournal.redis;
 
 import com.bulletjournal.notifications.CreateEtagEvent;
 import com.bulletjournal.redis.models.Etag;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.factory.EtaggableDaos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class RedisEtagDaoJpa {
@@ -24,7 +22,7 @@ public class RedisEtagDaoJpa {
     private EtaggableDaos daos;
 
     /**
-     * Batch create a list of etags instance in Redis Cache.
+     * Batch cache a list of etags instance into Redis.
      *
      * @param etagEvents a list of etag event instance contains contentId and EtagType
      */
@@ -36,26 +34,30 @@ public class RedisEtagDaoJpa {
     }
 
     /**
-     * Compute etag value for each event.
+     * Compute etag values for a set of unique events.
      * <p>
-     * 1. Get dao based on EtagType.
-     * 2. Fetch the list of affected users from the Dao from Step 1.
-     * 3. Loop through each username and create Etag instance.
+     * 1. Aggregate content ids into a HashMap with EtagType as Key and Set of Content Ids as value.
+     * 2. Iterate through the Etag Type in Map's KeySet and get Dao based on Etag Type.
+     * 3. Fetch the list of affected users from the Dao and create new Etag instance.
+     * 4. Added etag instance to return list
      *
      * @param events a list of unique event
-     * @return a list of etag values
+     * @return a list of etag instances
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Etag> computeEtags(Set<CreateEtagEvent> events) {
         List<Etag> etags = new ArrayList<>();
-        events.forEach(event -> {
-            Etaggable dao = daos.getDaos().get(event.getEtagType());
-            List<String> affectedUsernames = dao.findAffectedUsernames(event.getContentId());
+        Map<EtagType, Set<String>> aggregateMap = new HashMap<>();
+        events.forEach(e -> aggregateMap.computeIfAbsent(e.getEtagType(), n -> new HashSet<>()).add(e.getContentId()));
+        for (EtagType type : aggregateMap.keySet()) {
+            Set<String> contentIds = aggregateMap.get(type);
+            Etaggable dao = daos.getDaos().get(type);
+            List<String> affectedUsernames = dao.findAffectedUsernames(contentIds); // Batch get affected usernames
             affectedUsernames.forEach(username -> {
-                Etag etag = new Etag(username, event.getEtagType(), dao.getUserEtag(username));
+                Etag etag = new Etag(username, type, dao.getUserEtag(username));
                 etags.add(etag);
             });
-        });
+        }
         return etags;
     }
 }
