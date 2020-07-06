@@ -20,6 +20,7 @@ import {
 import { IState } from '../../store';
 import { ProjectItem } from '../../features/myBuJo/interface';
 import { Project } from '../../features/project/interface';
+import {inPublicPage} from "../../index";
 
 type DraggableLabelsProps = {
   mode: ProjectType;
@@ -89,7 +90,9 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   const shareFunction = shareProjectLabelUpdate[mode];
 
   useEffect(() => {
-    labelsUpdate(project ? project.id : undefined);
+    if (!inPublicPage()) {
+      labelsUpdate(project ? project.id : undefined);
+    }
   }, []);
 
   useEffect(() => {
@@ -133,6 +136,10 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   const handleChange = (newlabels: number[]) => {
     setSelectedLabels([...newlabels]);
   };
+
+  if (inPublicPage()) {
+    return null;
+  }
 
   return (
     <div className='note-labels'>

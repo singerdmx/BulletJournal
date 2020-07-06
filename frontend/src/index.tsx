@@ -28,10 +28,14 @@ function getCookie(cname: string) {
     return "";
 }
 
+export const inPublicPage = () => {
+    return window.location.href.toLowerCase().includes('/public');
+};
+
 function listen() {
     if (document.readyState === 'complete') {
         if (process.env.NODE_ENV === 'production' &&
-            !window.location.href.toLowerCase().includes('/public')) {
+            !inPublicPage()) {
             const loginCookie = getCookie('__discourse_proxy');
             console.log('loginCookie ' + loginCookie);
             if (!loginCookie) {
