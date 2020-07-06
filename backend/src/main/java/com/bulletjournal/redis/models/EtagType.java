@@ -4,7 +4,7 @@ public enum EtagType {
     NOTIFICATION(0, "Notification"),
     GROUP(1, "Group"),
     PROJECT(2, "Project"),
-    USER_PROJECT(3, "UserProject");
+    USER_PROJECTS(3, "UserProjects");
 
     public final int value;
 

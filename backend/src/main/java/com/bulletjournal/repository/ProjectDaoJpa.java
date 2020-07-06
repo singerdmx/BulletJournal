@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -361,12 +360,7 @@ public class ProjectDaoJpa implements Etaggable {
     }
 
     @Override
-    public JpaRepository getJpaRepository() {
-        return this.projectRepository;
-    }
-
-    @Override
-    public List<String> findAffectedUsers(String contentId) {
+    public List<String> findAffectedUsernames(String contentId) {
         List<String> users = new ArrayList<>();
         Project project = this.getProject(Long.valueOf(contentId));
         project.getGroup().getUsers().forEach(userGroup -> users.add(userGroup.getUser().getName()));

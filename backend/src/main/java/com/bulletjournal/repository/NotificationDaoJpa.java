@@ -9,7 +9,6 @@ import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,12 +69,7 @@ public class NotificationDaoJpa implements Etaggable {
     }
 
     @Override
-    public JpaRepository getJpaRepository() {
-        return this.notificationRepository;
-    }
-
-    @Override
-    public List<String> findAffectedUsers(String contentId) {
+    public List<String> findAffectedUsernames(String contentId) {
         List<String> users = new ArrayList<>();
         Notification notification = this.notificationRepository.findById(Long.valueOf(contentId))
                 .orElseThrow(() -> new ResourceNotFoundException("Notification " + contentId + " not found"));

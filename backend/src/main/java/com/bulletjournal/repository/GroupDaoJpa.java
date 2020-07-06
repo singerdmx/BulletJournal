@@ -18,7 +18,6 @@ import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -275,14 +274,8 @@ public class GroupDaoJpa implements Etaggable {
         }
     }
 
-
     @Override
-    public JpaRepository getJpaRepository() {
-        return this.groupRepository;
-    }
-
-    @Override
-    public List<String> findAffectedUsers(String contentId) {
+    public List<String> findAffectedUsernames(String contentId) {
         List<String> users = new ArrayList<>();
         Group group = this.getGroup(Long.valueOf(contentId));
         Set<UserGroup> userGroupSet = group.getUsers();
