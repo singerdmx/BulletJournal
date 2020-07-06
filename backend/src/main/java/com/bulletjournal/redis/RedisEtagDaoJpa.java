@@ -30,7 +30,27 @@ public class RedisEtagDaoJpa {
     public void create(List<CreateEtagEvent> etagEvents) {
         Set<CreateEtagEvent> uniqueEvents = new HashSet<>(etagEvents);
         List<Etag> etags = computeEtags(uniqueEvents);
+        this.batchCache(etags);
+    }
+
+    /**
+     * Batch store a list of Etag instances
+     *
+     * @param etags a list of etag instances
+     */
+    public void batchCache(List<Etag> etags) {
         this.redisEtagRepository.saveAll(etags);
+    }
+
+    /**
+     * Get etag by the key constructed by username and etag type
+     *
+     * @param username the requester's username string
+     * @param etagType the etag type enum
+     * @return an etag instance
+     */
+    public Etag findEtagsByIndex(String username, EtagType etagType) {
+        return this.redisEtagRepository.findByIndex(username + "@" + etagType.toString());
     }
 
     /**

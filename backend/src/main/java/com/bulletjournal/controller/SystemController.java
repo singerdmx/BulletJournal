@@ -10,7 +10,7 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.filters.rate.limiting.TokenBucketType;
-import com.bulletjournal.redis.RedisEtagRepository;
+import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
@@ -75,7 +75,7 @@ public class SystemController {
     private UserClient userClient;
 
     @Autowired
-    private RedisEtagRepository redisEtagRepository;
+    private RedisEtagDaoJpa redisEtagDaoJpa;
 
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
@@ -94,32 +94,40 @@ public class SystemController {
         String groupsEtag = null;
         String remindingTaskEtag = null;
         List<Task> remindingTasks = null;
+        List<Etag> cachingEtags = new ArrayList<>();
 
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
-            Projects projects = this.projectDaoJpa.getProjects(username);
-            ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE,
-                    projects.getOwned());
-            sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE,
-                    projects.getShared());
+
+            // Look up etag from cache
+            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.PROJECT);
+
+            // TODO: If cache missed, write new etag to redis
+            String projectsEtag = this.projectDaoJpa.getUserEtag(username);
+
+            int splitterPosition = projectsEtag.lastIndexOf("|");
+            if (splitterPosition != -1) {
+                ownedProjectsEtag = projectsEtag.substring(0, splitterPosition);
+                sharedProjectsEtag = projectsEtag.substring(splitterPosition + 1);
+                cachingEtags.add(new Etag(username, EtagType.PROJECT, projectsEtag));
+            }
         }
         if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
 
             // Look up etag from cache
-            //Etag cache = redisEtagRepository.findByIndex(username);
+            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
 
-            // If cache missed, write new etag to redis
-            //if (Objects.isNull(cache)) {
-            List<Notification> notificationList = this.notificationDaoJpa.getNotifications(username);
-            notificationsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE,
-                    notificationList);
-            Etag cached = new Etag(username, EtagType.NOTIFICATION, notificationsEtag);
-            redisEtagRepository.save(cached);
-            //} else {
-            //    notificationsEtag = cache.getEtag();
-            //}
+            // TODO: If cache missed, write new etag to redis
+            notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
+            cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
+        }
+        if (targetEtags == null || targetEtags.contains("groupsEtag")) {
+
+            // Look up etag from cache
+            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
+
+            // TODO: If cache missed, write new etag to redis
+            groupsEtag = this.groupDaoJpa.getUserEtag(username);
+            cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
         }
 
         if (projectId != null) {
@@ -142,12 +150,6 @@ public class SystemController {
             }
         }
 
-        if (targetEtags == null || targetEtags.contains("groupsEtag")) {
-            List<Group> groupList = this.groupDaoJpa.getGroups(username);
-            groupsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE,
-                    groupList);
-        }
         if (targetEtags == null || targetEtags.contains("taskReminders")) {
             remindingTasks = this.taskDaoJpa.getRemindingTasks(username, ZonedDateTimeHelper.getNow());
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -156,6 +158,10 @@ public class SystemController {
             if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
                 remindingTasks = null;
             }
+        }
+
+        if (cachingEtags.size() > 0) {
+            this.redisEtagDaoJpa.batchCache(cachingEtags);
         }
 
         SystemUpdates systemUpdates = new SystemUpdates();
