@@ -6,29 +6,29 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.AddUserGroupParams;
 import com.bulletjournal.controller.models.RemoveUserGroupParams;
 import com.bulletjournal.controller.models.UpdateGroupParams;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.JoinGroupEvent;
+import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Repository
-public class GroupDaoJpa {
+public class GroupDaoJpa implements Etaggable {
 
     @Autowired
     private UserGroupRepository userGroupRepository;
@@ -273,5 +273,28 @@ public class GroupDaoJpa {
             project.setGroup(group);
             this.projectRepository.save(project);
         }
+    }
+
+
+    @Override
+    public JpaRepository getJpaRepository() {
+        return this.groupRepository;
+    }
+
+    @Override
+    public List<String> findAffectedUsers(Long id) {
+        List<String> users = new ArrayList<>();
+        Group group = this.getGroup(id);
+        Set<UserGroup> userGroupSet = group.getUsers();
+        userGroupSet.forEach(userGroup -> users.add(userGroup.getUser().getName()));
+        return users;
+    }
+
+    @Override
+    public String getUserEtag(String username) {
+        List<com.bulletjournal.controller.models.Group> groupList = this.getGroups(username);
+        return EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE,
+                groupList);
     }
 }

@@ -1,11 +1,15 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
+import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class NotificationDaoJpa {
+public class NotificationDaoJpa implements Etaggable {
 
     private static final Gson GSON = new Gson();
     @Autowired
@@ -63,5 +67,26 @@ public class NotificationDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteAllExpiredNotifications(Timestamp expirationTime) {
         this.notificationRepository.deleteByUpdatedAtBefore(expirationTime);
+    }
+
+    @Override
+    public JpaRepository getJpaRepository() {
+        return this.notificationRepository;
+    }
+
+    @Override
+    public List<String> findAffectedUsers(Long id) {
+        List<String> users = new ArrayList<>();
+        Notification notification = this.notificationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification " + id + " not found"));
+        users.add(notification.getTargetUser());
+        return users;
+    }
+
+    @Override
+    public String getUserEtag(String username) {
+        List<com.bulletjournal.controller.models.Notification> notifications = this.getNotifications(username);
+        return EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE, notifications);
     }
 }

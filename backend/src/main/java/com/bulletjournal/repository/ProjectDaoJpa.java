@@ -4,12 +4,14 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
@@ -20,6 +22,7 @@ import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class ProjectDaoJpa {
+public class ProjectDaoJpa implements Etaggable {
 
     private static final Gson GSON = new Gson();
     @Autowired
@@ -70,6 +73,12 @@ public class ProjectDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         this.authorizationService.validateRequesterInProjectGroup(requester, project);
         return project;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Project getProject(Long projectId) {
+        return this.projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
     }
 
     private List<ProjectsWithOwner> getSharedProjects(UserProjects userProjects, String owner) {
@@ -349,5 +358,30 @@ public class ProjectDaoJpa {
         List<Project> projects = this.projectRepository.findByOwnerAndSharedTrue(owner);
         return projects.stream().filter(p -> ProjectType.getType(p.getType()).equals(projectType))
                 .findAny().orElse(null);
+    }
+
+    @Override
+    public JpaRepository getJpaRepository() {
+        return this.projectRepository;
+    }
+
+    @Override
+    public List<String> findAffectedUsers(Long id) {
+        List<String> users = new ArrayList<>();
+        Project project = this.getProject(id);
+        project.getGroup().getUsers().forEach(userGroup -> users.add(userGroup.getUser().getName()));
+        return users;
+    }
+
+    @Override
+    public String getUserEtag(String username) {
+        Projects projects = getProjects(username);
+        String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE,
+                projects.getOwned());
+        String sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE,
+                projects.getShared());
+        return ownedProjectsEtag + "|" + sharedProjectsEtag;
     }
 }
