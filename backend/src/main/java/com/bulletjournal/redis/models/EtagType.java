@@ -16,7 +16,7 @@ public enum EtagType {
     }
 
     public static EtagType of(String type) {
-        switch(type) {
+        switch (type) {
             case "Notification":
                 return NOTIFICATION;
             case "Group":

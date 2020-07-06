@@ -49,10 +49,16 @@ public class RedisEtagDaoJpa {
         List<Etag> etags = new ArrayList<>();
         Map<EtagType, Set<String>> aggregateMap = new HashMap<>();
         events.forEach(e -> aggregateMap.computeIfAbsent(e.getEtagType(), n -> new HashSet<>()).add(e.getContentId()));
+
+        // merge USER_PROJECTS and PROJECT
+        aggregateMap.computeIfAbsent(EtagType.PROJECT, n -> new HashSet<>()).addAll(
+                aggregateMap.getOrDefault(EtagType.USER_PROJECTS, Collections.emptySet()));
+        aggregateMap.remove(EtagType.USER_PROJECTS);
+
         for (EtagType type : aggregateMap.keySet()) {
             Set<String> contentIds = aggregateMap.get(type);
             Etaggable dao = daos.getDaos().get(type);
-            List<String> affectedUsernames = dao.findAffectedUsernames(contentIds); // Batch get affected usernames
+            Set<String> affectedUsernames = dao.findAffectedUsernames(contentIds); // Batch get affected usernames
             affectedUsernames.forEach(username -> {
                 Etag etag = new Etag(username, type, dao.getUserEtag(username));
                 etags.add(etag);

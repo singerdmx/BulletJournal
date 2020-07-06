@@ -23,7 +23,7 @@ public class UserProjectsDaoJpa implements Etaggable {
         projectsList.forEach(p -> {
             p.getOwned().forEach(project ->
                     project.getGroup().getUsers().forEach(userGroup -> users.add(userGroup.getName())));
-            p.getShared().forEach(projectsWithOwner -> users.add(projectsWithOwner.getOwner().getName());
+            p.getShared().forEach(projectsWithOwner -> users.add(projectsWithOwner.getOwner().getName()));
         });
         return users;
     }
