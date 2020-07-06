@@ -56,7 +56,7 @@ class ContentLayout extends React.Component {
             path='/transaction/:transactionId'
             component={TransactionPage}
           />
-          <Route exact path="/public/items/:itemId" component={PublicPage}/>
+          <Route exact path="/sharedItems/:itemId" component={PublicPage}/>
         </Switch>
       </Content>
     );

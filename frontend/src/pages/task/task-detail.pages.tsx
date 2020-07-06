@@ -171,6 +171,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
           labels={task.labels}
           editable={labelEditable}
           itemId={task.id}
+          itemShared={task.shared}
         />
       </div>
       <Divider style={{ marginTop: '5px', marginBottom: '0px' }} />

@@ -325,8 +325,8 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   const handleClick = () => {
     if (props.readOnly) {
-      // if readOnly, link to public item page
-      history.push(`/public/items/TASK${task.id}`);
+      // if readOnly, link to shared item page
+      history.push(`/sharedItems/TASK${task.id}`);
     } else if (isComplete) {
       // if isComplete, go to completedTask page
       history.push(`/completedTask/${task.id}`);

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { IState } from './store';
 import { connect } from 'react-redux';
@@ -17,6 +17,7 @@ import { Tooltip } from 'antd';
 import { removeSharedTask } from './features/tasks/actions';
 import { removeSharedNote } from './features/notes/actions';
 import welcome from './assets/welcome_cat.svg';
+import LabelManagement from "./pages/project/label-management.compoent";
 
 type PageProps = {
   note: Note | undefined;
@@ -42,6 +43,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
   } = props;
   const { itemId } = useParams();
   const history = useHistory();
+  const [labelEditable, setLabelEditable] = useState(false);
 
   useEffect(() => {
     if (itemId) {
@@ -52,6 +54,10 @@ const PublicPage: React.FC<PageProps> = (props) => {
   if (!contentType) {
     return null;
   }
+
+  const labelEditableHandler = () => {
+    setLabelEditable((labelEditable) => !labelEditable);
+  };
 
   const getRemoveButton = (projectId: number) => {
     return (
@@ -82,6 +88,10 @@ const PublicPage: React.FC<PageProps> = (props) => {
     }
     return (
       <div className="public-item-operation">
+        <LabelManagement
+            labelEditableHandler={labelEditableHandler}
+            labelEditable={labelEditable}
+        />
         {getRemoveButton(projectId)}
         <Tooltip title="Go to Parent BuJo">
           <div>
@@ -101,7 +111,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
       >
         <TaskDetailPage
           task={task}
-          labelEditable={false}
+          labelEditable={labelEditable}
           taskOperation={() => itemOperation(itemId!, projectId!)}
           contents={contents}
           createContentElem={null}
@@ -118,7 +128,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
       >
         <NoteDetailPage
           note={note}
-          labelEditable={false}
+          labelEditable={labelEditable}
           createContentElem={null}
           noteOperation={() => itemOperation(itemId!, projectId!)}
           noteEditorElem={null}

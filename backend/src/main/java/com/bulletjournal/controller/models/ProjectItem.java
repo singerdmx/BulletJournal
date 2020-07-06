@@ -33,6 +33,8 @@ public abstract class ProjectItem {
 
     protected Long createdAt;
 
+    protected boolean shared = false;
+
     public ProjectItem() {
     }
 
@@ -140,6 +142,14 @@ public abstract class ProjectItem {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(boolean shared) {
+        this.shared = shared;
     }
 
     @Override

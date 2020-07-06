@@ -224,6 +224,7 @@ public class SystemController {
                 throw new IllegalArgumentException();
         }
 
+        projectItem.setShared(true);
         contents.forEach(content -> content.setRevisions(new Revision[0])); // clear revisions
         com.bulletjournal.repository.models.Project project = projectDaoJpa.getSharedProject(contentType, originalUser);
         return ResponseEntity.ok().body(

@@ -52,6 +52,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
             labels={note.labels}
             editable={labelEditable}
             itemId={note.id}
+            itemShared={note.shared}
           />
         </div>
 

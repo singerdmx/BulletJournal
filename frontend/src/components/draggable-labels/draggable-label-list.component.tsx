@@ -23,6 +23,7 @@ import { Project } from '../../features/project/interface';
 
 type DraggableLabelsProps = {
   mode: ProjectType;
+  itemShared: boolean;
   labels: Label[];
   project: Project | undefined;
   editable: boolean;

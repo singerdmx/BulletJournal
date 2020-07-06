@@ -132,6 +132,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             labels={transaction.labels}
             editable={labelEditable}
             itemId={transaction.id}
+            itemShared={transaction.shared}
           />
         </div>
         <div className='transaction-operation'>

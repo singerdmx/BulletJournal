@@ -21,7 +21,8 @@ export interface ProjectItem {
   labels: Label[];
   contentType: ContentType;
   updatedAt: number,
-  createdAt: number
+  createdAt: number,
+  shared: boolean
 }
 
 export interface Content {
