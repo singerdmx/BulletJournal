@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { IState } from './store';
 import { connect } from 'react-redux';
@@ -17,7 +17,7 @@ import { Tooltip } from 'antd';
 import { removeSharedTask } from './features/tasks/actions';
 import { removeSharedNote } from './features/notes/actions';
 import welcome from './assets/welcome_cat.svg';
-import LabelManagement from "./pages/project/label-management.compoent";
+import LabelManagement from './pages/project/label-management.compoent';
 
 type PageProps = {
   note: Note | undefined;
@@ -89,8 +89,8 @@ const PublicPage: React.FC<PageProps> = (props) => {
     return (
       <div className="public-item-operation">
         <LabelManagement
-            labelEditableHandler={labelEditableHandler}
-            labelEditable={labelEditable}
+          labelEditableHandler={labelEditableHandler}
+          labelEditable={labelEditable}
         />
         {getRemoveButton(projectId)}
         <Tooltip title="Go to Parent BuJo">
@@ -116,6 +116,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
           contents={contents}
           createContentElem={null}
           taskEditorElem={null}
+          isPublic
         />
       </div>
     );
@@ -133,6 +134,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
           noteOperation={() => itemOperation(itemId!, projectId!)}
           noteEditorElem={null}
           contents={contents}
+          isPublic
         />
       </div>
     );

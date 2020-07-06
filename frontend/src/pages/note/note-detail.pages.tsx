@@ -24,6 +24,7 @@ type NoteDetailProps = {
   noteOperation: Function;
   createContentElem: React.ReactNode;
   noteEditorElem: React.ReactNode;
+  isPublic?: boolean;
 };
 
 const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
@@ -34,18 +35,23 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     noteEditorElem,
     createContentElem,
     contents,
+    isPublic,
   } = props;
   if (!note) return null;
   return (
-    <div className='note-page'>
-      <Tooltip placement='top' title={`${note.owner.alias}`} className='note-avatar'>
+    <div className={`note-page ${isPublic && 'public'}`}>
+      <Tooltip
+        placement="top"
+        title={`${note.owner.alias}`}
+        className="note-avatar"
+      >
         <span>
-          <Avatar size='large' src={note.owner.avatar} />
+          <Avatar size="large" src={note.owner.avatar} />
         </span>
       </Tooltip>
 
-      <div className='note-title'>
-        <div className='label-and-name'>
+      <div className="note-title">
+        <div className="label-and-name">
           {note.name}
           <DraggableLabelsList
             mode={ProjectType.NOTE}
@@ -59,8 +65,8 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
         {noteOperation()}
       </div>
       <Divider />
-      <div className='content'>
-        <div className='content-list'>
+      <div className="content">
+        <div className="content-list">
           <NoteContentList projectItem={note} contents={contents} />
         </div>
         {createContentElem}

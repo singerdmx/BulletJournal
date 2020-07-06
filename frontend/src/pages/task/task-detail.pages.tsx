@@ -27,7 +27,7 @@ import { IState } from '../../store';
 import { connect } from 'react-redux';
 //action
 import { setTaskStatus } from '../../features/tasks/actions';
-import {getDuration} from "../../components/project-item/task-item.component";
+import { getDuration } from '../../components/project-item/task-item.component';
 const { Option } = Select;
 
 export type TaskProps = {
@@ -36,6 +36,7 @@ export type TaskProps = {
   contents: Content[];
   contentEditable?: boolean;
   setTaskStatus: (taskId: number, taskStatus: TaskStatus) => void;
+  isPublic?: boolean;
 };
 
 type TaskDetailProps = {
@@ -56,6 +57,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     contents,
     contentEditable,
     setTaskStatus,
+    isPublic,
   } = props;
   const [inputStatus, setInputStatus] = useState('' as TaskStatus);
 
@@ -69,7 +71,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     if (task.recurrenceRule) {
       let taskDue = convertToTextWithRRule(task.recurrenceRule);
       if (task.duration) {
-          taskDue += `, duration ${getDuration(task.duration)}`;
+        taskDue += `, duration ${getDuration(task.duration)}`;
       }
       return (
         <Tooltip title={taskDue}>
@@ -132,7 +134,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     return (
       <Select
         style={{ width: '118px' }}
-        placeholder='Set Status'
+        placeholder="Set Status"
         onChange={(value: TaskStatus) => {
           setInputStatus(value);
           setTaskStatus(task.id, value);
@@ -151,21 +153,21 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
   if (!task) return null;
   return (
-    <div className='task-page'>
+    <div className={`task-page ${isPublic && 'public'}`}>
       <Tooltip
-        placement='top'
+        placement="top"
         title={`Created by ${task.owner.alias}`}
-        className='task-avatar'
+        className="task-avatar"
       >
         <span>
-          <Avatar size='large' src={task.owner.avatar} />
+          <Avatar size="large" src={task.owner.avatar} />
         </span>
       </Tooltip>
-      <div className='task-title'>
-        <div className='label-and-name'>{task.name}</div>
+      <div className="task-title">
+        <div className="label-and-name">{task.name}</div>
         {taskOperation()}
       </div>
-      <div className='title-labels'>
+      <div className="title-labels">
         <DraggableLabelsList
           mode={ProjectType.TODO}
           labels={task.labels}
@@ -176,7 +178,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       </div>
       <Divider style={{ marginTop: '5px', marginBottom: '0px' }} />
       <div
-        className='task-statistic-card'
+        className="task-statistic-card"
         style={getTaskBackgroundColor(task.status, theme)}
       >
         {getDueDateTime(task)}
@@ -184,8 +186,8 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         {getTaskStatusDropdown(task)}
       </div>
       <Divider style={{ marginTop: '0px' }} />
-      <div className='content'>
-        <div className='content-list'>
+      <div className="content">
+        <div className="content-list">
           <TaskContentList
             projectItem={task}
             contents={contents}
