@@ -205,7 +205,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
         </Row>
       </div>
       <Divider />
-      <div className='content'>
+      <div className='tran-content'>
         <div className='content-list'>
           <TransactionContentList
             projectItem={transaction}

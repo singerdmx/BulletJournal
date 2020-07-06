@@ -188,7 +188,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         {getTaskStatusDropdown(task)}
       </div>
       <Divider style={{ marginTop: '0px' }} />
-      <div className="content">
+      <div className="task-content">
         <div className="content-list">
           <TaskContentList
             projectItem={task}

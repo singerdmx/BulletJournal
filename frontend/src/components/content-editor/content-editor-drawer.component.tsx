@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Drawer } from 'antd';
+import {BackTop, Drawer} from 'antd';
 
 import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
@@ -34,6 +34,7 @@ const ContentEditorDrawer: React.FC<
     >
       {readMode && content ? (
         <div>
+          <BackTop/>
           <ContentReader content={content} />
         </div>
       ) : (
