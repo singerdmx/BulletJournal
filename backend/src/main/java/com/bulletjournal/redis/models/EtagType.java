@@ -3,7 +3,8 @@ package com.bulletjournal.redis.models;
 public enum EtagType {
     NOTIFICATION(0, "Notification"),
     GROUP(1, "Group"),
-    PROJECTS(2, "Projects");
+    PROJECT(2, "Project"),
+    USER_PROJECT(3, "UserProject");
 
     public final int value;
 

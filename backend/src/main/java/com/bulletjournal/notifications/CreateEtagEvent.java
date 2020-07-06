@@ -6,35 +6,24 @@ import java.io.Serializable;
 
 public class CreateEtagEvent implements Serializable {
 
-    private Long id;
-
-    private String userProjectId;
+    private String id;
 
     private EtagType etagType;
 
     public CreateEtagEvent() {
     }
 
-    public CreateEtagEvent(Long id, String userProjectId, EtagType etagType) {
+    public CreateEtagEvent(String id, EtagType etagType) {
         this.id = id;
-        this.userProjectId = userProjectId;
         this.etagType = etagType;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public String getUserProjectId() {
-        return userProjectId;
-    }
-
-    public void setUserProjectId(String userProjectId) {
-        this.userProjectId = userProjectId;
     }
 
     public EtagType getEtagType() {
