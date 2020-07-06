@@ -1,23 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
-import {IState} from './store';
-import {connect} from 'react-redux';
-import {Note} from './features/notes/interface';
-import {Task} from './features/tasks/interface';
-import {ContentType} from './features/myBuJo/constants';
-import {Content} from './features/myBuJo/interface';
-import {getPublicItem} from './features/system/actions';
-import {CloseCircleOutlined, UpSquareOutlined} from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { IState } from './store';
+import { connect } from 'react-redux';
+import { Note } from './features/notes/interface';
+import { Task } from './features/tasks/interface';
+import { ContentType } from './features/myBuJo/constants';
+import { Content } from './features/myBuJo/interface';
+import { getPublicItem } from './features/system/actions';
+import { CloseCircleOutlined, UpSquareOutlined } from '@ant-design/icons';
 
 import './styles/main.less';
 import './Public.styles.less';
 import TaskDetailPage from './pages/task/task-detail.pages';
 import NoteDetailPage from './pages/note/note-detail.pages';
-import {Tooltip} from 'antd';
-import {removeSharedTask} from './features/tasks/actions';
-import {removeSharedNote} from './features/notes/actions';
+import { Tooltip } from 'antd';
+import { removeSharedTask } from './features/tasks/actions';
+import { removeSharedNote } from './features/notes/actions';
 import LabelManagement from './pages/project/label-management.compoent';
-import {getRandomBackgroundImage} from "./assets/background";
+import { getRandomBackgroundImage } from './assets/background';
 
 type PageProps = {
   note: Note | undefined;
@@ -41,7 +41,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
     removeSharedTask,
     removeSharedNote,
   } = props;
-  const {itemId} = useParams();
+  const { itemId } = useParams();
   const history = useHistory();
   const [labelEditable, setLabelEditable] = useState(false);
 
@@ -61,24 +61,24 @@ const PublicPage: React.FC<PageProps> = (props) => {
 
   const getRemoveButton = (projectId: number) => {
     return (
-        <Tooltip title="Remove">
-          <div>
-            <CloseCircleOutlined
-                twoToneColor="#52c41a"
-                onClick={() => {
-                  switch (contentType) {
-                    case ContentType.TASK:
-                      removeSharedTask(task!.id);
-                      break;
-                    case ContentType.NOTE:
-                      removeSharedNote(note!.id);
-                      break;
-                  }
-                  history.push(`/projects/${projectId}`);
-                }}
-            />
-          </div>
-        </Tooltip>
+      <Tooltip title="Remove">
+        <div>
+          <CloseCircleOutlined
+            twoToneColor="#52c41a"
+            onClick={() => {
+              switch (contentType) {
+                case ContentType.TASK:
+                  removeSharedTask(task!.id);
+                  break;
+                case ContentType.NOTE:
+                  removeSharedNote(note!.id);
+                  break;
+              }
+              history.push(`/projects/${projectId}`);
+            }}
+          />
+        </div>
+      </Tooltip>
     );
   };
 
@@ -87,56 +87,64 @@ const PublicPage: React.FC<PageProps> = (props) => {
       return null;
     }
     return (
-        <div className="public-item-operation">
-          <LabelManagement
-              labelEditableHandler={labelEditableHandler}
-              labelEditable={labelEditable}
-          />
-          {getRemoveButton(projectId)}
-          <Tooltip title="Go to Parent BuJo">
-            <div>
-              <UpSquareOutlined
-                  onClick={(e) => history.push(`/projects/${projectId}`)}
-              />
-            </div>
-          </Tooltip>
-        </div>
+      <div className="public-item-operation">
+        <LabelManagement
+          labelEditableHandler={labelEditableHandler}
+          labelEditable={labelEditable}
+        />
+        {getRemoveButton(projectId)}
+        <Tooltip title="Go to Parent BuJo">
+          <div>
+            <UpSquareOutlined
+              onClick={(e) => history.push(`/projects/${projectId}`)}
+            />
+          </div>
+        </Tooltip>
+      </div>
     );
   };
 
   if (contentType === ContentType.TASK) {
     return (
-        <div
-            style={{backgroundImage: `url(${getRandomBackgroundImage()})`, backgroundSize: 'cover'}}
-        >
-          <TaskDetailPage
-              task={task}
-              labelEditable={labelEditable}
-              taskOperation={() => itemOperation(itemId!, projectId!)}
-              contents={contents}
-              createContentElem={null}
-              taskEditorElem={null}
-              isPublic
-          />
-        </div>
+      <div
+        style={{
+          backgroundImage: `url(${getRandomBackgroundImage()})`,
+          backgroundSize: 'cover',
+          padding: '10vh 0',
+        }}
+      >
+        <TaskDetailPage
+          task={task}
+          labelEditable={labelEditable}
+          taskOperation={() => itemOperation(itemId!, projectId!)}
+          contents={contents}
+          createContentElem={null}
+          taskEditorElem={null}
+          isPublic
+        />
+      </div>
     );
   }
 
   if (contentType === ContentType.NOTE) {
     return (
-        <div
-            style={{backgroundImage: `url(${getRandomBackgroundImage()})`, backgroundSize: 'cover'}}
-        >
-          <NoteDetailPage
-              note={note}
-              labelEditable={labelEditable}
-              createContentElem={null}
-              noteOperation={() => itemOperation(itemId!, projectId!)}
-              noteEditorElem={null}
-              contents={contents}
-              isPublic
-          />
-        </div>
+      <div
+        style={{
+          backgroundImage: `url(${getRandomBackgroundImage()})`,
+          backgroundSize: 'cover',
+          padding: '10vh',
+        }}
+      >
+        <NoteDetailPage
+          note={note}
+          labelEditable={labelEditable}
+          createContentElem={null}
+          noteOperation={() => itemOperation(itemId!, projectId!)}
+          noteEditorElem={null}
+          contents={contents}
+          isPublic
+        />
+      </div>
     );
   }
 
