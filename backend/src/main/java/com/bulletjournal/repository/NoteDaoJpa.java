@@ -67,11 +67,25 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Note> getNotes(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
+        Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
+
         if (project.isShared()) {
-            return this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, ProjectType.NOTE);
+            List<Note> notes = this.sharedProjectItemDaoJpa.
+                    getSharedProjectItems(requester, ProjectType.NOTE).stream()
+                    .filter(obj -> obj instanceof Note)
+                    .map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList());
+            if (!projectNotesOptional.isPresent()) {
+                return notes.stream().map(
+                        note -> note.toPresentationModel()
+                ).collect(Collectors.toList());
+            }
+            ProjectNotes projectNotes = projectNotesOptional.get();
+            final Map<Long, Note> notesMap = notes.stream()
+                    .collect(Collectors.toMap(n -> n.getId(), n -> n));
+            return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes()).stream()
+                    .map(note -> addLabels(note, notesMap)).collect(Collectors.toList());
         }
 
-        Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
         if (!projectNotesOptional.isPresent()) {
             return Collections.emptyList();
         }
