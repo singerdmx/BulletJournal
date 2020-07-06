@@ -109,9 +109,8 @@ const PublicPage: React.FC<PageProps> = (props) => {
       <div
         style={{
           backgroundImage: `url(${getRandomBackgroundImage()})`,
-          backgroundSize: 'cover',
-          padding: '10vh 0',
         }}
+        className="public-container"
       >
         <TaskDetailPage
           task={task}
@@ -131,9 +130,8 @@ const PublicPage: React.FC<PageProps> = (props) => {
       <div
         style={{
           backgroundImage: `url(${getRandomBackgroundImage()})`,
-          backgroundSize: 'cover',
-          padding: '10vh',
         }}
+        className="public-container"
       >
         <NoteDetailPage
           note={note}
