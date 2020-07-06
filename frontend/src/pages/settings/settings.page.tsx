@@ -1,7 +1,7 @@
 import React from 'react';
-import { Tabs } from 'antd';
+import {BackTop, Tabs} from 'antd';
 import Account from '../../components/settings/account';
-import { GoogleOutlined, DashboardOutlined } from '@ant-design/icons';
+import { DashboardOutlined } from '@ant-design/icons';
 import './setting.style.less';
 import { useLocation } from 'react-use';
 import GoogleCalendarSyncPage from '../../components/settings/google-calendar-sync';
@@ -17,6 +17,7 @@ const SettingPage: React.FC<SettingProps> = (props) => {
   console.log(defaultKey);
   return (
     <div className="setting">
+      <BackTop />
       <Tabs defaultActiveKey={defaultKey}>
         <TabPane
           tab={

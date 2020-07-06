@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import './search.styles.less';
-import {Empty, Tooltip} from 'antd';
+import {BackTop, Empty, Tooltip} from 'antd';
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {search, updateSearchTerm} from "../../features/search/action";
@@ -77,6 +77,8 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
 
         return (
             <div className='search-page'>
+                <BackTop />
+
                 <div>
                     {searchResult.searchResultItemList.map((item: SearchResultItem, index: number) => {
                         return <SearchResultItemElement item={item} index={index} key={index}/>

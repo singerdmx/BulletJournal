@@ -10,7 +10,7 @@ import {
   getTaskBackgroundColor,
 } from '../../features/tasks/interface';
 // antd imports
-import { Avatar, Divider, Tooltip, Select, Tag } from 'antd';
+import {Avatar, Divider, Tooltip, Select, Tag, BackTop} from 'antd';
 import { AlertOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
@@ -154,7 +154,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   if (!task) return null;
   return (
     <div className={`task-page ${isPublic && 'public'}`}>
-      <Tooltip
+        <BackTop />
+
+        <Tooltip
         placement="top"
         title={`Created by ${task.owner.alias}`}
         className="task-avatar"

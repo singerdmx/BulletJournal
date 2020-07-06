@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
-import {Button, Divider, Form, PageHeader, Select, Tooltip} from 'antd';
+import {BackTop, Button, Divider, Form, PageHeader, Select, Tooltip} from 'antd';
 import {Label} from '../../features/label/interface';
 import {getItemsByLabels} from '../../features/label/actions';
 import {IState} from '../../store';
@@ -39,6 +39,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = (props) => {
 
   return (
     <div className='labels-search-container'>
+      <BackTop />
       <PageHeader
         title='Search By Label(s)'
         subTitle='Click to choose label(s)'

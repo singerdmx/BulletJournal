@@ -4,7 +4,7 @@ import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner, User } from '../../features/group/interface';
-import { Avatar, Popconfirm, Popover, Tag, Tooltip, Collapse } from 'antd';
+import {Avatar, Popconfirm, Popover, Tag, Tooltip, Collapse, BackTop} from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
 import {
@@ -508,6 +508,7 @@ class ProjectPage extends React.Component<
           <div className='project-description'>{description}</div>
         )}
         {this.getProjectLabels()}
+        <BackTop />
         <div className='project-content'>{projectContent}</div>
       </div>
     );

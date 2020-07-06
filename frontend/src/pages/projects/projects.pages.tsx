@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Avatar, Collapse, Empty, List, Popover, Tooltip} from 'antd';
+import {Avatar, BackTop, Collapse, Empty, List, Popover, Tooltip} from 'antd';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {IState} from "../../store";
@@ -151,6 +151,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
 
     return (
         <div className='projects' style={{paddingTop: '30px'}}>
+            <BackTop />
             <Collapse defaultActiveKey={['OwnedBuJo', 'SharedBuJo']}>
                 <Panel header="Own BuJo" key="OwnedBuJo">
                     {getOwnedBuJo(ownedProjects)}

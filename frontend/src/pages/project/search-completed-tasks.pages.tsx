@@ -3,7 +3,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {IState} from '../../store';
 import {Project} from '../../features/project/interface';
 import {connect} from 'react-redux';
-import {Avatar, DatePicker, Divider, Select, Tooltip} from 'antd';
+import {Avatar, BackTop, DatePicker, Divider, Select, Tooltip} from 'antd';
 import {SyncOutlined, TeamOutlined, UpSquareOutlined,} from '@ant-design/icons';
 import moment from 'moment';
 import {getGroup} from '../../features/group/actions';
@@ -83,6 +83,8 @@ const SearchCompletedTasksPage: React.FC<SearchCompletedTasksProps> = (
 
   return (
     <div className='project'>
+      <BackTop />
+
       <div className='search-completed-task-header'>
         <Tooltip title='Search by Completion Time'>
           <span>

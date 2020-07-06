@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 
 import './task-status.styles.less';
 import {useHistory, useParams} from "react-router-dom";
-import {Collapse, Tooltip} from "antd";
+import {BackTop, Collapse, Tooltip} from "antd";
 import {CaretRightOutlined, SyncOutlined, UpSquareOutlined} from '@ant-design/icons';
 import {IState} from "../../store";
 import {getTasksByOrder} from "../../features/tasks/actions";
@@ -103,6 +103,8 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
 
     return (
         <div className='task-status-page'>
+            <BackTop />
+
             <div className='task-operation'>
                 <Tooltip title='Refresh'>
                     <span><SyncOutlined onClick={getTasksByStatus}/></span>

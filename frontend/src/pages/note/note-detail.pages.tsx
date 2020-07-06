@@ -7,7 +7,7 @@ import { Note } from '../../features/notes/interface';
 // components
 import NoteContentList from '../../components/content/content-list.component';
 // antd imports
-import { Avatar, Divider, Tooltip } from 'antd';
+import {Avatar, BackTop, Divider, Tooltip} from 'antd';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
@@ -40,7 +40,9 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
   if (!note) return null;
   return (
     <div className={`note-page ${isPublic && 'public'}`}>
-      <Tooltip
+        <BackTop />
+
+        <Tooltip
         placement="top"
         title={`${note.owner.alias}`}
         className="note-avatar"

@@ -14,7 +14,7 @@ import { Project } from '../../features/project/interface';
 import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
 import '@ant-design/compatible/assets/index.css';
-import { Checkbox, Tooltip } from 'antd';
+import {BackTop, Checkbox, Tooltip} from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import {
   getProjectItemsAfterUpdateSelect,
@@ -164,7 +164,7 @@ class BujoPage extends React.Component<
 
           {plusIcon}
         </div>
-
+        <BackTop />
         {this.getCategoryPage(category)}
       </div>
     );

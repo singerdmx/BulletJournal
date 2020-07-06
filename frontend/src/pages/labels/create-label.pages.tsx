@@ -16,7 +16,7 @@ import {
   Tooltip,
   Row,
   Col,
-  Popover,
+  Popover, BackTop,
 } from 'antd';
 import {
   SearchOutlined,
@@ -157,6 +157,7 @@ const Labels: React.FC<LabelsProps> = (props) => {
 
   return (
     <div className='labels-create-page'>
+      <BackTop />
       <div className='labels-create'>
         <Form form={createForm} layout='inline' onFinish={handleCreate}>
           <Popover
