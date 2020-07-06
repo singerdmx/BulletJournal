@@ -23,9 +23,15 @@ const ContentEditorDrawer: React.FC<
   const handleClose = () => {
     onClose();
   };
+  const fullWidth = global.window.innerWidth;
   if (!projectItem) return null;
   return (
-    <Drawer onClose={handleClose} visible={visible} width='700' destroyOnClose>
+    <Drawer
+      onClose={handleClose}
+      visible={visible}
+      width={fullWidth * 0.9}
+      destroyOnClose
+    >
       {readMode && content ? (
         <div>
           <ContentReader content={content} />
