@@ -51,7 +51,7 @@ public class Etag implements Serializable {
     }
 
     public String getUsername() {
-        int split = index.indexOf("@");
+        int split = index.lastIndexOf("@");
         if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
         return index.substring(0, split);
@@ -61,7 +61,7 @@ public class Etag implements Serializable {
         if (Objects.isNull(index))
             throw new IllegalStateException("Cannot set username with null index");
 
-        int split = index.indexOf("@");
+        int split = index.lastIndexOf("@");
         if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
 
@@ -69,7 +69,7 @@ public class Etag implements Serializable {
     }
 
     public String getType() {
-        int split = index.indexOf("@");
+        int split = index.lastIndexOf("@");
         if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
         return index.substring(split + 1);
@@ -79,7 +79,7 @@ public class Etag implements Serializable {
         if (Objects.isNull(index))
             throw new IllegalStateException("Cannot set type with null index");
 
-        int split = index.indexOf("@");
+        int split = index.lastIndexOf("@");
         if (split == -1)
             throw new IllegalArgumentException("Illegal index format");
 
