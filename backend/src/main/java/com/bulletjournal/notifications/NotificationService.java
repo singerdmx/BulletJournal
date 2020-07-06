@@ -98,7 +98,7 @@ public class NotificationService {
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
-            List<Etag> etags = new ArrayList<>();
+            List<CreateEtagEvent> createEtagEvents = new ArrayList<>();
             events.forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
@@ -106,8 +106,8 @@ public class NotificationService {
                     auditables.add((Auditable) e);
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
-                } else if (e instanceof Etag) {
-                    etags.add((Etag) e);
+                } else if (e instanceof CreateEtagEvent) {
+                    createEtagEvents.add((CreateEtagEvent) e);
                 }
             });
             try {
@@ -132,8 +132,8 @@ public class NotificationService {
                 LOGGER.error("Error on deleting records in SearchIndexDaoJpa", ex);
             }
             try {
-                if (!etags.isEmpty()) {
-                    this.redisEtagDaoJpa.create(etags);
+                if (!createEtagEvents.isEmpty()) {
+                    this.redisEtagDaoJpa.create(createEtagEvents);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on deleting records in RedisEtagDaoJpa", ex);

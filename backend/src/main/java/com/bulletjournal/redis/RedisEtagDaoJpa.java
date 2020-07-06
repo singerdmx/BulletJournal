@@ -1,18 +1,18 @@
 package com.bulletjournal.redis;
 
-import com.bulletjournal.redis.models.EtagType;
-import com.bulletjournal.controller.models.Group;
-import com.bulletjournal.controller.models.Notification;
-import com.bulletjournal.controller.models.Projects;
-import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.notifications.CreateEtagEvent;
 import com.bulletjournal.redis.models.Etag;
-import com.bulletjournal.repository.GroupDaoJpa;
-import com.bulletjournal.repository.NotificationDaoJpa;
-import com.bulletjournal.repository.ProjectDaoJpa;
+import com.bulletjournal.repository.factory.Etaggable;
+import com.bulletjournal.repository.factory.EtaggableDaos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class RedisEtagDaoJpa {
@@ -21,61 +21,41 @@ public class RedisEtagDaoJpa {
     private RedisEtagRepository redisEtagRepository;
 
     @Autowired
-    private NotificationDaoJpa notificationDaoJpa;
-
-    @Autowired
-    private GroupDaoJpa groupDaoJpa;
-
-    @Autowired
-    private ProjectDaoJpa projectDaoJpa;
+    private EtaggableDaos daos;
 
     /**
      * Batch create a list of etags instance in Redis Cache.
-     * Compute etag value based on username and etag type.
      *
-     * @param etags list of etags class objects without etag value
+     * @param etagEvents a list of etag event instance contains contentId and EtagType
      */
-    public void create(List<Etag> etags) {
-        etags.forEach(etag -> computeEtag(etag));
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void create(List<CreateEtagEvent> etagEvents) {
+        Set<CreateEtagEvent> uniqueEvents = new HashSet<>(etagEvents);
+        List<Etag> etags = computeEtags(uniqueEvents);
         this.redisEtagRepository.saveAll(etags);
     }
 
     /**
-     * Compute etag value based on Etag Object Type
+     * Compute etag value for each event.
+     * <p>
+     * 1. Get dao based on EtagType.
+     * 2. Fetch the list of affected users from the Dao from Step 1.
+     * 3. Loop through each username and create Etag instance.
      *
-     * @param etag Etag Class contains username, type and null EtagValue
+     * @param events a list of unique event
+     * @return a list of etag values
      */
-    public void computeEtag(Etag etag) {
-        String username = etag.getUsername();
-        EtagType etagType = etag.getEtagType();
-        String etagValue = null;
-        switch (etagType) {
-            case NOTIFICATION:
-                List<Notification> notificationList = this.notificationDaoJpa.getNotifications(username);
-                etagValue = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                        EtagGenerator.HashType.TO_HASHCODE,
-                        notificationList);
-                break;
-            case GROUP:
-                List<Group> groupList = this.groupDaoJpa.getGroups(username);
-                etagValue = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                        EtagGenerator.HashType.TO_HASHCODE,
-                        groupList);
-                break;
-            case PROJECTS:
-                Projects projects = this.projectDaoJpa.getProjects(username);
-                String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                        EtagGenerator.HashType.TO_HASHCODE,
-                        projects.getOwned());
-                String sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                        EtagGenerator.HashType.TO_HASHCODE,
-                        projects.getShared());
-                etagValue = ownedProjectsEtag + "|" + sharedProjectsEtag;
-                break;
-            default:
-                throw new IllegalStateException("Unknown etag type");
-        }
-
-        etag.setEtag(etagValue);
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Etag> computeEtags(Set<CreateEtagEvent> events) {
+        List<Etag> etags = new ArrayList<>();
+        events.forEach(event -> {
+            Etaggable dao = daos.getDaos().get(event.getEtagType());
+            List<String> affectedUsernames = dao.findAffectedUsernames(event.getContentId());
+            affectedUsernames.forEach(username -> {
+                Etag etag = new Etag(username, event.getEtagType(), dao.getUserEtag(username));
+                etags.add(etag);
+            });
+        });
+        return etags;
     }
 }

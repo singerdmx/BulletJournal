@@ -13,8 +13,13 @@ public class MockRedisEtagDaoJpa extends RedisEtagDaoJpa {
     private List<Etag> etags = Collections.synchronizedList(new ArrayList<>());
 
     @Override
-    public synchronized void create(List<Etag> etags) {
-        this.etags.addAll(etags);
+    public synchronized void create(List<CreateEtagEvent> etagEvents) {
+        etagEvents.forEach(event -> {
+            Etag etag = new Etag();
+            etag.setIndex("BulletJournal", event.getEtagType());
+            etag.setEtag("TestEtag");
+            etags.add(etag);
+        });
     }
 
 }

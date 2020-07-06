@@ -12,15 +12,22 @@ import java.util.List;
 public class UserProjectsDaoJpa implements Etaggable {
 
     private static final Gson GSON = new Gson();
+
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
 
+    /**
+     * Todo
+     */
     @Override
     public List<String> findAffectedUsernames(String contentId) {
         List<String> users = new ArrayList<>();
         return users;
     }
 
+    /**
+     * Todo
+     */
     @Override
     public String getUserEtag(String username) {
         return null;
