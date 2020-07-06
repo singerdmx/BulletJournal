@@ -16,7 +16,18 @@ public enum EtagType {
     }
 
     public static EtagType of(String type) {
-        return EtagType.valueOf(type);
+        switch(type) {
+            case "Notification":
+                return NOTIFICATION;
+            case "Group":
+                return GROUP;
+            case "Project":
+                return PROJECT;
+            case "UserProjects":
+                return USER_PROJECTS;
+            default:
+                throw new IllegalArgumentException("Unknown Etag Type");
+        }
     }
 
     @Override
