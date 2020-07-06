@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
-import {Result, Tree} from 'antd';
+import {Result, Tree, Empty} from 'antd';
 import TreeItem from '../project-item/note-item.component';
 import {putNote, updateNotes} from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
@@ -158,6 +158,10 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
 
   if (!project) {
     return null;
+  }
+
+  if (notes.length === 0 && project.shared) {
+    return <Empty/>
   }
 
   if (notes.length === 0) {

@@ -277,6 +277,10 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   }
 
   const getAddTaskButton = () => {
+    if (tasks.length === 0 && project.shared) {
+      return <Empty/>
+    }
+
     if (tasks.length === 0) {
       return (
           <div className='add-task-button'>
