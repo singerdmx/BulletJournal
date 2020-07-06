@@ -75,10 +75,10 @@ public class NotificationDaoJpa implements Etaggable {
     }
 
     @Override
-    public List<String> findAffectedUsers(Long id) {
+    public List<String> findAffectedUsers(String contentId) {
         List<String> users = new ArrayList<>();
-        Notification notification = this.notificationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Notification " + id + " not found"));
+        Notification notification = this.notificationRepository.findById(Long.valueOf(contentId))
+                .orElseThrow(() -> new ResourceNotFoundException("Notification " + contentId + " not found"));
         users.add(notification.getTargetUser());
         return users;
     }

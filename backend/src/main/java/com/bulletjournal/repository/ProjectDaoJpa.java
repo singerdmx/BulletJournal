@@ -366,9 +366,9 @@ public class ProjectDaoJpa implements Etaggable {
     }
 
     @Override
-    public List<String> findAffectedUsers(Long id) {
+    public List<String> findAffectedUsers(String contentId) {
         List<String> users = new ArrayList<>();
-        Project project = this.getProject(id);
+        Project project = this.getProject(Long.valueOf(contentId));
         project.getGroup().getUsers().forEach(userGroup -> users.add(userGroup.getUser().getName()));
         return users;
     }

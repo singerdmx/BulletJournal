@@ -9,7 +9,7 @@ public interface Etaggable {
 
     <T extends AuditModel> JpaRepository<T, Long> getJpaRepository();
 
-    List<String> findAffectedUsers(Long contentId);
+    List<String> findAffectedUsers(String contentId);
 
     String getUserEtag(String username);
 }
