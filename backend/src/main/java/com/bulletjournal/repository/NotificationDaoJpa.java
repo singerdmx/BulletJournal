@@ -13,10 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -69,8 +66,8 @@ public class NotificationDaoJpa implements Etaggable {
     }
 
     @Override
-    public List<String> findAffectedUsernames(Set<String> contentIds) {
-        List<String> users = new ArrayList<>();
+    public Set<String> findAffectedUsernames(Set<String> contentIds) {
+        Set<String> users = new HashSet<>();
         List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
         this.notificationRepository.findAllById(ids).forEach(n -> users.add(n.getTargetUser()));
         return users;

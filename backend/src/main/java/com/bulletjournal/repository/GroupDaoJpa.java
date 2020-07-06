@@ -275,8 +275,8 @@ public class GroupDaoJpa implements Etaggable {
     }
 
     @Override
-    public List<String> findAffectedUsernames(Set<String> contentIds) {
-        List<String> users = new ArrayList<>();
+    public Set<String> findAffectedUsernames(Set<String> contentIds) {
+        Set<String> users = new HashSet<>();
         List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
         List<Group> groups = this.groupRepository.findAllById(ids);
         groups.forEach(group -> group.getUsers().forEach(userGroup -> users.add(userGroup.getUser().getName())));

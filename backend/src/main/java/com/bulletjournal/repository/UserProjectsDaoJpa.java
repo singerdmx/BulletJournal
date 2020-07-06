@@ -1,10 +1,11 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.controller.models.Projects;
 import com.bulletjournal.repository.factory.Etaggable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,20 +15,22 @@ public class UserProjectsDaoJpa implements Etaggable {
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
 
-    /**
-     * Todo
-     */
+    // Todo: needs to optimize
     @Override
-    public List<String> findAffectedUsernames(Set<String> contentIds) {
-        List<String> users = new ArrayList<>();
+    public Set<String> findAffectedUsernames(Set<String> contentIds) {
+        Set<String> users = new HashSet<>();
+        List<Projects> projectsList = this.projectDaoJpa.getProjectsByOwners(contentIds);
+        projectsList.forEach(p -> {
+            p.getOwned().forEach(project ->
+                    project.getGroup().getUsers().forEach(userGroup -> users.add(userGroup.getName())));
+            p.getShared().forEach(projectsWithOwner -> users.add(projectsWithOwner.getOwner().getName());
+        });
         return users;
     }
 
-    /**
-     * Todo
-     */
+
     @Override
     public String getUserEtag(String username) {
-        return null;
+        return this.projectDaoJpa.getUserEtag(username);
     }
 }

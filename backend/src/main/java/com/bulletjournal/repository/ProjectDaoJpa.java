@@ -67,6 +67,18 @@ public class ProjectDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Projects> getProjectsByOwners(Set<String> owners) {
+        List<Projects> results = new ArrayList<>();
+        List<UserProjects> userProjectsList = this.userProjectsRepository.findAllById(owners);
+        userProjectsList.forEach(userProjects -> {
+            Projects result = new Projects();
+            result.setOwned(getOwnerProjects(userProjects, userProjects.getOwner()));
+            result.setShared(getSharedProjects(userProjects, userProjects.getOwner()));
+        });
+        return results;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project getProject(Long projectId, String requester) {
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
@@ -360,8 +372,8 @@ public class ProjectDaoJpa implements Etaggable {
     }
 
     @Override
-    public List<String> findAffectedUsernames(Set<String> contentIds) {
-        List<String> users = new ArrayList<>();
+    public Set<String> findAffectedUsernames(Set<String> contentIds) {
+        Set<String> users = new HashSet<>();
         List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
         this.projectRepository.findAllById(ids).forEach(p -> p.getGroup().getUsers()
                 .forEach(userGroup -> users.add(userGroup.getUser().getName())));
