@@ -73,7 +73,7 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
             { pattern: /^[0-9]*$/, message: 'Invalid Expiration in Days' },
           ]}
         >
-          <AutoComplete options={options}>
+          <AutoComplete options={options} style={{width: '150px'}}>
             <Input suffix="Days" prefix="Expire in:" />
           </AutoComplete>
         </Form.Item>
