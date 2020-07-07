@@ -34,6 +34,7 @@ services:
       GOOGLE_CALENDAR_CLIENT_SECRET: "${GOOGLE_CALENDAR_CLIENT_SECRET}"
       MJ_APIKEY_PRIVATE: "${MJ_APIKEY_PRIVATE}"
       MJ_APIKEY_PUBLIC: "${MJ_APIKEY_PUBLIC}"
+      FCM_ACCOUNT_KEY: "${FCM_ACCOUNT_KEY}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
     depends_on:
