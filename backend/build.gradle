@@ -31,6 +31,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-admin:6.14.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.bitbucket.cowwoc:diff-match-patch:1.2'

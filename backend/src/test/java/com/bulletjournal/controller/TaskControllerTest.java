@@ -170,7 +170,6 @@ public class TaskControllerTest {
         assertNotNull(completedTasksResponse.getBody());
         completedTasks = Arrays.asList(completedTasksResponse.getBody());
         assertEquals(4, completedTasks.size());
-
     }
 
     private void testUpdateAssignees(Project p1, Task task, List<String> users) {
