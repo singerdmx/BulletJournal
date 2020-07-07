@@ -6,6 +6,7 @@ export interface SearchResultItem {
     id: number,
     type: ContentType,
     name: string,
+    shared: boolean,
     nameHighlights: string[],
     contentHighlights: string[],
 }

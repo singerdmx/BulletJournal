@@ -39,7 +39,11 @@ const SearchResultItemElement: React.FC<SearchResultItemProps> =
         };
 
         const onClick = () => {
-            history.push(`/${item.type.toString().toLowerCase()}/${item.id}`);
+            if (item.shared) {
+                history.push(`/sharedItems/${item.type.toString().toUpperCase()}${item.id}`);
+            } else {
+                history.push(`/${item.type.toString().toLowerCase()}/${item.id}`);
+            }
         };
 
         return <div onClick={onClick} className='search-item' key={index}>

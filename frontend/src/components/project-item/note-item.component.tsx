@@ -175,7 +175,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   };
 
   const handleClick = () => {
-    if (props.readOnly) {
+    if (props.readOnly || note.shared) {
       // if readOnly, link to shared item page
       history.push(`/sharedItems/NOTE${note.id}`);
     } else {

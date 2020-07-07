@@ -10,6 +10,7 @@ public class SearchResultItem {
     private Long id;
     private ContentType type;
     private String name;
+    private boolean shared = false;
     private List<String> nameHighlights = new ArrayList<>();
     private List<String> contentHighlights = new ArrayList<>();
 
@@ -38,6 +39,14 @@ public class SearchResultItem {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(boolean shared) {
+        this.shared = shared;
     }
 
     public List<String> getNameHighlights() {
