@@ -67,13 +67,12 @@ public class ProjectDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Projects> getProjectsByOwners(Set<String> owners) {
-        List<Projects> results = new ArrayList<>();
+    public Set<Long> getProjectIdsByOwners(Set<String> owners) {
+        Set<Long> results = new HashSet<>();
         List<UserProjects> userProjectsList = this.userProjectsRepository.findAllById(owners);
         userProjectsList.forEach(userProjects -> {
-            Projects result = new Projects();
-            result.setOwned(getOwnerProjects(userProjects, userProjects.getOwner()));
-            result.setShared(getSharedProjects(userProjects, userProjects.getOwner()));
+            Set<Long> ids = HierarchyProcessor.findAllIds(userProjects.getOwnedProjects(), null).getRight();
+            results.addAll(ids);
         });
         return results;
     }

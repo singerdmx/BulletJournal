@@ -1,13 +1,11 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.controller.models.Projects;
 import com.bulletjournal.repository.factory.Etaggable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserProjectsDaoJpa implements Etaggable {
@@ -15,17 +13,20 @@ public class UserProjectsDaoJpa implements Etaggable {
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
 
-    // Todo: needs to optimize
+    /**
+     * Get project ids from ProjectDaoJpa with HierarchyProcessor's findAllIds API.
+     * Pass project id set to ProjectDaoJpa again to retrieve affected usernames.
+     *
+     * @param contentIds a set of content ids of user projects
+     * @return a set of usernames
+     */
     @Override
     public Set<String> findAffectedUsernames(Set<String> contentIds) {
-        Set<String> users = new HashSet<>();
-        List<Projects> projectsList = this.projectDaoJpa.getProjectsByOwners(contentIds);
-        projectsList.forEach(p -> {
-            p.getOwned().forEach(project ->
-                    project.getGroup().getUsers().forEach(userGroup -> users.add(userGroup.getName())));
-            p.getShared().forEach(projectsWithOwner -> users.add(projectsWithOwner.getOwner().getName()));
-        });
-        return users;
+        Set<Long> projectIds = this.projectDaoJpa.getProjectIdsByOwners(contentIds);
+        return this.projectDaoJpa.findAffectedUsernames(projectIds
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.toSet()));
     }
 
 
