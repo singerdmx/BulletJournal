@@ -170,6 +170,23 @@ public class SharedProjectItemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void setItemLabels(Long id, ContentType contentType, String requester) {
+    public void setItemLabels(ProjectItemModel projectItem, ContentType contentType,
+                              String requester, List<Long> labels) {
+        SharedProjectItem sharedProjectItem;
+        switch (contentType) {
+            case TASK:
+                sharedProjectItem = this.sharedProjectItemsRepository
+                        .findSharedProjectItemByTaskAndAndUsername((Task) projectItem, requester);
+                break;
+            case NOTE:
+                sharedProjectItem = this.sharedProjectItemsRepository
+                        .findSharedProjectItemByNoteAndAndUsername((Note) projectItem, requester);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        sharedProjectItem.setLabels(labels);
+        this.sharedProjectItemsRepository.save(sharedProjectItem);
     }
 }

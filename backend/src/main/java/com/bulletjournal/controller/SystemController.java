@@ -261,14 +261,14 @@ public class SystemController {
     }
 
     @PutMapping(SHARED_ITEM_SET_LABELS_ROUTE)
-    public <T extends ProjectItemModel> T setLabels(
+    public void setLabels(
             @NotNull @PathVariable String itemId, @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Pair<Long, ContentType> found = getSharedItemIdAndType(itemId);
         Long id = found.getLeft();
         ContentType contentType = found.getRight();
-        this.sharedProjectItemDaoJpa.setItemLabels(id, contentType, username);
-        return null;
+        ProjectItemModel projectItem = this.projectItemDaos.getDaos().get(contentType).getProjectItem(id, username);
+        this.sharedProjectItemDaoJpa.setItemLabels(projectItem, contentType, username, labels);
     }
 
     @PostMapping(CONTACTS_ROUTE)

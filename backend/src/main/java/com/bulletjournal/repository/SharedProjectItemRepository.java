@@ -15,4 +15,8 @@ public interface SharedProjectItemRepository extends JpaRepository<SharedProject
     List<SharedProjectItem> findByTask(Task task);
 
     List<SharedProjectItem> findByNote(Note note);
+
+    SharedProjectItem findSharedProjectItemByTaskAndAndUsername(Task task, String username);
+
+    SharedProjectItem findSharedProjectItemByNoteAndAndUsername(Note note, String username);
 }
