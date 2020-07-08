@@ -59,6 +59,7 @@ const SearchPage: React.FC<SearchProps & RouteComponentProps> =
             }
 
             search(term);
+            document.title = `Search Results for ${term}`;
         }, [term]);
 
         if (searching) {

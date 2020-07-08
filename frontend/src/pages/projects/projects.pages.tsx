@@ -75,6 +75,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
     useEffect(() => {
         updateGroups();
         updateProjects();
+        document.title = 'Bullet Journal - Journals';
     }, []);
 
     const handleClick = (projectId: number) => {

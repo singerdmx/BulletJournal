@@ -151,6 +151,12 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     );
   };
 
+    useEffect(() => {
+        if (task) {
+            document.title = task.name;
+        }
+    }, []);
+
   if (!task) return null;
   return (
     <div className={`task-page ${isPublic && 'public'}`}>

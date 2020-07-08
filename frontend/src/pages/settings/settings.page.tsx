@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {BackTop, Tabs} from 'antd';
 import Account from '../../components/settings/account';
 import { DashboardOutlined } from '@ant-design/icons';
@@ -11,6 +11,11 @@ const { TabPane } = Tabs;
 type SettingProps = {};
 
 const SettingPage: React.FC<SettingProps> = (props) => {
+
+    useEffect(() => {
+        document.title = 'Bullet Journal - Settings';
+    }, []);
+
   const location = useLocation();
 
   const defaultKey = location.hash;

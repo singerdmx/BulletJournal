@@ -147,6 +147,10 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     setInputPoints(userInfo.points);
   }, [userInfo.points]);
 
+  useEffect(() => {
+    document.title = 'Bullet Journal - Admins';
+  }, []);
+
   const handleLockUsers = () => {
     lockUserandIP(lockName, lockIP, lockReason);
     setLockIP('');

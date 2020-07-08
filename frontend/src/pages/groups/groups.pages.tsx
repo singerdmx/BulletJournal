@@ -15,6 +15,7 @@ type GroupsProps = {
 
 class GroupsPage extends React.Component<GroupsProps> {
   componentDidMount() {
+    document.title = 'Bullet Journal - Groups';
     this.props.updateGroups();
   }
 

@@ -1,5 +1,5 @@
 // react imports
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 // features
@@ -66,12 +66,15 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const history = useHistory();
 
   // listening on the empty state working as componentDidmount
-  React.useEffect(() => {
+  useEffect(() => {
     transactionId && getTransaction(parseInt(transactionId));
   }, [transactionId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     transaction && transaction.id && updateTransactionContents(transaction.id);
+    if (transaction) {
+      document.title = transaction.name;
+    }
   }, [transaction]);
 
   if (!transaction) return null;

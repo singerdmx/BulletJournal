@@ -145,6 +145,9 @@ class ProjectPage extends React.Component<
     this.props.getProject(projectId);
     this.setState({ completeTasksShown: false });
     this.props.projectLabelsUpdate(projectId);
+    if (this.props.project) {
+      document.title = this.props.project.name;
+    }
   }
 
   componentDidUpdate(prevProps: ProjectPathProps): void {
@@ -153,6 +156,9 @@ class ProjectPage extends React.Component<
       this.props.getProject(parseInt(projectId));
       this.setState({ completeTasksShown: false });
       this.props.projectLabelsUpdate(parseInt(projectId));
+    }
+    if (this.props.project) {
+      document.title = this.props.project.name;
     }
   }
 

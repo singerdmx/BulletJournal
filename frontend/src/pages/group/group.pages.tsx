@@ -25,12 +25,18 @@ class GroupPage extends React.Component<GroupPageProps & GroupPathProps> {
   componentDidMount() {
     const groupId = this.props.match.params.groupId.substring(5);
     this.props.getGroup(parseInt(groupId));
+    if (this.props.group) {
+      document.title = `Group ${this.props.group.name}`;
+    }
   }
 
   componentDidUpdate(prevProps: GroupPathProps): void {
     const groupId = this.props.match.params.groupId.substring(5);
     if (groupId !== prevProps.match.params.groupId.substring(5)) {
       this.props.getGroup(parseInt(groupId));
+    }
+    if (this.props.group) {
+      document.title = `Group ${this.props.group.name}`;
     }
   }
 

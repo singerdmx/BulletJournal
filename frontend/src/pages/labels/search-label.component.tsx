@@ -35,6 +35,7 @@ const LabelsSearching: React.FC<LabelSearchProps> = (props) => {
 
   useEffect(() => {
     handleSearch();
+    document.title = 'Bullet Journal - Labels';
   }, []);
 
   return (

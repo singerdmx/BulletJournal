@@ -44,6 +44,10 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
         getTasksByStatus();
     }, [projectId]);
 
+    useEffect(() => {
+       document.title = 'Bullet Journal - Tasks by Status';
+    }, []);
+
     const inProgressTasks = [] as Task[];
     const nextToDoTasks = [] as Task[];
     const readyTasks = [] as Task[];

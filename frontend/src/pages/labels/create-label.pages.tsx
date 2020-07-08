@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { connect } from 'react-redux';
 import { Label, stringToRGB } from '../../features/label/interface';
 import {
@@ -74,6 +74,9 @@ const Labels: React.FC<LabelsProps> = (props) => {
   const [editable, setEditable] = useState(false);
   const [currentLabel, setCurrentLabel] = useState(initialLabel);
   const [inputFocus, setFocus] = useState(false);
+  useEffect(() => {
+    document.title = 'Bullet Journal - Labels';
+  }, []);
   //label form state
   const [formCreateLabelIcon, setFormCreateLabelIcon] = useState(
     <TagOutlined />

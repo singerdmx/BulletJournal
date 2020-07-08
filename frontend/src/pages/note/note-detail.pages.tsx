@@ -1,6 +1,6 @@
 // page display contents of notes
 // react imports
-import React from 'react';
+import React, {useEffect} from 'react';
 // features
 //actions
 import { Note } from '../../features/notes/interface';
@@ -37,6 +37,11 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     contents,
     isPublic,
   } = props;
+    useEffect(() => {
+        if (note) {
+            document.title = note.name;
+        }
+    }, []);
   if (!note) return null;
   return (
     <div className={`note-page ${isPublic && 'public'}`}>

@@ -68,6 +68,16 @@ class BujoPage extends React.Component<
     showForm: false,
   };
 
+  componentDidMount() {
+      const { category = 'today' } = this.props.match.params;
+      document.title = `Bullet Journal - ${category.toUpperCase()}`;
+  }
+
+  componentDidUpdate(prevProps: BujoRouteParams): void {
+    const { category = 'today' } = this.props.match.params;
+    document.title = `Bullet Journal - ${category.toUpperCase()}`;
+  }
+
   handleOnChange = (type: string, category: string) => {
     let { ledgerSelected, todoSelected, noteSelected } = this.props;
     if (type === 'todo') {
