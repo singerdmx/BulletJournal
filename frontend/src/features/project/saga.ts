@@ -140,7 +140,7 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
     yield put(projectActions.projectReceived({ project: data }));
     yield put(groupsActions.getGroup({ groupId: data.group.id }));
   } catch (error) {
-    yield call(message.error, `Get Project Error Received: ${error}`);
+    console.error(`Get Project Error Received: ${error}`);
   }
 }
 

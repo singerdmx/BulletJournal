@@ -37,7 +37,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private static final Gson GSON = new Gson();
 
     @Autowired
-    private LabelDaoJpa labelDaoJpa;
+    protected LabelDaoJpa labelDaoJpa;
     @Autowired
     private AuthorizationService authorizationService;
     @Autowired

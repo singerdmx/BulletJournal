@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Label, stringToRGB } from '../../features/label/interface';
-import { Select, Tag } from 'antd';
-import { useHistory } from 'react-router-dom';
-import { PlusOutlined, TagOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { setSelectedLabel, labelsUpdate } from '../../features/label/actions';
-import { setNoteLabels } from '../../features/notes/actions';
-import { setTaskLabels } from '../../features/tasks/actions';
-import { setTransactionLabels } from '../../features/transactions/actions';
-import { ProjectType } from '../../features/project/constants';
+import React, {useEffect, useState} from 'react';
+import {Label, stringToRGB} from '../../features/label/interface';
+import {Select, Tag} from 'antd';
+import {useHistory} from 'react-router-dom';
+import {PlusOutlined, TagOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {labelsUpdate, setSelectedLabel} from '../../features/label/actions';
+import {setNoteLabels} from '../../features/notes/actions';
+import {setTaskLabels} from '../../features/tasks/actions';
+import {setTransactionLabels} from '../../features/transactions/actions';
+import {setSharedItemLabels} from '../../features/system/actions';
+import {ProjectType, toContentType} from '../../features/project/constants';
 
-import { icons } from '../../assets/icons/index';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import { IState } from '../../store';
-import { ProjectItem } from '../../features/myBuJo/interface';
-import { Project } from '../../features/project/interface';
+import {icons} from '../../assets/icons/index';
+import {DragDropContext, Draggable, Droppable, DropResult,} from 'react-beautiful-dnd';
+import {IState} from '../../store';
+import {ProjectItem} from '../../features/myBuJo/interface';
+import {Project} from '../../features/project/interface';
 import {inPublicPage} from "../../index";
 
 type DraggableLabelsProps = {
@@ -34,6 +30,7 @@ type DraggableLabelsProps = {
   setNoteLabels: (noteId: number, labels: number[]) => void;
   setTaskLabels: (taskId: number, labels: number[]) => void;
   setTransactionLabels: (transactionId: number, labels: number[]) => void;
+  setSharedItemLabels: (itemId: string, labels: number[]) => void;
   labelsUpdate: (projectId: number | undefined) => void;
 };
 
@@ -67,11 +64,13 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   labels,
   project,
   editable,
+  itemShared,
   itemId,
   setSelectedLabel,
   setNoteLabels,
   setTaskLabels,
   setTransactionLabels,
+  setSharedItemLabels,
   labelOptions,
   labelsUpdate,
 }) => {
@@ -87,7 +86,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
     [ProjectType.LEDGER]: setTransactionLabels,
   };
 
-  const shareFunction = shareProjectLabelUpdate[mode];
+  const updateLabels = shareProjectLabelUpdate[mode];
 
   useEffect(() => {
     if (!inPublicPage()) {
@@ -104,6 +103,14 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
     history.push('/labels/search');
   };
 
+  const setItemLabels = (itemId: number, labels: number[]) => {
+    if (itemShared) {
+      setSharedItemLabels(toContentType(mode).toString().toUpperCase() + itemId, labels);
+    } else {
+      updateLabels(itemId, labels);
+    }
+  };
+
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
@@ -113,12 +120,12 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
       result.source.index,
       result.destination.index
     );
-    shareFunction(itemId, newLabels);
+    setItemLabels(itemId, newLabels);
   };
 
   const handleLabelDelete = (labelId: number) => {
     const deletedLabels = labelsId.filter((id) => id !== labelId);
-    shareFunction(itemId, deletedLabels);
+    setItemLabels(itemId, deletedLabels);
   };
 
   const getListStyle = () => ({
@@ -129,7 +136,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
   // when adding labels for note
   const handleSubmit = () => {
     const newLabels = [...labelsId, ...selectedLabels];
-    shareFunction(itemId, newLabels);
+    setItemLabels(itemId, newLabels);
     setShowAdd(false);
   };
   // when change in selections
@@ -243,6 +250,7 @@ export default connect(mapStateToProps, {
   setNoteLabels,
   setTaskLabels,
   setTransactionLabels,
+  setSharedItemLabels,
   setSelectedLabel,
   labelsUpdate,
 })(DraggableLabelsList);

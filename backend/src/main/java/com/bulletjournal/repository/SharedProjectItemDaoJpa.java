@@ -57,7 +57,7 @@ public class SharedProjectItemDaoJpa {
             if (contentType == null || contentType == projectItem.getContentType()) {
                 result.add(projectItem);
             }
-            projectItem.setLabels(Collections.emptyList()); // TODO: set correct labels
+            projectItem.setLabels(item.getLabels());
         });
 
         return result.stream()

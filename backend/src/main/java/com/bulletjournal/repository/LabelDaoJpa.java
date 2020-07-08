@@ -223,7 +223,7 @@ public class LabelDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected List<com.bulletjournal.controller.models.Label> getLabels(final List<Long> labels) {
+    public List<com.bulletjournal.controller.models.Label> getLabels(final List<Long> labels) {
         if (labels == null || labels.isEmpty()) {
             return Collections.emptyList();
         }

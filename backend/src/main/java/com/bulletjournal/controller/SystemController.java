@@ -60,6 +60,9 @@ public class SystemController {
     private NoteDaoJpa noteDaoJpa;
 
     @Autowired
+    private LabelDaoJpa labelDaoJpa;
+
+    @Autowired
     private PublicProjectItemDaoJpa publicProjectItemDaoJpa;
 
     @Autowired
@@ -221,6 +224,11 @@ public class SystemController {
                 throw new IllegalArgumentException();
         }
 
+        if (!isUUID(itemId)) {
+            // For shared item, replace projectItem's labels with shared item's labels
+            projectItem.setLabels(this.labelDaoJpa.getLabels(item.getLabels()));
+        }
+
         projectItem.setShared(true);
         contents.forEach(content -> content.setRevisions(new Revision[0])); // clear revisions
         com.bulletjournal.repository.models.Project project = projectDaoJpa.getSharedProject(contentType, originalUser);
@@ -267,7 +275,8 @@ public class SystemController {
         Pair<Long, ContentType> found = getSharedItemIdAndType(itemId);
         Long id = found.getLeft();
         ContentType contentType = found.getRight();
-        ProjectItemModel projectItem = this.projectItemDaos.getDaos().get(contentType).getProjectItem(id, username);
+        ProjectItemModel projectItem = this.projectItemDaos.getDaos()
+                .get(ProjectType.fromContentType(contentType)).getProjectItem(id, username);
         this.sharedProjectItemDaoJpa.setItemLabels(projectItem, contentType, username, labels);
     }
 

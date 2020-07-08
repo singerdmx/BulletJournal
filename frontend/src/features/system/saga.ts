@@ -2,14 +2,14 @@ import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 import { message, notification } from 'antd';
 import {
   actions as systemActions,
-  GetPublicProjectItem,
+  GetPublicProjectItem, SetSharedItemLabels,
   SystemApiErrorAction,
   UpdateSystem,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchSystemUpdates,
-  getPublicProjectItem,
+  getPublicProjectItem, setSharedItemLabels,
 } from '../../apis/systemApis';
 import { ContentType } from '../myBuJo/constants';
 import { getProject, updateProjects } from '../project/actions';
@@ -177,6 +177,15 @@ function* getPublicItem(action: PayloadAction<GetPublicProjectItem>) {
   }
 }
 
+function* putSharedItemLabels(action: PayloadAction<SetSharedItemLabels>) {
+  try {
+    const { itemId, labels } = action.payload;
+    yield call(setSharedItemLabels, itemId, labels);
+  } catch (error) {
+    yield call(message.error, `setSharedItemLabels Received: ${error}`);
+  }
+}
+
 export default function* systemSagas() {
   yield all([
     yield takeLatest(
@@ -185,5 +194,6 @@ export default function* systemSagas() {
     ),
     yield takeLatest(systemActions.systemUpdate.type, SystemUpdate),
     yield takeLatest(systemActions.fetchPublicProjectItem.type, getPublicItem),
+    yield takeLatest(systemActions.setSharedItemLabels.type, putSharedItemLabels),
   ]);
 }

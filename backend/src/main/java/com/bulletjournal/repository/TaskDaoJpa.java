@@ -83,9 +83,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
     @Autowired
-    private LabelDaoJpa labelDaoJpa;
-
-    @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
 
     @Override
@@ -114,9 +111,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                     .filter(obj -> obj instanceof Task)
                     .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
             if (!projectTasksOptional.isPresent()) {
-                return tasks.stream().map(
+                return this.labelDaoJpa.getLabelsForProjectItemList(tasks.stream().map(
                         task -> task.toPresentationModel()
-                ).collect(Collectors.toList());
+                ).collect(Collectors.toList()));
             }
             ProjectTasks projectTasks = projectTasksOptional.get();
             final Map<Long, Task> taskMap = tasks.stream()

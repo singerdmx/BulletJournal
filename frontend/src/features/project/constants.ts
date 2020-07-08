@@ -1,3 +1,5 @@
+import {ContentType} from "../myBuJo/constants";
+
 export enum ProjectType {
     TODO = 'TODO',
     NOTE = 'NOTE',
@@ -14,6 +16,19 @@ export const toProjectType = (input: string) => {
             return ProjectType.LEDGER;
         default:
             return ProjectType.TODO;
+    }
+};
+
+export const toContentType = (projectType: ProjectType) => {
+    switch (projectType) {
+        case ProjectType.TODO:
+            return ContentType.TASK;
+        case ProjectType.NOTE:
+            return ContentType.NOTE;
+        case ProjectType.LEDGER:
+            return ContentType.TRANSACTION;
+        default:
+            return ContentType.TASK;
     }
 };
 

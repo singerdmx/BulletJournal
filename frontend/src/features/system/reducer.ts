@@ -33,6 +33,11 @@ export type GetPublicProjectItem = {
   itemId: string;
 };
 
+export type SetSharedItemLabels = {
+  itemId: string;
+  labels: number[];
+};
+
 let initialState = {
   tasksEtag: '',
   notesEtag: '',
@@ -95,6 +100,7 @@ const slice = createSlice({
     ) => state,
     systemUpdate: (state, action: PayloadAction<UpdateSystem>) => state,
     fetchPublicProjectItem: (state, action: PayloadAction<GetPublicProjectItem>) => state,
+    setSharedItemLabels: (state, action: PayloadAction<SetSharedItemLabels>) => state,
     publicProjectItemReceived: (state, action: PayloadAction<PublicProjectItemUpdate>) => {
       const {contents, contentType, publicNote, publicTask, publicItemProjectId} = action.payload;
       state.contentType = contentType;

@@ -75,9 +75,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                     .filter(obj -> obj instanceof Note)
                     .map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList());
             if (!projectNotesOptional.isPresent()) {
-                return notes.stream().map(
+                return this.labelDaoJpa.getLabelsForProjectItemList(notes.stream().map(
                         note -> note.toPresentationModel()
-                ).collect(Collectors.toList());
+                ).collect(Collectors.toList()));
             }
             ProjectNotes projectNotes = projectNotesOptional.get();
             final Map<Long, Note> notesMap = notes.stream()

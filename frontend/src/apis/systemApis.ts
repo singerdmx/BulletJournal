@@ -1,4 +1,4 @@
-import {doFetch, doPost} from './api-helper';
+import {doFetch, doPost, doPut} from './api-helper';
 import {ContactType} from "../features/system/constants";
 
 export const fetchSystemUpdates = (targets = '', projectId = undefined, remindingTaskEtag = undefined) => {
@@ -32,4 +32,12 @@ export const contactSupport = (contactType: ContactType, title: String, content:
         content: content
     });
     return doPost('/api/contacts', postBody);
+};
+
+export const setSharedItemLabels = (itemId: string, labels: number[]) => {
+    const putBody = JSON.stringify(labels);
+    return doPut(`/api/sharedItems/${itemId}/setLabels`, putBody)
+        .catch((err) => {
+            throw Error(err.message);
+        });
 };
