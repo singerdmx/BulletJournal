@@ -21,8 +21,8 @@ public class UserClientTests {
     public void testGetUser() throws Exception {
 
         String username = "BulletJournal";
-        String expectedThumbnail = "https://1o24bbs.com/user_avatar/1o24bbs.com/bulletjournal/37/15287_2.png";
-        String expectedAvatar = "https://1o24bbs.com/user_avatar/1o24bbs.com/bulletjournal/75/15287_2.png";
+        String expectedThumbnail = "https://1o24bbs.com/user_avatar/1o24bbs.com/bulletjournal/37/16257_2.png";
+        String expectedAvatar = "https://1o24bbs.com/user_avatar/1o24bbs.com/bulletjournal/75/16257_2.png";
 
         RedisUserRepository redisUserRepository = mock(RedisUserRepository.class);
         when(redisUserRepository.findById(username)).thenReturn(Optional.empty());

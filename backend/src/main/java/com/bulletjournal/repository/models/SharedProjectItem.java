@@ -1,10 +1,21 @@
 package com.bulletjournal.repository.models;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import com.bulletjournal.repository.utils.LongArrayType;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+@TypeDefs({
+        @TypeDef(
+                name = "long-array",
+                typeClass = LongArrayType.class
+        ),
+})
 @Entity
 @Table(name = "shared_project_items")
 public class SharedProjectItem extends AuditModel {
@@ -35,6 +46,13 @@ public class SharedProjectItem extends AuditModel {
     @JoinColumn(name = "transaction_id", nullable = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Transaction transaction;
+
+    @Type(type = "long-array")
+    @Column(
+            name = "labels",
+            columnDefinition = "bigint[]"
+    )
+    private Long[] labels;
 
     public SharedProjectItem() {
     }
@@ -102,5 +120,16 @@ public class SharedProjectItem extends AuditModel {
 
     public boolean hasTransaction() {
         return this.transaction != null;
+    }
+
+    public List<Long> getLabels() {
+        if (this.labels == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(this.labels);
+    }
+
+    public void setLabels(List<Long> labels) {
+        this.labels = labels == null ? null : labels.toArray(new Long[0]);
     }
 }
