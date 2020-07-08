@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 public class EtaggableDaos {
 
-    private Map<EtagType, Etaggable> daos;
+    private final Map<EtagType, Etaggable> daos;
 
     @Autowired
     public EtaggableDaos(NotificationDaoJpa notificationDaoJpa,

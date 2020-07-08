@@ -110,7 +110,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         if (project.isShared()) {
             List<Task> tasks = this.sharedProjectItemDaoJpa.
-                    getSharedProjectItems(requester, ProjectType.TODO).stream()
+                    getSharedProjectItems(requester, ContentType.TASK).stream()
                     .filter(obj -> obj instanceof Task)
                     .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
             if (!projectTasksOptional.isPresent()) {

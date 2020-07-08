@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.factory.ProjectItemDaos;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;

@@ -14,8 +14,10 @@ import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.factory.ProjectItemDaos;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -77,6 +79,9 @@ public class SystemController {
 
     @Autowired
     private RedisEtagDaoJpa redisEtagDaoJpa;
+
+    @Autowired
+    private ProjectItemDaos projectItemDaos;
 
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
@@ -178,7 +183,7 @@ public class SystemController {
     }
 
     @GetMapping(PUBLIC_ITEM_ROUTE)
-    public <T extends ProjectItemModel> ResponseEntity<?> getPublicProjectItem(
+    public ResponseEntity<?> getPublicProjectItem(
             @NotNull @PathVariable String itemId) {
         if (this.tokenBucket.isLimitExceeded(TokenBucketType.PUBLIC_ITEM)) {
             LOGGER.error("Get PublicProjectItem limit exceeded");
@@ -188,7 +193,7 @@ public class SystemController {
         String username = AuthorizationService.SUPER_USER;
         MDC.put(UserClient.USER_NAME_KEY, username);
 
-        T item;
+        ProjectItemModel item;
         if (!isUUID(itemId)) {
             if (StringUtils.isBlank(originalUser)) {
                 throw new UnAuthorizedException("User not logged in");
@@ -223,25 +228,24 @@ public class SystemController {
                 new PublicProjectItem(contentType, contents, projectItem, project != null ? project.getId() : null));
     }
 
-    private <T extends ProjectItemModel> T getSharedItem(String itemId, String requester) {
-        T item;
-        Long id = Long.parseLong(itemId.substring(4)); // both NOTE and TASK are 4 letters
-        if (itemId.startsWith(ContentType.TASK.name())) {
-            if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, ProjectType.TODO)
-                    .stream().anyMatch(m -> m.getId().equals(id))) {
-                throw new UnAuthorizedException("Task not shared with user " + requester);
-            }
-            item = this.taskDaoJpa.getProjectItem(id, AuthorizationService.SUPER_USER);
-        } else if (itemId.startsWith(ContentType.NOTE.name())) {
-            if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, ProjectType.NOTE)
-                    .stream().anyMatch(m -> m.getId().equals(id))) {
-                throw new UnAuthorizedException("Note not shared with user " + requester);
-            }
-            item = this.noteDaoJpa.getProjectItem(id, AuthorizationService.SUPER_USER);
-        } else {
-            throw new BadRequestException("Invalid itemId " + itemId);
+    private ProjectItemModel getSharedItem(String itemId, String requester) {
+        Pair<Long, ContentType> found = getSharedItemIdAndType(itemId);
+        Long id = found.getLeft();
+        ContentType contentType = found.getRight();
+        if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, contentType)
+                .stream().anyMatch(m -> m.getId().equals(id))) {
+            throw new UnAuthorizedException("Item not shared with user " + requester);
         }
-        return item;
+
+        return this.projectItemDaos.getDaos().get(ProjectType.fromContentType(contentType))
+                .getProjectItem(id, AuthorizationService.SUPER_USER);
+    }
+
+    private Pair<Long, ContentType> getSharedItemIdAndType(String itemId) {
+        Long id = Long.parseLong(itemId.substring(4)); // both NOTE and TASK are 4 letters
+        ContentType contentType = Arrays.stream(ContentType.values()).filter(c -> itemId.startsWith(c.name()))
+                .findAny().orElseThrow(() -> new BadRequestException("Invalid itemId " + itemId));
+        return Pair.of(id, contentType);
     }
 
     private boolean isUUID(String itemId) {
@@ -260,6 +264,10 @@ public class SystemController {
     public <T extends ProjectItemModel> T setLabels(
             @NotNull @PathVariable String itemId, @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        Pair<Long, ContentType> found = getSharedItemIdAndType(itemId);
+        Long id = found.getLeft();
+        ContentType contentType = found.getRight();
+        this.sharedProjectItemDaoJpa.setItemLabels(id, contentType, username);
         return null;
     }
 

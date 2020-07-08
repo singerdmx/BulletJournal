@@ -71,7 +71,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         if (project.isShared()) {
             List<Note> notes = this.sharedProjectItemDaoJpa.
-                    getSharedProjectItems(requester, ProjectType.NOTE).stream()
+                    getSharedProjectItems(requester, ContentType.NOTE).stream()
                     .filter(obj -> obj instanceof Note)
                     .map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList());
             if (!projectNotesOptional.isPresent()) {

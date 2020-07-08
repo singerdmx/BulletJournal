@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
@@ -38,7 +39,7 @@ public class SharedProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItemModel> getSharedProjectItems(
-            String requester, final ProjectType projectType) {
+            String requester, final ContentType contentType) {
         List<ProjectItemModel> result = new ArrayList<>();
         List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(requester);
         items.forEach(item -> {
@@ -53,7 +54,7 @@ public class SharedProjectItemDaoJpa {
                 throw new IllegalStateException();
             }
 
-            if (projectType == null || projectType.getValue() == projectItem.getProject().getType().intValue()) {
+            if (contentType == null || contentType == projectItem.getContentType()) {
                 result.add(projectItem);
             }
             projectItem.setLabels(Collections.emptyList()); // TODO: set correct labels
@@ -166,5 +167,9 @@ public class SharedProjectItemDaoJpa {
                 .filter(item -> Objects.equals(item.getUsername(), user))
                 .findAny().orElseThrow(() -> new ResourceNotFoundException("User " + user + " not found"));
         this.sharedProjectItemsRepository.delete(sharedProjectItem);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void setItemLabels(Long id, ContentType contentType, String requester) {
     }
 }
