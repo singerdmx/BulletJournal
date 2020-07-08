@@ -38,9 +38,9 @@ public class SharedProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItemModel> getSharedProjectItems(
-            String user, final ProjectType projectType) {
+            String requester, final ProjectType projectType) {
         List<ProjectItemModel> result = new ArrayList<>();
-        List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(user);
+        List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(requester);
         items.forEach(item -> {
             ProjectItemModel projectItem;
             if (item.hasNote()) {

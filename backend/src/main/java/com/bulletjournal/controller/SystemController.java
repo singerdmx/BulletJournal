@@ -38,8 +38,9 @@ public class SystemController {
     public static final String UPDATES_ROUTE = "/api/system/updates";
     public static final String PUBLIC_ITEM_ROUTE_PREFIX = "/api/public/items/";
     public static final String PUBLIC_ITEM_ROUTE = PUBLIC_ITEM_ROUTE_PREFIX + "{itemId}";
-    private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
     private static final String CONTACTS_ROUTE = "/api/contacts";
+    private static final String SHARED_ITEM_SET_LABELS_ROUTE = "/api/sharedItems/{itemId}/setLabels";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
@@ -192,22 +193,7 @@ public class SystemController {
             if (StringUtils.isBlank(originalUser)) {
                 throw new UnAuthorizedException("User not logged in");
             }
-            Long id = Long.parseLong(itemId.substring(4)); // both NOTE and TASK are 4 letters
-            if (itemId.startsWith(ContentType.TASK.name())) {
-                if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.TODO)
-                        .stream().anyMatch(m -> m.getId().equals(id))) {
-                    throw new UnAuthorizedException("Task not shared with user " + originalUser);
-                }
-                item = this.taskDaoJpa.getProjectItem(id, username);
-            } else if (itemId.startsWith(ContentType.NOTE.name())) {
-                if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(originalUser, ProjectType.NOTE)
-                        .stream().anyMatch(m -> m.getId().equals(id))) {
-                    throw new UnAuthorizedException("Note not shared with user " + originalUser);
-                }
-                item = this.noteDaoJpa.getProjectItem(id, username);
-            } else {
-                throw new BadRequestException("Invalid itemId " + itemId);
-            }
+            item = getSharedItem(itemId, originalUser);
         } else {
             item = this.publicProjectItemDaoJpa.getPublicItem(itemId);
         }
@@ -237,6 +223,27 @@ public class SystemController {
                 new PublicProjectItem(contentType, contents, projectItem, project != null ? project.getId() : null));
     }
 
+    private <T extends ProjectItemModel> T getSharedItem(String itemId, String requester) {
+        T item;
+        Long id = Long.parseLong(itemId.substring(4)); // both NOTE and TASK are 4 letters
+        if (itemId.startsWith(ContentType.TASK.name())) {
+            if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, ProjectType.TODO)
+                    .stream().anyMatch(m -> m.getId().equals(id))) {
+                throw new UnAuthorizedException("Task not shared with user " + requester);
+            }
+            item = this.taskDaoJpa.getProjectItem(id, AuthorizationService.SUPER_USER);
+        } else if (itemId.startsWith(ContentType.NOTE.name())) {
+            if (!this.sharedProjectItemDaoJpa.getSharedProjectItems(requester, ProjectType.NOTE)
+                    .stream().anyMatch(m -> m.getId().equals(id))) {
+                throw new UnAuthorizedException("Note not shared with user " + requester);
+            }
+            item = this.noteDaoJpa.getProjectItem(id, AuthorizationService.SUPER_USER);
+        } else {
+            throw new BadRequestException("Invalid itemId " + itemId);
+        }
+        return item;
+    }
+
     private boolean isUUID(String itemId) {
         if (itemId.length() != PublicProjectItemDaoJpa.UUID_LENGTH) {
             return false;
@@ -247,6 +254,13 @@ public class SystemController {
         }
 
         return true;
+    }
+
+    @PutMapping(SHARED_ITEM_SET_LABELS_ROUTE)
+    public <T extends ProjectItemModel> T setLabels(
+            @NotNull @PathVariable String itemId, @NotNull @RequestBody List<Long> labels) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return null;
     }
 
     @PostMapping(CONTACTS_ROUTE)
