@@ -37,6 +37,7 @@ export const contactSupport = (contactType: ContactType, title: String, content:
 export const setSharedItemLabels = (itemId: string, labels: number[]) => {
     const putBody = JSON.stringify(labels);
     return doPut(`/api/sharedItems/${itemId}/setLabels`, putBody)
+        .then(res => res.json())
         .catch((err) => {
             throw Error(err.message);
         });

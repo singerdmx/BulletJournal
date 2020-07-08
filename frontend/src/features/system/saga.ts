@@ -180,7 +180,19 @@ function* getPublicItem(action: PayloadAction<GetPublicProjectItem>) {
 function* putSharedItemLabels(action: PayloadAction<SetSharedItemLabels>) {
   try {
     const { itemId, labels } = action.payload;
-    yield call(setSharedItemLabels, itemId, labels);
+    const data = yield call(setSharedItemLabels, itemId, labels);
+    const type: ContentType = data.contentType;
+    const note = type === ContentType.NOTE ? data.projectItem : undefined;
+    const task = type === ContentType.TASK ? data.projectItem : undefined;
+    yield put(
+        systemActions.publicProjectItemReceived({
+          contentType: type,
+          contents: data.contents,
+          publicNote: note,
+          publicTask: task,
+          publicItemProjectId: data.projectId
+        })
+    );
   } catch (error) {
     yield call(message.error, `setSharedItemLabels Received: ${error}`);
   }

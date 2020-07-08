@@ -314,7 +314,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
     );
     const projectId = data.projectId;
     const state: IState = yield select();
-    //update transaciton project page's detail transaction
+    //update transaction project page's detail transaction
     if (state.transaction.timezone) {
       const updateData = yield call(
         fetchTransactions,
