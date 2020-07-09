@@ -56,15 +56,6 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
     const groups = yield data.json();
     const allGroups = flattenGroup(groups);
     yield put(groupsActions.groupsReceived({ groups: groups }));
-    const selectedGroup = state.group.group;
-    if (selectedGroup) {
-      const findGroup = allGroups.find(
-        (item: any) => item.id === selectedGroup.id
-      );
-      if (findGroup) {
-        yield put(groupsActions.groupReceived({ group: findGroup }));
-      }
-    }
   } catch (error) {
     yield call(message.error, `groupsUpdate Error Received: ${error}`);
   }
