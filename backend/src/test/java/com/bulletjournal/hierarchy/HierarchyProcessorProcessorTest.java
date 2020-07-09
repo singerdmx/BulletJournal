@@ -91,7 +91,7 @@ public class HierarchyProcessorProcessorTest {
         ret = HierarchyProcessor.findAllIds(relations, null);
         hierarchy = ret.getLeft();
         assertEquals(2, hierarchy.size());
-        CollectionUtils.isEqualCollection(ImmutableSet.of(1L, 2L, 3L, 4L, 5L, 6L), ret.getRight());
+        assertTrue(CollectionUtils.isEqualCollection(ImmutableSet.of(1L, 2L, 3L, 4L, 5L, 6L), ret.getRight()));
 
         set = new HashSet<>();
         set.add(p1.getId());
@@ -102,7 +102,7 @@ public class HierarchyProcessorProcessorTest {
         ret = HierarchyProcessor.findAllIds(relations, set);
         hierarchy = ret.getLeft();
         assertEquals(2, hierarchy.size());
-        CollectionUtils.isEqualCollection(ImmutableSet.of(3L), ret.getRight());
+        assertTrue(CollectionUtils.isEqualCollection(ImmutableSet.of(1L, 4L, 5L), ret.getRight()));
     }
 
     /**
