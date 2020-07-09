@@ -35,3 +35,11 @@ export const patchMyself = (
       throw Error(err.message);
     });
 };
+
+export const clearMyself = () => {
+  return doPost('/api/myself/clear')
+      .catch(err => {
+        throw Error(err.message);
+      });
+};
+

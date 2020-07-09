@@ -59,4 +59,4 @@ export const fetchItemsByLabels = (labels: number[]) => {
     .catch(err => {
       throw Error(err.message);
     });
-}
+};

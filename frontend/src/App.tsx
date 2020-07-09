@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Layout } from 'antd';
+import Joyride, { CallBackProps, STATUS, Step, StoreHelpers } from 'react-joyride';
 import SideLayout from './layouts/side/side.layout';
 import HeaderLayout from './layouts/header/header.layout';
 import ContentLayout from './layouts/content/content.layout';
@@ -34,11 +35,6 @@ const App: React.FC<RootProps> = (props) => {
     window.less.modifyVars(vars).then(() => {
       console.log('Theme updated at first successfully', vars);
     });
-    const app = document.querySelector('div.App');
-    console.log(app);
-    if (!app) {
-      console.log('reloading');
-    }
   }, [props.theme]);
 
   return props.loading ? (

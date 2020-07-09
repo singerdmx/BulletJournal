@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.RedisUserRepository;
+import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import org.slf4j.Logger;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -88,18 +88,14 @@ public class UserController {
     @PostMapping(CLEAR_MYSELF_ROUTE)
     public ResponseEntity<?> clear() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        LOGGER.info("Clearing " + username + " cache");
-        Optional<User> userOptional = redisUserRepository.findById(username);
-        if (userOptional.isPresent()) {
-            this.redisUserRepository.delete(userOptional.get());
-        }
-
+        LOGGER.info("Clearing " + username);
+        this.firstTimeUserRepository.delete(new FirstTimeUser(username));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(CHANGE_ALIAS_ROUTE)
     public ResponseEntity<?> changeAlias(@NotNull @PathVariable String username,
-            @Valid @RequestBody ChangeAliasParams changeAliasParams) {
+                                         @Valid @RequestBody ChangeAliasParams changeAliasParams) {
         LOGGER.info("Changing " + username + "'s alias to " + changeAliasParams.getAlias());
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         this.userAliasDaoJpa.changeAlias(requester, username, changeAliasParams.getAlias());

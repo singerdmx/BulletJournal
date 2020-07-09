@@ -51,7 +51,7 @@ const ProjectHistory: React.FC<ProjectHistoryProps> = (props) => {
     ];
 
     function parseActivity(a: Activity) {
-        const res: any = {...a}
+        const res: any = {...a};
         let description = (
             <span>
         {a.activity.split('##').map((a, index) => {

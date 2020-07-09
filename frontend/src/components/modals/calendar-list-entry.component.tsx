@@ -109,7 +109,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
     watchedProjects.forEach((calendarWatchedProject: CalendarWatchedProject) => {
       if (calendar.id === calendarWatchedProject.calendarId) setSyncedBuJo(calendarWatchedProject.project);
     });
-  }, [watchedProjects])
+  }, [watchedProjects]);
 
   const handleOpen = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
