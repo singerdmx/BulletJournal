@@ -44,7 +44,9 @@ export const flattenSharedProject = (
     sharedProjects.forEach(sharedProject => {
         sharedProject.projects.forEach(project => {
             flattenOwnedProject(project.subProjects, flattenedProjects);
-            flattenedProjects.push(project);
+            if (!project.shared) {
+                flattenedProjects.push(project);
+            }
         });
     });
     return flattenedProjects;
