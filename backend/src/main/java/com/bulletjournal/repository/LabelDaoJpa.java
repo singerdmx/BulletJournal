@@ -11,6 +11,7 @@ import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,6 +47,9 @@ public class LabelDaoJpa {
 
     @Autowired
     private NoteRepository noteRepository;
+
+    @Autowired
+    private SharedProjectItemRepository sharedProjectItemRepository;
 
     @Autowired
     private AuthorizationService authorizationService;
@@ -127,18 +131,27 @@ public class LabelDaoJpa {
 
         List<Task> tasks = this.taskRepository.findTasksByLabelId(labelId);
         tasks.stream().forEach(task -> task
-                .setLabels(task.getLabels().stream().filter(id -> id != labelId).collect(Collectors.toList())));
+                .setLabels(task.getLabels().stream().filter(id -> !Objects.equals(id, labelId))
+                        .collect(Collectors.toList())));
         this.taskRepository.saveAll(tasks);
 
         List<Transaction> transactions = this.transactionRepository.findTransactionsByLabelId(labelId);
         transactions.stream().forEach(transaction -> transaction
-                .setLabels(transaction.getLabels().stream().filter(id -> id != labelId).collect(Collectors.toList())));
+                .setLabels(transaction.getLabels().stream().filter(id -> !Objects.equals(id, labelId))
+                        .collect(Collectors.toList())));
         this.transactionRepository.saveAll(transactions);
 
         List<Note> notes = this.noteRepository.findNotesByLabelId(labelId);
         notes.stream().forEach(note -> note
-                .setLabels(note.getLabels().stream().filter(id -> id != labelId).collect(Collectors.toList())));
+                .setLabels(note.getLabels().stream().filter(id -> !Objects.equals(id, labelId))
+                        .collect(Collectors.toList())));
         this.noteRepository.saveAll(notes);
+
+        List<SharedProjectItem> sharedProjectItems = this.sharedProjectItemRepository
+                .findSharedProjectItemsByLabelIds(requester, ImmutableList.of(labelId));
+        sharedProjectItems.forEach(item -> item.setLabels(item.getLabels()
+                .stream().filter(id -> !Objects.equals(id, labelId)).collect(Collectors.toList())));
+        this.sharedProjectItemRepository.saveAll(sharedProjectItems);
     }
 
     /**
@@ -167,6 +180,29 @@ public class LabelDaoJpa {
         transactions = filter(transactions, requester, cache);
         notes = filter(notes, requester, cache);
 
+        List<ProjectItemModel> sharedProjectItems = SharedProjectItemDaoJpa.getProjectItemModelsFromSharedItems(
+                null, this.sharedProjectItemRepository.findSharedProjectItemsByLabelIds(requester, labels));
+        List<Task> sharedTasks = new ArrayList<>();
+        List<Note> sharedNotes = new ArrayList<>();
+        List<Transaction> sharedTransactions = new ArrayList<>();
+        for (ProjectItemModel projectItemModel : sharedProjectItems) {
+            if (projectItemModel instanceof Task &&
+                    tasks.stream().noneMatch(t -> Objects.equals(t.getId(), projectItemModel.getId()))) {
+                sharedTasks.add((Task) projectItemModel);
+            }
+            if (projectItemModel instanceof Note &&
+                    notes.stream().noneMatch(n -> Objects.equals(n.getId(), projectItemModel.getId()))) {
+                sharedNotes.add((Note) projectItemModel);
+            }
+            if (projectItemModel instanceof Transaction &&
+                    transactions.stream().noneMatch(t -> Objects.equals(t.getId(), projectItemModel.getId()))) {
+                sharedTransactions.add((Transaction) projectItemModel);
+            }
+        }
+
+        tasks.addAll(sharedTasks);
+        notes.addAll(sharedNotes);
+        transactions.addAll(sharedTransactions);
         // Group project items by date
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
@@ -176,8 +212,18 @@ public class LabelDaoJpa {
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
+        projectItems.forEach(items -> {
+            items.getTasks().stream().filter(task -> sharedTasks.stream()
+                    .anyMatch(t -> Objects.equals(task.getId(), t.getId())))
+                    .forEach(task -> task.setShared(true));
+            items.getNotes().stream().filter(note -> sharedNotes.stream()
+                    .anyMatch(n -> Objects.equals(note.getId(), n.getId())))
+                    .forEach(note -> note.setShared(true));
+            items.getTransactions().stream().filter(transaction -> sharedTransactions.stream()
+                    .anyMatch(t -> Objects.equals(transaction.getId(), t.getId())))
+                    .forEach(transaction -> transaction.setShared(true));
+        });
         return getLabelsForProjectItems(projectItems);
-
     }
 
     private <T extends ProjectItemModel> List<T> filter(List<T> projectItems, String requester,

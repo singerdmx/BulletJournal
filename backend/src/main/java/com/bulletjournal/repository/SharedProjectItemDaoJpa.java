@@ -13,7 +13,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -23,7 +26,7 @@ public class SharedProjectItemDaoJpa {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharedProjectItemDaoJpa.class);
 
     @Autowired
-    private SharedProjectItemRepository sharedProjectItemsRepository;
+    private SharedProjectItemRepository sharedProjectItemRepository;
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -40,8 +43,15 @@ public class SharedProjectItemDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItemModel> getSharedProjectItems(
             String requester, final ContentType contentType) {
+        List<SharedProjectItem> items = this.sharedProjectItemRepository.findByUsername(requester);
+        return getProjectItemModelsFromSharedItems(contentType, items).stream()
+                .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<ProjectItemModel> getProjectItemModelsFromSharedItems(
+            ContentType contentType, List<SharedProjectItem> items) {
         List<ProjectItemModel> result = new ArrayList<>();
-        List<SharedProjectItem> items = this.sharedProjectItemsRepository.findByUsername(requester);
         items.forEach(item -> {
             ProjectItemModel projectItem;
             if (item.hasNote()) {
@@ -60,9 +70,7 @@ public class SharedProjectItemDaoJpa {
             projectItem.setLabels(item.getLabels());
         });
 
-        return result.stream()
-                .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
-                .collect(Collectors.toList());
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -118,7 +126,7 @@ public class SharedProjectItemDaoJpa {
                 default:
                     throw new IllegalArgumentException();
             }
-            this.sharedProjectItemsRepository.save(sharedProjectItem);
+            this.sharedProjectItemRepository.save(sharedProjectItem);
             Event event = new Event(user, projectItem.getId(), projectItem.getName());
             events.add(event);
         }
@@ -148,10 +156,10 @@ public class SharedProjectItemDaoJpa {
         List<SharedProjectItem> sharedProjectItems;
         switch (projectItem.getContentType()) {
             case TASK:
-                sharedProjectItems = this.sharedProjectItemsRepository.findByTask((Task) projectItem);
+                sharedProjectItems = this.sharedProjectItemRepository.findByTask((Task) projectItem);
                 break;
             case NOTE:
-                sharedProjectItems = this.sharedProjectItemsRepository.findByNote((Note) projectItem);
+                sharedProjectItems = this.sharedProjectItemRepository.findByNote((Note) projectItem);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -166,7 +174,7 @@ public class SharedProjectItemDaoJpa {
                 .stream()
                 .filter(item -> Objects.equals(item.getUsername(), user))
                 .findAny().orElseThrow(() -> new ResourceNotFoundException("User " + user + " not found"));
-        this.sharedProjectItemsRepository.delete(sharedProjectItem);
+        this.sharedProjectItemRepository.delete(sharedProjectItem);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -175,11 +183,11 @@ public class SharedProjectItemDaoJpa {
         SharedProjectItem sharedProjectItem;
         switch (contentType) {
             case TASK:
-                sharedProjectItem = this.sharedProjectItemsRepository
+                sharedProjectItem = this.sharedProjectItemRepository
                         .findSharedProjectItemByTaskAndAndUsername((Task) projectItem, requester);
                 break;
             case NOTE:
-                sharedProjectItem = this.sharedProjectItemsRepository
+                sharedProjectItem = this.sharedProjectItemRepository
                         .findSharedProjectItemByNoteAndAndUsername((Note) projectItem, requester);
                 break;
             default:
@@ -187,6 +195,6 @@ public class SharedProjectItemDaoJpa {
         }
 
         sharedProjectItem.setLabels(labels);
-        this.sharedProjectItemsRepository.save(sharedProjectItem);
+        this.sharedProjectItemRepository.save(sharedProjectItem);
     }
 }

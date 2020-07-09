@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SharedProjectItemRepository extends JpaRepository<SharedProjectItem, Long> {
+public interface SharedProjectItemRepository extends JpaRepository<SharedProjectItem, Long>,
+        SharedProjectItemRepositoryCustom {
     List<SharedProjectItem> findByUsername(String username);
 
     List<SharedProjectItem> findByTask(Task task);
