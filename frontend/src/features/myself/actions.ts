@@ -2,6 +2,8 @@ import { actions } from './reducer';
 
 export const updateMyself = () => actions.myselfUpdate({});
 
+export const clearMyself = () => actions.clearMyself({});
+
 export const updateTheme = () => actions.themeUpdate({});
 
 export const expandedMyselfLoading = (loading: boolean) =>

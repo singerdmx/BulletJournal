@@ -5,7 +5,7 @@ import SideLayout from './layouts/side/side.layout';
 import HeaderLayout from './layouts/header/header.layout';
 import ContentLayout from './layouts/content/content.layout';
 import FooterLayout from './layouts/footer/footer.layout';
-import {updateTheme} from './features/myself/actions';
+import {clearMyself, updateTheme} from './features/myself/actions';
 import ReactLoading from 'react-loading';
 import getThemeColorVars from './utils/theme';
 
@@ -21,8 +21,10 @@ export const Loading = () => (
 
 type RootProps = {
   updateTheme: () => void;
+  clearMyself: () => void;
   theme: string;
   loading: boolean;
+  firstTime: boolean;
 };
 
 const App: React.FC<RootProps> = (props) => {
@@ -37,7 +39,6 @@ const App: React.FC<RootProps> = (props) => {
     });
   }, [props.theme]);
 
-  const [run, setRun] = useState(true);
   const [helpers, setHelpers] = useState({});
 
   const steps = [
@@ -107,10 +108,8 @@ const App: React.FC<RootProps> = (props) => {
       const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
       if (finishedStatuses.includes(status)) {
-        setRun(false);
+        props.clearMyself();
       }
-
-      console.log(data);
   };
 
   const getHelpers = (helpers: StoreHelpers) => {
@@ -125,7 +124,7 @@ const App: React.FC<RootProps> = (props) => {
           callback={handleJoyrideCallback}
           continuous={true}
           getHelpers={getHelpers}
-          run={run}
+          run={props.firstTime}
           scrollToFirstStep={true}
           showProgress={true}
           showSkipButton={true}
@@ -151,6 +150,7 @@ const App: React.FC<RootProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
   loading: state.myself.loading,
+  firstTime: state.myself.firstTime
 });
 
-export default connect(mapStateToProps, { updateTheme })(App);
+export default connect(mapStateToProps, { updateTheme, clearMyself })(App);

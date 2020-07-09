@@ -34,6 +34,8 @@ export type PatchMyself = {
   theme?: string;
 };
 
+export type ClearMyself = {};
+
 let initialState = {
   username: '',
   avatar: '',
@@ -59,6 +61,7 @@ const slice = createSlice({
         currency,
         theme,
         points,
+        firstTime
       } = action.payload;
       if (username && username.length > 0) state.username = username;
       if (avatar && avatar.length > 0) state.avatar = avatar;
@@ -67,6 +70,7 @@ const slice = createSlice({
       if (currency && currency.length > 0) state.currency = currency;
       if (theme) state.theme = theme;
       if (points) state.points = points;
+      if (firstTime) state.firstTime = firstTime;
     },
     myselfApiErrorReceived: (
       state,
@@ -75,6 +79,7 @@ const slice = createSlice({
     themeUpdate: (state, action: PayloadAction<ThemeUpdate>) => state,
     myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state,
     patchMyself: (state, action: PayloadAction<PatchMyself>) => state,
+    clearMyself: (state, action: PayloadAction<ClearMyself>) => state,
     expandedMyselfLoading: (
       state,
       action: PayloadAction<ExpandedMyselfLoading>

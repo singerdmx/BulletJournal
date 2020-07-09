@@ -1,12 +1,12 @@
 import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
-  actions as myselfActions,
-  MyselfApiErrorAction,
-  UpdateMyself,
-  PatchMyself,
-  ThemeUpdate,
-  UpdateExpandedMyself,
+    actions as myselfActions,
+    MyselfApiErrorAction,
+    UpdateMyself,
+    PatchMyself,
+    ThemeUpdate,
+    UpdateExpandedMyself, ClearMyself,
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -16,7 +16,7 @@ import {
   getProjectItems,
 } from '../../features/myBuJo/actions';
 import { PayloadAction } from 'redux-starter-kit';
-import { fetchMyself, patchMyself } from '../../apis/myselfApis';
+import { fetchMyself, patchMyself, clearMyself } from '../../apis/myselfApis';
 import moment from 'moment';
 import { dateFormat } from '../myBuJo/constants';
 import { expandedMyselfLoading } from './actions';
@@ -88,6 +88,7 @@ function* updateTheme(action: PayloadAction<ThemeUpdate>) {
         before: data.reminderBeforeTask,
         currency: data.currency,
         theme: data.theme,
+        firstTime: data.firstTime,
       })
     );
     yield put(expandedMyselfLoading(false));
@@ -135,6 +136,14 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
   }
 }
 
+function* unsetMyself(action: PayloadAction<ClearMyself>) {
+    try {
+        yield call(clearMyself);
+    } catch (error) {
+        yield call(message.error, `unsetMyself Error Received: ${error}`);
+    }
+}
+
 export default function* myselfSagas() {
   yield all([
     yield takeLatest(
@@ -143,6 +152,7 @@ export default function* myselfSagas() {
     ),
     yield takeLatest(myselfActions.myselfUpdate.type, myselfUpdate),
     yield takeLatest(myselfActions.patchMyself.type, myselfPatch),
+    yield takeLatest(myselfActions.clearMyself.type, unsetMyself),
     yield takeLatest(
       myselfActions.expandedMyselfUpdate.type,
       getExpandedMyself
