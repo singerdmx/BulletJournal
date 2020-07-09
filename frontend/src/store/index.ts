@@ -11,8 +11,7 @@ export type IState = ReturnType<typeof reducer>;
 export default () => {
   const composeEnhancers = composeWithDevTools({});
   const sagaMiddleware = createSagaMiddleware();
-  const loggerMiddleware = createLogger({ collapsed: true, duration: true });
-  const middleware = [loggerMiddleware, sagaMiddleware];
+  const middleware = [sagaMiddleware];
   const middlewares = applyMiddleware(...middleware);
   const store = createStore(reducer, composeEnhancers(middlewares));
   sagaMiddleware.run(sagas);
