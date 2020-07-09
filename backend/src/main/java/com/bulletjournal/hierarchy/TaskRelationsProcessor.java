@@ -13,6 +13,7 @@ public class TaskRelationsProcessor {
     private static final String SUB_TASKS_KEY = "subTasks";
     private static final Gson GSON = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson HIERARCHY_ITEM_GSON = new Gson();
 
     public static List<Task> processRelations(
             Map<Long, com.bulletjournal.repository.models.Task> taskMap, String relations) {
@@ -23,6 +24,11 @@ public class TaskRelationsProcessor {
             tasks.add(merge(taskMap, task));
         }
         return tasks;
+    }
+
+    public static List<Task> processRelations(Map<Long, com.bulletjournal.repository.models.Task> taskMap,
+                                              List<HierarchyItem> relations) {
+        return processRelations(taskMap, HIERARCHY_ITEM_GSON.toJson(relations));
     }
 
     private static Task merge(Map<Long, com.bulletjournal.repository.models.Task> taskMap, Task cur) {

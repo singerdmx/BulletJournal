@@ -102,7 +102,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 100))
     public List<com.bulletjournal.controller.models.Task> getTasks(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
 
         if (project.isShared()) {
@@ -110,16 +109,33 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                     getSharedProjectItems(requester, ContentType.TASK).stream()
                     .filter(obj -> obj instanceof Task)
                     .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
-            if (!projectTasksOptional.isPresent()) {
-                return this.labelDaoJpa.getLabelsForProjectItemList(tasks.stream().map(
-                        task -> task.toPresentationModel()
-                ).collect(Collectors.toList()));
+
+            List<com.bulletjournal.controller.models.Task> ret = new ArrayList<>();
+
+            if (projectTasksOptional.isPresent()) {
+                ProjectTasks projectTasks = projectTasksOptional.get();
+                Set<Long> existingIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toSet());
+
+                Pair<List<HierarchyItem>, Set<Long>> hierarchy =
+                        HierarchyProcessor.findAllIds(projectTasks.getTasks(), existingIds);
+
+                List<HierarchyItem> keptHierarchy = hierarchy.getLeft();
+                Set<Long> processedIds = hierarchy.getRight();
+
+                final Map<Long, Task> taskMap = tasks.stream().filter(t -> processedIds.contains(t.getId()))
+                        .collect(Collectors.toMap(n -> n.getId(), n -> n));
+
+                ret.addAll(TaskRelationsProcessor.processRelations(taskMap, keptHierarchy).stream()
+                        .map(task -> addLabels(task, taskMap)).collect(Collectors.toList()));
+
+                tasks = tasks.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
             }
-            ProjectTasks projectTasks = projectTasksOptional.get();
-            final Map<Long, Task> taskMap = tasks.stream()
-                    .collect(Collectors.toMap(n -> n.getId(), n -> n));
-            return TaskRelationsProcessor.processRelations(taskMap, projectTasks.getTasks()).stream()
-                    .map(task -> addLabels(task, taskMap)).collect(Collectors.toList());
+
+            ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(tasks.stream().map(
+                    task -> task.toPresentationModel()
+            ).collect(Collectors.toList())));
+
+            return ret;
         }
         if (!projectTasksOptional.isPresent()) {
             return Collections.emptyList();

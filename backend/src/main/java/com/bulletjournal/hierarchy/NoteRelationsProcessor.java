@@ -13,6 +13,7 @@ public class NoteRelationsProcessor {
     private static final String SUB_NOTES_KEY = "subNotes";
     private static final Gson GSON = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson HIERARCHY_ITEM_GSON = new Gson();
 
     public static List<Note> processRelations(
             Map<Long, com.bulletjournal.repository.models.Note> noteMap, String relations) {
@@ -23,6 +24,11 @@ public class NoteRelationsProcessor {
             notes.add(merge(noteMap, note));
         }
         return notes;
+    }
+
+    public static List<Note> processRelations(Map<Long, com.bulletjournal.repository.models.Note> noteMap,
+                                              List<HierarchyItem> relations) {
+        return processRelations(noteMap, HIERARCHY_ITEM_GSON.toJson(relations));
     }
 
     private static Note merge(Map<Long, com.bulletjournal.repository.models.Note> noteMap, Note cur) {
