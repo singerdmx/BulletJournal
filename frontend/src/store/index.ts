@@ -4,7 +4,6 @@ import createSagaMiddleware from 'redux-saga';
 import {combineReducers} from 'redux-starter-kit';
 import sagas from './sagas';
 import reducers from './reducers';
-import { createLogger } from 'redux-logger';
 
 const reducer = combineReducers(reducers);
 export type IState = ReturnType<typeof reducer>;
