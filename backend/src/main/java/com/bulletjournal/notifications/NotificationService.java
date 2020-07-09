@@ -3,7 +3,6 @@ package com.bulletjournal.notifications;
 import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
-import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;

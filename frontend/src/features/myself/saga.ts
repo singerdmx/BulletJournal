@@ -44,6 +44,7 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
         currency: data.currency,
         theme: data.theme,
         points: data.points,
+        firstTime: data.firstTime,
       })
     );
     const state: IState = yield select();

@@ -8,6 +8,7 @@ export type MyselfWithAvatar = {
   currency?: string;
   theme?: string;
   points?: number;
+  firstTime?: boolean;
 };
 
 export type MyselfApiErrorAction = {
@@ -42,6 +43,7 @@ let initialState = {
   theme: 'LIGHT',
   loading: false,
   points: 0,
+  firstTime: false
 };
 
 const slice = createSlice({

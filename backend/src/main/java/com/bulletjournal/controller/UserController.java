@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.RedisUserRepository;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -39,6 +40,9 @@ public class UserController {
     @Autowired
     private RedisUserRepository redisUserRepository;
 
+    @Autowired
+    private FirstTimeUserRepository firstTimeUserRepository;
+
     @GetMapping(GET_USER_ROUTE)
     public User getUser(@NotNull @PathVariable String username) {
         return this.userClient.getUser(username);
@@ -61,7 +65,8 @@ public class UserController {
             points = user.getPoints();
         }
         User self = userClient.getUser(username);
-        return new Myself(self, timezone, before, currency, theme, points);
+        return new Myself(self, timezone, before, currency, theme, points,
+                this.firstTimeUserRepository.existsById(username));
     }
 
     @PatchMapping(MYSELF_ROUTE)

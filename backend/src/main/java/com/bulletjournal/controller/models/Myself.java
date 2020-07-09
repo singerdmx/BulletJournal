@@ -15,11 +15,18 @@ public class Myself extends User {
 
     private Integer points;
 
+    private boolean firstTime = false;
+
     public Myself() {
     }
 
     public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme,
-            Integer points) {
+                  Integer points) {
+        this(user, timezone, reminderBeforeTask, currency, theme, points, false);
+    }
+
+    public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme,
+                  Integer points, boolean firstTime) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
         if (reminderBeforeTask != null) {
@@ -28,6 +35,7 @@ public class Myself extends User {
         this.currency = currency;
         this.theme = theme;
         this.points = points;
+        this.firstTime = firstTime;
     }
 
     public String getTimezone() {
@@ -76,5 +84,13 @@ public class Myself extends User {
 
     public void setPoints(Integer points) {
         this.points = points;
+    }
+
+    public boolean isFirstTime() {
+        return firstTime;
+    }
+
+    public void setFirstTime(boolean firstTime) {
+        this.firstTime = firstTime;
     }
 }

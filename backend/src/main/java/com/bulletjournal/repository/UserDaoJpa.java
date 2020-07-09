@@ -5,6 +5,8 @@ import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.redis.FirstTimeUserRepository;
+import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
@@ -32,6 +34,9 @@ public class UserDaoJpa {
     @Autowired
     private LabelDaoJpa labelDaoJpa;
 
+    @Autowired
+    private FirstTimeUserRepository firstTimeUserRepository;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
         List<User> userList = this.userRepository.findByName(name);
@@ -58,7 +63,9 @@ public class UserDaoJpa {
         user.addGroup(group);
         this.userGroupRepository.save(new UserGroup(user, group, true));
         this.labelDaoJpa.createDefaultLabels(name);
-        return this.userRepository.save(user);
+        user = this.userRepository.save(user);
+        this.firstTimeUserRepository.save(new FirstTimeUser(user.getName()));
+        return user;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
