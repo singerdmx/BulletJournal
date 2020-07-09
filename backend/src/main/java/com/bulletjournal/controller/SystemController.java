@@ -106,19 +106,13 @@ public class SystemController {
         List<Etag> cachingEtags = new ArrayList<>();
 
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
-
-            // Look up etag from cache
-            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.PROJECT);
-
-            // TODO: If cache missed, write new etag to redis
-            String projectsEtag = this.projectDaoJpa.getUserEtag(username);
-
-            int splitterPosition = projectsEtag.lastIndexOf("|");
-            if (splitterPosition != -1) {
-                ownedProjectsEtag = projectsEtag.substring(0, splitterPosition);
-                sharedProjectsEtag = projectsEtag.substring(splitterPosition + 1);
-                cachingEtags.add(new Etag(username, EtagType.PROJECT, projectsEtag));
-            }
+            Projects projects = this.projectDaoJpa.getProjects(username);
+            ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE,
+                    projects.getOwned());
+            sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE,
+                    projects.getShared());
         }
         if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
 
