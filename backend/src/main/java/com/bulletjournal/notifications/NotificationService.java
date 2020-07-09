@@ -71,12 +71,12 @@ public class NotificationService {
         this.eventQueue.offer(removeElasticsearchDocumentEvent);
     }
 
-    public void cacheEtag(Etag etag) {
-        LOGGER.info("Received etag: " + etag);
-        if (etag == null) {
+    public void cacheEtag(CreateEtagEvent createEtagEvent) {
+        LOGGER.info("Received etag: " + createEtagEvent);
+        if (createEtagEvent == null) {
             return;
         }
-        this.eventQueue.offer(etag);
+        this.eventQueue.offer(createEtagEvent);
     }
 
     public void handleNotifications() {
