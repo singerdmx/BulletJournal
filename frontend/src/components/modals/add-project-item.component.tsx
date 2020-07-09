@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
 import { createProjectByName } from '../../features/project/actions';
-import { updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { iconMapper } from '../side-menu/side-menu.component';
@@ -29,8 +27,6 @@ type ProjectItemProps = {
 
 //props of groups
 type GroupProps = {
-  groups: GroupsWithOwner[];
-  updateGroups: () => void;
   updateTaskVisible: (addTaskVisible: boolean) => void;
   updateNoteVisible: (addNoteVisible: boolean) => void;
   updateTransactionVisible: (addTransactionVisible: boolean) => void;
@@ -47,7 +43,6 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
   };
 
   useEffect(() => {
-    props.updateGroups();
     setProjects([]);
     setProjects(flattenOwnedProject(props.ownedProjects, projects));
     setProjects(flattenSharedProject(props.sharedProjects, projects));
@@ -164,14 +159,12 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  groups: state.group.groups,
   project: state.project.project,
   ownedProjects: state.project.owned,
   sharedProjects: state.project.shared,
 });
 
 export default connect(mapStateToProps, {
-  updateGroups,
   createProjectByName,
   updateTaskVisible,
   updateNoteVisible,

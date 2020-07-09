@@ -3,9 +3,7 @@ import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { RightCircleOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
 import { createProjectByName } from '../../features/project/actions';
-import { updateGroups } from '../../features/group/actions';
 import { IState } from '../../store';
 import { Project, ProjectsWithOwner } from '../../features/project/interface';
 import { iconMapper } from '../side-menu/side-menu.component';
@@ -36,8 +34,6 @@ type ProjectItemProps = {
 
 //props of groups
 type GroupProps = {
-  groups: GroupsWithOwner[];
-  updateGroups: () => void;
   moveNote: (noteId: number, targetProject: number, history: History) => void;
   moveTask: (taskId: number, targetProject: number, history: History) => void;
   moveTransaction: (
@@ -62,10 +58,6 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
   const openModal = () => {
     setVisible(true);
   };
-
-  useEffect(() => {
-    props.updateGroups();
-  }, []);
 
   useEffect(() => {
     let updateProjects = [] as Project[];
@@ -194,14 +186,12 @@ const MoveProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  groups: state.group.groups,
   project: state.project.project,
   ownedProjects: state.project.owned,
   sharedProjects: state.project.shared,
 });
 
 export default connect(mapStateToProps, {
-  updateGroups,
   createProjectByName,
   moveNote,
   moveTask,
