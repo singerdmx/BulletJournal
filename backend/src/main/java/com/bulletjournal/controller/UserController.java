@@ -3,7 +3,6 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.redis.FirstTimeUserRepository;
-import com.bulletjournal.redis.RedisUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -36,9 +35,6 @@ public class UserController {
 
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
-
-    @Autowired
-    private RedisUserRepository redisUserRepository;
 
     @Autowired
     private FirstTimeUserRepository firstTimeUserRepository;

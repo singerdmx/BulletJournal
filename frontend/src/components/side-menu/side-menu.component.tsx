@@ -116,7 +116,7 @@ class SideMenu extends React.Component<
           title={
             <span>
               <SketchOutlined />
-              <span>My BuJo</span>
+              <span id='myBuJo'>My BuJo</span>
             </span>
           }
         >
@@ -143,7 +143,7 @@ class SideMenu extends React.Component<
           title={
             <span>
               <FolderOutlined />
-              <span>Journals</span>
+              <span id='ownBuJos'>Journals</span>
             </span>
           }
           onTitleClick={this.onGroupsClick}
@@ -182,7 +182,7 @@ class SideMenu extends React.Component<
           title={
             <span>
               <TeamOutlined />
-              <span>Groups</span>
+              <span id='allGroups'>Groups</span>
             </span>
           }
         >
@@ -212,11 +212,11 @@ class SideMenu extends React.Component<
         </SubMenu>
         <Menu.Item key='labels'>
           <TagsOutlined />
-          Labels
+          <span id='labels'>Labels</span>
         </Menu.Item>
         <Menu.Item key='settings'>
           <SettingOutlined />
-          Settings
+          <span id='settings'>Settings</span>
         </Menu.Item>
         <Menu.Item key='ads'>
           <ins

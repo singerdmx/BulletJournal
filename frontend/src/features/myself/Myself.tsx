@@ -58,7 +58,7 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
   };
 
   render() {
-    let plusIcon = null;
+    let plusIcon;
     if (
       this.props.ownedProjects.length === 0 &&
       this.props.sharedProjects.length === 0
@@ -71,7 +71,7 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
     }
     return (
       <div className='myselfContainer'>
-        {plusIcon}
+        <span id='createNewBuJo'>{plusIcon}</span>
         <Tooltip placement='bottom' title='Refresh'>
           <SyncOutlined
             onClick={this.handleRefreshOnClick}
