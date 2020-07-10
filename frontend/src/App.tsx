@@ -55,7 +55,7 @@ const App: React.FC<RootProps> = (props) => {
       target: 'body',
       styles: {
         options: {
-          width: 420,
+          width: 350,
         },
       },
     },
@@ -64,6 +64,7 @@ const App: React.FC<RootProps> = (props) => {
       content: (
         <h4>Invite people to join your group to collaborate and share</h4>
       ),
+      spotlightPadding: 30,
       placement: 'bottom',
       target: '#allGroups',
     },
@@ -75,7 +76,7 @@ const App: React.FC<RootProps> = (props) => {
       floaterProps: {
         disableAnimation: true,
       },
-      spotlightPadding: 20,
+      spotlightPadding: 0,
       target: '#createNewBuJo',
     },
     {
@@ -83,6 +84,7 @@ const App: React.FC<RootProps> = (props) => {
       content: (
         <h4>You can change ordering or move your BuJo under other BuJo</h4>
       ),
+      spotlightPadding: 30,
       target: '#ownBuJos',
     },
     {
@@ -93,7 +95,7 @@ const App: React.FC<RootProps> = (props) => {
       floaterProps: {
         disableAnimation: true,
       },
-      spotlightPadding: 20,
+      spotlightPadding: 30,
       target: '#labels',
     },
     {
@@ -102,7 +104,7 @@ const App: React.FC<RootProps> = (props) => {
       floaterProps: {
         disableAnimation: true,
       },
-      spotlightPadding: 20,
+      spotlightPadding: 30,
       target: '#settings',
     },
     {
@@ -111,7 +113,7 @@ const App: React.FC<RootProps> = (props) => {
       floaterProps: {
         disableAnimation: true,
       },
-      spotlightPadding: 20,
+      spotlightPadding: 30,
       target: '#myBuJo',
     },
   ] as Step[];
@@ -137,7 +139,7 @@ const App: React.FC<RootProps> = (props) => {
         callback={handleJoyrideCallback}
         continuous={true}
         getHelpers={getHelpers}
-        run={true}
+        run={props.firstTime}
         scrollToFirstStep={true}
         showProgress={true}
         showSkipButton={true}
