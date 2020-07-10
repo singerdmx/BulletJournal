@@ -139,6 +139,7 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
 function* unsetMyself(action: PayloadAction<ClearMyself>) {
     try {
         yield call(clearMyself);
+        yield put(myselfActions.myselfDataReceived({firstTime: false}));
     } catch (error) {
         yield call(message.error, `unsetMyself Error Received: ${error}`);
     }
