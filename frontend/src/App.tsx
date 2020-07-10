@@ -1,17 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {Layout} from 'antd';
-import Joyride, {CallBackProps, STATUS, Step, StoreHelpers} from 'react-joyride';
+import React, { useEffect, useState } from 'react';
+import { Layout } from 'antd';
+import Joyride, {
+  CallBackProps,
+  STATUS,
+  Step,
+  StoreHelpers,
+} from 'react-joyride';
 import SideLayout from './layouts/side/side.layout';
 import HeaderLayout from './layouts/header/header.layout';
 import ContentLayout from './layouts/content/content.layout';
 import FooterLayout from './layouts/footer/footer.layout';
-import {clearMyself, updateTheme} from './features/myself/actions';
+import { clearMyself, updateTheme } from './features/myself/actions';
 import ReactLoading from 'react-loading';
 import getThemeColorVars from './utils/theme';
 
 import './styles/main.less';
-import {connect} from 'react-redux';
-import {IState} from './store';
+import { connect } from 'react-redux';
+import { IState } from './store';
 
 export const Loading = () => (
   <div className="loading">
@@ -46,7 +51,7 @@ const App: React.FC<RootProps> = (props) => {
       title: 'Welcome to Bullet Journal',
       content: <h2>Let's walk the Journey of Bullet Journal</h2>,
       placement: 'center',
-      locale: {skip: <strong aria-label="skip">SKIP</strong>},
+      locale: { skip: <strong aria-label="skip">SKIP</strong> },
       target: 'body',
       styles: {
         options: {
@@ -56,13 +61,17 @@ const App: React.FC<RootProps> = (props) => {
     },
     {
       title: 'Create new group here',
-      content: <h4>Invite people to join your group to collaborate and share</h4>,
+      content: (
+        <h4>Invite people to join your group to collaborate and share</h4>
+      ),
       placement: 'bottom',
       target: '#allGroups',
     },
     {
       title: 'Create a new BuJo here',
-      content: <h4>'BuJo' is a folder for notes or a project for To-Do list</h4>,
+      content: (
+        <h4>'BuJo' is a folder for notes or a project for To-Do list</h4>
+      ),
       floaterProps: {
         disableAnimation: true,
       },
@@ -71,12 +80,16 @@ const App: React.FC<RootProps> = (props) => {
     },
     {
       title: 'View your created BuJo here',
-      content: <h4>You can change ordering or move your BuJo under other BuJo</h4>,
+      content: (
+        <h4>You can change ordering or move your BuJo under other BuJo</h4>
+      ),
       target: '#ownBuJos',
     },
     {
       title: 'Create label here',
-      content: <h4>Attach label to note or task so you can find them by label</h4>,
+      content: (
+        <h4>Attach label to note or task so you can find them by label</h4>
+      ),
       floaterProps: {
         disableAnimation: true,
       },
@@ -104,12 +117,12 @@ const App: React.FC<RootProps> = (props) => {
   ] as Step[];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-      const { status, type } = data;
-      const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+    const { status, type } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
-      if (finishedStatuses.includes(status)) {
-        props.clearMyself();
-      }
+    if (finishedStatuses.includes(status)) {
+      props.clearMyself();
+    }
   };
 
   const getHelpers = (helpers: StoreHelpers) => {
@@ -121,19 +134,20 @@ const App: React.FC<RootProps> = (props) => {
   ) : (
     <div className="App">
       <Joyride
-          callback={handleJoyrideCallback}
-          continuous={true}
-          getHelpers={getHelpers}
-          run={props.firstTime}
-          scrollToFirstStep={true}
-          showProgress={true}
-          showSkipButton={true}
-          steps={steps}
-          styles={{
-            options: {
-              zIndex: 10000,
-            },
-          }}
+        callback={handleJoyrideCallback}
+        continuous={true}
+        getHelpers={getHelpers}
+        run={true}
+        scrollToFirstStep={true}
+        showProgress={true}
+        showSkipButton={true}
+        steps={steps}
+        styles={{
+          options: {
+            zIndex: 10000,
+            primaryColor: '#428bca',
+          },
+        }}
       />
       <Layout className="layout">
         <SideLayout />
@@ -150,7 +164,7 @@ const App: React.FC<RootProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
   loading: state.myself.loading,
-  firstTime: state.myself.firstTime
+  firstTime: state.myself.firstTime,
 });
 
 export default connect(mapStateToProps, { updateTheme, clearMyself })(App);
