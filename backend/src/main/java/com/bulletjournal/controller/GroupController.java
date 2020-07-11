@@ -5,6 +5,9 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.redis.RedisEtagDaoJpa;
+import com.bulletjournal.redis.models.Etag;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.GroupDaoJpa;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
@@ -38,6 +41,9 @@ public class GroupController {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private RedisEtagDaoJpa redisEtagDaoJpa;
 
     @PostMapping(GROUPS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -107,6 +113,9 @@ public class GroupController {
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(groupsEtag);
+
+        // Store etag to redis
+        redisEtagDaoJpa.singleCache(new Etag(username, EtagType.GROUP, groupsEtag));
 
         return ResponseEntity.ok().headers(responseHeader).body(GroupsWithOwner.addOwnerAvatar(result, this.userClient));
     }

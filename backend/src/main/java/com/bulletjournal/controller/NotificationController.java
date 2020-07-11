@@ -6,6 +6,9 @@ import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.redis.RedisEtagDaoJpa;
+import com.bulletjournal.redis.models.Etag;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
@@ -49,6 +52,9 @@ public class NotificationController {
     @Autowired
     private GroupRepository groupRepository;
 
+    @Autowired
+    private RedisEtagDaoJpa redisEtagDaoJpa;
+
     @GetMapping(NOTIFICATIONS_ROUTE)
     public ResponseEntity<List<Notification>> getNotifications() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -60,6 +66,9 @@ public class NotificationController {
 
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(notificationsEtag);
+
+        // Store Etag to cache
+        redisEtagDaoJpa.singleCache(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
 
         return ResponseEntity.ok().headers(responseHeader).body(notificationList);
     }
