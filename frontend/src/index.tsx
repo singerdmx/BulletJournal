@@ -9,6 +9,7 @@ import PublicPage from './Public';
 import PrivacyPage from './Privacy';
 import TermsOfServicePage from './TermsOfService';
 import TemplatesPage from './templates';
+import TokenPage from "./Token";
 
 const store = createStore();
 
@@ -56,6 +57,7 @@ function listen() {
                         <Route exact path="/public/tos" component={TermsOfServicePage}/>
                         <Route exact path="/public/templates" component={TemplatesPage}/>
                         <Route exact path="/public/items/:itemId" component={PublicPage}/>
+                        <Route exact path="/tokens/:token" component={TokenPage}/>
                         <Route path="/">
                             <HashRouter>
                                 <Route path="/" component={App}/>

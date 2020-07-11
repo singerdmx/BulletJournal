@@ -26,14 +26,6 @@ import { IState } from '../../store';
 import { clearUser } from '../user/actions';
 import { actions as SystemActions } from '../system/reducer';
 
-const flattenGroup = (groups: any) => {
-  let res = [] as any;
-  groups.forEach((element: any) => {
-    res.push(...element.groups);
-  });
-  return res;
-};
-
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
 }
@@ -54,7 +46,6 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
       );
     }
     const groups = yield data.json();
-    const allGroups = flattenGroup(groups);
     yield put(groupsActions.groupsReceived({ groups: groups }));
   } catch (error) {
     yield call(message.error, `groupsUpdate Error Received: ${error}`);
