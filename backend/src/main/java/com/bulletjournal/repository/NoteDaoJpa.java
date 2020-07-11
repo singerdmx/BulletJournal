@@ -77,7 +77,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
             List<com.bulletjournal.controller.models.Note> ret = new ArrayList<>();
 
-            if (!projectNotesOptional.isPresent()) {
+            if (projectNotesOptional.isPresent()) {
                 ProjectNotes projectNotes = projectNotesOptional.get();
                 Set<Long> existingIds = notes.stream().map(note -> note.getId()).collect(Collectors.toSet());
 
