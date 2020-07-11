@@ -7,7 +7,6 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
-import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Group;
@@ -68,7 +67,7 @@ public class NotificationController {
         responseHeader.setETag(notificationsEtag);
 
         // Store Etag to cache
-        redisEtagDaoJpa.singleCache(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
+        redisEtagDaoJpa.singleCache(username, EtagType.NOTIFICATION, notificationsEtag);
 
         return ResponseEntity.ok().headers(responseHeader).body(notificationList);
     }

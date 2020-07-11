@@ -1,5 +1,7 @@
 package com.bulletjournal.redis.models;
 
+import java.util.Objects;
+
 public enum EtagType {
     NOTIFICATION(0, "Notification"),
     GROUP(1, "Group"),
@@ -15,16 +17,13 @@ public enum EtagType {
     }
 
     public static EtagType of(String type) {
-        switch (type) {
-            case "Notification":
-                return NOTIFICATION;
-            case "Group":
-                return GROUP;
-            case "UserGroups":
-                return USER_GROUP;
-            default:
-                throw new IllegalArgumentException("Unknown Etag Type");
+        for (EtagType etagType : values()) {
+            if (Objects.equals(type, etagType.toString())) {
+                return etagType;
+            }
         }
+
+        throw new IllegalArgumentException("Unknown Etag Type " + type);
     }
 
     @Override

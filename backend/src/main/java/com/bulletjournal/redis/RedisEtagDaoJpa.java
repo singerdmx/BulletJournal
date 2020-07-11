@@ -28,14 +28,16 @@ public class RedisEtagDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<EtagEvent> etagEvents) {
+        if (etagEvents.isEmpty()) {
+            return;
+        }
         Set<EtagEvent> uniqueEvents = new HashSet<>(etagEvents);
         List<Etag> etags = computeEtags(uniqueEvents);
         this.batchCache(etags);
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void singleCache(Etag etag) {
-        this.redisEtagRepository.save(etag);
+    public void singleCache(String username, EtagType type, String etag) {
+        this.redisEtagRepository.save(new Etag(username, type, etag));
     }
 
     /**
