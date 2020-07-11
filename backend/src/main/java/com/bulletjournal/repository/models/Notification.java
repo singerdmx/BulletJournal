@@ -1,11 +1,15 @@
 package com.bulletjournal.repository.models;
 
+
+import com.bulletjournal.repository.auditing.NotificationEntityListeners;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "notifications")
+@EntityListeners(value = {NotificationEntityListeners.class})
 public class Notification extends AuditModel {
 
     @Id
