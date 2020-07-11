@@ -71,7 +71,7 @@ public class RedisEtagDaoJpa {
      * @return a list of etag instances
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Etag> computeEtags(Set<EtagEvent> events) {
+    List<Etag> computeEtags(Set<EtagEvent> events) {
         List<Etag> etags = new ArrayList<>();
         Map<EtagType, Set<String>> aggregateMap = new HashMap<>();
         events.forEach(e -> aggregateMap.computeIfAbsent(e.getEtagType(), n -> new HashSet<>()).add(e.getContentId()));
@@ -82,6 +82,9 @@ public class RedisEtagDaoJpa {
 
         for (EtagType type : aggregateMap.keySet()) {
             Set<String> contentIds = aggregateMap.get(type);
+            if (contentIds.isEmpty()) {
+                continue;
+            }
             Etaggable dao = daos.getDaos().get(type);
             Set<String> affectedUsernames = dao.findAffectedUsernames(contentIds); // Batch get affected usernames
             affectedUsernames.forEach(username -> {
