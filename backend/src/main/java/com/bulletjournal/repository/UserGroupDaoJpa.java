@@ -4,16 +4,14 @@ import com.bulletjournal.repository.factory.Etaggable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-@Deprecated
 @Repository
-public class UserProjectsDaoJpa implements Etaggable {
+public class UserGroupDaoJpa implements Etaggable {
 
     @Autowired
-    private ProjectDaoJpa projectDaoJpa;
-
+    private UserGroupRepository userGroupRepository;
     /**
      * Get project ids from ProjectDaoJpa with HierarchyProcessor's findAllIds API.
      * Pass project id set to ProjectDaoJpa again to retrieve affected usernames.
@@ -24,16 +22,17 @@ public class UserProjectsDaoJpa implements Etaggable {
     @Deprecated
     @Override
     public Set<String> findAffectedUsernames(Set<String> contentIds) {
-        Set<Long> projectIds = this.projectDaoJpa.getProjectIdsByOwners(contentIds);
-        return this.projectDaoJpa.findAffectedUsernames(projectIds
-                .stream()
-                .map(String::valueOf)
-                .collect(Collectors.toSet()));
+        Set<String> usernames = new HashSet<>();
+
+        // Todo: Needs to convert from String to UserGroupKey
+        //userGroupRepository.findAllById(contentIds);
+
+        return usernames;
     }
 
     @Deprecated
     @Override
     public String getUserEtag(String username) {
-        return this.projectDaoJpa.getUserEtag(username);
+        return null;
     }
 }

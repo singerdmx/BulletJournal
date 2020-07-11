@@ -70,12 +70,12 @@ public class NotificationService {
         this.eventQueue.offer(removeElasticsearchDocumentEvent);
     }
 
-    public void cacheEtag(CreateEtagEvent createEtagEvent) {
-        LOGGER.info("Received etag: " + createEtagEvent);
-        if (createEtagEvent == null) {
+    public void cacheEtag(EtagEvent etagEvent) {
+        LOGGER.info("Received etag: " + etagEvent);
+        if (etagEvent == null) {
             return;
         }
-        this.eventQueue.offer(createEtagEvent);
+        this.eventQueue.offer(etagEvent);
     }
 
     public void handleNotifications() {
@@ -97,7 +97,7 @@ public class NotificationService {
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
-            List<CreateEtagEvent> createEtagEvents = new ArrayList<>();
+            List<EtagEvent> etagEvents = new ArrayList<>();
             events.forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
@@ -105,8 +105,8 @@ public class NotificationService {
                     auditables.add((Auditable) e);
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
-                } else if (e instanceof CreateEtagEvent) {
-                    createEtagEvents.add((CreateEtagEvent) e);
+                } else if (e instanceof EtagEvent) {
+                    etagEvents.add((EtagEvent) e);
                 }
             });
             try {
@@ -131,8 +131,8 @@ public class NotificationService {
                 LOGGER.error("Error on deleting records in SearchIndexDaoJpa", ex);
             }
             try {
-                if (!createEtagEvents.isEmpty()) {
-                    this.redisEtagDaoJpa.create(createEtagEvents);
+                if (!etagEvents.isEmpty()) {
+                    this.redisEtagDaoJpa.create(etagEvents);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on deleting records in RedisEtagDaoJpa", ex);

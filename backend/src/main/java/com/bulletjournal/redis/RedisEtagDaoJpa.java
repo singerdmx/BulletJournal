@@ -1,6 +1,6 @@
 package com.bulletjournal.redis;
 
-import com.bulletjournal.notifications.CreateEtagEvent;
+import com.bulletjournal.notifications.EtagEvent;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
@@ -27,10 +27,15 @@ public class RedisEtagDaoJpa {
      * @param etagEvents a list of etag event instance contains contentId and EtagType
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void create(List<CreateEtagEvent> etagEvents) {
-        Set<CreateEtagEvent> uniqueEvents = new HashSet<>(etagEvents);
+    public void create(List<EtagEvent> etagEvents) {
+        Set<EtagEvent> uniqueEvents = new HashSet<>(etagEvents);
         List<Etag> etags = computeEtags(uniqueEvents);
         this.batchCache(etags);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void singleCache(Etag etag) {
+        this.redisEtagRepository.save(etag);
     }
 
     /**
@@ -49,6 +54,7 @@ public class RedisEtagDaoJpa {
      * @param etagType the etag type enum
      * @return an etag instance
      */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Etag findEtagsByIndex(String username, EtagType etagType) {
         return this.redisEtagRepository.findByIndex(username + "@" + etagType.toString());
     }
@@ -65,15 +71,14 @@ public class RedisEtagDaoJpa {
      * @return a list of etag instances
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Etag> computeEtags(Set<CreateEtagEvent> events) {
+    public List<Etag> computeEtags(Set<EtagEvent> events) {
         List<Etag> etags = new ArrayList<>();
         Map<EtagType, Set<String>> aggregateMap = new HashMap<>();
         events.forEach(e -> aggregateMap.computeIfAbsent(e.getEtagType(), n -> new HashSet<>()).add(e.getContentId()));
 
-        // merge USER_PROJECTS and PROJECT
-        aggregateMap.computeIfAbsent(EtagType.PROJECT, n -> new HashSet<>()).addAll(
-                aggregateMap.getOrDefault(EtagType.USER_PROJECTS, Collections.emptySet()));
-        aggregateMap.remove(EtagType.USER_PROJECTS);
+        aggregateMap.computeIfAbsent(EtagType.GROUP, n -> new HashSet<>())
+                .addAll(aggregateMap.getOrDefault(EtagType.USER_GROUP, Collections.emptySet()));
+        aggregateMap.remove(EtagType.USER_GROUP);
 
         for (EtagType type : aggregateMap.keySet()) {
             Set<String> contentIds = aggregateMap.get(type);

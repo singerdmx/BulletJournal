@@ -3,8 +3,7 @@ package com.bulletjournal.redis.models;
 public enum EtagType {
     NOTIFICATION(0, "Notification"),
     GROUP(1, "Group"),
-    PROJECT(2, "Project"),
-    USER_PROJECTS(3, "UserProjects");
+    USER_GROUP(2, "UserGroups");
 
     public final int value;
 
@@ -21,10 +20,8 @@ public enum EtagType {
                 return NOTIFICATION;
             case "Group":
                 return GROUP;
-            case "Project":
-                return PROJECT;
-            case "UserProjects":
-                return USER_PROJECTS;
+            case "UserGroups":
+                return USER_GROUP;
             default:
                 throw new IllegalArgumentException("Unknown Etag Type");
         }
