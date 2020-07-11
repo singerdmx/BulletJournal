@@ -59,71 +59,8 @@ SSL Certificate Renewal
 ===
 
 1. Stop auth-proxy container
-2. Run `sudo certbot certonly --standalone` (TODO: try `certbot renew`) 
-3. Copy the pem files to local machine `scp root@198.199.76.77:/etc/letsencrypt/live/bulletjournal.us-0001/* .`
-4. Rename `cert.pem` to `bulletjournal.us.cert` and `privkey.pem` to `bulletjournal.us.key`
+2. Run `certbot renew`
+3. Copy the pem files to local machine `scp root@198.199.76.77:/etc/letsencrypt/live/bulletjournal.us-0003/* .`
+4. Rename `fullchain.pem.pem` to `bulletjournal.us.cert` and `privkey.pem` to `bulletjournal.us.key`
 5. Update `discourse-auth-proxy/start.sh` for sso-secret
 6. Upgrade image by running `docker build -t xcode1024/auth-proxy:[version] .`
-
-The output of step 2 is as follows:
-```
-Saving debug log to /var/log/letsencrypt/letsencrypt.log
-
-Plugins selected: Authenticator standalone, Installer None
-
-Please enter in your domain name(s) (comma and/or space separated)  (Enter 'c'
-
-to cancel): bulletjournal.us
-
-Cert not yet due for renewal
-
-
-
-You have an existing certificate that has exactly the same domains or certificate name you requested and isn't close to expiry.
-
-(ref: /etc/letsencrypt/renewal/bulletjournal.us-0001.conf)
-
-
-
-What would you like to do?
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-1: Keep the existing certificate for now
-
-2: Renew & replace the cert (limit ~5 per 7 days)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 2
-
-Renewing an existing certificate
-
-
-
-IMPORTANT NOTES:
-
- - Congratulations! Your certificate and chain have been saved at:
-
-   /etc/letsencrypt/live/bulletjournal.us-0001/fullchain.pem
-
-   Your key file has been saved at:
-
-   /etc/letsencrypt/live/bulletjournal.us-0001/privkey.pem
-
-   Your cert will expire on 2020-07-27. To obtain a new or tweaked
-
-   version of this certificate in the future, simply run certbot
-
-   again. To non-interactively renew *all* of your certificates, run
-
-   "certbot renew"
-
- - If you like Certbot, please consider supporting our work by:
-
-
-
-   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
-
-   Donating to EFF:                    https://eff.org/donate-le
-```
