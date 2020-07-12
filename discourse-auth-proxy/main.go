@@ -181,8 +181,8 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 
 	if err == nil {
 		if isMobile(r) {
-			r.RequestURI = "/home/index.html"
-			handler.ServeHTTP(w, r)
+			proxyReq, _ := http.NewRequest("GET", "https://bulletjournal.us/home/index.html", nil)
+			handler.ServeHTTP(w, proxyReq)
 			return
 		}
 		logger.Printf("%s %s, %s", r.Header.Get("request-id"), username, r.RequestURI)
