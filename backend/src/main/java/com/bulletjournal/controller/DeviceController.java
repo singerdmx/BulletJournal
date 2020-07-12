@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Objects;
 
 @RestController
-public class FirebaseController {
+public class DeviceController {
 
     protected static final String DEVICE_TOKEN_ROUTE = "/api/deviceTokens";
 
@@ -25,7 +25,7 @@ public class FirebaseController {
 
     protected static final String EXISTED_RESPONSE = "token already exists";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FirebaseController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceController.class);
 
     @Autowired
     private DeviceTokenDaoJpa deviceTokenDaoJpa;

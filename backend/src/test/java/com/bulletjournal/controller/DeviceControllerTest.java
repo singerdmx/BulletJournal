@@ -28,15 +28,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 
 /**
- * Tests {@link com.bulletjournal.controller.FirebaseController}
+ * Tests {@link com.bulletjournal.controller.DeviceController}
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class FirebaseControllerTest {
+public class DeviceControllerTest {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FirebaseControllerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceControllerTest.class);
 
     private static final String USER1 = "fun_bam";
 
@@ -79,17 +79,17 @@ public class FirebaseControllerTest {
     @Test
     public void testAddToken() {
         ResponseEntity<String> response = submitToken(EXAMPLE_TOKEN1, USER1);
-        Assert.assertEquals(FirebaseController.CREATED_RESPONSE, response.getBody());
+        Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
         DeviceToken deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
         Assert.assertEquals(new DeviceToken(user1, EXAMPLE_TOKEN1), deviceToken);
 
         response = submitToken(EXAMPLE_TOKEN1, USER1);
-        Assert.assertEquals(FirebaseController.EXISTED_RESPONSE, response.getBody());
+        Assert.assertEquals(DeviceController.EXISTED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
         Assert.assertEquals(new DeviceToken(user1, EXAMPLE_TOKEN1), deviceToken);
 
         response = submitToken(EXAMPLE_TOKEN1, USER2);
-        Assert.assertEquals(FirebaseController.REPLACED_RESPONSE, response.getBody());
+        Assert.assertEquals(DeviceController.REPLACED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
         Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN1), deviceToken);
     }
@@ -110,7 +110,7 @@ public class FirebaseControllerTest {
     private ResponseEntity<String> submitToken(String token, String userName) {
         ResponseEntity<String> response
             = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + FirebaseController.DEVICE_TOKEN_ROUTE,
+                ROOT_URL + randomServerPort + DeviceController.DEVICE_TOKEN_ROUTE,
             HttpMethod.POST,
             TestHelpers.actAsOtherUser(new AddDeviceTokenParams(token), userName),
             String.class
