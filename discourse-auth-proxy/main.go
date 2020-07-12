@@ -83,7 +83,7 @@ func main() {
 		Addr: ":80",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logger.Printf("Port 80: Request %s %s", r.Host, r.URL)
-			if (r.Host == "home.bulletjournal.us") {
+			if r.Host == "home.bulletjournal.us" {
 				logger.Printf("Port 80: Bypassing Auth Proxy: %s", r.RequestURI)
 				proxy.ServeHTTP(w, r)
 				return
@@ -97,7 +97,7 @@ func main() {
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("Request %s %s", r.Host, r.URL)
-		if (r.Host == "home.bulletjournal.us") {
+		if r.Host == "home.bulletjournal.us" {
 			logger.Printf("Port 443: Redirect to 80: %s", r.RequestURI)
 			http.Redirect(w, r, "http://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 			return
@@ -117,26 +117,26 @@ func checkAuthorizationHeader(handler http.Handler, r *http.Request, w http.Resp
 		return false
 	}
 
-	auth_header := r.Header.Get("Authorization")
-	if len(auth_header) < 6 {
+	authHeader := r.Header.Get("Authorization")
+	if len(authHeader) < 6 {
 		return false
 	}
 
-	if auth_header[0:6] == "Basic " {
-		b_creds, _ := base64.StdEncoding.DecodeString(auth_header[6:])
-		creds := string(b_creds)
+	if authHeader[0:6] == "Basic " {
+		bCreds, _ := base64.StdEncoding.DecodeString(authHeader[6:])
+		creds := string(bCreds)
 		if creds == config.BasicAuth {
-			colon_idx := strings.Index(creds, ":")
-			if colon_idx == -1 {
+			colonIdx := strings.Index(creds, ":")
+			if colonIdx == -1 {
 				return false
 			}
-			username := creds[0:colon_idx]
+			username := creds[0:colonIdx]
 			r.Header.Set(config.UsernameHeader, username)
 			r.Header.Del("Authorization")
 			handler.ServeHTTP(w, r)
 			return true
 		} else {
-			logger.Printf("rejected basic auth creds: authorization header: %s", auth_header)
+			logger.Printf("rejected basic auth creds: authorization header: %s", authHeader)
 		}
 	}
 
