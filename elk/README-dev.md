@@ -2,8 +2,6 @@
 ## Start 
 ```
 docker-compose -f ./backend/docker-compose.yml -f ./elk/docker-compose.yml up -d
-
-docker-compose -f ./backend/docker-compose.yml -f ./elk/docker-compose.yml up -d
 ```
 
 # Stop logstash and create mappings and 
@@ -18,6 +16,8 @@ curl --user elastic:changeme -XDELETE "http://localhost:9200/project_items"
 curl --user elastic:changeme -XPUT "http://localhost:9200/project_items" -H 'Content-Type: application/json' -d @/$HOME/BulletJournal/elk/ProjectItemsIndexMapping.json
 
 curl --user elastic:changeme -XGET "http://localhost:9200/project_items/_mapping"
+
+docker-compose -f ./backend/docker-compose.yml -f ./elk/docker-compose.yml up -d
 ```
 
 
