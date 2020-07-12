@@ -212,7 +212,7 @@ const AddTransaction: React.FC<
           </div>
 
           <div style={{ display: 'flex' }}>
-            <Tooltip title='Select Date' placement='bottom'>
+            <Tooltip title='Select Date' placement='left'>
               <Form.Item
                 name='date'
                 rules={[{ required: true, message: 'Missing Date!' }]}
@@ -225,7 +225,7 @@ const AddTransaction: React.FC<
             </Tooltip>
 
             {timeVisible && (
-              <Tooltip title='Select Time' placement='bottom'>
+              <Tooltip title='Select Time' placement='right'>
                 <Form.Item name='time' style={{ width: '100px' }}>
                   <TimePicker
                     allowClear

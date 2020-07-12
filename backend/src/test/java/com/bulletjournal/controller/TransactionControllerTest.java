@@ -5,6 +5,7 @@ import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
 import com.bulletjournal.ledger.LedgerSummaryType;
+import com.bulletjournal.ledger.TransactionsSummary;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -93,7 +94,7 @@ public class TransactionControllerTest {
         assertTrue(Math.abs(summary.getIncome() - 1400.0) < 1e-4);
         assertEquals(5, summary.getTransactions().size());
         assertEquals(Double.valueOf("-500.0"), transactionsSummaries.get(2).getBalance());
-        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71.43) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71) < 1e-4);
         assertEquals(Double.valueOf("-200.0"), transactionsSummaries.get(1).getBalance());
 
         List<Label> label = createLabels();
@@ -122,8 +123,8 @@ public class TransactionControllerTest {
         assertEquals("Label0", transactionsSummaries.get(0).getName());
         assertEquals("Label2", transactionsSummaries.get(2).getName());
         assertEquals((Double) 600.0, transactionsSummaries.get(1).getBalance());
-        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 78.57) < 1e-4);
-        assertTrue(Math.abs(transactionsSummaries.get(0).getExpensePercentage() - 71.43) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 79) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(0).getExpensePercentage() - 71) < 1e-4);
 
         // get transactions default (MONTHLY)
         Transaction t6 = createTransaction(p1, "T6", "2019-11-28", "BulletJournal", 250.0, 1);
@@ -154,8 +155,8 @@ public class TransactionControllerTest {
         assertEquals("2018 SEPTEMBER", transactionsSummaries.get(0).getName());
         assertEquals("2019 SEPTEMBER", transactionsSummaries.get(2).getName());
         assertEquals(Double.valueOf("-400.0"), transactionsSummaries.get(2).getBalance());
-        assertTrue(Math.abs(transactionsSummaries.get(2).getExpensePercentage() - 61.54) < 1e-4);
-        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 16.67) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(2).getExpensePercentage() - 62) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 17) < 1e-4);
         assertEquals((Double) 0.0, transactionsSummaries.get(0).getExpensePercentage());
 
         // get transactions by default, yearly
@@ -200,7 +201,7 @@ public class TransactionControllerTest {
         assertEquals("2019 DECEMBER Week 1", transactionsSummaries.get(0).getName());
         assertEquals("2019 DECEMBER Week 4", transactionsSummaries.get(3).getName());
         assertEquals(Double.valueOf("-100.0"), transactionsSummaries.get(3).getBalance());
-        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71.43) < 1e-4);
+        assertTrue(Math.abs(transactionsSummaries.get(0).getIncomePercentage() - 71) < 1e-4);
     }
 
     private Group createGroup() {

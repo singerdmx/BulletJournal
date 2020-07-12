@@ -1,5 +1,6 @@
-package com.bulletjournal.controller.models;
+package com.bulletjournal.ledger;
 
+import com.bulletjournal.util.MathUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -61,7 +62,7 @@ public class TransactionsSummary {
     }
 
     public Double getIncome() {
-        return income;
+        return MathUtil.round(income, 2);
     }
 
     public void setIncome(Double income) {
@@ -69,7 +70,7 @@ public class TransactionsSummary {
     }
 
     public Double getIncomePercentage() {
-        return incomePercentage;
+        return MathUtil.round(incomePercentage, 0);
     }
 
     public void setIncomePercentage(Double incomePercentage) {
@@ -77,7 +78,7 @@ public class TransactionsSummary {
     }
 
     public Double getExpense() {
-        return expense;
+        return MathUtil.round(expense, 2);
     }
 
     public void setExpense(Double expense) {
@@ -85,7 +86,7 @@ public class TransactionsSummary {
     }
 
     public Double getExpensePercentage() {
-        return expensePercentage;
+        return MathUtil.round(expensePercentage, 0);
     }
 
     public void setExpensePercentage(Double expensePercentage) {
@@ -93,7 +94,7 @@ public class TransactionsSummary {
     }
 
     public Double getBalance() {
-        return balance;
+        return MathUtil.round(balance, 2);
     }
 
     public void setBalance(Double balance) {
@@ -101,7 +102,7 @@ public class TransactionsSummary {
     }
 
     public Double getBalancePercentage() {
-        return balancePercentage;
+        return MathUtil.round(balancePercentage, 0);
     }
 
     public void setBalancePercentage(Double balancePercentage) {

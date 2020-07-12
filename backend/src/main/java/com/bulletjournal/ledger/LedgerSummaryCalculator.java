@@ -2,7 +2,6 @@ package com.bulletjournal.ledger;
 
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.Transaction;
-import com.bulletjournal.controller.models.TransactionsSummary;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import org.springframework.stereotype.Component;
 
