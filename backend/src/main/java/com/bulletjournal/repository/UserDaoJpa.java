@@ -39,8 +39,8 @@ public class UserDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
-        List<User> userList = this.userRepository.findByName(name);
-        if (!userList.isEmpty()) {
+        User existingUser = this.userRepository.findByName(name);
+        if (existingUser != null) {
             throw new ResourceAlreadyExistException("User " + name + " already exists");
         }
 
@@ -74,16 +74,11 @@ public class UserDaoJpa {
             throw new IllegalArgumentException("Missing username");
         }
 
-        List<User> userList = this.userRepository.findByName(name);
-        if (userList.isEmpty()) {
+        User existingUser = this.userRepository.findByName(name);
+        if (existingUser == null) {
             throw new ResourceNotFoundException("User " + name + " does not exist");
         }
-
-        if (userList.size() > 1) {
-            throw new IllegalStateException("More than one user " + name + " exist");
-        }
-
-        return userList.get(0);
+        return existingUser;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
