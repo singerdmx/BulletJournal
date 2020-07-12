@@ -83,7 +83,7 @@ func main() {
 		Addr: ":80",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logger.Printf("Port 80: Request %s %s", r.Host, r.URL)
-			if (r.Host == "home.bulletjournal.us" || strings.HasPrefix(r.RequestURI, "/home")) {
+			if (r.Host == "home.bulletjournal.us") {
 				logger.Printf("Port 80: Bypassing Auth Proxy: %s", r.RequestURI)
 				proxy.ServeHTTP(w, r)
 				return
@@ -98,7 +98,7 @@ func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("Request %s %s", r.Host, r.URL)
 		if (r.Host == "home.bulletjournal.us") {
-			logger.Printf("Port 434: Redirect to 80: %s", r.RequestURI)
+			logger.Printf("Port 443: Redirect to 80: %s", r.RequestURI)
 			http.Redirect(w, r, "http://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 			return
 		}
@@ -173,51 +173,16 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 
 	if err == nil && cookie != nil {
 		username, groups, err = parseCookie(cookie.Value, config.CookieSecret)
-		if (err != nil) {
+		if err != nil {
 			logger.Printf("parseCookie err: %v", err)
 			deleteCookie(w)
 		}
 	}
 
 	if err == nil {
-		if strings.Contains(strings.ToLower(r.Header.Get("User-Agent")), "mobile") {
-			fmt.Fprintf(w, `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <style>
-      .login-success {
-        display: flex;
-        width: 100%;
-        height: 100vh;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-      .login-success .login-title {
-        padding: 5px 15px;
-        border-radius: 15px;
-        background: #9fe481;
-        color: white;
-        font-family: 'Courier New', Courier, monospace;
-      }
-      .login-success span {
-        margin-top: 15px;
-        color: rgba(0, 0, 0, 0.4);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-success">
-      <div class="login-title">
-        <h3>Login Sucess</h3>
-      </div>
-      <span>Close window</span>
-    </div>
-  </body>
-</html>`)
+		if isMobile(r) {
+			r.RequestURI = "/home/index.html"
+			handler.ServeHTTP(w, r)
 			return
 		}
 		logger.Printf("%s %s, %s", r.Header.Get("request-id"), username, r.RequestURI)
@@ -310,6 +275,14 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		// works around weird safari stuff
 		fmt.Fprintf(w, "<html><head></head><body><script>window.location = '%v'</script></body>", returnUrl)
 	}
+}
+
+func isMobile(r *http.Request) bool {
+	header := strings.ToLower(r.Header.Get("User-Agent"))
+	if strings.Contains(header, "ipad") {
+		return false
+	}
+	return strings.Contains(header, "mobile")
 }
 
 func deleteCookie(w http.ResponseWriter) {
