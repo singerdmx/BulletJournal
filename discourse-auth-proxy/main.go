@@ -279,6 +279,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 
 func isMobile(r *http.Request) bool {
 	header := strings.ToLower(r.Header.Get("User-Agent"))
+	logger.Printf("User-Agent: %s", header)
 	if strings.Contains(header, "ipad") {
 		return false
 	}
