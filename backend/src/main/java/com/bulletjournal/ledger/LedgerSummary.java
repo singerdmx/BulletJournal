@@ -1,7 +1,7 @@
 package com.bulletjournal.ledger;
 
 import com.bulletjournal.controller.models.Transaction;
-import com.bulletjournal.controller.models.TransactionsSummary;
+import com.bulletjournal.util.MathUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public class LedgerSummary {
     }
 
     public Double getBalance() {
-        return balance;
+        return MathUtil.round(balance, 2);
     }
 
     public void setBalance(Double balance) {
@@ -57,7 +57,7 @@ public class LedgerSummary {
     }
 
     public Double getIncome() {
-        return income;
+        return MathUtil.round(income, 2);
     }
 
     public void setIncome(Double income) {
@@ -65,7 +65,7 @@ public class LedgerSummary {
     }
 
     public Double getExpense() {
-        return expense;
+        return MathUtil.round(expense, 2);
     }
 
     public void setExpense(Double expense) {

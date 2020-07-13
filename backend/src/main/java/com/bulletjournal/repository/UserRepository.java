@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    List<User> findByName(String name);
+    User findByName(String name);
 
     @Query("SELECT u FROM User u WHERE u.role = :role")
     List<User> getUsersByRole(@Param("role") Integer role);

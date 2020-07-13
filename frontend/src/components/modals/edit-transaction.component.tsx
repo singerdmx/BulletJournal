@@ -252,7 +252,7 @@ const EditTransaction: React.FC<
           </div>
 
           <div style={{ display: 'flex' }}>
-            <Tooltip title='Select Date' placement='bottom'>
+            <Tooltip title='Select Date' placement='left'>
               <Form.Item name='date'>
                 <DatePicker
                   placeholder='Select Date'
@@ -265,7 +265,7 @@ const EditTransaction: React.FC<
               </Form.Item>
             </Tooltip>
 
-            <Tooltip title='Select Time' placement='bottom'>
+            <Tooltip title='Select Time' placement='right'>
               <Form.Item name='time' style={{ width: '100px' }}>
                 <TimePicker
                   allowClear

@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class Reminder {
@@ -35,24 +36,43 @@ public class Reminder {
 
     @PostConstruct
     public void postConstruct() {
-        this.loadPrevReminderRecords();
-        this.loadNextReminderRecords();
         LOGGER.info(reminderConfig.toString());
-        LOGGER.info("Reminder first delay minute: " + this.getFirstDelayMinutes());
+
+        this.initLoad();
+
+        this.cronJob();
     }
 
-    public void loadNextReminderRecords() {
+    private void initLoad() {
+        this.loadReminderRecords(reminderConfig.getLoadPrevHours());
         this.loadReminderRecords(reminderConfig.getLoadNextHours());
     }
 
-    public void loadPrevReminderRecords() {
-        this.loadReminderRecords(reminderConfig.getLoadPrevHours());
+    private void cronJob() {
+        LOGGER.info("Reminder first delay minute: " + this.getInitialDelayMinutes());
+
+        executorService.scheduleWithFixedDelay(
+                () -> loadReminderRecords(this.reminderConfig.getLoadNextHours()),
+                this.getInitialDelayMinutes(),
+                MINUTES_OF_DAY,
+                TimeUnit.MINUTES);
+
+        executorService.scheduleWithFixedDelay(
+                () -> this.purge(this.reminderConfig.getPurgePrevHours()),
+                this.getInitialDelayMinutes(),
+                MINUTES_OF_DAY * 2,
+                TimeUnit.MINUTES);
     }
 
     private void loadReminderRecords(int hours) {
+        System.out.println("Go database, load hours :" + hours + " reminder");
     }
 
-    private long getFirstDelayMinutes() {
+    private void purge(int hours) {
+        System.out.println("Purge work");
+    }
+
+    private long getInitialDelayMinutes() {
         Calendar rightNow = Calendar.getInstance(TimeZone.getTimeZone(reminderConfig.getTimeZone()));
         int hour = rightNow.get(Calendar.HOUR);
         int minute = rightNow.get(Calendar.MINUTE);
