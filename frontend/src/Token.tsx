@@ -25,7 +25,7 @@ const TokenPage: React.FC<PageProps> = (props) => {
       className="public-container"
     >
       <a href={hrefLink}>
-        You've successfully login. Now please go to our Bullet Journal Mobile
+        You've successfully logged in. Now please go to our Bullet Journal Mobile
         App.
       </a>
     </div>
