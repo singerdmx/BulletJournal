@@ -255,7 +255,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 		}
 		return
 	}
-	username, groups, _, err := getAuthCookie(r, w)
+	_, _, _, err := getAuthCookie(r, w)
 	if err != nil { // not logged in
 		sso := query.Get("sso")
 		sig := query.Get("sig")
