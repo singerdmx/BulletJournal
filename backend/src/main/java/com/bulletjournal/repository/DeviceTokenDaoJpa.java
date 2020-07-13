@@ -52,7 +52,11 @@ public class DeviceTokenDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<DeviceToken> getTokensByUser(String userName) {
-        return deviceTokenRepository.findDeviceTokensByUser(userName);
+        User user = userDaoJpa.getByName(userName);
+        if (user == null) {
+            throw new ResourceNotFoundException("User " + userName + " doesn't exist");
+        }
+        return deviceTokenRepository.findDeviceTokensByUser(user);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

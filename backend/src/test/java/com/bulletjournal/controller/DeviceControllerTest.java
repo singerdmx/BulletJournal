@@ -26,6 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tests {@link com.bulletjournal.controller.DeviceController}
@@ -73,8 +74,9 @@ public class DeviceControllerTest {
     }
 
     /**
-     * Submit token for USER1, should have (token, USER1) in DB
-     * Submit same token for USER2, should have (token, USER2) in DB
+     * Submit token1 for USER1, should have (token1, USER1) in DB
+     * Submit same token1 for USER2, should have (token1, USER2) in DB
+     * Submit token2 for USER2, should have (token1, USER2) (token2, USER2) in DB
      */
     @Test
     public void testAddToken() {
@@ -92,6 +94,18 @@ public class DeviceControllerTest {
         Assert.assertEquals(DeviceController.REPLACED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
         Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN1), deviceToken);
+
+        response = submitToken(EXAMPLE_TOKEN2, USER2);
+        Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
+        deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN2);
+        Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN2), deviceToken);
+        List<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUser(USER2);
+        Assert.assertTrue(
+            tokens.containsAll(
+                Arrays.asList(
+                    new DeviceToken(user2, EXAMPLE_TOKEN1),
+                    new DeviceToken(user2, EXAMPLE_TOKEN2)
+                )));
     }
 
     @Test
