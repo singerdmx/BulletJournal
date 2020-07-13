@@ -191,6 +191,12 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		logger.Printf(format, v...)
 		writeClientError()
 	}
+
+	if r.RequestURI == homePage {
+		logger.Printf("Forwarding homepage: %s", r.RequestURI)
+		handler.ServeHTTP(w, r)
+		return
+	}
 	
 	if isMobile(r) {
 		processMobileRequest(handler, r, w, fail, writeHttpError)
