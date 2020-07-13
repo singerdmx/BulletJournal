@@ -39,6 +39,7 @@ var (
 const cookieName = "__discourse_proxy"
 const homePage = "/home/index.html"
 const tokenPage = "/tokens/"
+const tokenForCookieUrl = "/api/tokens"
 
 func main() {
 	{
@@ -163,20 +164,20 @@ func checkWhitelist(handler http.Handler, r *http.Request, w http.ResponseWriter
 	return false
 }
 
-func getAuthCookie(r *http.Request, w http.ResponseWriter) (string, string, error) {
+func getAuthCookie(r *http.Request, w http.ResponseWriter) (string, string, string, error) {
 	cookie, err := r.Cookie(cookieName)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	if cookie == nil {
-		return "", "", fmt.Errorf("missing cookie")
+		return "", "", "", fmt.Errorf("missing cookie")
 	}
 	username, groups, err := parseCookie(cookie.Value, config.CookieSecret)
 	if err != nil {
 		logger.Printf("parseCookie err: %v", err)
 		deleteCookie(w)
 	}
-	return username, groups, err
+	return username, groups, cookie.Value, err
 }
 
 func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWriter) {
@@ -196,7 +197,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		return
 	}
 
-	username, groups, err := getAuthCookie(r, w)
+	username, groups, _, err := getAuthCookie(r, w)
 	if err != nil { // No Cookie
 		if shouldByPass(r) {
 			logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)
@@ -230,17 +231,26 @@ func forwardToNginx(handler http.Handler, r *http.Request, w http.ResponseWriter
 func processMobileRequest(handler http.Handler, r *http.Request, w http.ResponseWriter,
 	fail func(format string, v ...interface{}),
 	writeHttpError func(code int)) {
-	if strings.HasPrefix(r.RequestURI, tokenPage) {
-		if _, _, err := getAuthCookie(r, w); err == nil {
-			handler.ServeHTTP(w, r)
+	if strings.HasPrefix(r.RequestURI, tokenForCookieUrl) {
+		return
+	}
+
+	query := r.URL.Query()
+	if strings.HasPrefix(r.RequestURI, tokenPage) && len(query.Get("sso")) == 0 {
+		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil {
+			token := r.RequestURI[len(tokenPage):len(tokenPage)+6]
+			logger.Printf("Saving token %s", token)
+			tokenMutex.Lock()
+			tokenCache.Add(token, cookieValue)
+			tokenMutex.Unlock()
+			forwardToNginx(handler, r, w, username, groups)
 		} else {
 			redirectToSSO(r, w)
 		}
 		return
 	}
-	username, groups, err := getAuthCookie(r, w)
+	username, groups, _, err := getAuthCookie(r, w)
 	if err != nil { // not logged in
-		query := r.URL.Query()
 		sso := query.Get("sso")
 		sig := query.Get("sig")
 
