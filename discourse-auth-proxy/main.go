@@ -192,7 +192,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		writeClientError()
 	}
 
-	if r.RequestURI == homePage {
+	if strings.HasPrefix(r.RequestURI, "/home") {
 		logger.Printf("Forwarding homepage: %s", r.RequestURI)
 		handler.ServeHTTP(w, r)
 		return
@@ -261,11 +261,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 		sig := query.Get("sig")
 
 		if len(sso) == 0 {
-			if r.RequestURI == homePage {
-				handler.ServeHTTP(w, r)
-			} else {
-				http.Redirect(w, r, "https://"+r.Host+homePage, 302)
-			}
+			http.Redirect(w, r, "https://"+r.Host+homePage, 302)
 			return
 		}
 
@@ -274,11 +270,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	}
 
 	// logged in
-	if r.RequestURI == homePage {
-		forwardToNginx(handler, r, w, username, groups)
-	} else {
-		http.Redirect(w, r, "https://"+r.Host+homePage, 302)
-	}
+	http.Redirect(w, r, "https://"+r.Host+homePage, 302)
 }
 
 func redirectToSSO(r *http.Request, w http.ResponseWriter) {
