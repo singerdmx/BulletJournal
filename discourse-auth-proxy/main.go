@@ -238,7 +238,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	fail func(format string, v ...interface{}),
 	writeHttpError func(code int)) {
 	if strings.HasPrefix(r.RequestURI, tokenForCookieUrl) {
-		returnToken, _ := getApiToken(r)
+		returnToken := getApiToken(r)
 		fmt.Fprintf(w, "%v", returnToken)
 		return
 	}
@@ -275,14 +275,13 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	http.Redirect(w, r, "https://"+r.Host+homePage, 302)
 }
 
-func getApiToken(r *http.Request) (returnToken string, err error) {
+func getApiToken(r *http.Request) (returnToken string) {
 	token := r.RequestURI[len(tokenForCookieUrl) : len(tokenForCookieUrl)+6]
 	tokenMutex.Lock()
 	value, ok := tokenCache.Get(token)
 	tokenMutex.Unlock()
 
 	if !ok {
-		err = fmt.Errorf("token not found: %s", token)
 		returnToken = ""
 		return
 	}
