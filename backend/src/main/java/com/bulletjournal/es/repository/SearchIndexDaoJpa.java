@@ -67,12 +67,17 @@ public class SearchIndexDaoJpa {
      * @param pageSize the record count in one page
      * @return SearchScrollHits contains the search results
      */
-    public SearchScrollHits<SearchIndex> search(String username, String term, int pageNo, int pageSize) {
+    public SearchScrollHits<SearchIndex> search(String username, String term, List<String> sharedItemIds,
+                                                int pageNo, int pageSize) {
         List<Long> projectIdList = getUserProjects(username);
 
         BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
         for (long pid : projectIdList) {
             queryBuilder.should(QueryBuilders.termQuery(PROJECT_ID, pid));
+        }
+
+        for (String shareItemId : sharedItemIds) {
+            queryBuilder.should(QueryBuilders.termQuery("id", shareItemId));
         }
         queryBuilder.minimumShouldMatch(1)
                 .must(QueryBuilders.matchQuery(SEARCH_FIELD, term)

@@ -14,6 +14,8 @@ import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.ProjectItemDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
+import com.bulletjournal.repository.SharedProjectItemDaoJpa;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @RestController
@@ -52,6 +56,9 @@ public class QueryController {
     private TransactionDaoJpa transactionDaoJpa;
     @Autowired
     private NoteDaoJpa noteDaoJpa;
+    @Autowired
+    private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
+
     @Autowired
     private NotificationService notificationService;
     @Autowired
@@ -113,11 +120,35 @@ public class QueryController {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
         SearchScrollHits<SearchIndex> scroll;
+
         if (scrollId == null || scrollId.length() == 0) {
-            scroll = searchIndexDaoJpa.search(username, term, pageNo, pageSize);
+            List<ProjectItemModel> projectItemModels = sharedProjectItemDaoJpa.
+                    getSharedProjectItems(username, null);
+
+            Set<Long> sharedNoteIds = new HashSet<>();
+            Set<Long> sharedTaskIds  = new HashSet<>();
+            projectItemModels.forEach(
+                    projectItemModel -> {
+                        if (projectItemModel.getContentType().equals(ContentType.NOTE)) {
+                            sharedNoteIds.add(projectItemModel.getId());
+                        } else if (projectItemModel.getContentType().equals(ContentType.TASK)) {
+                            sharedTaskIds.add(projectItemModel.getId());
+                        }
+                    }
+            );
+
+           Pair<List<Long>, List<Long>> shareContentIds = sharedProjectItemDaoJpa.
+                   getSharedContentIds(sharedNoteIds, sharedTaskIds);
+           List<String> sharedProjectItemIds = generateSharedProjectItemIds(
+                   sharedNoteIds, sharedTaskIds, shareContentIds.getFirst(), shareContentIds.getSecond());
+
+            scroll = searchIndexDaoJpa.search(username, term, sharedProjectItemIds, pageNo, pageSize);
             scrollId = scroll.getScrollId();
+
         } else {
             scroll = searchIndexDaoJpa.search(scrollId);
+            scrollId = scroll.getScrollId();
+
         }
 
         if (scroll == null) {
@@ -143,6 +174,28 @@ public class QueryController {
         validSearchResult.setHasSearchHits(scroll.hasSearchHits());
 
         return validSearchResult;
+    }
+
+    private List<String> generateSharedProjectItemIds(Set<Long> sharedNoteIds, Set<Long> sharedTaskIds,
+                                                      List<Long> sharedNoteContentIds, List<Long> sharedTaskContentIds) {
+        List<String> ret = new ArrayList<>();
+        sharedNoteIds.forEach(
+                sharedNoteId -> ret.add("note" + SEARCH_INDEX_SPLITTER + sharedNoteId)
+        );
+
+        sharedTaskIds.forEach(
+                sharedTaskId -> ret.add("task" + SEARCH_INDEX_SPLITTER + sharedTaskId)
+        );
+
+        sharedNoteContentIds.forEach(
+                shareNoteContentId -> ret.add("note_content" + SEARCH_INDEX_SPLITTER + shareNoteContentId)
+        );
+
+        sharedTaskContentIds.forEach(
+                shareTaskContentId -> ret.add("task_content" + SEARCH_INDEX_SPLITTER + shareTaskContentId)
+        );
+
+        return ret;
     }
 
     /**
