@@ -238,6 +238,15 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	fail func(format string, v ...interface{}),
 	writeHttpError func(code int)) {
 	if strings.HasPrefix(r.RequestURI, tokenForCookieUrl) {
+		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil {
+			token := r.RequestURI[len(tokenForCookieUrl) : len(tokenForCookieUrl)+6]
+			tokenMutex.Lock()
+			tokenCache.Add(token, cookieValue)
+			tokenMutex.Unlock()
+			forwardToNginx(handler, r, w, username, groups)
+		} else {
+			redirectToSSO(r, w)
+		}
 		return
 	}
 
