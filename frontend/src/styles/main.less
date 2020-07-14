@@ -51,7 +51,6 @@
 
 //used for extend search bar when focused
 .search-box {
-
   //search bar default width
   .ant-input-search {
     width: 60%;
@@ -156,44 +155,43 @@
   padding: 1vh 2vw 0 2vw;
   height: 40vh;
   border-radius: 8px;
-  box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08), 
-              0 1px 20px 0 rgba(0, 0, 0, 0.07), 
-              0px 1px 11px 0px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
+    0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
   display: flex;
   flex-direction: column;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
   .group-title {
+    color: @primary-color;
+    height: 40px;
+    border-bottom: 1px solid #e0e6ed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .group-operation .group-setting {
+      text-align: right;
+      padding: 0;
+      margin-left: 14px;
       color: @primary-color;
-      height: 40px;
-      border-bottom: 1px solid #e0e6ed;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      .group-operation .group-setting {
-          text-align: right;
-          padding: 0;
-          margin-left: 14px;
-          color: @primary-color;
-      }
+    }
   }
   .group-users {
-      flex-grow: 1;
-      overflow-y: auto;
+    flex-grow: 1;
+    overflow-y: auto;
   }
   .group-users .user-item {
-      height: 52px;
-      width: 100%;
-      padding: 10px 10px;
-      border-bottom: 1px solid #e0e6ed;
+    height: 52px;
+    width: 100%;
+    padding: 10px 10px;
+    border-bottom: 1px solid #e0e6ed;
   }
 
   &:hover {
-      transform: scale(1.05);
+    transform: scale(1.05);
   }
 
   .group-footer {
-      background-origin: 0 -1rem rgba(66, 66, 66, 0.7);
-      padding: 0.5rem 0;
+    background-origin: 0 -1rem rgba(66, 66, 66, 0.7);
+    padding: 0.5rem 0;
   }
 }
 
@@ -208,27 +206,47 @@
 
 /* ----------------------Big Calendar---------------------- */
 .rbc-event {
-	border: none;
-	box-sizing: border-box;
-	box-shadow: none;
-	margin: 0;
-	padding: 2px 5px;
-	background-color: @primary-color;
-	border-radius: 5px;
-	color: #fff;
-	cursor: pointer;
-	width: 100%;
-	text-align: left;
-	&:focus {
-		outline: 5px auto #3b99fc;
-	}
+  border: none;
+  box-sizing: border-box;
+  box-shadow: none;
+  margin: 0;
+  padding: 2px 5px;
+  background-color: @primary-color;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  &:focus {
+    outline: 5px auto #3b99fc;
+  }
 }
 .rbc-event.rbc-selected {
-	background-color: @primary-color;
+  background-color: @primary-color;
 }
 
 .rbc-title h2 {
-    text-align: center;
-    color: @primary-color;
-    font-size: 18px;
+  text-align: center;
+  color: @primary-color;
+  font-size: 18px;
+}
+
+/* ------------------ Token Page -----------------------------*/
+.token-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10%;
+  width: 100%;
+
+  & > h4 {
+    font-size: 24px;
+    font-family: 'Pacifico';
+  }
+  & > a {
+    font-size: 20px;
+    text-decoration: underline;
+  }
 }
