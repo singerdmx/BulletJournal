@@ -310,7 +310,7 @@ public class TaskController {
         if (!events.isEmpty()) {
             this.notificationService.inform(new RemoveTaskEvent(events, username));
         }
-        return getCompletedTasks(task.getProjectId(), null, null, null, null, null, null);
+        return getCompletedTasks(task.getProjectId(), 0, 50, null, null, null, null);
     }
 
     @PutMapping(TASK_SET_LABELS_ROUTE)
