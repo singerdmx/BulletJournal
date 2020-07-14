@@ -119,18 +119,24 @@ public class SystemController {
             // Look up etag from cache
             Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
 
-            // TODO: If cache missed, write new etag to redis
-            notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
-            cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
+            if (cache == null) {
+                notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
+                cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
+            } else {
+                notificationsEtag = cache.getEtag();
+            }
         }
         if (targetEtags == null || targetEtags.contains("groupsEtag")) {
 
             // Look up etag from cache
             Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
 
-            // TODO: If cache missed, write new etag to redis
-            groupsEtag = this.groupDaoJpa.getUserEtag(username);
-            cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
+            if (cache == null) {
+                groupsEtag = this.groupDaoJpa.getUserEtag(username);
+                cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
+            } else {
+                groupsEtag = cache.getEtag();
+            }
         }
 
         if (projectId != null) {

@@ -31,8 +31,15 @@ public class RedisEtagDaoJpa {
         if (etagEvents.isEmpty()) {
             return;
         }
-        Set<EtagEvent> uniqueEvents = new HashSet<>(etagEvents);
-        List<Etag> etags = computeEtags(uniqueEvents);
+
+        Map<EtagType, Set<String>> aggregateMap = new HashMap<>();
+        etagEvents.forEach(e -> aggregateMap.computeIfAbsent(e.getEtagType(), n -> new HashSet<>()).add(e.getContentId()));
+
+        aggregateMap.computeIfAbsent(EtagType.GROUP, n -> new HashSet<>())
+                .addAll(aggregateMap.getOrDefault(EtagType.USER_GROUP, Collections.emptySet()));
+        aggregateMap.remove(EtagType.USER_GROUP);
+
+        List<Etag> etags = computeEtags(aggregateMap);
         this.batchCache(etags);
     }
 
@@ -69,18 +76,12 @@ public class RedisEtagDaoJpa {
      * 3. Fetch the list of affected users from the Dao and create new Etag instance.
      * 4. Added etag instance to return list
      *
-     * @param events a list of unique event
+     * @param aggregateMap a map of etag type and etag list
      * @return a list of etag instances
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    List<Etag> computeEtags(Set<EtagEvent> events) {
+    List<Etag> computeEtags(Map<EtagType, Set<String>> aggregateMap) {
         List<Etag> etags = new ArrayList<>();
-        Map<EtagType, Set<String>> aggregateMap = new HashMap<>();
-        events.forEach(e -> aggregateMap.computeIfAbsent(e.getEtagType(), n -> new HashSet<>()).add(e.getContentId()));
-
-        aggregateMap.computeIfAbsent(EtagType.GROUP, n -> new HashSet<>())
-                .addAll(aggregateMap.getOrDefault(EtagType.USER_GROUP, Collections.emptySet()));
-        aggregateMap.remove(EtagType.USER_GROUP);
 
         for (EtagType type : aggregateMap.keySet()) {
             Set<String> contentIds = aggregateMap.get(type);
