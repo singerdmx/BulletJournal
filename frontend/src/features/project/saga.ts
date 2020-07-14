@@ -13,6 +13,7 @@ import {
   GetProjectHistoryAction,
 } from './reducer';
 import { actions as groupsActions } from '../group/reducer';
+import { actions as tasksActions } from '../tasks/reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
   createProject,
@@ -139,6 +140,7 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
     const data: Project = yield call(getProject, projectId);
     yield put(projectActions.projectReceived({ project: data }));
     yield put(groupsActions.getGroup({ groupId: data.group.id }));
+    yield put(tasksActions.updateCompletedTaskPageNo({completedTaskPageNo: 0}));
   } catch (error) {
     console.error(`Get Project Error Received: ${error}`);
   }
