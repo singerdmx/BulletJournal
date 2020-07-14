@@ -1,8 +1,7 @@
 import React from 'react';
 
 import './styles/main.less';
-import './Public.styles.less';
-import { getRandomBackgroundImage } from './assets/background';
+import * as logo from './assets/favicon466.ico';
 
 type PageProps = {};
 
@@ -18,15 +17,14 @@ const TokenPage: React.FC<PageProps> = (props) => {
   }
 
   return (
-    <div
-      style={{
-        backgroundImage: `url(${getRandomBackgroundImage()})`,
-      }}
-      className="public-container"
-    >
+    <div className="token-page">
+      <div className="token-logo">
+        <img src={logo} alt="Logo" width="250" height="250" />
+      </div>
+      <h4>You've successfully logged in.</h4>
       <a href={hrefLink}>
-        You've successfully logged in. Now please go to our Bullet Journal Mobile
-        App.
+        {`Click to go back to our Bullet Journal
+        Mobile App.`}
       </a>
     </div>
   );
