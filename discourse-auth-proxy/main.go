@@ -238,10 +238,8 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	fail func(format string, v ...interface{}),
 	writeHttpError func(code int)) {
 	if strings.HasPrefix(r.RequestURI, tokenForCookieUrl) {
-		returnToken, err := getApiToken(r)
-		if err == nil {
-			fmt.Fprintf(w, "%v", returnToken)
-		}
+		returnToken, _ := getApiToken(r)
+		fmt.Fprintf(w, "%v", returnToken)
 		return
 	}
 
