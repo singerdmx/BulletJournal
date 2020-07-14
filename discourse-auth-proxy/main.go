@@ -39,7 +39,7 @@ var (
 const cookieName = "__discourse_proxy"
 const homePage = "/home/index.html"
 const tokenPage = "/tokens/"
-const tokenForCookieUrl = "/api/tokens"
+const tokenForCookieUrl = "/api/tokens/"
 
 func main() {
 	{
