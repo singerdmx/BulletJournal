@@ -275,7 +275,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	http.Redirect(w, r, "https://"+r.Host+homePage, 302)
 }
 
-func getApiToken(r *http.Request) (returnToken string) {
+func getApiToken(r *http.Request) (returnCookie string) {
 	token := r.RequestURI[len(tokenForCookieUrl) : len(tokenForCookieUrl)+6]
 	tokenMutex.Lock()
 	value, ok := tokenCache.Get(token)
@@ -283,12 +283,12 @@ func getApiToken(r *http.Request) (returnToken string) {
 
 	if !ok {
 		logger.Printf("token not found: %s", token)
-		returnToken = ""
+		returnCookie = ""
 		return
 	}
 
-	returnToken = value.(string)
-	logger.Printf("token not found: %v", returnToken)
+	returnCookie = value.(string)
+	logger.Printf("returnCookie found: %v", returnCookie)
 	tokenMutex.Lock()
 	tokenCache.Remove(token)
 	tokenMutex.Unlock()
