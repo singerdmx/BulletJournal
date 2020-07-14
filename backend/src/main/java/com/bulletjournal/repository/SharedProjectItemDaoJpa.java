@@ -58,7 +58,7 @@ public class SharedProjectItemDaoJpa {
 
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Pair<List<Long>, List<Long>> getSharedContentIds(Set<Long> sharedNoteIds, Set<Long>sharedTaskIds) {
+    public Pair<List<Long>, List<Long>> getSharedContentIds(Set<Long> sharedNoteIds, Set<Long> sharedTaskIds) {
         List<Long> sharedNoteContentIds = new ArrayList<>();
         List<Long> sharedTaskContentIds = new ArrayList<>();
         sharedNoteContentIds.addAll(
