@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.repository.auditing.GroupEntityListeners;
+
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -9,6 +11,7 @@ import java.util.stream.Collectors;
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"owner", "name"})
         })
+@EntityListeners(value = {GroupEntityListeners.class})
 public class Group extends OwnedModel {
 
     public static final String DEFAULT_NAME = "Default";

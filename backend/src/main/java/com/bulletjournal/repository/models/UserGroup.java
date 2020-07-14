@@ -1,10 +1,13 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.repository.auditing.UserGroupEntityListeners;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "user_groups")
+@EntityListeners(value = {UserGroupEntityListeners.class})
 public class UserGroup {
 
     @EmbeddedId
