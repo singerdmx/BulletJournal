@@ -19,12 +19,17 @@ const TokenPage: React.FC<PageProps> = (props) => {
   return (
     <div className="token-page">
       <div className="token-logo">
-        <img src={logo} alt="Logo" width="250" height="250" />
+          <a href={hrefLink}>
+              <img src={logo} alt="Logo" width="250" height="250" />
+          </a>
       </div>
-      <h4>You've successfully logged in.</h4>
+      <h4>
+          <a href={hrefLink}>
+              You've successfully logged in
+          </a>
+      </h4>
       <a href={hrefLink}>
-        {`Click to go back to our Bullet Journal
-        Mobile App.`}
+          Click to open Bullet Journal Mobile App
       </a>
     </div>
   );
