@@ -238,14 +238,9 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	fail func(format string, v ...interface{}),
 	writeHttpError func(code int)) {
 	if strings.HasPrefix(r.RequestURI, tokenForCookieUrl) {
-		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil {
-			token := r.RequestURI[len(tokenForCookieUrl) : len(tokenForCookieUrl)+6]
-			tokenMutex.Lock()
-			tokenCache.Add(token, cookieValue)
-			tokenMutex.Unlock()
-			forwardToNginx(handler, r, w, username, groups)
-		} else {
-			redirectToSSO(r, w)
+		returnToken, err := getApiToken(r)
+		if err == nil {
+			fmt.Fprintf(w, "%v", returnToken)
 		}
 		return
 	}
@@ -253,7 +248,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	query := r.URL.Query()
 	if strings.HasPrefix(r.RequestURI, tokenPage) && len(query.Get("sso")) == 0 {
 		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil {
-			token := r.RequestURI[len(tokenPage):len(tokenPage)+6]
+			token := r.RequestURI[len(tokenPage) : len(tokenPage)+6]
 			logger.Printf("Saving token %s", token)
 			tokenMutex.Lock()
 			tokenCache.Add(token, cookieValue)
@@ -280,6 +275,25 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 
 	// logged in
 	http.Redirect(w, r, "https://"+r.Host+homePage, 302)
+}
+
+func getApiToken(r *http.Request) (returnToken string, err error) {
+	token := r.RequestURI[len(tokenForCookieUrl) : len(tokenForCookieUrl)+6]
+	tokenMutex.Lock()
+	value, ok := tokenCache.Get(token)
+	tokenMutex.Unlock()
+
+	if !ok {
+		err = fmt.Errorf("token not found: %s", token)
+		returnToken = ""
+		return
+	}
+
+	returnToken = value.(string)
+	tokenMutex.Lock()
+	tokenCache.Remove(token)
+	tokenMutex.Unlock()
+	return
 }
 
 func redirectToSSO(r *http.Request, w http.ResponseWriter) {
