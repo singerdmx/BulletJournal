@@ -192,8 +192,8 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		writeClientError()
 	}
 
-	if strings.HasPrefix(r.RequestURI, "/home") {
-		logger.Printf("Forwarding homepage: %s", r.RequestURI)
+	if shouldByPass(r) {
+		logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)
 		handler.ServeHTTP(w, r)
 		return
 	}
@@ -205,12 +205,6 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 
 	username, groups, _, err := getAuthCookie(r, w)
 	if err != nil { // No Cookie
-		if shouldByPass(r) {
-			logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)
-			handler.ServeHTTP(w, r)
-			return
-		}
-
 		query := r.URL.Query()
 		sso := query.Get("sso")
 		sig := query.Get("sig")
