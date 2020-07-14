@@ -282,11 +282,13 @@ func getApiToken(r *http.Request) (returnToken string) {
 	tokenMutex.Unlock()
 
 	if !ok {
+		logger.Printf("token not found: %s", token)
 		returnToken = ""
 		return
 	}
 
 	returnToken = value.(string)
+	logger.Printf("token not found: %v", returnToken)
 	tokenMutex.Lock()
 	tokenCache.Remove(token)
 	tokenMutex.Unlock()
