@@ -192,6 +192,12 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		writeClientError()
 	}
 
+	if strings.HasPrefix(r.RequestURI, tokenForCookieUrl) {
+		returnToken := getApiToken(r)
+		fmt.Fprintf(w, "%v", returnToken)
+		return
+	}
+
 	if shouldByPass(r) {
 		logger.Printf("Bypassing Auth Proxy: %s", r.RequestURI)
 		handler.ServeHTTP(w, r)
@@ -231,11 +237,6 @@ func forwardToNginx(handler http.Handler, r *http.Request, w http.ResponseWriter
 func processMobileRequest(handler http.Handler, r *http.Request, w http.ResponseWriter,
 	fail func(format string, v ...interface{}),
 	writeHttpError func(code int)) {
-	if strings.HasPrefix(r.RequestURI, tokenForCookieUrl) {
-		returnToken := getApiToken(r)
-		fmt.Fprintf(w, "%v", returnToken)
-		return
-	}
 
 	query := r.URL.Query()
 	if strings.HasPrefix(r.RequestURI, tokenPage) && len(query.Get("sso")) == 0 {
