@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -108,11 +107,6 @@ public class Cleaner {
         LOGGER.info("History Cleaning Done");
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(executorService, notificationDaoJpa);
-    }
-
     @PreDestroy
     public void preDestroy() {
         if (executorService != null) {
@@ -122,16 +116,5 @@ public class Cleaner {
                 Thread.currentThread().interrupt();
             }
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Cleaner))
-            return false;
-        Cleaner that = (Cleaner) o;
-        return executorService.equals(that.executorService) && notificationDaoJpa.equals(that.notificationDaoJpa)
-                && notificationConfig.equals(that.notificationConfig);
     }
 }
