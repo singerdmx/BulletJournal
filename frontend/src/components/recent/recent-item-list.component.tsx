@@ -15,6 +15,7 @@ import { Note } from '../../features/notes/interface';
 import TransactionItem from '../project-item/transaction-item.component';
 import { Transaction } from '../../features/transactions/interface';
 import { ProjectItemUIType } from '../../features/project/constants';
+import './recent-item-list.styles.less';
 
 const { RangePicker } = DatePicker;
 
@@ -50,6 +51,47 @@ const RecentItemList: React.FC<RecentItemProps> = ({
     updateRecentItemsDates(dateStrings[0], dateStrings[1]);
   };
 
+  const renderItem = (projectItem: ProjectItem) => {
+    switch (projectItem.contentType) {
+      case ContentType.TASK: {
+        return (
+            <TaskItem
+                task={projectItem as Task}
+                type={ProjectItemUIType.RECENT}
+                isComplete={false}
+                readOnly={false}
+                inModal={false}
+                inProject={false}
+                completeOnlyOccurrence={false}
+            />
+        );
+      }
+      case ContentType.NOTE: {
+        return (
+            <NoteItem
+                note={projectItem as Note}
+                type={ProjectItemUIType.RECENT}
+                readOnly={false}
+                inProject={false}
+                inModal={false}
+            />
+        );
+      }
+      case ContentType.TRANSACTION: {
+        return (
+            <TransactionItem
+                type={ProjectItemUIType.RECENT}
+                transaction={projectItem as Transaction}
+                inModal={false}
+                inProject={false}
+            />
+        );
+      }
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <div className='todo-panel'>
@@ -73,44 +115,9 @@ const RecentItemList: React.FC<RecentItemProps> = ({
       <Divider />
       <div>
         {items.map((projectItem) => {
-          switch (projectItem.contentType) {
-            case ContentType.TASK: {
-              return (
-                <TaskItem
-                  task={projectItem as Task}
-                  type={ProjectItemUIType.RECENT}
-                  isComplete={false}
-                  readOnly={false}
-                  inModal={false}
-                  inProject={false}
-                  completeOnlyOccurrence={false}
-                />
-              );
-            }
-            case ContentType.NOTE: {
-              return (
-                <NoteItem
-                  note={projectItem as Note}
-                  type={ProjectItemUIType.RECENT}
-                  readOnly={false}
-                  inProject={false}
-                  inModal={false}
-                />
-              );
-            }
-            case ContentType.TRANSACTION: {
-              return (
-                <TransactionItem
-                  type={ProjectItemUIType.RECENT}
-                  transaction={projectItem as Transaction}
-                  inModal={false}
-                  inProject={false}
-                />
-              );
-            }
-            default:
-              return null;
-          }
+          return <div className='project-item-div'>
+            {renderItem(projectItem)}
+          </div>
         })}
       </div>
     </div>

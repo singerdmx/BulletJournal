@@ -247,7 +247,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
 
   render() {
     const { selectedValue } = this.state;
-    var mode: CalendarMode = this.props.calendarMode as CalendarMode;
+    const mode: CalendarMode = this.props.calendarMode as CalendarMode;
     return (
       <div className='bujo-calendar'>
         <div className='timezone-container'>
