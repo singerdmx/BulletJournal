@@ -10,6 +10,8 @@ import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.es.repository.models.SearchIndex;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
+import com.bulletjournal.redis.RedisShareItemIdRepository;
+import com.bulletjournal.redis.models.ShareItemIds;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +61,9 @@ public class QueryController {
     private NotificationService notificationService;
     @Autowired
     private SpringESConfig springESConfig;
+
+    @Autowired
+    private RedisShareItemIdRepository redisShareItemIdRepository;
 
     /**
      * Parse Search Index identifier into type and id
@@ -116,7 +121,7 @@ public class QueryController {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
         SearchScrollHits<SearchIndex> scroll;
-
+        ShareItemIds shareItemIds;
         if (scrollId == null || scrollId.length() == 0) {
             List<ProjectItemModel> projectItemModels = sharedProjectItemDaoJpa.
                     getSharedProjectItems(username, null);
@@ -124,11 +129,19 @@ public class QueryController {
             List<String> sharedProjectItemIds = generateSharedProjectItemIds(
                     projectItemModels, sharedContentIds);
 
+            Map<ContentType, Set<Long>> projectItemIdMap = getProjectItemIds(sharedProjectItemIds);
             scroll = searchIndexDaoJpa.search(username, term, sharedProjectItemIds, pageNo, pageSize);
             scrollId = scroll.getScrollId();
+            shareItemIds = new ShareItemIds(scrollId, projectItemIdMap.get(ContentType.NOTE),
+                    projectItemIdMap.get(ContentType.TASK));
+            redisShareItemIdRepository.save(shareItemIds);
         } else {
             scroll = searchIndexDaoJpa.search(scrollId);
+            shareItemIds = redisShareItemIdRepository.findByScrollId(scrollId);
             scrollId = scroll.getScrollId();
+            redisShareItemIdRepository.save(new ShareItemIds(
+                    scrollId, shareItemIds.getSharedNoteIds(), shareItemIds.getSharedTaskIds()
+            ));
         }
 
         if (scroll == null) {
@@ -141,7 +154,8 @@ public class QueryController {
         }
 
         List<SearchIndex> invalidResults = new ArrayList<>();
-        List<SearchResultItem> validResults = search(username, invalidResults, searchResultList);
+        List<SearchResultItem> validResults = search(username, invalidResults, searchResultList,
+                shareItemIds.getSharedNoteIds(), shareItemIds.getSharedTaskIds());
 
         // Batch remove all invalid results from ElasticSearch using notification event queue
         notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(
@@ -219,7 +233,8 @@ public class QueryController {
      */
     private List<SearchResultItem> search(String username,
                                           List<SearchIndex> invalid,
-                                          List<SearchHit<SearchIndex>> searchResultList) {
+                                          List<SearchHit<SearchIndex>> searchResultList,
+                                          Set<Long> shareNoteIds, Set<Long> shareTaskIds) {
         // Created a Map to group search result to the same id
         Map<String, SearchResultItem> results = new HashMap<>();
 
@@ -236,13 +251,18 @@ public class QueryController {
             }
 
             Pair<String, Long> identifierPair = parseSearchIndexInfo(projectItemId);
-
+            String type = identifierPair.getFirst();
+            Long id = identifierPair.getSecond();
             // Check if map contains search result that has the same id.
             // If yes, reuse the same search result. Otherwise, create a new search result instance.
             SearchResultItem searchResultItem = results.getOrDefault(projectItemId, new SearchResultItem());
-            searchResultItem.setType(ContentType.getType(identifierPair.getFirst()));
-            searchResultItem.setId(identifierPair.getSecond());
+            searchResultItem.setType(ContentType.getType(type));
+            searchResultItem.setId(id);
             searchResultItem.setName(projectItemName);
+            if ((ContentType.getType(type).equals(ContentType.NOTE) && shareNoteIds.contains(id)) ||
+                    (ContentType.getType(type).equals(ContentType.TASK) && shareTaskIds.contains(id))) {
+                searchResultItem.setShared(true);
+            }
 
             // Iterate through highlights and add them to Search Result Highlights
             Map<String, List<String>> highlights = searchHit.getHighlightFields();
