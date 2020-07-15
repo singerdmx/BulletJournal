@@ -132,8 +132,8 @@ public class QueryController {
             Map<ContentType, Set<Long>> projectItemIdMap = getProjectItemIds(sharedProjectItemIds);
             scroll = searchIndexDaoJpa.search(username, term, sharedProjectItemIds, pageNo, pageSize);
             scrollId = scroll.getScrollId();
-            shareItemIds = new ShareItemIds(scrollId, projectItemIdMap.get(ContentType.NOTE),
-                    projectItemIdMap.get(ContentType.TASK));
+            shareItemIds = new ShareItemIds(scrollId, projectItemIdMap.getOrDefault(ContentType.NOTE, Collections.emptySet()), n
+                    projectItemIdMap.getOrDefault(ContentType.TASK, Collections.emptySet()));
             redisShareItemIdRepository.save(shareItemIds);
         } else {
             scroll = searchIndexDaoJpa.search(scrollId);
