@@ -8,7 +8,7 @@ class FooterLayout extends React.Component {
     return (
         <Footer className="footer">
           <div className="col-lg-4 col-md-12 col-xs-12">
-            Bullet Journal ©2020 Powered by
+            Bullet Journal ©2020 Powered by{' '}
             <a href="https://1o24bbs.com/c/bulletjournal/108">1024 BBS</a>
           </div>
           <div className="col-lg-4 col-md-6 col-xs-12">
