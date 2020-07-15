@@ -17,4 +17,7 @@ public interface TaskContentRepository extends JpaRepository<TaskContent, Long> 
     @Query("SELECT taskContent FROM TaskContent taskContent WHERE taskContent.updatedAt >= :startTime AND taskContent.updatedAt <= :endTime")
     List<TaskContent> findRecentTaskContentsBetween(@Param("startTime") Timestamp startTime,
                                                     @Param("endTime") Timestamp endTime);
+
+    @Query(nativeQuery =true, value = "SELECT id FROM task_contents WHERE task_contents.task_id IN (:taskIds)")
+    List<Long> findAllByTaskIds(List<Long> taskIds);
 }

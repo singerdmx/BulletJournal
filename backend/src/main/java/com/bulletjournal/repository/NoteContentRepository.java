@@ -18,5 +18,7 @@ public interface NoteContentRepository extends JpaRepository<NoteContent, Long> 
     List<NoteContent> findRecentNoteContentsBetween(@Param("startTime") Timestamp startTime,
                                                     @Param("endTime") Timestamp endTime);
 
-    // List<Long> findAllByNotes(List<Long> notes);
+
+    @Query(nativeQuery =true, value = "SELECT id FROM note_contents WHERE note_contents.note_id IN (:noteIds)")
+    List<Long> findAllByNoteIds(List<Long> noteIds);
 }

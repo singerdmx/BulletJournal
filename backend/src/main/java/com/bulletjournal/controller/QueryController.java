@@ -51,6 +51,11 @@ public class QueryController {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
     @Autowired
+    private NoteContentRepository noteContentRepository;
+    @Autowired
+    private TaskContentRepository taskContentRepository;
+
+    @Autowired
     private NotificationService notificationService;
     @Autowired
     private SpringESConfig springESConfig;
@@ -166,11 +171,14 @@ public class QueryController {
             // item.getId() -> content ids
             switch (k) {
                 case NOTE:
-                    // v => l = this.noteContentRepository.findAllByNotes();
+                    List<Long> noteContentIds = this.noteContentRepository.findAllByNoteIds(v);
                     v.clear();
-                    // v.addAll(l);
+                    v.addAll(noteContentIds);
                     break;
                 case TASK:
+                    List<Long> taskContentIds = this.taskContentRepository.findAllByTaskIds(v);
+                    v.clear();
+                    v.addAll(taskContentIds);
                     break;
                 default:
             }
@@ -187,7 +195,7 @@ public class QueryController {
 
         contents.forEach((k, v) -> {
             for (Long id : v) {
-                ret.add(k.name().toLowerCase() + SEARCH_INDEX_SPLITTER + id);
+                ret.add(k.name().toLowerCase() + "_content" + SEARCH_INDEX_SPLITTER + id);
             }
         });
         return ret;
