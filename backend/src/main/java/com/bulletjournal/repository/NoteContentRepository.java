@@ -19,6 +19,6 @@ public interface NoteContentRepository extends JpaRepository<NoteContent, Long> 
                                                     @Param("endTime") Timestamp endTime);
 
 
-    @Query(nativeQuery =true, value = "SELECT id FROM note_contents WHERE note_contents.note_id IN (:noteIds)")
+    @Query(nativeQuery = true, value = "SELECT id FROM note_contents WHERE note_contents.note_id IN (:noteIds)")
     List<Long> findAllByNoteIds(List<Long> noteIds);
 }
