@@ -9,7 +9,6 @@ import com.bulletjournal.repository.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +43,6 @@ public class SharedProjectItemDaoJpa {
     @Autowired
     private NoteContentRepository noteContentRepository;
 
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItemModel> getSharedProjectItems(
             String requester, final ContentType contentType) {
@@ -53,24 +51,6 @@ public class SharedProjectItemDaoJpa {
                 .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
                 .collect(Collectors.toList());
     }
-
-
-
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Pair<List<Long>, List<Long>> getSharedContentIds(Set<Long> sharedNoteIds, Set<Long> sharedTaskIds) {
-        List<Long> sharedNoteContentIds = new ArrayList<>();
-        List<Long> sharedTaskContentIds = new ArrayList<>();
-        sharedNoteContentIds.addAll(
-                noteContentRepository.findAllById(sharedNoteIds).stream().map(NoteContent::getId).
-                        collect(Collectors.toList()));
-        sharedTaskContentIds.addAll(
-                taskContentRepository.findAllById(sharedTaskIds).stream().map(TaskContent::getId).
-                        collect(Collectors.toList()));
-        return Pair.of(sharedNoteContentIds, sharedTaskContentIds);
-    }
-
-
 
     public static List<ProjectItemModel> getProjectItemModelsFromSharedItems(
             ContentType contentType, List<SharedProjectItem> items) {

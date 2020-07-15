@@ -10,11 +10,7 @@ import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.es.repository.models.SearchIndex;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
-import com.bulletjournal.repository.NoteDaoJpa;
-import com.bulletjournal.repository.ProjectItemDaoJpa;
-import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.TransactionDaoJpa;
-import com.bulletjournal.repository.SharedProjectItemDaoJpa;
+import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,12 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -124,31 +115,15 @@ public class QueryController {
         if (scrollId == null || scrollId.length() == 0) {
             List<ProjectItemModel> projectItemModels = sharedProjectItemDaoJpa.
                     getSharedProjectItems(username, null);
-
-            Set<Long> sharedNoteIds = new HashSet<>();
-            Set<Long> sharedTaskIds  = new HashSet<>();
-            projectItemModels.forEach(
-                    projectItemModel -> {
-                        if (projectItemModel.getContentType().equals(ContentType.NOTE)) {
-                            sharedNoteIds.add(projectItemModel.getId());
-                        } else if (projectItemModel.getContentType().equals(ContentType.TASK)) {
-                            sharedTaskIds.add(projectItemModel.getId());
-                        }
-                    }
-            );
-
-           Pair<List<Long>, List<Long>> shareContentIds = sharedProjectItemDaoJpa.
-                   getSharedContentIds(sharedNoteIds, sharedTaskIds);
-           List<String> sharedProjectItemIds = generateSharedProjectItemIds(
-                   sharedNoteIds, sharedTaskIds, shareContentIds.getFirst(), shareContentIds.getSecond());
+            Map<ContentType, List<Long>> sharedContentIds = this.getContentIdsFromItems(projectItemModels);
+            List<String> sharedProjectItemIds = generateSharedProjectItemIds(
+                    projectItemModels, sharedContentIds);
 
             scroll = searchIndexDaoJpa.search(username, term, sharedProjectItemIds, pageNo, pageSize);
             scrollId = scroll.getScrollId();
-
         } else {
             scroll = searchIndexDaoJpa.search(scrollId);
             scrollId = scroll.getScrollId();
-
         }
 
         if (scroll == null) {
@@ -176,26 +151,54 @@ public class QueryController {
         return validSearchResult;
     }
 
-    private List<String> generateSharedProjectItemIds(Set<Long> sharedNoteIds, Set<Long> sharedTaskIds,
-                                                      List<Long> sharedNoteContentIds, List<Long> sharedTaskContentIds) {
+    // input: task 1, task 2, note 5, note 6
+    // task 1 -> content 1 3
+    // task 2 -> 5, 7
+    // note 5 -> 1, 4
+    // note 6 -> 7, 9, 10
+    // => <ContentType.TASK, [1,2]>, <ContentType.NOTE, [5,6]>
+    // => <ContentType.TASK, [1,3,5,7]>, <ContentType.NOTE, [1,4,7,9,10]>
+    private Map<ContentType, List<Long>> getContentIdsFromItems(List<ProjectItemModel> projectItemModels) {
+        Map<ContentType, List<Long>> m = new HashMap<>();
+        projectItemModels.forEach(item ->
+                m.computeIfAbsent(item.getContentType(), k -> new ArrayList<>()).add(item.getId()));
+        m.forEach((k, v) -> {
+            // item.getId() -> content ids
+            switch (k) {
+                case NOTE:
+                    // v => l = this.noteContentRepository.findAllByNotes();
+                    v.clear();
+                    // v.addAll(l);
+                    break;
+                case TASK:
+                    break;
+                default:
+            }
+        });
+        return m;
+    }
+
+    private List<String> generateSharedProjectItemIds(List<ProjectItemModel> items,
+                                                      Map<ContentType, List<Long>> contents) {
         List<String> ret = new ArrayList<>();
-        sharedNoteIds.forEach(
-                sharedNoteId -> ret.add("note" + SEARCH_INDEX_SPLITTER + sharedNoteId)
-        );
+        for (ProjectItemModel item : items) {
+            ret.add(item.getContentType().name().toLowerCase() + SEARCH_INDEX_SPLITTER + item.getId());
+        }
 
-        sharedTaskIds.forEach(
-                sharedTaskId -> ret.add("task" + SEARCH_INDEX_SPLITTER + sharedTaskId)
-        );
-
-        sharedNoteContentIds.forEach(
-                shareNoteContentId -> ret.add("note_content" + SEARCH_INDEX_SPLITTER + shareNoteContentId)
-        );
-
-        sharedTaskContentIds.forEach(
-                shareTaskContentId -> ret.add("task_content" + SEARCH_INDEX_SPLITTER + shareTaskContentId)
-        );
-
+        contents.forEach((k, v) -> {
+            for (Long id : v) {
+                ret.add(k.name().toLowerCase() + SEARCH_INDEX_SPLITTER + id);
+            }
+        });
         return ret;
+    }
+
+    private Map<ContentType, Set<Long>> getProjectItemIds(List<String> sharedProjectItemIds) {
+        Map<ContentType, Set<Long>> m = new HashMap<>();
+        sharedProjectItemIds.forEach(id ->
+                m.computeIfAbsent(ContentType.valueOf(id.substring(0, 4).toUpperCase()), k -> new HashSet<>())
+                        .add(Long.valueOf(id.substring(5))));
+        return m;
     }
 
     /**

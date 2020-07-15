@@ -17,4 +17,6 @@ public interface NoteContentRepository extends JpaRepository<NoteContent, Long> 
     @Query("SELECT noteContent FROM NoteContent noteContent WHERE noteContent.updatedAt >= :startTime AND noteContent.updatedAt <= :endTime")
     List<NoteContent> findRecentNoteContentsBetween(@Param("startTime") Timestamp startTime,
                                                     @Param("endTime") Timestamp endTime);
+
+    // List<Long> findAllByNotes(List<Long> notes);
 }
