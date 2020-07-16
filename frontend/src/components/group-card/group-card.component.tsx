@@ -54,6 +54,13 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
 
   deleteUser = (groupId: number, username: string, groupName: string) => {
     this.props.removeUserGroupByUsername(groupId, username, groupName);
+    const users = [] as User[];
+    this.state.users.forEach(u => {
+      if (u.name !== username) {
+        users.unshift(u);
+      }
+    })
+    this.setState({users: users});
   };
 
   deleteGroup = () => {
@@ -235,7 +242,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
               <AddUser groupId={group.id} groupName={group.name}/>
           )}
           <span className='group-card-footer-filter'>
-            <Input placeholder="Filter" prefix={<SearchOutlined />} onChange={e => onFilter(e)}/>
+            <Input placeholder="Filter" allowClear={true} prefix={<SearchOutlined />} onChange={e => onFilter(e)}/>
           </span>
         </div>
       </div>
