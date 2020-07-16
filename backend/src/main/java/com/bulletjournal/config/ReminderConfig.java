@@ -6,33 +6,33 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "reminder")
 public class ReminderConfig {
-    int loadPrevHours;
-    int loadNextHours;
-    int purgePrevHours;
+    int loadPrevSeconds;
+    int loadNextSeconds;
+    int purgePrevSeconds;
     String timeZone;
 
-    public int getLoadPrevHours() {
-        return loadPrevHours;
+    public int getLoadPrevSeconds() {
+        return loadPrevSeconds;
     }
 
-    public void setLoadPrevHours(int loadPrevHours) {
-        this.loadPrevHours = loadPrevHours;
+    public void setLoadPrevSeconds(int loadPrevSeconds) {
+        this.loadPrevSeconds = loadPrevSeconds;
     }
 
-    public int getLoadNextHours() {
-        return loadNextHours;
+    public int getLoadNextSeconds() {
+        return loadNextSeconds;
     }
 
-    public void setLoadNextHours(int loadNextHours) {
-        this.loadNextHours = loadNextHours;
+    public void setLoadNextSeconds(int loadNextSeconds) {
+        this.loadNextSeconds = loadNextSeconds;
     }
 
-    public int getPurgePrevHours() {
-        return purgePrevHours;
+    public int getPurgePrevSeconds() {
+        return purgePrevSeconds;
     }
 
-    public void setPurgePrevHours(int purgePrevHours) {
-        this.purgePrevHours = purgePrevHours;
+    public void setPurgePrevSeconds(int purgePrevSeconds) {
+        this.purgePrevSeconds = purgePrevSeconds;
     }
 
     public String getTimeZone() {
@@ -46,9 +46,9 @@ public class ReminderConfig {
     @Override
     public String toString() {
         return "ReminderConfig{" +
-                "loadPrevHours=" + loadPrevHours +
-                ", loadNextHours=" + loadNextHours +
-                ", purgePrevHours=" + purgePrevHours +
+                "loadPrevSeconds=" + loadPrevSeconds +
+                ", loadNextSeconds=" + loadNextSeconds +
+                ", purgePrevSeconds=" + purgePrevSeconds +
                 ", timeZone=" + timeZone +
                 '}';
     }
