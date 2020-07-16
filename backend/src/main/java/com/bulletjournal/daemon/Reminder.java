@@ -1,6 +1,7 @@
 package com.bulletjournal.daemon;
 
 import com.bulletjournal.config.ReminderConfig;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.Task;
@@ -15,7 +16,6 @@ import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -45,12 +45,11 @@ public class Reminder {
     @PostConstruct
     public void postConstruct() {
         LOGGER.info(reminderConfig.toString());
-        LOGGER.info("Reminder first delay seconds: " + this.getInitialDelaySeconds());
 
         this.initLoad();
 
         executorService.scheduleWithFixedDelay(this::cronJob,
-                this.getInitialDelaySeconds(),
+                SECONDS_OF_DAY - ZonedDateTimeHelper.getPassedSecondsOfDay(reminderConfig.getTimeZone()),
                 SECONDS_OF_DAY,
                 TimeUnit.SECONDS);
     }
@@ -76,15 +75,4 @@ public class Reminder {
 
         return taskDaoJpa.getTasks(start, end);
     }
-
-    private long getInitialDelaySeconds() {
-        Calendar rightNow = Calendar.getInstance(TimeZone.getTimeZone(reminderConfig.getTimeZone()));
-
-        int hour = rightNow.get(Calendar.HOUR);
-        int minute = rightNow.get(Calendar.MINUTE);
-        int second = rightNow.get(Calendar.SECOND);
-        int totalSeconds = (hour * MINUTES_OF_HOUR + minute) * SECONDS_OF_MINUTE + second;
-        return SECONDS_OF_DAY - totalSeconds;
-    }
-
 }

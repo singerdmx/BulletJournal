@@ -300,4 +300,9 @@ public class ZonedDateTimeHelper {
                 0,
                 ZoneId.of(timezone));
     }
+
+    public static long getPassedSecondsOfDay(String timezone) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
+        return now.get(ChronoField.SECOND_OF_DAY);
+    }
 }
