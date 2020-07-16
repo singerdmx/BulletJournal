@@ -152,8 +152,14 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       return null;
     };
 
+    const shouldInclude = (u: User, value: string) => {
+      return u.name.toLowerCase().includes(value) || u.alias.toLowerCase().includes(value);
+    }
+
     const onFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
       let { value } = e.target;
+      console.log(value)
+
       if (!value) {
         this.setState({users: group.users});
         return;
@@ -162,12 +168,11 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       value = value.toLowerCase();
       const users = [] as User[];
       group.users.forEach(u => {
-        if (u.name.toLowerCase().includes(value) || u.alias.toLowerCase().includes(value)) {
+        if (shouldInclude(u, value)) {
           users.unshift(u);
         }
       })
       this.setState({users: users});
-      console.log(value)
     };
 
     return (
