@@ -1,6 +1,6 @@
 import React from "react";
-import {CloseOutlined, DeleteOutlined, UserOutlined} from "@ant-design/icons";
-import {Avatar, Badge, Button, List, Popconfirm, Tooltip, Typography,} from "antd";
+import {CloseOutlined, DeleteOutlined, UserOutlined, SearchOutlined} from "@ant-design/icons";
+import {Avatar, Badge, Button, Input, List, Popconfirm, Tooltip, Typography,} from "antd";
 import {connect} from "react-redux";
 import {RouteComponentProps, withRouter} from "react-router";
 import {deleteGroup, getGroup, patchGroup, removeUserGroupByUsername,} from "../../features/group/actions";
@@ -33,6 +33,10 @@ type GroupProps = {
 
 type PathProps = RouteComponentProps;
 
+type GroupCardState = {
+  users: User[];
+};
+
 function getGroupUserTitle(user: User, group: Group): string {
   if (user.name === group.owner.name) {
     return `Owner ${user.name}`;
@@ -42,7 +46,11 @@ function getGroupUserTitle(user: User, group: Group): string {
 
 const { Title, Text } = Typography;
 
-class GroupCard extends React.Component<GroupProps & PathProps> {
+class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> {
+
+  state: GroupCardState = {
+    users: this.props.group.users,
+  };
 
   deleteUser = (groupId: number, username: string, groupName: string) => {
     this.props.removeUserGroupByUsername(groupId, username, groupName);
@@ -144,6 +152,24 @@ class GroupCard extends React.Component<GroupProps & PathProps> {
       return null;
     };
 
+    const onFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+      let { value } = e.target;
+      if (!value) {
+        this.setState({users: group.users});
+        return;
+      }
+
+      value = value.toLowerCase();
+      const users = [] as User[];
+      group.users.forEach(u => {
+        if (u.name.toLowerCase().includes(value) || u.alias.toLowerCase().includes(value)) {
+          users.unshift(u);
+        }
+      })
+      this.setState({users: users});
+      console.log(value)
+    };
+
     return (
       <div className={`group-card ${this.props.multiple && 'multiple'}`}>
         <div className="group-title">
@@ -175,7 +201,7 @@ class GroupCard extends React.Component<GroupProps & PathProps> {
         </div>
         <div className="group-users">
           <List
-            dataSource={group.users}
+            dataSource={this.state.users}
             renderItem={(user) => {
               return (
                 <List.Item key={user.id}>
@@ -199,9 +225,14 @@ class GroupCard extends React.Component<GroupProps & PathProps> {
             }}
           />
         </div>
-        {group.owner.name === this.props.myself.username && (
-          <AddUser groupId={group.id} groupName={group.name} />
-        )}
+        <div className='group-card-footer'>
+          {group.owner.name === this.props.myself.username && (
+              <AddUser groupId={group.id} groupName={group.name}/>
+          )}
+          <span className='group-card-footer-filter'>
+            <Input placeholder="Filter" prefix={<SearchOutlined />} onChange={e => onFilter(e)}/>
+          </span>
+        </div>
       </div>
     );
   }

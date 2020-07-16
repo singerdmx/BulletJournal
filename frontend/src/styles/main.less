@@ -156,6 +156,7 @@
   &.multiple {
     height: 40vh;
   }
+  max-height: 66vh;
   border-radius: 8px;
   box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
     0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
@@ -197,6 +198,16 @@
     width: 100%;
     padding: 10px 10px;
     border-bottom: 1px solid #e0e6ed;
+  }
+
+  .group-card-footer {
+    display: flex;
+    justify-content: space-evenly;
+
+    .group-card-footer-filter {
+      margin-top: 8px;
+      margin-left: 5px;
+    }
   }
 
   &:hover {
