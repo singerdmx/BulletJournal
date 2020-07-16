@@ -138,7 +138,7 @@ public class QueryController {
         } else {
             scroll = searchIndexDaoJpa.search(scrollId);
             Optional<ShareItemIds> option = redisShareItemIdRepository.findById(scrollId);
-            if(!option.isPresent()) {
+            if (!option.isPresent()) {
                 throw new IllegalStateException("ScrollId is not stored");
             }
             shareItemIds = option.get();
