@@ -261,8 +261,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Get assignee's reminding tasks and recurring reminding tasks from database.
      * <p>
-     * Reminding tasks qualifications: 1. Reminding Time is before current time. 2.
-     * Starting time plus 10 minutes buffer is after the current time.
+     * Reminding tasks qualifications:
+     * 1. Reminding Time is before current time.
+     * 2. Starting time plus 10 minutes buffer is after the current time.
      * <p>
      * [Reminding Time] <= Now <= [Starting Time + 10 mins]
      *
@@ -303,7 +304,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(assignee,
                 ZonedDateTimeHelper.toDBTimestamp(startTime), ZonedDateTimeHelper.toDBTimestamp(endTime));
 
-        List<Task> recurrentTasks = this.getRecurringTasks(assignee, startTime, endTime);
+        List<Task> recurrentTasks = this.getRecurringTaskOfAssignee(assignee, startTime, endTime);
 
         tasks.addAll(recurrentTasks);
         return tasks;
@@ -312,8 +313,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     /**
      * Get recurring reminding tasks from database.
      * <p>
-     * Reminding tasks qualifications: 1. Reminding Time is before current time. 2.
-     * Starting time is after the current time.
+     * Reminding tasks qualifications:
+     * 1. Reminding Time is before current time.
+     * 2. Starting time is after the current time.
      *
      * @param assignee the username of task assignee
      * @param now      the ZonedDateTime object of the current time
@@ -323,29 +325,28 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<com.bulletjournal.controller.models.Task> getRecurringTaskNeedReminding(final String assignee,
                                                                                         final ZonedDateTime now) {
         ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
-        return this.getRecurringTasks(assignee, now, maxRemindingTime).stream()
+        return this.getRecurringTaskOfAssignee(assignee, now, maxRemindingTime).stream()
                 .filter(t -> t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now))
                         && t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 
     /**
-     * Get all recurrent tasks of an assignee within requested start time and end
-     * time
+     * Get all recurrent tasks within requested time range
      * <p>
-     * Procedure: 1. Fetch all tasks with recurrence rule 2. Obtain new DateTime
-     * instance by using RecurrenceRule iterator 3. Clone the original recurring
-     * task and set its start/end time and reminding setting
+     * Procedure:
+     * 1. Iterate through input recurrent tasks
+     * 2. Obtain new DateTime instance by using RecurrenceRule iterator
+     * 3. Clone the original recurring task and set its start/end time and reminding setting
      *
-     * @param assignee  the username of task assignee
-     * @param startTime the ZonedDateTime object of start time
-     * @param endTime   the ZonedDateTime object of end time
+     * @param recurrentTasks a list of tasks with recurrence rule
+     * @param startTime      the ZonedDateTime object of start time
+     * @param endTime        the ZonedDateTime object of end time
      * @return List<Task> - a list of recurrent tasks within the time range
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getRecurringTasks(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Task> getRecurringTasks(List<Task> recurrentTasks, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasksBetween = new ArrayList<>();
-        List<Task> recurrentTasks = this.taskRepository.findTasksByAssigneeAndRecurrenceRuleNotNull(assignee);
         DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
         DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
 
@@ -390,14 +391,42 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Get all tasks: startTime <= task.startTime <= endTime
-     * Both nonrecurring and recurring tasks
-     * @param startTime Timestamp
-     * @param endTime Timestamp
-     * @return
+     * Get all recurrent tasks of an assignee within requested range
+     *
+     * @param assignee  the assignee of recurrent task
+     * @param startTime the requested range start time
+     * @param endTime   the requested range end time
+     * @return List<Task> - a list of recurrent tasks within the time range
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getTasks(Timestamp startTime, Timestamp endTime) {
+    public List<Task> getRecurringTaskOfAssignee(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Task> recurringTasks = this.taskRepository.findTasksByAssigneeAndRecurrenceRuleNotNull(assignee);
+        return getRecurringTasks(recurringTasks, startTime, endTime);
+    }
+
+    /**
+     * Get all recurrent tasks within requested range
+     *
+     * @param startTime the requested range start time
+     * @param endTime   the requested range end time
+     * @return List<Task> - a list of recurring tasks within the time range
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getAllRecurringTask(ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Task> recurringTasks = this.taskRepository.findTasksByRecurrenceRuleNotNull();
+        return getRecurringTasks(recurringTasks, startTime, endTime);
+    }
+
+    /**
+     * Get all tasks: startTime <= task.startTime <= endTime
+     * Both nonrecurring and recurring tasks
+     *
+     * @param startTime Timestamp
+     * @param endTime   Timestamp
+     * @return List<Task> - a list of recurrent tasks within the time range
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getRemindingTasks(Timestamp startTime, Timestamp endTime) {
         return Collections.emptyList();
     }
 

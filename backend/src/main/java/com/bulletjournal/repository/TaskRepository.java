@@ -25,6 +25,8 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.recurrence_rule IS NOT NULL", nativeQuery = true)
     List<Task> findTasksByAssigneeAndRecurrenceRuleNotNull(@Param("assignee") String assignee);
 
+    List<Task> findTasksByRecurrenceRuleNotNull();
+
     Optional<Task> findTaskByGoogleCalendarEventId(String googleCalendarEventId);
 
     @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND tasks.reminder_date_time IS NOT NULL"

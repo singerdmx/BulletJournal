@@ -73,6 +73,6 @@ public class Reminder {
         Timestamp start = new Timestamp(Calendar.getInstance().getTimeInMillis());
         Timestamp end = Timestamp.from((start.toInstant().plus(seconds, ChronoUnit.SECONDS)));
 
-        return taskDaoJpa.getTasks(start, end);
+        return taskDaoJpa.getRemindingTasks(start, end);
     }
 }
