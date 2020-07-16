@@ -137,7 +137,11 @@ public class QueryController {
             redisShareItemIdRepository.save(shareItemIds);
         } else {
             scroll = searchIndexDaoJpa.search(scrollId);
-            shareItemIds = redisShareItemIdRepository.findByScrollId(scrollId);
+            Optional<ShareItemIds> option = redisShareItemIdRepository.findById(scrollId);
+            if(!option.isPresent()) {
+                throw new IllegalStateException("ScrollId is not stored");
+            }
+            shareItemIds = option.get();
             scrollId = scroll.getScrollId();
             redisShareItemIdRepository.save(new ShareItemIds(
                     scrollId, shareItemIds.getSharedNoteIds(), shareItemIds.getSharedTaskIds()
