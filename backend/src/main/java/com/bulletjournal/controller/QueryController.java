@@ -217,9 +217,15 @@ public class QueryController {
 
     private Map<ContentType, Set<Long>> getProjectItemIds(List<String> sharedProjectItemIds) {
         Map<ContentType, Set<Long>> m = new HashMap<>();
-        sharedProjectItemIds.forEach(id ->
-                m.computeIfAbsent(ContentType.valueOf(id.substring(0, 4).toUpperCase()), k -> new HashSet<>())
-                        .add(Long.valueOf(id.substring(5))));
+        sharedProjectItemIds.forEach(id -> {
+                    int index = id.indexOf(SEARCH_INDEX_SPLITTER);
+                     String contentType = id.substring(0, index).toUpperCase();
+                    if (contentType.equals(ContentType.NOTE.name())
+                            ||  contentType.equals(ContentType.TASK.name()))
+                    m.computeIfAbsent(ContentType.valueOf(contentType), k -> new HashSet<>())
+                            .add(Long.valueOf(id.substring(index + 1)));
+                }
+        );
         return m;
     }
 
