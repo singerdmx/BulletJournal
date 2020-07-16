@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "reminder")
 public class ReminderConfig {
-    int loadPrevSeconds;
-    int loadNextSeconds;
-    int purgePrevSeconds;
-    String timeZone;
+    private int loadPrevSeconds;
+    private int loadNextSeconds;
+    private int purgePrevSeconds;
+    private String timeZone;
 
     public int getLoadPrevSeconds() {
         return loadPrevSeconds;
