@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -70,8 +69,8 @@ public class Reminder {
     }
 
     private List<Task> loadReminderRecords(int seconds) {
-        Timestamp start = new Timestamp(Calendar.getInstance().getTimeInMillis());
-        Timestamp end = Timestamp.from((start.toInstant().plus(seconds, ChronoUnit.SECONDS)));
+        ZonedDateTime start =  ZonedDateTimeHelper.getNow(reminderConfig.getTimeZone());
+        ZonedDateTime end = start.plus(seconds, ChronoUnit.SECONDS);
 
         return taskDaoJpa.getRemindingTasks(start, end);
     }

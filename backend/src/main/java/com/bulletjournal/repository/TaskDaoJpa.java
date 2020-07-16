@@ -421,17 +421,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * Get all tasks: startTime <= task.startTime <= endTime
      * Both nonrecurring and recurring tasks
      *
-     * @param startTime Timestamp
-     * @param endTime   Timestamp
+     * @param startTime
+     * @param endTime
      * @return List<Task> - a list of recurrent tasks within the time range
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getRemindingTasks(Timestamp startTime, Timestamp endTime) {
+    public List<Task> getRemindingTasks(ZonedDateTime startTime, ZonedDateTime endTime) {
         return Collections.emptyList();
-    }
-
-    public boolean isRemindingTask(Task task, Timestamp startTime, Timestamp endTime) {
-        return false;
     }
 
     /**

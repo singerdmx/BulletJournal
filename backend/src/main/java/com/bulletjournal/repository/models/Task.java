@@ -4,6 +4,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.TaskStatus;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import javax.persistence.*;
@@ -77,6 +78,10 @@ public class Task extends TaskModel {
             task.setStatus(TaskStatus.getType(this.status));
         }
         return task;
+    }
+
+    public boolean isRemindingTask(ZonedDateTime start, ZonedDateTime end) {
+        return false;
     }
 
 }
