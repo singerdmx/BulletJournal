@@ -153,7 +153,9 @@
   width: 380px;
   min-height: 300px;
   padding: 1vh 2vw 0 2vw;
-  height: 40vh;
+  &.multiple {
+    height: 40vh;
+  }
   border-radius: 8px;
   box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
     0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
@@ -177,6 +179,18 @@
   .group-users {
     flex-grow: 1;
     overflow-y: auto;
+
+    .group-user {
+      display: flex;
+      align-items: baseline;
+      .group-user-info {
+        margin-left: 0.5rem;
+      }
+      .ant-typography-edit-content {
+        margin: 0;
+        margin-left: 0.5rem;
+      }
+    }
   }
   .group-users .user-item {
     height: 52px;

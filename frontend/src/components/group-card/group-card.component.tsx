@@ -8,13 +8,13 @@ import {Group, User} from "../../features/group/interface";
 import {MyselfWithAvatar} from "../../features/myself/reducer";
 import {IState} from "../../store";
 
-import "./group-card.styles.less";
 import AddUser from "../modals/add-user.component";
 import {History} from "history";
 import {changeAlias} from "../../features/user/actions";
 
 type GroupProps = {
   group: Group;
+  multiple: boolean;
   myself: MyselfWithAvatar;
   deleteGroup: (
     groupId: number,
@@ -145,7 +145,7 @@ class GroupCard extends React.Component<GroupProps & PathProps> {
     };
 
     return (
-      <div className="group-card">
+      <div className={`group-card ${this.props.multiple && 'multiple'}`}>
         <div className="group-title">
           <Title
             level={4}

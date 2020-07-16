@@ -7,6 +7,7 @@ import { IState } from '../../store';
 import GroupCard from '../../components/group-card/group-card.component';
 
 import './group.styles.less';
+import {BackTop} from "antd";
 
 type GroupPathParams = {
   groupId: string;
@@ -45,7 +46,8 @@ class GroupPage extends React.Component<GroupPageProps & GroupPathProps> {
     if (!group) return null;
     return (
       <div className='group-page'>
-        <GroupCard group={group} />
+        <BackTop />
+        <GroupCard group={group} multiple={false}/>
       </div>
     );
   }
