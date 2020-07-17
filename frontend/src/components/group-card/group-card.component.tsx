@@ -11,6 +11,7 @@ import { IState } from "../../store";
 import AddUser from "../modals/add-user.component";
 import { History } from "history";
 import { changeAlias } from "../../features/user/actions";
+import moment from "moment";
 
 type GroupProps = {
   group: Group;
@@ -35,6 +36,7 @@ type PathProps = RouteComponentProps;
 
 type GroupCardState = {
   users: User[];
+  filter: string;
 };
 
 function getGroupUserTitle(user: User, group: Group): string {
@@ -50,7 +52,25 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
 
   state: GroupCardState = {
     users: this.props.group.users,
+    filter: ''
   };
+
+  componentDidMount() {
+    if (this.props.group) {
+      this.setState({users: this.props.group.users});
+    } else {
+      this.setState({users: []});
+    }
+    this.setState({filter: ''});
+  }
+
+  componentDidUpdate(prevProps: GroupProps & PathProps, prevState: GroupCardState): void {
+    const currentGroup = this.props.group;
+    if (currentGroup !== prevProps.group) {
+      this.setState({users: this.props.group.users});
+      this.setState({filter: ''});
+    }
+  }
 
   deleteUser = (groupId: number, username: string, groupName: string) => {
     this.props.removeUserGroupByUsername(groupId, username, groupName);
@@ -179,7 +199,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
 
     const onFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
       let { value } = e.target;
-      console.log(value)
+      this.setState({filter: value});
 
       if (!value) {
         this.setState({ users: group.users });
@@ -256,7 +276,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
             <AddUser groupId={group.id} groupName={group.name} />
           )}
           <span className='group-card-footer-filter'>
-            <Input placeholder="Filter" allowClear={true} prefix={<SearchOutlined />} onChange={e => onFilter(e)} />
+            <Input value={this.state.filter} placeholder="Filter" allowClear={true} prefix={<SearchOutlined />} onChange={e => onFilter(e)} />
           </span>
         </div>
       </div>
