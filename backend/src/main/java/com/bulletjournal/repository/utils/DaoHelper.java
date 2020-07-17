@@ -18,7 +18,7 @@ public class DaoHelper {
 
     // For recurring task, return list of ReminderRecord in [startTime, endTime]
     // For one-time task, return list of single or zero ReminderRecord
-    public List<ReminderRecord> getReminderRecords(Task task, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public static List<ReminderRecord> getReminderRecords(Task task, ZonedDateTime startTime, ZonedDateTime endTime) {
         return Collections.emptyList();
     }
 }
