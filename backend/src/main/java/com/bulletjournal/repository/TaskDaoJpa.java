@@ -421,15 +421,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Map<ReminderRecord, Task> getRemindingTasks(ZonedDateTime startTime, ZonedDateTime endTime) {
-//        List<Task> nonRecurringTasks = getAllRemindingTasksBetween(startTime, endTime);
-//        List<Task> recurringTasks = getAllRemindingRecurringTasksBetween(startTime, endTime);
-//
-//        Map<ReminderRecord, Task> reminderRecordTaskMap = new HashMap<>(); // TODO: Need to confirm map type
-//        fillReminderRecordTaskMap(reminderRecordTaskMap, nonRecurringTasks, startTime, endTime);
-//        fillReminderRecordTaskMap(reminderRecordTaskMap, recurringTasks, startTime, endTime);
-//
-//        return reminderRecordTaskMap;
-        return Collections.emptyMap();
+        List<Task> nonRecurringTasks = getAllRemindingTasksBetween(startTime, endTime);
+        List<Task> recurringTasks = getAllRemindingRecurringTasksBetween(startTime, endTime);
+
+        Map<ReminderRecord, Task> reminderRecordTaskMap = new HashMap<>(); // TODO: Need to confirm map type
+        fillReminderRecordTaskMap(reminderRecordTaskMap, nonRecurringTasks, startTime, endTime);
+        fillReminderRecordTaskMap(reminderRecordTaskMap, recurringTasks, startTime, endTime);
+
+        return reminderRecordTaskMap;
     }
 
     /**
