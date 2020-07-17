@@ -431,11 +431,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return Collections.emptyMap();
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getRemindingTasks(long taskId, ZonedDateTime startTime, ZonedDateTime endTime) {
-        return Collections.emptyList();
-    }
-
     /**
      * Create task based on CreateTaskParams
      *
