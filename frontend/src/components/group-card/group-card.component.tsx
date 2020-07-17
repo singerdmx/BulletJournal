@@ -160,8 +160,25 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
     };
 
     const shouldInclude = (u: User, value: string) => {
-      return u.name.toLowerCase().includes(value) || u.alias.toLowerCase().includes(value);
+
+      return isSubsequence(u.name.toLowerCase(), value) || isSubsequence(u.alias.toLowerCase(), value);
     }
+
+  
+    const isSubsequence = (userInfo: string, value: string) => {
+       var i = 0;
+       var j = 0;    
+      while (i < value.length && j< userInfo.length) {
+          if (value.charAt(i) === userInfo.charAt(j)){
+              i++;
+          }
+          j++;
+          if(i === value.length)
+              return true;
+      }
+      return false;
+    }
+   
 
     const onFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
       let { value } = e.target;
