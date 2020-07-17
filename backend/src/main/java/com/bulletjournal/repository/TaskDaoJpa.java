@@ -20,14 +20,11 @@ import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
-import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -333,7 +330,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Get all recurrent tasks within requested time range
+     * Get all recurrent tasks in [startTime, endTime]
      * <p>
      * Procedure:
      * 1. Iterate through input recurrent tasks
@@ -345,54 +342,19 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @param endTime        the ZonedDateTime object of end time
      * @return List<Task> - a list of recurrent tasks within the time range
      */
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecurringTasks(List<Task> recurrentTasks, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasksBetween = new ArrayList<>();
-        DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
-        DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
 
         for (Task t : recurrentTasks) {
-            try {
-                String recurrenceRule = t.getRecurrenceRule();
-                String timezone = t.getTimezone();
-                Set<String> completedSlots = ZonedDateTimeHelper.parseDateTimeSet(t.getCompletedSlots());
-                BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
-                RecurrenceRuleIterator it = rule.getIterator();
-                while (it.hasNext()) {
-                    DateTime currDateTime = it.nextDateTime();
-                    if (currDateTime.after(endDateTime)) {
-                        break;
-                    }
-                    if (currDateTime.before(startDateTime) || completedSlots.contains(currDateTime.toString())) {
-                        continue;
-                    }
-                    Task cloned = (Task) t.clone();
-
-                    String date = ZonedDateTimeHelper.getDate(currDateTime);
-                    String time = ZonedDateTimeHelper.getTime(currDateTime);
-
-                    cloned.setDueDate(date); // Set due date
-                    cloned.setDueTime(time); // Set due time
-
-                    // Set start time and end time
-                    cloned.setStartTime(
-                            Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-                    cloned.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
-
-                    cloned.setReminderSetting(t.getReminderSetting()); // Set reminding setting to cloned
-                    recurringTasksBetween.add(cloned);
-                }
-            } catch (InvalidRecurrenceRuleException | NumberFormatException e) {
-                throw new IllegalArgumentException("Recurrence rule format invalid");
-            } catch (CloneNotSupportedException e) {
-                throw new IllegalStateException("Clone new Task failed");
-            }
+            List<Task> recurringTasks = DaoHelper.getRecurringTask(t, startTime, endTime);
+            recurringTasksBetween.addAll(recurringTasks);
         }
+
         return recurringTasksBetween;
     }
 
     /**
-     * Get all recurrent tasks of an assignee within requested range
+     * Get all recurrent tasks of an assignee in [startTime, endTime]
      *
      * @param assignee  the assignee of recurrent task
      * @param startTime the requested range start time
@@ -406,7 +368,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Get all recurrent tasks within requested range
+     * Get all recurrent tasks in [startTime, endTime]
      *
      * @param startTime the requested range start time
      * @param endTime   the requested range end time
@@ -419,7 +381,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Get all reminding tasks within requested range
+     * Get all reminding tasks in [startTime, endTime]
      *
      * @param startTime the requested range start time
      * @param endTime   the requested range end time
@@ -433,16 +395,19 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Append a list of tasks to reminder record map
+     * Get all reminder records from given task and put them into target ReminderRecord Map along with given task
      *
      * @param reminderRecordTaskMap the ReminderRecord map
      * @param tasks                 a list of tasks to be added into reminderRecordTaskMap
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void fillReminderRecordTaskMap(Map<ReminderRecord, Task> reminderRecordTaskMap, List<Task> tasks) {
+    public void fillReminderRecordTaskMap(Map<ReminderRecord, Task> reminderRecordTaskMap,
+                                          List<Task> tasks, ZonedDateTime start, ZonedDateTime end) {
         tasks.forEach(t -> {
-            ReminderRecord reminderRecord = new ReminderRecord(t.getId(), t.getReminderDateTime().getTime());
-            reminderRecordTaskMap.put(reminderRecord, t);
+            List<ReminderRecord> records = DaoHelper.getReminderRecords(t, start, end);
+            for (ReminderRecord record : records) {
+                reminderRecordTaskMap.put(record, t);
+            }
         });
     }
 
@@ -460,8 +425,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<Task> recurringTasks = getAllRemindingRecurringTasksBetween(startTime, endTime);
 
         Map<ReminderRecord, Task> reminderRecordTaskMap = new HashMap<>(); // TODO: Need to confirm map type
-        fillReminderRecordTaskMap(reminderRecordTaskMap, nonRecurringTasks);
-        fillReminderRecordTaskMap(reminderRecordTaskMap, recurringTasks);
+        fillReminderRecordTaskMap(reminderRecordTaskMap, nonRecurringTasks, startTime, endTime);
+        fillReminderRecordTaskMap(reminderRecordTaskMap, recurringTasks, startTime, endTime);
 
         return reminderRecordTaskMap;
     }
