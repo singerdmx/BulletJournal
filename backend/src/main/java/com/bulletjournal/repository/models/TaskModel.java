@@ -1,9 +1,11 @@
 package com.bulletjournal.repository.models;
 
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.Label;
+import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.base.Preconditions;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @MappedSuperclass
@@ -223,7 +226,14 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
     }
 
     public void setRecurrenceRule(String recurrenceRule) {
-        this.recurrenceRule = recurrenceRule;
+        try {
+            if (Objects.nonNull(recurrenceRule)) {
+                BuJoRecurrenceRule.create(recurrenceRule);
+            }
+            this.recurrenceRule = recurrenceRule;
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Illegal recurrence rule format");
+        }
     }
 
     private Timestamp getReminderDateTime(Timestamp startTime, Integer before) {
