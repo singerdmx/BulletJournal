@@ -163,16 +163,16 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       return isSubsequence(u.name.toLowerCase(), value) || isSubsequence(u.alias.toLowerCase(), value);
     }
 
-    const isSubsequence = (userInfo: string, value: string) => {
-      var i = 0;
-      var j = 0;
-      while (i < value.length && j < userInfo.length) {
-        if (value.charAt(i) === userInfo.charAt(j)) {
+    const isSubsequence = (longS: string, shortS: string) => {
+      let i = 0;
+      let j = 0;
+      while (i < shortS.length && j < longS.length) {
+        if (shortS.charAt(i) === longS.charAt(j++)) {
           i++;
         }
-        j++;
-        if (i === value.length)
+        if (i === shortS.length) {
           return true;
+        }
       }
       return false;
     }
