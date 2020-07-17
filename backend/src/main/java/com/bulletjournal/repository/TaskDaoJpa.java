@@ -413,22 +413,57 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<Task> - a list of recurring tasks within the time range
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getAllRecurringTask(ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Task> getAllRemindingRecurringTasksBetween(ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasks = this.taskRepository.findTasksByRecurrenceRuleNotNull();
         return getRecurringTasks(recurringTasks, startTime, endTime);
+    }
+
+    /**
+     * Get all reminding tasks within requested range
+     *
+     * @param startTime the requested range start time
+     * @param endTime   the requested range end time
+     * @return List<Task> - a list of tasks within the time range
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getAllRemindingTasksBetween(ZonedDateTime startTime, ZonedDateTime endTime) {
+        Timestamp start = Timestamp.from(startTime.toInstant());
+        Timestamp end = Timestamp.from(endTime.toInstant());
+        return this.taskRepository.findRemindingTasksBetween(start.toString(), end.toString());
+    }
+
+    /**
+     * Append a list of tasks to reminder record map
+     *
+     * @param reminderRecordTaskMap the ReminderRecord map
+     * @param tasks                 a list of tasks to be added into reminderRecordTaskMap
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void fillReminderRecordTaskMap(Map<ReminderRecord, Task> reminderRecordTaskMap, List<Task> tasks) {
+        tasks.forEach(t -> {
+            ReminderRecord reminderRecord = new ReminderRecord(t.getId(), t.getReminderDateTime().getTime());
+            reminderRecordTaskMap.put(reminderRecord, t);
+        });
     }
 
     /**
      * Get all tasks: startTime <= task.startTime <= endTime
      * Both nonrecurring and recurring tasks
      *
-     * @param startTime
-     * @param endTime
-     * @return List<Task> - a list of recurrent tasks within the time range
+     * @param startTime the requested range start time
+     * @param endTime   the requested range end time
+     * @return Map<ReminderRecord, Task> - a map with
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Map<ReminderRecord, Task> getRemindingTasks(ZonedDateTime startTime, ZonedDateTime endTime) {
-        return Collections.emptyMap();
+        List<Task> nonRecurringTasks = getAllRemindingTasksBetween(startTime, endTime);
+        List<Task> recurringTasks = getAllRemindingRecurringTasksBetween(startTime, endTime);
+
+        Map<ReminderRecord, Task> reminderRecordTaskMap = new HashMap<>(); // TODO: Need to confirm map type
+        fillReminderRecordTaskMap(reminderRecordTaskMap, nonRecurringTasks);
+        fillReminderRecordTaskMap(reminderRecordTaskMap, recurringTasks);
+
+        return reminderRecordTaskMap;
     }
 
     /**
