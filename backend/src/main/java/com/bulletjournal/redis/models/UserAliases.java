@@ -6,7 +6,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Map;
 
-@RedisHash(value = "UserAliases")
+@RedisHash(value = "UserAliases", timeToLive = 90_000_000)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserAliases {
 
