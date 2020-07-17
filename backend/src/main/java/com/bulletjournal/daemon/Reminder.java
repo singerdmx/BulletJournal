@@ -4,7 +4,6 @@ import com.bulletjournal.config.ReminderConfig;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,9 +28,11 @@ public class Reminder {
 
     private final ScheduledExecutorService executorService;
     private final ConcurrentHashMap<ReminderRecord, ReminderRecord> concurrentHashMap;
+
     @Autowired
     ReminderConfig reminderConfig;
-    private TaskDaoJpa taskDaoJpa;
+
+    private final TaskDaoJpa taskDaoJpa;
 
     @Autowired
     Reminder(TaskDaoJpa taskDaoJpa) {
@@ -64,14 +64,14 @@ public class Reminder {
         this.loadReminderRecords(this.reminderConfig.getLoadNextSeconds());
     }
 
-    private void purge(int hours) {
+    private void purge(long seconds) {
         System.out.println("Purge work");
     }
 
-    private List<Task> loadReminderRecords(int seconds) {
-        ZonedDateTime start =  ZonedDateTimeHelper.getNow(reminderConfig.getTimeZone());
+    private void loadReminderRecords(long seconds) {
+        ZonedDateTime start = ZonedDateTime.now();
         ZonedDateTime end = start.plus(seconds, ChronoUnit.SECONDS);
 
-        return taskDaoJpa.getRemindingTasks(start, end);
+        taskDaoJpa.getRemindingTasks(start, end);
     }
 }

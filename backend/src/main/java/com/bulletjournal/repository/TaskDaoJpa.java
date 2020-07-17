@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -426,7 +427,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<Task> - a list of recurrent tasks within the time range
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getRemindingTasks(ZonedDateTime startTime, ZonedDateTime endTime) {
+    public Map<ReminderRecord, Task> getRemindingTasks(ZonedDateTime startTime, ZonedDateTime endTime) {
+        return Collections.emptyMap();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getRemindingTasks(long taskId, ZonedDateTime startTime, ZonedDateTime endTime) {
         return Collections.emptyList();
     }
 

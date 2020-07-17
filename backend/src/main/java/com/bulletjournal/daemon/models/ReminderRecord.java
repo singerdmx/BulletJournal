@@ -3,23 +3,28 @@ package com.bulletjournal.daemon.models;
 import java.util.Objects;
 
 public class ReminderRecord {
-    String id;
-    String timestamp; // "HH-mm"
+    private long id;
+    private long reminderTimeStamp;
 
-    public String getId() {
+    public ReminderRecord(long id, long reminderTimeStamp) {
+        this.id = id;
+        this.reminderTimeStamp = reminderTimeStamp;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public long getReminderTimeStamp() {
+        return reminderTimeStamp;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setReminderTimeStamp(long reminderTimeStamp) {
+        this.reminderTimeStamp = reminderTimeStamp;
     }
 
     @Override
@@ -28,12 +33,12 @@ public class ReminderRecord {
         if (!(o instanceof ReminderRecord)) return false;
         ReminderRecord that = (ReminderRecord) o;
         return Objects.equals(this.id, that.id) &&
-                Objects.equals(this.timestamp, that.timestamp);
+                Objects.equals(this.reminderTimeStamp, that.reminderTimeStamp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, timestamp);
+        return Objects.hash(id, reminderTimeStamp);
     }
 
 }
