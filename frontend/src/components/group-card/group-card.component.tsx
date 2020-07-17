@@ -11,7 +11,6 @@ import { IState } from "../../store";
 import AddUser from "../modals/add-user.component";
 import { History } from "history";
 import { changeAlias } from "../../features/user/actions";
-import moment from "moment";
 
 type GroupProps = {
   group: Group;
