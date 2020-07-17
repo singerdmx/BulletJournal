@@ -1,16 +1,16 @@
 import React from "react";
-import {CloseOutlined, DeleteOutlined, UserOutlined, SearchOutlined} from "@ant-design/icons";
-import {Avatar, Badge, Button, Input, List, Popconfirm, Tooltip, Typography,} from "antd";
-import {connect} from "react-redux";
-import {RouteComponentProps, withRouter} from "react-router";
-import {deleteGroup, getGroup, patchGroup, removeUserGroupByUsername,} from "../../features/group/actions";
-import {Group, User} from "../../features/group/interface";
-import {MyselfWithAvatar} from "../../features/myself/reducer";
-import {IState} from "../../store";
+import { CloseOutlined, DeleteOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Button, Input, List, Popconfirm, Tooltip, Typography, } from "antd";
+import { connect } from "react-redux";
+import { RouteComponentProps, withRouter } from "react-router";
+import { deleteGroup, getGroup, patchGroup, removeUserGroupByUsername, } from "../../features/group/actions";
+import { Group, User } from "../../features/group/interface";
+import { MyselfWithAvatar } from "../../features/myself/reducer";
+import { IState } from "../../store";
 
 import AddUser from "../modals/add-user.component";
-import {History} from "history";
-import {changeAlias} from "../../features/user/actions";
+import { History } from "history";
+import { changeAlias } from "../../features/user/actions";
 
 type GroupProps = {
   group: Group;
@@ -60,7 +60,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
         users.unshift(u);
       }
     })
-    this.setState({users: users});
+    this.setState({ users: users });
   };
 
   deleteGroup = () => {
@@ -91,10 +91,10 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
         <Tooltip title='Change Alias' placement='right'>
           <span className="group-user-info">
             <Text
-                ellipsis={true}
-                editable={{
-                  onChange: (e) => this.onAliasChange(e, user.name, group.id),
-                }}
+              ellipsis={true}
+              editable={{
+                onChange: (e) => this.onAliasChange(e, user.name, group.id),
+              }}
             >
               {user.alias}
             </Text>
@@ -126,33 +126,33 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
     const getUserOps = (user: User, groupOwner: string) => {
       if (user.name !== groupOwner && groupOwner === this.props.myself.username) {
         return <Tooltip
-            placement="right"
-            title={user.accepted ? "Remove" : "Cancel Invitation"}
+          placement="right"
+          title={user.accepted ? "Remove" : "Cancel Invitation"}
         >
           <Button
-              type="link"
-              size="small"
-              onClick={() =>
-                  this.deleteUser(group.id, user.name, group.name)
-              }
+            type="link"
+            size="small"
+            onClick={() =>
+              this.deleteUser(group.id, user.name, group.name)
+            }
           >
-            <CloseOutlined/>
+            <CloseOutlined />
           </Button>
         </Tooltip>;
       }
       if (user.name !== groupOwner && user.name === this.props.myself.username) {
         return <Tooltip
-            placement="right"
-            title='Leave'
+          placement="right"
+          title='Leave'
         >
           <Button
-              type="link"
-              size="small"
-              onClick={() =>
-                  this.deleteUser(group.id, user.name, group.name)
-              }
+            type="link"
+            size="small"
+            onClick={() =>
+              this.deleteUser(group.id, user.name, group.name)
+            }
           >
-            <CloseOutlined/>
+            <CloseOutlined />
           </Button>
         </Tooltip>;
       }
@@ -160,32 +160,29 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
     };
 
     const shouldInclude = (u: User, value: string) => {
-
       return isSubsequence(u.name.toLowerCase(), value) || isSubsequence(u.alias.toLowerCase(), value);
     }
 
-  
     const isSubsequence = (userInfo: string, value: string) => {
-       var i = 0;
-       var j = 0;    
-      while (i < value.length && j< userInfo.length) {
-          if (value.charAt(i) === userInfo.charAt(j)){
-              i++;
-          }
-          j++;
-          if(i === value.length)
-              return true;
+      var i = 0;
+      var j = 0;
+      while (i < value.length && j < userInfo.length) {
+        if (value.charAt(i) === userInfo.charAt(j)) {
+          i++;
+        }
+        j++;
+        if (i === value.length)
+          return true;
       }
       return false;
     }
-   
 
     const onFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
       let { value } = e.target;
       console.log(value)
 
       if (!value) {
-        this.setState({users: group.users});
+        this.setState({ users: group.users });
         return;
       }
 
@@ -196,7 +193,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
           users.unshift(u);
         }
       })
-      this.setState({users: users});
+      this.setState({ users: users });
     };
 
     return (
@@ -234,20 +231,20 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
             renderItem={(user) => {
               return (
                 <List.Item key={user.id}>
-                    <div className="group-user">
-                      <Tooltip
-                          placement="topLeft"
-                          title={getGroupUserTitle(user, group)}
-                      >
-                        <Badge dot={!user.accepted}>
-                          <Avatar
-                            size={user.name === group.owner.name ? "large" : "default"}
-                            src={user.avatar}
-                          />
-                        </Badge>
-                      </Tooltip>
-                      {this.getGroupUserSpan(user, group)}
-                    </div>
+                  <div className="group-user">
+                    <Tooltip
+                      placement="topLeft"
+                      title={getGroupUserTitle(user, group)}
+                    >
+                      <Badge dot={!user.accepted}>
+                        <Avatar
+                          size={user.name === group.owner.name ? "large" : "default"}
+                          src={user.avatar}
+                        />
+                      </Badge>
+                    </Tooltip>
+                    {this.getGroupUserSpan(user, group)}
+                  </div>
                   {getUserOps(user, group.owner.name)}
                 </List.Item>
               );
@@ -256,10 +253,10 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
         </div>
         <div className='group-card-footer'>
           {group.owner.name === this.props.myself.username && (
-              <AddUser groupId={group.id} groupName={group.name}/>
+            <AddUser groupId={group.id} groupName={group.name} />
           )}
           <span className='group-card-footer-filter'>
-            <Input placeholder="Filter" allowClear={true} prefix={<SearchOutlined />} onChange={e => onFilter(e)}/>
+            <Input placeholder="Filter" allowClear={true} prefix={<SearchOutlined />} onChange={e => onFilter(e)} />
           </span>
         </div>
       </div>
