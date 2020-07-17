@@ -39,16 +39,12 @@ public class TaskControllerTest {
 
     private static final String ROOT_URL = "http://localhost:";
 
-    private static String TIMEZONE = "America/Los_Angeles";
-
-    private static String RECURRENCERULE = "rucurrencerule1";
-
-    @Autowired
-    private ContentRevisionConfig revisionConfig;
-
+    private static final String TIMEZONE = "America/Los_Angeles";
     @LocalServerPort
     int randomServerPort;
-    private TestRestTemplate restTemplate = new TestRestTemplate();
+    @Autowired
+    private ContentRevisionConfig revisionConfig;
+    private final TestRestTemplate restTemplate = new TestRestTemplate();
 
     @Before
     public void setup() {
@@ -83,7 +79,7 @@ public class TaskControllerTest {
         Project p1 = createProject("task_project_1", group, ProjectType.TODO);
         Task task1 = createTask(
                 p1,
-                new CreateTaskParams("task_1", "2021-01-01", "01:01", 3, new ReminderSetting(), users, TIMEZONE, RECURRENCERULE));
+                new CreateTaskParams("task_1", "2021-01-01", "01:01", 3, new ReminderSetting(), users, TIMEZONE, null));
         Content content1 = addContent(task1, testContent1);
         List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testContent2);
         List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testContent3);
@@ -96,7 +92,7 @@ public class TaskControllerTest {
         testUpdateAssignees(p1, task1, users);
         int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
         for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
-            contents1 = updateContent(task1.getId(), content1.getId(), testContent1 + String.valueOf(i));
+            contents1 = updateContent(task1.getId(), content1.getId(), testContent1 + i);
         }
         assertEquals(1, contents1.size());
         assertEquals(maxRevisionNumber, contents1.get(0).getRevisions().length);
