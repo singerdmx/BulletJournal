@@ -3,6 +3,7 @@ package com.bulletjournal.controller.utils;
 import com.bulletjournal.ledger.FrequencyType;
 import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
+import org.springframework.data.util.Pair;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -11,6 +12,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class ZonedDateTimeHelper {
@@ -27,7 +29,7 @@ public class ZonedDateTimeHelper {
 
     public static String toDBTimestamp(ZonedDateTime zonedDateTime) {
         String res = Timestamp.from(zonedDateTime.toInstant()).toString();
-        return res.substring(0, res.lastIndexOf('.' ));
+        return res.substring(0, res.lastIndexOf('.'));
     }
 
     /**
@@ -58,6 +60,14 @@ public class ZonedDateTimeHelper {
      */
     public static Timestamp getTimestamp(ZonedDateTime dateTime) {
         return Timestamp.from(dateTime.toInstant());
+    }
+
+
+    /**
+     * Return ZonedDateTime from Timestamp and timezone
+     */
+    public static ZonedDateTime getZonedDateTime(long timestampSecond, String timezone) {
+        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(timestampSecond), ZoneId.of(timezone));
     }
 
     /**
@@ -305,4 +315,10 @@ public class ZonedDateTimeHelper {
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
         return now.get(ChronoField.SECOND_OF_DAY);
     }
+
+    public static Pair<ZonedDateTime, ZonedDateTime> nowToNext(long seconds, String timezone) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
+        return Pair.of(now, now.plus(seconds, ChronoUnit.SECONDS));
+    }
+
 }

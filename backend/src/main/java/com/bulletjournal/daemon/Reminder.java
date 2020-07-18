@@ -4,15 +4,19 @@ import com.bulletjournal.config.ReminderConfig;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.TaskRepository;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,16 +25,18 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class Reminder {
     private static final Logger LOGGER = LoggerFactory.getLogger(Reminder.class);
-    private static int MINUTES_OF_DAY = 1440;
-    private static int MINUTES_OF_HOUR = 60;
-    private static int SECONDS_OF_MINUTE = 60;
     private static int SECONDS_OF_DAY = 86400;
+    private static long VERIFY_BUFF_SECONDS = 600;
+    private static long SCHEDULE_BUFF_SECONDS = 5;
 
     private final ScheduledExecutorService executorService;
-    private final ConcurrentHashMap<ReminderRecord, ReminderRecord> concurrentHashMap;
+    private final ConcurrentHashMap<ReminderRecord, Task> concurrentHashMap;
 
     @Autowired
     ReminderConfig reminderConfig;
+
+    @Autowired
+    TaskRepository taskRepository;
 
     private final TaskDaoJpa taskDaoJpa;
 
@@ -54,24 +60,60 @@ public class Reminder {
     }
 
     private void initLoad() {
-        this.loadReminderRecords(reminderConfig.getLoadPrevSeconds());
-        this.loadReminderRecords(reminderConfig.getLoadNextSeconds());
+        this.scheduleReminderRecords(0 - reminderConfig.getLoadPrevSeconds());
+        this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
     }
 
     private void cronJob() {
         this.purge(this.reminderConfig.getPurgePrevSeconds());
 
-        this.loadReminderRecords(this.reminderConfig.getLoadNextSeconds());
+        this.scheduleReminderRecords(this.reminderConfig.getLoadNextSeconds());
     }
 
-    private void purge(long seconds) {
-        System.out.println("Purge work");
+    /***
+     * called by controller who created or updated task
+     * @param createdTask
+     */
+    public void generateTaskReminder(Task createdTask) {
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(SECONDS_OF_DAY, reminderConfig.getTimeZone());
+        taskRepository.findById(createdTask.getId()).ifPresent(task -> {
+            DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond()).forEach(e -> {
+                        if (!concurrentHashMap.containsKey(e)) {
+                            this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
+                        }
+                    }
+            );
+        });
+
     }
 
-    private void loadReminderRecords(long seconds) {
-        ZonedDateTime start = ZonedDateTime.now();
-        ZonedDateTime end = start.plus(seconds, ChronoUnit.SECONDS);
-
-        taskDaoJpa.getRemindingTasks(start, end);
+    private void purge(long expiredSeconds) {
+        concurrentHashMap.entrySet().removeIf(e ->
+                e.getKey().getTimeStampSecond() + expiredSeconds < ZonedDateTime.now().toEpochSecond());
     }
+
+    private void scheduleReminderRecords(long seconds) {
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(seconds, reminderConfig.getTimeZone());
+        taskDaoJpa.getRemindingTasks(interval.getFirst(), interval.getSecond()).forEach((k, v) -> {
+            if (!concurrentHashMap.containsKey(k)) {
+                executorService.schedule(() -> this.process(k),
+                        k.getTimeStampSecond() - ZonedDateTime.now().toEpochSecond() - SCHEDULE_BUFF_SECONDS,
+                        TimeUnit.SECONDS);
+                concurrentHashMap.put(k, v);
+            }
+        });
+    }
+
+    private void process(ReminderRecord record) {
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
+
+        taskRepository.findById(record.getId()).ifPresent(task -> {
+            List<ReminderRecord> records = DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond());
+            if (records.contains(record)) {
+                LOGGER.info("push notification");
+                concurrentHashMap.remove(record);
+            }
+        });
+    }
+
 }
