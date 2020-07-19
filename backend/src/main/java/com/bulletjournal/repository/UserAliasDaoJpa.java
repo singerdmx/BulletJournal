@@ -65,6 +65,7 @@ public class UserAliasDaoJpa {
     public User updateUserAlias(User user) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         if (requester == null) {
+            // handle request from daemon thread
             return user;
         }
         Map<String, String> aliases = this.getAliases(requester);
