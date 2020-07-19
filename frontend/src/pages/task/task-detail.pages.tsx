@@ -28,6 +28,7 @@ import { connect } from 'react-redux';
 //action
 import { setTaskStatus } from '../../features/tasks/actions';
 import { getDuration } from '../../components/project-item/task-item.component';
+import {inPublicPage} from "../../index";
 const { Option } = Select;
 
 export type TaskProps = {
@@ -157,54 +158,62 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         }
     }, [task]);
 
-  if (!task) return null;
-  return (
-    <div className={`task-page ${isPublic && 'public'}`}>
-        <BackTop />
+    if (!task) return null;
+
+    const getTaskStatisticsDiv = (task: Task) => {
+        if (isPublic) {
+            return null;
+        }
+        return <div
+            className="task-statistic-card"
+            style={getTaskBackgroundColor(task.status, theme)}
+        >
+            {getDueDateTime(task)}
+            {getReminder(task)}
+            {getTaskStatusDropdown(task)}
+        </div>;
+    };
+
+    return (
+    <div className={`task-page ${inPublicPage() && 'public'}`}>
+        <BackTop/>
 
         <Tooltip
-        placement="top"
-        title={`Created by ${task.owner.alias}`}
-        className="task-avatar"
-      >
+            placement="top"
+            title={`Created by ${task.owner.alias}`}
+            className="task-avatar"
+        >
         <span>
-          <Avatar size="large" src={task.owner.avatar} />
+          <Avatar size="large" src={task.owner.avatar}/>
         </span>
-      </Tooltip>
-      <div className="task-title">
-        <div className="label-and-name">{task.name}</div>
-        {taskOperation()}
-      </div>
-      <div className="title-labels">
-        <DraggableLabelsList
-          mode={ProjectType.TODO}
-          labels={task.labels}
-          editable={labelEditable}
-          itemId={task.id}
-          itemShared={task.shared}
-        />
-      </div>
-      <Divider style={{ marginTop: '5px', marginBottom: '0px' }} />
-      <div
-        className="task-statistic-card"
-        style={getTaskBackgroundColor(task.status, theme)}
-      >
-        {getDueDateTime(task)}
-        {getReminder(task)}
-        {getTaskStatusDropdown(task)}
-      </div>
-      <Divider style={{ marginTop: '0px' }} />
-      <div className="task-content">
-        <div className="content-list">
-          <TaskContentList
-            projectItem={task}
-            contents={contents}
-            contentEditable={contentEditable}
-          />
+        </Tooltip>
+        <div className="task-title">
+            <div className="label-and-name">{task.name}</div>
+            {taskOperation()}
         </div>
-        {createContentElem}
-      </div>
-      {taskEditorElem}
+        <div className="title-labels">
+            <DraggableLabelsList
+                mode={ProjectType.TODO}
+                labels={task.labels}
+                editable={labelEditable}
+                itemId={task.id}
+                itemShared={task.shared}
+            />
+        </div>
+        <Divider style={{marginTop: '5px', marginBottom: '0px'}}/>
+        {getTaskStatisticsDiv(task)}
+        <Divider style={{marginTop: '0px'}}/>
+        <div className="task-content">
+            <div className="content-list">
+                <TaskContentList
+                    projectItem={task}
+                    contents={contents}
+                    contentEditable={contentEditable}
+                />
+            </div>
+            {createContentElem}
+        </div>
+        {taskEditorElem}
     </div>
   );
 };

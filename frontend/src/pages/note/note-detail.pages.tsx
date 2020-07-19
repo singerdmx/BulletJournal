@@ -13,6 +13,7 @@ import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 import { Content } from '../../features/myBuJo/interface';
+import {inPublicPage} from "../../index";
 
 export type NoteProps = {
   note: Note | undefined;
@@ -44,7 +45,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     }, [note]);
   if (!note) return null;
   return (
-    <div className={`note-page ${isPublic && 'public'}`}>
+    <div className={`note-page ${inPublicPage() && 'public'}`}>
       <BackTop />
 
       <Tooltip

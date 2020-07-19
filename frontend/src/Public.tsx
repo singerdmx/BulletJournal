@@ -18,6 +18,7 @@ import { removeSharedTask } from './features/tasks/actions';
 import { removeSharedNote } from './features/notes/actions';
 import LabelManagement from './pages/project/label-management.compoent';
 import { getRandomBackgroundImage } from './assets/background';
+import {inPublicPage} from "./index";
 
 type PageProps = {
   note: Note | undefined;
@@ -106,12 +107,10 @@ const PublicPage: React.FC<PageProps> = (props) => {
 
   if (contentType === ContentType.TASK) {
     return (
-      <div
-        style={{
-          backgroundImage: `url(${getRandomBackgroundImage()})`,
-        }}
-        className="public-container"
-      >
+        <div
+            style={inPublicPage() ? {backgroundImage: `url(${getRandomBackgroundImage()})`} : {}}
+            className="public-container"
+        >
         <TaskDetailPage
           task={task}
           labelEditable={labelEditable}
@@ -127,12 +126,10 @@ const PublicPage: React.FC<PageProps> = (props) => {
 
   if (contentType === ContentType.NOTE) {
     return (
-      <div
-        style={{
-          backgroundImage: `url(${getRandomBackgroundImage()})`,
-        }}
-        className="public-container"
-      >
+        <div
+            style={inPublicPage() ? {backgroundImage: `url(${getRandomBackgroundImage()})`} : {}}
+            className="public-container"
+        >
         <NoteDetailPage
           note={note}
           labelEditable={labelEditable}
