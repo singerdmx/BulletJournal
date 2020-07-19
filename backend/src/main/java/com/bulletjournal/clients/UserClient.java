@@ -219,9 +219,11 @@ public class UserClient {
     }
 
     public void updateEmail(com.bulletjournal.repository.models.User user) {
-        String email = getUserEmail(user.getName());
-        UpdateMyselfParams params = new UpdateMyselfParams();
-        params.setEmail(email);
-        userDaoJpa.updateMyself(user.getName(), params);
+        if (user.getEmail() == null && this.ssoAPIKey != null) {
+            String email = getUserEmail(user.getName());
+            UpdateMyselfParams params = new UpdateMyselfParams();
+            params.setEmail(email);
+            this.userDaoJpa.updateMyself(user.getName(), params);
+        }
     }
 }

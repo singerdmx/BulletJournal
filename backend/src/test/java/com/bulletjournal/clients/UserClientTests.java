@@ -27,6 +27,10 @@ public class UserClientTests {
         RedisUserRepository redisUserRepository = mock(RedisUserRepository.class);
         when(redisUserRepository.findById(username)).thenReturn(Optional.empty());
         UserDaoJpa userDaoJpa = mock(UserDaoJpa.class);
+        com.bulletjournal.repository.models.User u = new com.bulletjournal.repository.models.User();
+        u.setName(username);
+        u.setEmail("todo1o24@outlook.com");
+        when(userDaoJpa.create(username, "America/Los_Angeles")).thenReturn(u);
         MockUserAliasDaoJpa userAliasDaoJpa = new MockUserAliasDaoJpa();
 
         UserClient userClient = new UserClient(new SSOConfig(

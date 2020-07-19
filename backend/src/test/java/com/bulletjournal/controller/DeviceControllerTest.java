@@ -100,7 +100,6 @@ public class DeviceControllerTest {
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN2);
         Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN2), deviceToken);
         Collection<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUser(USER2);
-        LOGGER.info("here1: {}", tokens);
         Assert.assertTrue(
             tokens.containsAll(
                 Arrays.asList(
