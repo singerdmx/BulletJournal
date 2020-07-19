@@ -19,7 +19,9 @@ public class EtaggableDaos {
                          GroupDaoJpa groupDaoJpa) {
         this.daos = ImmutableMap.of(
                 EtagType.NOTIFICATION, notificationDaoJpa,
-                EtagType.GROUP, groupDaoJpa
+                EtagType.GROUP, groupDaoJpa,
+                EtagType.NOTIFICATION_DELETE, notificationDaoJpa,
+                EtagType.GROUP_DELETE, groupDaoJpa
         );
     }
 
