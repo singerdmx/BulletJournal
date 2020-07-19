@@ -4,14 +4,12 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
@@ -30,7 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class ProjectDaoJpa implements Etaggable {
+public class ProjectDaoJpa {
 
     private static final Gson GSON = new Gson();
     @Autowired
@@ -368,26 +366,5 @@ public class ProjectDaoJpa implements Etaggable {
         List<Project> projects = this.projectRepository.findByOwnerAndSharedTrue(owner);
         return projects.stream().filter(p -> ProjectType.getType(p.getType()).equals(projectType))
                 .findAny().orElse(null);
-    }
-
-    @Override
-    public Set<String> findAffectedUsernames(Set<String> contentIds) {
-        Set<String> users = new HashSet<>();
-        List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
-        this.projectRepository.findAllById(ids).forEach(p -> p.getGroup().getUsers()
-                .forEach(userGroup -> users.add(userGroup.getUser().getName())));
-        return users;
-    }
-
-    @Override
-    public String getUserEtag(String username) {
-        Projects projects = getProjects(username);
-        String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                EtagGenerator.HashType.TO_HASHCODE,
-                projects.getOwned());
-        String sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                EtagGenerator.HashType.TO_HASHCODE,
-                projects.getShared());
-        return ownedProjectsEtag + "|" + sharedProjectsEtag;
     }
 }

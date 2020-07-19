@@ -5,7 +5,9 @@ import java.util.Objects;
 public enum EtagType {
     NOTIFICATION(0, "Notification"),
     GROUP(1, "Group"),
-    USER_GROUP(2, "UserGroups");
+    USER_GROUP(2, "UserGroups"),
+    NOTIFICATION_DELETE(3, "NotificationDelete"),
+    GROUP_DELETE(4, "GroupDelete"),;
 
     public final int value;
 

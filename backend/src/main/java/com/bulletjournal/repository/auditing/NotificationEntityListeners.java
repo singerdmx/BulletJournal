@@ -17,17 +17,17 @@ public class NotificationEntityListeners {
 
     @PostPersist
     public void postPersist(Object entity) {
-        cacheEtag((Notification) entity);
+        Notification notification = (Notification) entity;
+        EtagEvent etagEvent = new EtagEvent(String.valueOf(notification.getId()),
+                EtagType.NOTIFICATION);
+        this.notificationService.cacheEtag(etagEvent);
     }
 
     @PostRemove
     public void postDelete(Object entity) {
-        cacheEtag((Notification) entity);
-    }
-
-    private void cacheEtag(Notification notification) {
-        EtagEvent etagEvent = new EtagEvent(notification.getId() + "",
-                EtagType.NOTIFICATION);
-        notificationService.cacheEtag(etagEvent);
+        Notification notification = (Notification) entity;
+        EtagEvent etagEvent = new EtagEvent(notification.getTargetUser(),
+                EtagType.NOTIFICATION_DELETE);
+        this.notificationService.cacheEtag(etagEvent);
     }
 }

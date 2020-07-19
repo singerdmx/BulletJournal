@@ -15,17 +15,20 @@ public class GroupEntityListeners {
 
     @PostPersist
     public void postPersist(Object entity) {
-        cacheEtag((Group) entity);
+        Group group = (Group) entity;
+        EtagEvent etagEvent = new EtagEvent(String.valueOf(group.getId()),
+                EtagType.GROUP);
+        this.notificationService.cacheEtag(etagEvent);
     }
 
     @PostRemove
     public void postDelete(Object entity) {
-        cacheEtag((Group) entity);
+        Group group = (Group) entity;
+        group.getUsers().forEach(u -> {
+            EtagEvent etagEvent = new EtagEvent(u.getUser().getName(),
+                    EtagType.GROUP_DELETE);
+            this.notificationService.cacheEtag(etagEvent);
+        });
     }
 
-    private void cacheEtag(Group group) {
-        EtagEvent etagEvent = new EtagEvent(group.getId() + "",
-                EtagType.GROUP);
-        notificationService.cacheEtag(etagEvent);
-    }
 }

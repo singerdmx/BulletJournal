@@ -13,9 +13,11 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.JoinGroupEvent;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -275,12 +277,17 @@ public class GroupDaoJpa implements Etaggable {
     }
 
     @Override
-    public Set<String> findAffectedUsernames(Set<String> contentIds) {
-        Set<String> users = new HashSet<>();
-        List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
-        List<Group> groups = this.groupRepository.findAllById(ids);
-        groups.forEach(group -> group.getUsers().forEach(userGroup -> users.add(userGroup.getUser().getName())));
-        return users;
+    public Set<String> findAffectedUsernames(Set<String> contentIds, EtagType type) {
+        if (EtagType.GROUP.equals(type)) {
+            Set<String> users = new HashSet<>();
+            List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
+            List<Group> groups = this.groupRepository.findAllById(ids);
+            groups.forEach(group -> group.getUsers().forEach(userGroup -> users.add(userGroup.getUser().getName())));
+            return users;
+        }
+
+        Preconditions.checkArgument(EtagType.GROUP_DELETE.equals(type));
+        return contentIds;
     }
 
     @Override

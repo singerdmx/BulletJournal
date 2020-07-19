@@ -4,8 +4,10 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -66,11 +68,16 @@ public class NotificationDaoJpa implements Etaggable {
     }
 
     @Override
-    public Set<String> findAffectedUsernames(Set<String> contentIds) {
-        Set<String> users = new HashSet<>();
-        List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
-        this.notificationRepository.findAllById(ids).forEach(n -> users.add(n.getTargetUser()));
-        return users;
+    public Set<String> findAffectedUsernames(Set<String> contentIds, EtagType type) {
+        if (EtagType.NOTIFICATION.equals(type)) {
+            Set<String> users = new HashSet<>();
+            List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
+            this.notificationRepository.findAllById(ids).forEach(n -> users.add(n.getTargetUser()));
+            return users;
+        }
+
+        Preconditions.checkArgument(EtagType.NOTIFICATION_DELETE.equals(type));
+        return contentIds;
     }
 
     @Override

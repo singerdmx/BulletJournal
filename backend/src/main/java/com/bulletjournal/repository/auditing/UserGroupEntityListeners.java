@@ -24,7 +24,7 @@ public class UserGroupEntityListeners {
     }
 
     private void cacheEtag(UserGroup userGroup) {
-        EtagEvent etagEvent = new EtagEvent(userGroup.getId().getGroupId() + "",
+        EtagEvent etagEvent = new EtagEvent(String.valueOf(userGroup.getId().getGroupId()),
                 EtagType.USER_GROUP);
         notificationService.cacheEtag(etagEvent);
     }

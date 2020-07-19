@@ -35,9 +35,7 @@ public class RedisEtagDaoJpa {
         Map<EtagType, Set<String>> aggregateMap = new HashMap<>();
         etagEvents.forEach(e -> aggregateMap.computeIfAbsent(e.getEtagType(), n -> new HashSet<>()).add(e.getContentId()));
 
-        aggregateMap.computeIfAbsent(EtagType.GROUP, n -> new HashSet<>())
-                .addAll(aggregateMap.getOrDefault(EtagType.USER_GROUP, Collections.emptySet()));
-        aggregateMap.remove(EtagType.USER_GROUP);
+        mergeEventToOtherEvent(EtagType.USER_GROUP, EtagType.GROUP, aggregateMap);
 
         List<Etag> etags = computeEtags(aggregateMap);
         this.batchCache(etags);
@@ -89,12 +87,31 @@ public class RedisEtagDaoJpa {
                 continue;
             }
             Etaggable dao = daos.getDaos().get(type);
-            Set<String> affectedUsernames = dao.findAffectedUsernames(contentIds); // Batch get affected usernames
+            Set<String> affectedUsernames = dao.findAffectedUsernames(contentIds, type); // Batch get affected usernames
+            contentIds.clear();
+            contentIds.addAll(affectedUsernames);
+        }
+
+        // TODO: EtagType.NOTIFICATION => affectedUsernames => send push
+        // aggregateMap.getOrDefault(EtagType.NOTIFICATION, Collections.emptySet()).forEach();
+
+        mergeEventToOtherEvent(EtagType.GROUP_DELETE, EtagType.GROUP, aggregateMap);
+        mergeEventToOtherEvent(EtagType.NOTIFICATION_DELETE, EtagType.NOTIFICATION, aggregateMap);
+
+        for (EtagType type : aggregateMap.keySet()) {
+            Set<String> affectedUsernames = aggregateMap.get(type);
+            Etaggable dao = daos.getDaos().get(type);
             affectedUsernames.forEach(username -> {
                 Etag etag = new Etag(username, type, dao.getUserEtag(username));
                 etags.add(etag);
             });
         }
         return etags;
+    }
+
+    private void mergeEventToOtherEvent(EtagType from, EtagType to, Map<EtagType, Set<String>> aggregateMap) {
+        aggregateMap.computeIfAbsent(to, n -> new HashSet<>())
+                .addAll(aggregateMap.getOrDefault(from, Collections.emptySet()));
+        aggregateMap.remove(from);
     }
 }

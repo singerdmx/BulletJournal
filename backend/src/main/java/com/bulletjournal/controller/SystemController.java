@@ -117,26 +117,26 @@ public class SystemController {
         if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
 
             // Look up etag from cache
-            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
+//            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
 
-            if (cache == null) {
+//            if (cache == null) {
                 notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
                 cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
-            } else {
-                notificationsEtag = cache.getEtag();
-            }
+//            } else {
+//                notificationsEtag = cache.getEtag();
+//            }
         }
         if (targetEtags == null || targetEtags.contains("groupsEtag")) {
 
             // Look up etag from cache
-            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
-
-            if (cache == null) {
+//            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
+//
+//            if (cache == null) {
                 groupsEtag = this.groupDaoJpa.getUserEtag(username);
                 cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
-            } else {
-                groupsEtag = cache.getEtag();
-            }
+//            } else {
+//                groupsEtag = cache.getEtag();
+//            }
         }
 
         if (projectId != null) {
