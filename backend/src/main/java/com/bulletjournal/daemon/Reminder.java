@@ -114,6 +114,7 @@ public class Reminder {
             List<ReminderRecord> records = DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond());
             if (records.contains(record)) {
                 LOGGER.info("Push notification record = " + record);
+                concurrentHashMap.remove(record);
             }
         });
     }
