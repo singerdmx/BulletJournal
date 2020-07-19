@@ -41,7 +41,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
         if (note) {
             document.title = note.name;
         }
-    }, []);
+    }, [note]);
   if (!note) return null;
   return (
     <div className={`note-page ${isPublic && 'public'}`}>

@@ -155,7 +155,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         if (task) {
             document.title = task.name;
         }
-    }, []);
+    }, [task]);
 
   if (!task) return null;
   return (
