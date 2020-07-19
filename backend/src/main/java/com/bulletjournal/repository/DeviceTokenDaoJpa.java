@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Set;
 
 @Repository
 public class DeviceTokenDaoJpa {
@@ -51,12 +51,12 @@ public class DeviceTokenDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<DeviceToken> getTokensByUser(String userName) {
+    public Set<DeviceToken> getTokensByUser(String userName) {
         User user = userDaoJpa.getByName(userName);
         if (user == null) {
             throw new ResourceNotFoundException("User " + userName + " doesn't exist");
         }
-        return deviceTokenRepository.findDeviceTokensByUser(user);
+        return user.getTokens();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

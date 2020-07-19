@@ -84,14 +84,16 @@ public class UserDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User updateMyself(String user, UpdateMyselfParams updateMyselfParams) {
         User self = getByName(user);
-        DaoHelper.updateIfPresent(updateMyselfParams.hasTimezone(), updateMyselfParams.getTimezone(),
-                (value) -> self.setTimezone(value));
+        DaoHelper.updateIfPresent(updateMyselfParams.hasTimezone(),
+            updateMyselfParams.getTimezone(), self::setTimezone);
         DaoHelper.updateIfPresent(updateMyselfParams.hasReminderBeforeTask(),
-                updateMyselfParams.getReminderBeforeTask(), (value) -> self.setReminderBeforeTask(value));
-        DaoHelper.updateIfPresent(updateMyselfParams.hasCurrency(), updateMyselfParams.getCurrency(),
-                (value) -> self.setCurrency(value));
-        DaoHelper.updateIfPresent(updateMyselfParams.hasTheme(), updateMyselfParams.getTheme(),
-                (value) -> self.setTheme(value));
+                updateMyselfParams.getReminderBeforeTask(), self::setReminderBeforeTask);
+        DaoHelper.updateIfPresent(updateMyselfParams.hasCurrency(),
+            updateMyselfParams.getCurrency(), self::setCurrency);
+        DaoHelper.updateIfPresent(updateMyselfParams.hasTheme(),
+            updateMyselfParams.getTheme(), self::setTheme);
+        DaoHelper.updateIfPresent(updateMyselfParams.hasEmail(),
+            updateMyselfParams.getEmail(), self::setEmail);
         return self;
     }
 

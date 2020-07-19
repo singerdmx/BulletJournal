@@ -59,6 +59,9 @@ public class UserController {
             currency = user.getCurrency();
             theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
             points = user.getPoints();
+            if (user.getEmail() == null) {
+                userClient.updateEmail(user); //TODO: remove this line
+            }
         }
         User self = userClient.getUser(username);
         return new Myself(self, timezone, before, currency, theme, points,

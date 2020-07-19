@@ -2,6 +2,7 @@ package com.bulletjournal.clients;
 
 import com.bulletjournal.config.SSOConfig;
 import com.bulletjournal.controller.models.ContactType;
+import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -90,7 +91,9 @@ public class UserClient {
         }
 
         try {
-            this.userDaoJpa.create(username, getUserTimeZone(userInfo));
+            com.bulletjournal.repository.models.User createdUser
+                = this.userDaoJpa.create(username, getUserTimeZone(userInfo));
+            updateEmail(createdUser);
         } catch (ResourceAlreadyExistException ex) {
             LOGGER.info(username + " already exists");
         }
@@ -112,7 +115,7 @@ public class UserClient {
         return timezone;
     }
 
-    public String getUserEmail(String username) {
+    private String getUserEmail(String username) {
         if (this.ssoAPIKey == null) {
             throw new IllegalArgumentException("ssoAPIKey missing");
         }
@@ -213,5 +216,12 @@ public class UserClient {
         LOGGER.info("Posts response {}", response);
         return this.ssoEndPoint.resolve(
                 "/t/" + response.getBody().get("topic_slug") + "/" + response.getBody().get("topic_id")).toString();
+    }
+
+    public void updateEmail(com.bulletjournal.repository.models.User user) {
+        String email = getUserEmail(user.getName());
+        UpdateMyselfParams params = new UpdateMyselfParams();
+        params.setEmail(email);
+        userDaoJpa.updateMyself(user.getName(), params);
     }
 }

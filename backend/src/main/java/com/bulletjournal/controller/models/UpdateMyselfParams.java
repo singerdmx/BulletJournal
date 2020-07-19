@@ -10,6 +10,8 @@ public class UpdateMyselfParams {
 
     private String theme;
 
+    private String email;
+
     public String getTimezone() {
         return timezone;
     }
@@ -56,5 +58,17 @@ public class UpdateMyselfParams {
 
     public boolean hasTheme() {
         return this.theme != null;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean hasEmail() {
+        return this.email != null;
     }
 }

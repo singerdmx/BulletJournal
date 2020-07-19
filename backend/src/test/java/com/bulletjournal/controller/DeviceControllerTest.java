@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Tests {@link com.bulletjournal.controller.DeviceController}
@@ -99,7 +99,8 @@ public class DeviceControllerTest {
         Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN2);
         Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN2), deviceToken);
-        List<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUser(USER2);
+        Collection<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUser(USER2);
+        LOGGER.info("here1: {}", tokens);
         Assert.assertTrue(
             tokens.containsAll(
                 Arrays.asList(

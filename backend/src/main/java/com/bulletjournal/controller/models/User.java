@@ -20,6 +20,7 @@ public class User implements Serializable {
     private String alias;
     private String thumbnail;
     private String avatar;
+    private String email;
 
     public User() {
     }
@@ -81,6 +82,14 @@ public class User implements Serializable {
         this.avatar = avatar;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,6 +110,7 @@ public class User implements Serializable {
                 ", name='" + name + '\'' +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", avatar='" + avatar + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
 }

@@ -24,7 +24,7 @@ public class User extends NamedModel {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<DeviceToken> tokens = new HashSet<>();
 
     @Column(length = 50, nullable = false)
@@ -35,6 +35,9 @@ public class User extends NamedModel {
 
     @Column(length = 25)
     private String language;
+
+    @Column(length = 100)
+    private String email;
 
     @Column(name = "date_format", length = 10, nullable = false)
     private Integer dateFormat; // 0: "DD-MM-YYYY", 1: "MM-DD-YYYY"
@@ -84,6 +87,18 @@ public class User extends NamedModel {
     public void addToken(String token) {
         DeviceToken deviceToken = new DeviceToken(this, token);
         tokens.add(deviceToken);
+    }
+
+    public Set<DeviceToken> getTokens() {
+        return tokens;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getTimezone() {
