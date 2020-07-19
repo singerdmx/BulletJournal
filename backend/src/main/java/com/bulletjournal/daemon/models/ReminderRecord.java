@@ -4,11 +4,11 @@ import java.util.Objects;
 
 public class ReminderRecord {
     private long id;
-    private long timeStampSecond; // second
+    private long timestampMilli;
 
-    public ReminderRecord(long id, long timeStampSecond) {
+    public ReminderRecord(long id, long timestampMilli) {
         this.id = id;
-        this.timeStampSecond = timeStampSecond;
+        this.timestampMilli = timestampMilli;
     }
 
     public long getId() {
@@ -19,12 +19,16 @@ public class ReminderRecord {
         this.id = id;
     }
 
-    public long getTimeStampSecond() {
-        return timeStampSecond;
+    public long getTimestamp() {
+        return timestampMilli;
     }
 
-    public void setTimeStampSecond(long timeStampSecond) {
-        this.timeStampSecond = timeStampSecond;
+    public void setTimestamp(long timestamp) {
+        this.timestampMilli = timestamp;
+    }
+
+    public long getTimestampSecond() {
+        return this.timestampMilli / 1000;
     }
 
     @Override
@@ -33,12 +37,17 @@ public class ReminderRecord {
         if (!(o instanceof ReminderRecord)) return false;
         ReminderRecord that = (ReminderRecord) o;
         return Objects.equals(this.id, that.id) &&
-                Objects.equals(this.timeStampSecond, that.timeStampSecond);
+                Objects.equals(this.timestampMilli, that.timestampMilli);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, timeStampSecond);
+        return Objects.hash(id, timestampMilli);
     }
 
+    @Override
+    public String toString() {
+        return "ReminderRecord={id:" + this.id
+                + ",timestampSecond:" + this.getTimestampSecond() + "}";
+    }
 }
