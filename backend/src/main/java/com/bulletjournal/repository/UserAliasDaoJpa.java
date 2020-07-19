@@ -64,6 +64,9 @@ public class UserAliasDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User updateUserAlias(User user) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
+        if (requester == null) {
+            return user;
+        }
         Map<String, String> aliases = this.getAliases(requester);
         if (aliases.isEmpty()) {
             return user;
