@@ -70,10 +70,10 @@ public class NotificationDaoJpa implements Etaggable {
     @Override
     public Set<String> findAffectedUsernames(Set<String> contentIds, EtagType type) {
         if (EtagType.NOTIFICATION.equals(type)) {
-            Set<String> users = new HashSet<>();
             List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
-            this.notificationRepository.findAllById(ids).forEach(n -> users.add(n.getTargetUser()));
-            return users;
+            return this.notificationRepository.findAllById(ids)
+                    .stream().filter(Objects::nonNull)
+                    .map(n -> n.getTargetUser()).collect(Collectors.toSet());
         }
 
         Preconditions.checkArgument(EtagType.NOTIFICATION_DELETE.equals(type));

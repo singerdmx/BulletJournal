@@ -5,6 +5,7 @@ import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.factory.EtaggableDaos;
+import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,6 +38,7 @@ public class RedisEtagDaoJpa {
 
         mergeEventToOtherEvent(EtagType.USER_GROUP, EtagType.GROUP, aggregateMap);
 
+        // Now EtagType only have GROUP, GROUP_DELETE, NOTIFICATION and NOTIFICATION_DELETE
         List<Etag> etags = computeEtags(aggregateMap);
         this.batchCache(etags);
     }
@@ -63,6 +65,8 @@ public class RedisEtagDaoJpa {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Etag findEtagsByIndex(String username, EtagType etagType) {
+        Preconditions.checkNotNull(username, "findEtagsByIndex: username cannot be null");
+        Preconditions.checkNotNull(etagType, "findEtagsByIndex: etagType cannot be null");
         return this.redisEtagRepository.findByIndex(username + "@" + etagType.toString());
     }
 
@@ -98,6 +102,7 @@ public class RedisEtagDaoJpa {
         mergeEventToOtherEvent(EtagType.GROUP_DELETE, EtagType.GROUP, aggregateMap);
         mergeEventToOtherEvent(EtagType.NOTIFICATION_DELETE, EtagType.NOTIFICATION, aggregateMap);
 
+        // Now EtagType only have GROUP and NOTIFICATION
         for (EtagType type : aggregateMap.keySet()) {
             Set<String> affectedUsernames = aggregateMap.get(type);
             Etaggable dao = daos.getDaos().get(type);

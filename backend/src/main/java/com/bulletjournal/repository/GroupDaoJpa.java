@@ -281,7 +281,8 @@ public class GroupDaoJpa implements Etaggable {
         if (EtagType.GROUP.equals(type)) {
             Set<String> users = new HashSet<>();
             List<Long> ids = contentIds.stream().map(Long::parseLong).collect(Collectors.toList());
-            List<Group> groups = this.groupRepository.findAllById(ids);
+            List<Group> groups = this.groupRepository.findAllById(ids)
+                    .stream().filter(Objects::nonNull).collect(Collectors.toList());
             groups.forEach(group -> group.getUsers().forEach(userGroup -> users.add(userGroup.getUser().getName())));
             return users;
         }
