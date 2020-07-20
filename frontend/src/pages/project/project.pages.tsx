@@ -450,18 +450,19 @@ class ProjectPage extends React.Component<
     let popContent = null;
     if (group) {
       popContent = (
-        <div>
-          {groupUsers.map((u, index) => (
-            <p
-              key={index}
-              className='avatar-container'
-              onClick={() => handleGetProjectItemsByUser(u)}
-            >
-              <Avatar size='small' src={u.avatar} />
-              &nbsp;{u.alias}
-            </p>
-          ))}
-        </div>
+          <div className='project-users'>
+            {groupUsers.map((u, index) => (
+                <Tooltip title={u.alias}>
+                  <span
+                        key={index}
+                        className='avatar-container'
+                        onClick={() => handleGetProjectItemsByUser(u)}
+                  >
+                    <Avatar size='small' src={u.avatar} />
+                  </span>
+                </Tooltip>
+            ))}
+          </div>
       );
     }
 

@@ -9,7 +9,7 @@ import {completeTask, deleteTask, getTask, updateTaskContents} from '../../featu
 import {IState} from '../../store';
 // antd imports
 import {Avatar, Button, Popconfirm, Popover, Tooltip} from 'antd';
-import {CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined} from '@ant-design/icons';
+import {CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined} from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -108,9 +108,9 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         placement='bottom'
         content={getTaskAssigneesPopoverContent(task, (u) => <Avatar size='small' src={u.avatar}/>)}
       >
-        <div className='task-owner'>
-          <Avatar src={task.assignees[0].avatar} />
-        </div>
+          <div className='task-owner'>
+              <span><TeamOutlined/><span style={{fontSize: '12px'}}>{task.assignees.length}</span></span>
+          </div>
       </Popover>
     );
   };

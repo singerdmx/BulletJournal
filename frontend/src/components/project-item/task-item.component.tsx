@@ -7,6 +7,7 @@ import {
   CloseCircleOutlined,
   DeleteTwoTone,
   MoreOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import {
   getReminderSettingString,
@@ -366,14 +367,19 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
             placement='bottom'
             content={getTaskAssigneesPopoverContent(task, getAvatar)}
         >
-        {getAvatar(task.assignees[0])}
+        {getAssigneesIcon(task)}
       </Popover>
     );
   };
 
+  const getAssigneesIcon = (task: Task) => {
+    return <span><TeamOutlined/><span style={{fontSize: '10px'}}>{task.assignees.length}</span></span>
+  };
+
   const getAvatar = (user: User) => {
-    if (!inProject) return <Avatar src={user.avatar} size='small' />;
-    if (!showModal) return <Avatar src={user.avatar} size='small' />;
+    if (!inProject || !showModal) {
+      return <Avatar src={user.avatar} size='small' />;
+    }
     return (
       <span
         onClick={() => {
