@@ -4,14 +4,19 @@ import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import { GroupsWithOwner, User } from '../../features/group/interface';
-import {Avatar, Popconfirm, Popover, Tag, Tooltip, Collapse, BackTop} from 'antd';
+import {
+  Avatar,
+  Popconfirm,
+  Popover,
+  Tag,
+  Tooltip,
+  Collapse,
+  BackTop,
+  Badge,
+} from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
-import {
-  DeleteOutlined,
-  TeamOutlined,
-  SyncOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, TeamOutlined, SyncOutlined } from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
@@ -47,6 +52,7 @@ import {
 } from '../../features/label/actions';
 import { Label, stringToRGB } from '../../features/label/interface';
 import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
+import getThemeColorVars from '../../utils/theme';
 
 const { Panel } = Collapse;
 
@@ -257,12 +263,12 @@ class ProjectPage extends React.Component<
     }
 
     return (
-      <Collapse defaultActiveKey={['Labels']} expandIconPosition='right'>
+      <Collapse defaultActiveKey={['Labels']} expandIconPosition="right">
         <Panel
-          header='Labels in BuJo'
-          key='Labels'
+          header="Labels in BuJo"
+          key="Labels"
           extra={
-            <Tooltip title='Refresh BuJo Labels'>
+            <Tooltip title="Refresh BuJo Labels">
               <SyncOutlined
                 onClick={(event) => {
                   event.stopPropagation();
@@ -273,7 +279,7 @@ class ProjectPage extends React.Component<
             </Tooltip>
           }
         >
-          <div className='project-labels'>
+          <div className="project-labels">
             {this.props.projectLabels.map((label, index) => (
               <Tag
                 key={label.id}
@@ -311,7 +317,7 @@ class ProjectPage extends React.Component<
 
     switch (project.projectType) {
       case ProjectType.NOTE:
-        createContent = <AddNote mode='icon' />;
+        createContent = <AddNote mode="icon" />;
         projectContent = (
           <NoteTree
             readOnly={project.shared}
@@ -343,7 +349,7 @@ class ProjectPage extends React.Component<
         );
         break;
       case ProjectType.TODO:
-        createContent = <AddTask mode='icon' />;
+        createContent = <AddTask mode="icon" />;
         projectContent = (
           <TaskTree
             timezone={this.props.timezone}
@@ -355,8 +361,12 @@ class ProjectPage extends React.Component<
               handleGetProjectItemsByOrder();
             }}
             completeTasksShown={this.state.completeTasksShown}
-            hideCompletedTask={() => this.setState({ completeTasksShown: false })}
-            showCompletedTask={() => this.setState({ completeTasksShown: true })}
+            hideCompletedTask={() =>
+              this.setState({ completeTasksShown: false })
+            }
+            showCompletedTask={() =>
+              this.setState({ completeTasksShown: true })
+            }
           />
         );
         projectItemsByUser = (
@@ -366,7 +376,9 @@ class ProjectPage extends React.Component<
             onCancel={() => {
               this.setState({ tasksByUsersShown: false });
             }}
-            hideCompletedTask={() => this.setState({ completeTasksShown: false })}
+            hideCompletedTask={() =>
+              this.setState({ completeTasksShown: false })
+            }
           />
         );
         projectItemsByOrder = (
@@ -375,12 +387,14 @@ class ProjectPage extends React.Component<
             onCancel={() => {
               this.setState({ tasksByOrderShown: false });
             }}
-            hideCompletedTask={() => this.setState({ completeTasksShown: false })}
+            hideCompletedTask={() =>
+              this.setState({ completeTasksShown: false })
+            }
           />
         );
         break;
       case ProjectType.LEDGER:
-        createContent = <AddTransaction mode='icon' />;
+        createContent = <AddTransaction mode="icon" />;
         projectContent = (
           <TransactionProject
             showModal={(user: User) => {
@@ -405,17 +419,17 @@ class ProjectPage extends React.Component<
       editContent = <EditProject project={project} />;
       deleteContent = (
         <Popconfirm
-          title='Deleting BuJo also deletes its child BuJo. Are you sure?'
-          okText='Yes'
-          cancelText='No'
+          title="Deleting BuJo also deletes its child BuJo. Are you sure?"
+          okText="Yes"
+          cancelText="No"
           onConfirm={() => {
             this.props.deleteProject(project.id, project.name, history);
           }}
-          className='group-setting'
-          placement='bottom'
+          className="group-setting"
+          placement="bottom"
         >
-          <Tooltip placement='top' title='Delete BuJo'>
-            <div className='project-delete'>
+          <Tooltip placement="top" title="Delete BuJo">
+            <div className="project-delete">
               <DeleteOutlined
                 style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
               />
@@ -428,7 +442,7 @@ class ProjectPage extends React.Component<
     let description = null;
     if (project && project.description) {
       description = (
-        <div className='project-description'>
+        <div className="project-description">
           {project.description.split('\n').map((s, key) => {
             return <p key={key}>{s}</p>;
           })}
@@ -450,37 +464,37 @@ class ProjectPage extends React.Component<
     let popContent = null;
     if (group) {
       popContent = (
-          <div className='project-users'>
-            {groupUsers.map((u, index) => (
-                <Tooltip title={u.alias}>
-                  <span
-                        key={index}
-                        className='avatar-container'
-                        onClick={() => handleGetProjectItemsByUser(u)}
-                  >
-                    <Avatar size='small' src={u.avatar} />
-                  </span>
-                </Tooltip>
-            ))}
-          </div>
+        <div className="project-users">
+          {groupUsers.map((u, index) => (
+            <Tooltip title={u.alias}>
+              <span
+                key={index}
+                className="avatar-container"
+                onClick={() => handleGetProjectItemsByUser(u)}
+              >
+                <Avatar size="small" src={u.avatar} />
+              </span>
+            </Tooltip>
+          ))}
+        </div>
       );
     }
 
     return (
-      <div className='project'>
+      <div className="project">
         <Tooltip
-          placement='top'
+          placement="top"
           title={project.owner.alias}
-          className='project-avatar'
+          className="project-avatar"
         >
           <span>
-            <Avatar size='large' src={project.owner.avatar} />
+            <Avatar size="large" src={project.owner.avatar} />
           </span>
         </Tooltip>
-        <div className='project-header'>
+        <div className="project-header">
           <h2>
             <Tooltip
-              placement='top'
+              placement="top"
               title={`${project.projectType} ${project.name}`}
             >
               <span>
@@ -489,18 +503,24 @@ class ProjectPage extends React.Component<
               </span>
             </Tooltip>
           </h2>
-          <div className='project-control'>
+          <div className="project-control">
             <Popover
               title={group && group.name}
-              placement='bottom'
+              placement="bottom"
               content={popContent}
             >
               <span
                 style={{ cursor: 'pointer' }}
                 onClick={(e) => this.onClickGroup(group.id)}
               >
-                <TeamOutlined />
-                {group && groupUsers.length}
+                <Badge
+                  count={!!group ? groupUsers.length : 0}
+                  style={{
+                    fontSize: '10px',
+                  }}
+                >
+                  <TeamOutlined />
+                </Badge>
               </span>
             </Popover>
             <ShowProjectHistory />
@@ -512,11 +532,11 @@ class ProjectPage extends React.Component<
           </div>
         </div>
         {description && (
-          <div className='project-description'>{description}</div>
+          <div className="project-description">{description}</div>
         )}
         {this.getProjectLabels()}
         <BackTop />
-        <div className='project-content'>{projectContent}</div>
+        <div className="project-content">{projectContent}</div>
       </div>
     );
   }
