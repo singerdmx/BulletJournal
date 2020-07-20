@@ -350,7 +350,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
     return (
       <Popover
-        title='Assignees'
+        title={`${task.assignees.length} Assignees`}
         placement='bottom'
         content={
           <div>
