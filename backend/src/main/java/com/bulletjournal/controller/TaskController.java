@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
@@ -23,13 +24,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -56,6 +56,7 @@ public class TaskController {
     protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
     protected static final String COMPLETED_TASK_CONTENTS_ROUTE = "/api/completedTasks/{taskId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
+    protected static final String TASK_STATISTICS_ROUTE = "/api/taskStatistics";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -439,6 +440,28 @@ public class TaskController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.taskDaoJpa.getContentRevision(username, taskId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);
+    }
+
+    @GetMapping(TASK_STATISTICS_ROUTE)
+    public TaskStatistics getTaskStatistics(
+            @NotNull @RequestParam List<Long> projectIds,
+            @NotBlank @RequestParam String timezone,
+            @NotNull @RequestParam Integer type,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) List<String> userFilter) {
+    // e.g. /api/taskStatistics?projectIds=11&projectIds=12&timezone=america%2Flos_angeles&type=3&startDate=2020-08-01
+        if (type == 0) {
+            return new TaskStatistics();
+        }
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+
+        // Set start time and end time
+        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+
+        return new TaskStatistics();
     }
 
 }
