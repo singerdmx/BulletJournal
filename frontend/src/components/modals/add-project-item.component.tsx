@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Form, Modal, Select, Tooltip } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Avatar, Form, Modal, Select, Tooltip, Button } from 'antd';
+import { PlusCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { createProjectByName } from '../../features/project/actions';
 import { IState } from '../../store';
@@ -138,7 +138,9 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
         <div>
           <Tooltip placement='bottom' title='Create New BuJo Item'>
             <h2 className='add-todo-button' onClick={openModal}>
-              <PlusOutlined />
+              <Button type="primary" shape="round" icon={<PlusCircleFilled />}>
+                Create
+              </Button>
             </h2>
           </Tooltip>
           {getModal()}
