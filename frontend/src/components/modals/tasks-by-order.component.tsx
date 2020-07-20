@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Checkbox, DatePicker, Divider, Empty, message, Modal, Tooltip,} from 'antd';
+import {Checkbox, DatePicker, Divider, Empty, message, Modal, Tooltip, Button} from 'antd';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
@@ -165,9 +165,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
             onChange={handleRangeChange}
           />
           <span>
-            <Tooltip title='Refresh'>
-              <SyncOutlined onClick={handleUpdate} />
-            </Tooltip>
+            <Button type="primary" icon={<SyncOutlined />} onClick={handleUpdate}>Refresh</Button>
           </span>
         </div>
         <Divider />

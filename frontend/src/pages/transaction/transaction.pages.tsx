@@ -122,7 +122,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
       <Tooltip
         placement='top'
-        title={`Payer ${transaction.payer}`}
+        title={`Payer ${transaction.payer.alias}`}
         className='transaction-avatar'
       >
         <span>

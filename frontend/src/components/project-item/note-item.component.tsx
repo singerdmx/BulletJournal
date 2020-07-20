@@ -155,22 +155,21 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   };
 
   const getAvatar = (user: User) => {
-    if (!inProject) return <Avatar src={user.avatar} size="small" />;
-    if (!showModal) return <Avatar src={user.avatar} size="small" />;
+    if (!inProject || !showModal) return <span><Avatar src={user.avatar} size={24}/></span>;
     return (
-      <span
-        onClick={() => {
-          showModal(user);
-        }}
-      >
-        <Avatar src={user.avatar} size={20} style={{ cursor: 'pointer' }} />
+        <span
+            onClick={(e) => {
+              e.stopPropagation();
+              showModal(user);
+            }}
+        >
+        <Avatar src={user.avatar} size={24} style={{cursor: 'pointer'}}/>
       </span>
     );
   };
 
   const getOrderIcon = () => {
-    if (!inProject) return <FormOutlined />;
-    if (!showOrderModal) return <FormOutlined />;
+    if (!inProject || !showOrderModal) return <FormOutlined />;
     return (
       <FormOutlined
         onClick={() => {
@@ -194,7 +193,8 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
       <div className="project-item-content">
         <a onClick={handleClick}>
           <h3 className="project-item-name">
-            {getItemIcon(note, <FileTextOutlined />)}&nbsp;
+            <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
+            &nbsp;{getItemIcon(note, <FileTextOutlined />)}&nbsp;
             {note.name}
           </h3>
         </a>
@@ -225,9 +225,6 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
       </div>
 
       <div className="project-control">
-        <div className="project-item-owner">
-          <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
-        </div>
         <div style={{marginLeft: '5px'}}>
           <Tooltip
             title={

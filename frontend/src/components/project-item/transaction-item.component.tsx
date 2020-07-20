@@ -150,11 +150,14 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
   };
 
   const getAvatar = (user: User) => {
-    if (!inProject) return <Avatar src={user.avatar} size='small' />;
-    if (!showModal) return <Avatar src={user.avatar} size='small' />;
+    if (!inProject || !showModal) return <span
+        className='user-avatar-icon'><Avatar src={user.avatar} size='small' /></span>;
     return (
         <span
-            onClick={() => {
+            className='user-avatar-icon'
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
               showModal(user);
             }}
         >
@@ -168,7 +171,12 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
       <div className='project-item-content'>
         <Link to={`/transaction/${transaction.id}`}>
           <h3 className='project-item-name'>
-            {getItemIcon(transaction, <AccountBookOutlined />)}&nbsp;
+              <Tooltip
+                  title={`Created by ${transaction.owner.alias}`}
+              >
+                  {getAvatar(transaction.owner)}
+              </Tooltip>
+              {' '}{getItemIcon(transaction, <AccountBookOutlined />)}&nbsp;
             {transaction.name}
           </h3>
         </Link>
@@ -197,13 +205,6 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
       </div>
 
       <div className='project-control'>
-        <div className='project-item-owner'>
-          <Tooltip
-            title={`Created by ${transaction.owner.alias}`}
-          >
-            {getAvatar(transaction.owner)}
-          </Tooltip>
-        </div>
         <div className='project-item-owner'>
           <Tooltip
             title={`Payer ${transaction.payer.alias}`}

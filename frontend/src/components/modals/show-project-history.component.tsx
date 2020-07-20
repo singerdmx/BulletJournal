@@ -5,7 +5,7 @@ import {
   Project,
   ProjectsWithOwner,
 } from '../../features/project/interface';
-import { Avatar, DatePicker, Divider, Modal, Select, Tooltip } from 'antd';
+import {Avatar, Button, DatePicker, Divider, Modal, Select, Tooltip} from 'antd';
 import {
   CheckCircleTwoTone,
   CloseCircleTwoTone,
@@ -224,7 +224,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
           <div style={{ display: 'flex' }}>
             <span>
               <Select
-                style={{ width: '200px', marginRight: '25px' }}
+                style={{ width: '160px', marginRight: '25px' }}
                 value={selectAction.replace('_', ' ')}
                 onChange={(action) => {
                   let actionKey = action.replace(' ', '_');
@@ -263,8 +263,10 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                     selectGroup.map((user) => {
                       return (
                         <Option value={user.name} key={user.name}>
-                          <Avatar size='small' src={user.avatar} />
-                          &nbsp;&nbsp; <strong>{user.alias}</strong>
+                          <Tooltip title={user.alias} placement='right'>
+                          <span><Avatar size='small' src={user.avatar}/>
+                            &nbsp;&nbsp; <strong>{user.alias}</strong></span>
+                          </Tooltip>
                         </Option>
                       );
                     })}
@@ -272,9 +274,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
               </Tooltip>
             </span>
             <span className='history-refresh-button'>
-              <Tooltip title='Refresh'>
-                <SyncOutlined onClick={handleGetHistory} />
-              </Tooltip>
+              <Button type="primary" icon={<SyncOutlined />} onClick={handleGetHistory}>Refresh</Button>
             </span>
           </div>
           <Divider />

@@ -395,7 +395,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   const getAvatar = (user: User) => {
     if (!inProject || !showModal) {
       return (
-        <div key={user.name} className="user-avatar-icon">
+        <div key={user.name}>
           <Avatar src={user.avatar} size={20} />
         </div>
       );
@@ -403,7 +403,6 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     return (
       <div
         key={user.name}
-        className="user-avatar-icon"
         onClick={() => {
           showModal(user);
         }}
@@ -423,7 +422,8 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     }
     return (
       <span
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           showModal(user);
         }}
       >
@@ -433,11 +433,11 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   };
 
   const getOrderIcon = () => {
-    if (!inProject) return <AlertOutlined />;
-    if (!showOrderModal) return <AlertOutlined />;
+    if (!inProject || !showOrderModal) return <AlertOutlined />;
     return (
       <AlertOutlined
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           showOrderModal();
         }}
       />
@@ -452,7 +452,9 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
       <div className="project-item-content">
         <a onClick={handleClick}>
           <h3 className={taskStyle}>
-            {getItemIcon(task, <CarryOutOutlined />)} {task.name}
+            <Tooltip title={`Created by ${task.owner.alias}`}>
+              {getAssigneesPopupAvatar(task.owner)}
+          </Tooltip> {' '}{getItemIcon(task, <CarryOutOutlined />)} {task.name}
           </h3>
         </a>
         <div className="project-item-subs">
@@ -481,13 +483,8 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
       </div>
 
       <div className="project-control">
-        <div className="project-item-owner">
-          <Tooltip title={`Created by ${task.owner.alias}`}>
-            {getAvatar(task.owner)}
-          </Tooltip>
-        </div>
         <div className="project-item-assignee">{getAssignees()}</div>
-        <div className="project-item-assignee">
+        <div>
           <Tooltip title={getReminderSettingString(task.reminderSetting)}>
             {getOrderIcon()}
           </Tooltip>
