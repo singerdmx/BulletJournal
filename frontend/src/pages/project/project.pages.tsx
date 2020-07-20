@@ -505,7 +505,7 @@ class ProjectPage extends React.Component<
           </h2>
           <div className="project-control">
             <Popover
-              title={group && group.name}
+              title={group && `${group.name} (${!!group ? groupUsers.length : 0})`}
               placement="bottom"
               content={popContent}
             >
@@ -516,10 +516,12 @@ class ProjectPage extends React.Component<
                 <Badge
                   count={!!group ? groupUsers.length : 0}
                   style={{
-                    fontSize: '10px',
+                    fontSize: '9px',
+                    color: '#006633',
+                    backgroundColor: '#e6fff2'
                   }}
                 >
-                  <TeamOutlined />
+                  <TeamOutlined style={{ fontSize: '21px' }}/>
                 </Badge>
               </span>
             </Popover>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
+import {Avatar, Badge, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 import {
   AlertOutlined,
   CarryOutOutlined,
@@ -365,7 +365,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
         <Popover
             title={`${task.assignees.length} Assignees`}
             placement='bottom'
-            content={getTaskAssigneesPopoverContent(task, getAvatar)}
+            content={getTaskAssigneesPopoverContent(task, getAssigneesPopupAvatar)}
         >
         {getAssigneesIcon(task)}
       </Popover>
@@ -373,19 +373,48 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   };
 
   const getAssigneesIcon = (task: Task) => {
-    return <span style={{fontSize: '18px'}}><TeamOutlined/><span style={{fontSize: '10px', paddingRight: '2px'}}>{task.assignees.length}</span></span>
+    return <div key={task.id} style={{marginRight: '13px', marginLeft: '1px', marginTop: '6px'}}
+    >
+                <Badge
+                    count={task.assignees.length}
+                    style={{
+                      fontSize: '9px',
+                      color: '#006633',
+                      backgroundColor: '#e6fff2'
+                    }}
+                >
+                  <TeamOutlined style={{fontSize: '20px'}}/>
+                </Badge>
+              </div>
   };
 
   const getAvatar = (user: User) => {
     if (!inProject || !showModal) {
-      return <Avatar src={user.avatar} size='small' />;
+      return <div key={user.name} className='user-avatar-icon'><Avatar src={user.avatar} size='small' /></div>
     }
     return (
-      <span
+      <div
+        key={user.name}
+        className='user-avatar-icon'
         onClick={() => {
           showModal(user);
         }}
       >
+        <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
+      </div>
+    );
+  };
+
+  const getAssigneesPopupAvatar = (user: User) => {
+    if (!inProject || !showModal) {
+      return <span><Avatar src={user.avatar} size='small' /></span>
+    }
+    return (
+        <span
+            onClick={() => {
+              showModal(user);
+            }}
+        >
         <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
       </span>
     );

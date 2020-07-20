@@ -8,7 +8,7 @@ import {connect} from 'react-redux';
 import {completeTask, deleteTask, getTask, updateTaskContents} from '../../features/tasks/actions';
 import {IState} from '../../store';
 // antd imports
-import {Avatar, Button, Popconfirm, Popover, Tooltip} from 'antd';
+import {Avatar, Badge, Button, Popconfirm, Popover, Tooltip} from 'antd';
 import {CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined} from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
@@ -109,7 +109,19 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         content={getTaskAssigneesPopoverContent(task, (u) => <Avatar size='small' src={u.avatar}/>)}
       >
           <div className='task-owner'>
-              <span><TeamOutlined/><span style={{fontSize: '12px'}}>{task.assignees.length}</span></span>
+              <span
+              >
+                <Badge
+                    count={task.assignees.length}
+                    style={{
+                        fontSize: '9px',
+                        color: '#006633',
+                        backgroundColor: '#e6fff2'
+                    }}
+                >
+                  <TeamOutlined style={{ fontSize: '21px' }}/>
+                </Badge>
+              </span>
           </div>
       </Popover>
     );
