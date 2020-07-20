@@ -1,5 +1,5 @@
 import React from 'react';
-import {Avatar, Badge, Popconfirm, Popover, Tag, Tooltip} from 'antd';
+import { Avatar, Badge, Popconfirm, Popover, Tag, Tooltip } from 'antd';
 import {
   AlertOutlined,
   CarryOutOutlined,
@@ -7,7 +7,7 @@ import {
   CloseCircleOutlined,
   DeleteTwoTone,
   MoreOutlined,
-  TeamOutlined
+  TeamOutlined,
 } from '@ant-design/icons';
 import {
   getReminderSettingString,
@@ -86,22 +86,22 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div
           onClick={() => uncompleteTask(task.id)}
-          className='popover-control-item'
+          className="popover-control-item"
         >
           <span>Uncomplete</span>
-          <CloseCircleOutlined twoToneColor='#52c41a' />
+          <CloseCircleOutlined twoToneColor="#52c41a" />
         </div>
         <Popconfirm
-          title='Are you sure?'
-          okText='Yes'
-          cancelText='No'
+          title="Are you sure?"
+          okText="Yes"
+          cancelText="No"
           onConfirm={() => deleteCompletedTask(task.id)}
-          className='group-setting'
-          placement='bottom'
+          className="group-setting"
+          placement="bottom"
         >
-          <div className='popover-control-item'>
+          <div className="popover-control-item">
             <span>Delete</span>
-            <DeleteTwoTone twoToneColor='#f5222d' />
+            <DeleteTwoTone twoToneColor="#f5222d" />
           </div>
         </Popconfirm>
       </div>
@@ -121,22 +121,22 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div
           onClick={() => handleCompleteTaskClick()}
-          className='popover-control-item'
+          className="popover-control-item"
         >
           <span>Complete</span>
-          <CheckCircleTwoTone twoToneColor='#52c41a' />
+          <CheckCircleTwoTone twoToneColor="#52c41a" />
         </div>
         <Popconfirm
-          title='Deleting Task also deletes its child tasks. Are you sure?'
-          okText='Yes'
-          cancelText='No'
+          title="Deleting Task also deletes its child tasks. Are you sure?"
+          okText="Yes"
+          cancelText="No"
           onConfirm={() => deleteTask(task.id, type)}
-          className='group-setting'
-          placement='bottom'
+          className="group-setting"
+          placement="bottom"
         >
-          <div className='popover-control-item'>
+          <div className="popover-control-item">
             <span>Delete</span>
-            <DeleteTwoTone twoToneColor='#f5222d' />
+            <DeleteTwoTone twoToneColor="#f5222d" />
           </div>
         </Popconfirm>
       </div>
@@ -145,35 +145,35 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditTask task={task} mode='div' />
+      <EditTask task={task} mode="div" />
       <MoveProjectItem
         type={ProjectType.TODO}
         projectItemId={task.id}
-        mode='div'
+        mode="div"
       />
       <ShareProjectItem
         type={ProjectType.TODO}
         projectItemId={task.id}
-        mode='div'
+        mode="div"
       />
       <div
         onClick={() => handleCompleteTaskClick()}
-        className='popover-control-item'
+        className="popover-control-item"
       >
         <span>Complete</span>
-        <CheckCircleTwoTone twoToneColor='#52c41a' />
+        <CheckCircleTwoTone twoToneColor="#52c41a" />
       </div>
       <Popconfirm
-        title='Deleting Task also deletes its child tasks. Are you sure?'
-        okText='Yes'
-        cancelText='No'
+        title="Deleting Task also deletes its child tasks. Are you sure?"
+        okText="Yes"
+        cancelText="No"
         onConfirm={() => deleteTask(task.id, type)}
-        className='group-setting'
-        placement='bottom'
+        className="group-setting"
+        placement="bottom"
       >
-        <div className='popover-control-item'>
+        <div className="popover-control-item">
           <span>Delete</span>
-          <DeleteTwoTone twoToneColor='#f5222d' />
+          <DeleteTwoTone twoToneColor="#f5222d" />
         </div>
       </Popconfirm>
     </div>
@@ -186,8 +186,8 @@ const getCompletionTime = (task: Task) => {
       title={task.createdAt && `Completed ${moment(task.createdAt).fromNow()}`}
       placement={'bottom'}
     >
-      <div className='project-item-time'>
-        <Tag color='green'>
+      <div className="project-item-time">
+        <Tag color="green">
           {task.createdAt && moment(task.createdAt).format('YYYY-MM-DD HH:mm')}
         </Tag>
       </div>
@@ -226,9 +226,9 @@ export const getDueDateTime = (task: Task) => {
       s += `, duration ${duration}`;
     }
     return (
-      <Tooltip title={s} placement='bottom'>
-        <div className='project-item-time'>
-          <Tag className='item-tag'>{s}</Tag>
+      <Tooltip title={s} placement="bottom">
+        <div className="project-item-time">
+          <Tag className="item-tag">{s}</Tag>
         </div>
       </Tooltip>
     );
@@ -252,7 +252,7 @@ export const getDueDateTime = (task: Task) => {
 
   return (
     <Tooltip title={dueDateTitle} placement={'bottom'}>
-      <div className='project-item-time'>
+      <div className="project-item-time">
         <Tag>
           {task.dueDate} {task.dueTime}
         </Tag>
@@ -261,16 +261,19 @@ export const getDueDateTime = (task: Task) => {
   );
 };
 
-export const getTaskAssigneesPopoverContent = (task: Task, getAvatar: (user: User) => (any)) => {
-  return <div className='task-assignees'>
-    {task.assignees.map((u, index) => (
+export const getTaskAssigneesPopoverContent = (
+  task: Task,
+  getAvatar: (user: User) => any
+) => {
+  return (
+    <div className="task-assignees">
+      {task.assignees.map((u, index) => (
         <Tooltip title={u.alias}>
-          <span key={index}>
-            {getAvatar(u)}
-          </span>
+          <span key={index}>{getAvatar(u)}</span>
         </Tooltip>
-    ))}
-  </div>;
+      ))}
+    </div>
+  );
 };
 
 const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
@@ -291,7 +294,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     return (
       <Popover
         arrowPointAtCenter
-        placement='rightTop'
+        placement="rightTop"
         overlayStyle={{ width: '150px' }}
         content={
           <ManageTask
@@ -307,9 +310,9 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
           />
         }
         z-index={500}
-        trigger='click'
+        trigger="click"
       >
-        <span className='project-control-more'>
+        <span className="project-control-more">
           <MoreOutlined />
         </span>
       </Popover>
@@ -362,60 +365,69 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     }
 
     return (
-        <Popover
-            title={`${task.assignees.length} Assignees`}
-            placement='bottom'
-            content={getTaskAssigneesPopoverContent(task, getAssigneesPopupAvatar)}
-        >
+      <Popover
+        title={`${task.assignees.length} Assignees`}
+        placement="bottom"
+        content={getTaskAssigneesPopoverContent(task, getAssigneesPopupAvatar)}
+      >
         {getAssigneesIcon(task)}
       </Popover>
     );
   };
 
   const getAssigneesIcon = (task: Task) => {
-    return <div key={task.id} style={{marginRight: '13px'}}
-    >
-                <Badge
-                    count={task.assignees.length}
-                    style={{
-                      fontSize: '9px',
-                      color: '#006633',
-                      backgroundColor: '#e6fff2'
-                    }}
-                >
-                  <TeamOutlined style={{fontSize: '20px'}}/>
-                </Badge>
-              </div>
+    return (
+      <div key={task.id} style={{ marginRight: '13px' }}>
+        <Badge
+          count={task.assignees.length}
+          style={{
+            fontSize: '9px',
+            color: '#006633',
+            backgroundColor: '#e6fff2',
+          }}
+        >
+          <TeamOutlined style={{ fontSize: '20px' }} />
+        </Badge>
+      </div>
+    );
   };
 
   const getAvatar = (user: User) => {
     if (!inProject || !showModal) {
-      return <div key={user.name} className='user-avatar-icon'><Avatar src={user.avatar} size='small' /></div>
+      return (
+        <div key={user.name} className="user-avatar-icon">
+          <Avatar src={user.avatar} size={20} />
+        </div>
+      );
     }
     return (
       <div
         key={user.name}
-        className='user-avatar-icon'
+        className="user-avatar-icon"
         onClick={() => {
           showModal(user);
         }}
       >
-        <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
+        <Avatar src={user.avatar} size={20} style={{ cursor: 'pointer' }} />
       </div>
     );
   };
 
   const getAssigneesPopupAvatar = (user: User) => {
     if (!inProject || !showModal) {
-      return <span><Avatar src={user.avatar} size='small' /></span>
+      return (
+        <span>
+          <Avatar src={user.avatar} size="small" />
+        </span>
+      );
     }
     return (
-        <span
-            onClick={() => {
-              showModal(user);
-            }}
-        >
-        <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
+      <span
+        onClick={() => {
+          showModal(user);
+        }}
+      >
+        <Avatar src={user.avatar} size="small" style={{ cursor: 'pointer' }} />
       </span>
     );
   };
@@ -436,23 +448,23 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   return (
     <div
-      className='project-item'
+      className="project-item"
       style={getTaskBackgroundColor(task.status, theme)}
     >
-      <div className='project-item-content'>
+      <div className="project-item-content">
         <a onClick={handleClick}>
           <h3 className={taskStyle}>
             {getItemIcon(task, <CarryOutOutlined />)} {task.name}
           </h3>
         </a>
-        <div className='project-item-subs'>
-          <div className='project-item-labels'>
+        <div className="project-item-subs">
+          <div className="project-item-labels">
             {task.labels &&
               task.labels.map((label) => {
                 return (
                   <Tag
                     key={`label${label.id}`}
-                    className='labels'
+                    className="labels"
                     onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
                     style={{ cursor: 'pointer', borderRadius: 10 }}
@@ -470,14 +482,14 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
         </div>
       </div>
 
-      <div className='project-control'>
-        <div className='project-item-owner'>
+      <div className="project-control">
+        <div className="project-item-owner">
           <Tooltip title={`Created by ${task.owner.alias}`}>
             {getAvatar(task.owner)}
           </Tooltip>
         </div>
-        <div className='project-item-assignee'>{getAssignees()}</div>
-        <div className='project-item-assignee'>
+        <div className="project-item-assignee">{getAssignees()}</div>
+        <div className="project-item-assignee">
           <Tooltip title={getReminderSettingString(task.reminderSetting)}>
             {getOrderIcon()}
           </Tooltip>

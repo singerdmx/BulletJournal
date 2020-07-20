@@ -24,7 +24,10 @@ import ShareProjectItem from '../modals/share-project-item.component';
 import moment from 'moment';
 // assets import
 import './project-item.styles.less';
-import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
+import {
+  ProjectItemUIType,
+  ProjectType,
+} from '../../features/project/constants';
 import {
   getIcon,
   getItemIcon,
@@ -56,16 +59,16 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Popconfirm
-          title='Deleting Note also deletes its child notes. Are you sure?'
-          okText='Yes'
-          cancelText='No'
+          title="Deleting Note also deletes its child notes. Are you sure?"
+          okText="Yes"
+          cancelText="No"
           onConfirm={() => deleteNote(note.id, type)}
-          className='group-setting'
-          placement='bottom'
+          className="group-setting"
+          placement="bottom"
         >
-          <div className='popover-control-item'>
+          <div className="popover-control-item">
             <span>Delete</span>
-            <DeleteTwoTone twoToneColor='#f5222d' />
+            <DeleteTwoTone twoToneColor="#f5222d" />
           </div>
         </Popconfirm>
       </div>
@@ -74,28 +77,28 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditNote note={note} mode='div' />
+      <EditNote note={note} mode="div" />
       <MoveProjectItem
         type={ProjectType.NOTE}
         projectItemId={note.id}
-        mode='div'
+        mode="div"
       />
       <ShareProjectItem
         type={ProjectType.NOTE}
         projectItemId={note.id}
-        mode='div'
+        mode="div"
       />
       <Popconfirm
-        title='Deleting Note also deletes its child notes. Are you sure?'
-        okText='Yes'
-        cancelText='No'
+        title="Deleting Note also deletes its child notes. Are you sure?"
+        okText="Yes"
+        cancelText="No"
         onConfirm={() => deleteNote(note.id, type)}
-        className='group-setting'
-        placement='bottom'
+        className="group-setting"
+        placement="bottom"
       >
-        <div className='popover-control-item'>
+        <div className="popover-control-item">
           <span>Delete</span>
-          <DeleteTwoTone twoToneColor='#f5222d' />
+          <DeleteTwoTone twoToneColor="#f5222d" />
         </div>
       </Popconfirm>
     </div>
@@ -132,14 +135,19 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
     return (
       <Popover
         arrowPointAtCenter
-        placement='rightTop'
+        placement="rightTop"
         overlayStyle={{ width: '150px' }}
         content={
-          <ManageNote note={note} deleteNote={deleteNote} inModal={inModal} type={type} />
+          <ManageNote
+            note={note}
+            deleteNote={deleteNote}
+            inModal={inModal}
+            type={type}
+          />
         }
-        trigger='click'
+        trigger="click"
       >
-        <span className='project-control-more'>
+        <span className="project-control-more">
           <MoreOutlined />
         </span>
       </Popover>
@@ -147,15 +155,15 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   };
 
   const getAvatar = (user: User) => {
-    if (!inProject) return <Avatar src={user.avatar} size='small' />;
-    if (!showModal) return <Avatar src={user.avatar} size='small' />;
+    if (!inProject) return <Avatar src={user.avatar} size="small" />;
+    if (!showModal) return <Avatar src={user.avatar} size="small" />;
     return (
       <span
         onClick={() => {
           showModal(user);
         }}
       >
-        <Avatar src={user.avatar} size='small' style={{ cursor: 'pointer' }} />
+        <Avatar src={user.avatar} size={20} style={{ cursor: 'pointer' }} />
       </span>
     );
   };
@@ -184,22 +192,22 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   };
 
   return (
-    <div className='project-item'>
-      <div className='project-item-content'>
+    <div className="project-item">
+      <div className="project-item-content">
         <a onClick={handleClick}>
-          <h3 className='project-item-name'>
+          <h3 className="project-item-name">
             {getItemIcon(note, <FileTextOutlined />)}&nbsp;
             {note.name}
           </h3>
         </a>
-        <div className='project-item-subs'>
-          <div className='project-item-labels'>
+        <div className="project-item-subs">
+          <div className="project-item-labels">
             {note.labels &&
               note.labels.map((label) => {
                 return (
                   <Tag
                     key={`label${label.id}`}
-                    className='labels'
+                    className="labels"
                     onClick={() => toLabelSearching(label)}
                     color={stringToRGB(label.value)}
                     style={{ cursor: 'pointer', borderRadius: 10 }}
@@ -212,19 +220,15 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
                 );
               })}
           </div>
-          <div className='project-item-time'>
+          <div className="project-item-time">
             {note.createdAt && `Created ${moment(note.createdAt).fromNow()}`}
           </div>
         </div>
       </div>
 
-      <div className='project-control'>
-        <div className='project-item-owner'>
-          <Tooltip
-            title={note.owner.alias}
-          >
-            {getAvatar(note.owner)}
-          </Tooltip>
+      <div className="project-control">
+        <div className="project-item-owner">
+          <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
         </div>
         <div>
           <Tooltip
@@ -241,6 +245,4 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   );
 };
 
-export default connect(null, { deleteNote, setSelectedLabel })(
-  NoteItem
-);
+export default connect(null, { deleteNote, setSelectedLabel })(NoteItem);
