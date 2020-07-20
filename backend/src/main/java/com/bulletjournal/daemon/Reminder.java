@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -62,12 +63,13 @@ public class Reminder {
     }
 
     private void initLoad() {
-        this.scheduleReminderRecords(0 - reminderConfig.getLoadPrevSeconds());
-        this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
+        ZonedDateTime start = ZonedDateTime.now().minus(reminderConfig.getLoadPrevSeconds(), ChronoUnit.SECONDS);
+        ZonedDateTime end = ZonedDateTime.now().plus(reminderConfig.getLoadNextSeconds(), ChronoUnit.SECONDS);
+        this.scheduleReminderRecords(Pair.of(start, end));
     }
 
     private void cronJob() {
-        LOGGER.info("This is cronJob");
+        LOGGER.info("This is Reminder daily cronJob");
         this.purge(this.reminderConfig.getPurgePrevSeconds());
 
         this.scheduleReminderRecords(this.reminderConfig.getLoadNextSeconds());
@@ -95,8 +97,7 @@ public class Reminder {
                 e.getKey().getTimestampSecond() + expiredSeconds < ZonedDateTime.now().toEpochSecond());
     }
 
-    private void scheduleReminderRecords(long seconds) {
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(seconds, reminderConfig.getTimeZone());
+    private void scheduleReminderRecords(Pair<ZonedDateTime, ZonedDateTime> interval) {
         taskDaoJpa.getRemindingTasks(interval.getFirst(), interval.getSecond()).forEach((k, v) -> {
             if (!concurrentHashMap.containsKey(k)) {
                 LOGGER.info("Schedule New job" + k.toString());
@@ -106,6 +107,11 @@ public class Reminder {
                 concurrentHashMap.put(k, v);
             }
         });
+    }
+
+    private void scheduleReminderRecords(long seconds) {
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(seconds, reminderConfig.getTimeZone());
+        this.scheduleReminderRecords(interval);
     }
 
     private void process(ReminderRecord record) {
