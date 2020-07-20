@@ -22,6 +22,7 @@ import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
 import TaskDetailPage, {TaskProps} from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
+import {getTaskAssigneesPopoverContent} from "../../components/project-item/task-item.component";
 
 interface TaskPageHandler {
   getTask: (taskId: number) => void;
@@ -105,16 +106,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
       <Popover
         title={`${task.assignees.length} Assignees`}
         placement='bottom'
-        content={
-          <div>
-            {task.assignees.map((u, index) => (
-              <p key={index}>
-                <Avatar size='small' src={u.avatar} />
-                &nbsp;{u.alias}
-              </p>
-            ))}
-          </div>
-        }
+        content={getTaskAssigneesPopoverContent(task, (u) => <Avatar size='small' src={u.avatar}/>)}
       >
         <div className='task-owner'>
           <Avatar src={task.assignees[0].avatar} />

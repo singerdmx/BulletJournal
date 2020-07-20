@@ -260,6 +260,18 @@ export const getDueDateTime = (task: Task) => {
   );
 };
 
+export const getTaskAssigneesPopoverContent = (task: Task, getAvatar: (user: User) => (any)) => {
+  return <div className='task-assignees'>
+    {task.assignees.map((u, index) => (
+        <Tooltip title={u.alias}>
+          <span key={index}>
+            {getAvatar(u)}
+          </span>
+        </Tooltip>
+    ))}
+  </div>;
+};
+
 const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   props
 ) => {
@@ -349,20 +361,11 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     }
 
     return (
-      <Popover
-        title={`${task.assignees.length} Assignees`}
-        placement='bottom'
-        content={
-          <div>
-            {task.assignees.map((u, index) => (
-              <p key={index}>
-                {getAvatar(u)}
-                &nbsp;{u.alias}
-              </p>
-            ))}
-          </div>
-        }
-      >
+        <Popover
+            title={`${task.assignees.length} Assignees`}
+            placement='bottom'
+            content={getTaskAssigneesPopoverContent(task, getAvatar)}
+        >
         {getAvatar(task.assignees[0])}
       </Popover>
     );
