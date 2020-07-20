@@ -373,7 +373,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   };
 
   const getAssigneesIcon = (task: Task) => {
-    return <span><TeamOutlined/><span style={{fontSize: '10px'}}>{task.assignees.length}</span></span>
+    return <span style={{fontSize: '18px'}}><TeamOutlined/><span style={{fontSize: '10px', paddingRight: '2px'}}>{task.assignees.length}</span></span>
   };
 
   const getAvatar = (user: User) => {
