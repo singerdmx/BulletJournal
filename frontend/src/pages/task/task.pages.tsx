@@ -103,7 +103,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 
     return (
       <Popover
-        title='Assignees'
+        title={`${task.assignees.length} Assignees`}
         placement='bottom'
         content={
           <div>

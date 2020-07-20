@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import static java.lang.Thread.sleep;
 import static org.junit.Assert.*;
 
 /**
@@ -38,11 +39,11 @@ import static org.junit.Assert.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class SystemControllerTest {
+    private static final int ETAG_TEST_RETRY = 10;
     private static final String ROOT_URL = "http://localhost:";
     private static String TIMEZONE = "America/Los_Angeles";
-    private final String expectedOwner = "BulletJournal";
     private final String[] sampleUsers = {
-            "Michael_Zhou"
+            "Michael_Zhou", "Xavier"
     };
     @LocalServerPort
     int randomServerPort;
@@ -121,6 +122,96 @@ public class SystemControllerTest {
         deleteTask(t3);
         deleteTask(t4);
         deleteTask(t5);
+
+        String oldGroupsEtag = getGroupsEtag();
+        addUserToGroup(group, sampleUsers[1], 2);
+        boolean flag = false;
+        for (int i = 0; i < ETAG_TEST_RETRY; i++) {
+            String newGroupsEtag = getGroupsEtag();
+            if (!oldGroupsEtag.equals(newGroupsEtag)) {
+                flag = true;
+                break;
+            }
+            sleep(2000);
+        }
+        assertTrue(flag);
+
+        String oldNotificationsEtag = getNotificationsEtag();
+        createTask(p1, new CreateTaskParams("task_for_notification_etag", "2022-02-27",
+                null, null, new ReminderSetting(), ImmutableList.of(sampleUsers[1]), TIMEZONE, null));
+        flag = false;
+        for (int i = 0; i < ETAG_TEST_RETRY; i++) {
+            String newNotificationsEtag = getNotificationsEtag();
+            if (!oldNotificationsEtag.equals(newNotificationsEtag)) {
+                flag = true;
+                break;
+            }
+            sleep(2000);
+        }
+        assertTrue(flag);
+    }
+
+    private Task createTask(
+            Project project, CreateTaskParams params
+    ) {
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(params, sampleUsers[0]),
+                Task.class,
+                project.getId());
+        Task created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+        assertEquals(params.getName(), created.getName());
+        assertEquals(project.getId(), created.getProjectId());
+        return created;
+    }
+
+    private String getNotificationsEtag() {
+        String url = ROOT_URL + randomServerPort + SystemController.UPDATES_ROUTE;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("targets", "notificationsEtag");
+
+        ResponseEntity<SystemUpdates> response = this.restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, sampleUsers[1]),
+                SystemUpdates.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        SystemUpdates systemUpdates = response.getBody();
+        assertNotNull(systemUpdates);
+        return systemUpdates.getNotificationsEtag();
+    }
+
+    private Group addUserToGroup(Group group, String username, int expectedSize) {
+        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
+        ResponseEntity<Group> groupsResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUP_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(addUserGroupParams, sampleUsers[0]),
+                Group.class);
+        Group updated = groupsResponse.getBody();
+        assertEquals(expectedSize, updated.getUsers().size());
+        return updated;
+    }
+
+    private String getGroupsEtag() {
+        String url = ROOT_URL + randomServerPort + SystemController.UPDATES_ROUTE;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("targets", "groupsEtag");
+
+        ResponseEntity<SystemUpdates> response = this.restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, sampleUsers[0]),
+                SystemUpdates.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        SystemUpdates systemUpdates = response.getBody();
+        assertNotNull(systemUpdates);
+        return systemUpdates.getGroupsEtag();
     }
 
     private Task addRecurringRemindingTasks(Project project, Integer before, String date, String time) {
