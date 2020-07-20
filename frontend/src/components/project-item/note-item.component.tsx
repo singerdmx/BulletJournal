@@ -228,7 +228,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
         <div className="project-item-owner">
           <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
         </div>
-        <div>
+        <div style={{marginLeft: '5px'}}>
           <Tooltip
             title={
               note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
