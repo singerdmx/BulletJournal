@@ -172,13 +172,11 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
     if (!inProject) return <FormOutlined />;
     if (!showOrderModal) return <FormOutlined />;
     return (
-      <span
+      <FormOutlined
         onClick={() => {
           showOrderModal();
         }}
-      >
-        <FormOutlined />
-      </span>
+      />
     );
   };
 

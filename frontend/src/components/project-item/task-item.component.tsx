@@ -436,13 +436,11 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     if (!inProject) return <AlertOutlined />;
     if (!showOrderModal) return <AlertOutlined />;
     return (
-      <span
+      <AlertOutlined
         onClick={() => {
           showOrderModal();
         }}
-      >
-        <AlertOutlined />
-      </span>
+      />
     );
   };
 
