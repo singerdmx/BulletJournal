@@ -75,14 +75,15 @@ public class ProjectItemController {
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap = getZonedDateTimeProjectItemsMap(types, username, startTime,
-                endTime);
+                endTime, timezone);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
         return ProjectItems.addAvatar(this.labelDaoJpa.getLabelsForProjectItems(projectItems), this.userClient);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(List<ProjectType> types, String username,
-                                                                               ZonedDateTime startTime, ZonedDateTime endTime) {
+                                                                               ZonedDateTime startTime, ZonedDateTime endTime,
+                                                                               String timezone) {
 
         Map<ZonedDateTime, List<Task>> taskMap = null;
         Map<ZonedDateTime, List<Transaction>> transactionMap = null;
@@ -92,14 +93,14 @@ public class ProjectItemController {
         if (types.contains(ProjectType.TODO)) {
             List<Task> tasks = taskDaoJpa.getTasksBetween(user.getName(), startTime, endTime);
             // Group tasks by date
-            taskMap = ProjectItemsGrouper.groupTasksByDate(tasks, false);
+            taskMap = ProjectItemsGrouper.groupTasksByDate(tasks, false, timezone);
         }
         // Ledger query
         if (types.contains(ProjectType.LEDGER)) {
             List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(user.getName(), startTime,
                     endTime);
             // Group transaction by date
-            transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions);
+            transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions, timezone);
         }
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();

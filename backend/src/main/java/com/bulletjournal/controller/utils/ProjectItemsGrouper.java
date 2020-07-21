@@ -41,11 +41,12 @@ public class ProjectItemsGrouper {
      *
      * @transactions Map<ZonedDateTime, List<Transaction>> - List of Transactions
      */
-    public static Map<ZonedDateTime, List<Transaction>> groupTransactionsByDate(List<Transaction> transactions) {
+    public static Map<ZonedDateTime, List<Transaction>> groupTransactionsByDate(List<Transaction> transactions,
+                                                                                String timezone) {
         Map<ZonedDateTime, List<Transaction>> map = new HashMap<>();
         for (Transaction transaction : transactions) {
             ZonedDateTime zonedDateTime =
-                    ZonedDateTimeHelper.convertDateOnly(transaction.getDate(), transaction.getTimezone());
+                    ZonedDateTimeHelper.convertDateOnly(transaction.getDate(), timezone);
             map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(transaction);
         }
         return map;
@@ -56,7 +57,9 @@ public class ProjectItemsGrouper {
      *
      * @tasks Map<ZonedDateTime, List<Task>> - List of Tasks
      */
-    public static Map<ZonedDateTime, List<Task>> groupTasksByDate(List<Task> tasks, boolean keepTaskWithNoDueDate) {
+    public static Map<ZonedDateTime, List<Task>> groupTasksByDate(List<Task> tasks,
+                                                                  boolean keepTaskWithNoDueDate,
+                                                                  String timezone) {
         Map<ZonedDateTime, List<Task>> map = new HashMap<>();
         for (Task task : tasks) {
             String dueDate = task.getDueDate();
@@ -66,7 +69,7 @@ public class ProjectItemsGrouper {
                 }
                 dueDate = ZonedDateTimeHelper.getNow(task.getTimezone()).format(ZonedDateTimeHelper.DATE_FORMATTER);
             }
-            ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateOnly(dueDate, task.getTimezone());
+            ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateOnly(dueDate, timezone);
             map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(task);
         }
         return map;

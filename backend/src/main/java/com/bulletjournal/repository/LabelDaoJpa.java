@@ -204,10 +204,10 @@ public class LabelDaoJpa {
         notes.addAll(sharedNotes);
         transactions.addAll(sharedTransactions);
         // Group project items by date
-        Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true);
+        Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
         Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper
-                .groupTransactionsByDate(transactions);
+                .groupTransactionsByDate(transactions, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);

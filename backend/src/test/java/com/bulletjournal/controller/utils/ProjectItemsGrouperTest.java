@@ -39,7 +39,7 @@ public class ProjectItemsGrouperTest {
         transactions.add(t3);
         transactions.add(t4);
 
-        Map<ZonedDateTime, List<Transaction>> map = ProjectItemsGrouper.groupTransactionsByDate(transactions);
+        Map<ZonedDateTime, List<Transaction>> map = ProjectItemsGrouper.groupTransactionsByDate(transactions, "America/Los_Angeles");
         assertEquals(4, map.size());
         for (Map.Entry<ZonedDateTime, List<Transaction>> entry : map.entrySet()) {
             List<Transaction> t = entry.getValue();
@@ -62,7 +62,7 @@ public class ProjectItemsGrouperTest {
         tasks.add(t3);
         tasks.add(t4);
 
-        Map<ZonedDateTime, List<Task>> map = ProjectItemsGrouper.groupTasksByDate(tasks, true);
+        Map<ZonedDateTime, List<Task>> map = ProjectItemsGrouper.groupTasksByDate(tasks, true, "America/Los_Angeles");
         assertEquals(4, map.size());
         for (Map.Entry<ZonedDateTime, List<Task>> entry : map.entrySet()) {
             List<Task> t = entry.getValue();
