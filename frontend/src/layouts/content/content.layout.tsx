@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import SettingPage from '../../pages/settings/settings.page';
-import PointPage from '../../components/points/point'
+import PointPage from '../../pages/points/point'
 import BujoPage from '../../pages/bujo/bujo.pages';
 import GroupPage from '../../pages/group/group.pages';
 import GroupsPage from '../../pages/groups/groups.pages';

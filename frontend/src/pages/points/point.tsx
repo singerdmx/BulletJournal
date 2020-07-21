@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import '../pages.style.less';
 import coin from '../../assets/coin.jpeg';
 
 export default function Point() {
