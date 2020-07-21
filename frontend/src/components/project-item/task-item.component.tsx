@@ -377,7 +377,7 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
 
   const getAssigneesIcon = (task: Task) => {
     return (
-      <div key={task.id} style={{ marginRight: '13px' }}>
+      <div key={task.id} style={{ marginRight: '8px' }}>
         <Badge
           count={task.assignees.length}
           style={{
