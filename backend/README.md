@@ -3,10 +3,17 @@ Run command `./gradlew build`
 
 ## How to run Spring Boot App locally
 
+First for logging purpose create folder /var/log/bulletjournal and grant permissions
+```
+sudo mkdir -p /var/log/bulletjournal
+sudo chmod 777 /var/log/bulletjournal
+```
+
 Make sure port 8080 is available and then start backend by running the following command:
 ```
 ./gradlew bootRun
 ```
+
 ## How to build and push the backend image
 ```
 DOCKER_BUILDKIT=1 docker build -t {dockerhub_name}/{image_name} .
