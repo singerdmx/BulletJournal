@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import SettingPage from '../../pages/settings/settings.page';
+import PointPage from '../../components/points/point'
 import BujoPage from '../../pages/bujo/bujo.pages';
 import GroupPage from '../../pages/group/group.pages';
 import GroupsPage from '../../pages/groups/groups.pages';
@@ -27,6 +28,7 @@ class ContentLayout extends React.Component {
         <Switch>
           <Route exact path='/' component={BujoPage} />
           <Route exact path='/bujo/:category' component={BujoPage} />
+          <Route exact path='/points' component={PointPage} />
           <Route exact path='/settings' component={SettingPage} />
           <Route exact path='/googleCalendar' component={SettingPage} />
           <Route exact path='/projects' component={ProjectsPage} />
@@ -56,7 +58,7 @@ class ContentLayout extends React.Component {
             path='/transaction/:transactionId'
             component={TransactionPage}
           />
-          <Route exact path="/sharedItems/:itemId" component={PublicPage}/>
+          <Route exact path="/sharedItems/:itemId" component={PublicPage} />
         </Switch>
       </Content>
     );
