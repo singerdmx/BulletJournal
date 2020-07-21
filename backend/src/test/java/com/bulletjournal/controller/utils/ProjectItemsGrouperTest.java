@@ -13,7 +13,10 @@ import org.springframework.test.context.ActiveProfiles;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -30,9 +33,9 @@ public class ProjectItemsGrouperTest {
         List<Transaction> transactions = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
         Transaction t1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction t2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
-        Transaction t3 = getTransaction(1L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
-        Transaction t4 = getTransaction(1L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
+        Transaction t2 = getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction t3 = getTransaction(3L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
+        Transaction t4 = getTransaction(4L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
 
         transactions.add(t1);
         transactions.add(t2);
@@ -53,9 +56,9 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
         Task t1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task t2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
-        Task t3 = getTask(1L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
-        Task t4 = getTask(1L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
+        Task t2 = getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task t3 = getTask(3L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
+        Task t4 = getTask(4L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
 
         tasks.add(t1);
         tasks.add(t2);
@@ -67,6 +70,29 @@ public class ProjectItemsGrouperTest {
         for (Map.Entry<ZonedDateTime, List<Task>> entry : map.entrySet()) {
             List<Task> t = entry.getValue();
             assertTrue(tasks.contains(t.get(0)));
+        }
+    }
+
+    @Test
+    public void testGroupTasksByDateInDifferentZone() {
+        List<Task> tasks = new ArrayList<>();
+        ProjectStub projectStub = new ProjectStub();
+        ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
+
+        Task t1 = getTask(1L, "Michael_Zhou", "2020-03-03", "23:15", "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+
+        tasks.add(t1);
+
+        Map<ZonedDateTime, List<Task>> map = ProjectItemsGrouper.groupTasksByDate(tasks, true, "America/Chicago");
+        assertEquals(1, map.size());
+
+        for (Map.Entry<ZonedDateTime, List<Task>> entry : map.entrySet()) {
+
+            List<Task> t = entry.getValue();
+            assertTrue(tasks.contains(t.get(0)));
+
+            String date = entry.getKey().format(ZonedDateTimeHelper.DATE_FORMATTER);
+            assertEquals("2020-03-04", date);
         }
     }
 
@@ -90,10 +116,10 @@ public class ProjectItemsGrouperTest {
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
         Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
         Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task2 = getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1
                 = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
@@ -148,10 +174,10 @@ public class ProjectItemsGrouperTest {
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
         Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = getTransaction(1L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
         Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = getTask(1L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task2 = getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1
                 = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());

@@ -1,7 +1,10 @@
 package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.repository.models.*;
+import com.bulletjournal.repository.models.AuditModel;
+import com.bulletjournal.repository.models.Note;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
@@ -46,7 +49,7 @@ public class ProjectItemsGrouper {
         Map<ZonedDateTime, List<Transaction>> map = new HashMap<>();
         for (Transaction transaction : transactions) {
             ZonedDateTime zonedDateTime =
-                    ZonedDateTimeHelper.convertDateOnly(transaction.getDate(), timezone);
+                    ZonedDateTimeHelper.getDateInDifferentZone(transaction.getDate(), transaction.getTime(), transaction.getTimezone(), timezone);
             map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(transaction);
         }
         return map;
@@ -63,13 +66,17 @@ public class ProjectItemsGrouper {
         Map<ZonedDateTime, List<Task>> map = new HashMap<>();
         for (Task task : tasks) {
             String dueDate = task.getDueDate();
+            String dueTime = task.getDueTime();
             if (dueDate == null) {
                 if (!keepTaskWithNoDueDate) {
                     continue;
                 }
-                dueDate = ZonedDateTimeHelper.getNow(task.getTimezone()).format(ZonedDateTimeHelper.DATE_FORMATTER);
+                ZonedDateTime deadline = ZonedDateTimeHelper.getNow(task.getTimezone());
+                dueDate = deadline.format(ZonedDateTimeHelper.DATE_FORMATTER);
+                dueTime = deadline.format(ZonedDateTimeHelper.TIME_FORMATTER);
             }
-            ZonedDateTime zonedDateTime = ZonedDateTimeHelper.convertDateOnly(dueDate, timezone);
+            ZonedDateTime zonedDateTime = ZonedDateTimeHelper
+                    .getDateInDifferentZone(dueDate, dueTime, task.getTimezone(), timezone);
             map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(task);
         }
         return map;

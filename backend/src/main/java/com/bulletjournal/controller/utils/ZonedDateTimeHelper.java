@@ -24,6 +24,7 @@ public class ZonedDateTimeHelper {
     public static final String PATTERN = "yyyy-MM-dd HH:mm";
     public static final int MAX_HOURS_BEFORE = 2;
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private static final String MIN_TIME = "00:00";
     private static final String MAX_TIME = "23:59";
 
@@ -176,11 +177,22 @@ public class ZonedDateTimeHelper {
     }
 
     /**
-     * Convert Date String to ZonedDateTime
+     * Convert Date and Time String to ZonedDateTime
      */
     public static ZonedDateTime convertDateAndTime(String date, String time, String timezone) {
         return time == null ? convertDateOnly(date, timezone) :
                 convertDateTime(date + DATE_TIME_DELIMITER + time, timezone);
+    }
+
+
+    /**
+     * Convert Date and Time String to ZonedDateTime and shift timezone
+     */
+    public static ZonedDateTime getDateInDifferentZone(String date, String time, String fromZone, String toZone) {
+        return convertDateAndTime(date, time, fromZone)
+                .withZoneSameInstant(ZoneId.of(toZone))
+                .withHour(0)
+                .withMinute(0);
     }
 
     /**
