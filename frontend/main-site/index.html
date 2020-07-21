@@ -360,6 +360,34 @@
     </div>
     <!-- End Preloader -->
 
+    <!-- Mobile Popup-->
+    <!-- Button trigger modal -->
+<button type="button" id="mobileControlButton" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter" style="display:none;">
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-mobile" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Download <i class="lni lni-download"></i>
+</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <section>
+          <div class="text-center" id="downloadLink">
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- End Mobile Popup-->
+
+
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="assets/js/jquery-min.js"></script>
     <script src="assets/js/popper.min.js"></script>
@@ -378,5 +406,34 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/form-validator.min.js"></script>
     <script src="assets/js/contact-form-script.min.js"></script>
+    <script>
+      function getMobileOperatingSystem() {
+          var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            if (/android/i.test(userAgent)) {
+                return "Android";
+            }
+
+            // iOS detection from: http://stackoverflow.com/a/9039885/177710
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return "iOS";
+            }
+
+            return "unknown";
+        }
+
+        let mobileOperatingSystem = getMobileOperatingSystem();
+        switch(mobileOperatingSystem){
+          case "Android":
+            $("#mobileControlButton").click();
+            $("#downloadLink").html('<a id="android" href="https://play.google.com/store/apps/details?id=us.bullet_journal"><img src="./assets/img/icons-android.png"></a>');
+            break;
+          case "iOS":
+            $("#mobileControlButton").click();
+            $("#downloadLink").html('<a id="ios" href="https://apps.apple.com/us/app/taskade-team-productivity/id1264713923"><img src="./assets/img/icons-iphone.png"></a>')
+            break;
+          default:
+        }
+    </script>
   </body>
 </html>
