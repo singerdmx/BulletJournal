@@ -39,6 +39,7 @@ import moment from 'moment';
 import { Project } from '../../features/project/interface';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
+import isSubsequence from "../../utils/Util";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -237,6 +238,11 @@ const EditTask: React.FC<
     setUseTaskRecurrenceRule(false);
   };
 
+  const onSearchAssignees = (inputValue: string, t: any) => {
+    inputValue = inputValue.toLowerCase();
+    return isSubsequence(t.key.toString().toLowerCase(), inputValue) || isSubsequence(t.value.toString().toLowerCase(), inputValue)
+  };
+
   const getSelections = (task: Task) => {
     if (!props.group || !props.group.users) {
       return null;
@@ -244,6 +250,7 @@ const EditTask: React.FC<
     return (
       <Select
         mode='multiple'
+        filterOption={(e, t) => onSearchAssignees(e, t)}
         defaultValue={task.assignees ? task.assignees.map((u) => u.name) : []}
         style={{ width: '100%' }}
       >

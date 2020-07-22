@@ -196,9 +196,8 @@ const AddTask: React.FC<
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
 
-
-
   const onSearchAssignees = (inputValue: string, t: any) => {
+    inputValue = inputValue.toLowerCase();
     return isSubsequence(t.key.toString().toLowerCase(), inputValue) || isSubsequence(t.value.toString().toLowerCase(), inputValue)
   };
 
