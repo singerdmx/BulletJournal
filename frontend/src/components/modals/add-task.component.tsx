@@ -105,7 +105,7 @@ const AddTask: React.FC<
     if (projectId) {
       props.labelsUpdate(parseInt(projectId));
     }
-  }, []);
+  }, [projectId]);
 
   const addTask = (values: any) => {
     //convert time object to string
@@ -194,6 +194,14 @@ const AddTask: React.FC<
   const rRuleTextList = rRuleText.match(
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
+
+  const onSearchAssignees = (e: any, t: any) => {
+    console.log(e);
+    console.log(t.key);
+    console.log(t.value);
+    return true;
+  };
+
   const getSelections = () => {
     if (!props.group || !props.group.users) {
       return null;
@@ -201,6 +209,7 @@ const AddTask: React.FC<
     return (
       <Select
         mode='multiple'
+        filterOption={(e, t) => onSearchAssignees(e, t)}
         defaultValue={props.myself}
         style={{ width: '100%' }}
       >
@@ -208,7 +217,7 @@ const AddTask: React.FC<
           .filter((u) => u.accepted)
           .map((user) => {
             return (
-              <Option value={user.name} key={user.name}>
+              <Option value={user.name} key={user.alias}>
                 <Avatar size='small' src={user.avatar} />
                 &nbsp;&nbsp; <strong>{user.alias}</strong>
               </Option>
