@@ -201,11 +201,6 @@ const AddTask: React.FC<
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
 
-  const onFilterAssignees = (inputValue: string, t: any) => {
-    inputValue = inputValue.toLowerCase();
-    return isSubsequence(t.key.toLowerCase(), inputValue) || isSubsequence(t.value.toLowerCase(), inputValue);
-  };
-
   const getSelections = () => {
     if (!props.group || !props.group.users) {
       return null;
