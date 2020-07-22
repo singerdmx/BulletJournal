@@ -111,10 +111,13 @@ public class DeviceControllerTest {
     @Test
     @Ignore
     public void testFcm() throws Exception {
+        String newToken = "cuIiWu-1TjiRomJNP8948o:APA91bEdx_G7MVKD3mYEwgeoOQJqS6KVxYdhJ1oE5ot0-AauTw30lzL_JQYbgDZ60HKFA2PeGzdnniXfaS-vIwAQHEMgWo6kDe7fb_D4X32jfAwlWfntdt8HHQE2ZcLilpMhQhJQpYwp";
+        String oldToken = "fZbssspGI_8:APA91bFs24liZn4wZgPMtGuL5KqvsJErwNCKB7sIm2Qd2FC4EdjjtCfStQoqzL-iGDomDHpv7sV8bdoCm_DTf9GuBmf5eZZBoNq2pYl_bNAJAPs6WK7zywg3TjHQ47mbtqJ7IaPkDSR5";
+
         FcmMessageParams params = new FcmMessageParams(
             "Title1",
             "testMessage1",
-            "fZbt6xpGI_8:APA91bFs24liZn4wZgPMtGuL5KqvsJErwNCKB7sIm2Qd2FC4EdjjtCfStQoqzL-iGDomDHpv7sV8bdoCm_DTf9GuBmf5eZZBoNq2pYl_bNAJAPs6WK7zywg3TjHQ47mbtqJ7IaPkDSR5",
+            oldToken,
             null
         );
         fcmService.sendAllMessages(Arrays.asList(params));

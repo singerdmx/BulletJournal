@@ -45,4 +45,14 @@ public class FcmMessageParams {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    @Override
+    public String toString() {
+        return "FcmMessageParams{" +
+            "title='" + title + '\'' +
+            ", message='" + message + '\'' +
+            ", token='" + token + '\'' +
+            ", topic='" + topic + '\'' +
+            '}';
+    }
 }
