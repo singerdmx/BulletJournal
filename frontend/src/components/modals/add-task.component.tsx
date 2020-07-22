@@ -90,6 +90,11 @@ interface TaskCreateFormProps {
   labelsUpdate: (projectId: number | undefined) => void;
 }
 
+export const onFilterAssignees = (inputValue: string, option: any) => {
+  inputValue = inputValue.toLowerCase();
+  return isSubsequence(option.key.toLowerCase(), inputValue) || isSubsequence(option.value.toLowerCase(), inputValue);
+};
+
 const AddTask: React.FC<
   RouteComponentProps & TaskProps & TaskCreateFormProps
 > = (props) => {

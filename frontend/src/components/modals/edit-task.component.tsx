@@ -40,6 +40,7 @@ import { Project } from '../../features/project/interface';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import isSubsequence from "../../utils/Util";
+import {onFilterAssignees} from "./add-task.component";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -236,11 +237,6 @@ const EditTask: React.FC<
 
   const onClickRecurrenceButton = () => {
     setUseTaskRecurrenceRule(false);
-  };
-
-  const onFilterAssignees = (inputValue: string, t: any) => {
-    inputValue = inputValue.toLowerCase();
-    return isSubsequence(t.key.toLowerCase(), inputValue) || isSubsequence(t.value.toLowerCase(), inputValue);
   };
 
   const getSelections = (task: Task) => {
