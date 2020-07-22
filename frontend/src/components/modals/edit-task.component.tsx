@@ -39,8 +39,7 @@ import moment from 'moment';
 import { Project } from '../../features/project/interface';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
-import isSubsequence from "../../utils/Util";
-import {onFilterAssignees} from "./add-task.component";
+import {onFilterAssignees, onFilterLabel} from "../../utils/Util";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -540,6 +539,7 @@ const EditTask: React.FC<
             <Form.Item name='labels' label='Labels'>
               <Select
                 mode='multiple'
+                filterOption={(e, t) => onFilterLabel(e, t)}
                 defaultValue={task.labels.map((l) => {
                   return l.id;
                 })}
@@ -548,7 +548,7 @@ const EditTask: React.FC<
                   props.labelOptions.length &&
                   props.labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );

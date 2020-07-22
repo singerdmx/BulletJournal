@@ -36,7 +36,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import { Project } from '../../features/project/interface';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
-import isSubsequence from "../../utils/Util";
+import { onFilterAssignees, onFilterLabel } from "../../utils/Util";
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -89,11 +89,6 @@ interface TaskCreateFormProps {
   updateTaskVisible: (addTaskVisible: boolean) => void;
   labelsUpdate: (projectId: number | undefined) => void;
 }
-
-export const onFilterAssignees = (inputValue: string, option: any) => {
-  inputValue = inputValue.toLowerCase();
-  return isSubsequence(option.key.toLowerCase(), inputValue) || isSubsequence(option.value.toLowerCase(), inputValue);
-};
 
 const AddTask: React.FC<
   RouteComponentProps & TaskProps & TaskCreateFormProps
@@ -470,12 +465,14 @@ const AddTask: React.FC<
           {/* label */}
           <div>
             <Form.Item name='labels' label='Labels'>
-              <Select mode='multiple'>
+              <Select
+                  mode='multiple'
+                  filterOption={(e, t) => onFilterLabel(e, t)}>
                 {props.labelOptions &&
                   props.labelOptions.length &&
                   props.labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.value} key={l.id}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );

@@ -27,6 +27,7 @@ import { patchTransaction } from '../../features/transactions/actions';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { Label } from '../../features/label/interface';
 import { labelsUpdate } from '../../features/label/actions';
+import {onFilterLabel} from "../../utils/Util";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -305,6 +306,7 @@ const EditTransaction: React.FC<
             <Form.Item name='labels' label='Labels'>
               <Select
                 mode='multiple'
+                filterOption={(e, t) => onFilterLabel(e, t)}
                 defaultValue={transaction.labels.map((l) => {
                   return l.id;
                 })}
@@ -313,7 +315,7 @@ const EditTransaction: React.FC<
                   props.labelOptions.length &&
                   props.labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );

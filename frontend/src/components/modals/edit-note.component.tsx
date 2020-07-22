@@ -10,6 +10,7 @@ import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { useParams } from 'react-router-dom';
 import { labelsUpdate } from '../../features/label/actions';
+import {onFilterLabel} from "../../utils/Util";
 const { Option } = Select;
 type NoteProps = {
   mode: string;
@@ -75,6 +76,7 @@ const EditNote: React.FC<NoteProps> = (props) => {
             <Form.Item name='labels' label='Labels'>
               <Select
                 mode='multiple'
+                filterOption={(e, t) => onFilterLabel(e, t)}
                 onChange={(value: number[]) => {
                   setLabels(value);
                 }}
@@ -83,7 +85,7 @@ const EditNote: React.FC<NoteProps> = (props) => {
                   labelOptions.length &&
                   labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );

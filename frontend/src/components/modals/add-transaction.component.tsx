@@ -29,6 +29,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { labelsUpdate } from '../../features/label/actions';
 import { Label } from '../../features/label/interface';
+import {onFilterLabel} from "../../utils/Util";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -257,12 +258,14 @@ const AddTransaction: React.FC<
           {/* label */}
           <div>
             <Form.Item name='labels' label='Labels'>
-              <Select mode='multiple'>
+              <Select
+                  mode='multiple'
+                  filterOption={(e, t) => onFilterLabel(e, t)}>
                 {props.labelOptions &&
                   props.labelOptions.length &&
                   props.labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );
