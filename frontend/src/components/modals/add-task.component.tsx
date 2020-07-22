@@ -25,7 +25,7 @@ import { createTask, updateTaskVisible } from '../../features/tasks/actions';
 import { IState } from '../../store';
 import './modals.styles.less';
 import { zones } from '../settings/constants';
-import { Group } from '../../features/group/interface';
+import {Group, User} from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
@@ -36,6 +36,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import { Project } from '../../features/project/interface';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
+import isSubsequence from "../../utils/Util";
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -195,11 +196,10 @@ const AddTask: React.FC<
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
 
-  const onSearchAssignees = (e: any, t: any) => {
-    console.log(e);
-    console.log(t.key);
-    console.log(t.value);
-    return true;
+
+
+  const onSearchAssignees = (inputValue: string, t: any) => {
+    return isSubsequence(t.key.toString().toLowerCase(), inputValue) || isSubsequence(t.value.toString().toLowerCase(), inputValue)
   };
 
   const getSelections = () => {
