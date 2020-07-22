@@ -196,9 +196,9 @@ const AddTask: React.FC<
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
 
-  const onSearchAssignees = (inputValue: string, t: any) => {
+  const onFilterAssignees = (inputValue: string, t: any) => {
     inputValue = inputValue.toLowerCase();
-    return isSubsequence(t.key.toString().toLowerCase(), inputValue) || isSubsequence(t.value.toString().toLowerCase(), inputValue)
+    return isSubsequence(t.key.toLowerCase(), inputValue) || isSubsequence(t.value.toLowerCase(), inputValue);
   };
 
   const getSelections = () => {
@@ -208,7 +208,7 @@ const AddTask: React.FC<
     return (
       <Select
         mode='multiple'
-        filterOption={(e, t) => onSearchAssignees(e, t)}
+        filterOption={(e, t) => onFilterAssignees(e, t)}
         defaultValue={props.myself}
         style={{ width: '100%' }}
       >

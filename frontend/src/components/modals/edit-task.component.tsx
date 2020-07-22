@@ -238,9 +238,9 @@ const EditTask: React.FC<
     setUseTaskRecurrenceRule(false);
   };
 
-  const onSearchAssignees = (inputValue: string, t: any) => {
+  const onFilterAssignees = (inputValue: string, t: any) => {
     inputValue = inputValue.toLowerCase();
-    return isSubsequence(t.key.toString().toLowerCase(), inputValue) || isSubsequence(t.value.toString().toLowerCase(), inputValue)
+    return isSubsequence(t.key.toLowerCase(), inputValue) || isSubsequence(t.value.toLowerCase(), inputValue);
   };
 
   const getSelections = (task: Task) => {
@@ -250,7 +250,7 @@ const EditTask: React.FC<
     return (
       <Select
         mode='multiple'
-        filterOption={(e, t) => onSearchAssignees(e, t)}
+        filterOption={(e, t) => onFilterAssignees(e, t)}
         defaultValue={task.assignees ? task.assignees.map((u) => u.name) : []}
         style={{ width: '100%' }}
       >
