@@ -70,7 +70,7 @@ const AddNote: React.FC<
         <Form form={form}>
           <Form.Item
             name='noteName'
-            rules={[{ required: true, message: 'Missing Note Name!' }]}
+            rules={[{ required: true, message: 'Note Name must be between 1 and 30 characters', min: 1, max: 30 }]}
           >
             <Input placeholder='Enter Note Name' allowClear />
           </Form.Item>
