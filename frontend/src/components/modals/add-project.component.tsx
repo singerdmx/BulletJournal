@@ -138,7 +138,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
             </Form.Item>
             <Form.Item
               name="projectName"
-              rules={[{ required: true, message: 'BuJo Name must be between 1 and 20 characters', min: 1, max: 20 }]}
+              rules={[{ required: true, message: 'BuJo Name must be between 1 and 30 characters', min: 1, max: 30 }]}
               style={{ display: 'inline-block', width: '70%' }}
             >
               <Input

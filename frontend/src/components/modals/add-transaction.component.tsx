@@ -167,7 +167,7 @@ const AddTransaction: React.FC<
             label='Name'
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
-            rules={[{ required: true, message: 'Transaction Name must be between 1 and 30 characters', min: 1, max: 30 }]}
+            rules={[{ required: true, message: 'Transaction Name must be between 1 and 50 characters', min: 1, max: 50 }]}
           >
             <Input placeholder='Enter Transaction Name' allowClear />
           </Form.Item>

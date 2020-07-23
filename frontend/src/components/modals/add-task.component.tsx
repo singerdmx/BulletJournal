@@ -244,7 +244,7 @@ const AddTask: React.FC<
           <Form.Item
             name='taskName'
             label='Name'
-            rules={[{ required: true, message: 'Task Name must be between 1 and 30 characters', min: 1, max: 30 }]}
+            rules={[{ required: true, message: 'Task Name must be between 1 and 50 characters', min: 1, max: 50 }]}
           >
             <Input placeholder='Enter Task Name' allowClear />
           </Form.Item>
