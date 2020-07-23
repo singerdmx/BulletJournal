@@ -94,7 +94,7 @@ const EditTransaction: React.FC<
     if (projectId) {
       props.labelsUpdate(parseInt(projectId));
     }
-  }, []);
+  }, [projectId]);
 
   const editTransaction = (values: any) => {
     //convert time object to format string
@@ -199,8 +199,10 @@ const EditTransaction: React.FC<
             label='Name'
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
+            rules={[{message: 'Transaction Name must be between 1 and 50 characters', min: 1, max: 50 }]}
           >
             <Input
+              allowClear
               placeholder='Enter Transaction Name'
               value={transactionName}
               onChange={(e: any) => setTransactionName(e.target.value)}

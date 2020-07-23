@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 public class UpdateNoteParams {
@@ -24,7 +26,7 @@ public class UpdateNoteParams {
     }
 
     public boolean hasName() {
-        return this.name != null;
+        return StringUtils.isNotBlank(this.name);
     }
 
     public List<Long> getLabels() {

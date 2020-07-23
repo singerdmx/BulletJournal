@@ -96,6 +96,8 @@ interface TaskEditFormProps {
 const EditTask: React.FC<
   RouteComponentProps & TaskProps & TaskEditFormProps
 > = (props) => {
+  const { task, patchTask, labelsUpdate } = props;
+
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [dueType, setDueType] = useState('dueByTime');
@@ -117,12 +119,11 @@ const EditTask: React.FC<
 
   useEffect(() => {
     if (projectId) {
-      props.labelsUpdate(parseInt(projectId));
+      labelsUpdate(parseInt(projectId));
     }
-  }, []);
+  }, [projectId]);
 
   const updateTask = (values: any) => {
-    const { task } = props;
     //convert time object to string
     let dueDate = values.dueDate
       ? values.dueDate.format(dateFormat)
@@ -166,7 +167,7 @@ const EditTask: React.FC<
       reminderSetting.before = undefined;
     }
 
-    props.patchTask(
+    patchTask(
       task.id,
       timezone,
       values.taskName,
@@ -286,8 +287,12 @@ const EditTask: React.FC<
       >
         <Form form={form} layout='vertical'>
           {/* form for name */}
-          <Form.Item name='taskName' label='Name'>
+          <Form.Item
+              name='taskName' label='Name'
+              rules={[{message: 'Task Name must be between 1 and 50 characters', min: 1, max: 50}]}
+          >
             <Input
+              allowClear
               placeholder='Enter Task Name'
               defaultValue={task.name ? task.name : ''}
             />
