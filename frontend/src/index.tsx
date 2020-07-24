@@ -38,7 +38,6 @@ function listen() {
         if (process.env.NODE_ENV === 'production' &&
             !inPublicPage()) {
             const loginCookie = getCookie('__discourse_proxy');
-            console.log('loginCookie ' + loginCookie);
             if (!loginCookie) {
                 if (caches) {
                     // Service worker cache should be cleared with caches.delete()
