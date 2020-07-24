@@ -397,7 +397,7 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
                                                 onClick={() => setRecurrenceVisible(false)}
                                                 type='primary'
                                             >
-                                                Done
+                                                {' '}Done
                                             </Button>
                                         </div>
                                     }

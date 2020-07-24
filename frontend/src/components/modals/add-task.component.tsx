@@ -344,7 +344,7 @@ const AddTask: React.FC<
                         onClick={() => setRecurrenceVisible(false)}
                         type='primary'
                       >
-                        Done
+                        {' '}Done
                       </Button>
                     </div>
                   }
