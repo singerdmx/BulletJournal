@@ -92,6 +92,19 @@ public class Reminder {
 
     }
 
+    public void generateTaskReminder(List<Task> tasks) {
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(SECONDS_OF_DAY, reminderConfig.getTimeZone());
+        tasks.forEach(t -> {
+            DaoHelper.getReminderRecords(t, interval.getFirst(), interval.getSecond()).forEach(e -> {
+                        if (!concurrentHashMap.containsKey(e)) {
+                            this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
+                        }
+                    }
+            );
+        });
+
+    }
+
     private void purge(long expiredSeconds) {
         concurrentHashMap.entrySet().removeIf(e ->
                 e.getKey().getTimestampSecond() + expiredSeconds < ZonedDateTime.now().toEpochSecond());

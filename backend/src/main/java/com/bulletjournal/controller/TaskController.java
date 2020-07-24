@@ -5,7 +5,6 @@ import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
@@ -68,9 +67,6 @@ public class TaskController {
     private NotificationService notificationService;
 
     @Autowired
-    Reminder reminder;
-
-    @Autowired
     private UserClient userClient;
 
     @GetMapping(TASKS_ROUTE)
@@ -127,6 +123,7 @@ public class TaskController {
     public Task createTask(@NotNull @PathVariable Long projectId, @Valid @RequestBody CreateTaskParams task) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.repository.models.Task createdTask = taskDaoJpa.create(projectId, username, task);
+        this.notificationService.remind(new Remindable(createdTask));
         String projectName = createdTask.getProject().getName();
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Task ##" + createdTask.getName() + "## in BuJo ##" + projectName + "##", username,
@@ -143,6 +140,7 @@ public class TaskController {
 
         com.bulletjournal.repository.models.Task updatedTask = this.taskDaoJpa.partialUpdate(username, taskId,
                 updateTaskParams, events);
+        this.notificationService.remind(new Remindable(updatedTask));
         Long projectId = updatedTask.getProject().getId();
         String projectName = updatedTask.getProject().getName();
         if (!events.isEmpty()) {
