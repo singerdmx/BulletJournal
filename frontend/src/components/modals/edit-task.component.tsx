@@ -370,54 +370,43 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
                                 </Tooltip>
                             )}
                         </div>
-                        <Form.Item style={{flex: 1}}>
+                        <Form.Item>
                             <Tooltip title={rRuleText} placement='bottom'>
-                                <Popover
-                                    content={<ReactRRuleGenerator/>}
-                                    title={
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                padding: '0.5em',
-                                            }}
-                                        >
-                                            <div className='recurrence-title'>
-                                                <div>{rRuleTextList && rRuleTextList[0]}</div>
-                                                {rRuleTextList &&
-                                                rRuleTextList.length > 1 &&
-                                                rRuleTextList
-                                                    .slice(1)
-                                                    .map((text, index) => (
-                                                        <div key={index}>{text}</div>
-                                                    ))}
-                                            </div>
-                                            <Button
-                                                onClick={() => setRecurrenceVisible(false)}
-                                                type='primary'
-                                            >
-                                                {' '}Done
-                                            </Button>
-                                        </div>
-                                    }
-                                    visible={recurrenceVisible && dueType === 'dueByRec'}
-                                    onVisibleChange={(visible) => {
-                                        setRecurrenceVisible(visible);
-                                    }}
-                                    trigger='click'
-                                    placement='top'
+                                <Button
+                                    type='default'
+                                    disabled={dueType !== 'dueByRec'}
+                                    onClick={onClickRecurrenceButton}
                                 >
-                                    <Button
-                                        type='default'
-                                        disabled={dueType !== 'dueByRec'}
-                                        onClick={onClickRecurrenceButton}
-                                    >
-                                        <p className='marquee'>{rRuleText}</p>
-                                    </Button>
-                                </Popover>
+                                    <p className='marquee'>{rRuleText}</p>
+                                </Button>
                             </Tooltip>
                         </Form.Item>
+                    </div>
+                    <div>
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '0.5em',
+                            }}
+                        >
+                            <div className='recurrence-title'>
+                                <div>{rRuleTextList && rRuleTextList[0]}</div>
+                                {rRuleTextList &&
+                                rRuleTextList.length > 1 &&
+                                rRuleTextList
+                                    .slice(1)
+                                    .map((text, index) => (
+                                        <div key={index}>{text}</div>
+                                    ))}
+                            </div>
+                        </div>
+                        {/*visible={recurrenceVisible && dueType === 'dueByRec'}*/}
+                        {/*onVisibleChange={(visible) => {*/}
+                        {/*    setRecurrenceVisible(visible);*/}
+                        {/*}}*/}
+                        <ReactRRuleGenerator/>
                     </div>
                     {/* timezone and duration */}
                     <Form.Item label='Time Zone and Duration' style={{marginBottom: 0}}>

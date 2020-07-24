@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import RRule from 'rrule';
+import RRule, {Frequency} from 'rrule';
 import {
   Hourly,
   Daily,
@@ -16,6 +16,10 @@ import {dateFormat} from "../myBuJo/constants";
 export type End = {
   count?: any;
   until?: any;
+};
+
+export type FreqAction = {
+  freq: Frequency;
 };
 
 export type StartDateAction = {
@@ -113,13 +117,19 @@ let initialState = {
   start: {},
   repeat: {},
   end: {} as End,
-  rRuleString: ''
+  rRuleString: '',
+  freq: Frequency.WEEKLY
 };
 
 const slice = createSlice({
   name: 'rRule',
   initialState,
   reducers: {
+    updateFreq: (state, action: PayloadAction<FreqAction>) => {
+      const { freq } = action.payload;
+      state.freq = freq;
+    },
+
     updateStart: (state, action: PayloadAction<StartDateAction>) => {
       const { startDate, startTime } = action.payload;
       state.startDate = startDate;

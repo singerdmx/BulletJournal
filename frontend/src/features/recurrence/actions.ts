@@ -9,7 +9,10 @@ import {
   Weekly,
 } from './interface';
 import { End } from './reducer';
-import RRule from 'rrule';
+import RRule, {Frequency} from 'rrule';
+
+export const updateFreq = (freq: Frequency) =>
+    actions.updateFreq({freq: freq});
 
 export const updateStartString = (startDate: string, startTime: string) =>
   actions.updateStart({
@@ -80,6 +83,7 @@ export const updateYearlyOn = (yearlyOn: boolean) =>
   actions.updateYearlyOn({ yearlyOn: yearlyOn });
 
 export const convertToTextWithRRule = (rrule: string) => {
+    console.log(rrule)
     const rule = RRule.fromString(rrule);
     const resultString = rule.toText();
 
@@ -87,6 +91,9 @@ export const convertToTextWithRRule = (rrule: string) => {
         rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' +
         rrule.substr(14, 2) + ' ' + rrule.substr(17, 2) + ':' +
         rrule.substr(19, 2);
+    console.log(rule)
+    console.log(resultString)
+    console.log(Frequency[rule.options.freq])
     return result;
 };
 

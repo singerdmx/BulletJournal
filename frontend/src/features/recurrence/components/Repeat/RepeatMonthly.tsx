@@ -96,7 +96,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
           <Radio value='on' style={{ marginBottom: 24 }}>
             <span>On day</span>
             <Select
-              style={{ width: '100px', paddingLeft: '20px' }}
+              style={{ width: '90px', paddingLeft: '20px' }}
               disabled={!this.props.monthlyOn}
               onChange={this.onChangeOnDay}
               value={this.props.repeatMonthlyOn.day}
@@ -112,7 +112,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
           <Radio value='onThe'>
             <span>On the</span>
             <Select
-              style={{ width: '100px', paddingLeft: '20px' }}
+              style={{ width: '90px', paddingLeft: '20px' }}
               disabled={this.props.monthlyOn}
               onChange={this.onChangeOnTheWhich}
               value={this.props.repeatMonthlyOnThe.which}
@@ -126,7 +126,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
               })}
             </Select>
             <Select
-              style={{ width: '100px', paddingLeft: '20px' }}
+              style={{ width: '90px', paddingLeft: '20px' }}
               disabled={this.props.monthlyOn}
               onChange={this.onChangeOnTheDay}
               value={this.props.repeatMonthlyOnThe.day}
