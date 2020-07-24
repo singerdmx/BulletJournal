@@ -1,5 +1,6 @@
 package com.bulletjournal.redis;
 
+import com.bulletjournal.firebase.FcmService;
 import com.bulletjournal.notifications.EtagEvent;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
@@ -21,6 +22,9 @@ public class RedisEtagDaoJpa {
 
     @Autowired
     private EtaggableDaos daos;
+
+    @Autowired
+    private FcmService fcmService;
 
     /**
      * Batch cache a list of etags instance into Redis.
@@ -95,9 +99,8 @@ public class RedisEtagDaoJpa {
             contentIds.clear();
             contentIds.addAll(affectedUsernames);
         }
-
-        // TODO: EtagType.NOTIFICATION => affectedUsernames => send push
-        // aggregateMap.getOrDefault(EtagType.NOTIFICATION, Collections.emptySet()).forEach();
+        fcmService.sendNotificationToUsers(
+            aggregateMap.getOrDefault(EtagType.NOTIFICATION, Collections.emptySet()));
 
         mergeEventToOtherEvent(EtagType.GROUP_DELETE, EtagType.GROUP, aggregateMap);
         mergeEventToOtherEvent(EtagType.NOTIFICATION_DELETE, EtagType.NOTIFICATION, aggregateMap);

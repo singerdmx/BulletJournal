@@ -8,6 +8,7 @@ import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.User;
+import com.google.common.collect.Iterables;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -77,9 +78,10 @@ public class DeviceControllerTest {
      * Submit token1 for USER1, should have (token1, USER1) in DB
      * Submit same token1 for USER2, should have (token1, USER2) in DB
      * Submit token2 for USER2, should have (token1, USER2) (token2, USER2) in DB
+     * Remove token1, should have only token2 in DB
      */
     @Test
-    public void testAddToken() {
+    public void testAddDeleteToken() {
         ResponseEntity<String> response = submitToken(EXAMPLE_TOKEN1, USER1);
         Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
         DeviceToken deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
@@ -104,8 +106,15 @@ public class DeviceControllerTest {
             tokens.containsAll(
                 Arrays.asList(
                     new DeviceToken(user2, EXAMPLE_TOKEN1),
-                    new DeviceToken(user2, EXAMPLE_TOKEN2)
-                )));
+                    new DeviceToken(user2, EXAMPLE_TOKEN2))
+            )
+        );
+
+        Assert.assertTrue(deviceTokenDaoJpa.deleteToken(EXAMPLE_TOKEN1));
+        Assert.assertTrue(deviceTokenDaoJpa.getTokensByUser(USER1).isEmpty());
+        Assert.assertEquals(
+            Iterables.getOnlyElement(deviceTokenDaoJpa.getTokensByUser(USER2)).getToken(),
+            EXAMPLE_TOKEN2);
     }
 
     @Test
@@ -115,10 +124,9 @@ public class DeviceControllerTest {
         String oldToken = "fZbssspGI_8:APA91bFs24liZn4wZgPMtGuL5KqvsJErwNCKB7sIm2Qd2FC4EdjjtCfStQoqzL-iGDomDHpv7sV8bdoCm_DTf9GuBmf5eZZBoNq2pYl_bNAJAPs6WK7zywg3TjHQ47mbtqJ7IaPkDSR5";
 
         FcmMessageParams params = new FcmMessageParams(
-            "Title1",
-            "testMessage1",
             oldToken,
-            null
+            "ExampleKey",
+            "ExampleValue"
         );
         fcmService.sendAllMessages(Arrays.asList(params));
         Thread.sleep(5000);

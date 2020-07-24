@@ -1,33 +1,24 @@
 package com.bulletjournal.firebase;
 
+
+import com.google.common.base.Preconditions;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class FcmMessageParams {
 
-    private String title;
-    private String message;
     private String token;
-    private String topic;
+    private Map<String, String> data;
 
-    public FcmMessageParams(String title, String message, String token, String topic) {
-        this.title = title;
-        this.message = message;
+    public FcmMessageParams(String token, String...kv) {
+        Preconditions.checkArgument((kv.length & 1) == 0,
+            "Argument kv must be Key-Value pairs");
         this.token = token;
-        this.topic = topic;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+        this.data = new HashMap<>();
+        for (int i = 0; i < kv.length; i += 2) {
+            data.put(kv[i], kv[i + 1]);
+        }
     }
 
     public String getToken() {
@@ -38,21 +29,19 @@ public class FcmMessageParams {
         this.token = token;
     }
 
-    public String getTitle() {
-        return title;
+    public Map<String, String> getData() {
+        return data;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setData(Map<String, String> data) {
+        this.data = data;
     }
 
     @Override
     public String toString() {
         return "FcmMessageParams{" +
-            "title='" + title + '\'' +
-            ", message='" + message + '\'' +
-            ", token='" + token + '\'' +
-            ", topic='" + topic + '\'' +
+            "token='" + token + '\'' +
+            ", data=" + data +
             '}';
     }
 }

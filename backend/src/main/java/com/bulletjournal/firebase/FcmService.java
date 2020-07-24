@@ -1,6 +1,7 @@
 package com.bulletjournal.firebase;
 
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
+import com.bulletjournal.repository.models.DeviceToken;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutureCallback;
 import com.google.api.core.ApiFutures;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +60,16 @@ public class FcmService {
         } else {
             LOGGER.warn("FCM account key not set up, failed to initialize FcmService.");
         }
+    }
+
+    public void sendNotificationToUsers(Collection<String> usernames) {
+        LOGGER.info("Sending notification to users: {}", usernames);
+        List<FcmMessageParams> params = usernames.stream()
+            .flatMap(username -> deviceTokenDaoJpa.getTokensByUser(username).stream())
+            .map(DeviceToken::getToken)
+            .map(token -> new FcmMessageParams(token, "type", "Notification"))
+            .collect(Collectors.toList());
+        sendAllMessages(params);
     }
 
     public void sendAllMessages(List<FcmMessageParams> paramsList) {
@@ -102,12 +114,8 @@ public class FcmService {
 
     private Message getMessageFromParams(FcmMessageParams fcmMessageParams) {
         return Message.builder()
-            .setNotification(
-                Notification.builder()
-                    .setTitle(fcmMessageParams.getTitle())
-                    .setBody(fcmMessageParams.getMessage()).build())
             .setToken(fcmMessageParams.getToken())
-            .setTopic(fcmMessageParams.getTopic())
+            .putAllData(fcmMessageParams.getData())
             .build();
     }
 }
