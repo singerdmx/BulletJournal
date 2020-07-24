@@ -94,7 +94,7 @@ interface TaskEditFormProps {
 }
 
 const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = (props) => {
-    const {task, patchTask, labelsUpdate, rRuleString} = props;
+    const {task, patchTask, labelsUpdate, rRuleString, group, updateExpandedMyself, mode} = props;
 
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
@@ -136,8 +136,8 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
             dueTime = null;
         }
         let recurrence = useTaskRecurrenceRule
-            ? props.task.recurrenceRule
-            : props.rRuleString;
+            ? task.recurrenceRule
+            : rRuleString;
         if (dueType === 'dueByRec') {
             dueDate = null;
             dueTime = null;
@@ -155,7 +155,7 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
                 : undefined,
             before:
                 values.remindBefore === undefined
-                    ? props.task.reminderSetting.before
+                    ? task.reminderSetting.before
                     : values.remindBefore,
         } as ReminderSetting;
         if (reminderType === 'remindBefore') {
@@ -189,11 +189,11 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
     };
 
     const selectAll = () => {
-        if (props.group) {
+        if (group) {
             form.setFields([
                 {
                     name: 'assignees',
-                    value: props.group.users
+                    value: group.users
                         .filter((u) => u.accepted)
                         .map((user) => user.name),
                 },
@@ -206,8 +206,7 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
     };
 
     useEffect(() => {
-        const {task} = props;
-        props.updateExpandedMyself(true);
+        updateExpandedMyself(true);
         //initialize due type
         if (task.recurrenceRule) {
             setDueType('dueByRec');
@@ -238,7 +237,7 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
     };
 
     const getSelections = (task: Task) => {
-        if (!props.group || !props.group.users) {
+        if (!group || !group.users) {
             return null;
         }
         return (
@@ -248,7 +247,7 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
                 defaultValue={task.assignees ? task.assignees.map((u) => u.name) : []}
                 style={{width: '100%'}}
             >
-                {props.group.users
+                {group.users
                     .filter((u) => u.accepted)
                     .map((user) => {
                         return (
@@ -562,7 +561,7 @@ const EditTask: React.FC<RouteComponentProps & TaskProps & TaskEditFormProps> = 
         );
     };
 
-    if (props.mode === 'div') {
+    if (mode === 'div') {
         return (
             <>
                 <div onClick={openModal} className='popover-control-item'>
