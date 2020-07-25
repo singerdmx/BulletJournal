@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { Form, Button, message } from 'antd';
 import { connect } from 'react-redux';
-import BraftEditor from 'braft-editor';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import EditorToolbar, { modules, formats } from "./content-editor-toolbar";
 import {
   createContent as createNoteContent,
   patchContent as patchNoteContent,
@@ -55,9 +57,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   // get hook of form from ant form
   const [form] = Form.useForm();
   const isEdit = !!content;
-  const [editorState, setEditorState] = useState(
-    BraftEditor.createEditorState(content ? content.text : null)
-  );
+  const [editorContent, setEditorContent] = useState(content ? JSON.parse(content.text) : undefined);
 
   //general create content function
   const createContentCall: { [key in ContentType]: Function } = {
@@ -87,8 +87,11 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     if (!isEdit) {
       form
         .validateFields()
-        .then(async (values) => {
-          await createContentFunction(projectItemId, values.content.toHTML());
+        .then(async () => {
+          await createContentFunction(
+            projectItemId,
+            JSON.stringify(editorContent)
+          );
           afterFinish();
         })
         .catch((err) => message.error(err));
@@ -96,16 +99,20 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       content &&
         form
           .validateFields()
-          .then(async (values) => {
+          .then(async () => {
             await patchContentFunction(
               projectItemId,
               content.id,
-              values.content.toHTML()
+              JSON.stringify(editorContent)
             );
             afterFinish();
           })
           .catch((err) => message.error(err));
     }
+  };
+
+  const handleChange = (content: string, delta: any, source: any, editor: any) => {
+    setEditorContent(editor.getContents());
   };
 
   const validateFile = (file: File) => {
@@ -155,15 +162,18 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     <Form
       form={form}
       onFinish={handleFormSubmit}
-      initialValues={{ content: editorState }}
     >
-      <Form.Item name="content">
-        <BraftEditor
-          language="en"
-          className="content-editor"
-          value={editorState}
-          media={{ uploadFn: handleUpload, validateFn: validateFile }}
-        />
+      <Form.Item>
+        <div className='content-editor'>
+          <EditorToolbar />
+          <ReactQuill
+            theme='snow'
+            defaultValue={editorContent}
+            onChange={handleChange}
+            modules={modules}
+            formats={formats}
+          />
+        </div>
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">

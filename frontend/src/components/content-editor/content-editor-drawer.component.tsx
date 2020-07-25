@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {BackTop, Drawer} from 'antd';
+import { BackTop, Drawer } from 'antd';
 
 import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
@@ -27,24 +27,25 @@ const ContentEditorDrawer: React.FC<
   if (!projectItem) return null;
   return (
     <Drawer
+      placement={'right'}
       onClose={handleClose}
       visible={visible}
-      width={fullWidth * 0.9}
+      width={fullWidth * 0.35}
       destroyOnClose
     >
       {readMode && content ? (
         <div>
-          <BackTop/>
+          <BackTop />
           <ContentReader content={content} />
         </div>
       ) : (
-        <ContentEditor
-          content={content || undefined}
-          projectItemId={projectItem.id}
-          afterFinish={handleClose}
-          contentType={projectItem.contentType}
-        />
-      )}
+          <ContentEditor
+            content={content || undefined}
+            projectItemId={projectItem.id}
+            afterFinish={handleClose}
+            contentType={projectItem.contentType}
+          />
+        )}
     </Drawer>
   );
 };

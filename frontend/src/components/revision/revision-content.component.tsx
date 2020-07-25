@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import BraftEditor from 'braft-editor';
 import { connect } from 'react-redux';
 import {
   patchContent as patchNoteContent,
@@ -27,6 +26,14 @@ import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { ContentType } from '../../features/myBuJo/constants';
 import { isContentEditable } from '../content/content-item.component';
+
+const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
+
+export const ConvertQuillDeltaToHtml = (delta: any) => {
+  const converter = new QuillDeltaToHtmlConverter(delta, {});
+  const html = converter.convert();
+  return html;
+}
 
 type RevisionProps = {
   revisionIndex: number;
@@ -102,7 +109,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
   const patchContentFunction = patchProjectContent[projectItem.contentType];
 
-  const [history, setHistory] = useState(BraftEditor.createEditorState(''));
+  const [history, setHistory] = useState<string | undefined>('');
   const historyContent = revisions[revisionIndex - 1].content;
 
   useEffect(() => {
@@ -112,7 +119,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
 
   useEffect(() => {
     setHistory(
-      BraftEditor.createEditorState(revisions[revisionIndex - 1].content)
+      revisions[revisionIndex - 1].content
     );
   }, [historyContent]);
 
@@ -169,7 +176,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
             {moment(revisions[revisionIndex - 1].createdAt).fromNow()}
           </span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: history.toHTML() }}></div>
+        <div dangerouslySetInnerHTML={{ __html: ConvertQuillDeltaToHtml(history && JSON.parse(history).ops) }}></div>
       </div>
       <div className="revision-content">
         <div className="revision-header">
@@ -177,15 +184,15 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
             Current version{' '}
             <Tooltip title={`Edited by ${content.owner.alias}`}>
               <Avatar
-                  src={content.owner.avatar}
-                  style={{ marginRight: '1rem' }}
-                  size="small"
+                src={content.owner.avatar}
+                style={{ marginRight: '1rem' }}
+                size="small"
               />
             </Tooltip>
           </div>
           <span>{moment(content.updatedAt).fromNow()}</span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: content.text }}></div>
+        <div dangerouslySetInnerHTML={{ __html: ConvertQuillDeltaToHtml(JSON.parse(content.text).ops) }}></div>
       </div>
     </div>
   );
