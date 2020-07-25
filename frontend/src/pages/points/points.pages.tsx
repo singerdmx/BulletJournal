@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { DollarCircleOutlined } from '@ant-design/icons';
 import './points.styles.less';
 import { BackTop } from "antd";
 import { Tabs } from 'antd';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import { Point } from 'recharts/types/shape/Curve';
+
+
 const { TabPane } = Tabs;
 
 
 type PointsProps = {
+    userPoint: number
 };
 
 const PointsPage: React.FC<PointsProps> = (props) => {
+
+    const { userPoint } = props;
 
     const [PointList, setPointList] = useState([
         {
@@ -36,7 +45,7 @@ const PointsPage: React.FC<PointsProps> = (props) => {
 
     ]);
 
-    const [TotalPoint, setTotalPoint] = useState('0');
+
 
     useEffect(() => {
         document.title = 'Bullet Journal - Points';
@@ -68,7 +77,7 @@ const PointsPage: React.FC<PointsProps> = (props) => {
             <BackTop />
             <Tabs defaultActiveKey="1">
                 <TabPane tab="Points" key="1">
-                    <div style={{ textAlign: "right", padding: "2rem" }}>Total Points:{TotalPoint}</div>
+                    <div style={{ textAlign: "right", padding: "2rem" }}>Total Points:{userPoint}</div>
                     <div style={{ textAlign: "center" }}><h1>Points Activity</h1></div>
 
                     <div className="points-container" style={{ display: "flex", justifyContent: 'center' }}>
@@ -87,4 +96,10 @@ const PointsPage: React.FC<PointsProps> = (props) => {
 };
 
 
-export default PointsPage;
+const mapStateToProps = (state: IState) => ({
+    userPoint: state.myself.points,
+});
+
+
+
+export default connect(mapStateToProps)(PointsPage);
