@@ -55,7 +55,7 @@ public class FcmService {
                     LOGGER.info("Firebase application has been initialized");
                 }
             } catch (IOException e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.error("Unable to open FCM private key json file {}", e.toString());
             }
         } else {
             LOGGER.warn("FCM account key not set up, failed to initialize FcmService.");
