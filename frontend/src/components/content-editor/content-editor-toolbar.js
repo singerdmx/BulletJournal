@@ -1,6 +1,7 @@
 import React from 'react';
 import { Quill } from 'react-quill';
 import quillEmoji from 'quill-emoji';
+import "quill-emoji/dist/quill-emoji.css"
 import 'react-quill/dist/quill.snow.css';
 
 // Custom Undo button icon component for Quill editor. You can import it directly
