@@ -2,16 +2,12 @@ package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ReminderSetting;
-import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
-import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
