@@ -28,10 +28,10 @@ public class ProjectItemsGrouperTest {
     public void testGroupTransactionsByDate() {
         List<Transaction> transactions = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
-        Transaction t1 = TestHelpers.getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction t2 = TestHelpers.getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
-        Transaction t3 = TestHelpers.getTransaction(3L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
-        Transaction t4 = TestHelpers.getTransaction(4L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
+        Transaction t1 = TestHelpers.getTransactionRepoModel(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction t2 = TestHelpers.getTransactionRepoModel(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction t3 = TestHelpers.getTransactionRepoModel(3L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
+        Transaction t4 = TestHelpers.getTransactionRepoModel(4L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
 
         transactions.add(t1);
         transactions.add(t2);
@@ -51,10 +51,10 @@ public class ProjectItemsGrouperTest {
         List<Task> tasks = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
-        Task t1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task t2 = TestHelpers.getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
-        Task t3 = TestHelpers.getTask(3L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
-        Task t4 = TestHelpers.getTask(4L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
+        Task t1 = TestHelpers.getTaskRepoModel(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task t2 = TestHelpers.getTaskRepoModel(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task t3 = TestHelpers.getTaskRepoModel(3L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
+        Task t4 = TestHelpers.getTaskRepoModel(4L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
 
         tasks.add(t1);
         tasks.add(t2);
@@ -75,7 +75,7 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
-        Task t1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", "23:15", "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task t1 = TestHelpers.getTaskRepoModel(1L, "Michael_Zhou", "2020-03-03", "23:15", "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
 
         tasks.add(t1);
 
@@ -111,11 +111,11 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
-        Transaction transaction1 = TestHelpers.getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = TestHelpers.getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction1 = TestHelpers.getTransactionRepoModel(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = TestHelpers.getTransactionRepoModel(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = TestHelpers.getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task1 = TestHelpers.getTaskRepoModel(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task2 = TestHelpers.getTaskRepoModel(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1
                 = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
@@ -169,11 +169,11 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
-        Transaction transaction1 = TestHelpers.getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = TestHelpers.getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction1 = TestHelpers.getTransactionRepoModel(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = TestHelpers.getTransactionRepoModel(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = TestHelpers.getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task1 = TestHelpers.getTaskRepoModel(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task2 = TestHelpers.getTaskRepoModel(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1
                 = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());

@@ -20,7 +20,7 @@ public class DaoHelperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
-        Task task = TestHelpers.getTask(1L, "Michael_Zhou", null, null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task = TestHelpers.getTaskRepoModel(1L, "Michael_Zhou", null, null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
         long epochMillis = 1595694480000L; // 2020-7-25 9:28 PST
         Task clonedTask = DaoHelper.recoverTaskWithDueDateTime(task, epochMillis);
 

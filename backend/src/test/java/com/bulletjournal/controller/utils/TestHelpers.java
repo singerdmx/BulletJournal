@@ -47,8 +47,16 @@ public class TestHelpers {
         return new HttpEntity<>(body, headers);
     }
 
-    public static Task getTask(Long id, String assignee, String dueDate, String dueTime, String timezone, String name,
-                         Integer duration, Project project, List<Long> labels, ReminderSetting reminderSetting) {
+    public static Task getTaskRepoModel(Long id,
+                                        String assignee,
+                                        String dueDate,
+                                        String dueTime,
+                                        String timezone,
+                                        String name,
+                                        Integer duration,
+                                        Project project,
+                                        List<Long> labels,
+                                        ReminderSetting reminderSetting) {
         Task task = new Task();
         task.setId(id);
         task.setAssignees(ImmutableList.of(assignee));
@@ -66,7 +74,15 @@ public class TestHelpers {
     }
 
 
-    public static Transaction getTransaction(Long id, String name, Project project, String payer, Double amount, String date, String time, String timezone, Integer transactionType) {
+    public static Transaction getTransactionRepoModel(Long id,
+                                                      String name,
+                                                      Project project,
+                                                      String payer,
+                                                      Double amount,
+                                                      String date,
+                                                      String time,
+                                                      String timezone,
+                                                      Integer transactionType) {
         Transaction transaction = new Transaction();
         transaction.setId(id);
         transaction.setName(name);
