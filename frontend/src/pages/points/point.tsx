@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import '../pages.style.less';
-import coin from '../../assets/coin.jpeg';
+import { DollarCircleOutlined } from '@ant-design/icons';
+import { Tabs } from 'antd';
+import { AppleOutlined, AndroidOutlined } from '@ant-design/icons';
+
+const { TabPane } = Tabs;
 
 export default function Point() {
     const [PointList, setPointList] = useState([
@@ -32,7 +36,9 @@ export default function Point() {
 
 
     return (
+
         <div>
+
             <div style={{ textAlign: "right", padding: "2rem" }}>Total Points:{TotalPoint}</div>
             <div style={{ textAlign: "center" }}><h1>Points Activity</h1></div>
 
@@ -47,7 +53,7 @@ export default function Point() {
                                     <tbody>
                                         <tr>
                                             <th className="points-head" style={{ width: '30%' }}>
-                                                <img src={coin} alt="BulletPoint" style={{ width: "6rem", borderRadius: "50%" }} />
+                                                <DollarCircleOutlined style={{ fontSize: "4rem", color: "#FFD700" }} />
                                                 <div>{point.point}</div>
                                             </th>
                                             <th className="points-body"
@@ -64,7 +70,8 @@ export default function Point() {
 
                 </ul>
             </div>
-        </div>
+
+        </div >
 
     )
 }
