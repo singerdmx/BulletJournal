@@ -65,8 +65,10 @@ public class DaoHelper {
             String recurrenceRule = task.getRecurrenceRule();
             String timezone = task.getTimezone();
             Set<String> completedSlots = ZonedDateTimeHelper.parseDateTimeSet(task.getCompletedSlots());
+
             BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
             RecurrenceRuleIterator it = rule.getIterator();
+
             while (it.hasNext()) {
                 DateTime currDateTime = it.nextDateTime();
                 if (currDateTime.after(endDateTime)) {
@@ -77,16 +79,20 @@ public class DaoHelper {
                 }
                 Task cloned = (Task) task.clone();
 
-                String date = ZonedDateTimeHelper.getDate(currDateTime);
-                String time = ZonedDateTimeHelper.getTime(currDateTime);
+                String defaultDate = ZonedDateTimeHelper.getDate(currDateTime);
+                String defaultTime = ZonedDateTimeHelper.getTime(currDateTime);
 
-                cloned.setDueDate(date); // Set due date
-                cloned.setDueTime(time); // Set due time
+                // Shift to task's timezone
+                ZonedDateTime targetDate = ZonedDateTimeHelper.getStartTime(defaultDate, defaultTime, timezone);
+                ZonedDateTime targetTime = ZonedDateTimeHelper.getEndTime(defaultDate, defaultTime, timezone);
+
+                // Set due date and time
+                cloned.setDueDate(ZonedDateTimeHelper.getDate(targetDate));
+                cloned.setDueTime(ZonedDateTimeHelper.getTime(targetTime));
 
                 // Set start time and end time
-                cloned.setStartTime(
-                        Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-                cloned.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+                cloned.setStartTime(Timestamp.from(targetDate.toInstant()));
+                cloned.setEndTime(Timestamp.from(targetTime.toInstant()));
 
                 cloned.setReminderSetting(task.getReminderSetting()); // Set reminding setting to cloned
                 recurringTasksBetween.add(cloned);
