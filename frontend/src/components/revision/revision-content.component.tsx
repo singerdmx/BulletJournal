@@ -27,14 +27,6 @@ import { Project } from '../../features/project/interface';
 import { ContentType } from '../../features/myBuJo/constants';
 import { isContentEditable } from '../content/content-item.component';
 
-const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
-
-export const ConvertQuillDeltaToHtml = (delta: any) => {
-  const converter = new QuillDeltaToHtmlConverter(delta, {});
-  const html = converter.convert();
-  return html;
-}
-
 type RevisionProps = {
   revisionIndex: number;
   revisions: Revision[];
@@ -176,7 +168,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
             {moment(revisions[revisionIndex - 1].createdAt).fromNow()}
           </span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: ConvertQuillDeltaToHtml(history && JSON.parse(history).ops) }}></div>
+        <div dangerouslySetInnerHTML={{ __html: history && JSON.parse(history)['###html###'] }}></div>
       </div>
       <div className="revision-content">
         <div className="revision-header">
@@ -192,7 +184,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
           </div>
           <span>{moment(content.updatedAt).fromNow()}</span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: ConvertQuillDeltaToHtml(JSON.parse(content.text).ops) }}></div>
+        <div dangerouslySetInnerHTML={{ __html: JSON.parse(content.text)['###html###'] }}></div>
       </div>
     </div>
   );

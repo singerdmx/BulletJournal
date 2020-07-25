@@ -14,8 +14,6 @@ import { deleteContent as deleteNoteContent } from "../../features/notes/actions
 import { getProject } from "../../features/project/actions";
 import { deleteContent as deleteTaskContent } from "../../features/tasks/actions";
 import { deleteContent as deleteTransactionContent } from "../../features/transactions/actions";
-import { ConvertQuillDeltaToHtml } from '../revision/revision-content.component';
-import ReactQuill from 'react-quill';
 
 type ContentProps = {
   contentEditable?: boolean;
@@ -46,7 +44,7 @@ const ContentItem: React.FC<ContentProps> = ({
   deleteTransactionContent,
   getProject
 }) => {
-  const contentHtml = ConvertQuillDeltaToHtml(JSON.parse(content.text).ops);
+  const contentHtml = JSON.parse(content.text)['###html###'];
   const [displayMore, setDisplayMore] = useState(false);
   const [displayRevision, setDisplayRevision] = useState(false);
   const [readMode, setReadMode] = useState(true);

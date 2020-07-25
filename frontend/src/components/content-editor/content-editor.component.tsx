@@ -57,7 +57,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   // get hook of form from ant form
   const [form] = Form.useForm();
   const isEdit = !!content;
-  const [editorContent, setEditorContent] = useState(content ? JSON.parse(content.text) : undefined);
+  const [editorContent, setEditorContent] = useState(content ? JSON.parse(content.text)['delta'] : undefined);
 
   //general create content function
   const createContentCall: { [key in ContentType]: Function } = {
@@ -112,7 +112,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   };
 
   const handleChange = (content: string, delta: any, source: any, editor: any) => {
-    setEditorContent(editor.getContents());
+    setEditorContent({ 'delta': editor.getContents(), '###html###': editor.getHTML() });
   };
 
   const validateFile = (file: File) => {
