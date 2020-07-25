@@ -77,7 +77,7 @@ public class DaoHelper {
                 if (currDateTime.before(startDateTime) || completedSlots.contains(currDateTime.toString())) {
                     continue;
                 }
-                Task cloned = cloneTaskWithDateTimeRecovering(task, timezone, currDateTime);
+                Task cloned = cloneTaskWithDateTime(task, timezone, currDateTime);
                 recurringTasksBetween.add(cloned);
             }
             return recurringTasksBetween;
@@ -98,7 +98,7 @@ public class DaoHelper {
     public static Task recoverTaskWithDueDateTime(Task task, Long timestampMillis) {
         try {
             DateTime taskDateTime = ZonedDateTimeHelper.getDateTime(timestampMillis, task.getTimezone());
-            return cloneTaskWithDateTimeRecovering(task, task.getTimezone(), taskDateTime);
+            return cloneTaskWithDateTime(task, task.getTimezone(), taskDateTime);
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Clone new Task failed");
         }
@@ -113,7 +113,7 @@ public class DaoHelper {
      * @return Task a task cloned from original task with new Due DateTime and Timezone
      * @throws CloneNotSupportedException
      */
-    private static Task cloneTaskWithDateTimeRecovering(Task task, String timezone, DateTime currDateTime) throws CloneNotSupportedException {
+    private static Task cloneTaskWithDateTime(Task task, String timezone, DateTime currDateTime) throws CloneNotSupportedException {
         Task cloned = (Task) task.clone();
 
         String defaultDate = ZonedDateTimeHelper.getDate(currDateTime);
