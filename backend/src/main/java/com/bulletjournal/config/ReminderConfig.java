@@ -9,6 +9,7 @@ public class ReminderConfig {
     private Long loadPrevSeconds;
     private Long loadNextSeconds;
     private Long purgePrevSeconds;
+    private Long cronJobSeconds;
     private String timeZone;
 
     public Long getLoadPrevSeconds() {
@@ -43,13 +44,22 @@ public class ReminderConfig {
         this.timeZone = timeZone;
     }
 
+    public Long getCronJobSeconds() {
+        return cronJobSeconds;
+    }
+
+    public void setCronJobSeconds(Long cronJobSeconds) {
+        this.cronJobSeconds = cronJobSeconds;
+    }
+
     @Override
     public String toString() {
         return "ReminderConfig{" +
                 "loadPrevSeconds=" + loadPrevSeconds +
                 ", loadNextSeconds=" + loadNextSeconds +
                 ", purgePrevSeconds=" + purgePrevSeconds +
-                ", timeZone=" + timeZone +
+                ", cronJobSeconds=" + cronJobSeconds +
+                ", timeZone='" + timeZone + '\'' +
                 '}';
     }
 }
