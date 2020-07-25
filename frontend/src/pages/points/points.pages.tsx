@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { DollarCircleOutlined } from '@ant-design/icons';
 import './points.styles.less';
 import { BackTop } from "antd";
 import { Tabs } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Point } from 'recharts/types/shape/Curve';
-
 
 const { TabPane } = Tabs;
-
 
 type PointsProps = {
     userPoint: number
@@ -41,11 +37,7 @@ const PointsPage: React.FC<PointsProps> = (props) => {
             point: "+4",
             desc: "Completed a task",
         },
-
-
     ]);
-
-
 
     useEffect(() => {
         document.title = 'Bullet Journal - Points';
@@ -99,7 +91,5 @@ const PointsPage: React.FC<PointsProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
     userPoint: state.myself.points,
 });
-
-
 
 export default connect(mapStateToProps)(PointsPage);
