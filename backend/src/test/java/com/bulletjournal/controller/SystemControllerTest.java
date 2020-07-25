@@ -124,6 +124,7 @@ public class SystemControllerTest {
         deleteTask(t5);
 
         String oldGroupsEtag = getGroupsEtag();
+        String oldNotificationsEtag = getNotificationsEtag();
         addUserToGroup(group, sampleUsers[1], 2);
         boolean flag = false;
         for (int i = 0; i < ETAG_TEST_RETRY; i++) {
@@ -135,10 +136,6 @@ public class SystemControllerTest {
             sleep(2000);
         }
         assertTrue(flag);
-
-        String oldNotificationsEtag = getNotificationsEtag();
-        createTask(p1, new CreateTaskParams("task_for_notification_etag", "2022-02-27",
-                null, null, new ReminderSetting(), ImmutableList.of(sampleUsers[1]), TIMEZONE, null));
         flag = false;
         for (int i = 0; i < ETAG_TEST_RETRY; i++) {
             String newNotificationsEtag = getNotificationsEtag();
