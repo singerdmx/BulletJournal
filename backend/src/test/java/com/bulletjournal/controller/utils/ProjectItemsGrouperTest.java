@@ -32,10 +32,10 @@ public class ProjectItemsGrouperTest {
     public void testGroupTransactionsByDate() {
         List<Transaction> transactions = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
-        Transaction t1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction t2 = getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
-        Transaction t3 = getTransaction(3L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
-        Transaction t4 = getTransaction(4L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
+        Transaction t1 = TestHelpers.getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction t2 = TestHelpers.getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction t3 = TestHelpers.getTransaction(3L, "t3", projectStub, "Michael_Zhou", 1.0, "2020-03-05", null, "America/Los_Angeles", 0);
+        Transaction t4 = TestHelpers.getTransaction(4L, "t4", projectStub, "Michael_Zhou", 1.0, "2020-03-06", null, "America/Los_Angeles", 0);
 
         transactions.add(t1);
         transactions.add(t2);
@@ -55,10 +55,10 @@ public class ProjectItemsGrouperTest {
         List<Task> tasks = new ArrayList<>();
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
-        Task t1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task t2 = getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
-        Task t3 = getTask(3L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
-        Task t4 = getTask(4L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
+        Task t1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task t2 = TestHelpers.getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task t3 = TestHelpers.getTask(3L, "Michael_Zhou", "2020-03-05", null, "America/Los_Angeles", "t3", 0, projectStub, null, reminderSetting);
+        Task t4 = TestHelpers.getTask(4L, "Michael_Zhou", "2020-03-06", null, "America/Los_Angeles", "t4", 0, projectStub, null, reminderSetting);
 
         tasks.add(t1);
         tasks.add(t2);
@@ -79,7 +79,7 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
-        Task t1 = getTask(1L, "Michael_Zhou", "2020-03-03", "23:15", "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task t1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", "23:15", "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
 
         tasks.add(t1);
 
@@ -115,11 +115,11 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
-        Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction1 = TestHelpers.getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = TestHelpers.getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task2 = TestHelpers.getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1
                 = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
@@ -173,11 +173,11 @@ public class ProjectItemsGrouperTest {
         ProjectStub projectStub = new ProjectStub();
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
-        Transaction transaction1 = getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
-        Transaction transaction2 = getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
+        Transaction transaction1 = TestHelpers.getTransaction(1L, "t1", projectStub, "Michael_Zhou", 1.0, "2020-03-07", null, "America/Los_Angeles", 0);
+        Transaction transaction2 = TestHelpers.getTransaction(2L, "t2", projectStub, "Michael_Zhou", 1.0, "2020-03-04", null, "America/Los_Angeles", 0);
 
-        Task task1 = getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
-        Task task2 = getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
+        Task task1 = TestHelpers.getTask(1L, "Michael_Zhou", "2020-03-03", null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        Task task2 = TestHelpers.getTask(2L, "Michael_Zhou", "2020-03-04", null, "America/Los_Angeles", "t2", 0, projectStub, null, reminderSetting);
 
         ZonedDateTime time1
                 = ZonedDateTimeHelper.getStartTime(transaction1.getDate(), transaction1.getTime(), transaction1.getTimezone());
@@ -231,40 +231,6 @@ public class ProjectItemsGrouperTest {
         assertEquals(1, projectItems.get(1).getTasks().size());
         assertEquals(1, projectItems.get(1).getTransactions().size());
         assertEquals(1, projectItems.get(0).getTasks().size());
-    }
-
-    private Transaction getTransaction(Long id, String name, Project project, String payer, Double amount, String date, String time, String timezone, Integer transactionType) {
-        Transaction transaction = new Transaction();
-        transaction.setId(id);
-        transaction.setName(name);
-        transaction.setProject(project);
-        transaction.setPayer(payer);
-        transaction.setAmount(amount);
-        transaction.setDate(date);
-        transaction.setTime(time);
-        transaction.setTimezone(timezone);
-        transaction.setTransactionType(TransactionType.getType(transactionType));
-        transaction.setCreatedAt(Timestamp.from(Instant.now()));
-        transaction.setUpdatedAt(Timestamp.from(Instant.now()));
-        return transaction;
-    }
-
-    private Task getTask(Long id, String assignee, String dueDate, String dueTime, String timezone, String name,
-                         Integer duration, Project project, List<Long> labels, ReminderSetting reminderSetting) {
-        Task task = new Task();
-        task.setId(id);
-        task.setAssignees(ImmutableList.of(assignee));
-        task.setDueDate(dueDate);
-        task.setDueTime(dueTime);
-        task.setTimezone(timezone);
-        task.setName(name);
-        task.setDuration(duration);
-        task.setProject(project);
-        task.setLabels(labels);
-        task.setReminderSetting(reminderSetting);
-        task.setCreatedAt(Timestamp.from(Instant.now()));
-        task.setUpdatedAt(Timestamp.from(Instant.now()));
-        return task;
     }
 
     /*
