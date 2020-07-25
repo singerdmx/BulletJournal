@@ -162,7 +162,8 @@ public class GoogleCalendarController {
         if (StringUtils.isNotBlank(text)) {
             List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
                     .map(s -> "<p>" + s + "</p>").collect(Collectors.toList());
-            text = StringUtils.join(l, "");
+            String html = StringUtils.join(l, "");
+            text = "{\"delta\":{\"ops\":[{\"insert\":\"" + text + "\"}]},\"###html###\":\"" + html + "\"}";
         }
         taskDaoJpa.create(projectId, username,
                 Converter.toCreateTaskParams(e), e.getEventId(), text);

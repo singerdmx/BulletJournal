@@ -11,6 +11,7 @@ import { Project } from '../../features/project/interface';
 import { labelsUpdate } from '../../features/label/actions';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
+import {onFilterLabel} from "../../utils/Util";
 const { Option } = Select;
 
 type NoteProps = {
@@ -69,18 +70,20 @@ const AddNote: React.FC<
         <Form form={form}>
           <Form.Item
             name='noteName'
-            rules={[{ required: true, message: 'Missing Note Name!' }]}
+            rules={[{ required: true, message: 'Note Name must be between 1 and 50 characters', min: 1, max: 50 }]}
           >
             <Input placeholder='Enter Note Name' allowClear />
           </Form.Item>
           <div>
             <Form.Item name='labels' label='Labels'>
-              <Select mode='multiple'>
+              <Select
+                  mode='multiple'
+                  filterOption={(e, t) => onFilterLabel(e, t)}>
                 {props.labelOptions &&
                   props.labelOptions.length &&
                   props.labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );

@@ -65,8 +65,10 @@ public class DaoHelper {
             String recurrenceRule = task.getRecurrenceRule();
             String timezone = task.getTimezone();
             Set<String> completedSlots = ZonedDateTimeHelper.parseDateTimeSet(task.getCompletedSlots());
+
             BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
             RecurrenceRuleIterator it = rule.getIterator();
+
             while (it.hasNext()) {
                 DateTime currDateTime = it.nextDateTime();
                 if (currDateTime.after(endDateTime)) {
@@ -75,20 +77,7 @@ public class DaoHelper {
                 if (currDateTime.before(startDateTime) || completedSlots.contains(currDateTime.toString())) {
                     continue;
                 }
-                Task cloned = (Task) task.clone();
-
-                String date = ZonedDateTimeHelper.getDate(currDateTime);
-                String time = ZonedDateTimeHelper.getTime(currDateTime);
-
-                cloned.setDueDate(date); // Set due date
-                cloned.setDueTime(time); // Set due time
-
-                // Set start time and end time
-                cloned.setStartTime(
-                        Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-                cloned.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
-
-                cloned.setReminderSetting(task.getReminderSetting()); // Set reminding setting to cloned
+                Task cloned = cloneTaskWithDateTime(task, timezone, currDateTime);
                 recurringTasksBetween.add(cloned);
             }
             return recurringTasksBetween;
@@ -97,5 +86,56 @@ public class DaoHelper {
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Clone new Task failed");
         }
+    }
+
+    /**
+     * Clone a new task and set input timestamp to [DueDate, DueTime] and [StartTime, EndTime]
+     *
+     * @param task            the target task needs to be cloned
+     * @param timestampMillis the input timestamp for task Due DateTime
+     * @return Task a task cloned from original task with new Due DateTime and Timezone
+     */
+    public static Task recoverTaskWithDueDateTime(Task task, Long timestampMillis) {
+        try {
+            DateTime taskDateTime = ZonedDateTimeHelper.getDateTime(timestampMillis, task.getTimezone());
+            return cloneTaskWithDateTime(task, task.getTimezone(), taskDateTime);
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Clone new Task failed");
+        }
+    }
+
+    /**
+     * Clone a new task and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
+     *
+     * @param task         the target task needs to cloned
+     * @param timezone     the target timezone for cloned task's due date and due time
+     * @param currDateTime the RFC 5545 DateTime Object contains timing information
+     * @return Task a task cloned from original task with new Due DateTime and Timezone
+     * @throws CloneNotSupportedException
+     */
+    private static Task cloneTaskWithDateTime(Task task, String timezone, DateTime currDateTime) throws CloneNotSupportedException {
+        Task cloned = (Task) task.clone();
+
+        String defaultDate = ZonedDateTimeHelper.getDate(currDateTime);
+        String defaultTime = ZonedDateTimeHelper.getTime(currDateTime);
+
+        // Shift to task's timezone
+        ZonedDateTime targetDate = ZonedDateTimeHelper.getStartTime(defaultDate, defaultTime, timezone);
+        ZonedDateTime targetTime = ZonedDateTimeHelper.getEndTime(defaultDate, defaultTime, timezone);
+
+        // Set due date and time
+        cloned.setDueDate(ZonedDateTimeHelper.getDate(targetDate));
+        cloned.setDueTime(ZonedDateTimeHelper.getTime(targetTime));
+
+        // Set start time and end time
+        cloned.setStartTime(Timestamp.from(targetDate.toInstant()));
+        cloned.setEndTime(Timestamp.from(targetTime.toInstant()));
+
+        // Set timezone
+        cloned.setTimezone(timezone);
+
+        cloned.setReminderSetting(task.getReminderSetting()); // Set reminding setting to cloned
+
+        return cloned;
     }
 }

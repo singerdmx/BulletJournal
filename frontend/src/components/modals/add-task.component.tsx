@@ -25,7 +25,7 @@ import { createTask, updateTaskVisible } from '../../features/tasks/actions';
 import { IState } from '../../store';
 import './modals.styles.less';
 import { zones } from '../settings/constants';
-import { Group } from '../../features/group/interface';
+import {Group, User} from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
@@ -36,6 +36,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import { Project } from '../../features/project/interface';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
+import { onFilterAssignees, onFilterLabel } from "../../utils/Util";
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -105,7 +106,7 @@ const AddTask: React.FC<
     if (projectId) {
       props.labelsUpdate(parseInt(projectId));
     }
-  }, []);
+  }, [projectId]);
 
   const addTask = (values: any) => {
     //convert time object to string
@@ -194,6 +195,7 @@ const AddTask: React.FC<
   const rRuleTextList = rRuleText.match(
     /\b[\w,|\w-|\w:]+(?:\s+[\w,|\w-|\w:]+){0,5}/g
   );
+
   const getSelections = () => {
     if (!props.group || !props.group.users) {
       return null;
@@ -201,6 +203,7 @@ const AddTask: React.FC<
     return (
       <Select
         mode='multiple'
+        filterOption={(e, t) => onFilterAssignees(e, t)}
         defaultValue={props.myself}
         style={{ width: '100%' }}
       >
@@ -208,7 +211,7 @@ const AddTask: React.FC<
           .filter((u) => u.accepted)
           .map((user) => {
             return (
-              <Option value={user.name} key={user.name}>
+              <Option value={user.name} key={user.alias}>
                 <Avatar size='small' src={user.avatar} />
                 &nbsp;&nbsp; <strong>{user.alias}</strong>
               </Option>
@@ -241,7 +244,7 @@ const AddTask: React.FC<
           <Form.Item
             name='taskName'
             label='Name'
-            rules={[{ required: true, message: 'Missing Task Name!' }]}
+            rules={[{ required: true, message: 'Task Name must be between 1 and 50 characters', min: 1, max: 50 }]}
           >
             <Input placeholder='Enter Task Name' allowClear />
           </Form.Item>
@@ -341,7 +344,7 @@ const AddTask: React.FC<
                         onClick={() => setRecurrenceVisible(false)}
                         type='primary'
                       >
-                        Done
+                        {' '}Done
                       </Button>
                     </div>
                   }
@@ -462,12 +465,14 @@ const AddTask: React.FC<
           {/* label */}
           <div>
             <Form.Item name='labels' label='Labels'>
-              <Select mode='multiple'>
+              <Select
+                  mode='multiple'
+                  filterOption={(e, t) => onFilterLabel(e, t)}>
                 {props.labelOptions &&
                   props.labelOptions.length &&
                   props.labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );

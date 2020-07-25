@@ -57,15 +57,15 @@ public class ProjectItemControllerTest {
      * test recent project item
      */
     private static final String USER_0518 = "0518";
-    private static String TIMEZONE = "America/Los_Angeles";
+    private static final String TIMEZONE = "America/Los_Angeles";
     private final String expectedOwner = "BulletJournal";
     private final String[] sampleUsers = {
             "Michael_Zhou",
             "Xavier"
     };
+    private final TestRestTemplate restTemplate = new TestRestTemplate();
     @LocalServerPort
     int randomServerPort;
-    private TestRestTemplate restTemplate = new TestRestTemplate();
 
     @Before
     public void setup() {
@@ -156,13 +156,14 @@ public class ProjectItemControllerTest {
     }
 
     private void addTasks(Project p) {
-        Task t1 = createTask(p, "T1", "2020-02-29");
-        Task t2 = createTask(p, "T2", "2020-03-01");
-        Task t3 = createTask(p, "T3", "2020-03-02");
-        Task t4 = createTask(p, "T4", "2020-03-02");
-        Task t5 = createTask(p, "T5", "2020-03-04");
-        Task t6 = createTask(p, "T6", "2020-03-04");
-        Task t7 = createTask(p, "T7", "2020-02-28");
+        Task t1 = createTask(p, "T1", "2020-02-29", null);
+        Task t2 = createTask(p, "T2", "2020-03-01", null);
+        Task t3 = createTask(p, "T3", "2020-03-02", null);
+        Task t4 = createTask(p, "T4", "2020-03-02", null);
+        Task t5 = createTask(p, "T5", "2020-03-04", null);
+        Task t6 = createTask(p, "T6", "2020-03-04", null);
+        Task t7 = createTask(p, "T7", "2020-02-28", null);
+        Task t8 = createTask(p, "T8", "2020-07-24", "23:30");
 
         List<ProjectType> types = getTypes(ProjectType.TODO); // Added a task project type
 
@@ -203,6 +204,15 @@ public class ProjectItemControllerTest {
         List<ProjectItems> p5 = projectItems.stream().filter(x -> x.getDate().equals(t5.getDueDate()))
                 .collect(Collectors.toList());
         assertEquals(0, p5.size());
+
+        projectItems = getProjectItems("2020-07-23",
+                "2020-07-26",
+                "America/Los_Angeles",
+                types);
+
+        List<ProjectItems> p8 = projectItems.stream().filter(x -> x.getDate().equals(t8.getDueDate()))
+                .collect(Collectors.toList());
+        assertEquals(1, p8.size());
     }
 
     private Task addRecurringTasks(Project project) {
@@ -247,9 +257,9 @@ public class ProjectItemControllerTest {
         return created;
     }
 
-    private Task createTask(Project project, String name, String date) {
+    private Task createTask(Project project, String name, String date, String time) {
         CreateTaskParams task =
-                new CreateTaskParams(name, date, null, 10,
+                new CreateTaskParams(name, date, time, 10,
                         new ReminderSetting(), ImmutableList.of(sampleUsers[0]), TIMEZONE, null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
@@ -333,6 +343,7 @@ public class ProjectItemControllerTest {
          *     "2020-03-02"
          *     "2020-03-04"
          *     "2020-03-04"
+         *     "2020-07-24 23:30"
          */
         Project p2 = createProject("p_ProjectItem_Task", group, ProjectType.TODO);
         addTasks(p2);
@@ -369,6 +380,19 @@ public class ProjectItemControllerTest {
         assertEquals(0, projectItems.get(0).getTransactions().size());
         assertEquals(1, projectItems.get(0).getTasks().size());
 
+        /*
+         * "2020-07-24 23:30" American/Los_Angeles -> "2020-07-25 00:30" American/Chicago
+         */
+        List<ProjectItems> projectItemsInDifferentTimezone = getProjectItems("2020-07-25",
+                "2020-07-25",
+                "America/Chicago",
+                types);
+        assertNotNull(projectItemsInDifferentTimezone);
+        assertEquals(1, projectItemsInDifferentTimezone.get(0).getTasks().size());
+
+        /*
+         * No project item for other user
+         */
         List<ProjectItems> projectItemsOtherUser = getProjectItemsOtherUser("2020-02-28",
                 "2020-03-04",
                 TIMEZONE,

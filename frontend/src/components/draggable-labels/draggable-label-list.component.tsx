@@ -17,6 +17,7 @@ import {IState} from '../../store';
 import {ProjectItem} from '../../features/myBuJo/interface';
 import {Project} from '../../features/project/interface';
 import {inPublicPage} from "../../index";
+import {onFilterLabel} from "../../utils/Util";
 
 type DraggableLabelsProps = {
   mode: ProjectType;
@@ -203,6 +204,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                 showAdd ? (
                   <Select
                     mode='multiple'
+                    filterOption={(e, t) => onFilterLabel(e, t)}
                     style={{ height: '70%', width: 100 }}
                     value={selectedLabels}
                     size='small'
@@ -214,7 +216,7 @@ const DraggableLabelsList: React.FC<DraggableLabelsProps> = ({
                         .filter((option) => !labelsId.includes(option.id))
                         .map((option) => {
                           return (
-                            <Select.Option key={option.id} value={option.id}>
+                            <Select.Option key={option.value} value={option.id}>
                               {option.value}
                             </Select.Option>
                           );

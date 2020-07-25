@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 public class UpdateTaskParams {
@@ -85,7 +87,7 @@ public class UpdateTaskParams {
     }
 
     public boolean hasName() {
-        return this.name != null;
+        return StringUtils.isNotBlank(this.name);
     }
 
     public ReminderSetting getReminderSetting() {

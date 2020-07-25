@@ -259,7 +259,9 @@ public class GroupDaoJpa implements Etaggable {
             this.assignProjectsToOwnerDefaultGroup(username, userGroup);
             this.userGroupRepository.delete(userGroup);
 
-            events.add(new Event(username, groupId, group.getName()));
+            if (!Objects.equals(requester, username)) { // do not notify on leaving group
+                events.add(new Event(username, groupId, group.getName()));
+            }
         }
         return events;
     }

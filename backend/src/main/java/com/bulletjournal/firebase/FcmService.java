@@ -1,5 +1,7 @@
 package com.bulletjournal.firebase;
 
+import com.bulletjournal.repository.DeviceTokenDaoJpa;
+import com.bulletjournal.repository.models.DeviceToken;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutureCallback;
 import com.google.api.core.ApiFutures;
@@ -30,6 +32,11 @@ public class FcmService {
 
     private static final String FCM_ACCOUNT_KEY = "FCM_ACCOUNT_KEY";
 
+    private static final String TOKEN_REGISTRATION_ERROR = "registration-token-not-registered";
+
+    @Autowired
+    private DeviceTokenDaoJpa deviceTokenDaoJpa;
+
     @Autowired
     @Qualifier(APPLICATION_TASK_EXECUTOR_BEAN_NAME)
     private TaskExecutor executor;
@@ -48,15 +55,24 @@ public class FcmService {
                     LOGGER.info("Firebase application has been initialized");
                 }
             } catch (IOException e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.error("Unable to open FCM private key json file {}", e.toString());
             }
         } else {
             LOGGER.warn("FCM account key not set up, failed to initialize FcmService.");
         }
     }
 
-    public void sendAllMessages(Collection<FcmMessageParams> paramsList) {
-        LOGGER.warn("here3:");
+    public void sendNotificationToUsers(Collection<String> usernames) {
+        LOGGER.info("Sending notification to users: {}", usernames);
+        List<FcmMessageParams> params = usernames.stream()
+            .flatMap(username -> deviceTokenDaoJpa.getTokensByUser(username).stream())
+            .map(DeviceToken::getToken)
+            .map(token -> new FcmMessageParams(token, "type", "Notification"))
+            .collect(Collectors.toList());
+        sendAllMessages(params);
+    }
+
+    public void sendAllMessages(List<FcmMessageParams> paramsList) {
         List<Message> messages
             = paramsList.stream().map(this::getMessageFromParams).collect(Collectors.toList());
         ApiFuture<BatchResponse> future
@@ -64,33 +80,42 @@ public class FcmService {
         ApiFutures.addCallback(future, new ApiFutureCallback<BatchResponse>() {
             @Override
             public void onFailure(Throwable t) {
-                LOGGER.warn("here1" + t.toString());
-                // TODO: handle error
+                LOGGER.warn("Failed to send messages: {}\nError: {}",
+                    paramsList, t.getMessage());
             }
 
             @Override
             public void onSuccess(BatchResponse result) {
-                processResponse(result);
+                processResponse(result, paramsList);
             }
         }, executor);
     }
 
-    private void processResponse(BatchResponse batchResponse) {
-        // TODO
-        batchResponse.getResponses().forEach(r -> {
-            LOGGER.warn(r.getMessageId() + " " + r.getException());
-        });
-        LOGGER.warn("here2:" + batchResponse.toString());
+    private void processResponse(BatchResponse batchResponse, List<FcmMessageParams> messages) {
+        LOGGER.debug("Got batchResponse, succeeded: {}, failed: {}",
+            batchResponse.getSuccessCount(), batchResponse.getFailureCount());
+        List<SendResponse> responses = batchResponse.getResponses();
+        for (int i = 0; i < responses.size(); ++i) {
+            SendResponse response = responses.get(i);
+            if (!response.isSuccessful()) {
+                LOGGER.warn("Message {} failed to send, error: {}",
+                    messages.get(i), response.getException().getErrorCode());
+                if (response.getException().getErrorCode().equals(TOKEN_REGISTRATION_ERROR)) {
+                    String invalidToken = messages.get(i).getToken();
+                    if (deviceTokenDaoJpa.deleteToken(invalidToken)) {
+                        LOGGER.info("Removed expired/invalid token {}.", invalidToken);
+                    } else {
+                        LOGGER.error("Expired/invalid token {} doesn't exist in db.", invalidToken);
+                    }
+                }
+            }
+        }
     }
 
     private Message getMessageFromParams(FcmMessageParams fcmMessageParams) {
         return Message.builder()
-            .setNotification(
-                Notification.builder()
-                    .setTitle(fcmMessageParams.getTitle())
-                    .setBody(fcmMessageParams.getMessage()).build())
             .setToken(fcmMessageParams.getToken())
-            .setTopic(fcmMessageParams.getTopic())
+            .putAllData(fcmMessageParams.getData())
             .build();
     }
 }

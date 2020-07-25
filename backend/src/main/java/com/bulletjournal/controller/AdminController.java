@@ -49,9 +49,15 @@ public class AdminController {
 
     @PostMapping(SET_ROLE_ROUTE)
     public void setRole(@NotBlank @PathVariable String username, @NotNull @RequestBody SetRoleParams setRoleParams) {
+        username = getUsername(username);
         validateRequester();
 
         this.userDaoJpa.setRole(username, setRoleParams.getRole());
+    }
+
+    private String getUsername(String username) {
+        User user = this.userClient.getUser(username);
+        return user.getName();
     }
 
     private void validateRequester() {
@@ -92,7 +98,7 @@ public class AdminController {
             redisLockedIPRepository.delete(new LockedIP(ip, null));
         }
         if (StringUtils.isNotBlank(name)) {
-            redisLockedUserRepository.delete(new LockedUser(name, null));
+            redisLockedUserRepository.delete(new LockedUser(getUsername(name), null));
         }
     }
 
@@ -114,6 +120,7 @@ public class AdminController {
     @PostMapping(CHANGE_POINTS_ROUTE)
     public void changePoints(@NotBlank @PathVariable String username,
                              @NotNull @RequestBody ChangePointsParams changePointsParams) {
+        username = getUsername(username);
         validateRequester();
         Integer points = changePointsParams.getPoints();
         this.userDaoJpa.changeUserPoints(username, points);
@@ -122,6 +129,7 @@ public class AdminController {
     @PostMapping(SET_POINTS_ROUTE)
     public void setPoints(@NotBlank @PathVariable String username,
                           @NotNull @RequestBody SetPointsParams setPointsParams) {
+        username = getUsername(username);
         validateRequester();
         Integer points = setPointsParams.getPoints();
         this.userDaoJpa.setUserPoints(username, points);

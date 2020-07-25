@@ -27,6 +27,7 @@ import { patchTransaction } from '../../features/transactions/actions';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { Label } from '../../features/label/interface';
 import { labelsUpdate } from '../../features/label/actions';
+import {onFilterLabel} from "../../utils/Util";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -93,7 +94,7 @@ const EditTransaction: React.FC<
     if (projectId) {
       props.labelsUpdate(parseInt(projectId));
     }
-  }, []);
+  }, [projectId]);
 
   const editTransaction = (values: any) => {
     //convert time object to format string
@@ -198,8 +199,10 @@ const EditTransaction: React.FC<
             label='Name'
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
+            rules={[{message: 'Transaction Name must be between 1 and 50 characters', min: 1, max: 50 }]}
           >
             <Input
+              allowClear
               placeholder='Enter Transaction Name'
               value={transactionName}
               onChange={(e: any) => setTransactionName(e.target.value)}
@@ -305,6 +308,7 @@ const EditTransaction: React.FC<
             <Form.Item name='labels' label='Labels'>
               <Select
                 mode='multiple'
+                filterOption={(e, t) => onFilterLabel(e, t)}
                 defaultValue={transaction.labels.map((l) => {
                   return l.id;
                 })}
@@ -313,7 +317,7 @@ const EditTransaction: React.FC<
                   props.labelOptions.length &&
                   props.labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );

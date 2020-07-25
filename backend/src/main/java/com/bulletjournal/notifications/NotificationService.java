@@ -1,6 +1,7 @@
 package com.bulletjournal.notifications;
 
 import com.bulletjournal.config.SpringESConfig;
+import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.repository.AuditableDaoJpa;
@@ -9,6 +10,7 @@ import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +18,7 @@ import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
@@ -30,6 +33,10 @@ public class NotificationService {
 
     @Autowired
     private SpringESConfig springESConfig;
+
+    @Autowired
+    @Lazy
+    Reminder reminder;
 
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa, SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
@@ -60,6 +67,14 @@ public class NotificationService {
             return;
         }
         this.eventQueue.offer(auditable);
+    }
+
+    public void remind(Remindable remindable) {
+        LOGGER.info("Received remindable: " + remindable);
+        if (remindable == null) {
+            return;
+        }
+        this.eventQueue.offer(remindable);
     }
 
     public void deleteESDocument(RemoveElasticsearchDocumentEvent removeElasticsearchDocumentEvent) {
@@ -98,6 +113,7 @@ public class NotificationService {
             List<Auditable> auditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
+            List<Remindable> remindables = new ArrayList<>();
             events.forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
@@ -107,6 +123,8 @@ public class NotificationService {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
                 } else if (e instanceof EtagEvent) {
                     etagEvents.add((EtagEvent) e);
+                } else if (e instanceof Remindable) {
+                    remindables.add((Remindable) e);
                 }
             });
             try {
@@ -136,6 +154,14 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on deleting records in RedisEtagDaoJpa", ex);
+            }
+
+            try {
+                if (!remindables.isEmpty()) {
+                    this.reminder.generateTaskReminder(remindables.stream().map(e -> e.getTask()).collect(Collectors.toList()));
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on Reminder", ex);
             }
             events = new ArrayList<>();
         }

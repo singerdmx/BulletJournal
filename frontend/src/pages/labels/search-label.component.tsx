@@ -8,6 +8,7 @@ import {SearchOutlined} from '@ant-design/icons';
 import {ProjectItems} from '../../features/myBuJo/interface';
 import ProjectModelItems from '../../components/project-item/project-model-items.component';
 import {ProjectItemUIType} from "../../features/project/constants";
+import {onFilterLabel} from "../../utils/Util";
 
 type LabelSearchProps = {
   labelOptions: Label[];
@@ -58,11 +59,13 @@ const LabelsSearching: React.FC<LabelSearchProps> = (props) => {
             rules={[{ required: true, message: 'Missing Label(s)' }]}
             style={{ flex: 5 }}
           >
-            <Select mode='multiple'>
+            <Select mode='multiple'
+                    filterOption={(e, t) => onFilterLabel(e, t)}
+            >
               {props.labelOptions &&
                 props.labelOptions.map((option) => {
                   return (
-                    <Select.Option key={option.id} value={option.id}>
+                    <Select.Option key={option.value} value={option.id}>
                       {option.value}
                     </Select.Option>
                   );

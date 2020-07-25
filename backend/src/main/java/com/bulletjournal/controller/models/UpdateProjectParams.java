@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class UpdateProjectParams {
 
     private String name;
@@ -26,7 +28,7 @@ public class UpdateProjectParams {
     }
 
     public boolean hasName() {
-        return this.name != null;
+        return StringUtils.isNotBlank(this.name);
     }
 
     public Long getGroupId() {

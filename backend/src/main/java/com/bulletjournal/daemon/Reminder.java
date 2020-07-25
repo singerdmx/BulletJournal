@@ -30,18 +30,17 @@ public class Reminder {
     private static long SECONDS_OF_DAY = 86400;
     private static long VERIFY_BUFF_SECONDS = 600;
     private static long SCHEDULE_BUFF_SECONDS = 5;
-    private static long CRON_JOB_CYCLE_SECONDS = 15;
+    private static long AWAIT_TERMINATION_SECONDS = 5;
 
     private final ScheduledExecutorService executorService;
     private final ConcurrentHashMap<ReminderRecord, Task> concurrentHashMap;
-
-    @Autowired
-    ReminderConfig reminderConfig;
-
-    @Autowired
-    TaskRepository taskRepository;
-
     private final TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private ReminderConfig reminderConfig;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     Reminder(TaskDaoJpa taskDaoJpa) {
@@ -58,7 +57,7 @@ public class Reminder {
 
         executorService.scheduleWithFixedDelay(this::cronJob,
                 SECONDS_OF_DAY - ZonedDateTimeHelper.getPassedSecondsOfDay(reminderConfig.getTimeZone()),
-                CRON_JOB_CYCLE_SECONDS,
+                this.reminderConfig.getCronJobSeconds(),
                 TimeUnit.SECONDS);
     }
 
@@ -83,6 +82,19 @@ public class Reminder {
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(SECONDS_OF_DAY, reminderConfig.getTimeZone());
         taskRepository.findById(createdTask.getId()).ifPresent(task -> {
             DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond()).forEach(e -> {
+                        if (!concurrentHashMap.containsKey(e)) {
+                            this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
+                        }
+                    }
+            );
+        });
+
+    }
+
+    public void generateTaskReminder(List<Task> tasks) {
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(SECONDS_OF_DAY, reminderConfig.getTimeZone());
+        tasks.forEach(t -> {
+            DaoHelper.getReminderRecords(t, interval.getFirst(), interval.getSecond()).forEach(e -> {
                         if (!concurrentHashMap.containsKey(e)) {
                             this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
                         }
@@ -129,7 +141,7 @@ public class Reminder {
     public void preDestroy() {
         if (executorService != null) {
             try {
-                executorService.awaitTermination(5, TimeUnit.SECONDS);
+                executorService.awaitTermination(AWAIT_TERMINATION_SECONDS, TimeUnit.SECONDS);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }

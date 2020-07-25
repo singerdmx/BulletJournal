@@ -43,11 +43,13 @@ public class DeviceTokenDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void deleteToken(String token) {
+    public boolean deleteToken(String token) {
         DeviceToken existingToken = deviceTokenRepository.findDeviceTokenByToken(token);
         if (existingToken != null) {
             deviceTokenRepository.delete(existingToken);
+            return true;
         }
+        return false;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

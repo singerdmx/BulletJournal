@@ -467,7 +467,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
                 createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
-        task = this.taskRepository.save(task);
+        task = this.taskRepository.saveAndFlush(task);
 
         final ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId).orElseGet(ProjectTasks::new);
 
@@ -615,16 +615,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         Set<String> assigneesOverlap = new HashSet<>(newAssignees);
         assigneesOverlap.retainAll(oldAssignees);
-        String taskName = updateTaskParams.getName() == null ? task.getName() : updateTaskParams.getName();
+        String taskName = updateTaskParams.hasName() ? task.getName() : updateTaskParams.getName();
         for (String user : oldAssignees) {
-            if (!assigneesOverlap.contains(user)) {
+            if (!assigneesOverlap.contains(user) && !Objects.equals(requester, user)) {
                 Event event = new Event(user, task.getId(), taskName);
                 events.add(new UpdateTaskAssigneeEvent(event, requester, null));
-
             }
         }
         for (String user : newAssignees) {
-            if (!assigneesOverlap.contains(user)) {
+            if (!assigneesOverlap.contains(user) && !Objects.equals(requester, user)) {
                 Event event = new Event(user, task.getId(), taskName);
                 events.add(new UpdateTaskAssigneeEvent(event, requester, user));
             }

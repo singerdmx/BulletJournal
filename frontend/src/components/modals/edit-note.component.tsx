@@ -10,6 +10,7 @@ import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { useParams } from 'react-router-dom';
 import { labelsUpdate } from '../../features/label/actions';
+import {onFilterLabel} from "../../utils/Util";
 const { Option } = Select;
 type NoteProps = {
   mode: string;
@@ -21,26 +22,28 @@ type NoteProps = {
 
 const EditNote: React.FC<NoteProps> = (props) => {
   const { note, patchNote, mode, labelOptions, labelsUpdate } = props;
+  const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
-  const [labels, setLabels] = useState([] as number[]);
   const { projectId } = useParams();
-  const [value, setValue] = useState(note.name);
-  const onOk = () => {
-    if (value) {
-      patchNote(note.id, value, labels);
-    }
-    setVisible(!visible);
-  };
 
-  useEffect(() => {
-    setValue(note.name);
-  }, [note]);
+  const updateNote = (values: any) => {
+    patchNote(note.id, values.noteName, values.labels);
+  }
 
   useEffect(() => {
     if (projectId) {
       labelsUpdate(parseInt(projectId));
     }
-  }, []);
+  }, [projectId]);
+
+  const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.stopPropagation();
+    setVisible(false);
+  };
+
+  const openModal = () => {
+    setVisible(true);
+  };
 
   const getModal = () => {
     return (
@@ -48,42 +51,50 @@ const EditNote: React.FC<NoteProps> = (props) => {
         title='Edit'
         okText='Confirm'
         cancelText='Cancel'
-        onOk={onOk}
+        onOk={() => {
+          form
+              .validateFields()
+              .then((values) => {
+                form.resetFields();
+                setVisible(!visible);
+                updateNote(values);
+              })
+              .catch((info) => console.log(info));
+        }}
         destroyOnClose
         visible={visible}
-        onCancel={() => setVisible(!visible)}
+        onCancel={(e) => handleCancel(e)}
       >
         <Form
           layout='vertical'
-          initialValues={{
-            labels: note.labels.map((l) => {
-              return l.id;
-            }),
-          }}
+          form={form}
         >
-          <Input
-            onClick={(e) => e.stopPropagation()}
-            value={value}
-            placeholder={note.name}
-            onChange={(e) => {
-              e.stopPropagation();
-              setValue(e.target.value);
-            }}
-          />
+          <Form.Item
+              name='noteName'
+              label='Name'
+              rules={[{message: 'Note Name must be between 1 and 50 characters', min: 1, max: 50}]}
+          >
+            <Input
+                allowClear
+                placeholder='Enter Note Name'
+                defaultValue={note.name ? note.name : ''}
+            />
+          </Form.Item>
           {/* label */}
-          <div onClick={(e) => e.stopPropagation()}>
+          <div>
             <Form.Item name='labels' label='Labels'>
               <Select
                 mode='multiple'
-                onChange={(value: number[]) => {
-                  setLabels(value);
-                }}
+                filterOption={(e, t) => onFilterLabel(e, t)}
+                defaultValue={note.labels.map((l) => {
+                  return l.id;
+                })}
               >
                 {labelOptions &&
                   labelOptions.length &&
                   labelOptions.map((l) => {
                     return (
-                      <Option value={l.id} key={l.id}>
+                      <Option value={l.id} key={l.value}>
                         {getIcon(l.icon)} &nbsp;{l.value}
                       </Option>
                     );
@@ -99,7 +110,7 @@ const EditNote: React.FC<NoteProps> = (props) => {
   if (mode === 'div') {
     return (
       <div
-        onClick={() => setVisible(!visible)}
+        onClick={openModal}
         className='popover-control-item'
       >
         <span>Edit</span>

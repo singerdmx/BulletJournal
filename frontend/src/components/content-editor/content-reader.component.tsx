@@ -9,7 +9,7 @@ type ContentReaderProps = {
 const ContentReader: React.FC<ContentReaderProps> = ({ content }) => {
   return (
     <div className="content-in-drawer">
-      <div dangerouslySetInnerHTML={{ __html: content.text }} />
+      <div dangerouslySetInnerHTML={{ __html: JSON.parse(content.text)['###html###'] }} />
     </div>
   );
 };

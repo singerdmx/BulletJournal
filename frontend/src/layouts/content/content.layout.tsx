@@ -1,7 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import SettingPage from '../../pages/settings/settings.page';
-import PointPage from '../../pages/points/point'
 import BujoPage from '../../pages/bujo/bujo.pages';
 import GroupPage from '../../pages/group/group.pages';
 import GroupsPage from '../../pages/groups/groups.pages';
@@ -19,6 +18,7 @@ import PunchCardPage from "../../pages/punch-card/punch-card.pages";
 import SearchPage from "../../pages/search/search.pages";
 import TaskStatusPage from "../../pages/task-status/task-status.pages";
 import PublicPage from "../../Public";
+import PointsPage from "../../pages/points/points.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -28,7 +28,7 @@ class ContentLayout extends React.Component {
         <Switch>
           <Route exact path='/' component={BujoPage} />
           <Route exact path='/bujo/:category' component={BujoPage} />
-          <Route exact path='/points' component={PointPage} />
+          <Route exact path='/points' component={PointsPage} />
           <Route exact path='/settings' component={SettingPage} />
           <Route exact path='/googleCalendar' component={SettingPage} />
           <Route exact path='/projects' component={ProjectsPage} />

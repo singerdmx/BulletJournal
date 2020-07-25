@@ -11,6 +11,7 @@ import { IState } from "../../store";
 import AddUser from "../modals/add-user.component";
 import { History } from "history";
 import { changeAlias } from "../../features/user/actions";
+import { onFilterUser } from "../../utils/Util";
 
 type GroupProps = {
   group: Group;
@@ -178,24 +179,6 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       return null;
     };
 
-    const shouldInclude = (u: User, value: string) => {
-      return isSubsequence(u.name.toLowerCase(), value) || isSubsequence(u.alias.toLowerCase(), value);
-    }
-
-    const isSubsequence = (longS: string, shortS: string) => {
-      let i = 0;
-      let j = 0;
-      while (i < shortS.length && j < longS.length) {
-        if (shortS.charAt(i) === longS.charAt(j++)) {
-          i++;
-        }
-        if (i === shortS.length) {
-          return true;
-        }
-      }
-      return false;
-    }
-
     const onFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
       let { value } = e.target;
       this.setState({filter: value});
@@ -208,7 +191,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       value = value.toLowerCase();
       const users = [] as User[];
       group.users.forEach(u => {
-        if (shouldInclude(u, value)) {
+        if (onFilterUser(u, value)) {
           users.unshift(u);
         }
       })
