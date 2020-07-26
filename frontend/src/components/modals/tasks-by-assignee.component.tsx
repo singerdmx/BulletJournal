@@ -1,15 +1,20 @@
-import React, {useState} from 'react';
-import {Checkbox, Empty, message, Modal, Tooltip} from 'antd';
-import {IState} from '../../store';
-import {connect} from 'react-redux';
+import React, { useState } from 'react';
+import { Checkbox, Empty, message, Modal, Tooltip } from 'antd';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
 import './modals.styles.less';
 import TaskItem from '../project-item/task-item.component';
-import {Task} from '../../features/tasks/interface';
-import {User} from '../../features/group/interface';
-import {CheckCircleTwoTone, CheckSquareTwoTone, CloseSquareTwoTone, DeleteTwoTone,} from '@ant-design/icons';
-import {completeTasks, deleteTasks} from '../../features/tasks/actions';
-import {Project} from '../../features/project/interface';
-import {ProjectItemUIType} from "../../features/project/constants";
+import { Task } from '../../features/tasks/interface';
+import { User } from '../../features/group/interface';
+import {
+  CheckCircleTwoTone,
+  CheckSquareTwoTone,
+  CloseSquareTwoTone,
+  DeleteTwoTone,
+} from '@ant-design/icons';
+import { completeTasks, deleteTasks } from '../../features/tasks/actions';
+import { Project } from '../../features/project/interface';
+import { ProjectItemUIType } from '../../features/project/constants';
 
 type TasksByAssigneeProps = {
   project: Project | undefined;
@@ -17,8 +22,16 @@ type TasksByAssigneeProps = {
   visible: boolean;
   assignee: User | undefined;
   onCancel: () => void;
-  deleteTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
-  completeTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
+  deleteTasks: (
+    projectId: number,
+    tasksId: number[],
+    type: ProjectItemUIType
+  ) => void;
+  completeTasks: (
+    projectId: number,
+    tasksId: number[],
+    type: ProjectItemUIType
+  ) => void;
   hideCompletedTask: () => void;
 };
 
@@ -30,7 +43,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
     tasksByAssignee,
     deleteTasks,
     completeTasks,
-    hideCompletedTask
+    hideCompletedTask,
   } = props;
   const [checkboxVisible, setCheckboxVisible] = useState(false);
   const [checked, setChecked] = useState([] as number[]);
@@ -46,7 +59,7 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
   const getList = () => {
     return tasksByAssignee.map((task, index) => {
       return (
-        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+        <div key={task.id} style={{ display: 'flex', alignItems: 'center' }}>
           {checkboxVisible && (
             <Checkbox
               checked={checked.includes(task.id)}
@@ -123,21 +136,21 @@ const TasksByAssignee: React.FC<TasksByAssigneeProps> = (props) => {
         <Empty />
       ) : (
         <div>
-          <div className='checkbox-actions'>
-            <Tooltip title='Select All'>
+          <div className="checkbox-actions">
+            <Tooltip title="Select All">
               <CheckSquareTwoTone onClick={selectAll} />
             </Tooltip>
-            <Tooltip title='Clear All'>
+            <Tooltip title="Clear All">
               <CloseSquareTwoTone onClick={clearAll} />
             </Tooltip>
-            <Tooltip title='Complete All'>
+            <Tooltip title="Complete All">
               <CheckCircleTwoTone
-                twoToneColor='#52c41a'
+                twoToneColor="#52c41a"
                 onClick={completeAll}
               />
             </Tooltip>
-            <Tooltip title='Delete All'>
-              <DeleteTwoTone twoToneColor='#f5222d' onClick={deleteAll} />
+            <Tooltip title="Delete All">
+              <DeleteTwoTone twoToneColor="#f5222d" onClick={deleteAll} />
             </Tooltip>
           </div>
           <div>{getList()}</div>

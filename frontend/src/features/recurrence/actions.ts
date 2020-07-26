@@ -9,7 +9,10 @@ import {
   Weekly,
 } from './interface';
 import { End } from './reducer';
-import RRule from 'rrule';
+import RRule, { Frequency, rrulestr } from 'rrule';
+
+export const updateFreq = (freq: Frequency) =>
+  actions.updateFreq({ freq: freq });
 
 export const updateStartString = (startDate: string, startTime: string) =>
   actions.updateStart({
@@ -79,15 +82,26 @@ export const updateMonthlyOn = (monthlyOn: boolean) =>
 export const updateYearlyOn = (yearlyOn: boolean) =>
   actions.updateYearlyOn({ yearlyOn: yearlyOn });
 
-export const convertToTextWithRRule = (rrule: string) => {
-    const rule = RRule.fromString(rrule);
-    const resultString = rule.toText();
+export const updateRruleString = (rrulestr: string) =>
+  actions.updateRRuleString({ rruleString: rrulestr });
 
-    const result = resultString.charAt(0).toUpperCase() + resultString.slice(1) + ' starting at ' +
-        rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' +
-        rrule.substr(14, 2) + ' ' + rrule.substr(17, 2) + ':' +
-        rrule.substr(19, 2);
-    return result;
+export const convertToTextWithRRule = (rrule: string) => {
+  const rule = RRule.fromString(rrule);
+  const resultString = rule.toText();
+  const result =
+    resultString.charAt(0).toUpperCase() +
+    resultString.slice(1) +
+    ' starting at ' +
+    rrule.substr(8, 4) +
+    '-' +
+    rrule.substr(12, 2) +
+    '-' +
+    rrule.substr(14, 2) +
+    ' ' +
+    rrule.substr(17, 2) +
+    ':' +
+    rrule.substr(19, 2);
+  return result;
 };
 
 export const convertToTextWithTime = (start: any, repeat: any, end: End) => {

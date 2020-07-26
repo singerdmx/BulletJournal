@@ -466,9 +466,8 @@ class ProjectPage extends React.Component<
       popContent = (
         <div className="project-users">
           {groupUsers.map((u, index) => (
-            <Tooltip title={u.alias}>
+            <Tooltip title={u.alias} key={u.id}>
               <span
-                key={index}
                 className="avatar-container"
                 onClick={() => handleGetProjectItemsByUser(u)}
               >
@@ -505,7 +504,9 @@ class ProjectPage extends React.Component<
           </h2>
           <div className="project-control">
             <Popover
-              title={group && `${group.name} (${!!group ? groupUsers.length : 0})`}
+              title={
+                group && `${group.name} (${!!group ? groupUsers.length : 0})`
+              }
               placement="bottom"
               content={popContent}
             >
@@ -518,10 +519,10 @@ class ProjectPage extends React.Component<
                   style={{
                     fontSize: '9px',
                     color: '#006633',
-                    backgroundColor: '#e6fff2'
+                    backgroundColor: '#e6fff2',
                   }}
                 >
-                  <TeamOutlined style={{ fontSize: '21px' }}/>
+                  <TeamOutlined style={{ fontSize: '21px' }} />
                 </Badge>
               </span>
             </Popover>

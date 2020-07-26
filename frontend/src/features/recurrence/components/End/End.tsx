@@ -5,7 +5,7 @@ import moment from 'moment';
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
 import { updateEndString } from '../../actions';
-import {dateFormat} from "../../../myBuJo/constants";
+import { dateFormat } from '../../../myBuJo/constants';
 const { Option } = Select;
 
 type EndProps = {
@@ -21,19 +21,19 @@ type SelectState = {
 
 class End extends React.Component<EndProps, SelectState> {
   state: SelectState = {
-    value: 'Never'
+    value: 'Never',
   };
 
-  componentDidMount = () => {
-    const initEndDate = moment(
-      new Date().toLocaleString(
-        'fr-CA',
-        this.props.timezone ? { timeZone: this.props.timezone } : {}
-      ),
-      dateFormat
-    ).format(dateFormat);
-    this.props.updateEndString('', initEndDate, this.props.endCount);
-  };
+  // componentDidMount = () => {
+  //   const initEndDate = moment(
+  //     new Date().toLocaleString(
+  //       'fr-CA',
+  //       this.props.timezone ? { timeZone: this.props.timezone } : {}
+  //     ),
+  //     dateFormat
+  //   ).format(dateFormat);
+  //   this.props.updateEndString('', initEndDate, this.props.endCount);
+  // };
 
   onChangeValue = (value: string) => {
     this.setState({ value: value });
@@ -68,7 +68,7 @@ class End extends React.Component<EndProps, SelectState> {
           placeholder="Choose a type"
           style={{ width: '30%' }}
           value={this.state.value}
-          onChange={e => this.onChangeValue(e)}
+          onChange={(e) => this.onChangeValue(e)}
         >
           <Option value="Never">Never</Option>
           <Option value="After">After</Option>
@@ -86,7 +86,7 @@ class End extends React.Component<EndProps, SelectState> {
               value={this.props.endCount ? this.props.endCount : 0}
               onChange={this.onChangeCount}
             />
-            <div style={{paddingLeft: '6px'}}>time(s)</div>
+            <div style={{ paddingLeft: '6px' }}>time(s)</div>
           </div>
         ) : null}
       </div>
@@ -96,6 +96,6 @@ class End extends React.Component<EndProps, SelectState> {
 const mapStateToProps = (state: IState) => ({
   endDate: state.rRule.endDate,
   endCount: state.rRule.endCount,
-  timezone: state.settings.timezone
+  timezone: state.settings.timezone,
 });
 export default connect(mapStateToProps, { updateEndString })(End);

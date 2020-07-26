@@ -1,10 +1,10 @@
 import React from 'react';
-import { Select } from 'antd';
 import RepeatYearly from './RepeatYearly';
 import RepeatMonthly from './RepeatMonthly';
 import RepeatWeekly from './RepeatWeekly';
 import RepeatDaily from './RepeatDaily';
 import RepeatHourly from './RepeatHourly';
+import { Select } from 'antd';
 //used for redux
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
@@ -12,23 +12,26 @@ import { connect } from 'react-redux';
 import {
   Daily,
   Hourly,
-  Weekly,
   MonthlyOn,
   MonthlyOnThe,
+  Weekly,
   YearlyOn,
-  YearlyOnThe
+  YearlyOnThe,
 } from '../../interface';
 //used for action
 import {
-  updateStartString,
-  updateRepeatYearlyOn,
-  updateRepeatYearlyOnThe,
+  updateFreq,
   updateRepeatDaily,
   updateRepeatHourly,
   updateRepeatMonthlyOn,
   updateRepeatMonthlyOnThe,
-  updateRepeatWeekly
+  updateRepeatWeekly,
+  updateRepeatYearlyOn,
+  updateRepeatYearlyOnThe,
+  updateStartString,
 } from '../../actions';
+import { Frequency } from 'rrule';
+
 const { Option } = Select;
 
 type RepeatProps = {
@@ -43,6 +46,8 @@ type RepeatProps = {
   repeatYearlyOn: any;
   monthlyOn: boolean;
   yearlyOn: boolean;
+  freq: Frequency;
+  updateFreq: (freq: Frequency) => void;
   updateStartString: (startDate: string, startTime: string) => void;
   updateRepeatYearlyOn: (repeatYearlyOn: YearlyOn) => void;
   updateRepeatYearlyOnThe: (repeatYearlyOnThe: YearlyOnThe) => void;
@@ -53,44 +58,49 @@ type RepeatProps = {
   updateRepeatHourly: (repeatHourly: Hourly) => void;
 };
 
-type SelectState = {
-  value: string;
-};
+const frequencies = [
+  Frequency.YEARLY,
+  Frequency.MONTHLY,
+  Frequency.WEEKLY,
+  Frequency.DAILY,
+  Frequency.HOURLY,
+] as Frequency[];
 
-class Repeat extends React.Component<RepeatProps, SelectState> {
-  state: SelectState = {
-    value: 'Yearly'
-  };
+class Repeat extends React.Component<RepeatProps> {
+  constructor(props: RepeatProps) {
+    super(props);
+    this.state = {};
+  }
+  //   componentDidMount = () => {
+  //     this.props.updateStartString(this.props.startDate, this.props.startTime);
+  //     this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
+  //   };
 
-  componentDidMount = () => {
-    this.props.updateStartString(this.props.startDate, this.props.startTime);
-    this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
-  };
-
-  onChangeValue = (value: string) => {
-    this.setState({ value: value });
-    if (value === 'Yearly') {
+  onChangeValue = (value: Frequency) => {
+    this.props.updateFreq(value);
+    if (value === Frequency.YEARLY) {
       if (this.props.yearlyOn) {
         this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
       } else {
         this.props.updateRepeatYearlyOnThe(this.props.repeatYearlyOnThe);
       }
-    } else if (value === 'Monthly') {
+    } else if (value === Frequency.MONTHLY) {
       if (this.props.monthlyOn) {
         this.props.updateRepeatMonthlyOn(this.props.repeatMonthlyOn);
       } else {
         this.props.updateRepeatMonthlyOnThe(this.props.repeatMonthlyOnThe);
       }
-    } else if (value === 'Weekly') {
+    } else if (value === Frequency.WEEKLY) {
       this.props.updateRepeatWeekly(this.props.repeatWeekly);
-    } else if (value === 'Daily') {
+    } else if (value === Frequency.DAILY) {
       this.props.updateRepeatDaily(this.props.repeatDaily);
-    } else if (value === 'Hourly') {
+    } else if (value === Frequency.HOURLY) {
       this.props.updateRepeatHourly(this.props.repeatHourly);
     }
   };
 
   render() {
+    console.log(this.props.freq);
     return (
       <div>
         <div
@@ -100,23 +110,26 @@ class Repeat extends React.Component<RepeatProps, SelectState> {
             <strong>Repeat : </strong>
           </label>
           <Select
-            placeholder='Choose a type'
+            placeholder="Choose a type"
             style={{ width: '30%' }}
-            value={this.state.value}
-            onChange={e => this.onChangeValue(e)}
+            defaultValue={this.props.freq}
+            value={this.props.freq}
+            onChange={(e) => this.onChangeValue(e)}
           >
-            <Option value='Yearly'>Yearly</Option>
-            <Option value='Monthly'>Monthly</Option>
-            <Option value='Weekly'>Weekly</Option>
-            <Option value='Daily'>Daily</Option>
-            <Option value='Hourly'>Hourly</Option>
+            {frequencies.map((frequency) => {
+              return (
+                <Option key={frequency} value={frequency}>
+                  {Frequency[frequency]}
+                </Option>
+              );
+            })}
           </Select>
         </div>
-        {this.state.value === 'Yearly' && <RepeatYearly />}
-        {this.state.value === 'Monthly' && <RepeatMonthly />}
-        {this.state.value === 'Weekly' && <RepeatWeekly />}
-        {this.state.value === 'Daily' && <RepeatDaily />}
-        {this.state.value === 'Hourly' && <RepeatHourly />}
+        {this.props.freq === Frequency.YEARLY && <RepeatYearly />}
+        {this.props.freq === Frequency.MONTHLY && <RepeatMonthly />}
+        {this.props.freq === Frequency.WEEKLY && <RepeatWeekly />}
+        {this.props.freq === Frequency.DAILY && <RepeatDaily />}
+        {this.props.freq === Frequency.HOURLY && <RepeatHourly />}
       </div>
     );
   }
@@ -133,9 +146,12 @@ const mapStateToProps = (state: IState) => ({
   repeatMonthlyOnThe: state.rRule.repeatMonthlyOnThe,
   repeatWeekly: state.rRule.repeatWeekly,
   repeatDaily: state.rRule.repeatDaily,
-  repeatHourly: state.rRule.repeatHourly
+  repeatHourly: state.rRule.repeatHourly,
+  freq: state.rRule.freq,
 });
+
 export default connect(mapStateToProps, {
+  updateFreq,
   updateStartString,
   updateRepeatYearlyOn,
   updateRepeatYearlyOnThe,
@@ -143,5 +159,5 @@ export default connect(mapStateToProps, {
   updateRepeatHourly,
   updateRepeatMonthlyOn,
   updateRepeatMonthlyOnThe,
-  updateRepeatWeekly
+  updateRepeatWeekly,
 })(Repeat);
