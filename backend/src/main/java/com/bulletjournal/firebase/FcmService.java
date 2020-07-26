@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME;
@@ -67,10 +68,9 @@ public class FcmService {
 
     public void sendNotificationToUsers(Collection<String> usernames) {
         LOGGER.info("Sending notification to users: {}", usernames);
-        List<FcmMessageParams> params = usernames.stream()
-            .flatMap(username -> deviceTokenDaoJpa.getTokensByUser(username).stream())
-            .map(DeviceToken::getToken)
-            .map(token -> new FcmMessageParams(token, "type", "Notification"))
+        Set<DeviceToken> deviceTokens = deviceTokenDaoJpa.getTokensByUsers(usernames);
+        List<FcmMessageParams> params = deviceTokens.stream()
+            .map(token -> new FcmMessageParams(token.getToken(), "type", "Notification"))
             .collect(Collectors.toList());
         sendAllMessages(params);
     }

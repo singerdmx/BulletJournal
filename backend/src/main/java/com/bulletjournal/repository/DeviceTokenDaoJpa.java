@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Repository
@@ -54,15 +56,24 @@ public class DeviceTokenDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Set<DeviceToken> getTokensByUser(String userName) {
-        User user = userDaoJpa.getByName(userName);
-        if (user == null) {
-            throw new ResourceNotFoundException("User " + userName + " doesn't exist");
-        }
-        return user.getTokens();
+        return new HashSet<>(deviceTokenRepository.findDeviceTokensByUser(userName));
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Set<DeviceToken> getTokensByUsers(Collection<String> userNames) {
+        return new HashSet<>(
+            deviceTokenRepository.findDeviceTokensByUsers(
+                new HashSet<>(userNames)
+            ));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public DeviceToken get(String token) {
         return deviceTokenRepository.findDeviceTokenByToken(token);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteAllTokens() {
+        deviceTokenRepository.deleteAll();
     }
 }

@@ -55,36 +55,36 @@ const RecentItemList: React.FC<RecentItemProps> = ({
     switch (projectItem.contentType) {
       case ContentType.TASK: {
         return (
-            <TaskItem
-                task={projectItem as Task}
-                type={ProjectItemUIType.RECENT}
-                isComplete={false}
-                readOnly={false}
-                inModal={false}
-                inProject={false}
-                completeOnlyOccurrence={false}
-            />
+          <TaskItem
+            task={projectItem as Task}
+            type={ProjectItemUIType.RECENT}
+            isComplete={false}
+            readOnly={false}
+            inModal={false}
+            inProject={false}
+            completeOnlyOccurrence={false}
+          />
         );
       }
       case ContentType.NOTE: {
         return (
-            <NoteItem
-                note={projectItem as Note}
-                type={ProjectItemUIType.RECENT}
-                readOnly={false}
-                inProject={false}
-                inModal={false}
-            />
+          <NoteItem
+            note={projectItem as Note}
+            type={ProjectItemUIType.RECENT}
+            readOnly={false}
+            inProject={false}
+            inModal={false}
+          />
         );
       }
       case ContentType.TRANSACTION: {
         return (
-            <TransactionItem
-                type={ProjectItemUIType.RECENT}
-                transaction={projectItem as Transaction}
-                inModal={false}
-                inProject={false}
-            />
+          <TransactionItem
+            type={ProjectItemUIType.RECENT}
+            transaction={projectItem as Transaction}
+            inModal={false}
+            inProject={false}
+          />
         );
       }
       default:
@@ -94,7 +94,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
 
   return (
     <div>
-      <div className='todo-panel'>
+      <div className="todo-panel">
         <RangePicker
           ranges={{
             Today: [moment(), moment()],
@@ -106,8 +106,8 @@ const RecentItemList: React.FC<RecentItemProps> = ({
           format={dateFormat}
           onChange={handleRangeChange}
         />
-        <Tooltip placement='top' title='Change Time Zone'>
-          <Link to='/settings' style={{ paddingLeft: '30px' }}>
+        <Tooltip placement="top" title="Change Time Zone">
+          <Link to="/settings" style={{ paddingLeft: '30px' }}>
             {timezone}
           </Link>
         </Tooltip>
@@ -115,9 +115,11 @@ const RecentItemList: React.FC<RecentItemProps> = ({
       <Divider />
       <div>
         {items.map((projectItem) => {
-          return <div className='project-item-div'>
-            {renderItem(projectItem)}
-          </div>
+          return (
+            <div className="project-item-div" key={projectItem.id}>
+              {renderItem(projectItem)}
+            </div>
+          );
         })}
       </div>
     </div>

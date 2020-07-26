@@ -268,7 +268,7 @@ export const getTaskAssigneesPopoverContent = (
   return (
     <div className="task-assignees">
       {task.assignees.map((u, index) => (
-        <Tooltip title={u.alias}>
+        <Tooltip title={u.alias} key={u.id}>
           <span key={index}>{getAvatar(u)}</span>
         </Tooltip>
       ))}
@@ -454,7 +454,8 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
           <h3 className={taskStyle}>
             <Tooltip title={`Created by ${task.owner.alias}`}>
               {getAssigneesPopupAvatar(task.owner)}
-          </Tooltip> {' '}{getItemIcon(task, <CarryOutOutlined />)} {task.name}
+            </Tooltip>{' '}
+            {getItemIcon(task, <CarryOutOutlined />)} {task.name}
           </h3>
         </a>
         <div className="project-item-subs">

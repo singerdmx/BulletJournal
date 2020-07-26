@@ -22,9 +22,8 @@ import { ProjectItemUIType, ProjectType } from '../../features/project/constants
 import TaskDetailPage, { TaskProps } from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
-import { getTaskAssigneesPopoverContent } from "../../components/project-item/task-item.component";
 import { Container, Button as FloatButton, lightColors, darkColors } from 'react-floating-action-button'
-
+import { getTaskAssigneesPopoverContent } from "../../components/project-item/task-item.component";
 
 interface TaskPageHandler {
   getTask: (taskId: number) => void;
@@ -85,6 +84,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     //   <PlusCircleTwoTone />
     //   New
     // </Button>
+
   );
 
   const taskEditorElem = (
@@ -198,7 +198,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             />
           </div>
         </Tooltip>
-
       </div>
     );
   };

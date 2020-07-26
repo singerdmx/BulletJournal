@@ -1,13 +1,26 @@
-import React, {useState} from 'react';
-import {Checkbox, DatePicker, Divider, Empty, message, Modal, Tooltip, Button} from 'antd';
-import {IState} from '../../store';
-import {connect} from 'react-redux';
+import React, { useState } from 'react';
+import {
+  Checkbox,
+  DatePicker,
+  Divider,
+  Empty,
+  message,
+  Modal,
+  Tooltip,
+  Button,
+} from 'antd';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
 import './modals.styles.less';
 import TaskItem from '../project-item/task-item.component';
 import moment from 'moment';
-import {Task} from '../../features/tasks/interface';
-import {dateFormat} from '../../features/myBuJo/constants';
-import {completeTasks, deleteTasks, getTasksByOrder} from '../../features/tasks/actions';
+import { Task } from '../../features/tasks/interface';
+import { dateFormat } from '../../features/myBuJo/constants';
+import {
+  completeTasks,
+  deleteTasks,
+  getTasksByOrder,
+} from '../../features/tasks/actions';
 import {
   CheckCircleTwoTone,
   CheckSquareTwoTone,
@@ -15,8 +28,8 @@ import {
   DeleteTwoTone,
   SyncOutlined,
 } from '@ant-design/icons';
-import {Project} from "../../features/project/interface";
-import {ProjectItemUIType} from "../../features/project/constants";
+import { Project } from '../../features/project/interface';
+import { ProjectItemUIType } from '../../features/project/constants';
 
 const { RangePicker } = DatePicker;
 
@@ -32,8 +45,16 @@ type TasksByOrderProps = {
     startDate?: string,
     endDate?: string
   ) => void;
-  deleteTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
-  completeTasks: (projectId: number, tasksId: number[], type: ProjectItemUIType) => void;
+  deleteTasks: (
+    projectId: number,
+    tasksId: number[],
+    type: ProjectItemUIType
+  ) => void;
+  completeTasks: (
+    projectId: number,
+    tasksId: number[],
+    type: ProjectItemUIType
+  ) => void;
   hideCompletedTask: () => void;
 };
 
@@ -46,7 +67,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
     getTasksByOrder,
     deleteTasks,
     completeTasks,
-    hideCompletedTask
+    hideCompletedTask,
   } = props;
   const [dateArray, setDateArray] = useState(['', '']);
   const [checkboxVisible, setCheckboxVisible] = useState(false);
@@ -63,7 +84,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
   const getList = () => {
     return tasksByOrder.map((task, index) => {
       return (
-        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+        <div key={task.id} style={{ display: 'flex', alignItems: 'center' }}>
           {checkboxVisible && (
             <Checkbox
               checked={checked.includes(task.id)}
@@ -145,7 +166,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
       footer={false}
     >
       <div>
-        <div className='range-picker'>
+        <div className="range-picker">
           <RangePicker
             ranges={{
               Today: [moment(), moment()],
@@ -158,14 +179,20 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
             value={
               dateArray[0] ? [moment(dateArray[0]), moment(dateArray[1])] : null
             }
-            size='small'
+            size="small"
             allowClear={true}
             format={dateFormat}
             placeholder={['Start Date', 'End Date']}
             onChange={handleRangeChange}
           />
           <span>
-            <Button type="primary" icon={<SyncOutlined />} onClick={handleUpdate}>Refresh</Button>
+            <Button
+              type="primary"
+              icon={<SyncOutlined />}
+              onClick={handleUpdate}
+            >
+              Refresh
+            </Button>
           </span>
         </div>
         <Divider />
@@ -173,21 +200,21 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
           <Empty />
         ) : (
           <div>
-            <div className='checkbox-actions'>
-              <Tooltip title='Select All'>
+            <div className="checkbox-actions">
+              <Tooltip title="Select All">
                 <CheckSquareTwoTone onClick={selectAll} />
               </Tooltip>
-              <Tooltip title='Clear All'>
+              <Tooltip title="Clear All">
                 <CloseSquareTwoTone onClick={clearAll} />
               </Tooltip>
-              <Tooltip title='Complete All'>
+              <Tooltip title="Complete All">
                 <CheckCircleTwoTone
-                  twoToneColor='#52c41a'
+                  twoToneColor="#52c41a"
                   onClick={completeAll}
                 />
               </Tooltip>
-              <Tooltip title='Delete All'>
-                <DeleteTwoTone twoToneColor='#f5222d' onClick={deleteAll} />
+              <Tooltip title="Delete All">
+                <DeleteTwoTone twoToneColor="#f5222d" onClick={deleteAll} />
               </Tooltip>
             </div>
             <div>{getList()}</div>
@@ -204,6 +231,8 @@ const mapStateToProps = (state: IState) => ({
   project: state.project.project,
 });
 
-export default connect(mapStateToProps, { getTasksByOrder, deleteTasks, completeTasks })(
-  TasksByOrder
-);
+export default connect(mapStateToProps, {
+  getTasksByOrder,
+  deleteTasks,
+  completeTasks,
+})(TasksByOrder);

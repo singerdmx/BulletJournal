@@ -1,21 +1,18 @@
-import { createSlice, PayloadAction } from 'redux-starter-kit';
-import RRule from 'rrule';
-import {
-  Hourly,
-  Daily,
-  YearlyOn,
-  YearlyOnThe,
-  MonthlyOn,
-  MonthlyOnThe,
-  Weekly
-} from './interface';
-import { MONTHS } from './constants';
+import {createSlice, PayloadAction} from 'redux-starter-kit';
+import RRule, {Frequency} from 'rrule';
+import {bySetPosMap, byWeekDayMap, MonthlyOn, MonthlyOnThe, Weekly, YearlyOn, YearlyOnThe,} from './interface';
+import {MONTHS} from './constants';
 import moment from 'moment';
-import {dateFormat} from "../myBuJo/constants";
+import {dateFormat} from '../myBuJo/constants';
+import {Task} from "../tasks/interface";
 
 export type End = {
-  count?: any;
-  until?: any;
+  count: number | null;
+  until: Date | null;
+};
+
+export type FreqAction = {
+  freq: Frequency;
 };
 
 export type StartDateAction = {
@@ -24,17 +21,16 @@ export type StartDateAction = {
 };
 
 export type EndDateAction = {
-  mode: string;
-  endDate: string;
-  endCount: number;
+  endDate: string | null;
+  endCount: number | null;
 };
 
 export type RepeatHourlyAction = {
-  repeatHourly: Hourly;
+  repeatHourly: number;
 };
 
 export type RepeatDailyAction = {
-  repeatDaily: Daily;
+  repeatDaily: number;
 };
 
 export type RepeatYearlyOnAction = {
@@ -73,34 +69,39 @@ export type YearlyOnAction = {
   yearlyOn: boolean;
 };
 
+export type RRuleStringFromTask = {
+  task: Task;
+};
+
+export const defaultDate = moment(new Date().toLocaleString('fr-CA'), dateFormat).format(dateFormat);
+const defaultTime = '00:00';
+const defaultStart = moment(
+    new Date(defaultDate + 'T' + defaultTime + ':00+00:00')
+).toDate();
+const defaultRepeat = {
+  freq: Frequency.DAILY,
+  interval: 1,
+  byweekday: [],
+} as any;
+
 let initialState = {
-  startDate: moment(new Date().toLocaleString('fr-CA'), dateFormat).format(
-    dateFormat
-  ),
-  startTime: '00:00',
-  endDate: moment(new Date().toLocaleString('fr-CA'), dateFormat).format(
-    dateFormat
-  ),
-  endCount: 1,
-  repeatHourly: { interval: 1 } as Hourly,
-  repeatDaily: { interval: 1 } as Daily,
+  startDate: defaultDate,
+  startTime: defaultTime,
   yearlyOn: true,
   monthlyOn: true,
-  repeatYearlyOn: { month: 'Jan', day: 1 } as YearlyOn,
+  repeatYearlyOn: {month: 'Jan', day: 1} as YearlyOn,
   repeatYearlyOnThe: {
     month: 'Jan',
     day: 'Monday',
-    which: 'First'
+    which: 'First',
   } as YearlyOnThe,
   repeatMonthlyOn: {
-    day: 1
+    day: 1,
   } as MonthlyOn,
   repeatMonthlyOnThe: {
     day: 'Monday',
-    which: 'First'
+    which: 'First',
   } as MonthlyOnThe,
-  repeatMonthlyCount: 1,
-  repeatWeeklyCount: 1,
   repeatWeekly: {
     mon: false,
     tue: false,
@@ -108,54 +109,61 @@ let initialState = {
     thu: false,
     fri: false,
     sat: false,
-    sun: false
+    sun: false,
   } as Weekly,
-  start: {},
-  repeat: {},
+  start: {dtstart: defaultStart},
   end: {} as End,
-  rRuleString: ''
+  repeat: defaultRepeat,
+  rRuleString: new RRule({
+    dtstart: defaultStart,
+    ...defaultRepeat,
+  }).toString(),
 };
 
 const slice = createSlice({
   name: 'rRule',
   initialState,
   reducers: {
+    updateFreq: (state, action: PayloadAction<FreqAction>) => {
+      const {freq} = action.payload;
+      state.repeat.freq = freq;
+    },
+
     updateStart: (state, action: PayloadAction<StartDateAction>) => {
-      const { startDate, startTime } = action.payload;
+      const {startDate, startTime} = action.payload;
       state.startDate = startDate;
       state.startTime = startTime;
-      //update rrule start string
-      const start = {
+      state.start = {
         dtstart: moment(
-          new Date(startDate + 'T' + startTime + ':00+00:00')
-        ).toDate()
+            new Date(startDate + 'T' + startTime + ':00+00:00')
+        ).toDate(),
       };
-
-      state.start = start;
       state.rRuleString = new RRule({
-        ...start,
+        ...state.start,
         ...state.repeat,
-        ...state.end
+        ...state.end,
       }).toString();
     },
 
     updateMonthlyOn: (state, action: PayloadAction<MonthlyOnAction>) => {
-      const { monthlyOn } = action.payload;
+      const {monthlyOn} = action.payload;
       state.monthlyOn = monthlyOn;
     },
     updateYearlyOn: (state, action: PayloadAction<YearlyOnAction>) => {
-      const { yearlyOn } = action.payload;
+      const {yearlyOn} = action.payload;
       state.yearlyOn = yearlyOn;
     },
     updateEnd: (state, action: PayloadAction<EndDateAction>) => {
-      const { endDate, endCount, mode } = action.payload;
-      state.endDate = endDate;
-      state.endCount = endCount;
+      const {endDate, endCount} = action.payload;
       //update rrule end string here
       let end = {} as End;
-      if (mode === 'After') {
-        end.count = endCount;
-      } else if (mode === 'On date') {
+      if (endCount) {
+        if (endCount <= 0) {
+          end.count = 1;
+        } else {
+          end.count = endCount;
+        }
+      } else if (endDate) {
         //end until use date type because .toText only recognize Date() type
         end.until = new Date(endDate);
       }
@@ -163,257 +171,144 @@ const slice = createSlice({
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
-        ...end
+        ...end,
       }).toString();
     },
     updateRepeatHourly: (state, action: PayloadAction<RepeatHourlyAction>) => {
-      const { repeatHourly } = action.payload;
-      state.repeatHourly = repeatHourly;
+      const {repeatHourly} = action.payload;
+      state.repeat = {
+        freq: Frequency.HOURLY,
+        interval: Math.max(1, repeatHourly),
+      };
       //update rrule end string here
-      const repeat = { freq: RRule.HOURLY, interval: repeatHourly.interval };
-      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
-        ...repeat,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatDaily: (state, action: PayloadAction<RepeatDailyAction>) => {
-      const { repeatDaily } = action.payload;
-      state.repeatDaily = repeatDaily;
+      const {repeatDaily} = action.payload;
+      state.repeat = {
+        freq: Frequency.DAILY,
+        interval: Math.max(1, repeatDaily)
+      };
       //update rrule end string here
-      const repeat = { freq: RRule.DAILY, interval: repeatDaily.interval };
-      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
-        ...repeat,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatYearlyOn: (
-      state,
-      action: PayloadAction<RepeatYearlyOnAction>
+        state,
+        action: PayloadAction<RepeatYearlyOnAction>
     ) => {
-      const { repeatYearlyOn } = action.payload;
+      const {repeatYearlyOn} = action.payload;
       state.repeatYearlyOn = repeatYearlyOn;
       //update rrule end string here
-      const repeat = {
+      state.repeat = {
         freq: RRule.YEARLY,
         bymonth: MONTHS.indexOf(repeatYearlyOn.month) + 1,
-        bymonthday: repeatYearlyOn.day
+        bymonthday: repeatYearlyOn.day,
+        interval: 1
       };
-      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
-        ...repeat,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatYearlyOnThe: (
-      state,
-      action: PayloadAction<RepeatYearlyOnTheAction>
+        state,
+        action: PayloadAction<RepeatYearlyOnTheAction>
     ) => {
-      const { repeatYearlyOnThe } = action.payload;
+      const {repeatYearlyOnThe} = action.payload;
       state.repeatYearlyOnThe = repeatYearlyOnThe;
       //update rrule end string here
-      const repeat = {
+      state.repeat = {
         freq: RRule.YEARLY,
-        bysetpos: 0,
-        byweekday: [0],
-        bymonth: 1
+        bysetpos: [bySetPosMap.get(repeatYearlyOnThe.which)],
+        byweekday: byWeekDayMap.get(repeatYearlyOnThe.day),
+        bymonth: MONTHS.indexOf(repeatYearlyOnThe.month) + 1,
+        interval: 1
       };
-      switch (repeatYearlyOnThe.which) {
-        case 'First':
-          repeat.bysetpos = 1;
-          break;
-        case 'Second':
-          repeat.bysetpos = 2;
-          break;
-        case 'Third':
-          repeat.bysetpos = 3;
-          break;
-        case 'Fourth':
-          repeat.bysetpos = 4;
-          break;
-        case 'Last':
-          repeat.bysetpos = -1;
-          break;
-        default:
-          break;
-      }
-      switch (repeatYearlyOnThe.day) {
-        case 'Monday':
-          repeat.byweekday = [0];
-          break;
-        case 'Tuesday':
-          repeat.byweekday = [1];
-          break;
-        case 'Wednesday':
-          repeat.byweekday = [2];
-          break;
-        case 'Thursday':
-          repeat.byweekday = [3];
-          break;
-        case 'Friday':
-          repeat.byweekday = [4];
-          break;
-        case 'Saturday':
-          repeat.byweekday = [5];
-          break;
-        case 'Sunday':
-          repeat.byweekday = [6];
-          break;
-        case 'Day':
-          repeat.byweekday = [0, 1, 2, 3, 4, 5, 6];
-          break;
-        case 'Weekday':
-          repeat.byweekday = [0, 1, 2, 3, 4];
-          break;
-        case 'Weekend day':
-          repeat.byweekday = [5, 6];
-          break;
-        default:
-          break;
-      }
-      repeat.bymonth = MONTHS.indexOf(repeatYearlyOnThe.month) + 1;
-      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
-        ...repeat,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatMonthlyOn: (
-      state,
-      action: PayloadAction<RepeatMonthlyOnAction>
+        state,
+        action: PayloadAction<RepeatMonthlyOnAction>
     ) => {
-      const { repeatMonthlyOn } = action.payload;
+      const {repeatMonthlyOn} = action.payload;
       state.repeatMonthlyOn = repeatMonthlyOn;
       //update rrule end string here
-      const repeat = {
+      state.repeat = {
         freq: RRule.MONTHLY,
-        interval: state.repeatMonthlyCount,
-        bymonthday: repeatMonthlyOn.day
+        interval: state.repeat.interval,
+        bymonthday: repeatMonthlyOn.day,
       };
-      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
-        ...repeat,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatMonthlyOnThe: (
-      state,
-      action: PayloadAction<RepeatMonthlyOnTheAction>
+        state,
+        action: PayloadAction<RepeatMonthlyOnTheAction>
     ) => {
-      const { repeatMonthlyOnThe } = action.payload;
+      const {repeatMonthlyOnThe} = action.payload;
       state.repeatMonthlyOnThe = repeatMonthlyOnThe;
       //update rrule end string here
-      const repeat = {
+      state.repeat = {
         freq: RRule.MONTHLY,
-        interval: state.repeatMonthlyCount,
-        bysetpos: 1,
-        byweekday: [0]
+        interval: state.repeat.interval,
+        bysetpos: bySetPosMap.get(repeatMonthlyOnThe.which),
+        byweekday: byWeekDayMap.get(repeatMonthlyOnThe.day),
       };
 
-      switch (repeatMonthlyOnThe.which) {
-        case 'First':
-          repeat.bysetpos = 1;
-          break;
-        case 'Second':
-          repeat.bysetpos = 2;
-          break;
-        case 'Third':
-          repeat.bysetpos = 3;
-          break;
-        case 'Fourth':
-          repeat.bysetpos = 4;
-          break;
-        case 'Last':
-          repeat.bysetpos = -1;
-          break;
-        default:
-          break;
-      }
-
-      switch (repeatMonthlyOnThe.day) {
-        case 'Monday':
-          repeat.byweekday = [0];
-          break;
-        case 'Tuesday':
-          repeat.byweekday = [1];
-          break;
-        case 'Wednesday':
-          repeat.byweekday = [2];
-          break;
-        case 'Thursday':
-          repeat.byweekday = [3];
-          break;
-        case 'Friday':
-          repeat.byweekday = [4];
-          break;
-        case 'Saturday':
-          repeat.byweekday = [5];
-          break;
-        case 'Sunday':
-          repeat.byweekday = [6];
-          break;
-        case 'Day':
-          repeat.byweekday = [0, 1, 2, 3, 4, 5, 6];
-          break;
-        case 'Weekday':
-          repeat.byweekday = [0, 1, 2, 3, 4];
-          break;
-        case 'Weekend day':
-          repeat.byweekday = [5, 6];
-          break;
-        default:
-          break;
-      }
-      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
-        ...repeat,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatMonthlyCount: (
-      state,
-      action: PayloadAction<RepeatMonthlyCountAction>
+        state,
+        action: PayloadAction<RepeatMonthlyCountAction>
     ) => {
-      const { repeatMonthlyCount } = action.payload;
-      state.repeatMonthlyCount = repeatMonthlyCount;
-      //update rrule end string here
-      let update = {
-        ...state.repeat,
-        freq: RRule.MONTHLY,
-        interval: repeatMonthlyCount
-      };
-      state.repeat = update;
+      const {repeatMonthlyCount} = action.payload;
+      state.repeat.interval = Math.max(1, repeatMonthlyCount);
       state.rRuleString = new RRule({
         ...state.start,
-        ...update,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatWeeklyCount: (
-      state,
-      action: PayloadAction<RepeatWeeklyCountAction>
+        state,
+        action: PayloadAction<RepeatWeeklyCountAction>
     ) => {
-      const { repeatWeeklyCount } = action.payload;
+      const {repeatWeeklyCount} = action.payload;
 
-      state.repeatWeeklyCount = repeatWeeklyCount;
+      state.repeat = {
+        freq: Frequency.WEEKLY,
+        interval: repeatWeeklyCount,
+        byweekday: state.repeat.byweekday ? state.repeat.byweekday : []
+      };
       //update rrule end string here
-      let update = { ...state.repeat, interval: repeatWeeklyCount };
-      state.repeat = update;
       state.rRuleString = new RRule({
         ...state.start,
-        ...update,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
     },
     updateRepeatWeekly: (state, action: PayloadAction<RepeatWeeklyAction>) => {
-      const { repeatWeekly } = action.payload;
+      const {repeatWeekly} = action.payload;
       state.repeatWeekly = repeatWeekly;
       //update rrule end string here
       let byweekday = [];
@@ -424,19 +319,111 @@ const slice = createSlice({
       if (repeatWeekly.fri) byweekday.push(4);
       if (repeatWeekly.sat) byweekday.push(5);
       if (repeatWeekly.sun) byweekday.push(6);
-      const repeat = {
-        freq: RRule.WEEKLY,
-        interval: state.repeatWeeklyCount,
-        byweekday: byweekday
+      state.repeat = {
+        freq: Frequency.WEEKLY,
+        byweekday: byweekday,
+        interval: state.repeat.interval
       };
-      state.repeat = repeat;
       state.rRuleString = new RRule({
         ...state.start,
-        ...repeat,
-        ...state.end
+        ...state.repeat,
+        ...state.end,
       }).toString();
-    }
-  }
+    },
+    updateRRuleString: (state, action: PayloadAction<RRuleStringFromTask>) => {
+      const {task} = action.payload;
+      const rruleString = task.recurrenceRule;
+      console.log(rruleString);
+
+      if (!rruleString.startsWith("DTSTART:")) {
+        alert("Invalid rruleString: " + rruleString);
+        return;
+      }
+
+      state.rRuleString = rruleString;
+      const rule = RRule.fromString(rruleString);
+      console.log(rule);
+      state.repeat = {freq: rule.options.freq, interval: rule.options.interval} as any;
+      let which = 'First';
+      if (rule.options.bysetpos) {
+        for (let k in bySetPosMap.keys()) {
+          if (bySetPosMap.get(k) === rule.options.bysetpos[0]) {
+            which = k;
+            break;
+          }
+        }
+      }
+      let day = 'Monday';
+      if (rule.options.byweekday) {
+        for (let k in byWeekDayMap.keys()) {
+          if (JSON.stringify(byWeekDayMap.get(k)) === JSON.stringify(rule.options.byweekday)) {
+            day = k;
+            break;
+          }
+        }
+      }
+
+      switch (state.repeat.freq) {
+        case Frequency.WEEKLY:
+          state.repeat.byweekday = rule.options.byweekday;
+          let i = 0;
+          state.repeatWeekly = {
+            mon: state.repeat.byweekday.includes(i++),
+            tue: state.repeat.byweekday.includes(i++),
+            wed: state.repeat.byweekday.includes(i++),
+            thu: state.repeat.byweekday.includes(i++),
+            fri: state.repeat.byweekday.includes(i++),
+            sat: state.repeat.byweekday.includes(i++),
+            sun: state.repeat.byweekday.includes(i++),
+          };
+          break;
+        case Frequency.MONTHLY:
+          if (rule.options.bysetpos) {
+            state.repeatMonthlyOnThe = {
+              which: which,
+              day: day
+            }
+          } else {
+            state.repeatMonthlyOn = {
+              day: rule.options.bynmonthday[0]
+            }
+          }
+          break;
+        case Frequency.YEARLY:
+          state.repeat.interval = 1;
+          const m = MONTHS[rule.options.bymonth[0] - 1];
+          if (rule.options.bysetpos) {
+            state.repeatYearlyOnThe = {
+              month: m,
+              which: which,
+              day: day
+            }
+          } else {
+            state.repeatYearlyOn = {
+              month: m,
+              day: rule.options.bynmonthday[0]
+            }
+          }
+          break;
+      }
+
+      state.startDate = rruleString.substring(8, 12) + '-' + rruleString.substring(12, 14) + '-' + rruleString.substring(14, 16);
+      state.startTime = rruleString.substring(17, 19) + ':' + rruleString.substring(19, 21);
+      state.start = {
+        dtstart: moment(
+            new Date(state.startDate + 'T' + state.startTime + ':00+00:00')
+        ).toDate(),
+      };
+
+      if (rule.options.count) {
+        state.end = {count: rule.options.count, until: null};
+      } else if (rule.options.until) {
+        state.end = {until: rule.options.until, count: null};
+      } else {
+        state.end = {until: null, count: null};
+      }
+    },
+  },
 });
 
 export const reducer = slice.reducer;

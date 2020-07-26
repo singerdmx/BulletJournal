@@ -12,7 +12,7 @@ import {
   updateRepeatMonthlyOn,
   updateRepeatMonthlyOnThe,
   updateRepeatMonthlyCount,
-  updateMonthlyOn
+  updateMonthlyOn,
 } from '../../actions';
 const { Option } = Select;
 
@@ -33,7 +33,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
       this.props.updateMonthlyOn(true);
       //update rrule string
       let update = {
-        day: this.props.repeatMonthlyOn.day
+        day: this.props.repeatMonthlyOn.day,
       } as MonthlyOn;
       this.props.updateRepeatMonthlyOn(update);
     } else {
@@ -41,7 +41,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
       //update rrule string
       let update = {
         day: this.props.repeatMonthlyOnThe.day,
-        which: this.props.repeatMonthlyOnThe.which
+        which: this.props.repeatMonthlyOnThe.which,
       } as MonthlyOnThe;
       this.props.updateRepeatMonthlyOnThe(update);
     }
@@ -55,7 +55,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
 
   onChangeOnDay = (e: any) => {
     let update = {
-      day: e
+      day: e,
     } as MonthlyOn;
     this.props.updateRepeatMonthlyOn(update);
   };
@@ -63,7 +63,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
   onChangeOnTheDay = (e: any) => {
     let update = {
       day: e,
-      which: this.props.repeatMonthlyOnThe.which
+      which: this.props.repeatMonthlyOnThe.which,
     } as MonthlyOnThe;
     this.props.updateRepeatMonthlyOnThe(update);
   };
@@ -71,7 +71,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
   onChangeOnTheWhich = (e: any) => {
     let update = {
       day: this.props.repeatMonthlyOnThe.day,
-      which: e
+      which: e,
     } as MonthlyOnThe;
     this.props.updateRepeatMonthlyOnThe(update);
   };
@@ -81,11 +81,11 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
       <div style={{ display: 'flex' }}>
         <div style={{ marginBottom: 24 }}>
           <Input
-            prefix='Every'
+            prefix="Every"
             style={{ width: '90%' }}
             onChange={this.onChangeCount}
             value={this.props.repeatMonthlyCount}
-            suffix='Month(s)'
+            suffix="Month(s)"
           />
         </div>
 
@@ -93,26 +93,26 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
           onChange={this.onChange}
           value={this.props.monthlyOn ? 'on' : 'onThe'}
         >
-          <Radio value='on' style={{ marginBottom: 24 }}>
+          <Radio value="on" style={{ marginBottom: 24 }}>
             <span>On day</span>
             <Select
-              style={{ width: '100px', paddingLeft: '20px' }}
+              style={{ width: '90px', paddingLeft: '20px' }}
               disabled={!this.props.monthlyOn}
               onChange={this.onChangeOnDay}
               value={this.props.repeatMonthlyOn.day}
             >
-              {range(0, 31).map(i => (
-                <option key={i} value={i + 1}>
+              {range(0, 31).map((i) => (
+                <Option key={i} value={i + 1}>
                   {i + 1}
-                </option>
+                </Option>
               ))}
             </Select>
           </Radio>
           <br />
-          <Radio value='onThe'>
+          <Radio value="onThe">
             <span>On the</span>
             <Select
-              style={{ width: '100px', paddingLeft: '20px' }}
+              style={{ width: '90px', paddingLeft: '20px' }}
               disabled={this.props.monthlyOn}
               onChange={this.onChangeOnTheWhich}
               value={this.props.repeatMonthlyOnThe.which}
@@ -126,7 +126,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
               })}
             </Select>
             <Select
-              style={{ width: '100px', paddingLeft: '20px' }}
+              style={{ width: '90px', paddingLeft: '20px' }}
               disabled={this.props.monthlyOn}
               onChange={this.onChangeOnTheDay}
               value={this.props.repeatMonthlyOnThe.day}
@@ -149,12 +149,12 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
 const mapStateToProps = (state: IState) => ({
   repeatMonthlyOn: state.rRule.repeatMonthlyOn,
   repeatMonthlyOnThe: state.rRule.repeatMonthlyOnThe,
-  repeatMonthlyCount: state.rRule.repeatMonthlyCount,
-  monthlyOn: state.rRule.monthlyOn
+  repeatMonthlyCount: state.rRule.repeat.interval,
+  monthlyOn: state.rRule.monthlyOn,
 });
 export default connect(mapStateToProps, {
   updateRepeatMonthlyOn,
   updateRepeatMonthlyOnThe,
   updateRepeatMonthlyCount,
-  updateMonthlyOn
+  updateMonthlyOn,
 })(RepeatMonthly);

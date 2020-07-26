@@ -12,7 +12,7 @@ import { YearlyOn, YearlyOnThe } from '../../interface';
 import {
   updateRepeatYearlyOn,
   updateRepeatYearlyOnThe,
-  updateYearlyOn
+  updateYearlyOn,
 } from '../../actions';
 const { Option } = Select;
 
@@ -34,7 +34,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
       //update rrule string
       let update = {
         month: this.props.repeatYearlyOn.month,
-        day: this.props.repeatYearlyOn.day
+        day: this.props.repeatYearlyOn.day,
       } as YearlyOn;
       this.props.updateRepeatYearlyOn(update);
     } else {
@@ -43,7 +43,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
       let update = {
         month: this.props.repeatYearlyOnThe.month,
         day: this.props.repeatYearlyOnThe.day,
-        which: this.props.repeatYearlyOnThe.which
+        which: this.props.repeatYearlyOnThe.which,
       } as YearlyOnThe;
       this.props.updateRepeatYearlyOnThe(update);
     }
@@ -52,7 +52,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
   onChangeOnMonth = (e: string) => {
     let update = {
       month: e,
-      day: 1
+      day: 1,
     } as YearlyOn;
     daysOn = moment(e, 'MMM').daysInMonth();
     this.props.updateRepeatYearlyOn(update);
@@ -61,7 +61,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
   onChangeOnDay = (e: number) => {
     let update = {
       month: this.props.repeatYearlyOn.month,
-      day: e
+      day: e,
     } as YearlyOn;
     this.props.updateRepeatYearlyOn(update);
   };
@@ -70,7 +70,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
     let update = {
       month: e,
       day: this.props.repeatYearlyOnThe.day,
-      which: this.props.repeatYearlyOnThe.which
+      which: this.props.repeatYearlyOnThe.which,
     } as YearlyOnThe;
     this.props.updateRepeatYearlyOnThe(update);
   };
@@ -79,7 +79,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
     let update = {
       month: this.props.repeatYearlyOnThe.month,
       day: e,
-      which: this.props.repeatYearlyOnThe.which
+      which: this.props.repeatYearlyOnThe.which,
     } as YearlyOnThe;
     this.props.updateRepeatYearlyOnThe(update);
   };
@@ -88,7 +88,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
     let update = {
       month: this.props.repeatYearlyOnThe.month,
       day: this.props.repeatYearlyOnThe.day,
-      which: e
+      which: e,
     } as YearlyOnThe;
     this.props.updateRepeatYearlyOnThe(update);
   };
@@ -100,7 +100,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
           onChange={this.onChange}
           value={this.props.yearlyOn ? 'on' : 'onThe'}
         >
-          <Radio value='on' style={{marginBottom : 24}}>
+          <Radio value="on" style={{ marginBottom: 24 }}>
             <span>On</span>
             <Select
               style={{ width: '100px', paddingLeft: '20px' }}
@@ -108,7 +108,7 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
               onChange={this.onChangeOnMonth}
               value={this.props.repeatYearlyOn.month}
             >
-              {MONTHS.map(month => {
+              {MONTHS.map((month) => {
                 return (
                   <Option value={month} key={month}>
                     {month}
@@ -122,15 +122,15 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
               onChange={this.onChangeOnDay}
               value={this.props.repeatYearlyOn.day}
             >
-              {range(0, daysOn).map(i => (
-                <option key={i} value={i + 1}>
+              {range(0, daysOn).map((i) => (
+                <Option key={i} value={i + 1}>
                   {i + 1}
-                </option>
+                </Option>
               ))}
             </Select>
           </Radio>
           <br />
-          <Radio value='onThe'>
+          <Radio value="onThe">
             <span>On the</span>
             <Select
               style={{ width: '100px', paddingLeft: '20px' }}
@@ -185,10 +185,10 @@ class RepeatYearly extends React.Component<RepeatYealyProps> {
 const mapStateToProps = (state: IState) => ({
   repeatYearlyOn: state.rRule.repeatYearlyOn,
   repeatYearlyOnThe: state.rRule.repeatYearlyOnThe,
-  yearlyOn: state.rRule.yearlyOn
+  yearlyOn: state.rRule.yearlyOn,
 });
 export default connect(mapStateToProps, {
   updateRepeatYearlyOn,
   updateRepeatYearlyOnThe,
-  updateYearlyOn
+  updateYearlyOn,
 })(RepeatYearly);

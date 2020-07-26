@@ -2,30 +2,26 @@ import React from 'react';
 import { Input } from 'antd';
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
-import { Daily } from '../../interface';
 import { updateRepeatDaily } from '../../actions';
 
 type RepeatDailyProps = {
-  repeatDaily: Daily;
-  updateRepeatDaily: (repeatDaily: Daily) => void;
+  repeatDaily: number;
+  updateRepeatDaily: (repeatDaily: number) => void;
 };
 
 class RepeatDaily extends React.Component<RepeatDailyProps> {
   onChange = (event: any) => {
     let updateInterval = parseInt(event.target.value ? event.target.value : 0);
     if (isNaN(updateInterval)) updateInterval = 0;
-    let update = { interval: updateInterval } as Daily;
-    this.props.updateRepeatDaily(update);
+    this.props.updateRepeatDaily(updateInterval);
   };
 
   render() {
     return (
       <Input
         prefix='Every'
-        style={{ width: '70%' }}
-        value={
-          this.props.repeatDaily.interval ? this.props.repeatDaily.interval : 0
-        }
+        style={{ width: '40%' }}
+        value={this.props.repeatDaily}
         onChange={this.onChange}
         suffix='Day(s)'
       />
@@ -34,6 +30,6 @@ class RepeatDaily extends React.Component<RepeatDailyProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  repeatDaily: state.rRule.repeatDaily
+  repeatDaily: state.rRule.repeat.interval
 });
 export default connect(mapStateToProps, { updateRepeatDaily })(RepeatDaily);
