@@ -14,3 +14,4 @@ interface Window {
 }
 
 declare module '*.ico'
+declare module 'react-floating-action-button'

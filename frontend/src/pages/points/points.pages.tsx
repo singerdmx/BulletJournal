@@ -6,6 +6,7 @@ import { Tabs } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 
+
 const { TabPane } = Tabs;
 
 type PointsProps = {
@@ -83,6 +84,8 @@ const PointsPage: React.FC<PointsProps> = (props) => {
                     Redeem your Points
                 </TabPane>
             </Tabs>
+
+
         </div>
     );
 };

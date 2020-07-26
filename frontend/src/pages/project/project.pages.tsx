@@ -52,6 +52,7 @@ import {
 } from '../../features/label/actions';
 import { Label, stringToRGB } from '../../features/label/interface';
 import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
+
 import getThemeColorVars from '../../utils/theme';
 
 const { Panel } = Collapse;
@@ -131,7 +132,7 @@ type MyselfProps = {
 class ProjectPage extends React.Component<
   ProjectPageProps & ProjectPathProps & GroupProps & MyselfProps,
   ModalState
-> {
+  > {
   state: ModalState = {
     isShow: false,
     groupName: '',
@@ -254,7 +255,7 @@ class ProjectPage extends React.Component<
   handleGetProjectItemsByOrderCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOrder,
     [ProjectType.TODO]: this.handleGetTasksByOrder,
-    [ProjectType.LEDGER]: () => {},
+    [ProjectType.LEDGER]: () => { },
   };
 
   getProjectLabels = () => {
@@ -521,7 +522,7 @@ class ProjectPage extends React.Component<
                     backgroundColor: '#e6fff2'
                   }}
                 >
-                  <TeamOutlined style={{ fontSize: '21px' }}/>
+                  <TeamOutlined style={{ fontSize: '21px' }} />
                 </Badge>
               </span>
             </Popover>
@@ -537,6 +538,7 @@ class ProjectPage extends React.Component<
           <div className="project-description">{description}</div>
         )}
         {this.getProjectLabels()}
+
         <BackTop />
         <div className="project-content">{projectContent}</div>
       </div>

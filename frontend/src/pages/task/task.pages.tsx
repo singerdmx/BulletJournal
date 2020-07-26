@@ -1,15 +1,15 @@
 // page display contents of tasks
 // react imports
-import React, {useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
-import {connect} from 'react-redux';
+import React, { useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
 // features
 //actions
-import {completeTask, deleteTask, getTask, updateTaskContents} from '../../features/tasks/actions';
-import {IState} from '../../store';
+import { completeTask, deleteTask, getTask, updateTaskContents } from '../../features/tasks/actions';
+import { IState } from '../../store';
 // antd imports
-import {Avatar, Badge, Button, Popconfirm, Popover, Tooltip} from 'antd';
-import {CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined} from '@ant-design/icons';
+import { Avatar, Badge, Button, Popconfirm, Popover, Tooltip } from 'antd';
+import { CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined } from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -17,12 +17,13 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
-import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
+import { ProjectItemUIType, ProjectType } from '../../features/project/constants';
 // components
-import TaskDetailPage, {TaskProps} from './task-detail.pages';
+import TaskDetailPage, { TaskProps } from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
-import {getTaskAssigneesPopoverContent} from "../../components/project-item/task-item.component";
+import { getTaskAssigneesPopoverContent } from "../../components/project-item/task-item.component";
+
 
 interface TaskPageHandler {
   getTask: (taskId: number) => void;
@@ -70,6 +71,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   };
 
   const createContentElem = (
+
     <Button onClick={createHandler}>
       <PlusCircleTwoTone />
       New
@@ -106,30 +108,30 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
       <Popover
         title={`${task.assignees.length} Assignees`}
         placement='bottom'
-        content={getTaskAssigneesPopoverContent(task, (u) => <Avatar size='small' src={u.avatar}/>)}
+        content={getTaskAssigneesPopoverContent(task, (u) => <Avatar size='small' src={u.avatar} />)}
       >
-          <div className='task-owner'>
-              <span
-              >
-                <Badge
-                    count={task.assignees.length}
-                    style={{
-                        fontSize: '9px',
-                        color: '#006633',
-                        backgroundColor: '#e6fff2'
-                    }}
-                >
-                  <TeamOutlined style={{ fontSize: '21px' }}/>
-                </Badge>
-              </span>
-          </div>
+        <div className='task-owner'>
+          <span
+          >
+            <Badge
+              count={task.assignees.length}
+              style={{
+                fontSize: '9px',
+                color: '#006633',
+                backgroundColor: '#e6fff2'
+              }}
+            >
+              <TeamOutlined style={{ fontSize: '21px' }} />
+            </Badge>
+          </span>
+        </div>
       </Popover>
     );
   };
 
   const handleCompleteTaskClick = () => {
-      completeTask(task.id, ProjectItemUIType.PAGE);
-      history.push(`/projects/${task.projectId}`);
+    completeTask(task.id, ProjectItemUIType.PAGE);
+    history.push(`/projects/${task.projectId}`);
   };
 
   const taskOperation = () => {
@@ -177,7 +179,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         <Tooltip title='Complete Task'>
           <div>
             <CheckCircleTwoTone twoToneColor='#52c41a'
-                                onClick={() => handleCompleteTaskClick()}/>
+              onClick={() => handleCompleteTaskClick()} />
           </div>
         </Tooltip>
         <Tooltip title='Go to Parent BuJo'>
@@ -187,6 +189,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             />
           </div>
         </Tooltip>
+
       </div>
     );
   };

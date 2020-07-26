@@ -16,6 +16,8 @@ import {
   flattenSharedProject,
 } from '../../pages/projects/projects.pages';
 
+
+
 const { Option } = Select;
 
 type ProjectItemProps = {
@@ -128,7 +130,9 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
         }}
       >
         <div>{getProjectSelections()}</div>
+
       </Modal>
+
     );
   };
 
@@ -143,6 +147,8 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
               </Button>
             </h2>
           </Tooltip>
+
+
           {getModal()}
         </div>
       );
@@ -153,7 +159,10 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
           <PlusOutlined className='rotateIcon' onClick={openModal} />
         </Tooltip>
         {getModal()}
+
+
       </div>
+
     );
   };
 
