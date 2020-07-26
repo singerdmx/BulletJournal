@@ -4,6 +4,7 @@ import quillEmoji from 'quill-emoji';
 import 'quill-emoji/dist/quill-emoji.css';
 import 'react-quill/dist/quill.snow.css';
 import { message } from 'antd';
+import axios from 'axios';
 
 // Custom Undo button icon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
@@ -43,15 +44,12 @@ const apiPostNewsImage = (formData) => {
       'Content-Type': 'multipart/form-data',
     },
   };
-  return axios.post('/api/uploadFile', formdata, uploadConfig);
+  return axios.post('/api/uploadFile', formData, uploadConfig);
 };
 // uploader event handler
 const imageHandler = () => {
-  const input = document.createElement('input');
-  input.setAttribute('type', 'file');
-  input.setAttribute('accept', 'image/*');
-  input.click();
-
+  this.input.click();
+  console.log('start upload');
   input.onchange = async () => {
     const file = input.files[0];
     const formData = new FormData();
@@ -82,7 +80,7 @@ const imageHandler = () => {
     this.quill.setSelection(range.index + 1);
 
     const res = await apiPostNewsImage(formData); // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
-
+    console.log('uploaded');
     // Remove placeholder image
     this.quill.deleteText(range.index, 1);
 
