@@ -34,6 +34,9 @@ public class FcmService {
 
     private static final String TOKEN_REGISTRATION_ERROR = "registration-token-not-registered";
 
+    private static final Notification DEFAULT_NOTIFICATION
+        = Notification.builder().setTitle("Bullet Journal").setBody("You've got a new message.").build();
+
     @Autowired
     private DeviceTokenDaoJpa deviceTokenDaoJpa;
 
@@ -113,9 +116,19 @@ public class FcmService {
     }
 
     private Message getMessageFromParams(FcmMessageParams fcmMessageParams) {
-        return Message.builder()
+        Message.Builder msg = Message.builder()
             .setToken(fcmMessageParams.getToken())
-            .putAllData(fcmMessageParams.getData())
-            .build();
+            .putAllData(fcmMessageParams.getData());
+        if (fcmMessageParams.getNotificationTitle() == null) {
+            msg.setNotification(DEFAULT_NOTIFICATION);
+        } else {
+            msg.setNotification(
+                Notification.builder()
+                    .setTitle(fcmMessageParams.getNotificationTitle())
+                    .setBody(fcmMessageParams.getNotificationBody())
+                    .build()
+            );
+        }
+        return msg.build();
     }
 }

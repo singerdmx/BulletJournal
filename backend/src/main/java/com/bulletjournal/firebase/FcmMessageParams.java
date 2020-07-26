@@ -10,6 +10,8 @@ public class FcmMessageParams {
 
     private String token;
     private Map<String, String> data;
+    private String notificationTitle;
+    private String notificationBody;
 
     public FcmMessageParams(String token, String...kv) {
         Preconditions.checkArgument((kv.length & 1) == 0,
@@ -23,6 +25,22 @@ public class FcmMessageParams {
 
     public String getToken() {
         return token;
+    }
+
+    public String getNotificationTitle() {
+        return notificationTitle;
+    }
+
+    public void setNotificationTitle(String notificationTitle) {
+        this.notificationTitle = notificationTitle;
+    }
+
+    public String getNotificationBody() {
+        return notificationBody;
+    }
+
+    public void setNotificationBody(String notificationBody) {
+        this.notificationBody = notificationBody;
     }
 
     public void setToken(String token) {
