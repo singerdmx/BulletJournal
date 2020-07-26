@@ -48,7 +48,10 @@ const apiPostNewsImage = (formData) => {
 };
 // uploader event handler
 const imageHandler = () => {
-  this.input.click();
+  const input = document.createElement('input');
+  input.setAttribute('type', 'file');
+  input.setAttribute('accept', 'image/*');
+  input.click();
   console.log('start upload');
   input.onchange = async () => {
     const file = input.files[0];
