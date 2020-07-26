@@ -75,17 +75,13 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
     <Container>
       <FloatButton
-        tooltip="Create New"
+        tooltip="Add Content"
         onClick={createHandler}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
       >
         <PlusOutlined />
       </FloatButton>
     </Container>
-    // <Button onClick={createHandler}>
-    //   <PlusCircleTwoTone />
-    //   New
-    // </Button>
   );
 
   const noteEditorElem = (

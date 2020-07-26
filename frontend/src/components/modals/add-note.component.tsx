@@ -12,6 +12,7 @@ import { labelsUpdate } from '../../features/label/actions';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import {onFilterLabel} from "../../utils/Util";
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 const { Option } = Select;
 
 type NoteProps = {
@@ -107,16 +108,16 @@ const AddNote: React.FC<
     );
   }
   return (
-    <Tooltip placement='top' title='Create New Note'>
-      <div className='add-note'>
-        <PlusOutlined
-          style={{ fontSize: 20, cursor: 'pointer' }}
-          onClick={openModal}
-          title='Create New Note'
-        />
+      <Container>
+        <FloatButton
+            tooltip="Add New Note"
+            onClick={openModal}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <PlusOutlined/>
+        </FloatButton>
         {getModal()}
-      </div>
-    </Tooltip>
+      </Container>
   );
 };
 

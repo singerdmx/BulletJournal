@@ -30,6 +30,7 @@ import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { labelsUpdate } from '../../features/label/actions';
 import { Label } from '../../features/label/interface';
 import {onFilterLabel} from "../../utils/Util";
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -290,16 +291,16 @@ const AddTransaction: React.FC<
   }
 
   return (
-    <Tooltip placement='top' title='Create New Transaction'>
-      <div className='add-transaction'>
-        <PlusOutlined
-          style={{ fontSize: 20, cursor: 'pointer' }}
-          onClick={openModal}
-          title='Create New Transaction'
-        />
+      <Container>
+        <FloatButton
+            tooltip="Add New Transaction"
+            onClick={openModal}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <PlusOutlined/>
+        </FloatButton>
         {getModal()}
-      </div>
-    </Tooltip>
+      </Container>
   );
 };
 

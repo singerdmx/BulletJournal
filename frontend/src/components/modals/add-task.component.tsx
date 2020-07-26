@@ -1,43 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Modal,
-  Input,
-  Tooltip,
-  Form,
-  DatePicker,
-  TimePicker,
-  Select,
-  Avatar,
-  AutoComplete,
-  Radio,
-  Button,
-} from 'antd';
-import { useParams } from 'react-router-dom';
-import {
-  PlusOutlined,
-  CheckSquareTwoTone,
-  CloseSquareTwoTone,
-} from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps } from 'react-router';
-import { createTask, updateTaskVisible } from '../../features/tasks/actions';
-import { IState } from '../../store';
+import React, {useEffect, useState} from 'react';
+import {AutoComplete, Avatar, Button, DatePicker, Form, Input, Modal, Radio, Select, TimePicker, Tooltip,} from 'antd';
+import {useParams} from 'react-router-dom';
+import {CheckSquareTwoTone, CloseSquareTwoTone, PlusOutlined,} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {createTask, updateTaskVisible} from '../../features/tasks/actions';
+import {IState} from '../../store';
 import './modals.styles.less';
-import { zones } from '../settings/constants';
-import { Group, User } from '../../features/group/interface';
-import { updateExpandedMyself } from '../../features/myself/actions';
+import {zones} from '../settings/constants';
+import {Group} from '../../features/group/interface';
+import {updateExpandedMyself} from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
-import { ReminderBeforeTaskText } from '../settings/reducer';
-import {
-  convertToTextWithRRule,
-} from '../../features/recurrence/actions';
-import { labelsUpdate } from '../../features/label/actions';
-import { ReminderSetting } from '../../features/tasks/interface';
-import { dateFormat } from '../../features/myBuJo/constants';
-import { Project } from '../../features/project/interface';
-import { Label } from '../../features/label/interface';
-import { getIcon } from '../draggable-labels/draggable-label-list.component';
-import { onFilterAssignees, onFilterLabel } from '../../utils/Util';
+import {ReminderBeforeTaskText} from '../settings/reducer';
+import {convertToTextWithRRule,} from '../../features/recurrence/actions';
+import {labelsUpdate} from '../../features/label/actions';
+import {ReminderSetting} from '../../features/tasks/interface';
+import {dateFormat} from '../../features/myBuJo/constants';
+import {Project} from '../../features/project/interface';
+import {Label} from '../../features/label/interface';
+import {getIcon} from '../draggable-labels/draggable-label-list.component';
+import {onFilterAssignees, onFilterLabel} from '../../utils/Util';
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const currentCountry = currentZone && currentZone.split('/')[0];
@@ -471,16 +455,16 @@ const AddTask: React.FC<
   }
 
   return (
-    <Tooltip placement="top" title="Create New Task">
-      <div className="add-task">
-        <PlusOutlined
-          style={{ fontSize: 20, cursor: 'pointer' }}
-          onClick={openModal}
-          title="Create New Task"
-        />
+      <Container>
+        <FloatButton
+            tooltip="Add New Task"
+            onClick={openModal}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <PlusOutlined/>
+        </FloatButton>
         {getModal()}
-      </div>
-    </Tooltip>
+      </Container>
   );
 };
 

@@ -220,7 +220,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
         </div>
         <Container>
           <FloatButton
-            tooltip="Create New"
+            tooltip="Add Content"
             onClick={createHandler}
             styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
           >
