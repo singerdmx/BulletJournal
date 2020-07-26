@@ -23,6 +23,7 @@ import TaskDetailPage, { TaskProps } from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
 import { getTaskAssigneesPopoverContent } from "../../components/project-item/task-item.component";
+import { Container, Button as FloatButton, lightColors, darkColors } from 'react-floating-action-button'
 
 
 interface TaskPageHandler {
@@ -71,11 +72,19 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   };
 
   const createContentElem = (
-
-    <Button onClick={createHandler}>
-      <PlusCircleTwoTone />
-      New
-    </Button>
+    <Container>
+      <FloatButton
+        tooltip="Create New"
+        onClick={createHandler}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <PlusCircleTwoTone />
+      </FloatButton>
+    </Container>
+    // <Button onClick={createHandler}>
+    //   <PlusCircleTwoTone />
+    //   New
+    // </Button>
   );
 
   const taskEditorElem = (
