@@ -3,6 +3,7 @@ import { Quill } from 'react-quill';
 import quillEmoji from 'quill-emoji';
 import 'quill-emoji/dist/quill-emoji.css';
 import 'react-quill/dist/quill.snow.css';
+import { message } from 'antd';
 
 // Custom Undo button icon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
@@ -54,6 +55,16 @@ const imageHandler = () => {
   input.onchange = async () => {
     const file = input.files[0];
     const formData = new FormData();
+    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+    if (fileSize > 20) {
+      message.error('The file can not be larger than 20MB');
+      return;
+    }
+
+    if (!file.type.match('image.*')) {
+      message.error('The file can only be image');
+      return;
+    }
 
     formData.append('image', file);
 
