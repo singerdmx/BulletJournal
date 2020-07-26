@@ -5,7 +5,6 @@ import { IState } from '../../../../store';
 import { connect } from 'react-redux';
 import { updateStartString } from '../../actions';
 import moment from 'moment';
-import { dateFormat } from '../../../myBuJo/constants';
 
 type StartProps = {
   timezone: string;

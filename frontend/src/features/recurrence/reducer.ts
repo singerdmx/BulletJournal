@@ -1,17 +1,9 @@
-import { createSlice, PayloadAction } from 'redux-starter-kit';
-import RRule, { Frequency } from 'rrule';
-import {
-  Hourly,
-  Daily,
-  YearlyOn,
-  YearlyOnThe,
-  MonthlyOn,
-  MonthlyOnThe,
-  Weekly,
-} from './interface';
-import { MONTHS } from './constants';
+import {createSlice, PayloadAction} from 'redux-starter-kit';
+import RRule, {Frequency} from 'rrule';
+import {Daily, Hourly, MonthlyOn, MonthlyOnThe, Weekly, YearlyOn, YearlyOnThe,} from './interface';
+import {MONTHS} from './constants';
 import moment from 'moment';
-import { dateFormat } from '../myBuJo/constants';
+import {dateFormat} from '../myBuJo/constants';
 
 export type End = {
   count?: any;
@@ -81,14 +73,14 @@ export type RRuleStringFromTask = {
   rruleString: string;
 };
 
+const defaultStartDate = moment(new Date().toLocaleString('fr-CA'), dateFormat).format(dateFormat);
+const defaultStartTime = '00:00';
+const defaultEndDate = moment(new Date().toLocaleString('fr-CA'), dateFormat).format(dateFormat);
+
 let initialState = {
-  startDate: moment(new Date().toLocaleString('fr-CA'), dateFormat).format(
-    dateFormat
-  ),
-  startTime: '00:00',
-  endDate: moment(new Date().toLocaleString('fr-CA'), dateFormat).format(
-    dateFormat
-  ),
+  startDate: defaultStartDate,
+  startTime: defaultStartTime,
+  endDate: defaultEndDate,
   endCount: 1,
   repeatHourly: { interval: 1 } as Hourly,
   repeatDaily: { interval: 1 } as Daily,
@@ -121,7 +113,15 @@ let initialState = {
   start: {},
   repeat: {},
   end: {} as End,
-  rRuleString: '',
+  rRuleString: new RRule({
+    dtstart: moment(
+        new Date(defaultStartDate + 'T' + defaultStartTime + ':00+00:00')
+    ).toDate(),
+    freq: RRule.WEEKLY,
+    interval: 1,
+    byweekday: [],
+    wkst: RRule.SU
+  }).toString(),
   freq: Frequency.WEEKLY,
 };
 
@@ -146,13 +146,12 @@ const slice = createSlice({
       };
 
       state.start = start;
-      console.log('start reducer');
       state.rRuleString = new RRule({
         ...start,
         ...state.repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
-      console.log(state.rRuleString);
     },
 
     updateMonthlyOn: (state, action: PayloadAction<MonthlyOnAction>) => {
@@ -176,13 +175,12 @@ const slice = createSlice({
         end.until = new Date(endDate);
       }
       state.end = end;
-      console.log('end reducer');
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
         ...end,
+        wkst: RRule.SU
       }).toString();
-      console.log(state.rRuleString);
     },
     updateRepeatHourly: (state, action: PayloadAction<RepeatHourlyAction>) => {
       const { repeatHourly } = action.payload;
@@ -190,11 +188,11 @@ const slice = createSlice({
       //update rrule end string here
       const repeat = { freq: RRule.HOURLY, interval: repeatHourly.interval };
       state.repeat = repeat;
-      console.log('hourly reducer');
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRepeatDaily: (state, action: PayloadAction<RepeatDailyAction>) => {
@@ -203,11 +201,11 @@ const slice = createSlice({
       //update rrule end string here
       const repeat = { freq: RRule.DAILY, interval: repeatDaily.interval };
       state.repeat = repeat;
-      console.log('repeatly reducer');
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRepeatYearlyOn: (
@@ -223,11 +221,11 @@ const slice = createSlice({
         bymonthday: repeatYearlyOn.day,
       };
       state.repeat = repeat;
-      console.log('repeat reducer');
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
       console.log(state.rRuleString);
     },
@@ -304,6 +302,7 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRepeatMonthlyOn: (
@@ -319,11 +318,11 @@ const slice = createSlice({
         bymonthday: repeatMonthlyOn.day,
       };
       state.repeat = repeat;
-      console.log('monthly reducer');
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRepeatMonthlyOnThe: (
@@ -399,6 +398,7 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRepeatMonthlyCount: (
@@ -419,6 +419,7 @@ const slice = createSlice({
         ...state.start,
         ...update,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRepeatWeeklyCount: (
@@ -431,11 +432,11 @@ const slice = createSlice({
       //update rrule end string here
       let update = { ...state.repeat, interval: repeatWeeklyCount };
       state.repeat = update;
-      console.log('weekly reducer');
       state.rRuleString = new RRule({
         ...state.start,
         ...update,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRepeatWeekly: (state, action: PayloadAction<RepeatWeeklyAction>) => {
@@ -456,16 +457,15 @@ const slice = createSlice({
         byweekday: byweekday,
       };
       state.repeat = repeat;
-      console.log('repeat weekly reducer');
       state.rRuleString = new RRule({
         ...state.start,
         ...repeat,
         ...state.end,
+        wkst: RRule.SU
       }).toString();
     },
     updateRRuleString: (state, action: PayloadAction<RRuleStringFromTask>) => {
       const { rruleString } = action.payload;
-      console.log('start reducer');
 
       state.rRuleString = rruleString;
       const rule = RRule.fromString(rruleString);

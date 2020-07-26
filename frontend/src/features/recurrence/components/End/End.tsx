@@ -5,7 +5,6 @@ import moment from 'moment';
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
 import { updateEndString } from '../../actions';
-import { dateFormat } from '../../../myBuJo/constants';
 const { Option } = Select;
 
 type EndProps = {
