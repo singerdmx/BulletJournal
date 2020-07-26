@@ -29,7 +29,6 @@ import { ReminderBeforeTaskText } from '../settings/reducer';
 import { labelsUpdate } from '../../features/label/actions';
 import {
   convertToTextWithRRule,
-  convertToTextWithTime,
 } from '../../features/recurrence/actions';
 import { ReminderSetting, Task } from '../../features/tasks/interface';
 import { dateFormat } from '../../features/myBuJo/constants';
@@ -77,12 +76,10 @@ interface TaskEditFormProps {
     recurrenceRule?: string,
     labels?: number[]
   ) => void;
-  updateRruleString: (rrulestr: string) => void;
+  updateRruleString: (task: Task) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
-  convertToTextWithTime: (start: any, repeat: any, end: any) => string;
   timezone: string;
   start: any;
-  repeat: any;
   end: any;
   myself: any;
   before: number;
@@ -123,13 +120,12 @@ const EditTask: React.FC<
 
   useEffect(() => {
     console.log('mount effect');
-    task.recurrenceRule && props.updateRruleString(task.recurrenceRule);
+    task.recurrenceRule && props.updateRruleString(task);
   }, []);
 
   useEffect(() => {
     setRRuleText(convertToTextWithRRule(props.rRuleString));
   }, [props.rRuleString]);
-  console.log(rRuleText);
   const { projectId } = useParams();
 
   useEffect(() => {
@@ -583,7 +579,6 @@ const mapStateToProps = (state: IState) => ({
   group: state.group.group,
   myself: state.myself.username,
   start: state.rRule.start,
-  repeat: state.rRule.repeat,
   end: state.rRule.end,
   rRuleString: state.rRule.rRuleString,
   labelOptions: state.label.labelOptions,
@@ -592,7 +587,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   patchTask,
   updateExpandedMyself,
-  convertToTextWithTime,
   labelsUpdate,
   updateRruleString,
 })(withRouter(EditTask));

@@ -7,23 +7,12 @@ import { updateStartString } from '../../actions';
 import moment from 'moment';
 
 type StartProps = {
-  timezone: string;
   startDate: string;
   startTime: string;
   updateStartString: (startDate: string, startTime: string) => void;
 };
 
 class Start extends React.Component<StartProps> {
-  // componentDidMount = () => {
-  //   const initStartDate = moment(
-  //     new Date().toLocaleString(
-  //       'fr-CA',
-  //       this.props.timezone ? { timeZone: this.props.timezone } : {}
-  //     ),
-  //     dateFormat
-  //   ).format(dateFormat);
-  //   this.props.updateStartString(initStartDate, '00:00');
-  // };
 
   onChange = (date: any, dateString: string) => {
     this.props.updateStartString(dateString, this.props.startTime);
@@ -59,7 +48,6 @@ class Start extends React.Component<StartProps> {
 const mapStateToProps = (state: IState) => ({
   startDate: state.rRule.startDate,
   startTime: state.rRule.startTime,
-  timezone: state.settings.timezone,
 });
 
 export default connect(mapStateToProps, { updateStartString })(Start);

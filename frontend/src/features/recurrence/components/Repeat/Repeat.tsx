@@ -4,20 +4,12 @@ import RepeatMonthly from './RepeatMonthly';
 import RepeatWeekly from './RepeatWeekly';
 import RepeatDaily from './RepeatDaily';
 import RepeatHourly from './RepeatHourly';
-import { Select } from 'antd';
+import {Select} from 'antd';
 //used for redux
-import { IState } from '../../../../store';
-import { connect } from 'react-redux';
+import {IState} from '../../../../store';
+import {connect} from 'react-redux';
 //used for interface
-import {
-  Daily,
-  Hourly,
-  MonthlyOn,
-  MonthlyOnThe,
-  Weekly,
-  YearlyOn,
-  YearlyOnThe,
-} from '../../interface';
+import {MonthlyOn, MonthlyOnThe, YearlyOn, YearlyOnThe,} from '../../interface';
 //used for action
 import {
   updateFreq,
@@ -25,20 +17,19 @@ import {
   updateRepeatHourly,
   updateRepeatMonthlyOn,
   updateRepeatMonthlyOnThe,
-  updateRepeatWeekly,
+  updateRepeatWeeklyCount,
   updateRepeatYearlyOn,
   updateRepeatYearlyOnThe,
   updateStartString,
 } from '../../actions';
-import { Frequency } from 'rrule';
+import {Frequency} from 'rrule';
 
 const { Option } = Select;
 
 type RepeatProps = {
   startDate: string;
   startTime: string;
-  repeatHourly: any;
-  repeatDaily: any;
+  interval: number;
   repeatWeekly: any;
   repeatMonthlyOnThe: any;
   repeatMonthlyOn: any;
@@ -53,9 +44,9 @@ type RepeatProps = {
   updateRepeatYearlyOnThe: (repeatYearlyOnThe: YearlyOnThe) => void;
   updateRepeatMonthlyOn: (repeatMonthlyOn: MonthlyOn) => void;
   updateRepeatMonthlyOnThe: (repeatMonthlyOnThe: MonthlyOnThe) => void;
-  updateRepeatWeekly: (repeatWeekly: Weekly) => void;
-  updateRepeatDaily: (repeatDaily: Daily) => void;
-  updateRepeatHourly: (repeatHourly: Hourly) => void;
+  updateRepeatWeeklyCount: (repeatWeeklyCount: number) => void;
+  updateRepeatDaily: (repeatDaily: number) => void;
+  updateRepeatHourly: (repeatHourly: number) => void;
 };
 
 const frequencies = [
@@ -71,13 +62,27 @@ class Repeat extends React.Component<RepeatProps> {
     super(props);
     this.state = {};
   }
-  //   componentDidMount = () => {
-  //     this.props.updateStartString(this.props.startDate, this.props.startTime);
-  //     this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
-  //   };
 
   onChangeValue = (value: Frequency) => {
     this.props.updateFreq(value);
+    switch (value) {
+      case Frequency.HOURLY:
+        this.props.updateRepeatHourly(1);
+        break;
+      case Frequency.DAILY:
+        this.props.updateRepeatDaily(1);
+        break;
+      case Frequency.WEEKLY:
+        this.props.updateRepeatWeeklyCount(1);
+        break;
+      case Frequency.MONTHLY:
+        this.props.updateRepeatMonthlyOn({day: 1});
+        break;
+      case Frequency.YEARLY:
+        this.props.updateRepeatYearlyOn({month: 'Jan', day: 1});
+        break;
+      default:
+    }
     if (value === Frequency.YEARLY) {
       if (this.props.yearlyOn) {
         this.props.updateRepeatYearlyOn(this.props.repeatYearlyOn);
@@ -90,17 +95,11 @@ class Repeat extends React.Component<RepeatProps> {
       } else {
         this.props.updateRepeatMonthlyOnThe(this.props.repeatMonthlyOnThe);
       }
-    } else if (value === Frequency.WEEKLY) {
-      this.props.updateRepeatWeekly(this.props.repeatWeekly);
-    } else if (value === Frequency.DAILY) {
-      this.props.updateRepeatDaily(this.props.repeatDaily);
-    } else if (value === Frequency.HOURLY) {
-      this.props.updateRepeatHourly(this.props.repeatHourly);
     }
+
   };
 
   render() {
-    console.log(this.props.freq);
     return (
       <div>
         <div
@@ -145,9 +144,8 @@ const mapStateToProps = (state: IState) => ({
   repeatMonthlyOn: state.rRule.repeatMonthlyOn,
   repeatMonthlyOnThe: state.rRule.repeatMonthlyOnThe,
   repeatWeekly: state.rRule.repeatWeekly,
-  repeatDaily: state.rRule.repeatDaily,
-  repeatHourly: state.rRule.repeatHourly,
-  freq: state.rRule.freq,
+  interval: state.rRule.repeat.interval,
+  freq: state.rRule.repeat.freq,
 });
 
 export default connect(mapStateToProps, {
@@ -159,5 +157,5 @@ export default connect(mapStateToProps, {
   updateRepeatHourly,
   updateRepeatMonthlyOn,
   updateRepeatMonthlyOnThe,
-  updateRepeatWeekly,
+  updateRepeatWeeklyCount,
 })(Repeat);

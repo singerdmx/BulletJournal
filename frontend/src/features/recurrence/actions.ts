@@ -1,15 +1,13 @@
 import { actions } from './reducer';
 import {
-  Hourly,
-  Daily,
   YearlyOn,
   YearlyOnThe,
   MonthlyOn,
   MonthlyOnThe,
   Weekly,
 } from './interface';
-import { End } from './reducer';
-import RRule, { Frequency, rrulestr } from 'rrule';
+import RRule, { Frequency } from 'rrule';
+import {Task} from "../tasks/interface";
 
 export const updateFreq = (freq: Frequency) =>
   actions.updateFreq({ freq: freq });
@@ -21,22 +19,20 @@ export const updateStartString = (startDate: string, startTime: string) =>
   });
 
 export const updateEndString = (
-  mode: string,
-  endDate: string,
-  endCount: number
+  endDate: string | null,
+  endCount: number | null
 ) =>
   actions.updateEnd({
-    mode: mode,
     endDate: endDate,
     endCount: endCount,
   });
 
-export const updateRepeatHourly = (repeatHourly: Hourly) =>
+export const updateRepeatHourly = (repeatHourly: number) =>
   actions.updateRepeatHourly({
     repeatHourly: repeatHourly,
   });
 
-export const updateRepeatDaily = (repeatDaily: Daily) =>
+export const updateRepeatDaily = (repeatDaily: number) =>
   actions.updateRepeatDaily({
     repeatDaily: repeatDaily,
   });
@@ -82,8 +78,8 @@ export const updateMonthlyOn = (monthlyOn: boolean) =>
 export const updateYearlyOn = (yearlyOn: boolean) =>
   actions.updateYearlyOn({ yearlyOn: yearlyOn });
 
-export const updateRruleString = (rrulestr: string) =>
-  actions.updateRRuleString({ rruleString: rrulestr });
+export const updateRruleString = (task: Task) =>
+  actions.updateRRuleString({ task: task });
 
 export const convertToTextWithRRule = (rrule: string) => {
   const rule = RRule.fromString(rrule);
@@ -102,16 +98,4 @@ export const convertToTextWithRRule = (rrule: string) => {
     ':' +
     rrule.substr(19, 2);
   return result;
-};
-
-export const convertToTextWithTime = (start: any, repeat: any, end: End) => {
-  let resultString = '';
-  const rRuleFirstPart = new RRule({
-    ...start,
-    ...repeat,
-    ...end,
-  });
-  resultString = rRuleFirstPart.toText();
-
-  return resultString.charAt(0).toUpperCase() + resultString.slice(1);
 };

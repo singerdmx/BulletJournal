@@ -10,7 +10,6 @@ import {
   Avatar,
   AutoComplete,
   Radio,
-  Popover,
   Button,
 } from 'antd';
 import { useParams } from 'react-router-dom';
@@ -30,7 +29,6 @@ import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import { ReminderBeforeTaskText } from '../settings/reducer';
 import {
-  convertToTextWithTime,
   convertToTextWithRRule,
 } from '../../features/recurrence/actions';
 import { labelsUpdate } from '../../features/label/actions';
@@ -77,13 +75,11 @@ interface TaskCreateFormProps {
     labels: number[]
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
-  convertToTextWithTime: (start: any, repeat: any, end: any) => string;
   labelOptions: Label[];
   timezone: string;
   myself: string;
   before: number;
   start: any;
-  repeat: any;
   end: any;
   startTime: string;
   startDate: string;
@@ -497,7 +493,6 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself.username,
   before: state.settings.before,
   start: state.rRule.start,
-  repeat: state.rRule.repeat,
   end: state.rRule.end,
   rRuleString: state.rRule.rRuleString,
   addTaskVisible: state.task.addTaskVisible,
@@ -507,7 +502,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   createTask,
   updateExpandedMyself,
-  convertToTextWithTime,
   updateTaskVisible,
   labelsUpdate,
 })(withRouter(AddTask));

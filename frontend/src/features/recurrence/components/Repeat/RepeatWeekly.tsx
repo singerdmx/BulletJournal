@@ -52,7 +52,7 @@ class RepeatWeekly extends React.Component<RepeatWeeklyProps, SelectState> {
         <div style={{ marginBottom: 24 }}>
           <Input
             prefix='Every'
-            style={{ width: '33%' }}
+            style={{ width: '40%' }}
             value={this.props.repeatWeeklyCount}
             onChange={this.onChangeCount}
             suffix='Week(s)'
@@ -105,7 +105,7 @@ class RepeatWeekly extends React.Component<RepeatWeeklyProps, SelectState> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  repeatWeeklyCount: state.rRule.repeatWeeklyCount,
+  repeatWeeklyCount: state.rRule.repeat.interval,
   repeatWeekly: state.rRule.repeatWeekly
 });
 export default connect(mapStateToProps, {

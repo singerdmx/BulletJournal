@@ -232,7 +232,7 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
             }
             this.recurrenceRule = recurrenceRule;
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Illegal recurrence rule format");
+            throw new IllegalArgumentException("Illegal recurrence rule: " + recurrenceRule);
         }
     }
 

@@ -149,7 +149,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
 const mapStateToProps = (state: IState) => ({
   repeatMonthlyOn: state.rRule.repeatMonthlyOn,
   repeatMonthlyOnThe: state.rRule.repeatMonthlyOnThe,
-  repeatMonthlyCount: state.rRule.repeatMonthlyCount,
+  repeatMonthlyCount: state.rRule.repeat.interval,
   monthlyOn: state.rRule.monthlyOn,
 });
 export default connect(mapStateToProps, {
