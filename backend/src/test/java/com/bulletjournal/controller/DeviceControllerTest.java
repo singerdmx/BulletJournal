@@ -5,14 +5,13 @@ import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.firebase.FcmMessageParams;
 import com.bulletjournal.firebase.FcmService;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
+import com.bulletjournal.repository.DeviceTokenRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.User;
 import com.google.common.collect.Iterables;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import com.google.common.collect.Sets;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +27,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Tests {@link com.bulletjournal.controller.DeviceController}
@@ -54,6 +55,9 @@ public class DeviceControllerTest {
     DeviceTokenDaoJpa deviceTokenDaoJpa;
 
     @Autowired
+    DeviceTokenRepository deviceTokenRepository;
+
+    @Autowired
     UserDaoJpa userDaoJpa;
 
     @Autowired
@@ -72,6 +76,11 @@ public class DeviceControllerTest {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         user1 = userDaoJpa.getByName(USER1);
         user2 = userDaoJpa.getByName(USER2);
+    }
+
+    @After
+    public void tearDown() {
+        deviceTokenDaoJpa.deleteAllTokens();
     }
 
     /**
@@ -115,6 +124,29 @@ public class DeviceControllerTest {
         Assert.assertEquals(
             Iterables.getOnlyElement(deviceTokenDaoJpa.getTokensByUser(USER2)).getToken(),
             EXAMPLE_TOKEN2);
+    }
+
+    /**
+     * Submit token to have [token1, user1] [token2, user2] in DB
+     * Batch get tokens for [user1, user2], should return [token1, token2]
+     */
+    @Test
+    public void testBatchGetTokens() {
+        ResponseEntity<String> response = submitToken(EXAMPLE_TOKEN1, USER1);
+        Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
+        DeviceToken deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
+        Assert.assertEquals(new DeviceToken(user1, EXAMPLE_TOKEN1), deviceToken);
+
+        response = submitToken(EXAMPLE_TOKEN2, USER2);
+        Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
+        deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN2);
+        Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN2), deviceToken);
+        List<DeviceToken> tokens
+            = deviceTokenRepository.findDeviceTokensByUsers(Sets.newHashSet(USER1, USER2));
+        Assert.assertEquals(2, tokens.size());
+        Assert.assertTrue(
+            tokens.stream().map(DeviceToken::getToken).collect(Collectors.toList())
+                .containsAll(Arrays.asList(EXAMPLE_TOKEN1, EXAMPLE_TOKEN2)));
     }
 
     @Test
