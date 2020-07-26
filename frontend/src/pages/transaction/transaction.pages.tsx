@@ -1,18 +1,18 @@
 // react imports
-import React, {useEffect, useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
-import {connect} from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
 // features
-import {Transaction} from '../../features/transactions/interface';
-import {IState} from '../../store';
-import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
-import {deleteTransaction, getTransaction, updateTransactionContents,} from '../../features/transactions/actions';
-import {dateFormat} from '../../features/myBuJo/constants';
+import { Transaction } from '../../features/transactions/interface';
+import { IState } from '../../store';
+import { ProjectItemUIType, ProjectType } from '../../features/project/constants';
+import { deleteTransaction, getTransaction, updateTransactionContents, } from '../../features/transactions/actions';
+import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
 import EditTransaction from '../../components/modals/edit-transaction.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 // antd imports
-import {Avatar, BackTop, Button, Card, Col, Divider, Popconfirm, Row, Statistic, Tooltip,} from 'antd';
+import { Avatar, BackTop, Button, Card, Col, Divider, Popconfirm, Row, Statistic, Tooltip, } from 'antd';
 import {
   AccountBookOutlined,
   DeleteTwoTone,
@@ -20,15 +20,18 @@ import {
   PlusCircleTwoTone,
   SyncOutlined,
   UpSquareOutlined,
+  PlusOutlined
 } from '@ant-design/icons';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 import TransactionContentList from '../../components/content/content-list.component';
-import {Content} from '../../features/myBuJo/interface';
+import { Content } from '../../features/myBuJo/interface';
 import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
+import { Container, Button as FloatButton, lightColors, darkColors } from 'react-floating-action-button'
+
 
 const LocaleCurrency = require('locale-currency');
 
@@ -104,7 +107,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             title={moment(transaction.date, dateFormat).fromNow()}
             value={`${transaction.date} ${
               transaction.time ? transaction.time : ''
-            }`}
+              }`}
             prefix={<AccountBookOutlined />}
           />
         </Card>
@@ -215,10 +218,15 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             contents={contents}
           />
         </div>
-        <Button onClick={createHandler}>
-          <PlusCircleTwoTone />
-          New
-        </Button>
+        <Container>
+          <FloatButton
+            tooltip="Create New"
+            onClick={createHandler}
+            styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+          >
+            <PlusOutlined />
+          </FloatButton>
+        </Container>
       </div>
       <div className='transaction-drawer'>
         <ContentEditorDrawer

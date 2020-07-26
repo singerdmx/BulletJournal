@@ -1,18 +1,18 @@
 // page display contents of notes
 // react imports
-import React, {useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
-import {connect} from 'react-redux';
+import React, { useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
 // features
 //actions
-import {deleteNote, getNote, updateNoteContents,} from '../../features/notes/actions';
+import { deleteNote, getNote, updateNoteContents, } from '../../features/notes/actions';
 
-import {IState} from '../../store';
+import { IState } from '../../store';
 // components
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
-import {Button, Popconfirm, Tooltip} from 'antd';
-import {DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined,} from '@ant-design/icons';
+import { Button, Popconfirm, Tooltip } from 'antd';
+import { DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, PlusOutlined } from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -20,9 +20,11 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
-import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
-import NoteDetailPage, {NoteProps} from './note-detail.pages';
+import { ProjectItemUIType, ProjectType } from '../../features/project/constants';
+import NoteDetailPage, { NoteProps } from './note-detail.pages';
 import LabelManagement from '../project/label-management.compoent';
+import { Container, Button as FloatButton, lightColors, darkColors } from 'react-floating-action-button'
+
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
@@ -70,10 +72,20 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   if (!note) return null;
 
   const createContentElem = (
-    <Button onClick={createHandler}>
-      <PlusCircleTwoTone />
-      New
-    </Button>
+
+    <Container>
+      <FloatButton
+        tooltip="Create New"
+        onClick={createHandler}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <PlusOutlined />
+      </FloatButton>
+    </Container>
+    // <Button onClick={createHandler}>
+    //   <PlusCircleTwoTone />
+    //   New
+    // </Button>
   );
 
   const noteEditorElem = (

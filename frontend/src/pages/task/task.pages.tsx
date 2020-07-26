@@ -9,7 +9,7 @@ import { completeTask, deleteTask, getTask, updateTaskContents } from '../../fea
 import { IState } from '../../store';
 // antd imports
 import { Avatar, Badge, Button, Popconfirm, Popover, Tooltip } from 'antd';
-import { CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined, PlusOutlined } from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -77,7 +77,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         onClick={createHandler}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
       >
-        <PlusCircleTwoTone />
+        <PlusOutlined />
       </FloatButton>
     </Container>
     // <Button onClick={createHandler}>
