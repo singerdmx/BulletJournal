@@ -15,6 +15,7 @@ nginx -c "/Users/xyao/ws/BulletJournal/frontend-dev/nginx.conf"
 ```
 
 (3) Run `../start.sh` to bring up containers except frontend
+Make sure you have run `DOCKER_BUILDKIT=1 docker build -t mwangxx/bulletjournal-backend .` in the backend folder to build lasted image.
 
 (4) Go to folder `../frontend` to start the frontend application in the development mode
 ```bash
