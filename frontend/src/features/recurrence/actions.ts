@@ -110,7 +110,6 @@ export const convertToTextWithTime = (start: any, repeat: any, end: End) => {
     ...start,
     ...repeat,
     ...end,
-    wkst: RRule.SU
   });
   resultString = rRuleFirstPart.toText();
 

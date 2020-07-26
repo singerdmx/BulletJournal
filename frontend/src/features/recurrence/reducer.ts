@@ -120,7 +120,6 @@ let initialState = {
     freq: RRule.WEEKLY,
     interval: 1,
     byweekday: [],
-    wkst: RRule.SU
   }).toString(),
   freq: Frequency.WEEKLY,
 };
@@ -150,7 +149,6 @@ const slice = createSlice({
         ...start,
         ...state.repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
 
@@ -179,7 +177,6 @@ const slice = createSlice({
         ...state.start,
         ...state.repeat,
         ...end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatHourly: (state, action: PayloadAction<RepeatHourlyAction>) => {
@@ -192,7 +189,6 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatDaily: (state, action: PayloadAction<RepeatDailyAction>) => {
@@ -205,7 +201,6 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatYearlyOn: (
@@ -225,7 +220,6 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
       console.log(state.rRuleString);
     },
@@ -302,7 +296,6 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatMonthlyOn: (
@@ -322,7 +315,6 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatMonthlyOnThe: (
@@ -398,7 +390,6 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatMonthlyCount: (
@@ -419,7 +410,6 @@ const slice = createSlice({
         ...state.start,
         ...update,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatWeeklyCount: (
@@ -436,7 +426,6 @@ const slice = createSlice({
         ...state.start,
         ...update,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRepeatWeekly: (state, action: PayloadAction<RepeatWeeklyAction>) => {
@@ -461,7 +450,6 @@ const slice = createSlice({
         ...state.start,
         ...repeat,
         ...state.end,
-        wkst: RRule.SU
       }).toString();
     },
     updateRRuleString: (state, action: PayloadAction<RRuleStringFromTask>) => {
