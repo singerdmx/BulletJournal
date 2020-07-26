@@ -37,6 +37,7 @@ services:
       FCM_ACCOUNT_KEY: "${FCM_ACCOUNT_KEY}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
+      - $HOME/docker/volumes/etc/key:/etc/key
     depends_on:
       database:
         condition: service_healthy
