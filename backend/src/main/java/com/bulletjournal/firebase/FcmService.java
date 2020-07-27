@@ -45,6 +45,8 @@ public class FcmService {
     @Qualifier(APPLICATION_TASK_EXECUTOR_BEAN_NAME)
     private TaskExecutor executor;
 
+    private FirebaseMessaging firebase;
+
     @PostConstruct
     public void initialize() {
         if (System.getenv(FCM_ACCOUNT_KEY) != null) {
@@ -64,6 +66,7 @@ public class FcmService {
         } else {
             LOGGER.warn("FCM account key not set up, failed to initialize FcmService.");
         }
+        this.firebase = FirebaseMessaging.getInstance();
     }
 
     public void sendNotificationToUsers(Collection<String> usernames) {
@@ -76,6 +79,10 @@ public class FcmService {
     }
 
     public void sendAllMessages(List<FcmMessageParams> paramsList) {
+        if (this.firebase == null) {
+            LOGGER.error("FirebaseMessaging not initialized, cannot send message.");
+            return;
+        }
         List<Message> messages
             = paramsList.stream().map(this::getMessageFromParams).collect(Collectors.toList());
         ApiFuture<BatchResponse> future
