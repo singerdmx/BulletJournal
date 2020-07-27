@@ -11,8 +11,8 @@ import { IState } from '../../store';
 // components
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
-import { Button, Popconfirm, Tooltip } from 'antd';
-import { DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, PlusOutlined } from '@ant-design/icons';
+import { Popconfirm, Tooltip } from 'antd';
+import { DeleteTwoTone, SyncOutlined, UpSquareOutlined, PlusOutlined } from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';

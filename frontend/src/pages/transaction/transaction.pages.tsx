@@ -12,12 +12,11 @@ import { dateFormat } from '../../features/myBuJo/constants';
 import EditTransaction from '../../components/modals/edit-transaction.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 // antd imports
-import { Avatar, BackTop, Button, Card, Col, Divider, Popconfirm, Row, Statistic, Tooltip, } from 'antd';
+import { Avatar, BackTop, Card, Col, Divider, Popconfirm, Row, Statistic, Tooltip, } from 'antd';
 import {
   AccountBookOutlined,
   DeleteTwoTone,
   DollarCircleOutlined,
-  PlusCircleTwoTone,
   SyncOutlined,
   UpSquareOutlined,
   PlusOutlined
