@@ -1,6 +1,6 @@
 package com.bulletjournal.redis;
 
-import com.bulletjournal.firebase.FcmService;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.EtagEvent;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
@@ -28,7 +28,7 @@ public class RedisEtagDaoJpa {
     private EtaggableDaos daos;
 
     @Autowired
-    private FcmService fcmService;
+    private MessagingService messagingService;
 
     /**
      * Batch cache a list of etags instance into Redis.
@@ -104,8 +104,8 @@ public class RedisEtagDaoJpa {
             contentIds.addAll(affectedUsernames);
         }
         try {
-        fcmService.sendNotificationToUsers(
-            aggregateMap.getOrDefault(EtagType.NOTIFICATION, Collections.emptySet()));
+            messagingService.sendEtagUpdateNotificationToUsers(
+                aggregateMap.getOrDefault(EtagType.NOTIFICATION, Collections.emptySet()));
         } catch (Exception e) {
             LOGGER.error("Got exception when sending notification: {}", e.toString());
         }

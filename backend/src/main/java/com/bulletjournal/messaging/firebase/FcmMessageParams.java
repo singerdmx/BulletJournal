@@ -1,7 +1,8 @@
-package com.bulletjournal.firebase;
+package com.bulletjournal.messaging.firebase;
 
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ public class FcmMessageParams {
     private String notificationTitle;
     private String notificationBody;
 
-    public FcmMessageParams(String token, String...kv) {
+    public FcmMessageParams(String token, String... kv) {
         Preconditions.checkArgument((kv.length & 1) == 0,
             "Argument kv must be Key-Value pairs");
         this.token = token;
@@ -21,6 +22,16 @@ public class FcmMessageParams {
         for (int i = 0; i < kv.length; i += 2) {
             data.put(kv[i], kv[i + 1]);
         }
+    }
+
+    public FcmMessageParams(
+        String token,
+        Pair<String, String> notification,
+        String... kv
+    ) {
+        this(token, kv);
+        this.notificationTitle = notification.getLeft();
+        this.notificationBody = notification.getRight();
     }
 
     public String getToken() {

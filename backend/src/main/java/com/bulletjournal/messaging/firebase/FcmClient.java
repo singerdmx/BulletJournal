@@ -1,7 +1,6 @@
-package com.bulletjournal.firebase;
+package com.bulletjournal.messaging.firebase;
 
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
-import com.bulletjournal.repository.models.DeviceToken;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutureCallback;
 import com.google.api.core.ApiFutures;
@@ -15,21 +14,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME;
 
-@Service
-public class FcmService {
+@Component
+public class FcmClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FcmService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FcmClient.class);
 
     private static final String FCM_ACCOUNT_KEY = "FCM_ACCOUNT_KEY";
 
@@ -67,15 +64,6 @@ public class FcmService {
         } else {
             LOGGER.warn("FCM account key not set up, failed to initialize FcmService.");
         }
-    }
-
-    public void sendNotificationToUsers(Collection<String> usernames) {
-        LOGGER.info("Sending notification to users: {}", usernames);
-        Set<DeviceToken> deviceTokens = deviceTokenDaoJpa.getTokensByUsers(usernames);
-        List<FcmMessageParams> params = deviceTokens.stream()
-            .map(token -> new FcmMessageParams(token.getToken(), "type", "Notification"))
-            .collect(Collectors.toList());
-        sendAllMessages(params);
     }
 
     public void sendAllMessages(List<FcmMessageParams> paramsList) {

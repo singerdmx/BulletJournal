@@ -2,8 +2,8 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.AddDeviceTokenParams;
 import com.bulletjournal.controller.utils.TestHelpers;
-import com.bulletjournal.firebase.FcmMessageParams;
-import com.bulletjournal.firebase.FcmService;
+import com.bulletjournal.messaging.firebase.FcmMessageParams;
+import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.DeviceTokenRepository;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -61,7 +61,7 @@ public class DeviceControllerTest {
     UserDaoJpa userDaoJpa;
 
     @Autowired
-    FcmService fcmService;
+    FcmClient fcmClient;
 
     private User user1;
 
@@ -160,7 +160,7 @@ public class DeviceControllerTest {
             "ExampleKey",
             "ExampleValue"
         );
-        fcmService.sendAllMessages(Arrays.asList(params));
+        fcmClient.sendAllMessages(Arrays.asList(params));
         Thread.sleep(5000);
     }
 
