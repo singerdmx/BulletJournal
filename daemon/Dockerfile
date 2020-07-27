@@ -9,12 +9,12 @@ WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
 COPY servers/grpc/. ./servers/grpc/.
 COPY protobuf/. ./protobuf/.
 COPY go.mod .
-COPY vendor/. ./vendor/.
 
 # Build the grpc command inside the container.
 RUN apk update && \
     apk add git protobuf && \
-    go get -u github.com/golang/protobuf/protoc-gen-go
+    go get -u github.com/golang/protobuf/protoc-gen-go && \
+    go mod vendor
 
 RUN go build -mod=vendor -o /go/bin/hello-server servers/grpc/main.go
 
