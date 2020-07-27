@@ -58,6 +58,7 @@ public class FcmService {
                     .build();
                 if (FirebaseApp.getApps().isEmpty()) {
                     FirebaseApp.initializeApp(options);
+                    this.firebase = FirebaseMessaging.getInstance();
                     LOGGER.info("Firebase application has been initialized");
                 }
             } catch (IOException e) {
@@ -66,7 +67,6 @@ public class FcmService {
         } else {
             LOGGER.warn("FCM account key not set up, failed to initialize FcmService.");
         }
-        this.firebase = FirebaseMessaging.getInstance();
     }
 
     public void sendNotificationToUsers(Collection<String> usernames) {
@@ -86,7 +86,7 @@ public class FcmService {
         List<Message> messages
             = paramsList.stream().map(this::getMessageFromParams).collect(Collectors.toList());
         ApiFuture<BatchResponse> future
-            = FirebaseMessaging.getInstance().sendAllAsync(messages);
+            = firebase.sendAllAsync(messages);
         ApiFutures.addCallback(future, new ApiFutureCallback<BatchResponse>() {
             @Override
             public void onFailure(Throwable t) {
@@ -108,8 +108,8 @@ public class FcmService {
         for (int i = 0; i < responses.size(); ++i) {
             SendResponse response = responses.get(i);
             if (!response.isSuccessful()) {
-                LOGGER.warn("Message {} failed to send, error: {}",
-                    messages.get(i), response.getException().getErrorCode());
+                LOGGER.warn("Failed to send Message with Error: '{}', message content: '{}'",
+                    response.getException().getErrorCode(), messages.get(i));
                 if (response.getException().getErrorCode().equals(TOKEN_REGISTRATION_ERROR)) {
                     String invalidToken = messages.get(i).getToken();
                     if (deviceTokenDaoJpa.deleteToken(invalidToken)) {
