@@ -9,14 +9,15 @@ WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
 COPY servers/grpc/. ./servers/grpc/.
 COPY protobuf/. ./protobuf/.
 COPY go.mod .
+COPY Makefile .
 
 # Build the grpc command inside the container.
 RUN apk update && \
-    apk add git protobuf && \
+    apk add git protobuf make && \
     go get -u github.com/golang/protobuf/protoc-gen-go && \
     go mod vendor
 
-RUN go build -mod=vendor -o /go/bin/hello-server servers/grpc/main.go
+RUN GOOS=linux TARGET=/go/bin make build
 
 # Run the grpc command by default when the container starts.
 ENTRYPOINT [ "/go/bin/hello-server" ]

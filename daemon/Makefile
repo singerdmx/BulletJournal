@@ -10,7 +10,7 @@ generate-grpc-stub:
 .PHONY: hello-server
 hello-server:
 	GOOS=${GOOS} GOARCH=${GOARCH} go build -mod=vendor -o ${TARGET}/hello-server servers/grpc/main.go
-	chmod a+x target/hello-server
+	chmod a+x ${TARGET}/hello-server
 
 .PHONY: clean
 clean:
