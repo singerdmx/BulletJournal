@@ -111,11 +111,10 @@ public class Reminder {
 
     private void scheduleReminderRecords(Pair<ZonedDateTime, ZonedDateTime> interval) {
         taskDaoJpa.getRemindingTasks(interval.getFirst(), interval.getSecond()).forEach((k, v) -> {
-            if (!concurrentHashMap.containsKey(k)) {
-                LOGGER.info("Schedule New job" + k.toString());
-                executorService.schedule(() -> this.process(k),
-                        k.getTimestampSecond() - ZonedDateTime.now().toEpochSecond() - SCHEDULE_BUFF_SECONDS,
-                        TimeUnit.SECONDS);
+            long delay = k.getTimestampSecond() - ZonedDateTime.now().toEpochSecond() - SCHEDULE_BUFF_SECONDS;
+            if (!concurrentHashMap.containsKey(k) && delay > 0) {
+                LOGGER.info("Schedule New Job:" + k.toString() + "\t delay=" + delay);
+                executorService.schedule(() -> this.process(k), delay, TimeUnit.SECONDS);
                 concurrentHashMap.put(k, v);
             }
         });

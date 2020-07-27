@@ -41,7 +41,7 @@ public class DaoHelper {
         } else {
             List<Task> recurringTasks = getRecurringTask(task, startTime, endTime);
             recurringTasks.forEach(t -> {
-                records.add(new ReminderRecord(task.getId(), task.getReminderDateTime().getTime()));
+                records.add(new ReminderRecord(t.getId(), t.getReminderDateTime().getTime()));
             });
         }
         return records;
