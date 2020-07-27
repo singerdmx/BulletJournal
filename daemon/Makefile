@@ -1,3 +1,7 @@
+GOOS ?= darwin
+GOARCH ?= amd64
+TARGET ?= target
+
 .PHONY: generate-grpc-stub
 generate-grpc-stub:
 	protoc --go_out=plugins=grpc,paths=source_relative:. protobuf/grpc/types/hello.proto
@@ -5,12 +9,12 @@ generate-grpc-stub:
 
 .PHONY: hello-server
 hello-server:
-	go build -mod=vendor -o target/hello-server servers/grpc/main.go
+	GOOS=${GOOS} GOARCH=${GOARCH} go build -mod=vendor -o ${TARGET}/hello-server servers/grpc/main.go
 	chmod a+x target/hello-server
 
 .PHONY: clean
 clean:
-	rm -rf target
+	rm -rf ${TARGET}
 
 .PHONY: build
 build: hello-server
