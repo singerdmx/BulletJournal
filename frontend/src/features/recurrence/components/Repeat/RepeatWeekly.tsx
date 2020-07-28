@@ -50,13 +50,7 @@ class RepeatWeekly extends React.Component<RepeatWeeklyProps, SelectState> {
     return (
       <div style={{}}>
         <div style={{ marginBottom: 24 }}>
-          {/* <Input
-            prefix='Every'
-            style={{ width: '40%' }}
-            value={this.props.repeatWeeklyCount}
-            onChange={this.onChangeCount}
-            suffix='Week(s)'
-          /> */}
+
 
           <span>Every</span>
           {'  '}
