@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox, Input } from 'antd';
+import { Checkbox, InputNumber } from 'antd';
 //used for redux
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
@@ -19,8 +19,8 @@ type SelectState = {};
 
 class RepeatWeekly extends React.Component<RepeatWeeklyProps, SelectState> {
   onChangeCount = (e: any) => {
-    let update = parseInt(e.target.value ? e.target.value : 0);
-    if (isNaN(update)) update = 0;
+    let update = e >= 1 ? e : 1;
+
     this.props.updateRepeatWeeklyCount(update);
   };
 
@@ -50,13 +50,23 @@ class RepeatWeekly extends React.Component<RepeatWeeklyProps, SelectState> {
     return (
       <div style={{}}>
         <div style={{ marginBottom: 24 }}>
-          <Input
+          {/* <Input
             prefix='Every'
             style={{ width: '40%' }}
             value={this.props.repeatWeeklyCount}
             onChange={this.onChangeCount}
             suffix='Week(s)'
+          /> */}
+
+          <span>Every</span>
+          {'  '}
+          <InputNumber
+            style={{ width: '60px' }}
+            value={this.props.repeatWeeklyCount}
+            onChange={this.onChangeCount}
           />
+          {'  '}
+          <span>Week(s)</span>
         </div>
 
         <div style={{ display: 'flex' }}>

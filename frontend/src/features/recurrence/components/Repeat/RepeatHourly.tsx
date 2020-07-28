@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'antd';
+import { InputNumber } from 'antd';
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
 import { updateRepeatHourly } from '../../actions';
@@ -11,20 +11,25 @@ type RepeatHourlyProps = {
 
 class RepeatHourly extends React.Component<RepeatHourlyProps> {
   onChange = (event: any) => {
-    let updateInterval = parseInt(event.target.value ? event.target.value : 1);
-    if (isNaN(updateInterval)) updateInterval = 1;
-    this.props.updateRepeatHourly(updateInterval);
+    if (isNaN(event)) {
+      event = 1;
+    }
+    this.props.updateRepeatHourly(event);
   };
 
   render() {
     return (
-      <Input
-        prefix='Every '
-        style={{ width: '40%' }}
-        value={this.props.repeatHourly}
-        onChange={this.onChange}
-        suffix='Hour(s)'
-      />
+      <div>
+        <span>Every</span>
+        {'  '}
+        <InputNumber
+          style={{ width: '60px' }}
+          value={this.props.repeatHourly}
+          onChange={this.onChange}
+        />
+        {'  '}
+        <span>Hour(s)</span>
+      </div>
     );
   }
 }

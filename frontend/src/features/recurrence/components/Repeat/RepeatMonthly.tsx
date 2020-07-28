@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, Input, Radio } from 'antd';
+import { Select, InputNumber, Radio } from 'antd';
 import { range } from 'lodash';
 import { WHICHS, DAYS } from '../../constants/index';
 //used for redux
@@ -48,8 +48,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
   };
 
   onChangeCount = (e: any) => {
-    let update = parseInt(e.target.value ? e.target.value : 0);
-    if (isNaN(update)) update = 0;
+    let update = e >= 1 ? e : 1;
     this.props.updateRepeatMonthlyCount(update);
   };
 
@@ -80,13 +79,16 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
     return (
       <div style={{ display: 'flex' }}>
         <div style={{ marginBottom: 24 }}>
-          <Input
-            prefix="Every"
-            style={{ width: '90%' }}
-            onChange={this.onChangeCount}
+
+          <span>Every</span>
+          {'  '}
+          <InputNumber
+            style={{ width: '60px' }}
             value={this.props.repeatMonthlyCount}
-            suffix="Month(s)"
+            onChange={this.onChangeCount}
           />
+          {'  '}
+          <span>Month(s)</span>
         </div>
 
         <Radio.Group
