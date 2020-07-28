@@ -1,5 +1,5 @@
 import React from 'react';
-import { Quill } from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill';
 import quillEmoji from 'quill-emoji';
 import 'quill-emoji/dist/quill-emoji.css';
 import 'react-quill/dist/quill.snow.css';
@@ -29,16 +29,18 @@ const CustomRedo = () => (
     />
   </svg>
 );
+// // Undo and redo functions for Custom Toolbar
+// function undoChange(quillRef : ReactQuill) {
+//   const editor = quillRef.getEditor();
 
-// Undo and redo functions for Custom Toolbar
-function undoChange() {
-  this.quill.history.undo();
-}
-function redoChange() {
-  this.quill.history.redo();
-}
+//   editor.history.undo();
+// }
+// function redoChange(quillRef : ReactQuill) {
+//   const editor = quillRef.getEditor();
+//   editor.history.redo();
+// }
 
-const apiPostNewsImage = (formData) => {
+const apiPostNewsImage = (formData: FormData) => {
   const uploadConfig = {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -47,17 +49,20 @@ const apiPostNewsImage = (formData) => {
   return axios.post('/api/uploadFile', formData, uploadConfig);
 };
 // uploader event handler
-const imageHandler = () => {
+export const imageHandler = (quillRef: ReactQuill | null) => {
+  console.log('uploading');
+  console.log(quillRef);
+  if (!quillRef) return;
+  const editor = quillRef.getEditor();
   const input = document.createElement('input');
   input.setAttribute('type', 'file');
   input.setAttribute('accept', 'image/*');
   input.click();
   console.log('start upload');
   input.onchange = async () => {
-    const file = input.files[0];
+    const file = input.files![0];
     const formData = new FormData();
-    const fileSize = (file.size / 1024 / 1024).toFixed(2);
-    if (fileSize > 20) {
+    if (file.size > 20 * 1024 * 1024) {
       message.error('The file can not be larger than 20MB');
       return;
     }
@@ -70,26 +75,14 @@ const imageHandler = () => {
     formData.append('image', file);
 
     // Save current cursor state
-    const range = this.quill.getSelection(true);
-
-    // Insert temporary loading placeholder image
-    this.quill.insertEmbed(
-      range.index,
-      'image',
-      `${window.location.origin}/images/loaders/placeholder.gif`
-    );
-
-    // Move cursor to right side of image (easier to continue typing)
-    this.quill.setSelection(range.index + 1);
+    const range = editor.getSelection(true);
 
     const res = await apiPostNewsImage(formData); // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
-    console.log('uploaded');
-    // Remove placeholder image
-    this.quill.deleteText(range.index, 1);
+    const link = res.data;
 
     // Insert uploaded image
     // this.quill.insertEmbed(range.index, 'image', res.body.image);
-    this.quill.insertEmbed(range.index, 'image', res);
+    editor.insertEmbed(range.index, 'image', link);
   };
 };
 
@@ -126,11 +119,7 @@ Quill.register(Font, true);
 export const modules = {
   toolbar: {
     container: '#toolbar',
-    handlers: {
-      undo: undoChange,
-      redo: redoChange,
-      img: imageHandler,
-    },
+    handlers: {},
   },
   'emoji-toolbar': true,
   'emoji-shortname': true,
@@ -141,29 +130,6 @@ export const modules = {
     userOnly: true,
   },
 };
-
-// Formats objects for setting up the Quill editor
-export const formats = [
-  'header',
-  'font',
-  'size',
-  'bold',
-  'italic',
-  'underline',
-  'align',
-  'strike',
-  'script',
-  'blockquote',
-  'background',
-  'list',
-  'bullet',
-  'indent',
-  'link',
-  'image',
-  'emoji',
-  'color',
-  'code-block',
-];
 
 // Quill Toolbar component
 export const QuillToolbar = () => (

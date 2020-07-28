@@ -1,10 +1,10 @@
 // a editor component for taking and update note
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Form, Button, message } from 'antd';
 import { connect } from 'react-redux';
-import ReactQuill from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import EditorToolbar, { modules, formats } from "./content-editor-toolbar";
+import EditorToolbar, { modules } from './content-editor-toolbar';
 import {
   createContent as createNoteContent,
   patchContent as patchNoteContent,
@@ -19,7 +19,6 @@ import {
 } from '../../features/transactions/actions';
 import { Content } from '../../features/myBuJo/interface';
 import { ContentType } from '../../features/myBuJo/constants';
-
 import axios from 'axios';
 
 type ContentEditorProps = {
@@ -57,7 +56,65 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   // get hook of form from ant form
   const [form] = Form.useForm();
   const isEdit = !!content;
-  const [editorContent, setEditorContent] = useState(content ? JSON.parse(content.text)['delta'] : undefined);
+  const [editorContent, setEditorContent] = useState(
+    content ? JSON.parse(content.text)['delta'] : ''
+  );
+  const quillRef = useRef<ReactQuill>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (error.length < 1) return;
+    message.error(error);
+    return () => {
+      setError('');
+    };
+  }, [error]);
+
+  const apiPostNewsImage = (formData: FormData) => {
+    const uploadConfig = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    return axios.post('/api/uploadFile', formData, uploadConfig);
+  };
+  const imageUploader = () => {
+    if (!quillRef) return;
+    const editor = quillRef.current!.getEditor();
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+    console.log('start upload');
+    input.onchange = async () => {
+      const file = input.files![0];
+      const formData = new FormData();
+      if (file.size > 20 * 1024 * 1024) {
+        setError('The file can not be larger than 20MB');
+        return;
+      }
+
+      if (!file.type.match('image.*')) {
+        setError('The file can only be image');
+        return;
+      }
+
+      formData.append('image', file);
+
+      // Save current cursor state
+      const range = editor.getSelection(true);
+      try {
+        const res = await apiPostNewsImage(formData); // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
+        const link = res.data;
+        editor.insertEmbed(range.index, 'image', link);
+      } catch (e) {
+        // message.error(e.response);
+        console.log(e.response.data.message);
+        setError(e.response.toString());
+      }
+    };
+  };
+  modules.toolbar.handlers = { image: imageUploader };
 
   //general create content function
   const createContentCall: { [key in ContentType]: Function } = {
@@ -111,67 +168,34 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     }
   };
 
-  const handleChange = (content: string, delta: any, source: any, editor: any) => {
-    setEditorContent({ 'delta': editor.getContents(), '###html###': editor.getHTML() });
+  const handleChange = (
+    content: string,
+    delta: any,
+    source: any,
+    editor: any
+  ) => {
+    setEditorContent({
+      delta: editor.getContents(),
+      '###html###': editor.getHTML(),
+    });
   };
-
-  const validateFile = (file: File) => {
-    return file.size < 20 * 1024 * 1024; //20MB
-  };
-
-  const handleUpload = (param: any) => {
-    const formdata = new FormData();
-    formdata.append('file', param.file);
-    const uploadConfig = {
-      onUploadProgress: function (progressEvent: any) {
-        let percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
-        param.progress(percentCompleted);
-      },
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    };
-
-    axios
-      .post('/api/uploadFile', formdata, uploadConfig)
-      .then((res) => {
-        console.log(res.data);
-        param.success({
-          url: res.data,
-          meta: {
-            id: 'xxx',
-            title: param.file.name,
-            alt: '',
-            loop: true,
-            autoPlay: false,
-            controls: true,
-            poster: 'http://xxx/xx.png',
-          },
-        });
-      })
-      .catch((err) => {
-        param.error({
-          msg: err.message,
-        });
-      });
-  };
+  console.log(modules);
 
   return (
     <Form
       form={form}
       onFinish={handleFormSubmit}
+      initialValues={{ editor: editorContent }}
     >
-      <Form.Item>
-        <div className='content-editor'>
+      <Form.Item name="editor">
+        <div className="content-editor">
           <EditorToolbar />
           <ReactQuill
-            theme='snow'
-            defaultValue={editorContent}
+            value={editorContent}
+            ref={quillRef}
+            theme="snow"
             onChange={handleChange}
             modules={modules}
-            formats={formats}
           />
         </div>
       </Form.Item>

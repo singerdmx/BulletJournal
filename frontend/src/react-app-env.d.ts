@@ -13,5 +13,6 @@ interface Window {
   Stripe: any;
 }
 
-declare module '*.ico'
-declare module 'react-floating-action-button'
+declare module '*.ico';
+declare module 'react-floating-action-button';
+declare module 'quill-emoji';
