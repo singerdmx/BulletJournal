@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Button, Form, Input, Modal, Select, Tooltip } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Avatar, Button, Form, Input, Modal, Select, Tooltip} from 'antd';
 import {
   AccountBookOutlined,
   CarryOutOutlined,
@@ -7,14 +7,15 @@ import {
   FolderAddOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { GroupsWithOwner } from '../../features/group/interface';
-import { createProjectByName } from '../../features/project/actions';
-import { updateGroups } from '../../features/group/actions';
-import { ProjectType, toProjectType } from '../../features/project/constants';
-import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { History } from 'history';
+import {connect} from 'react-redux';
+import {GroupsWithOwner} from '../../features/group/interface';
+import {createProjectByName} from '../../features/project/actions';
+import {updateGroups} from '../../features/group/actions';
+import {ProjectType, toProjectType} from '../../features/project/constants';
+import {IState} from '../../store';
+import {Project} from '../../features/project/interface';
+import {History} from 'history';
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 
 import './modals.styles.less';
 
@@ -213,6 +214,19 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
           {getModal()}
         </div>
       );
+    }
+
+    if (props.mode === 'float') {
+      return <Container>
+        <FloatButton
+            tooltip="Add New BuJo"
+            onClick={openModal}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <PlusOutlined/>
+        </FloatButton>
+        {getModal()}
+      </Container>
     }
 
     return (

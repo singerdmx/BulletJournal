@@ -49,9 +49,12 @@ public class SystemControllerTest {
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
 
+    private RequestParams requestParams;
+
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @After
@@ -61,10 +64,9 @@ public class SystemControllerTest {
     @Test
     public void testRemindingTask() throws Exception {
         // Create default testing group
-        Group group = createGroup();
+        Group group = TestHelpers.createGroup(requestParams, sampleUsers[0], "Group_SystemControl");
 
-        Project p1 = createProject("p_SystemControl_Task", group, ProjectType.TODO);
-
+        Project p1 = TestHelpers.createProject(requestParams, sampleUsers[0], "p_SystemControl_task", group, ProjectType.TODO);
         Task t1 = createRemindingTask(p1, "T1", 0,
                 ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
         Task t2 = createRemindingTask(p1, "T2", 1,
@@ -146,23 +148,6 @@ public class SystemControllerTest {
             sleep(2000);
         }
         assertTrue(flag);
-    }
-
-    private Task createTask(
-            Project project, CreateTaskParams params
-    ) {
-        ResponseEntity<Task> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(params, sampleUsers[0]),
-                Task.class,
-                project.getId());
-        Task created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals(params.getName(), created.getName());
-        assertEquals(project.getId(), created.getProjectId());
-        return created;
     }
 
     private String getNotificationsEtag() {
@@ -310,45 +295,6 @@ public class SystemControllerTest {
         assertNotNull(created);
         assertEquals(name, created.getName());
         assertEquals(project.getId(), created.getProjectId());
-        return created;
-    }
-
-    private Group createGroup() {
-        CreateGroupParams group = new CreateGroupParams("Group_SystemControl");
-
-        ResponseEntity<Group> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(group, sampleUsers[0]),
-                Group.class);
-        Group created = response.getBody();
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals("Group_SystemControl", created.getName());
-        assertEquals("Michael_Zhou", created.getOwner().getName());
-
-        return created;
-    }
-
-    private Project createProject(String projectName, Group g, ProjectType type) {
-        CreateProjectParams project = new CreateProjectParams(
-                projectName, type, "d15", g.getId());
-
-        ResponseEntity<Project> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(project, sampleUsers[0]),
-                Project.class);
-        Project created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals(projectName, created.getName());
-        assertEquals("Michael_Zhou", created.getOwner().getName());
-        assertEquals(type, created.getProjectType());
-        assertEquals("Group_SystemControl", created.getGroup().getName());
-        assertEquals("Michael_Zhou", created.getGroup().getOwner().getName());
-        assertEquals("d15", created.getDescription());
         return created;
     }
 

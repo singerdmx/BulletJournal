@@ -12,12 +12,12 @@ go mod init github.com/BulletJournal/daemon
 go mod vendor
 ```
 
-If needed, pull dependencies that are updated in your go code
+If needed, please pull dependencies that are updated in your go code
 ```
 go mod vendor
 ```
 
-Build grpc server written in go code
+Build grpc server written in go code for macOS
 ```
 make clean build
 ```
@@ -35,4 +35,9 @@ Right click and run daemon/clients/grpc/main.go
 Kill grpc server
 ```
 control+c
+```
+
+Build grpc server in bin directory for linux platform
+```
+make clean build GOOS=linux TARGET=bin
 ```

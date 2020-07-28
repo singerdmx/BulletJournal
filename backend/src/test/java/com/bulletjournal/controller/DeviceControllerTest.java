@@ -2,8 +2,10 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.AddDeviceTokenParams;
 import com.bulletjournal.controller.utils.TestHelpers;
-import com.bulletjournal.firebase.FcmMessageParams;
-import com.bulletjournal.firebase.FcmService;
+import com.bulletjournal.messaging.firebase.FcmClient;
+import com.bulletjournal.messaging.firebase.FcmMessageParams;
+import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
+import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.DeviceTokenRepository;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -11,6 +13,8 @@ import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.User;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.mailjet.client.MailjetResponse;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -28,6 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -61,7 +66,10 @@ public class DeviceControllerTest {
     UserDaoJpa userDaoJpa;
 
     @Autowired
-    FcmService fcmService;
+    FcmClient fcmClient;
+
+    @Autowired
+    MailjetEmailClient mailjetEmailClient;
 
     private User user1;
 
@@ -160,7 +168,7 @@ public class DeviceControllerTest {
             "ExampleKey",
             "ExampleValue"
         );
-        fcmService.sendAllMessages(Arrays.asList(params));
+        fcmClient.sendAllMessages(Arrays.asList(params));
         Thread.sleep(5000);
     }
 
@@ -173,5 +181,23 @@ public class DeviceControllerTest {
             String.class
         );
         return response;
+    }
+
+    @Test
+    @Ignore
+    public void testEmail() throws Exception {
+        MailjetEmailParams params = new MailjetEmailParams(
+            Arrays.asList(new ImmutablePair<>("Will", "eg@gmail.com")),
+            "TestSubject", "TestContentText");
+        MailjetEmailParams params2 = new MailjetEmailParams(
+            Arrays.asList(new ImmutablePair<>("Will2", "eg@gmail.com")),
+            "TestSubject2", "TestContentText2");
+        List<Future<MailjetResponse>> ret
+            = mailjetEmailClient.sendAllEmailAsync(Arrays.asList(params, params2));
+        LOGGER.info("reached here first");
+        for (Future<MailjetResponse> future : ret) {
+            MailjetResponse response = future.get();
+            LOGGER.info("response: {}", response);
+        }
     }
 }

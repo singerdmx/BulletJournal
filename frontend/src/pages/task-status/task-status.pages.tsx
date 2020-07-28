@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 
 import './task-status.styles.less';
-import { useHistory, useParams } from 'react-router-dom';
-import { BackTop, Collapse, Tooltip } from 'antd';
-import {
-  CaretRightOutlined,
-  SyncOutlined,
-  UpSquareOutlined,
-} from '@ant-design/icons';
-import { IState } from '../../store';
-import { getTasksByOrder } from '../../features/tasks/actions';
-import { connect } from 'react-redux';
-import { Task, TaskStatus } from '../../features/tasks/interface';
-import { ProjectItemUIType } from '../../features/project/constants';
+import {useHistory, useParams} from 'react-router-dom';
+import {BackTop, Collapse, Tooltip} from 'antd';
+import {CaretRightOutlined, SyncOutlined, UpSquareOutlined, FieldTimeOutlined} from '@ant-design/icons';
+import {IState} from '../../store';
+import {getTasksByAssignee, getTasksByOrder} from '../../features/tasks/actions';
+import {connect} from 'react-redux';
+import {Task, TaskStatus} from '../../features/tasks/interface';
+import {ProjectItemUIType} from '../../features/project/constants';
 import TaskItem from '../../components/project-item/task-item.component';
+import TasksByAssignee from "../../components/modals/tasks-by-assignee.component";
+import {User} from "../../features/group/interface";
+import TasksByOrder from "../../components/modals/tasks-by-order.component";
 
 const { Panel } = Collapse;
 
@@ -26,15 +25,21 @@ type TaskStatusProps = {
     startDate?: string,
     endDate?: string
   ) => void;
+  getTasksByAssignee: (projectId: number, assignee: string) => void;
 };
 
 const TaskStatusPage: React.FC<TaskStatusProps> = ({
   getTasksByOrder,
   timezone,
   tasksByOrder,
+  getTasksByAssignee
 }) => {
   const { projectId } = useParams();
   const history = useHistory();
+  const [completeTasksShown, setCompleteTasksShown] = useState(false);
+  const [tasksByUsersShown, setTasksByUsersShown] = useState(false);
+  const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
+  const [assignee, setAssignee] = useState<User | undefined>(undefined);
 
   const getTasksByStatus = () => {
     if (!projectId) {
@@ -75,6 +80,30 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
     }
   });
 
+  //by user modal
+  const handleGetTasksByAssignee = (u: User) => {
+    if (!projectId) {
+      return;
+    }
+    setTasksByUsersShown(true);
+    setAssignee(u);
+    // update tasks
+   getTasksByAssignee(parseInt(projectId), u.name);
+  };
+
+  const handleGetTasksByOrder = () => {
+    if (!projectId) {
+      return;
+    }
+    setTasksByOrderShown(true);
+    getTasksByOrder(
+        parseInt(projectId),
+        timezone,
+        undefined,
+        undefined
+    );
+  };
+
   const getPanel = (status: TaskStatus | undefined, tasks: Task[]) => {
     if (tasks.length === 0) {
       return null;
@@ -98,9 +127,11 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
                 task={task}
                 type={ProjectItemUIType.ORDER}
                 readOnly={false}
-                inProject={false}
+                inProject={true}
                 inModal={false}
                 isComplete={false}
+                showModal={handleGetTasksByAssignee}
+                showOrderModal={handleGetTasksByOrder}
                 completeOnlyOccurrence={false}
               />
             </div>
@@ -115,6 +146,11 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
       <BackTop />
 
       <div className="task-operation">
+        <Tooltip title='Tasks Ordered by Due Date Time'>
+          <span>
+            <FieldTimeOutlined onClick={handleGetTasksByOrder}/>
+          </span>
+        </Tooltip>
         <Tooltip title="Refresh">
           <span>
             <SyncOutlined onClick={getTasksByStatus} />
@@ -149,6 +185,21 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
           {getPanel(undefined, tasks)}
         </Collapse>
       </div>
+      <div>
+        <TasksByAssignee
+            assignee={assignee}
+            visible={tasksByUsersShown}
+            onCancel={() => setTasksByUsersShown(false)}
+            hideCompletedTask={() => setCompleteTasksShown(false)}
+        />
+      </div>
+      <div>
+        <TasksByOrder
+            visible={tasksByOrderShown}
+            onCancel={() => setTasksByOrderShown(false)}
+            hideCompletedTask={() => setCompleteTasksShown(false)}
+        />
+      </div>
     </div>
   );
 };
@@ -160,4 +211,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   getTasksByOrder,
+  getTasksByAssignee
 })(TaskStatusPage);

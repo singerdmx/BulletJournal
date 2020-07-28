@@ -11,6 +11,7 @@ import {iconMapper} from "../../components/side-menu/side-menu.component";
 import {TeamOutlined} from "@ant-design/icons";
 
 import './projects.styles.less';
+import AddProject from "../../components/modals/add-project.component";
 
 const {Panel} = Collapse;
 
@@ -163,6 +164,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                     {getSharedBuJo(sharedProjects)}
                 </Panel>
             </Collapse>
+            <AddProject history={props.history} mode={'float'} />
         </div>
     );
 };

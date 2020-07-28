@@ -46,15 +46,17 @@ public class TransactionControllerTest {
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
+    private RequestParams requestParams;
 
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @Test
     public void testGetTransactions() throws Exception {
-        Group group = createGroup();
+        Group group = TestHelpers.createGroup(requestParams, USER, "Group_ProjectItem");
         List<String> users = new ArrayList<>();
         users.add("BulletJournal");
         users.add("Thinker");
@@ -65,7 +67,7 @@ public class TransactionControllerTest {
             group = addUserToGroup(group, username, ++count);
         }
 
-        Project p1 = createProject("p_Ledger_transaction", group, ProjectType.LEDGER);
+        Project p1 = TestHelpers.createProject(requestParams, USER, "p_Ledger_transaction", group, ProjectType.LEDGER);
         Transaction t1 = createTransaction(p1, "T1", "2019-12-01", "BulletJournal", 1000.0, 0);
         Transaction t2 = createTransaction(p1, "T2", "2019-12-13", "Thinker", 500.0, 1);
         Transaction t3 = createTransaction(p1, "T3", "2019-12-15", "ccc", 300.0, 0);

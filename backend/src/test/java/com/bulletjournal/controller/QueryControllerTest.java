@@ -31,22 +31,24 @@ public class QueryControllerTest {
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
+    private RequestParams requestParams;
 
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @Test
     public void testQuery() {
-        Group group = createGroup(USER);
-        Project p1 = createProject("for_es_p_ProjectItem_Task", group, ProjectType.TODO);
+        Group group = TestHelpers.createGroup(requestParams, USER, "for_es_Group_ProjectItem");
+        Project p1 = TestHelpers.createProject(requestParams, USER, "for_es_p_ProjectItem_Task", group, ProjectType.TODO);
         addTasks(p1);
 
-        Project p2 = createProject("for_es_p_ProjectItem_Note", group, ProjectType.NOTE);
+        Project p2 = TestHelpers.createProject(requestParams, USER, "for_es_p_ProjectItem_Note", group, ProjectType.NOTE);
         addNotes(p2);
 
-        Project p3 = createProject("for_es_p_ProjectItem_Ledger", group, ProjectType.LEDGER);
+        Project p3 = TestHelpers.createProject(requestParams, USER, "for_es_p_ProjectItem_Ledger", group, ProjectType.LEDGER);
         addTransactions(p3);
 
     }
@@ -125,45 +127,6 @@ public class QueryControllerTest {
                 Note.class,
                 project.getId());
         Note created = response.getBody();
-        return created;
-    }
-
-    private Project createProject(String projectName, Group g, ProjectType type) {
-        CreateProjectParams project = new CreateProjectParams(
-                projectName, type, "for_es_d14", g.getId());
-
-        ResponseEntity<Project> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(project, USER),
-                Project.class);
-        Project created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals(projectName, created.getName());
-        assertEquals(USER, created.getOwner().getName());
-        assertEquals(type, created.getProjectType());
-        assertEquals("for_es_Group_ProjectItem", created.getGroup().getName());
-        assertEquals(USER, created.getGroup().getOwner().getName());
-        assertEquals("for_es_d14", created.getDescription());
-        return created;
-    }
-
-    private Group createGroup(String user) {
-        CreateGroupParams group = new CreateGroupParams("for_es_Group_ProjectItem");
-
-        ResponseEntity<Group> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(group, user),
-                Group.class);
-        Group created = response.getBody();
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals("for_es_Group_ProjectItem", created.getName());
-        assertEquals(user, created.getOwner().getName());
-
         return created;
     }
 

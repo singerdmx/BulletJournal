@@ -24,9 +24,6 @@ public class User extends NamedModel {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<DeviceToken> tokens = new HashSet<>();
-
     @Column(length = 50, nullable = false)
     private String timezone;
 
@@ -82,15 +79,6 @@ public class User extends NamedModel {
             this.groups.add(userGroup);
             group.addUser(this);
         }
-    }
-
-    public void addToken(String token) {
-        DeviceToken deviceToken = new DeviceToken(this, token);
-        tokens.add(deviceToken);
-    }
-
-    public Set<DeviceToken> getTokens() {
-        return tokens;
     }
 
     public String getEmail() {

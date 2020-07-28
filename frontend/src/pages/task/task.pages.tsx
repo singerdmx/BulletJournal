@@ -8,8 +8,8 @@ import { connect } from 'react-redux';
 import { completeTask, deleteTask, getTask, updateTaskContents } from '../../features/tasks/actions';
 import { IState } from '../../store';
 // antd imports
-import { Avatar, Badge, Button, Popconfirm, Popover, Tooltip } from 'antd';
-import { CheckCircleTwoTone, DeleteTwoTone, PlusCircleTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined, PlusOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Popconfirm, Popover, Tooltip } from 'antd';
+import { CheckCircleTwoTone, DeleteTwoTone, SyncOutlined, UpSquareOutlined, TeamOutlined, PlusOutlined } from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';

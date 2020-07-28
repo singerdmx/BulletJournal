@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'antd';
+import { InputNumber } from 'antd';
 import { IState } from '../../../../store';
 import { connect } from 'react-redux';
 import { updateRepeatDaily } from '../../actions';
@@ -11,20 +11,26 @@ type RepeatDailyProps = {
 
 class RepeatDaily extends React.Component<RepeatDailyProps> {
   onChange = (event: any) => {
-    let updateInterval = parseInt(event.target.value ? event.target.value : 0);
-    if (isNaN(updateInterval)) updateInterval = 0;
-    this.props.updateRepeatDaily(updateInterval);
+    if (isNaN(event)) {
+      event = 1;
+    }
+    this.props.updateRepeatDaily(event);
   };
+
 
   render() {
     return (
-      <Input
-        prefix='Every'
-        style={{ width: '40%' }}
-        value={this.props.repeatDaily}
-        onChange={this.onChange}
-        suffix='Day(s)'
-      />
+      <div>
+        <span>Every</span>
+        {'  '}
+        <InputNumber
+          style={{ width: '60px' }}
+          value={this.props.repeatDaily}
+          onChange={this.onChange}
+        />
+        {'  '}
+        <span>Day(s)</span>
+      </div>
     );
   }
 }

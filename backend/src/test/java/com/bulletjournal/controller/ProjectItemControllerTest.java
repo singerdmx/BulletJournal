@@ -66,10 +66,12 @@ public class ProjectItemControllerTest {
     private final TestRestTemplate restTemplate = new TestRestTemplate();
     @LocalServerPort
     int randomServerPort;
+    private RequestParams requestParams;
 
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @After
@@ -297,31 +299,10 @@ public class ProjectItemControllerTest {
         return Arrays.asList(response.getBody());
     }
 
-    private Project createProject(String projectName, Group g, ProjectType type) {
-        CreateProjectParams project = new CreateProjectParams(
-                projectName, type, "d14", g.getId());
-
-        ResponseEntity<Project> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(project, sampleUsers[0]),
-                Project.class);
-        Project created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals(projectName, created.getName());
-        assertEquals(sampleUsers[0], created.getOwner().getName());
-        assertEquals(type, created.getProjectType());
-        assertEquals("Group_ProjectItem", created.getGroup().getName());
-        assertEquals(sampleUsers[0], created.getGroup().getOwner().getName());
-        assertEquals("d14", created.getDescription());
-        return created;
-    }
-
     @Test
     public void testGetProjectItems() throws Exception {
         // Create default testing group
-        Group group = createGroup(sampleUsers[0]);
+        Group group = TestHelpers.createGroup(requestParams, sampleUsers[0], "Group_ProjectItem");
 
         /*
          * Transaction:
@@ -331,7 +312,7 @@ public class ProjectItemControllerTest {
          *     "2020-03-02"
          *     "2020-03-04"
          */
-        Project p1 = createProject("p_ProjectItem_Ledger", group, ProjectType.LEDGER);
+        Project p1 = TestHelpers.createProject(requestParams, sampleUsers[0], "p_ProjectItem_Ledger", group, ProjectType.LEDGER);
         addTransactions(p1);
 
         /*
@@ -345,7 +326,7 @@ public class ProjectItemControllerTest {
          *     "2020-03-04"
          *     "2020-07-24 23:30"
          */
-        Project p2 = createProject("p_ProjectItem_Task", group, ProjectType.TODO);
+        Project p2 = TestHelpers.createProject(requestParams, sampleUsers[0], "p_ProjectItem_Task", group, ProjectType.TODO);
         addTasks(p2);
 
         /*
@@ -434,24 +415,6 @@ public class ProjectItemControllerTest {
 
     private List<ProjectType> getTypes(ProjectType... types) {
         return new ArrayList<>(Arrays.asList(types));
-    }
-
-    private Group createGroup(String user) {
-        CreateGroupParams group = new CreateGroupParams("Group_ProjectItem");
-
-        ResponseEntity<Group> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(group, user),
-                Group.class);
-        Group created = response.getBody();
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals("Group_ProjectItem", created.getName());
-        assertEquals(user, created.getOwner().getName());
-
-        return created;
     }
 
     private List<LinkedHashMap> getRecentProjectItems(String startDate, String endDate, String timezone, List<ProjectType> types) {
@@ -659,7 +622,8 @@ public class ProjectItemControllerTest {
     @Test
     public void testGetRecentProjectItems() throws Exception {
         // Create default testing group
-        Group group = createGroup(USER_0518);
+        //Group group = createGroup(USER_0518);
+        Group group = TestHelpers.createGroup(requestParams, USER_0518, "Group_ProjectItem");
 
         Project p1 = createRecentProject("p_RecentProjectItem_Task", group, ProjectType.TODO);
         addRecentTasks(p1);

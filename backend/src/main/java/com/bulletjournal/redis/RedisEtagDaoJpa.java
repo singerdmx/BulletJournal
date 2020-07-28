@@ -1,12 +1,14 @@
 package com.bulletjournal.redis;
 
-import com.bulletjournal.firebase.FcmService;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.EtagEvent;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.factory.EtaggableDaos;
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,6 +19,8 @@ import java.util.*;
 @Repository
 public class RedisEtagDaoJpa {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisEtagDaoJpa.class);
+
     @Autowired
     private RedisEtagRepository redisEtagRepository;
 
@@ -24,7 +28,7 @@ public class RedisEtagDaoJpa {
     private EtaggableDaos daos;
 
     @Autowired
-    private FcmService fcmService;
+    private MessagingService messagingService;
 
     /**
      * Batch cache a list of etags instance into Redis.
@@ -99,9 +103,12 @@ public class RedisEtagDaoJpa {
             contentIds.clear();
             contentIds.addAll(affectedUsernames);
         }
-        fcmService.sendNotificationToUsers(
-            aggregateMap.getOrDefault(EtagType.NOTIFICATION, Collections.emptySet()));
-
+        try {
+            messagingService.sendEtagUpdateNotificationToUsers(
+                aggregateMap.getOrDefault(EtagType.NOTIFICATION, Collections.emptySet()));
+        } catch (Exception e) {
+            LOGGER.error("Got exception when sending notification: {}", e.toString());
+        }
         mergeEventToOtherEvent(EtagType.GROUP_DELETE, EtagType.GROUP, aggregateMap);
         mergeEventToOtherEvent(EtagType.NOTIFICATION_DELETE, EtagType.NOTIFICATION, aggregateMap);
 
