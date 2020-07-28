@@ -61,6 +61,7 @@ public class ProjectControllerTest {
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
+    private RequestParams requestParams;
 
     @Autowired
     TokenBucket tokenBucket;
@@ -69,6 +70,7 @@ public class ProjectControllerTest {
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         tokenBucket.clearBucket();
+        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @Test
@@ -86,22 +88,22 @@ public class ProjectControllerTest {
             removeUserFromGroup(group, username, --count);
         }
 
-        Project p1 = createProject(projectName, expectedOwner, group, ProjectType.TODO);
+        Project p1 = TestHelpers.createProject(requestParams, expectedOwner, projectName, group, ProjectType.TODO);
         p1 = updateProject(p1);
 
         // create other projects
-        Project p2 = createProject("P2", expectedOwner, group, ProjectType.LEDGER);
-        Project p3 = createProject("P3", expectedOwner, group, ProjectType.NOTE);
-        Project p4 = createProject("P4", expectedOwner, group, ProjectType.TODO);
-        Project p5 = createProject("P5", expectedOwner, group, ProjectType.NOTE);
-        Project p6 = createProject("P6", expectedOwner, group, ProjectType.LEDGER);
+        Project p2 = TestHelpers.createProject(requestParams, expectedOwner, "P2", group, ProjectType.LEDGER);
+        Project p3 = TestHelpers.createProject(requestParams, expectedOwner, "P3", group, ProjectType.NOTE);
+        Project p4 = TestHelpers.createProject(requestParams, expectedOwner, "P4", group, ProjectType.TODO);
+        Project p5 = TestHelpers.createProject(requestParams, expectedOwner, "P5", group, ProjectType.NOTE);
+        Project p6 = TestHelpers.createProject(requestParams, expectedOwner, "P6", group, ProjectType.LEDGER);
         updateProjectRelations(p1, p2, p3, p4, p5, p6);
         deleteProject(p1);
-        Project p7 = createProject("P7", expectedOwner, group, ProjectType.TODO);
+        Project p7 = TestHelpers.createProject(requestParams, expectedOwner, "P7", group, ProjectType.TODO);
         updateProjectRelations(p5, p6, p7);
 
         // test notification for adding and removing users
-        Project p8 = createProject("P8", expectedOwner, group, ProjectType.TODO);
+        Project p8 = TestHelpers.createProject(requestParams, expectedOwner, "P8", group, ProjectType.TODO);
         p8 = updateProjectGroup(p8, groups.get(0).getGroups().get(0).getId());
         /**
          *  p5
@@ -1294,9 +1296,9 @@ public class ProjectControllerTest {
         assertEquals(expectedOwner, joinedGroup.getUsers().get(1).getName());
         assertEquals(true, joinedGroup.getUsers().get(1).isAccepted());
         Group joinedGroup2 = groups.get(3).getGroups().get(0);
-        Group g1 = createGroup("G0", owner);
-        Group g2 = createGroup("G2", owner);
-        Group g3 = createGroup("G3", owner);
+        Group g1 = TestHelpers.createGroup(requestParams, owner, "G0");
+        Group g2 = TestHelpers.createGroup(requestParams, owner, "G2");
+        Group g3 = TestHelpers.createGroup(requestParams, owner, "G3");
 
         String groupNewName = "G1";
         UpdateGroupParams updateGroupParams = new UpdateGroupParams();
@@ -1406,38 +1408,6 @@ public class ProjectControllerTest {
                 .findFirst().get().getGroups()
                 .stream().filter(g -> group.getId().equals(g.getId())).findFirst().get();
         assertEquals(count, resultGroup.getUsers().size());
-    }
-
-    private Group createGroup(String groupName, String expectedOwner) {
-        CreateGroupParams group = new CreateGroupParams(groupName);
-        ResponseEntity<Group> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-                HttpMethod.POST,
-                new HttpEntity<>(group),
-                Group.class);
-        Group created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(groupName, created.getName());
-        assertEquals(expectedOwner, created.getOwner().getName());
-
-        return created;
-    }
-
-    private Project createProject(String projectName, String expectedOwner, Group g, ProjectType projectType) {
-        CreateProjectParams project = new CreateProjectParams(
-                projectName, projectType, "d1", g.getId());
-        ResponseEntity<Project> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.POST,
-                new HttpEntity<>(project),
-                Project.class);
-        Project created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(projectName, created.getName());
-        assertEquals(expectedOwner, created.getOwner().getName());
-        assertEquals(projectType, created.getProjectType());
-        assertEquals(expectedOwner, created.getGroup().getOwner().getName());
-        return created;
     }
 }
 

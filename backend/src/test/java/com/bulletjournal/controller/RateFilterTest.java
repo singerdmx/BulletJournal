@@ -39,6 +39,7 @@ public class RateFilterTest {
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
+    private RequestParams requestParams;
 
     @Autowired
     private RateConfig rateConfig;
@@ -55,6 +56,7 @@ public class RateFilterTest {
         clearLockedCache();
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         tokenBucket.clearBucket();
+        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     private void clearLockedCache() {
@@ -73,10 +75,10 @@ public class RateFilterTest {
 
     @Test
     public void testRateFilter() throws Exception {
-        Group group = createGroup();
+        Group group = TestHelpers.createGroup(requestParams, USER, "testfilter");
 
 
-        Project p1 = createProject("p_Ledger_transaction", group, ProjectType.LEDGER);
+        Project p1 = TestHelpers.createProject(requestParams, USER, "p_Ledger_transaction", group, ProjectType.LEDGER);
 
         // assumes this runs within the same minute as last request
         ResponseEntity<Transaction> t1 = createTransaction(p1, "T1", "2019-12-01", "hero", 1000.0, 0);
@@ -90,39 +92,6 @@ public class RateFilterTest {
         t1 = createTransaction(p1, "T1", "2019-12-01", "hero", 1000.0, 0);
         assertEquals(HttpStatus.UNAUTHORIZED, t1.getStatusCode());
 
-    }
-
-    private Group createGroup() {
-        CreateGroupParams group = new CreateGroupParams("testfilter");
-
-        ResponseEntity<Group> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.GROUPS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(group, USER),
-                Group.class);
-        Group created = response.getBody();
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(created);
-        assertEquals("testfilter", created.getName());
-
-        return created;
-    }
-
-    private Project createProject(String projectName, Group g, ProjectType type) {
-        CreateProjectParams project = new CreateProjectParams(
-                projectName, type, "ddd", g.getId());
-
-        ResponseEntity<Project> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(project, USER),
-                Project.class);
-
-        Project created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-
-        return created;
     }
 
     private ResponseEntity<Transaction> createTransaction(Project project, String name, String date, String payer, double amount, Integer type) {
