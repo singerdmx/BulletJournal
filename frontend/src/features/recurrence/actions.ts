@@ -1,12 +1,6 @@
-import { actions } from './reducer';
-import {
-  YearlyOn,
-  YearlyOnThe,
-  MonthlyOn,
-  MonthlyOnThe,
-  Weekly,
-} from './interface';
-import RRule, { Frequency } from 'rrule';
+import {actions} from './reducer';
+import {bySetPosMap, byWeekDayMap, MonthlyOn, MonthlyOnThe, Weekly, YearlyOn, YearlyOnThe,} from './interface';
+import RRule, {Frequency} from 'rrule';
 import {Task} from "../tasks/interface";
 
 export const updateFreq = (freq: Frequency) =>
@@ -81,21 +75,54 @@ export const updateYearlyOn = (yearlyOn: boolean) =>
 export const updateRruleString = (task: Task) =>
   actions.updateRRuleString({ task: task });
 
+export const getBySetPosWhich = (rule: RRule) => {
+    let which = 'First';
+    if (rule.options.bysetpos) {
+        bySetPosMap.forEach((v: number, k: string) => {
+            if (v === rule.options.bysetpos[0]) {
+                which = k;
+            }
+        });
+    }
+    return which;
+}
+
+export const getByWeekDay = (rule: RRule) => {
+    let day = 'Monday';
+    if (rule.options.byweekday) {
+        byWeekDayMap.forEach((v: number[], k: string) => {
+            if (JSON.stringify(v) === JSON.stringify(rule.options.byweekday)) {
+                day = k;
+            }
+        });
+    }
+    return day;
+}
+
 export const convertToTextWithRRule = (rrule: string) => {
-  const rule = RRule.fromString(rrule);
-  const resultString = rule.toText();
-  const result =
-    resultString.charAt(0).toUpperCase() +
-    resultString.slice(1) +
-    ' starting at ' +
-    rrule.substr(8, 4) +
-    '-' +
-    rrule.substr(12, 2) +
-    '-' +
-    rrule.substr(14, 2) +
-    ' ' +
-    rrule.substr(17, 2) +
-    ':' +
-    rrule.substr(19, 2);
-  return result;
+    const rule = RRule.fromString(rrule);
+    const resultString = rule.toText();
+    console.log(resultString)
+    console.log(rule)
+    let result =
+        resultString.charAt(0).toUpperCase() +
+        resultString.slice(1);
+
+    if (rule.options.freq === Frequency.MONTHLY && rule.options.bysetpos) {
+        const which = getBySetPosWhich(rule);
+        const day = getByWeekDay(rule);
+        result = result.substring(0, result.toLowerCase().indexOf('month') + 6) + 'on the ' + which.toLowerCase() + ' ' + day.toLowerCase();
+    }
+
+    const starting = ' starting at ' +
+        rrule.substr(8, 4) +
+        '-' +
+        rrule.substr(12, 2) +
+        '-' +
+        rrule.substr(14, 2) +
+        ' ' +
+        rrule.substr(17, 2) +
+        ':' +
+        rrule.substr(19, 2);
+    return result + starting;
 };

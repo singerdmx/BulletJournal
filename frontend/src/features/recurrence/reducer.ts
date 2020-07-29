@@ -5,6 +5,7 @@ import {MONTHS} from './constants';
 import moment from 'moment';
 import {dateFormat} from '../myBuJo/constants';
 import {Task} from "../tasks/interface";
+import {getBySetPosWhich, getByWeekDay} from "./actions";
 
 export type End = {
   count: number | null;
@@ -346,26 +347,9 @@ const slice = createSlice({
 
       state.rRuleString = rruleString;
       const rule = RRule.fromString(rruleString);
-      console.log(rule);
       state.repeat = {freq: rule.options.freq, interval: rule.options.interval} as any;
-      let which = 'First';
-      if (rule.options.bysetpos) {
-        for (let k in bySetPosMap.keys()) {
-          if (bySetPosMap.get(k) === rule.options.bysetpos[0]) {
-            which = k;
-            break;
-          }
-        }
-      }
-      let day = 'Monday';
-      if (rule.options.byweekday) {
-        for (let k in byWeekDayMap.keys()) {
-          if (JSON.stringify(byWeekDayMap.get(k)) === JSON.stringify(rule.options.byweekday)) {
-            day = k;
-            break;
-          }
-        }
-      }
+      const which = getBySetPosWhich(rule);
+      const day = getByWeekDay(rule);
 
       switch (state.repeat.freq) {
         case Frequency.WEEKLY:
