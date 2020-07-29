@@ -12,3 +12,23 @@
 .open-revisions-button {
   cursor: pointer;
 }
+
+.content-item-page-contianer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  .content-item-page {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    & img {
+      max-width: 100%;
+    }
+  }
+
+  .content-item-page-control {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

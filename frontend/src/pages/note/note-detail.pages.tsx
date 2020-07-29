@@ -1,19 +1,19 @@
 // page display contents of notes
 // react imports
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 // features
 //actions
 import { Note } from '../../features/notes/interface';
 // components
 import NoteContentList from '../../components/content/content-list.component';
 // antd imports
-import { Avatar, BackTop, Divider, Tooltip } from 'antd';
+import { Avatar, Divider, Tooltip } from 'antd';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 import { Content } from '../../features/myBuJo/interface';
-import {inPublicPage} from "../../index";
+import { inPublicPage } from '../../index';
 
 export type NoteProps = {
   note: Note | undefined;
@@ -38,16 +38,14 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     contents,
     isPublic,
   } = props;
-    useEffect(() => {
-        if (note) {
-            document.title = note.name;
-        }
-    }, [note]);
+  useEffect(() => {
+    if (note) {
+      document.title = note.name;
+    }
+  }, [note]);
   if (!note) return null;
   return (
     <div className={`note-page ${inPublicPage() && 'public'}`}>
-      <BackTop />
-
       <Tooltip
         placement="top"
         title={`${note.owner.alias}`}
