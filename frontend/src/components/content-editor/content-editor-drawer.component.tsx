@@ -24,13 +24,23 @@ const ContentEditorDrawer: React.FC<
     onClose();
   };
   const fullWidth = global.window.innerWidth;
+  const drawerWidth =
+    fullWidth < 576
+      ? fullWidth * 0.9
+      : fullWidth < 768
+      ? fullWidth * 0.7
+      : fullWidth < 992
+      ? fullWidth * 0.6
+      : fullWidth < 1200
+      ? fullWidth * 0.5
+      : fullWidth * 0.4;
   if (!projectItem) return null;
   return (
     <Drawer
       placement={'right'}
       onClose={handleClose}
       visible={visible}
-      width={fullWidth * 0.35}
+      width={drawerWidth}
       destroyOnClose
     >
       {readMode && content ? (
@@ -39,13 +49,13 @@ const ContentEditorDrawer: React.FC<
           <ContentReader content={content} />
         </div>
       ) : (
-          <ContentEditor
-            content={content || undefined}
-            projectItemId={projectItem.id}
-            afterFinish={handleClose}
-            contentType={projectItem.contentType}
-          />
-        )}
+        <ContentEditor
+          content={content || undefined}
+          projectItemId={projectItem.id}
+          afterFinish={handleClose}
+          contentType={projectItem.contentType}
+        />
+      )}
     </Drawer>
   );
 };
