@@ -7,6 +7,15 @@ curl --user elastic:changeme -XPUT "http://localhost:9200/project_items" -H 'Con
 curl --user elastic:changeme -XGET "http://localhost:9200/project_items/_mapping"
 ```
 
+## change logstash pipeline
+```
+docker stop {logstash_id}
+docker rm {logstash_id}
+
+cd ~/ws/BulletJournal/deployment
+./start.sh
+```
+
 ## build image for logstash
 ```
 cd logstash
