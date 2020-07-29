@@ -119,11 +119,6 @@ const EditTask: React.FC<
   );
 
   useEffect(() => {
-    console.log('mount effect');
-    task.recurrenceRule && props.updateRruleString(task);
-  }, []);
-
-  useEffect(() => {
     setRRuleText(convertToTextWithRRule(props.rRuleString));
   }, [props.rRuleString]);
   const { projectId } = useParams();
@@ -201,6 +196,9 @@ const EditTask: React.FC<
   };
 
   const openModal = () => {
+    if (task) {
+      task.recurrenceRule && props.updateRruleString(task);
+    }
     setVisible(true);
   };
 
