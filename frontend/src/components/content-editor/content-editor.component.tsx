@@ -99,7 +99,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
         return;
       }
 
-      formData.append('image', file);
+      formData.append('file', file);
 
       // Save current cursor state
       const range = editor.getSelection(true);
@@ -110,7 +110,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       } catch (e) {
         // message.error(e.response);
         console.log(e.response.data.message);
-        setError(e.response.toString());
+        setError(e.response.data.message);
       }
     };
   };
