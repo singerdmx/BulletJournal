@@ -57,7 +57,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   const [form] = Form.useForm();
   const isEdit = !!content;
   const [editorContent, setEditorContent] = useState(
-    content ? JSON.parse(content.text)['delta'] : ''
+    content ? JSON.parse(content.text) : { delta: '', '###html###': '' }
   );
   const quillRef = useRef<ReactQuill>(null);
   const [error, setError] = useState('');
@@ -179,19 +179,15 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       '###html###': editor.getHTML(),
     });
   };
-  console.log(modules);
 
   return (
-    <Form
-      form={form}
-      onFinish={handleFormSubmit}
-      initialValues={{ editor: editorContent }}
-    >
-      <Form.Item name="editor">
+    <Form form={form} onFinish={handleFormSubmit}>
+      <Form.Item>
         <div className="content-editor">
           <EditorToolbar />
           <ReactQuill
-            value={editorContent}
+            defaultValue={editorContent['delta']}
+            value={editorContent['delta']}
             ref={quillRef}
             theme="snow"
             onChange={handleChange}
