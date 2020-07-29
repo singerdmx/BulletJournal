@@ -186,6 +186,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
         <div className="content-editor">
           <EditorToolbar />
           <ReactQuill
+            bounds={'.content-editor'}
             defaultValue={editorContent['delta']}
             value={editorContent['delta']}
             ref={quillRef}
