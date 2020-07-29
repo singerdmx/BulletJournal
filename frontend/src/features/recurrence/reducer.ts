@@ -5,6 +5,7 @@ import {MONTHS} from './constants';
 import moment from 'moment';
 import {dateFormat} from '../myBuJo/constants';
 import {Task} from "../tasks/interface";
+import {getBySetPosWhich, getByWeekDay} from "./actions";
 
 export type End = {
   count: number | null;
@@ -158,11 +159,7 @@ const slice = createSlice({
       //update rrule end string here
       let end = {} as End;
       if (endCount) {
-        if (endCount <= 0) {
-          end.count = 1;
-        } else {
-          end.count = endCount;
-        }
+        end.count = Math.max(1, endCount);
       } else if (endDate) {
         //end until use date type because .toText only recognize Date() type
         end.until = new Date(endDate);
@@ -213,6 +210,7 @@ const slice = createSlice({
         bymonthday: repeatYearlyOn.day,
         interval: 1
       };
+      state.yearlyOn = true;
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
@@ -233,6 +231,7 @@ const slice = createSlice({
         bymonth: MONTHS.indexOf(repeatYearlyOnThe.month) + 1,
         interval: 1
       };
+      state.yearlyOn = false;
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
@@ -251,6 +250,7 @@ const slice = createSlice({
         interval: state.repeat.interval,
         bymonthday: repeatMonthlyOn.day,
       };
+      state.monthlyOn = true;
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
@@ -263,6 +263,7 @@ const slice = createSlice({
     ) => {
       const {repeatMonthlyOnThe} = action.payload;
       state.repeatMonthlyOnThe = repeatMonthlyOnThe;
+      state.monthlyOn = false;
       //update rrule end string here
       state.repeat = {
         freq: RRule.MONTHLY,
@@ -342,26 +343,9 @@ const slice = createSlice({
 
       state.rRuleString = rruleString;
       const rule = RRule.fromString(rruleString);
-      console.log(rule);
       state.repeat = {freq: rule.options.freq, interval: rule.options.interval} as any;
-      let which = 'First';
-      if (rule.options.bysetpos) {
-        for (let k in bySetPosMap.keys()) {
-          if (bySetPosMap.get(k) === rule.options.bysetpos[0]) {
-            which = k;
-            break;
-          }
-        }
-      }
-      let day = 'Monday';
-      if (rule.options.byweekday) {
-        for (let k in byWeekDayMap.keys()) {
-          if (JSON.stringify(byWeekDayMap.get(k)) === JSON.stringify(rule.options.byweekday)) {
-            day = k;
-            break;
-          }
-        }
-      }
+      const which = getBySetPosWhich(rule);
+      const day = getByWeekDay(rule);
 
       switch (state.repeat.freq) {
         case Frequency.WEEKLY:
@@ -383,10 +367,12 @@ const slice = createSlice({
               which: which,
               day: day
             }
+            state.monthlyOn = false;
           } else {
             state.repeatMonthlyOn = {
               day: rule.options.bynmonthday[0]
             }
+            state.monthlyOn = true;
           }
           break;
         case Frequency.YEARLY:
@@ -398,11 +384,13 @@ const slice = createSlice({
               which: which,
               day: day
             }
+            state.yearlyOn = false;
           } else {
             state.repeatYearlyOn = {
               month: m,
               day: rule.options.bynmonthday[0]
             }
+            state.yearlyOn = true;
           }
           break;
       }
