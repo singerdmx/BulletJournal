@@ -159,11 +159,7 @@ const slice = createSlice({
       //update rrule end string here
       let end = {} as End;
       if (endCount) {
-        if (endCount <= 0) {
-          end.count = 1;
-        } else {
-          end.count = endCount;
-        }
+        end.count = Math.max(1, endCount);
       } else if (endDate) {
         //end until use date type because .toText only recognize Date() type
         end.until = new Date(endDate);

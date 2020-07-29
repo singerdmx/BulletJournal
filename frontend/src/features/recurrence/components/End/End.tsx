@@ -1,5 +1,5 @@
 import React from 'react';
-import {DatePicker, Input, Select} from 'antd';
+import {DatePicker, InputNumber, Select} from 'antd';
 import moment from 'moment';
 import {IState} from '../../../../store';
 import {connect} from 'react-redux';
@@ -25,7 +25,7 @@ class End extends React.Component<EndProps, SelectState> {
   onChangeValue = (value: string) => {
     this.setState({value: value});
     if (value === 'After') {
-      this.props.updateEndString(null, this.props.end.count);
+      this.props.updateEndString(null, 1);
     } else if (value === 'On date') {
       this.props.updateEndString(defaultDate, null);
     } else {
@@ -42,11 +42,13 @@ class End extends React.Component<EndProps, SelectState> {
   };
 
   onChangeCount = (event: any) => {
+    if (isNaN(event)) {
+      event = 1;
+    }
     //only change end count
-    console.log(event.target)
     this.props.updateEndString(
         null,
-        parseInt(event.target.value ? event.target.value : 0)
+        parseInt(event)
     );
   };
 
@@ -74,7 +76,8 @@ class End extends React.Component<EndProps, SelectState> {
               />
           ) : this.state.value === 'After' ? (
               <div style={{width: '40%', display: 'flex', alignItems: 'center'}}>
-                <Input
+                <InputNumber
+                    style={{ width: '60px' }}
                     value={this.props.end.count ? this.props.end.count : 1}
                     onChange={this.onChangeCount}
                 />
