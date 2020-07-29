@@ -93,9 +93,13 @@ public class Reminder {
 
     public void generateTaskReminder(List<Task> tasks) {
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(SECONDS_OF_DAY, reminderConfig.getTimeZone());
+
         tasks.forEach(t -> {
+            LOGGER.info("generateTaskReminder" + t);
             DaoHelper.getReminderRecords(t, interval.getFirst(), interval.getSecond()).forEach(e -> {
+                LOGGER.info("getReminderRecords" + e);
                         if (!concurrentHashMap.containsKey(e)) {
+                            LOGGER.info("getReminderRecords in map" + e);
                             this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
                         }
                     }
