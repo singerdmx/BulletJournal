@@ -102,8 +102,6 @@ export const getByWeekDay = (rule: RRule) => {
 export const convertToTextWithRRule = (rrule: string) => {
     const rule = RRule.fromString(rrule);
     const resultString = rule.toText();
-    console.log(resultString)
-    console.log(rule)
     let result =
         resultString.charAt(0).toUpperCase() +
         resultString.slice(1);

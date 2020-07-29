@@ -106,56 +106,6 @@ const ContentItem: React.FC<ContentProps> = ({
     setDisplayMore(true);
   };
 
-  const getActions = () => {
-    const actions = [
-      <Tooltip title={`Created by ${content.owner.alias} ${createdTime}`}>
-        <Avatar src={content.owner.avatar} size="small" />
-      </Tooltip>,
-    ];
-    if (!project && !window.location.pathname.startsWith('/public/item')) {
-      getProject(projectItem.projectId);
-    }
-    if (
-      contentEditable !== false &&
-      project &&
-      !project.shared &&
-      isContentEditable(project, projectItem, content, myself)
-    ) {
-      actions.push(
-        <Tooltip title="Edit">
-          <EditOutlined onClick={handleEdit} />
-        </Tooltip>
-      );
-      actions.push(
-        <Tooltip title="Delete">
-          <DeleteOutlined onClick={handleDelete} />
-        </Tooltip>
-      );
-    }
-
-    if (content.revisions && content.revisions.length > 0) {
-      actions.push(
-        <Tooltip title="View revision history">
-          <span className="open-revisions-button" onClick={handleOpenRevisions}>
-            <HighlightOutlined />
-            &nbsp;
-            {content.revisions.length}
-          </span>
-        </Tooltip>
-      );
-    }
-
-    if (content.updatedAt) {
-      actions.push(
-        <Tooltip title={`Updated ${moment(content.updatedAt).fromNow()}`}>
-          <span>{updateTime}</span>
-        </Tooltip>
-      );
-    }
-
-    return actions;
-  };
-
   return (
     <div className="content-item-page-contianer">
       <div className="content-item-page-control">
