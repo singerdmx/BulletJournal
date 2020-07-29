@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { Avatar, List, Tooltip } from 'antd';
+import { Avatar, List, Tooltip, Tabs, Button } from 'antd';
 import { Content, ProjectItem } from '../../features/myBuJo/interface';
 import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import RevisionDrawer from '../revision/revision-drawer.component';
-import { HighlightOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  HighlightOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from '@ant-design/icons';
 import moment from 'moment';
 import './content-item.styles.less';
-import { Project } from "../../features/project/interface";
-import { IState } from "../../store";
-import { connect } from "react-redux";
-import { ContentType } from "../../features/myBuJo/constants";
-import { deleteContent as deleteNoteContent } from "../../features/notes/actions";
-import { getProject } from "../../features/project/actions";
-import { deleteContent as deleteTaskContent } from "../../features/tasks/actions";
-import { deleteContent as deleteTransactionContent } from "../../features/transactions/actions";
+import { Project } from '../../features/project/interface';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import { ContentType } from '../../features/myBuJo/constants';
+import { deleteContent as deleteNoteContent } from '../../features/notes/actions';
+import { getProject } from '../../features/project/actions';
+import { deleteContent as deleteTaskContent } from '../../features/tasks/actions';
+import { deleteContent as deleteTransactionContent } from '../../features/transactions/actions';
 
 type ContentProps = {
   contentEditable?: boolean;
@@ -27,10 +31,17 @@ type ContentProps = {
   getProject: (projectId: number) => void;
 };
 
-export const isContentEditable = (project: Project, projectItem: ProjectItem, content: Content, myself: string) => {
-  return project.owner.name === myself ||
+export const isContentEditable = (
+  project: Project,
+  projectItem: ProjectItem,
+  content: Content,
+  myself: string
+) => {
+  return (
+    project.owner.name === myself ||
     projectItem.owner.name === myself ||
     content.owner.name === myself
+  );
 };
 
 const ContentItem: React.FC<ContentProps> = ({
@@ -42,7 +53,7 @@ const ContentItem: React.FC<ContentProps> = ({
   deleteNoteContent,
   deleteTaskContent,
   deleteTransactionContent,
-  getProject
+  getProject,
 }) => {
   const contentHtml = JSON.parse(content.text)['###html###'];
   const [displayMore, setDisplayMore] = useState(false);
@@ -99,12 +110,17 @@ const ContentItem: React.FC<ContentProps> = ({
     const actions = [
       <Tooltip title={`Created by ${content.owner.alias} ${createdTime}`}>
         <Avatar src={content.owner.avatar} size="small" />
-      </Tooltip>
+      </Tooltip>,
     ];
     if (!project && !window.location.pathname.startsWith('/public/item')) {
       getProject(projectItem.projectId);
     }
-    if (contentEditable !== false && project && !project.shared && isContentEditable(project, projectItem, content, myself)) {
+    if (
+      contentEditable !== false &&
+      project &&
+      !project.shared &&
+      isContentEditable(project, projectItem, content, myself)
+    ) {
       actions.push(
         <Tooltip title="Edit">
           <EditOutlined onClick={handleEdit} />
@@ -141,14 +157,34 @@ const ContentItem: React.FC<ContentProps> = ({
   };
 
   return (
-    <List.Item key={content.id} actions={getActions()}>
-      <List.Item.Meta description={
-        <div style={{ cursor: 'pointer' }} onClick={handleOpen} dangerouslySetInnerHTML={{
-          __html: contentHtml.length > 300
-            ? `${contentHtml.slice(0, 300)}...`
-            : contentHtml
-        }} />}
+    <div className="content-item-page-contianer">
+      <div className="content-item-page-control">
+        <Tooltip title={'Edit'}>
+          <Button onClick={handleEdit}>
+            <EditOutlined />
+          </Button>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <Button onClick={handleDelete}>
+            <DeleteOutlined />
+          </Button>
+        </Tooltip>
+        <Tooltip title="View revision history">
+          <Button onClick={handleOpenRevisions}>
+            <HighlightOutlined />
+            &nbsp;
+            {content.revisions.length}
+          </Button>
+        </Tooltip>
+      </div>
+      <div
+        className="content-item-page"
+        onClick={handleOpen}
+        dangerouslySetInnerHTML={{
+          __html: contentHtml,
+        }}
       />
+
       <ContentEditorDrawer
         content={content}
         visible={displayMore}
@@ -163,7 +199,7 @@ const ContentItem: React.FC<ContentProps> = ({
         projectItem={projectItem}
         content={content}
       />
-    </List.Item>
+    </div>
   );
 };
 

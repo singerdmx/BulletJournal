@@ -19,6 +19,7 @@ import {
 } from '../../features/transactions/actions';
 import { Content } from '../../features/myBuJo/interface';
 import { ContentType } from '../../features/myBuJo/constants';
+import placeholder from '../../assets/placeholder.png';
 import axios from 'axios';
 
 type ContentEditorProps = {
@@ -100,11 +101,12 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       }
 
       formData.append('file', file);
-
       // Save current cursor state
       const range = editor.getSelection(true);
+      editor.insertEmbed(range.index, 'image', `${placeholder}`);
       try {
         const res = await apiPostNewsImage(formData); // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
+        editor.deleteText(range.index, 1);
         const link = res.data;
         editor.insertEmbed(range.index, 'image', link);
       } catch (e) {
@@ -181,26 +183,21 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   };
 
   return (
-    <Form form={form} onFinish={handleFormSubmit}>
-      <Form.Item>
-        <div className="content-editor">
-          <EditorToolbar />
-          <ReactQuill
-            defaultValue={editorContent['delta']}
-            value={editorContent['delta']}
-            ref={quillRef}
-            theme="snow"
-            onChange={handleChange}
-            modules={modules}
-          />
-        </div>
-      </Form.Item>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          {isEdit ? 'Update' : 'Create'}
-        </Button>
-      </Form.Item>
-    </Form>
+    <div className="content-editor">
+      <EditorToolbar />
+      <ReactQuill
+        bounds={'.content-editor'}
+        defaultValue={editorContent['delta']}
+        value={editorContent['delta']}
+        ref={quillRef}
+        theme="snow"
+        onChange={handleChange}
+        modules={modules}
+      />
+      <Button type="primary" onClick={handleFormSubmit}>
+        {isEdit ? 'Update' : 'Create'}
+      </Button>
+    </div>
   );
 };
 

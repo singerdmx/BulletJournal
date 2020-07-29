@@ -1,13 +1,30 @@
 import React from 'react';
-import { List } from 'antd';
+import { List, Tabs, Avatar } from 'antd';
 import { ProjectItem } from '../../features/myBuJo/interface';
 import { Content } from '../../features/myBuJo/interface';
 import ContentItem from './content-item.component';
+import moment from 'moment';
 
 type ContentListProps = {
   contentEditable?: boolean;
   projectItem: ProjectItem;
   contents: Content[];
+};
+
+type TabContentProps = {
+  content: Content;
+};
+
+const TabContent: React.FC<TabContentProps> = ({ content }) => {
+  const updateTime = content.updatedAt
+    ? moment(content.updatedAt).format('MMM Do YYYY')
+    : '';
+  return (
+    <span className="tab-content">
+      <Avatar src={content.owner.avatar} />
+      <span>{updateTime}</span>
+    </span>
+  );
 };
 
 const ContentList: React.FC<ContentListProps> = ({
@@ -16,17 +33,23 @@ const ContentList: React.FC<ContentListProps> = ({
   contentEditable,
 }) => {
   return (
-    <List itemLayout='vertical'>
+    <Tabs defaultActiveKey="0" tabPosition="left" style={{ height: '100%' }}>
       {contents &&
-        contents.map((content) => (
-          <ContentItem
-            projectItem={projectItem}
-            key={content.id}
-            content={content}
-            contentEditable={contentEditable}
-          />
+        contents.map((content, index) => (
+          <Tabs.TabPane
+            key={`${index}`}
+            tab={<TabContent content={content} />}
+            forceRender
+          >
+            <ContentItem
+              projectItem={projectItem}
+              key={content.id}
+              content={content}
+              contentEditable={contentEditable}
+            />
+          </Tabs.TabPane>
         ))}
-    </List>
+    </Tabs>
   );
 };
 
