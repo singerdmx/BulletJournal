@@ -181,27 +181,21 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   };
 
   return (
-    <Form form={form} onFinish={handleFormSubmit}>
-      <Form.Item>
-        <div className="content-editor">
-          <EditorToolbar />
-          <ReactQuill
-            bounds={'.content-editor'}
-            defaultValue={editorContent['delta']}
-            value={editorContent['delta']}
-            ref={quillRef}
-            theme="snow"
-            onChange={handleChange}
-            modules={modules}
-          />
-        </div>
-      </Form.Item>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          {isEdit ? 'Update' : 'Create'}
-        </Button>
-      </Form.Item>
-    </Form>
+    <div className="content-editor">
+      <EditorToolbar />
+      <ReactQuill
+        bounds={'.content-editor'}
+        defaultValue={editorContent['delta']}
+        value={editorContent['delta']}
+        ref={quillRef}
+        theme="snow"
+        onChange={handleChange}
+        modules={modules}
+      />
+      <Button type="primary" onClick={handleFormSubmit}>
+        {isEdit ? 'Update' : 'Create'}
+      </Button>
+    </div>
   );
 };
 

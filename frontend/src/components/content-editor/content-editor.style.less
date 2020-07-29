@@ -16,19 +16,33 @@
 }
 
 .content-editor {
+  height: 80%;
+  min-height: 80%;
   padding-top: 3em;
-}
+  display: flex;
+  flex-direction: column;
 
-.ql-toolbar {
-  background: #DCDCDC;
-  width: 32.1em;
-  border-top-left-radius: 0.5em;
-  border-top-right-radius: 0.5em;
-}
+  .ql-toolbar {
+    width: 100%;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+  }
 
-.ql-container {
-  height: 42em;
-  width: 34.5em;
-  border-bottom-left-radius: 0.5em;
-  border-bottom-right-radius: 0.5em;
+  .quill {
+    height: 100%;
+    flex: 1;
+    padding-bottom: 1rem;
+
+    .ql-container {
+      height: 100%;
+      width: 100%;
+      border-bottom-left-radius: 0.5em;
+      border-bottom-right-radius: 0.5em;
+
+      .ql-editor {
+        height: 100%;
+        overflow-y: scroll;
+      }
+    }
+  }
 }
