@@ -213,6 +213,7 @@ const slice = createSlice({
         bymonthday: repeatYearlyOn.day,
         interval: 1
       };
+      state.yearlyOn = true;
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
@@ -233,6 +234,7 @@ const slice = createSlice({
         bymonth: MONTHS.indexOf(repeatYearlyOnThe.month) + 1,
         interval: 1
       };
+      state.yearlyOn = false;
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
@@ -251,6 +253,7 @@ const slice = createSlice({
         interval: state.repeat.interval,
         bymonthday: repeatMonthlyOn.day,
       };
+      state.monthlyOn = true;
       state.rRuleString = new RRule({
         ...state.start,
         ...state.repeat,
@@ -263,6 +266,7 @@ const slice = createSlice({
     ) => {
       const {repeatMonthlyOnThe} = action.payload;
       state.repeatMonthlyOnThe = repeatMonthlyOnThe;
+      state.monthlyOn = false;
       //update rrule end string here
       state.repeat = {
         freq: RRule.MONTHLY,
@@ -383,10 +387,12 @@ const slice = createSlice({
               which: which,
               day: day
             }
+            state.monthlyOn = false;
           } else {
             state.repeatMonthlyOn = {
               day: rule.options.bynmonthday[0]
             }
+            state.monthlyOn = true;
           }
           break;
         case Frequency.YEARLY:
@@ -398,11 +404,13 @@ const slice = createSlice({
               which: which,
               day: day
             }
+            state.yearlyOn = false;
           } else {
             state.repeatYearlyOn = {
               month: m,
               day: rule.options.bynmonthday[0]
             }
+            state.yearlyOn = true;
           }
           break;
       }
