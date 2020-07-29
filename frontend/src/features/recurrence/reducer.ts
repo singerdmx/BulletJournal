@@ -370,7 +370,7 @@ const slice = createSlice({
             state.monthlyOn = false;
           } else {
             state.repeatMonthlyOn = {
-              day: rule.options.bynmonthday[0]
+              day: rule.options.bymonthday[0]
             }
             state.monthlyOn = true;
           }
@@ -388,7 +388,7 @@ const slice = createSlice({
           } else {
             state.repeatYearlyOn = {
               month: m,
-              day: rule.options.bynmonthday[0]
+              day: rule.options.bymonthday[0]
             }
             state.yearlyOn = true;
           }
