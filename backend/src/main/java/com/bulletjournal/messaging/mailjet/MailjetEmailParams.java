@@ -13,7 +13,7 @@ public class MailjetEmailParams {
 
     private String text;
 
-    // left: email, right: name
+    // left: name, right: email
     private List<Pair<String, String>> receivers;
 
     public MailjetEmailParams(

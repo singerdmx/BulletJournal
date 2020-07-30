@@ -1,6 +1,9 @@
 package com.bulletjournal.messaging.mailjet;
 
-import com.mailjet.client.*;
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.MailjetRequest;
+import com.mailjet.client.MailjetResponse;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
@@ -14,7 +17,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Component
 public class MailjetEmailClient {
@@ -30,6 +36,8 @@ public class MailjetEmailClient {
     private static final String SENDER_EMAIL_VAR = "SENDER_EMAIL";
 
     private static final String SENDER_NAME_VAR = "SENDER_NAME";
+
+    private static final int SUCCESS_STATUS = 200;
 
     private String senderEmail;
 
@@ -67,17 +75,25 @@ public class MailjetEmailClient {
 
 
     public List<Future<MailjetResponse>> sendAllEmailAsync(List<MailjetEmailParams> paramsList) {
+        if (client == null) {
+            LOGGER.error("Mailjet key not set up, skip sending email.");
+            return null;
+        }
         List<Future<MailjetResponse>> ret = new ArrayList<>();
         for (MailjetEmailParams params : paramsList) {
             CompletableFuture<MailjetResponse> future = new CompletableFuture<>();
             executorService.submit(() -> {
                 try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                    MailjetResponse response = sendEmail(getReuqestFromParams(params));
+                    if (response.getStatus() != SUCCESS_STATUS) {
+                        LOGGER.error("Failed to send email, code:'{}', response:'{}'",
+                            response.getStatus(), response.getData());
+                    }
+                    future.complete(response);
+                } catch (Exception e) {
                     e.printStackTrace();
+                    future.completeExceptionally(e);
                 }
-                MailjetResponse response = sendEmail(getReuqestFromParams(params));
-                future.complete(response);
             });
             ret.add(future);
         }
@@ -87,29 +103,21 @@ public class MailjetEmailClient {
     /**
      * Blocking call to send a single email
      */
-    public MailjetResponse sendEmail(MailjetRequest request) {
-        if (client == null) {
-            LOGGER.error("Mailjet key not set up, skip sending email.");
-            return null;
-        }
-        try {
-            MailjetResponse response = client.post(request);
-            LOGGER.info("Mail sent, response status: {}, response data: {}",
-                response.getStatus(), response.getData());
-            return response;
-        } catch (MailjetSocketTimeoutException e) {
-            LOGGER.error("Email timeout, error:'{}', request:'{}'", e.toString(), request);
-        } catch (MailjetException e) {
-            LOGGER.error("Got error:'{}' when sending email:'{}'", e.toString(), request);
-        }
-        return null;
+    private MailjetResponse sendEmail(MailjetRequest request) throws MailjetSocketTimeoutException, MailjetException {
+        MailjetResponse response = client.post(request);
+        LOGGER.debug("Mail sent, response status: {}, response data: {}",
+            response.getStatus(), response.getData());
+        return response;
     }
 
     private MailjetRequest getReuqestFromParams(MailjetEmailParams params) {
         JSONArray receivers = new JSONArray();
         for (Pair<String, String> receiver : params.getReceivers()) {
-            receivers.put(new JSONObject().put("Email", receiver.getLeft()));
-            receivers.put(new JSONObject().put("Email", receiver.getRight()));
+            receivers.put(
+                new JSONObject()
+                    .put("name", receiver.getLeft())
+                    .put("email", receiver.getRight())
+            );
         }
         return new MailjetRequest(Emailv31.resource)
             .property(Emailv31.MESSAGES, new JSONArray()

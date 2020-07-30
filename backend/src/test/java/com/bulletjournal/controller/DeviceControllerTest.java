@@ -168,7 +168,7 @@ public class DeviceControllerTest {
             "ExampleKey",
             "ExampleValue"
         );
-        fcmClient.sendAllMessages(Arrays.asList(params));
+        fcmClient.sendAllMessagesAsync(Arrays.asList(params));
         Thread.sleep(5000);
     }
 
@@ -187,7 +187,7 @@ public class DeviceControllerTest {
     @Ignore
     public void testEmail() throws Exception {
         MailjetEmailParams params = new MailjetEmailParams(
-            Arrays.asList(new ImmutablePair<>("Will", "eg@gmail.com")),
+            Arrays.asList(new ImmutablePair<>("Will", "eg1@gmail.com")),
             "TestSubject", "TestContentText");
         MailjetEmailParams params2 = new MailjetEmailParams(
             Arrays.asList(new ImmutablePair<>("Will2", "eg@gmail.com")),
@@ -195,9 +195,11 @@ public class DeviceControllerTest {
         List<Future<MailjetResponse>> ret
             = mailjetEmailClient.sendAllEmailAsync(Arrays.asList(params, params2));
         LOGGER.info("reached here first");
-        for (Future<MailjetResponse> future : ret) {
-            MailjetResponse response = future.get();
-            LOGGER.info("response: {}", response);
+        if (ret != null) {
+            for (Future<MailjetResponse> future : ret) {
+                MailjetResponse response = future.get();
+                LOGGER.info("response: {}", response.getData());
+            }
         }
     }
 }

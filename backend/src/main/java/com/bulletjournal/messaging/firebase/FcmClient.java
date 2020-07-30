@@ -66,7 +66,7 @@ public class FcmClient {
         }
     }
 
-    public void sendAllMessages(List<FcmMessageParams> paramsList) {
+    public void sendAllMessagesAsync(List<FcmMessageParams> paramsList) {
         if (this.firebase == null) {
             LOGGER.error("FirebaseMessaging not initialized, cannot send message.");
             return;

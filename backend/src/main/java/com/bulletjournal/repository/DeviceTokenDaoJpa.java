@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public class DeviceTokenDaoJpa {
@@ -55,16 +55,13 @@ public class DeviceTokenDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Set<DeviceToken> getTokensByUser(String userName) {
-        return new HashSet<>(deviceTokenRepository.findDeviceTokensByUser(userName));
+    public List<DeviceToken> getTokensByUser(String userName) {
+        return deviceTokenRepository.findDeviceTokensByUser(userName);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Set<DeviceToken> getTokensByUsers(Collection<String> userNames) {
-        return new HashSet<>(
-            deviceTokenRepository.findDeviceTokensByUsers(
-                new HashSet<>(userNames)
-            ));
+    public List<DeviceToken> getTokensByUsers(Collection<String> userNames) {
+        return deviceTokenRepository.findDeviceTokensByUsers(new HashSet<>(userNames));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -95,7 +95,7 @@ public class DaoHelper {
      * @param timestampMillis the input timestamp for task Due DateTime
      * @return Task a task cloned from original task with new Due DateTime and Timezone
      */
-    public static Task recoverTaskWithDueDateTime(Task task, Long timestampMillis) {
+    public static Task cloneTaskWithDueDateTime(Task task, Long timestampMillis) {
         try {
             DateTime taskDateTime = ZonedDateTimeHelper.getDateTime(timestampMillis, task.getTimezone());
             return cloneTaskWithDateTime(task, task.getTimezone(), taskDateTime);
