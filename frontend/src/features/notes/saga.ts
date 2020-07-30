@@ -276,7 +276,13 @@ function* patchNote(action: PayloadAction<PatchNote>) {
 function* patchContent(action: PayloadAction<PatchContent>) {
   try {
     const { noteId, contentId, text } = action.payload;
+    const state: IState = yield select();
+    const order = state.note.contents.map(c => c.id);
+
     const contents = yield call(updateContent, noteId, contentId, text);
+    contents.sort((a: Content, b: Content) => {
+      return order.findIndex((o) => o === a.id) - order.findIndex((o) => o === b.id);
+    });
     yield put(
       notesActions.noteContentsReceived({
         contents: contents,
