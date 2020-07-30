@@ -19,6 +19,8 @@ import { ProjectType } from '../project/constants';
 import { Task } from '../tasks/interface';
 import moment from 'moment-timezone';
 import { ArgsProps } from 'antd/lib/notification';
+import {Content} from "../myBuJo/interface";
+import {updateTargetContent} from "../content/actions";
 
 const fetchReminderFromLocal = () => {
   const defaultReminders = [] as Task[];
@@ -163,15 +165,18 @@ function* getPublicItem(action: PayloadAction<GetPublicProjectItem>) {
     const type: ContentType = data.contentType;
     const note = type === ContentType.NOTE ? data.projectItem : undefined;
     const task = type === ContentType.TASK ? data.projectItem : undefined;
+    const contents : Content[] = data.contents;
     yield put(
       systemActions.publicProjectItemReceived({
         contentType: type,
-        contents: data.contents,
+        contents: contents,
         publicNote: note,
         publicTask: task,
         publicItemProjectId: data.projectId
       })
     );
+
+    yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
   } catch (error) {
     yield call(message.error, `getPublicItem Received: ${error}`);
   }
