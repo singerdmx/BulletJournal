@@ -28,7 +28,7 @@ const TabContent: React.FC<TabContentProps> = ({content}) => {
           placement="right"
           title={content.owner.alias}
           content={updateTime}
-      ><Avatar src={content.owner.avatar}/>
+      ><Avatar src={content.owner.avatar} size='small'/>
       </Popover>
   );
 };
