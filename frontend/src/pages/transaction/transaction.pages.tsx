@@ -316,18 +316,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             contents={contents}
           />
         </div>
-        <Container>
-          <FloatButton
-            tooltip="Add Content"
-            onClick={createHandler}
-            styles={{
-              backgroundColor: darkColors.grey,
-              color: lightColors.white,
-            }}
-          >
-            <PlusOutlined />
-          </FloatButton>
-        </Container>
+        {createContentElem}
       </div>
       <div className="transaction-drawer">
         <ContentEditorDrawer
