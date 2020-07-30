@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
@@ -13,10 +13,17 @@ import {
   Collapse,
   BackTop,
   Badge,
+  Button,
 } from 'antd';
 import { deleteProject, getProject } from '../../features/project/actions';
 import { iconMapper } from '../../components/side-menu/side-menu.component';
-import { DeleteOutlined, TeamOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  TeamOutlined,
+  SyncOutlined,
+  UpOutlined,
+  DownOutlined,
+} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
@@ -52,7 +59,6 @@ import {
 } from '../../features/label/actions';
 import { Label, stringToRGB } from '../../features/label/interface';
 import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
-import getThemeColorVars from '../../utils/theme';
 
 const { Panel } = Collapse;
 
@@ -62,6 +68,7 @@ type ProjectPathParams = {
 
 type ModalState = {
   isShow: boolean;
+  hideLabel: boolean;
   groupName: string;
   completeTasksShown: boolean;
   tasksByUsersShown: boolean;
@@ -134,6 +141,7 @@ class ProjectPage extends React.Component<
 > {
   state: ModalState = {
     isShow: false,
+    hideLabel: false,
     groupName: '',
     completeTasksShown: false,
     //used for tasks by assignee modal
@@ -262,38 +270,48 @@ class ProjectPage extends React.Component<
       return null;
     }
 
+    const hasLabel = this.props.projectLabels.length > 0;
+
     return (
-      <Collapse defaultActiveKey={['Labels']} expandIconPosition="right">
-        <Panel
-          header="Labels in BuJo"
-          key="Labels"
-          extra={
-            <Tooltip title="Refresh BuJo Labels">
-              <SyncOutlined
-                onClick={(event) => {
-                  event.stopPropagation();
-                  const projectId = parseInt(this.props.match.params.projectId);
-                  this.props.projectLabelsUpdate(projectId);
-                }}
-              />
-            </Tooltip>
-          }
-        >
-          <div className="project-labels">
-            {this.props.projectLabels.map((label, index) => (
-              <Tag
-                key={label.id}
-                color={stringToRGB(label.value)}
-                onClick={() => this.toLabelSearching(label)}
+      <>
+       {hasLabel &&(<div>
+        <div className="project-labels-icon">
+          <span>
+            {!this.state.hideLabel && (<UpOutlined onClick={() => {this.setState({hideLabel : true});}} />)}
+            {this.state.hideLabel && (<DownOutlined onClick={() => {this.setState({hideLabel : false});}} />)}
+          </span>
+          {" "}
+          <span>
+            <Popover
+                placement="top"
+                content="Refresh Labels"
               >
-                <span>
-                  {getIcon(label.icon)} &nbsp;{label.value}
-                </span>
-              </Tag>
-            ))}
-          </div>
-        </Panel>
-      </Collapse>
+                <SyncOutlined
+              onClick={(event) => {
+                event.stopPropagation();
+                const projectId = parseInt(this.props.match.params.projectId);
+                this.props.projectLabelsUpdate(projectId);
+              }}
+            />
+              </Popover>
+            
+          </span>
+        </div>
+
+        {!this.state.hideLabel && <div className="project-labels">
+          {this.props.projectLabels.map((label, index) => (
+            <Tag
+              key={label.id}
+              color={stringToRGB(label.value)}
+              onClick={() => this.toLabelSearching(label)}
+            >
+              <span>
+                {getIcon(label.icon)} &nbsp;{label.value}
+              </span>
+            </Tag>
+          ))}
+        </div>}</div>)
+     }   </>
     );
   };
 
@@ -496,15 +514,23 @@ class ProjectPage extends React.Component<
         </Tooltip>
         <div className="project-header">
           <h2>
-            <Tooltip
-              placement="top"
-              title={`${project.projectType} ${project.name}`}
-            >
+            {!description && (
               <span>
                 {iconMapper[project.projectType]}
                 &nbsp;{project.name}
               </span>
-            </Tooltip>
+            )}
+            {description && (
+              <Popover
+                placement="bottomLeft"
+                content={description || project.name}
+              >
+                <span>
+                  {iconMapper[project.projectType]}
+                  &nbsp;{project.name}
+                </span>
+              </Popover>
+            )}
           </h2>
           <div className="project-control">
             <Popover
@@ -538,9 +564,6 @@ class ProjectPage extends React.Component<
             {projectItemsByOrder}
           </div>
         </div>
-        {description && (
-          <div className="project-description">{description}</div>
-        )}
         {this.getProjectLabels()}
         <BackTop />
         <div className="project-content">{projectContent}</div>
