@@ -2,7 +2,7 @@
 
 .project {
   position: relative;
-  .pages-property();
+  .pages-property(unset);
 
   .project-avatar {
     width: 50px;
@@ -64,7 +64,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    padding-top:20px;
+    padding-top: 20px;
 
     & span {
       cursor: pointer;
@@ -73,10 +73,9 @@
   }
 
   .project-labels-icon {
-    right:36px;
+    right: 36px;
     position: absolute;
   }
-
 }
 
 .project.ledger {
