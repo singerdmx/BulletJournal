@@ -125,13 +125,15 @@ const ContentItem: React.FC<ContentProps> = ({
                   <DeleteOutlined />
                 </Button>
               </Tooltip>
-              {content.revisions && content.revisions.length > 1 && <Tooltip title="View revision history">
-                <Button onClick={handleOpenRevisions} type="link">
-                  <HighlightOutlined />
-                  &nbsp;
-                  {content.revisions.length}
-                </Button>
-              </Tooltip>}
+              {content.revisions && content.revisions.length > 1 && (
+                <Tooltip title="View revision history">
+                  <Button onClick={handleOpenRevisions} type="link">
+                    <HighlightOutlined />
+                    &nbsp;
+                    {content.revisions.length}
+                  </Button>
+                </Tooltip>
+              )}
             </>
           }
         >
