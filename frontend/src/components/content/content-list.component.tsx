@@ -1,7 +1,6 @@
 import React from 'react';
-import { List, Tabs, Avatar, Tooltip } from 'antd';
-import { ProjectItem } from '../../features/myBuJo/interface';
-import { Content } from '../../features/myBuJo/interface';
+import {Avatar, Popover, Tabs} from 'antd';
+import {Content, ProjectItem} from '../../features/myBuJo/interface';
 import ContentItem from './content-item.component';
 import moment from 'moment';
 
@@ -15,17 +14,17 @@ type TabContentProps = {
   content: Content;
 };
 
-const TabContent: React.FC<TabContentProps> = ({ content }) => {
+const TabContent: React.FC<TabContentProps> = ({content}) => {
   const updateTime = content.updatedAt
-    ? moment(content.updatedAt).format('MMM Do YYYY')
-    : '';
+      ? `${moment(content.updatedAt).format('MMM Do YYYY')} (${moment(content.updatedAt).fromNow()})`
+      : '';
   return (
-    <Tooltip
-      title={`${content.owner.alias} ${updateTime}`}
-      className="tab-content"
-    >
-      <Avatar src={content.owner.avatar} />
-    </Tooltip>
+      <Popover
+          placement="right"
+          title={content.owner.alias}
+          content={updateTime}
+      ><Avatar src={content.owner.avatar}/>
+      </Popover>
   );
 };
 
