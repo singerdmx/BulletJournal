@@ -33,7 +33,7 @@ public class SearchIndexDaoJpa {
     private static final String PRE_TAG = "<em class='highlight'>";
     private static final String POST_TAG = "</em>";
     private static final String BOUNDARY_SCANNER_TYPE = "sentence";
-    private static final String HIGHLIGHTER_TYPE = "unified";
+    private static final String HIGHLIGHTER_TYPE = "plain";
     private static final String SEARCH_FIELD = "value";
     private static final String FRAGMENTER = "span";
     private static final String SEARCH_INDEX_NAME = "project_items";
