@@ -22,17 +22,10 @@ const ContentEditorDrawer: React.FC<
   const handleClose = () => {
     onClose();
   };
+  const fullHeight = global.window.innerHeight;
   const fullWidth = global.window.innerWidth;
   const drawerWidth =
-    fullWidth < 576
-      ? fullWidth
-      : fullWidth < 768
-      ? fullWidth * 0.7
-      : fullWidth < 992
-      ? fullWidth * 0.6
-      : fullWidth < 1200
-      ? fullWidth * 0.5
-      : fullWidth * 0.4;
+    fullWidth > fullHeight ? Math.floor(fullHeight / 1.4) : fullWidth;
   if (!projectItem) return null;
   return (
     <Drawer
