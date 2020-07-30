@@ -245,6 +245,12 @@ public class QueryController {
                                           List<SearchIndex> invalid,
                                           List<SearchHit<SearchIndex>> searchResultList,
                                           Set<Long> shareNoteIds, Set<Long> shareTaskIds) {
+        if (shareNoteIds == null) {
+            shareNoteIds = Collections.emptySet();
+        }
+        if (shareTaskIds == null) {
+            shareTaskIds = Collections.emptySet();
+        }
         // Created a Map to group search result to the same id
         Map<String, SearchResultItem> results = new HashMap<>();
 
