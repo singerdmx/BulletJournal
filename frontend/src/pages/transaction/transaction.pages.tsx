@@ -10,7 +10,7 @@ import {
   ProjectType,
 } from '../../features/project/constants';
 import {
-  deleteTransaction,
+  deleteTransaction, deleteContent,
   getTransaction,
   updateTransactionContents,
 } from '../../features/transactions/actions';
@@ -52,6 +52,8 @@ import {
   lightColors,
   darkColors,
 } from 'react-floating-action-button';
+import { setDisplayMore, setDisplayRevision } from "../../features/content/actions";
+import { DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined } from "@ant-design/icons/lib";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -64,19 +66,27 @@ type TransactionProps = {
 };
 
 interface TransactionPageHandler {
+  content: Content | undefined;
   getTransaction: (transactionId: number) => void;
+  setDisplayMore: (displayMore: boolean) => void;
+  setDisplayRevision: (displayRevision: boolean) => void;
+  deleteContent: (taskId: number, contentId: number) => void;
 }
 
 const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props
 ) => {
   const {
+    content,
     transaction,
     deleteTransaction,
     currency,
     contents,
     updateTransactionContents,
     getTransaction,
+    setDisplayMore,
+    setDisplayRevision,
+    deleteContent
   } = props;
 
   // get id of Transaction from oruter
@@ -100,6 +110,18 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     }
   }, [transaction]);
 
+
+  useEffect(() => {
+
+    if (!transaction) {
+      return;
+    }
+    updateTransactionContents(transaction.id);
+    setDisplayMore(false);
+    setDisplayRevision(false);
+
+  }, [transaction]);
+
   if (!transaction) return null;
   // show drawer
   const createHandler = () => {
@@ -109,6 +131,62 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const handleClose = () => {
     setEditorShow(false);
   };
+
+  const handleEdit = () => {
+    setDisplayMore(true);
+  };
+
+  const handleOpenRevisions = () => {
+    setDisplayRevision(true);
+  };
+
+  const handleDelete = () => {
+    if (!content) {
+      return;
+    }
+    deleteContent(transaction.id, content.id);
+  };
+
+
+  const createContentElem = (
+    <Container>
+      {content && <FloatButton
+        tooltip="Delete Content"
+        onClick={handleDelete}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <DeleteOutlined />
+      </FloatButton>}
+      {content && content.revisions.length > 1 && <FloatButton
+        tooltip={`View Revision History (${content.revisions.length - 1})`}
+        onClick={handleOpenRevisions}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <HighlightOutlined />
+      </FloatButton>}
+      {content && <FloatButton
+        tooltip="Edit Content"
+        onClick={handleEdit}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <EditOutlined />
+      </FloatButton>}
+      <FloatButton
+        tooltip="Add Content"
+        onClick={createHandler}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <PlusOutlined />
+      </FloatButton>
+      <FloatButton
+        tooltip="Actions"
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <MenuOutlined />
+      </FloatButton>
+    </Container>
+
+  );
 
   const handleRefresh = () => {
     transaction && transaction.id && updateTransactionContents(transaction.id);
@@ -127,7 +205,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             title={moment(transaction.date, dateFormat).fromNow()}
             value={`${transaction.date} ${
               transaction.time ? transaction.time : ''
-            }`}
+              }`}
             prefix={<AccountBookOutlined />}
           />
         </Card>
@@ -266,10 +344,15 @@ const mapStateToProps = (state: IState) => ({
   transaction: state.transaction.transaction,
   currency: state.myself.currency,
   contents: state.transaction.contents,
+  content: state.content.content
+
 });
 
 export default connect(mapStateToProps, {
   getTransaction,
   deleteTransaction,
   updateTransactionContents,
+  deleteContent,
+  setDisplayMore,
+  setDisplayRevision
 })(TransactionPage);
