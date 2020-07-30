@@ -56,8 +56,12 @@
   }
 
   .note-content {
-    height: calc(100% - 100px);
+    height: 82%;
 
+    @media screen and (max-width: 1024px) {
+      height: 85%;
+    }
+    
     .content-list {
       height: 100%;
     }
