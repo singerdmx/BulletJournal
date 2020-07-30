@@ -33,11 +33,10 @@ const ContentList: React.FC<ContentListProps> = ({
   contents,
   contentEditable,
 }) => {
-  const fullWidth = global.window.innerWidth;
   return (
     <Tabs
       defaultActiveKey="0"
-      tabPosition={fullWidth < 768 ? 'top' : 'left'}
+      tabPosition='left'
       style={{ height: '100%' }}
     >
       {contents &&
