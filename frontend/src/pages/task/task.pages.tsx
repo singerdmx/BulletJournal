@@ -1,12 +1,12 @@
 // page display contents of tasks
 // react imports
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 //actions
 import {
-  completeTask,
+  completeTask, deleteContent,
   deleteTask,
   getTask,
   updateTaskContents,
@@ -44,8 +44,12 @@ import {
   darkColors,
 } from 'react-floating-action-button';
 import { getTaskAssigneesPopoverContent } from '../../components/project-item/task-item.component';
+import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
+import {Content} from "../../features/myBuJo/interface";
+import {DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@ant-design/icons/lib";
 
 interface TaskPageHandler {
+  content: Content | undefined;
   getTask: (taskId: number) => void;
   deleteTask: (taskId: number, type: ProjectItemUIType) => void;
   updateTaskContents: (taskId: number) => void;
@@ -54,16 +58,24 @@ interface TaskPageHandler {
     type: ProjectItemUIType,
     dateTime?: string
   ) => void;
+  setDisplayMore: (displayMore: boolean) => void;
+  setDisplayRevision: (displayRevision: boolean) => void;
+  deleteContent: (taskId: number, contentId: number) => void;
+
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const {
+    content,
     task,
     deleteTask,
     updateTaskContents,
     getTask,
     contents,
     completeTask,
+    setDisplayMore,
+    setDisplayRevision,
+    deleteContent
   } = props;
   // get id of task from router
   const { taskId } = useParams();
@@ -74,12 +86,18 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const history = useHistory();
 
   // listening on the empty state working as componentDidmount
-  React.useEffect(() => {
+  useEffect(() => {
     taskId && getTask(parseInt(taskId));
   }, [taskId]);
 
-  React.useEffect(() => {
-    task && task.id && updateTaskContents(task.id);
+  useEffect(() => {
+    if (!task) {
+      return;
+    }
+    updateTaskContents(task.id);
+    setDisplayMore(false);
+    setDisplayRevision(false);
+
   }, [task]);
 
   if (!task) return null;
@@ -101,16 +119,60 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     taskId && getTask(parseInt(taskId));
   };
 
+  const handleEdit = () => {
+    setDisplayMore(true);
+  };
+
+  const handleOpenRevisions = () => {
+    setDisplayRevision(true);
+  };
+
+  const handleDelete = () => {
+    if (!content) {
+      return;
+    }
+    deleteContent(task.id, content.id);
+  };
+
+
   const createContentElem = (
-    <Container>
-      <FloatButton
-        tooltip="Add Content"
-        onClick={createHandler}
-        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
-      >
-        <PlusOutlined />
-      </FloatButton>
-    </Container>
+      <Container>
+        {content && <FloatButton
+            tooltip="Delete Content"
+            onClick={handleDelete}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <DeleteOutlined/>
+        </FloatButton>}
+        {content && content.revisions.length > 1 && <FloatButton
+            tooltip={`View Revision History (${content.revisions.length - 1})`}
+            onClick={handleOpenRevisions}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <HighlightOutlined/>
+        </FloatButton>}
+        {content && <FloatButton
+            tooltip="Edit Content"
+            onClick={handleEdit}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <EditOutlined/>
+        </FloatButton>}
+        <FloatButton
+            tooltip="Add Content"
+            onClick={createHandler}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <PlusOutlined/>
+        </FloatButton>
+        <FloatButton
+            tooltip="Actions"
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <MenuOutlined/>
+        </FloatButton>
+      </Container>
+
   );
 
   const taskEditorElem = (
@@ -245,6 +307,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   task: state.task.task,
   contents: state.task.contents,
+  content: state.content.content
 });
 
 export default connect(mapStateToProps, {
@@ -252,4 +315,7 @@ export default connect(mapStateToProps, {
   getTask,
   updateTaskContents,
   completeTask,
+  deleteContent,
+  setDisplayMore,
+  setDisplayRevision
 })(TaskPage);

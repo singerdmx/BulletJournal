@@ -70,6 +70,7 @@ import {completedTaskPageSize, ProjectItemUIType} from '../project/constants';
 import {Task} from './interface';
 import {recentItemsReceived} from '../recent/actions';
 import {ContentType} from '../myBuJo/constants';
+import {updateTargetContent} from "../content/actions";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -777,8 +778,9 @@ function* removeSharedTask(action: PayloadAction<RemoveShared>) {
 function* createTaskContent(action: PayloadAction<CreateContent>) {
   try {
     const { taskId, text } = action.payload;
-    yield call(addContent, taskId, text);
+    const content: Content = yield call(addContent, taskId, text);
     yield put(updateTaskContents(taskId));
+    yield put(updateTargetContent(content));
   } catch (error) {
     yield call(message.error, `createTaskContent Error Received: ${error}`);
   }
@@ -792,6 +794,7 @@ function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
         contents: contents,
       })
     );
+    yield put(updateTargetContent(contents[0]));
   } catch (error) {
     yield call(message.error, `taskContentsUpdate Error Received: ${error}`);
   }
@@ -875,7 +878,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
     const state: IState = yield select();
     const order = state.note.contents.map(c => c.id);
 
-    const contents = yield call(updateContent, taskId, contentId, text);
+    const contents : Content[] = yield call(updateContent, taskId, contentId, text);
     contents.sort((a: Content, b: Content) => {
       return order.findIndex((o) => o === a.id) - order.findIndex((o) => o === b.id);
     });
@@ -884,6 +887,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
         contents: contents,
       })
     );
+    yield put(updateTargetContent(contents.filter(c => c.id === contentId)[0]));
   } catch (error) {
     yield call(message.error, `Patch Content Error Received: ${error}`);
   }
@@ -933,6 +937,7 @@ function* deleteTaskContent(action: PayloadAction<DeleteContent>) {
         contents: contents,
       })
     );
+    yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
   } catch (error) {
     yield call(
       message.error,
