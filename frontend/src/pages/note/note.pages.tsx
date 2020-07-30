@@ -5,14 +5,23 @@ import { useHistory, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 // features
 //actions
-import { deleteNote, getNote, updateNoteContents, } from '../../features/notes/actions';
+import {
+  deleteNote,
+  getNote,
+  updateNoteContents,
+} from '../../features/notes/actions';
 
 import { IState } from '../../store';
 // components
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
 import { Popconfirm, Tooltip } from 'antd';
-import { DeleteTwoTone, SyncOutlined, UpSquareOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteTwoTone,
+  SyncOutlined,
+  UpSquareOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -20,11 +29,18 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
-import { ProjectItemUIType, ProjectType } from '../../features/project/constants';
+import {
+  ProjectItemUIType,
+  ProjectType,
+} from '../../features/project/constants';
 import NoteDetailPage, { NoteProps } from './note-detail.pages';
 import LabelManagement from '../project/label-management.compoent';
-import { Container, Button as FloatButton, lightColors, darkColors } from 'react-floating-action-button'
-
+import {
+  Container,
+  Button as FloatButton,
+  lightColors,
+  darkColors,
+} from 'react-floating-action-button';
 
 interface NotePageHandler {
   getNote: (noteId: number) => void;
@@ -72,7 +88,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   if (!note) return null;
 
   const createContentElem = (
-
     <Container>
       <FloatButton
         tooltip="Add Content"
@@ -85,9 +100,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
   );
 
   const noteEditorElem = (
-    <div className='note-drawer'>
+    <div className="note-drawer">
       <ContentEditorDrawer
-        readMode={false}
         projectItem={note}
         visible={showEditor}
         onClose={handleClose}
@@ -97,45 +111,45 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
   const noteOperation = () => {
     return (
-      <div className='note-operation'>
+      <div className="note-operation">
         <LabelManagement
           labelEditableHandler={labelEditableHandler}
           labelEditable={labelEditable}
         />
-        <EditNote note={note} mode='icon' />
+        <EditNote note={note} mode="icon" />
         <MoveProjectItem
           type={ProjectType.NOTE}
           projectItemId={note.id}
-          mode='icon'
+          mode="icon"
         />
         <ShareProjectItem
           type={ProjectType.NOTE}
           projectItemId={note.id}
-          mode='icon'
+          mode="icon"
         />
-        <Tooltip title='Delete'>
+        <Tooltip title="Delete">
           <Popconfirm
-            title='Deleting Note also deletes its child notes. Are you sure?'
-            okText='Yes'
-            cancelText='No'
+            title="Deleting Note also deletes its child notes. Are you sure?"
+            okText="Yes"
+            cancelText="No"
             onConfirm={() => {
               deleteNote(note.id, ProjectItemUIType.PAGE);
               history.goBack();
             }}
-            className='group-setting'
-            placement='bottom'
+            className="group-setting"
+            placement="bottom"
           >
             <div>
-              <DeleteTwoTone twoToneColor='#f5222d' />
+              <DeleteTwoTone twoToneColor="#f5222d" />
             </div>
           </Popconfirm>
         </Tooltip>
-        <Tooltip title='Refresh Contents'>
+        <Tooltip title="Refresh Contents">
           <div>
             <SyncOutlined onClick={handleRefresh} />
           </div>
         </Tooltip>
-        <Tooltip title='Go to Parent BuJo'>
+        <Tooltip title="Go to Parent BuJo">
           <div>
             <UpSquareOutlined
               onClick={(e) => history.push(`/projects/${note.projectId}`)}
