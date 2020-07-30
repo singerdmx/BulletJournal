@@ -480,7 +480,11 @@ class ProjectPage extends React.Component<
     }
 
     return (
-      <div className="project">
+      <div
+        className={`project ${
+          project.projectType === ProjectType.LEDGER && 'ledger'
+        }`}
+      >
         <Tooltip
           placement="top"
           title={project.owner.alias}

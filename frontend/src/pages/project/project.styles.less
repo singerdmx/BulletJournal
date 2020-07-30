@@ -46,6 +46,8 @@
   .project-content {
     padding: 0.5em 1em;
     min-height: auto;
+    height: calc(100% - 200px);
+    overflow: scroll;
   }
   .project-description {
     width: 100%;
@@ -68,6 +70,10 @@
       margin-bottom: 2px;
     }
   }
+}
+
+.project.ledger {
+  .pages-property(unset);
 }
 
 .completed-tasks {
