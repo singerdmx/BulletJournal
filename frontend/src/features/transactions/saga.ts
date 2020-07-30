@@ -475,7 +475,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
     const state: IState = yield select();
     const order = state.note.contents.map(c => c.id);
 
-    const contents = yield call(updateContent, transactionId, contentId, text);
+    const contents : Content[] = yield call(updateContent, transactionId, contentId, text);
     contents.sort((a: Content, b: Content) => {
       return order.findIndex((o) => o === a.id) - order.findIndex((o) => o === b.id);
     });
