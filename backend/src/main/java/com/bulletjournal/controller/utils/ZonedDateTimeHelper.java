@@ -328,9 +328,9 @@ public class ZonedDateTimeHelper {
         return now.get(ChronoField.SECOND_OF_DAY);
     }
 
-    public static Pair<ZonedDateTime, ZonedDateTime> nowToNext(long seconds, String timezone) {
+    public static Pair<ZonedDateTime, ZonedDateTime> getInterval(long seconds, String timezone) {
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
-        return Pair.of(now, now.plus(seconds, ChronoUnit.SECONDS));
+        return Pair.of(now.minus(seconds, ChronoUnit.SECONDS), now.plus(seconds, ChronoUnit.SECONDS));
     }
 
 }

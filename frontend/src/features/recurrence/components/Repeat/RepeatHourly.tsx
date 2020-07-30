@@ -23,7 +23,7 @@ class RepeatHourly extends React.Component<RepeatHourlyProps> {
         <span>Every</span>
         {'  '}
         <InputNumber
-          style={{ width: '60px' }}
+          style={{ width: '50px' }}
           value={this.props.repeatHourly}
           onChange={this.onChange}
         />

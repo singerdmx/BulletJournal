@@ -83,7 +83,7 @@ class RepeatMonthly extends React.Component<RepeatMonthlyProps> {
           <span>Every</span>
           {'  '}
           <InputNumber
-            style={{ width: '60px' }}
+            style={{ width: '50px' }}
             value={this.props.repeatMonthlyCount}
             onChange={this.onChangeCount}
           />
