@@ -59,7 +59,6 @@ const ContentItem: React.FC<ContentProps> = ({
   const contentHtml = JSON.parse(content.text)['###html###'];
   const [displayMore, setDisplayMore] = useState(false);
   const [displayRevision, setDisplayRevision] = useState(false);
-  const [readMode, setReadMode] = useState(true);
 
   const createdTime = content.createdAt
     ? moment(content.createdAt).fromNow()
@@ -67,10 +66,7 @@ const ContentItem: React.FC<ContentProps> = ({
   const updateTime = content.updatedAt
     ? moment(content.updatedAt).format('MMM Do YYYY')
     : '';
-  const handleOpen = () => {
-    setReadMode(true);
-    setDisplayMore(true);
-  };
+
   const handleOpenRevisions = () => {
     setDisplayRevision(true);
   };
@@ -80,7 +76,6 @@ const ContentItem: React.FC<ContentProps> = ({
   };
 
   const handleClose = () => {
-    setReadMode(true);
     setDisplayMore(false);
   };
 
@@ -103,7 +98,6 @@ const ContentItem: React.FC<ContentProps> = ({
   };
 
   const handleEdit = () => {
-    setReadMode(false);
     setDisplayMore(true);
   };
 
@@ -142,7 +136,6 @@ const ContentItem: React.FC<ContentProps> = ({
       </div>
       <div
         className="content-item-page"
-        onClick={handleOpen}
         dangerouslySetInnerHTML={{
           __html: contentHtml,
         }}
@@ -153,7 +146,6 @@ const ContentItem: React.FC<ContentProps> = ({
         visible={displayMore}
         onClose={handleClose}
         projectItem={projectItem}
-        readMode={readMode}
       />
       <RevisionDrawer
         revisionDisplay={displayRevision}
