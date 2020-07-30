@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
+import com.bulletjournal.controller.models.UserPointActivity;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.FirstTimeUserRepository;
@@ -36,6 +37,9 @@ public class UserDaoJpa {
 
     @Autowired
     private FirstTimeUserRepository firstTimeUserRepository;
+
+    @Autowired
+    private UserPointActivityDaoJpa userPointActivityDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
@@ -116,11 +120,17 @@ public class UserDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void changeUserPoints(String username, Integer points) {
+    public void changeUserPoints(String username, Integer points, String description) {
+        userPointActivityDaoJpa.create(this.getByName(username), points, description);
         User user = this.getByName(username);
         Integer pts = user.getPoints() + points;
         user.setPoints(pts);
         this.userRepository.save(user);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<UserPointActivity> getPointActivitiesByUserName(String username) {
+        return userPointActivityDaoJpa.findPointActivityByUserName(username);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

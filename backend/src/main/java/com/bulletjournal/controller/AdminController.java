@@ -5,14 +5,15 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.VersionConfig;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.redis.models.LockedIP;
-import com.bulletjournal.redis.models.LockedUser;
 import com.bulletjournal.redis.RedisLockedIPRepository;
 import com.bulletjournal.redis.RedisLockedUserRepository;
+import com.bulletjournal.redis.models.LockedIP;
+import com.bulletjournal.redis.models.LockedUser;
 import com.bulletjournal.repository.UserDaoJpa;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
@@ -25,6 +26,7 @@ public class AdminController {
     public static final String SET_ROLE_ROUTE = "/api/users/{username}/setRole";
     public static final String USER_ROUTE = "/api/admin/users/{username}";
     public static final String CHANGE_POINTS_ROUTE = "/api/users/{username}/changePoints";
+    public static final String POINT_ACTIVITY_ROUTE = "/api/admin/pointActivity/{username}";
     public static final String SET_POINTS_ROUTE = "/api/users/{username}/setPoints";
     public static final String USERS_ROUTE = "/api/users";
     public static final String LOCKED_USERS_ROUTE = "/api/lockedUsers";
@@ -123,9 +125,18 @@ public class AdminController {
         username = getUsername(username);
         validateRequester();
         Integer points = changePointsParams.getPoints();
-        this.userDaoJpa.changeUserPoints(username, points);
+        String description = changePointsParams.getDescription();
+        this.userDaoJpa.changeUserPoints(username, points, description);
     }
 
+    @GetMapping(POINT_ACTIVITY_ROUTE)
+    public ResponseEntity<List<UserPointActivity>> getUserPointActivities(@NotBlank @PathVariable String username) {
+        username = getUsername(username);
+        validateRequester();
+        return ResponseEntity.ok().body(this.userDaoJpa.getPointActivitiesByUserName(username));
+    }
+
+    @Deprecated
     @PostMapping(SET_POINTS_ROUTE)
     public void setPoints(@NotBlank @PathVariable String username,
                           @NotNull @RequestBody SetPointsParams setPointsParams) {
