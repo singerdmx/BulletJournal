@@ -1,7 +1,6 @@
 @import (reference) '../pages.style.less';
 
 .task-page {
-  position: relative;
   .pages-property();
 
   &.public {
@@ -82,6 +81,19 @@
   .task-drawer {
     .task-editor {
       border: 1px solid lightgrey;
+    }
+  }
+
+  .task-content {
+    height: calc(100% - 200px);
+
+    .content-list {
+      height: 100%;
+    }
+
+    .ant-tabs-content {
+      height: 100%;
+      overflow: scroll;
     }
   }
 }
