@@ -384,8 +384,8 @@ function* createTransactionContent(action: PayloadAction<CreateContent>) {
   try {
     const { transactionId, text } = action.payload;
     const content: Content = yield call(addContent, transactionId, text);
-    yield call(addContent, transactionId, text);
     yield put(updateTransactionContents(transactionId));
+    yield put(updateTargetContent(content));
 
   } catch (error) {
     yield call(
