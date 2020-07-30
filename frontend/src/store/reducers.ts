@@ -15,6 +15,7 @@ import { reducer as calendarSyncReducer } from '../features/calendarSync/reducer
 import { reducer as recent } from '../features/recent/reducer';
 import { reducer as admin } from '../features/admin/reducer';
 import { reducer as search } from '../features/search/reducer';
+import { reducer as content } from '../features/content/reducer';
 
 export default {
   settings: settingsReducer,
@@ -34,4 +35,5 @@ export default {
   recent: recent,
   admin: admin,
   search: search,
+  content: content,
 };

@@ -54,6 +54,7 @@ import {Note} from './interface';
 import {ProjectItemUIType} from "../project/constants";
 import {ContentType} from "../myBuJo/constants";
 import {recentItemsReceived} from "../recent/actions";
+import {updateTargetContent} from "../content/actions";
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -93,6 +94,7 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
         contents: contents,
       })
     );
+    yield put(updateTargetContent(contents[0]));
   } catch (error) {
     yield call(message.error, `noteContentsUpdate Error Received: ${error}`);
   }
@@ -199,8 +201,9 @@ function* noteCreate(action: PayloadAction<CreateNote>) {
 function* createNoteContent(action: PayloadAction<CreateContent>) {
   try {
     const { noteId, text } = action.payload;
-    yield call(addContent, noteId, text);
+    const content: Content = yield call(addContent, noteId, text);
     yield put(updateNoteContents(noteId));
+    yield put(updateTargetContent(content));
   } catch (error) {
     yield call(message.error, `createNoteContent Error Received: ${error}`);
   }
@@ -407,6 +410,7 @@ function* deleteNoteContent(action: PayloadAction<DeleteContent>) {
         contents: contents,
       })
     );
+    yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
   } catch (error) {
     yield call(
       message.error,
