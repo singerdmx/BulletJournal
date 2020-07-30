@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Avatar, List, Tooltip, Tabs, Button } from 'antd';
+import { Avatar, List, Tooltip, Tabs, Button, Popover } from 'antd';
 import { Content, ProjectItem } from '../../features/myBuJo/interface';
 import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import RevisionDrawer from '../revision/revision-drawer.component';
@@ -7,6 +7,7 @@ import {
   HighlightOutlined,
   DeleteOutlined,
   EditOutlined,
+  DashOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import './content-item.styles.less';
@@ -109,23 +110,33 @@ const ContentItem: React.FC<ContentProps> = ({
   return (
     <div className="content-item-page-contianer">
       <div className="content-item-page-control">
-        <Tooltip title={'Edit'}>
-          <Button onClick={handleEdit}>
-            <EditOutlined />
-          </Button>
-        </Tooltip>
-        <Tooltip title="Delete">
-          <Button onClick={handleDelete}>
-            <DeleteOutlined />
-          </Button>
-        </Tooltip>
-        <Tooltip title="View revision history">
-          <Button onClick={handleOpenRevisions}>
-            <HighlightOutlined />
-            &nbsp;
-            {content.revisions.length}
-          </Button>
-        </Tooltip>
+        {content.owner.alias}
+        <Popover
+          placement="bottomRight"
+          content={
+            <>
+              <Tooltip title={'Edit'}>
+                <Button onClick={handleEdit} type="link">
+                  <EditOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Delete">
+                <Button onClick={handleDelete} type="link">
+                  <DeleteOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title="View revision history">
+                <Button onClick={handleOpenRevisions} type="link">
+                  <HighlightOutlined />
+                  &nbsp;
+                  {content.revisions.length}
+                </Button>
+              </Tooltip>
+            </>
+          }
+        >
+          <DashOutlined style={{ fontWeight: 'bold' }} />
+        </Popover>
       </div>
       <div
         className="content-item-page"

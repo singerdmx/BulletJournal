@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Tabs, Avatar } from 'antd';
+import { List, Tabs, Avatar, Tooltip } from 'antd';
 import { ProjectItem } from '../../features/myBuJo/interface';
 import { Content } from '../../features/myBuJo/interface';
 import ContentItem from './content-item.component';
@@ -20,10 +20,12 @@ const TabContent: React.FC<TabContentProps> = ({ content }) => {
     ? moment(content.updatedAt).format('MMM Do YYYY')
     : '';
   return (
-    <span className="tab-content">
+    <Tooltip
+      title={`${content.owner.alias} ${updateTime}`}
+      className="tab-content"
+    >
       <Avatar src={content.owner.avatar} />
-      <span>{updateTime}</span>
-    </span>
+    </Tooltip>
   );
 };
 
