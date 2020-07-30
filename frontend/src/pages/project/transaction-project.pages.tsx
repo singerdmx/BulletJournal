@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Cell,
   Legend,
@@ -11,15 +11,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {IState} from '../../store';
-import {connect} from 'react-redux';
-import {Carousel, DatePicker, Form, List, Radio, Result, Select, Tooltip} from 'antd';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import { Carousel, DatePicker, Form, List, Radio, Result, Select, Tooltip } from 'antd';
 import moment from 'moment';
-import {dateFormat} from '../../features/myBuJo/constants';
+import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
-import {zones} from '../../components/settings/constants';
-import {updateTransactionForm, updateTransactions,} from '../../features/transactions/actions';
-import {updateExpandedMyself} from '../../features/myself/actions';
+import { zones } from '../../components/settings/constants';
+import { updateTransactionForm, updateTransactions, } from '../../features/transactions/actions';
+import { updateExpandedMyself } from '../../features/myself/actions';
 import {
   FrequencyType,
   LedgerSummary,
@@ -29,12 +29,12 @@ import {
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
 import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
-import {RadioChangeEvent} from 'antd/lib/radio';
-import {Project} from '../../features/project/interface';
-import {User} from '../../features/group/interface';
-import {AccountBookOutlined} from '@ant-design/icons';
+import { RadioChangeEvent } from 'antd/lib/radio';
+import { Project } from '../../features/project/interface';
+import { User } from '../../features/group/interface';
+import { AccountBookOutlined } from '@ant-design/icons';
 import AddTransaction from "../../components/modals/add-transaction.component";
-import {ProjectItemUIType} from "../../features/project/constants";
+import { ProjectItemUIType } from "../../features/project/constants";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -343,8 +343,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     if (transactions.length === 0) {
       return <div className='add-transaction-button'>
         <Result
-            icon={<AccountBookOutlined />}
-            extra={<AddTransaction mode='button'/>}
+          icon={<AccountBookOutlined />}
+          extra={<AddTransaction mode='button' />}
         />
       </div>
     }
@@ -358,7 +358,6 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
   return (
     <div className='transaction-page'>
-      {getAddTransactionButton()}
       <div className='transaction-control'>
         <Form
           form={form}
@@ -512,8 +511,8 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                 )
               )
             ) : (
-              <div>LedgerSummaries</div>
-            )}
+                <div>LedgerSummaries</div>
+              )}
           </Carousel>
         </div>
       )}
@@ -568,17 +567,17 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   >
                     {graphCate === 'expense'
                       ? labelExpenseData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))
                       : labelIncomeData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
                   </Pie>
                   <HoverHint content={<PieTooltipContent />} />
                 </PieChart>
@@ -616,17 +615,17 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
                   >
                     {graphCate === 'expense'
                       ? labelExpenseData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))
                       : labelIncomeData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
@@ -646,6 +645,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           </List.Item>
         ))}
       </List>
+      {getAddTransactionButton()}
     </div>
   );
 };
