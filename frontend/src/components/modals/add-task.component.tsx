@@ -20,7 +20,7 @@ import {Project} from '../../features/project/interface';
 import {Label} from '../../features/label/interface';
 import {getIcon} from '../draggable-labels/draggable-label-list.component';
 import {onFilterAssignees, onFilterLabel} from '../../utils/Util';
-import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -455,7 +455,7 @@ const AddTask: React.FC<
   }
 
   return (
-      <Container>
+      <>
         <FloatButton
             tooltip="Add New Task"
             onClick={openModal}
@@ -464,7 +464,7 @@ const AddTask: React.FC<
           <PlusOutlined/>
         </FloatButton>
         {getModal()}
-      </Container>
+      </>
   );
 };
 

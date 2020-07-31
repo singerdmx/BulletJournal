@@ -1,64 +1,41 @@
-import React, { useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import { Project } from '../../features/project/interface';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import { GroupsWithOwner, User } from '../../features/group/interface';
-import {
-  Avatar,
-  Popconfirm,
-  Popover,
-  Tag,
-  Tooltip,
-  Collapse,
-  BackTop,
-  Badge,
-  Button,
-} from 'antd';
-import { deleteProject, getProject } from '../../features/project/actions';
-import { iconMapper } from '../../components/side-menu/side-menu.component';
-import {
-  DeleteOutlined,
-  TeamOutlined,
-  SyncOutlined,
-  UpOutlined,
-  DownOutlined,
-} from '@ant-design/icons';
+import React from 'react';
+import {RouteComponentProps} from 'react-router';
+import {Project} from '../../features/project/interface';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {GroupsWithOwner, User} from '../../features/group/interface';
+import {Avatar, BackTop, Badge, Collapse, Popconfirm, Popover, Tag, Tooltip,} from 'antd';
+import {deleteProject, getProject} from '../../features/project/actions';
+import {iconMapper} from '../../components/side-menu/side-menu.component';
+import {DeleteOutlined, DownOutlined, SyncOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTask from '../../components/modals/add-task.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
-import { ProjectType } from '../../features/project/constants';
-import { NoteTree } from '../../components/note-tree';
-import { History } from 'history';
-import { getGroupByProject } from '../projects/projects.pages';
+import {ProjectType} from '../../features/project/constants';
+import {NoteTree} from '../../components/note-tree';
+import {History} from 'history';
+import {getGroupByProject} from '../projects/projects.pages';
 import TaskTree from './task-tree.component';
 import TransactionProject from './transaction-project.pages';
-import { updateExpandedMyself } from '../../features/myself/actions';
+import {updateExpandedMyself} from '../../features/myself/actions';
 
 import './project.styles.less';
-import {
-  getTasksByAssignee,
-  getTasksByOrder,
-} from '../../features/tasks/actions';
-import { getNotesByOwner, getNotesByOrder } from '../../features/notes/actions';
-import { getTransactionsByPayer } from '../../features/transactions/actions';
+import {getTasksByAssignee, getTasksByOrder,} from '../../features/tasks/actions';
+import {getNotesByOrder, getNotesByOwner} from '../../features/notes/actions';
+import {getTransactionsByPayer} from '../../features/transactions/actions';
 import TasksByAssignee from '../../components/modals/tasks-by-assignee.component';
 import TasksByOrder from '../../components/modals/tasks-by-order.component';
 import NotesByOwner from '../../components/modals/notes-by-owner.component';
 import NotesByOrder from '../../components/modals/notes-by-order.component';
 import TransactionsByPayer from '../../components/modals/transactions-by-payer.component';
 import ShowProjectHistory from '../../components/modals/show-project-history.component';
-import {
-  FrequencyType,
-  LedgerSummaryType,
-} from '../../features/transactions/interface';
-import {
-  projectLabelsUpdate,
-  setSelectedLabel,
-} from '../../features/label/actions';
-import { Label, stringToRGB } from '../../features/label/interface';
-import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
+import {FrequencyType, LedgerSummaryType,} from '../../features/transactions/interface';
+import {projectLabelsUpdate, setSelectedLabel,} from '../../features/label/actions';
+import {Label, stringToRGB} from '../../features/label/interface';
+import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {MenuOutlined} from "@ant-design/icons/lib";
 
 const { Panel } = Collapse;
 
@@ -367,7 +344,16 @@ class ProjectPage extends React.Component<
         );
         break;
       case ProjectType.TODO:
-        createContent = <AddTask mode="icon" />;
+        createContent = <Container>
+          <AddTask mode="icon"/>
+          <FloatButton
+              tooltip="Actions"
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          >
+            <MenuOutlined/>
+          </FloatButton>
+        </Container>
+
         projectContent = (
           <TaskTree
             timezone={this.props.timezone}
