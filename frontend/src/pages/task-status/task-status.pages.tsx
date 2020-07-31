@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 
 import './task-status.styles.less';
 import {useHistory, useParams} from 'react-router-dom';
-import {BackTop, Collapse, Tooltip} from 'antd';
+import {BackTop, Collapse} from 'antd';
 import {CaretRightOutlined, SyncOutlined, UpSquareOutlined, FieldTimeOutlined} from '@ant-design/icons';
 import {IState} from '../../store';
 import {getTasksByAssignee, getTasksByOrder} from '../../features/tasks/actions';
@@ -13,7 +13,6 @@ import TaskItem from '../../components/project-item/task-item.component';
 import TasksByAssignee from "../../components/modals/tasks-by-assignee.component";
 import {User} from "../../features/group/interface";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
-import AddTask from "../../components/modals/add-task.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {MenuOutlined} from "@ant-design/icons/lib";
 
