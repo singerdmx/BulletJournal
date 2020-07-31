@@ -127,19 +127,22 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public List<com.bulletjournal.controller.models.Note> getNotesByOrder(Long projectId, String requester,
                                                                           String startDate, String endDate, String timezone) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-        if (project.isShared()) {
-            return Collections.emptyList();
-        }
-
         List<Note> notes;
-        if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
-            notes = this.noteRepository.findNoteByProject(project);
+        if (project.isShared()) {
+            notes = this.sharedProjectItemDaoJpa.
+                    getSharedProjectItems(requester, ContentType.NOTE).stream()
+                    .filter(obj -> obj instanceof Note)
+                    .map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList());
         } else {
-            // Set start time and end time
-            ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
-            ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
-            notes = this.noteRepository.findNotesBetween(project, Timestamp.from(startTime.toInstant()),
-                    Timestamp.from(endTime.toInstant()));
+            if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
+                notes = this.noteRepository.findNoteByProject(project);
+            } else {
+                // Set start time and end time
+                ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+                ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+                notes = this.noteRepository.findNotesBetween(project, Timestamp.from(startTime.toInstant()),
+                        Timestamp.from(endTime.toInstant()));
+            }
         }
 
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
