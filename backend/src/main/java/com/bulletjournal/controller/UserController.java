@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -22,6 +24,7 @@ public class UserController {
     public static final String MYSELF_ROUTE = "/api/myself";
     public static final String LOGOUT_MYSELF_ROUTE = "/api/myself/logout";
     public static final String CLEAR_MYSELF_ROUTE = "/api/myself/clear";
+    public static final String POINT_ACTIVITY_ROUTE = "/api/pointActivities";
     protected static final String GET_USER_ROUTE = "/api/users/{username}";
     protected static final String CHANGE_ALIAS_ROUTE = "/api/users/{username}/changeAlias";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -97,5 +100,11 @@ public class UserController {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         this.userAliasDaoJpa.changeAlias(requester, username, changeAliasParams.getAlias());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(POINT_ACTIVITY_ROUTE)
+    public ResponseEntity<List<UserPointActivity>> getUserPointActivities() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return ResponseEntity.ok().body(this.userDaoJpa.getPointActivitiesByUsername(username));
     }
 }
