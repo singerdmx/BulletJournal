@@ -264,7 +264,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
           projectItemId={task.id}
           mode="icon"
         />
-        <EditTask task={task} mode="icon" />
+        <EditTask task={task} mode="icon" type={ProjectItemUIType.PAGE}/>
         <Tooltip title="Delete">
           <Popconfirm
             title="Deleting Task also deletes its child tasks. Are you sure?"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Badge, Popconfirm, Popover, Tag, Tooltip } from 'antd';
+import {Avatar, Badge, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 import {
   AlertOutlined,
   CarryOutOutlined,
@@ -9,37 +9,22 @@ import {
   MoreOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import {
-  getReminderSettingString,
-  Task,
-  getTaskBackgroundColor,
-} from '../../features/tasks/interface';
-import { connect } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import {
-  completeTask,
-  deleteCompletedTask,
-  deleteTask,
-  uncompleteTask,
-} from '../../features/tasks/actions';
+import {getReminderSettingString, getTaskBackgroundColor, Task,} from '../../features/tasks/interface';
+import {connect} from 'react-redux';
+import {useHistory} from 'react-router-dom';
+import {completeTask, deleteCompletedTask, deleteTask, uncompleteTask,} from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import { Label, stringToRGB } from '../../features/label/interface';
+import {Label, stringToRGB} from '../../features/label/interface';
 import moment from 'moment-timezone';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
-import {
-  ProjectItemUIType,
-  ProjectType,
-} from '../../features/project/constants';
-import { convertToTextWithRRule } from '../../features/recurrence/actions';
-import {
-  getIcon,
-  getItemIcon,
-} from '../draggable-labels/draggable-label-list.component';
-import { setSelectedLabel } from '../../features/label/actions';
-import { User } from '../../features/group/interface';
-import { IState } from '../../store';
+import {ProjectItemUIType, ProjectType,} from '../../features/project/constants';
+import {convertToTextWithRRule} from '../../features/recurrence/actions';
+import {getIcon, getItemIcon,} from '../draggable-labels/draggable-label-list.component';
+import {setSelectedLabel} from '../../features/label/actions';
+import {User} from '../../features/group/interface';
+import {IState} from '../../store';
 
 type ProjectProps = {
   readOnly: boolean;
@@ -145,7 +130,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditTask task={task} mode="div" />
+      <EditTask task={task} mode="div" type={type}/>
       <MoveProjectItem
         type={ProjectType.TODO}
         projectItemId={task.id}

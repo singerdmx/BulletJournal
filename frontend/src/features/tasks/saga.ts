@@ -264,6 +264,7 @@ function* patchTask(action: PayloadAction<PatchTask>) {
     const {
       taskId,
       name,
+      type,
       assignees,
       dueDate,
       dueTime,
@@ -295,6 +296,24 @@ function* patchTask(action: PayloadAction<PatchTask>) {
     );
 
     const state: IState = yield select();
+
+    if (type === ProjectItemUIType.ORDER && state.project.project) {
+      const data = yield call(
+          fetchTasks,
+          state.project.project.id,
+          undefined,
+          timezone,
+          undefined,
+          undefined,
+          true
+      );
+      const tasksByOrder = yield data.json();
+      yield put(
+          tasksActions.tasksByOrderReceived({
+            tasksByOrder: tasksByOrder,
+          })
+      );
+    }
 
     yield put(
       getProjectItemsAfterUpdateSelect(

@@ -141,6 +141,7 @@ export type RemoveShared = {
 export type PatchTask = {
   taskId: number;
   timezone: string;
+  type: ProjectItemUIType;
   name?: string;
   assignees?: string[];
   dueDate?: string;

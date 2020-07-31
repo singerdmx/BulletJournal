@@ -55,6 +55,7 @@ export const deleteCompletedTask = (taskId: number) =>
 export const patchTask = (
   taskId: number,
   timezone: string,
+  type: ProjectItemUIType,
   name?: string,
   assignees?: string[],
   dueDate?: string,
@@ -67,6 +68,7 @@ export const patchTask = (
   actions.TaskPatch({
     taskId: taskId,
     timezone: timezone,
+    type: type,
     name: name,
     assignees: assignees,
     dueDate: dueDate,

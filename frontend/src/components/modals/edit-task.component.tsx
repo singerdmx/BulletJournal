@@ -38,6 +38,7 @@ import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { onFilterAssignees, onFilterLabel } from '../../utils/Util';
 import { updateRruleString } from '../../features/recurrence/actions';
+import {ProjectItemUIType} from "../../features/project/constants";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -58,6 +59,7 @@ zones.sort((a, b) => {
 
 type TaskProps = {
   mode: string;
+  type: ProjectItemUIType;
   task: Task;
   project: Project | undefined;
   group: Group | undefined;
@@ -67,6 +69,7 @@ interface TaskEditFormProps {
   patchTask: (
     taskId: number,
     timezone: string,
+    type: ProjectItemUIType,
     name?: string,
     assignees?: string[],
     dueDate?: string,
@@ -95,6 +98,7 @@ const EditTask: React.FC<
 > = (props) => {
   const {
     task,
+    type,
     patchTask,
     labelsUpdate,
     rRuleString,
@@ -174,6 +178,7 @@ const EditTask: React.FC<
     patchTask(
       task.id,
       timezone,
+      type,
       values.taskName,
       assignees,
       dueDate,
