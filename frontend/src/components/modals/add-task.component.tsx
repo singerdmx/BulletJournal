@@ -290,18 +290,16 @@ const AddTask: React.FC<
                     />
                   </Form.Item>
                 </Tooltip>
-                {dueTimeVisible && (
-                  <Tooltip title="Select Due Time" placement="right">
-                    <Form.Item name="dueTime" style={{ width: '210px' }}>
-                      <TimePicker
+                <Tooltip title="Select Due Time" placement="right">
+                  <Form.Item name="dueTime" style={{width: '210px'}}>
+                    <TimePicker
                         allowClear={true}
                         format="HH:mm"
                         placeholder="Due Time"
                         disabled={dueType !== 'dueByTime'}
-                      />
-                    </Form.Item>
-                  </Tooltip>
-                )}
+                    />
+                  </Form.Item>
+                </Tooltip>
               </div>
             </div>
           )}
