@@ -1,5 +1,6 @@
 package com.bulletjournal.util;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DeltaConverterTest {
@@ -12,16 +13,11 @@ public class DeltaConverterTest {
         String mDeltaEx = "[{\"insert\":\"test Italic\",\"attributes\":{\"i\":true}},{\"insert\":\"\\n\"}]";
         String detlaEx = "{\"delta\":{\"ops\":[{\"attributes\":{\"italic\":true},\"insert\":\"test Italic\"},{\"insert\":\"\\n\"}]}}";
 
-        System.out.println(mDelta);
-        System.out.println(delta);
-        System.out.println(DeltaConverter.mDeltaToDelta(mDelta));
-        System.out.println(DeltaConverter.deltaTomDelta(delta));
+        Assert.assertEquals(delta.length(), DeltaConverter.mDeltaToDelta(mDelta).length());
+        Assert.assertEquals(mDelta.length(), DeltaConverter.deltaTomDelta(delta).length());
 
-        System.out.println("=======test 2 =======");
-        System.out.println(detlaEx);
-        System.out.println(DeltaConverter.mDeltaToDelta(mDeltaEx));
-        System.out.println(mDeltaEx);
-        System.out.println(DeltaConverter.deltaTomDelta(detlaEx));
+        Assert.assertEquals(detlaEx.length(), DeltaConverter.mDeltaToDelta(mDeltaEx).length());
+        Assert.assertEquals(mDelta.length(), DeltaConverter.deltaTomDelta(delta).length());
     }
 
 }
