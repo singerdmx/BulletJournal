@@ -1,13 +1,16 @@
 import React from 'react';
-import {Content, ProjectItem} from '../../features/myBuJo/interface';
+import { Content, ProjectItem } from '../../features/myBuJo/interface';
 import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import RevisionDrawer from '../revision/revision-drawer.component';
 import moment from 'moment';
 import './content-item.styles.less';
-import {Project} from '../../features/project/interface';
-import {IState} from '../../store';
-import {connect} from 'react-redux';
-import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
+import { Project } from '../../features/project/interface';
+import { IState } from '../../store';
+import { connect } from 'react-redux';
+import {
+  setDisplayMore,
+  setDisplayRevision,
+} from '../../features/content/actions';
 
 type ContentProps = {
   content: Content;
@@ -37,16 +40,9 @@ const ContentItem: React.FC<ContentProps> = ({
   displayMore,
   displayRevision,
   setDisplayRevision,
-  setDisplayMore
+  setDisplayMore,
 }) => {
   const contentHtml = JSON.parse(content.text)['###html###'];
-
-  const createdTime = content.createdAt
-    ? moment(content.createdAt).fromNow()
-    : '';
-  const updateTime = content.updatedAt
-    ? moment(content.updatedAt).format('MMM Do YYYY')
-    : '';
 
   const handleRevisionClose = () => {
     setDisplayRevision(false);
@@ -89,5 +85,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   setDisplayMore,
-  setDisplayRevision
+  setDisplayRevision,
 })(ContentItem);

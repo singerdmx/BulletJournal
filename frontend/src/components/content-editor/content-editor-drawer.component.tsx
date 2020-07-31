@@ -1,11 +1,10 @@
 import React from 'react';
 
-import { BackTop, Drawer } from 'antd';
+import { Drawer } from 'antd';
 
 import { Content, ProjectItem } from '../../features/myBuJo/interface';
 
 import ContentEditor from './content-editor.component';
-import ContentReader from './content-reader.component';
 
 type ContentEditorDrawerProps = {
   content?: Content;
@@ -36,6 +35,7 @@ const ContentEditorDrawer: React.FC<
       destroyOnClose
     >
       <ContentEditor
+        isOpen={visible}
         content={content || undefined}
         projectItemId={projectItem.id}
         afterFinish={handleClose}

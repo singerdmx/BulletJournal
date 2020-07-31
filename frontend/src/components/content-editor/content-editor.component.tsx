@@ -4,7 +4,7 @@ import { Form, Button, message } from 'antd';
 import { connect } from 'react-redux';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import EditorToolbar, { modules } from './content-editor-toolbar';
+import { modules, formats } from './content-editor-toolbar';
 import {
   createContent as createNoteContent,
   patchContent as patchNoteContent,
@@ -21,11 +21,13 @@ import { Content } from '../../features/myBuJo/interface';
 import { ContentType } from '../../features/myBuJo/constants';
 import placeholder from '../../assets/placeholder.png';
 import axios from 'axios';
+import './content-editor.style.less';
 
 type ContentEditorProps = {
   projectItemId: number;
   content?: Content;
   contentType: ContentType;
+  isOpen: boolean;
 };
 
 interface ContentEditorHandler {
@@ -49,6 +51,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   patchNoteContent,
   afterFinish,
   contentType,
+  isOpen,
   createTaskContent,
   createTransactionContent,
   patchTransactionContent,
@@ -174,26 +177,28 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     content: string,
     delta: any,
     source: any,
-    editor: any
+    editor: ReactQuill.UnprivilegedEditor
   ) => {
     setEditorContent({
       delta: editor.getContents(),
-      '###html###': editor.getHTML(),
+      '###html###': content,
     });
   };
-
+  console.log(isOpen);
   return (
     <div className="content-editor">
-      <EditorToolbar />
-      <ReactQuill
-        bounds={'.content-editor'}
-        defaultValue={editorContent['delta']}
-        value={editorContent['delta']}
-        ref={quillRef}
-        theme="snow"
-        onChange={handleChange}
-        modules={modules}
-      />
+      {isOpen && (
+        <ReactQuill
+          bounds={'.content-editor'}
+          defaultValue={editorContent['delta']}
+          value={editorContent['delta']}
+          ref={quillRef}
+          theme="snow"
+          onChange={handleChange}
+          modules={modules}
+          formats={formats}
+        />
+      )}
       <Button type="primary" onClick={handleFormSubmit}>
         {isEdit ? 'Update' : 'Create'}
       </Button>
