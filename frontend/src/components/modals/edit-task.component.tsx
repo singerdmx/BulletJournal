@@ -252,7 +252,7 @@ const EditTask: React.FC<
           .filter((u) => u.accepted)
           .map((user) => {
             return (
-              <Option value={user.name} key={user.name}>
+              <Option value={user.name} key={user.alias}>
                 <Avatar size="small" src={user.avatar} />
                 &nbsp;&nbsp; <strong>{user.alias}</strong>
               </Option>

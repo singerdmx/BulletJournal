@@ -2,7 +2,7 @@
 
 .project {
   position: relative;
-  .pages-property();
+  .pages-property(unset);
 
   .project-avatar {
     width: 50px;
@@ -46,6 +46,8 @@
   .project-content {
     padding: 0.5em 1em;
     min-height: auto;
+    height: calc(100% - 200px);
+    overflow: scroll;
   }
   .project-description {
     width: 100%;
@@ -62,12 +64,22 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
+    padding-top: 20px;
 
     & span {
       cursor: pointer;
       margin-bottom: 2px;
     }
   }
+
+  .project-labels-icon {
+    right: 36px;
+    position: absolute;
+  }
+}
+
+.project.ledger {
+  .pages-property(unset);
 }
 
 .completed-tasks {

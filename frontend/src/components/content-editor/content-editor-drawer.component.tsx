@@ -11,7 +11,6 @@ type ContentEditorDrawerProps = {
   content?: Content;
   projectItem?: ProjectItem;
   visible: boolean;
-  readMode: boolean;
   onClose: Function;
 };
 
@@ -19,21 +18,14 @@ interface ContentEditorDrawerHandler {}
 
 const ContentEditorDrawer: React.FC<
   ContentEditorDrawerProps & ContentEditorDrawerHandler
-> = ({ content, projectItem, visible, readMode, onClose }) => {
+> = ({ content, projectItem, visible, onClose }) => {
   const handleClose = () => {
     onClose();
   };
+  const fullHeight = global.window.innerHeight;
   const fullWidth = global.window.innerWidth;
   const drawerWidth =
-    fullWidth < 576
-      ? fullWidth * 0.9
-      : fullWidth < 768
-      ? fullWidth * 0.7
-      : fullWidth < 992
-      ? fullWidth * 0.6
-      : fullWidth < 1200
-      ? fullWidth * 0.5
-      : fullWidth * 0.4;
+    fullWidth > fullHeight ? Math.floor(fullHeight / 1.4) : fullWidth;
   if (!projectItem) return null;
   return (
     <Drawer
@@ -43,19 +35,12 @@ const ContentEditorDrawer: React.FC<
       width={drawerWidth}
       destroyOnClose
     >
-      {readMode && content ? (
-        <div>
-          <BackTop />
-          <ContentReader content={content} />
-        </div>
-      ) : (
-        <ContentEditor
-          content={content || undefined}
-          projectItemId={projectItem.id}
-          afterFinish={handleClose}
-          contentType={projectItem.contentType}
-        />
-      )}
+      <ContentEditor
+        content={content || undefined}
+        projectItemId={projectItem.id}
+        afterFinish={handleClose}
+        contentType={projectItem.contentType}
+      />
     </Drawer>
   );
 };

@@ -84,4 +84,21 @@
       border: 1px solid lightgrey;
     }
   }
+
+  .task-content {
+    height: 75%;
+
+    @media screen and (max-width: 1024px) {
+      height: 85%;
+    }
+
+    .content-list {
+      height: 100%;
+    }
+
+    .ant-tabs-content {
+      height: 100%;
+      overflow: scroll;
+    }
+  }
 }

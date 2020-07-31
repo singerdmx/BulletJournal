@@ -1,53 +1,66 @@
 import React from 'react';
-import { List, Tabs, Avatar, Tooltip } from 'antd';
-import { ProjectItem } from '../../features/myBuJo/interface';
-import { Content } from '../../features/myBuJo/interface';
+import {Avatar, Popover, Tabs} from 'antd';
+import {Content, ProjectItem} from '../../features/myBuJo/interface';
 import ContentItem from './content-item.component';
 import moment from 'moment';
+import {connect} from "react-redux";
+import {updateTargetContent} from "../../features/content/actions";
+import {IState} from "../../store";
 
 type ContentListProps = {
   contentEditable?: boolean;
   projectItem: ProjectItem;
   contents: Content[];
+  content: Content | undefined;
+  updateTargetContent: (content: Content | undefined) => void;
 };
 
 type TabContentProps = {
   content: Content;
 };
 
-const TabContent: React.FC<TabContentProps> = ({ content }) => {
+const TabContent: React.FC<TabContentProps> = ({content}) => {
   const updateTime = content.updatedAt
-    ? moment(content.updatedAt).format('MMM Do YYYY')
-    : '';
+      ? `${moment(content.updatedAt).format('MMM Do YYYY')} (${moment(content.updatedAt).fromNow()})`
+      : '';
   return (
-    <Tooltip
-      title={`${content.owner.alias} ${updateTime}`}
-      className="tab-content"
-    >
-      <Avatar src={content.owner.avatar} />
-    </Tooltip>
+      <Popover
+          placement="right"
+          title={content.owner.alias}
+          content={updateTime}
+      ><Avatar src={content.owner.avatar} size='small'/>
+      </Popover>
   );
 };
 
 const ContentList: React.FC<ContentListProps> = ({
   projectItem,
   contents,
-  contentEditable,
+  content,
+  updateTargetContent
 }) => {
+  const onTabClick = (key: string, e: MouseEvent) => {
+    updateTargetContent(contents.filter(c => c.id.toString() === key)[0]);
+  };
+
   return (
-    <Tabs defaultActiveKey="0" tabPosition="left" style={{ height: '100%' }}>
+    <Tabs
+      activeKey={content ? content.id.toString() : ''}
+      tabPosition='left'
+      style={{ height: '100%' }}
+      onTabClick={onTabClick}
+    >
       {contents &&
-        contents.map((content, index) => (
+        contents.map((c, index) => (
           <Tabs.TabPane
-            key={`${index}`}
-            tab={<TabContent content={content} />}
+            key={`${c.id}`}
+            tab={<TabContent content={c} />}
             forceRender
           >
             <ContentItem
               projectItem={projectItem}
-              key={content.id}
-              content={content}
-              contentEditable={contentEditable}
+              key={c.id}
+              content={c}
             />
           </Tabs.TabPane>
         ))}
@@ -55,4 +68,8 @@ const ContentList: React.FC<ContentListProps> = ({
   );
 };
 
-export default ContentList;
+const mapStateToProps = (state: IState) => ({
+  content: state.content.content,
+});
+
+export default connect(mapStateToProps, {updateTargetContent})(ContentList);

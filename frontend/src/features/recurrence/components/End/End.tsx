@@ -77,7 +77,7 @@ class End extends React.Component<EndProps, SelectState> {
           ) : this.state.value === 'After' ? (
               <div style={{width: '40%', display: 'flex', alignItems: 'center'}}>
                 <InputNumber
-                    style={{ width: '60px' }}
+                    style={{ width: '50px' }}
                     value={this.props.end.count ? this.props.end.count : 1}
                     onChange={this.onChangeCount}
                 />

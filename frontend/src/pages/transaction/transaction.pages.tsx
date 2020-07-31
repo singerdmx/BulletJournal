@@ -5,21 +5,38 @@ import { connect } from 'react-redux';
 // features
 import { Transaction } from '../../features/transactions/interface';
 import { IState } from '../../store';
-import { ProjectItemUIType, ProjectType } from '../../features/project/constants';
-import { deleteTransaction, getTransaction, updateTransactionContents, } from '../../features/transactions/actions';
+import {
+  ProjectItemUIType,
+  ProjectType,
+} from '../../features/project/constants';
+import {
+  deleteTransaction, deleteContent,
+  getTransaction,
+  updateTransactionContents,
+} from '../../features/transactions/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
 import EditTransaction from '../../components/modals/edit-transaction.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 // antd imports
-import { Avatar, BackTop, Card, Col, Divider, Popconfirm, Row, Statistic, Tooltip, } from 'antd';
+import {
+  Avatar,
+  BackTop,
+  Card,
+  Col,
+  Divider,
+  Popconfirm,
+  Row,
+  Statistic,
+  Tooltip,
+} from 'antd';
 import {
   AccountBookOutlined,
   DeleteTwoTone,
   DollarCircleOutlined,
   SyncOutlined,
   UpSquareOutlined,
-  PlusOutlined
+  PlusOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
@@ -29,8 +46,14 @@ import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
-import { Container, Button as FloatButton, lightColors, darkColors } from 'react-floating-action-button'
-
+import {
+  Container,
+  Button as FloatButton,
+  lightColors,
+  darkColors,
+} from 'react-floating-action-button';
+import { setDisplayMore, setDisplayRevision } from "../../features/content/actions";
+import { DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined } from "@ant-design/icons/lib";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -43,19 +66,27 @@ type TransactionProps = {
 };
 
 interface TransactionPageHandler {
+  content: Content | undefined;
   getTransaction: (transactionId: number) => void;
+  setDisplayMore: (displayMore: boolean) => void;
+  setDisplayRevision: (displayRevision: boolean) => void;
+  deleteContent: (taskId: number, contentId: number) => void;
 }
 
 const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props
 ) => {
   const {
+    content,
     transaction,
     deleteTransaction,
     currency,
     contents,
     updateTransactionContents,
-    getTransaction
+    getTransaction,
+    setDisplayMore,
+    setDisplayRevision,
+    deleteContent
   } = props;
 
   // get id of Transaction from oruter
@@ -79,6 +110,18 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     }
   }, [transaction]);
 
+
+  useEffect(() => {
+
+    if (!transaction) {
+      return;
+    }
+    updateTransactionContents(transaction.id);
+    setDisplayMore(false);
+    setDisplayRevision(false);
+
+  }, [transaction]);
+
   if (!transaction) return null;
   // show drawer
   const createHandler = () => {
@@ -88,6 +131,62 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const handleClose = () => {
     setEditorShow(false);
   };
+
+  const handleEdit = () => {
+    setDisplayMore(true);
+  };
+
+  const handleOpenRevisions = () => {
+    setDisplayRevision(true);
+  };
+
+  const handleDelete = () => {
+    if (!content) {
+      return;
+    }
+    deleteContent(transaction.id, content.id);
+  };
+
+
+  const createContentElem = (
+    <Container>
+      {content && <FloatButton
+        tooltip="Delete Content"
+        onClick={handleDelete}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <DeleteOutlined />
+      </FloatButton>}
+      {content && content.revisions.length > 1 && <FloatButton
+        tooltip={`View Revision History (${content.revisions.length - 1})`}
+        onClick={handleOpenRevisions}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <HighlightOutlined />
+      </FloatButton>}
+      {content && <FloatButton
+        tooltip="Edit Content"
+        onClick={handleEdit}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <EditOutlined />
+      </FloatButton>}
+      <FloatButton
+        tooltip="Add Content"
+        onClick={createHandler}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <PlusOutlined />
+      </FloatButton>
+      <FloatButton
+        tooltip="Actions"
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+      >
+        <MenuOutlined />
+      </FloatButton>
+    </Container>
+
+  );
 
   const handleRefresh = () => {
     transaction && transaction.id && updateTransactionContents(transaction.id);
@@ -119,20 +218,20 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   };
 
   return (
-    <div className='tran-page'>
+    <div className="tran-page">
       <BackTop />
 
       <Tooltip
-        placement='top'
+        placement="top"
         title={`Payer ${transaction.payer.alias}`}
-        className='transaction-avatar'
+        className="transaction-avatar"
       >
         <span>
-          <Avatar size='large' src={transaction.payer.avatar} />
+          <Avatar size="large" src={transaction.payer.avatar} />
         </span>
       </Tooltip>
-      <div className='transaction-title'>
-        <div className='label-and-name'>
+      <div className="transaction-title">
+        <div className="label-and-name">
           {transaction.name}
           <DraggableLabelsList
             mode={ProjectType.LEDGER}
@@ -142,9 +241,9 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             itemShared={transaction.shared}
           />
         </div>
-        <div className='transaction-operation'>
+        <div className="transaction-operation">
           <Tooltip title={`Created by ${transaction.owner.alias}`}>
-            <div className='transaction-owner'>
+            <div className="transaction-owner">
               <Avatar src={transaction.owner.avatar} />
             </div>
           </Tooltip>
@@ -152,35 +251,35 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             labelEditableHandler={labelEditableHandler}
             labelEditable={labelEditable}
           />
-          <EditTransaction transaction={transaction} mode='icon' />
+          <EditTransaction transaction={transaction} mode="icon" />
           <MoveProjectItem
             type={ProjectType.LEDGER}
             projectItemId={transaction.id}
-            mode='icon'
+            mode="icon"
           />
-          <Tooltip title='Delete'>
+          <Tooltip title="Delete">
             <Popconfirm
-              title='Are you sure?'
-              okText='Yes'
-              cancelText='No'
+              title="Are you sure?"
+              okText="Yes"
+              cancelText="No"
               onConfirm={() => {
                 deleteTransaction(transaction.id, ProjectItemUIType.PAGE);
                 history.goBack();
               }}
-              className='group-setting'
-              placement='bottom'
+              className="group-setting"
+              placement="bottom"
             >
               <div>
-                <DeleteTwoTone twoToneColor='#f5222d' />
+                <DeleteTwoTone twoToneColor="#f5222d" />
               </div>
             </Popconfirm>
           </Tooltip>
-          <Tooltip title='Refresh Contents'>
+          <Tooltip title="Refresh Contents">
             <div>
               <SyncOutlined onClick={handleRefresh} />
             </div>
           </Tooltip>
-          <Tooltip title='Go to Parent BuJo'>
+          <Tooltip title="Go to Parent BuJo">
             <div>
               <UpSquareOutlined
                 onClick={(e) =>
@@ -192,7 +291,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
         </div>
       </div>
       <Divider />
-      <div className='transaction-statistic-card'>
+      <div className="transaction-statistic-card">
         <Row gutter={10}>
           {getPaymentDateTime(transaction)}
           <Col span={12}>
@@ -210,26 +309,17 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
         </Row>
       </div>
       <Divider />
-      <div className='tran-content'>
-        <div className='content-list'>
+      <div className="tran-content">
+        <div className="content-list">
           <TransactionContentList
             projectItem={transaction}
             contents={contents}
           />
         </div>
-        <Container>
-          <FloatButton
-            tooltip="Add Content"
-            onClick={createHandler}
-            styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
-          >
-            <PlusOutlined />
-          </FloatButton>
-        </Container>
+        {createContentElem}
       </div>
-      <div className='transaction-drawer'>
+      <div className="transaction-drawer">
         <ContentEditorDrawer
-          readMode={false}
           projectItem={transaction}
           visible={showEditor}
           onClose={handleClose}
@@ -243,10 +333,15 @@ const mapStateToProps = (state: IState) => ({
   transaction: state.transaction.transaction,
   currency: state.myself.currency,
   contents: state.transaction.contents,
+  content: state.content.content
+
 });
 
 export default connect(mapStateToProps, {
   getTransaction,
   deleteTransaction,
   updateTransactionContents,
+  deleteContent,
+  setDisplayMore,
+  setDisplayRevision
 })(TransactionPage);

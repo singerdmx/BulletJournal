@@ -1,13 +1,14 @@
-.pages-property() {
+.pages-property(@vheight : 75vh) {
   margin: 10vh auto;
   padding: 1vh 2vw;
-  min-height: 80%;
-  max-height: 90vh;
-  width: 60%;
+  height: @vheight;
+  width: 70%;
   max-width: 1024px;
   @media screen and (max-width: 1024px) {
-    width: 80%;
-    margin: 5vh auto;
+    margin-right: 3% !important;
+    margin-bottom: 1% !important;
+    width: 93%;
+    height: 88vh;
   }
   @media screen and (max-width: 1440px) {
     max-width: 978px;

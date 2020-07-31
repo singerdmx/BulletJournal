@@ -93,7 +93,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
   };
 
   return (
-    <div>
+    <>
       <div className="todo-panel">
         <RangePicker
           ranges={{
@@ -113,7 +113,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
         </Tooltip>
       </div>
       <Divider />
-      <div>
+      <div className="todo-contents">
         {items.map((projectItem) => {
           return (
             <div className="project-item-div" key={projectItem.id}>
@@ -122,7 +122,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
           );
         })}
       </div>
-    </div>
+    </>
   );
 };
 

@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class Reminder {
     private static final Logger LOGGER = LoggerFactory.getLogger(Reminder.class);
     private static long SECONDS_OF_DAY = 86400;
-    private static long VERIFY_BUFF_SECONDS = 600;
+    private static long VERIFY_BUFF_SECONDS = 7200;
     private static long SCHEDULE_BUFF_SECONDS = 5;
     private static long AWAIT_TERMINATION_SECONDS = 5;
 
@@ -79,7 +79,7 @@ public class Reminder {
      * @param createdTask
      */
     public void generateTaskReminder(Task createdTask) {
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(SECONDS_OF_DAY, reminderConfig.getTimeZone());
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(SECONDS_OF_DAY, reminderConfig.getTimeZone());
         taskRepository.findById(createdTask.getId()).ifPresent(task -> {
             DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond()).forEach(e -> {
                         if (!concurrentHashMap.containsKey(e)) {
@@ -92,7 +92,7 @@ public class Reminder {
     }
 
     public void generateTaskReminder(List<Task> tasks) {
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(SECONDS_OF_DAY, reminderConfig.getTimeZone());
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(SECONDS_OF_DAY, reminderConfig.getTimeZone());
 
         tasks.forEach(t -> {
             LOGGER.info("generateTaskReminder" + t);
@@ -125,14 +125,16 @@ public class Reminder {
     }
 
     private void scheduleReminderRecords(long seconds) {
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(seconds, reminderConfig.getTimeZone());
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(seconds, reminderConfig.getTimeZone());
         this.scheduleReminderRecords(interval);
     }
 
     private void process(ReminderRecord record) {
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.nowToNext(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
+        LOGGER.info("process record=" + record.toString());
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
         taskRepository.findById(record.getId()).ifPresent(task -> {
             List<ReminderRecord> records = DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond());
+            LOGGER.info("records = " + records);
             if (records.contains(record)) {
                 LOGGER.info("Push notification record = " + record);
                 concurrentHashMap.remove(record);

@@ -24,7 +24,7 @@ class RepeatDaily extends React.Component<RepeatDailyProps> {
         <span>Every</span>
         {'  '}
         <InputNumber
-          style={{ width: '60px' }}
+          style={{ width: '50px' }}
           value={this.props.repeatDaily}
           onChange={this.onChange}
         />

@@ -176,19 +176,22 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public List<com.bulletjournal.controller.models.Task> getTasksByOrder(Long projectId, String requester,
                                                                           String startDate, String endDate, String timezone) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-        if (project.isShared()) {
-            return Collections.emptyList();
-        }
-
         List<Task> tasks;
-        if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
-            tasks = this.taskRepository.findTaskByProject(project);
+        if (project.isShared()) {
+            tasks = this.sharedProjectItemDaoJpa.
+                    getSharedProjectItems(requester, ContentType.TASK).stream()
+                    .filter(obj -> obj instanceof Task)
+                    .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
         } else {
-            // Set start time and end time
-            ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
-            ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
-            tasks = this.taskRepository.findTasksBetween(project, Timestamp.from(startTime.toInstant()),
-                    Timestamp.from(endTime.toInstant()));
+            if (StringUtils.isBlank(startDate) && StringUtils.isBlank(endDate)) {
+                tasks = this.taskRepository.findTaskByProject(project);
+            } else {
+                // Set start time and end time
+                ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+                ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+                tasks = this.taskRepository.findTasksBetween(project, Timestamp.from(startTime.toInstant()),
+                        Timestamp.from(endTime.toInstant()));
+            }
         }
 
         tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);

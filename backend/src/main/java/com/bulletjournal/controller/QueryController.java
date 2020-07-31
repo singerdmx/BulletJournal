@@ -245,6 +245,14 @@ public class QueryController {
                                           List<SearchIndex> invalid,
                                           List<SearchHit<SearchIndex>> searchResultList,
                                           Set<Long> shareNoteIds, Set<Long> shareTaskIds) {
+        if (shareNoteIds == null) {
+            shareNoteIds = Collections.emptySet();
+        }
+        if (shareTaskIds == null) {
+            shareTaskIds = Collections.emptySet();
+        }
+        final Set<Long> shareNotes = shareNoteIds;
+        final Set<Long> shareTasks = shareTaskIds;
         // Created a Map to group search result to the same id
         Map<String, SearchResultItem> results = new HashMap<>();
 
@@ -269,8 +277,8 @@ public class QueryController {
             searchResultItem.setType(ContentType.getType(type));
             searchResultItem.setId(id);
             searchResultItem.setName(projectItemName);
-            if ((ContentType.getType(type).equals(ContentType.NOTE) && shareNoteIds.contains(id)) ||
-                    (ContentType.getType(type).equals(ContentType.TASK) && shareTaskIds.contains(id))) {
+            if ((ContentType.getType(type).equals(ContentType.NOTE) && shareNotes.contains(id)) ||
+                    (ContentType.getType(type).equals(ContentType.TASK) && shareTasks.contains(id))) {
                 searchResultItem.setShared(true);
             }
 
