@@ -26,7 +26,8 @@ public class UserPointActivity extends AuditModel {
     @Column(nullable = false)
     private String description;
 
-    public UserPointActivity(){}
+    public UserPointActivity() {
+    }
 
     public UserPointActivity(String username, Integer pointChange, String description) {
         this.username = username;

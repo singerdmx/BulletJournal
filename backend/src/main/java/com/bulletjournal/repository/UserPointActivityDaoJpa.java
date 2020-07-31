@@ -1,6 +1,5 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserPointActivity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
