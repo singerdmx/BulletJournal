@@ -1,4 +1,21 @@
 {
+   "settings": {
+    "analysis": {
+      "analyzer": {
+        "html_charFilter_lower_stop_filter_standard_analyzer": {
+          "type": "custom", 
+          "tokenizer": "standard",
+          "char_filter": [
+            "html_strip"
+          ],
+          "filter": [
+            "lowercase",
+            "stop"
+          ]
+        }
+      }
+    }
+  },
   "mappings": {
     "properties": {
       "@timestamp": {
@@ -15,7 +32,7 @@
       },
       "value": {
         "type": "text",
-        "analyzer": "standard", 
+        "analyzer": "html_charFilter_lower_stop_filter_standard_analyzer", 
         "fields": {
           "keyword": {
             "type": "keyword"
