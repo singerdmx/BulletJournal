@@ -444,9 +444,15 @@ const EditTask: React.FC<
             buttonStyle="solid"
             style={{ marginBottom: 18 }}
           >
-            <Radio value={'remindBefore'}>Time Before</Radio>
+            <Radio value={'remindBefore'}><span onClick={() => {
+              setRemindButton('remindBefore');
+              setReminderType('remindBefore');
+            }}>Time Before</span></Radio>
             <Radio value={'reminderDate'} disabled={dueType === 'dueByRec'}>
-              Date (Time)
+              <span onClick={() => {
+                setRemindButton('reminderDate');
+                setReminderType('reminderDate');
+              }}>Date (Time)</span>
             </Radio>
           </Radio.Group>
           <div style={{ display: 'flex' }}>
