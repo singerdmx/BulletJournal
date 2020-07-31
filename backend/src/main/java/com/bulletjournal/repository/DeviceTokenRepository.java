@@ -13,9 +13,9 @@ public interface DeviceTokenRepository extends JpaRepository<DeviceToken, Long> 
 
     DeviceToken findDeviceTokenByToken(String token);
 
-    @Query("SELECT t FROM DeviceToken t WHERE t.user.name = ?1")
+    @Query("SELECT t FROM DeviceToken t WHERE t.username = ?1")
     List<DeviceToken> findDeviceTokensByUser(String username);
 
-    @Query("SELECT t FROM DeviceToken t WHERE t.user.name IN ?1")
+    @Query("SELECT t FROM DeviceToken t WHERE t.username IN ?1")
     List<DeviceToken> findDeviceTokensByUsers(Set<String> usernames);
 }

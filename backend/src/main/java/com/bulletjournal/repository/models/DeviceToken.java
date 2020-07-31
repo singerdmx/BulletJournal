@@ -14,21 +14,29 @@ public class DeviceToken extends AuditModel {
     @SequenceGenerator(name = "device_token_generator", sequenceName = "device_token_sequence", initialValue = 100, allocationSize = 2)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private User user;
-
     @Column(nullable = false)
     private String token;
+
+    @JoinColumn(table = "users", name = "username", referencedColumnName = "name", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @Column(name = "username", nullable = false)
+    private String username;
 
     public DeviceToken() {
 
     }
 
-    public DeviceToken(User user, String token) {
-        this.user = user;
+    public DeviceToken(String username, String token) {
+        this.username = username;
         this.token = token;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Long getId() {
@@ -37,14 +45,6 @@ public class DeviceToken extends AuditModel {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getToken() {
@@ -57,7 +57,7 @@ public class DeviceToken extends AuditModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, token);
+        return Objects.hash(username, token);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class DeviceToken extends AuditModel {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         DeviceToken that = (DeviceToken) obj;
-        return Objects.equals(user, that.user)
+        return Objects.equals(username, that.username)
             && Objects.equals(token, that.token);
     }
 }

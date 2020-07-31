@@ -3,9 +3,13 @@ package com.bulletjournal.controller;
 import com.bulletjournal.controller.models.ChangeAliasParams;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.repository.UserDaoJpa;
+import com.google.common.collect.Sets;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -15,6 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,6 +40,9 @@ public class UserControllerTest {
     private static final String ROOT_URL = "http://localhost:";
 
     private static String TIMEZONE = "America/Los_Angeles";
+
+    @Autowired
+    UserDaoJpa userDaoJpa;
 
     @LocalServerPort
     int randomServerPort;
@@ -78,4 +89,12 @@ public class UserControllerTest {
         assertEquals("xlf", user.getAlias());
     }
 
+    @Test
+    public void testGetUsersByNames() {
+        List<com.bulletjournal.repository.models.User> users
+            = userDaoJpa.getUsersByNames(Sets.newHashSet("Xavier", "xlf"));
+        List<String> usernames = users.stream().map(com.bulletjournal.repository.models.User::getName).collect(Collectors.toList());
+        Assert.assertEquals(2, usernames.size());
+        Assert.assertTrue(usernames.containsAll(Arrays.asList("Xavier", "xlf")));
+    }
 }

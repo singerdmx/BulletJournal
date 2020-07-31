@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class UserDaoJpa {
@@ -79,6 +80,15 @@ public class UserDaoJpa {
             throw new ResourceNotFoundException("User " + name + " does not exist");
         }
         return existingUser;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<User> getUsersByNames(Set<String> usernames) {
+        List<User> ret = userRepository.findAllByNameIn(usernames);
+        if (ret.isEmpty()) {
+            throw new ResourceNotFoundException("Non of usernames in '" + usernames + "' exist");
+        }
+        return ret;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

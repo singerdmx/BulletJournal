@@ -40,9 +40,9 @@ public class DeviceController {
             deviceTokenDaoJpa.create(token, userName);
             return CREATED_RESPONSE;
         }
-        if (!Objects.equals(existingToken.getUser().getName(), userName)) {
+        if (!Objects.equals(existingToken.getUsername(), userName)) {
             LOGGER.info("Token {} is changed from user {} to user {}",
-                token, existingToken.getUser().getName(), userName);
+                token, existingToken.getUsername(), userName);
             deviceTokenDaoJpa.updateUser(existingToken, userName);
             return REPLACED_RESPONSE;
         }
