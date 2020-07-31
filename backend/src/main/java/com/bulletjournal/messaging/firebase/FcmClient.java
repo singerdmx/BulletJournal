@@ -1,6 +1,7 @@
 package com.bulletjournal.messaging.firebase;
 
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
+import com.bulletjournal.util.CustomThreadFactory;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutureCallback;
 import com.google.api.core.ApiFutures;
@@ -11,17 +12,17 @@ import com.google.firebase.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME;
 
 @Component
 public class FcmClient {
@@ -32,20 +33,21 @@ public class FcmClient {
 
     private static final String TOKEN_REGISTRATION_ERROR = "registration-token-not-registered";
 
+    private static long AWAIT_TERMINATION_SECONDS = 5;
+
     private static final Notification DEFAULT_NOTIFICATION
         = Notification.builder().setTitle("Bullet Journal").setBody("You've got a new message.").build();
 
     @Autowired
     private DeviceTokenDaoJpa deviceTokenDaoJpa;
 
-    @Autowired
-    @Qualifier(APPLICATION_TASK_EXECUTOR_BEAN_NAME)
-    private TaskExecutor executor;
+    private ExecutorService executorService;
 
     private FirebaseMessaging firebase;
 
     @PostConstruct
     public void initialize() {
+        this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("FcmMessaging"));
         if (System.getenv(FCM_ACCOUNT_KEY) != null) {
             try {
                 FirebaseOptions options
@@ -86,7 +88,7 @@ public class FcmClient {
             public void onSuccess(BatchResponse result) {
                 processResponse(result, paramsList);
             }
-        }, executor);
+        }, executorService);
     }
 
     private void processResponse(BatchResponse batchResponse, List<FcmMessageParams> messages) {
@@ -125,5 +127,16 @@ public class FcmClient {
             );
         }
         return msg.build();
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        if (executorService != null) {
+            try {
+                executorService.awaitTermination(AWAIT_TERMINATION_SECONDS, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.bulletjournal.messaging.mailjet;
 
+import com.bulletjournal.util.CustomThreadFactory;
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
@@ -15,12 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 @Component
 public class MailjetEmailClient {
@@ -37,6 +36,8 @@ public class MailjetEmailClient {
 
     private static final String SENDER_NAME_VAR = "SENDER_NAME";
 
+    private static final long AWAIT_TERMINATION_SECONDS = 5;
+
     private static final int SUCCESS_STATUS = 200;
 
     private String senderEmail;
@@ -49,7 +50,7 @@ public class MailjetEmailClient {
 
     @PostConstruct
     private void initializeMailjetClient() {
-        this.executorService = Executors.newSingleThreadExecutor();
+        this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("EmailClient"));
         if (System.getenv(API_KEY_PUBLIC) != null
             && System.getenv(SENDER_EMAIL_VAR) != null
             && System.getenv(SENDER_NAME_VAR) != null
@@ -128,5 +129,16 @@ public class MailjetEmailClient {
                     .put(Emailv31.Message.TO, receivers)
                     .put(Emailv31.Message.SUBJECT, params.getSubject())
                     .put(Emailv31.Message.TEXTPART, params.getText())));
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        if (executorService != null) {
+            try {
+                executorService.awaitTermination(AWAIT_TERMINATION_SECONDS, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }
