@@ -119,17 +119,22 @@ Quill.register(Font, true);
 export const modules = {
   toolbar: {
     container: [
-      [{ header: [1, 2, false] }],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [
+        { header: [1, 2, false] },
+        { color: [] },
+        { background: [] },
+        { align: [] },
+      ],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
       [
         { list: 'ordered' },
         { list: 'bullet' },
         { indent: '-1' },
         { indent: '+1' },
       ],
-      [{ align: [] }],
+
       ['link', 'image', 'emoji'],
-      [{ color: '' }, { background: [] }],
+
       ['clean'],
     ],
     handlers: {},
@@ -160,6 +165,7 @@ export const formats = [
   'emoji',
   'color',
   'background',
+  'code-block',
 ];
 
 // // Quill Toolbar component
