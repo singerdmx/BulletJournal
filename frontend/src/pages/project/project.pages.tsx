@@ -10,7 +10,6 @@ import {iconMapper} from '../../components/side-menu/side-menu.component';
 import {DeleteOutlined, DownOutlined, SyncOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
-import AddTask from '../../components/modals/add-task.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
 import {ProjectType} from '../../features/project/constants';
 import {NoteTree} from '../../components/note-tree';
@@ -34,8 +33,6 @@ import {FrequencyType, LedgerSummaryType,} from '../../features/transactions/int
 import {projectLabelsUpdate, setSelectedLabel,} from '../../features/label/actions';
 import {Label, stringToRGB} from '../../features/label/interface';
 import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
-import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {MenuOutlined} from "@ant-design/icons/lib";
 
 const { Panel } = Collapse;
 
@@ -252,28 +249,38 @@ class ProjectPage extends React.Component<
     return (
       <>
        {hasLabel &&(<div>
-        <div className="project-labels-icon">
+         <div className="project-labels-icon">
           <span>
-            {!this.state.hideLabel && (<UpOutlined onClick={() => {this.setState({hideLabel : true});}} />)}
-            {this.state.hideLabel && (<DownOutlined onClick={() => {this.setState({hideLabel : false});}} />)}
-          </span>
-          {" "}
-          <span>
-            <Popover
+            {!this.state.hideLabel && (<Tooltip
                 placement="top"
-                content="Refresh Labels"
-              >
-                <SyncOutlined
-              onClick={(event) => {
-                event.stopPropagation();
-                const projectId = parseInt(this.props.match.params.projectId);
-                this.props.projectLabelsUpdate(projectId);
-              }}
-            />
-              </Popover>
-            
+                title="Hide Labels"
+            ><UpOutlined onClick={() => {
+              this.setState({hideLabel: true});
+            }}/>
+            </Tooltip>)}
+            {this.state.hideLabel && (<Tooltip
+                placement="top"
+                title="Show Project Labels"
+            ><DownOutlined onClick={() => {
+              this.setState({hideLabel: false});
+            }}/></Tooltip>)}
           </span>
-        </div>
+           {" "}
+           <span>
+            {!this.state.hideLabel && <Tooltip
+                placement="top"
+                title="Refresh Labels"
+            >
+              <SyncOutlined
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    const projectId = parseInt(this.props.match.params.projectId);
+                    this.props.projectLabelsUpdate(projectId);
+                  }}
+              />
+            </Tooltip>}
+          </span>
+         </div>
 
         {!this.state.hideLabel && <div className="project-labels">
           {this.props.projectLabels.map((label, index) => (
@@ -500,6 +507,7 @@ class ProjectPage extends React.Component<
             )}
             {description && (
               <Popover
+                className='project-description'
                 placement="bottomLeft"
                 content={description || project.name}
               >
