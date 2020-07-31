@@ -13,6 +13,9 @@ import TaskItem from '../../components/project-item/task-item.component';
 import TasksByAssignee from "../../components/modals/tasks-by-assignee.component";
 import {User} from "../../features/group/interface";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
+import AddTask from "../../components/modals/add-task.component";
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {MenuOutlined} from "@ant-design/icons/lib";
 
 const { Panel } = Collapse;
 
@@ -145,25 +148,6 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
     <div className="task-status-page">
       <BackTop />
 
-      <div className="task-operation">
-        <Tooltip title='Tasks Ordered by Due Date Time'>
-          <span>
-            <FieldTimeOutlined onClick={handleGetTasksByOrder}/>
-          </span>
-        </Tooltip>
-        <Tooltip title="Refresh">
-          <span>
-            <SyncOutlined onClick={getTasksByStatus} />
-          </span>
-        </Tooltip>
-        <Tooltip title="Go to BuJo">
-          <span>
-            <UpSquareOutlined
-              onClick={(e) => history.push(`/projects/${projectId}`)}
-            />
-          </span>
-        </Tooltip>
-      </div>
       <div>
         <Collapse
           bordered={false}
@@ -199,6 +183,37 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
             onCancel={() => setTasksByOrderShown(false)}
             hideCompletedTask={() => setCompleteTasksShown(false)}
         />
+      </div>
+      <div>
+        <Container>
+          <FloatButton
+              onClick={() => history.push(`/projects/${projectId}`)}
+              tooltip="Go to BuJo"
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          >
+            <UpSquareOutlined/>
+          </FloatButton>
+          <FloatButton
+              tooltip="Tasks Ordered by Due Date Time"
+              onClick={handleGetTasksByOrder}
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          >
+            <FieldTimeOutlined />
+          </FloatButton>
+          <FloatButton
+              onClick={getTasksByStatus}
+              tooltip="Refresh"
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          >
+            <SyncOutlined />
+          </FloatButton>
+          <FloatButton
+              tooltip="Actions"
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          >
+            <MenuOutlined/>
+          </FloatButton>
+        </Container>
       </div>
     </div>
   );
