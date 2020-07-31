@@ -298,6 +298,10 @@ func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 }
 
 func shouldByPass(r *http.Request) bool {
+	if strings.HasPrefix(r.RequestURI, "/api/public/items/NOTE") ||
+			strings.HasPrefix(r.RequestURI, "/api/public/items/TASK") {
+		return false
+	}
 	return r.Host == "home.bulletjournal.us" ||
 		strings.HasPrefix(r.RequestURI, "/home") ||
 		strings.HasPrefix(r.RequestURI, "/api/public/") ||
