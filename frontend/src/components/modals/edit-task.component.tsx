@@ -1,26 +1,26 @@
-import React, {useEffect, useState} from 'react';
-import {AutoComplete, Avatar, DatePicker, Form, Input, Modal, Radio, Select, TimePicker, Tooltip,} from 'antd';
-import {CheckSquareTwoTone, CloseSquareTwoTone, EditTwoTone,} from '@ant-design/icons';
-import {connect} from 'react-redux';
-import {RouteComponentProps, useParams, withRouter} from 'react-router';
-import {patchTask} from '../../features/tasks/actions';
-import {IState} from '../../store';
+import React, { useEffect, useState } from 'react';
+import { AutoComplete, Avatar, DatePicker, Form, Input, Modal, Radio, Select, TimePicker, Tooltip, } from 'antd';
+import { CheckSquareTwoTone, CloseSquareTwoTone, EditTwoTone, } from '@ant-design/icons';
+import { connect } from 'react-redux';
+import { RouteComponentProps, useParams, withRouter } from 'react-router';
+import { patchTask } from '../../features/tasks/actions';
+import { IState } from '../../store';
 import './modals.styles.less';
-import {zones} from '../settings/constants';
-import {Group} from '../../features/group/interface';
-import {updateExpandedMyself} from '../../features/myself/actions';
+import { zones } from '../settings/constants';
+import { Group } from '../../features/group/interface';
+import { updateExpandedMyself } from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
-import {ReminderBeforeTaskText} from '../settings/reducer';
-import {labelsUpdate} from '../../features/label/actions';
-import {convertToTextWithRRule, updateRruleString,} from '../../features/recurrence/actions';
-import {ReminderSetting, Task} from '../../features/tasks/interface';
-import {dateFormat} from '../../features/myBuJo/constants';
+import { ReminderBeforeTaskText } from '../settings/reducer';
+import { labelsUpdate } from '../../features/label/actions';
+import { convertToTextWithRRule, updateRruleString, } from '../../features/recurrence/actions';
+import { ReminderSetting, Task } from '../../features/tasks/interface';
+import { dateFormat } from '../../features/myBuJo/constants';
 import moment from 'moment';
-import {Project} from '../../features/project/interface';
-import {Label} from '../../features/label/interface';
-import {getIcon} from '../draggable-labels/draggable-label-list.component';
-import {onFilterAssignees, onFilterLabel} from '../../utils/Util';
-import {ProjectItemUIType} from "../../features/project/constants";
+import { Project } from '../../features/project/interface';
+import { Label } from '../../features/label/interface';
+import { getIcon } from '../draggable-labels/draggable-label-list.component';
+import { onFilterAssignees, onFilterLabel } from '../../utils/Util';
+import { ProjectItemUIType } from "../../features/project/constants";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -321,10 +321,10 @@ const EditTask: React.FC<
             buttonStyle="solid"
             style={{ marginBottom: 18 }}
           >
-            <Radio value={'dueByTime'}>
+            <Radio.Button value={'dueByTime'}>
               <span onClick={() => setDueType('dueByTime')}>Date (Time)</span>
-            </Radio>
-            <Radio
+            </Radio.Button>
+            <Radio.Button
               value={'dueByRec'}
               onClick={() => {
                 //force remind option to be before
@@ -338,7 +338,7 @@ const EditTask: React.FC<
                 setRemindButton('remindBefore');
                 setReminderType('remindBefore');
               }}>Recurrence</span>
-            </Radio>
+            </Radio.Button>
           </Radio.Group>
 
           {dueType === 'dueByTime' && (
@@ -361,18 +361,18 @@ const EditTask: React.FC<
                   </Form.Item>
                 </Tooltip>
                 <Tooltip title="Select Due Time" placement="right">
-                  <Form.Item name="dueTime" style={{width: '210px'}}>
+                  <Form.Item name="dueTime" style={{ width: '210px' }}>
                     <TimePicker
-                        allowClear={true}
-                        format="HH:mm"
-                        placeholder="Due Time"
-                        disabled={dueType !== 'dueByTime'}
-                        defaultValue={
-                          //  defaultValue here not work try to set initail value on Form outside
-                          task.dueTime
-                              ? moment(task.dueTime, 'HH:mm')
-                              : undefined
-                        }
+                      allowClear={true}
+                      format="HH:mm"
+                      placeholder="Due Time"
+                      disabled={dueType !== 'dueByTime'}
+                      defaultValue={
+                        //  defaultValue here not work try to set initail value on Form outside
+                        task.dueTime
+                          ? moment(task.dueTime, 'HH:mm')
+                          : undefined
+                      }
                     />
                   </Form.Item>
                 </Tooltip>
@@ -444,10 +444,10 @@ const EditTask: React.FC<
             buttonStyle="solid"
             style={{ marginBottom: 18 }}
           >
-            <Radio value={'remindBefore'}>Time Before</Radio>
-            <Radio value={'reminderDate'} disabled={dueType === 'dueByRec'}>
+            <Radio.Button value={'remindBefore'}>Time Before</Radio.Button>
+            <Radio.Button value={'reminderDate'} disabled={dueType === 'dueByRec'}>
               Date (Time)
-            </Radio>
+            </Radio.Button>
           </Radio.Group>
           <div style={{ display: 'flex' }}>
             <Form.Item name="remindBefore">
