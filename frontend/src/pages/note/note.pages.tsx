@@ -100,6 +100,20 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
     const createContentElem = (
         <Container>
+            <FloatButton
+                tooltip="Go to Parent BuJo"
+                onClick={() => history.push(`/projects/${note.projectId}`)}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            >
+                <UpSquareOutlined/>
+            </FloatButton>
+            <FloatButton
+                tooltip="Refresh Contents"
+                onClick={handleRefresh}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            >
+                <SyncOutlined/>
+            </FloatButton>
             {content && <FloatButton
                 tooltip="Delete Content"
                 onClick={handleDelete}
@@ -154,7 +168,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                     labelEditableHandler={labelEditableHandler}
                     labelEditable={labelEditable}
                 />
-                <EditNote note={note} mode="icon"/>
                 <MoveProjectItem
                     type={ProjectType.NOTE}
                     projectItemId={note.id}
@@ -165,6 +178,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                     projectItemId={note.id}
                     mode="icon"
                 />
+                <EditNote note={note} mode="icon"/>
                 <Tooltip title="Delete">
                     <Popconfirm
                         title="Deleting Note also deletes its child notes. Are you sure?"
@@ -181,18 +195,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                             <DeleteTwoTone twoToneColor="#f5222d"/>
                         </div>
                     </Popconfirm>
-                </Tooltip>
-                <Tooltip title="Refresh Contents">
-                    <div>
-                        <SyncOutlined onClick={handleRefresh}/>
-                    </div>
-                </Tooltip>
-                <Tooltip title="Go to Parent BuJo">
-                    <div>
-                        <UpSquareOutlined
-                            onClick={(e) => history.push(`/projects/${note.projectId}`)}
-                        />
-                    </div>
                 </Tooltip>
             </div>
         );

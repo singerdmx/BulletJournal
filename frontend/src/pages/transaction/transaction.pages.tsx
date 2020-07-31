@@ -147,9 +147,27 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     deleteContent(transaction.id, content.id);
   };
 
+  const handleRefresh = () => {
+    transaction && transaction.id && updateTransactionContents(transaction.id);
+    transactionId && getTransaction(parseInt(transactionId));
+  };
 
   const createContentElem = (
     <Container>
+      <FloatButton
+          tooltip="Go to Parent BuJo"
+          onClick={() => history.push(`/projects/${transaction.projectId}`)}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <UpSquareOutlined/>
+      </FloatButton>
+      <FloatButton
+          tooltip="Refresh Contents"
+          onClick={handleRefresh}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <SyncOutlined/>
+      </FloatButton>
       {content && <FloatButton
         tooltip="Delete Content"
         onClick={handleDelete}
@@ -187,11 +205,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     </Container>
 
   );
-
-  const handleRefresh = () => {
-    transaction && transaction.id && updateTransactionContents(transaction.id);
-    transactionId && getTransaction(parseInt(transactionId));
-  };
 
   const getPaymentDateTime = (transaction: Transaction) => {
     if (!transaction.date) {
@@ -251,12 +264,12 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             labelEditableHandler={labelEditableHandler}
             labelEditable={labelEditable}
           />
-          <EditTransaction transaction={transaction} mode="icon" />
           <MoveProjectItem
             type={ProjectType.LEDGER}
             projectItemId={transaction.id}
             mode="icon"
           />
+          <EditTransaction transaction={transaction} mode="icon" />
           <Tooltip title="Delete">
             <Popconfirm
               title="Are you sure?"
@@ -273,20 +286,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                 <DeleteTwoTone twoToneColor="#f5222d" />
               </div>
             </Popconfirm>
-          </Tooltip>
-          <Tooltip title="Refresh Contents">
-            <div>
-              <SyncOutlined onClick={handleRefresh} />
-            </div>
-          </Tooltip>
-          <Tooltip title="Go to Parent BuJo">
-            <div>
-              <UpSquareOutlined
-                onClick={(e) =>
-                  history.push(`/projects/${transaction.projectId}`)
-                }
-              />
-            </div>
           </Tooltip>
         </div>
       </div>

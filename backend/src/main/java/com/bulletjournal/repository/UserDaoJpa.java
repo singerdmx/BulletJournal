@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
+import com.bulletjournal.controller.models.UserPointActivity;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.FirstTimeUserRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class UserDaoJpa {
@@ -36,6 +38,9 @@ public class UserDaoJpa {
 
     @Autowired
     private FirstTimeUserRepository firstTimeUserRepository;
+
+    @Autowired
+    private UserPointActivityDaoJpa userPointActivityDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
@@ -82,6 +87,15 @@ public class UserDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<User> getUsersByNames(Set<String> usernames) {
+        List<User> ret = userRepository.findAllByNameIn(usernames);
+        if (ret.isEmpty()) {
+            throw new ResourceNotFoundException("Non of usernames in '" + usernames + "' exist");
+        }
+        return ret;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User updateMyself(String user, UpdateMyselfParams updateMyselfParams) {
         User self = getByName(user);
         DaoHelper.updateIfPresent(updateMyselfParams.hasTimezone(),
@@ -116,11 +130,17 @@ public class UserDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void changeUserPoints(String username, Integer points) {
+    public void changeUserPoints(String username, Integer points, String description) {
+        userPointActivityDaoJpa.create(username, points, description);
         User user = this.getByName(username);
         Integer pts = user.getPoints() + points;
         user.setPoints(pts);
         this.userRepository.save(user);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<UserPointActivity> getPointActivitiesByUsername(String username) {
+        return userPointActivityDaoJpa.findPointActivityByUsername(username);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

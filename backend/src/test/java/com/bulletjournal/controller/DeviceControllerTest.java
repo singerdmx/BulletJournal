@@ -10,7 +10,6 @@ import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.DeviceTokenRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
-import com.bulletjournal.repository.models.User;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.mailjet.client.MailjetResponse;
@@ -71,10 +70,6 @@ public class DeviceControllerTest {
     @Autowired
     MailjetEmailClient mailjetEmailClient;
 
-    private User user1;
-
-    private User user2;
-
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
@@ -82,8 +77,6 @@ public class DeviceControllerTest {
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        user1 = userDaoJpa.getByName(USER1);
-        user2 = userDaoJpa.getByName(USER2);
     }
 
     @After
@@ -102,28 +95,28 @@ public class DeviceControllerTest {
         ResponseEntity<String> response = submitToken(EXAMPLE_TOKEN1, USER1);
         Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
         DeviceToken deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
-        Assert.assertEquals(new DeviceToken(user1, EXAMPLE_TOKEN1), deviceToken);
+        Assert.assertEquals(new DeviceToken(USER1, EXAMPLE_TOKEN1), deviceToken);
 
         response = submitToken(EXAMPLE_TOKEN1, USER1);
         Assert.assertEquals(DeviceController.EXISTED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
-        Assert.assertEquals(new DeviceToken(user1, EXAMPLE_TOKEN1), deviceToken);
+        Assert.assertEquals(new DeviceToken(USER1, EXAMPLE_TOKEN1), deviceToken);
 
         response = submitToken(EXAMPLE_TOKEN1, USER2);
         Assert.assertEquals(DeviceController.REPLACED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
-        Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN1), deviceToken);
+        Assert.assertEquals(new DeviceToken(USER2, EXAMPLE_TOKEN1), deviceToken);
 
         response = submitToken(EXAMPLE_TOKEN2, USER2);
         Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN2);
-        Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN2), deviceToken);
+        Assert.assertEquals(new DeviceToken(USER2, EXAMPLE_TOKEN2), deviceToken);
         Collection<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUser(USER2);
         Assert.assertTrue(
             tokens.containsAll(
                 Arrays.asList(
-                    new DeviceToken(user2, EXAMPLE_TOKEN1),
-                    new DeviceToken(user2, EXAMPLE_TOKEN2))
+                    new DeviceToken(USER2, EXAMPLE_TOKEN1),
+                    new DeviceToken(USER2, EXAMPLE_TOKEN2))
             )
         );
 
@@ -143,12 +136,12 @@ public class DeviceControllerTest {
         ResponseEntity<String> response = submitToken(EXAMPLE_TOKEN1, USER1);
         Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
         DeviceToken deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN1);
-        Assert.assertEquals(new DeviceToken(user1, EXAMPLE_TOKEN1), deviceToken);
+        Assert.assertEquals(new DeviceToken(USER1, EXAMPLE_TOKEN1), deviceToken);
 
         response = submitToken(EXAMPLE_TOKEN2, USER2);
         Assert.assertEquals(DeviceController.CREATED_RESPONSE, response.getBody());
         deviceToken = deviceTokenDaoJpa.get(EXAMPLE_TOKEN2);
-        Assert.assertEquals(new DeviceToken(user2, EXAMPLE_TOKEN2), deviceToken);
+        Assert.assertEquals(new DeviceToken(USER2, EXAMPLE_TOKEN2), deviceToken);
         List<DeviceToken> tokens
             = deviceTokenRepository.findDeviceTokensByUsers(Sets.newHashSet(USER1, USER2));
         Assert.assertEquals(2, tokens.size());

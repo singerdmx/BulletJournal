@@ -344,15 +344,7 @@ class ProjectPage extends React.Component<
         );
         break;
       case ProjectType.TODO:
-        createContent = <Container>
-          <AddTask mode="icon"/>
-          <FloatButton
-              tooltip="Actions"
-              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-          >
-            <MenuOutlined/>
-          </FloatButton>
-        </Container>
+        createContent = null; // TODO has createContent in task-tree.component.tsx
 
         projectContent = (
           <TaskTree

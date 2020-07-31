@@ -5,6 +5,7 @@ import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
 import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
@@ -33,15 +34,19 @@ public class MessagingService {
 
     private DeviceTokenDaoJpa deviceTokenDaoJpa;
 
+    private UserDaoJpa userDaoJpa;
+
     @Autowired
     public MessagingService(
         FcmClient fcmClient,
         MailjetEmailClient mailjetClient,
-        DeviceTokenDaoJpa deviceTokenDaoJpa
+        DeviceTokenDaoJpa deviceTokenDaoJpa,
+        UserDaoJpa userDaoJpa
     ) {
         this.fcmClient = fcmClient;
         this.mailjetClient = mailjetClient;
         this.deviceTokenDaoJpa = deviceTokenDaoJpa;
+        this.userDaoJpa = userDaoJpa;
     }
 
     public void sendEtagUpdateNotificationToUsers(Collection<String> usernames) {
@@ -60,16 +65,18 @@ public class MessagingService {
             .flatMap(pair -> pair.getLeft().getAssignees().stream())
             .collect(Collectors.toSet());
         List<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUsers(distinctUsers);
+        List<User> users = userDaoJpa.getUsersByNames(distinctUsers);
 
         Map<String, List<String>> nameTokensMap = new HashMap<>();
-        Map<String, String> nameEmailMap = new HashMap<>();
         for (DeviceToken deviceToken : tokens) {
-            User user = deviceToken.getUser();
-            nameEmailMap.put(user.getName(), user.getEmail());
-            if (!nameTokensMap.containsKey(user.getName())) {
-                nameTokensMap.put(user.getName(), new ArrayList<>());
+            if (!nameTokensMap.containsKey(deviceToken.getUsername())) {
+                nameTokensMap.put(deviceToken.getUsername(), new ArrayList<>());
             }
-            nameTokensMap.get(user.getName()).add(deviceToken.getToken());
+            nameTokensMap.get(deviceToken.getUsername()).add(deviceToken.getToken());
+        }
+        Map<String, String> nameEmailMap = new HashMap<>();
+        for (User user : users) {
+            nameEmailMap.put(user.getName(), user.getEmail());
         }
 
         List<MailjetEmailParams> emailParamsList = new ArrayList<>();

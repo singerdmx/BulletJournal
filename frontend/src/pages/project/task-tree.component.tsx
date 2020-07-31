@@ -11,11 +11,11 @@ import {Project} from '../../features/project/interface';
 import {
   CarryOutOutlined,
   CheckCircleOutlined,
+  CloseCircleOutlined,
   CloudSyncOutlined,
   FieldTimeOutlined,
   SearchOutlined,
-  UnorderedListOutlined,
-  CloseCircleOutlined
+  UnorderedListOutlined
 } from '@ant-design/icons';
 import './task.styles.less';
 import {User} from '../../features/group/interface';
@@ -23,6 +23,8 @@ import {useHistory} from 'react-router-dom';
 import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {MenuOutlined} from "@ant-design/icons/lib";
 
 type TasksProps = {
   completeTasksShown: boolean;
@@ -308,32 +310,47 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     window.scrollTo(0, document.body.scrollHeight);
   };
 
-  const getShowCompletedTasksIcon = () => {
-    if (completeTasksShown) {
-      return (
-          <Tooltip placement='top' title='Hide Completed Tasks'>
-              <CloseCircleOutlined onClick={hideCompletedTask}/>
-          </Tooltip>
-      );
+  const createContent = () => {
+    if (project.shared) {
+      return null;
     }
-
-    return  <Tooltip title='Show Completed Tasks'>
-      <CheckCircleOutlined onClick={handleClickShowCompletedTasksButton}/>
-    </Tooltip>
-  };
-
-  const getTaskActions = () => {
-
-    return <div className='task-actions'>
-      {getShowCompletedTasksIcon()}
-      <Tooltip title='Tasks Ordered by Due Date Time'>
-        <FieldTimeOutlined onClick={handleShowTasksOrdered}/>
-      </Tooltip>
-      <Tooltip title='Tasks by Status'>
-        <UnorderedListOutlined onClick={() => history.push(`/projects/${project.id}/taskStatus`)}/>
-      </Tooltip>
-    </div>
-  };
+    return <Container>
+      {completeTasksShown ? <FloatButton
+          tooltip="Hide Completed Tasks"
+          onClick={hideCompletedTask}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <CloseCircleOutlined/>
+      </FloatButton> : <FloatButton
+          tooltip="Show Completed Tasks"
+          onClick={handleClickShowCompletedTasksButton}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <CheckCircleOutlined/>
+      </FloatButton>}
+      {tasks.length > 0 && <FloatButton
+          tooltip="Tasks Ordered by Due Date Time"
+          onClick={handleShowTasksOrdered}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <FieldTimeOutlined/>
+      </FloatButton>}
+      {tasks.length > 0 && <FloatButton
+          tooltip="Tasks by Status"
+          onClick={() => history.push(`/projects/${project.id}/taskStatus`)}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <UnorderedListOutlined/>
+      </FloatButton>}
+      <AddTask mode="icon"/>
+      <FloatButton
+          tooltip="Actions"
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <MenuOutlined/>
+      </FloatButton>
+    </Container>
+  }
 
   const treeTask = getTree(
       !project.shared,
@@ -345,6 +362,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
 
   return (
       <div>
+        {createContent()}
         <div>
           <TasksByOrder
               visible={tasksByOrderShown}
@@ -352,7 +370,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
               hideCompletedTask={hideCompletedTask}
           />
         </div>
-        {getTaskActions()}
         <div>
           {getAddTaskButton()}
           <Tree

@@ -137,6 +137,20 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 
   const createContentElem = (
       <Container>
+        <FloatButton
+            tooltip="Go to Parent BuJo"
+            onClick={() => history.push(`/projects/${task.projectId}`)}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <UpSquareOutlined/>
+        </FloatButton>
+        <FloatButton
+            tooltip="Refresh Contents"
+            onClick={handleRefresh}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <SyncOutlined/>
+        </FloatButton>
         {content && <FloatButton
             tooltip="Delete Content"
             onClick={handleDelete}
@@ -240,7 +254,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
           labelEditableHandler={labelEditableHandler}
           labelEditable={labelEditable}
         />
-        <EditTask task={task} mode="icon" />
         <MoveProjectItem
           type={ProjectType.TODO}
           projectItemId={task.id}
@@ -251,6 +264,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
           projectItemId={task.id}
           mode="icon"
         />
+        <EditTask task={task} mode="icon" />
         <Tooltip title="Delete">
           <Popconfirm
             title="Deleting Task also deletes its child tasks. Are you sure?"
@@ -268,23 +282,11 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             </div>
           </Popconfirm>
         </Tooltip>
-        <Tooltip title="Refresh Contents">
-          <div>
-            <SyncOutlined onClick={handleRefresh} />
-          </div>
-        </Tooltip>
         <Tooltip title="Complete Task">
           <div>
             <CheckCircleTwoTone
               twoToneColor="#52c41a"
               onClick={() => handleCompleteTaskClick()}
-            />
-          </div>
-        </Tooltip>
-        <Tooltip title="Go to Parent BuJo">
-          <div>
-            <UpSquareOutlined
-              onClick={(e) => history.push(`/projects/${task.projectId}`)}
             />
           </div>
         </Tooltip>
