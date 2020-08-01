@@ -12,7 +12,6 @@ import ProjectModelItems from '../project-item/project-model-items.component';
 import { ProjectItemUIType } from "../../features/project/constants";
 import TimeZoneAgnosticBigCalendar from '../../utils/react-big-calendar/calendar-wrapper';
 import { RouteComponentProps, withRouter } from "react-router";
-import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 type PathProps = RouteComponentProps;
 
@@ -43,12 +42,8 @@ let format = {
       return moment(event.end).format("hh:mm A")
     }
     return moment(event.start).format("hh:mm A") + ' — ' + moment(event.end).format("hh:mm A")
-
-
   }
 }
-
-
 
 class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
   state: ProjectItemCalendarState = {
@@ -56,8 +51,6 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
     calendarEvents: [],
     calendarDate: moment(this.props.startDate).toDate()
   };
-
-
 
   componentDidMount() {
     this.props.updateExpandedMyself(true);
@@ -149,10 +142,6 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
               }
             }
             formats={format}
-
-
-
-
           />);
     }
   };
