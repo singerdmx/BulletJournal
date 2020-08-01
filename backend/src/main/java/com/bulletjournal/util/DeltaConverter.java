@@ -15,7 +15,7 @@ public class DeltaConverter {
             // each attributes and insert
             for (Map.Entry<String, Object> e : eDelta.entrySet()) {
                 if (Objects.equals(e.getKey(), "attributes")) {
-                    Map<String, String> formatMap =  (Map<String, String>) e.getValue();
+                    Map<String, String> formatMap = (Map<String, String>) e.getValue();
                     LinkedHashMap clonedAttri = new LinkedHashMap();
 
                     if (Objects.nonNull(formatMap.get("b"))) {
@@ -53,22 +53,61 @@ public class DeltaConverter {
         List<LinkedHashMap> opsList = (ArrayList) (opsMap.get("ops"));
         List<LinkedHashMap> mDeltaList = new ArrayList<>();
 
-        for (Map<String, Object> innerDeltaMap: opsList) {
+        for (Map<String, Object> innerDeltaMap : opsList) {
             LinkedHashMap clonedMap = new LinkedHashMap();
-            for (Map.Entry<String, Object> e: innerDeltaMap.entrySet()) {
+            for (Map.Entry<String, Object> e : innerDeltaMap.entrySet()) {
                 if (Objects.equals(e.getKey(), "attributes")) {
-                    Map<String, String> formatMap =  (Map<String, String>) e.getValue();
+                    Map<String, Object> formatMap = (Map<String, Object>) e.getValue();
                     LinkedHashMap clonedAttri = new LinkedHashMap();
 
+                    // bold
                     if (Objects.nonNull(formatMap.get("bold"))) {
-                        Boolean val = Objects.nonNull(formatMap.get("bold")) ? true : false;
+                        Boolean val = (Boolean) formatMap.get("bold");
                         clonedAttri.put("b", val);
                     }
-
+                    //italic
                     if (Objects.nonNull(formatMap.get("italic"))) {
-                        Boolean val = Objects.nonNull(formatMap.get("italic")) ? true : false;
+                        Boolean val = (Boolean) formatMap.get("italic");
                         clonedAttri.put("i", val);
                     }
+                    //link
+                    if (Objects.nonNull(formatMap.get("link"))) {
+                        String val = (String) formatMap.get("link");
+                        clonedAttri.put("a", val);
+                    }
+                    //heading
+                    if (Objects.nonNull(formatMap.get("header"))) {
+                        Double val = (Double) formatMap.get("header");
+                        Integer intVal = val.intValue();
+                        clonedAttri.put("heading", intVal);
+                    }
+                    //block
+                    //list
+                    if (Objects.nonNull(formatMap.get("list"))) {
+                        String val = (String) formatMap.get("list");
+                        // order list
+                        if (val.equals("ordered")) {
+                            clonedAttri.put("block", "ol");
+                        }
+                        // bullet list
+                        if (val.equals("bullet")) {
+                            clonedAttri.put("block", "ul");
+                        }
+                    }
+                    //code
+                    if (Objects.nonNull(formatMap.get("code-block"))) {
+                        Boolean val = (Boolean) formatMap.get("code-block");
+                        if (val) {
+                            clonedAttri.put("block", "code");
+                        }
+                    }
+                    //quote
+                    if (Objects.nonNull(formatMap.get("blockquote"))) {
+                        Boolean val = (Boolean) formatMap.get("blockquote");
+                        clonedAttri.put("block", "quote");
+                    }
+
+                    // convert embed
 
                     clonedMap.put("attributes", clonedAttri);
 
