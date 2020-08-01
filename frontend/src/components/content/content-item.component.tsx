@@ -2,7 +2,6 @@ import React from 'react';
 import { Content, ProjectItem } from '../../features/myBuJo/interface';
 import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import RevisionDrawer from '../revision/revision-drawer.component';
-import moment from 'moment';
 import './content-item.styles.less';
 import { Project } from '../../features/project/interface';
 import { IState } from '../../store';
@@ -14,6 +13,7 @@ import {
 
 type ContentProps = {
   content: Content;
+  targetContent: Content | undefined;
   projectItem: ProjectItem;
   displayMore: boolean;
   displayRevision: boolean;
@@ -36,6 +36,7 @@ export const isContentEditable = (
 
 const ContentItem: React.FC<ContentProps> = ({
   content,
+  targetContent,
   projectItem,
   displayMore,
   displayRevision,
@@ -52,6 +53,30 @@ const ContentItem: React.FC<ContentProps> = ({
     setDisplayMore(false);
   };
 
+  const isDisplayMore = () => {
+    if (!displayMore) {
+      return false;
+    }
+
+    if (!targetContent) {
+      return false;
+    }
+
+    return targetContent.id === content.id;
+  }
+
+  const isDisplayRevision = () => {
+    if (!displayRevision) {
+      return false;
+    }
+
+    if (!targetContent) {
+      return false;
+    }
+
+    return targetContent.id === content.id;
+  }
+
   return (
     <div className="content-item-page-contianer">
       <div
@@ -63,12 +88,12 @@ const ContentItem: React.FC<ContentProps> = ({
 
       <ContentEditorDrawer
         content={content}
-        visible={displayMore}
+        visible={isDisplayMore()}
         onClose={handleClose}
         projectItem={projectItem}
       />
       <RevisionDrawer
-        revisionDisplay={displayRevision}
+        revisionDisplay={isDisplayRevision()}
         onClose={handleRevisionClose}
         revisions={content.revisions}
         projectItem={projectItem}
@@ -81,6 +106,7 @@ const ContentItem: React.FC<ContentProps> = ({
 const mapStateToProps = (state: IState) => ({
   displayMore: state.content.displayMore,
   displayRevision: state.content.displayRevision,
+  targetContent: state.content.content
 });
 
 export default connect(mapStateToProps, {

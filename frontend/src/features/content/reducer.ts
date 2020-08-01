@@ -23,7 +23,7 @@ const slice = createSlice({
   name: 'content',
   initialState,
   reducers: {
-    updateContentId: (state, action: PayloadAction<ContentAction>) => {
+    updateContent: (state, action: PayloadAction<ContentAction>) => {
       const {content} = action.payload;
       state.content = content;
     },
