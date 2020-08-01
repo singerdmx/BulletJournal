@@ -45,7 +45,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
   }, [note]);
   if (!note) return null;
   return (
-    <div className={`note-page ${inPublicPage() && 'public'}`}>
+    <div className={`note-page ${inPublicPage() ? 'publicPage' : ''} ${isPublic ? 'sharedItem' : ''}`}>
       <Tooltip
         placement="top"
         title={`${note.owner.alias}`}

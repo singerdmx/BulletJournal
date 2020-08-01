@@ -175,7 +175,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     };
 
     return (
-    <div className={`task-page ${inPublicPage() && 'public'}`}>
+    <div className={`task-page ${inPublicPage() ? 'publicPage' : ''} ${isPublic ? 'sharedItem' : ''}`}>
         <BackTop/>
 
         <Tooltip
