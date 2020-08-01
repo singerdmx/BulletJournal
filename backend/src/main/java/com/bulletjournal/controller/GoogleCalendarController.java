@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 public class GoogleCalendarController {
 
     public static final String CHANNEL_NOTIFICATIONS_ROUTE = "/api/calendar/google/channel/notifications";
+    public static final String OAUTH_CALL_BACK = "/api/calendar/google/oauth2_basic/callback";
     private static final GsonFactory GSON = new GsonFactory();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleCalendarController.class);
@@ -70,14 +71,15 @@ public class GoogleCalendarController {
     @PostMapping(value = "/api/calendar/google/login")
     public ResponseEntity<?> loginGoogleCalendar() {
         LOGGER.info("Logging in for Google Calendar");
+        String username = MDC.get(UserClient.USER_NAME_KEY);
         HttpHeaders responseHeader = new HttpHeaders();
-        responseHeader.setLocation(URI.create(authorize()));
+        responseHeader.setLocation(URI.create(authorize(username)));
         return ResponseEntity.ok().headers(responseHeader).build();
     }
 
-    @RequestMapping(value = "/api/calendar/google/oauth2_basic/callback", method = RequestMethod.GET, params = "code")
-    public RedirectView oauth2Callback(@RequestParam(value = "code") String code) {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
+    @RequestMapping(value = OAUTH_CALL_BACK, method = RequestMethod.GET, params = {"code", "state"})
+    public RedirectView oauth2Callback(@RequestParam(value = "code") String code,
+                                       @RequestParam(value = "state") String username) {
         try {
             TokenResponse response = this.googleCalClient.getFlow().newTokenRequest(code)
                     .setRedirectUri(this.googleCalConfig.getRedirectURI()).execute();
@@ -307,13 +309,13 @@ public class GoogleCalendarController {
     }
 
 
-    private String authorize() {
+    private String authorize(String username) {
         if (this.googleCalClient.getFlow() == null) {
             throw new IllegalStateException("Google Calendar Settings missing");
         }
         AuthorizationCodeRequestUrl authorizationUrl;
         authorizationUrl = this.googleCalClient.getFlow().newAuthorizationUrl()
-                .setRedirectUri(this.googleCalConfig.getRedirectURI());
+                .setRedirectUri(this.googleCalConfig.getRedirectURI()).setState(username);
         LOGGER.info("authorizationUrl: " + authorizationUrl);
         return authorizationUrl.build();
     }

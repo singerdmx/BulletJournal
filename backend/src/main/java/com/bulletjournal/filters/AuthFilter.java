@@ -31,7 +31,8 @@ import java.util.Optional;
 @Order(0)
 public class AuthFilter implements Filter {
     private static final List<String> BYPASS_WHITE_LIST_ROUTES = ImmutableList.of(
-            SystemController.PUBLIC_ITEM_ROUTE_PREFIX, GoogleCalendarController.CHANNEL_NOTIFICATIONS_ROUTE);
+            SystemController.PUBLIC_ITEM_ROUTE_PREFIX, GoogleCalendarController.CHANNEL_NOTIFICATIONS_ROUTE,
+            GoogleCalendarController.OAUTH_CALL_BACK);
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilter.class);
 
     @Autowired
