@@ -250,22 +250,6 @@ class ProjectPage extends React.Component<
       <>
        {hasLabel &&(<div>
          <div className="project-labels-icon">
-          <span>
-            {!this.state.hideLabel && (<Tooltip
-                placement="top"
-                title="Hide Labels"
-            ><UpOutlined onClick={() => {
-              this.setState({hideLabel: true});
-            }}/>
-            </Tooltip>)}
-            {this.state.hideLabel && (<Tooltip
-                placement="top"
-                title="Show Project Labels"
-            ><DownOutlined onClick={() => {
-              this.setState({hideLabel: false});
-            }}/></Tooltip>)}
-          </span>
-           {" "}
            <span>
             {!this.state.hideLabel && <Tooltip
                 placement="top"
@@ -279,6 +263,22 @@ class ProjectPage extends React.Component<
                   }}
               />
             </Tooltip>}
+           </span>
+           {" "}
+           <span>
+            {!this.state.hideLabel && (<Tooltip
+                placement="top"
+                title="Hide Labels"
+            ><UpOutlined onClick={() => {
+              this.setState({hideLabel: true});
+            }}/>
+            </Tooltip>)}
+            {this.state.hideLabel && (<Tooltip
+                placement="top"
+                title="Show Project Labels"
+            ><DownOutlined onClick={() => {
+              this.setState({hideLabel: false});
+            }}/></Tooltip>)}
           </span>
          </div>
 
