@@ -127,6 +127,11 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
             timeslots={1}
             step={60}
             onSelectEvent={(event: any, e: any) => this.props.history.push(event.resource)}
+            dayPropGetter={
+              (date: any) => {
+                return moment(date).format(dateFormat) === moment().format(dateFormat) ? { style: { background: 'rgba(0, 203, 196, 0.12)' } } : {}
+              }
+            }
 
           />);
     }
