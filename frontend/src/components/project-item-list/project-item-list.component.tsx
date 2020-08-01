@@ -12,6 +12,7 @@ import ProjectModelItems from '../project-item/project-model-items.component';
 import { ProjectItemUIType } from "../../features/project/constants";
 import TimeZoneAgnosticBigCalendar from '../../utils/react-big-calendar/calendar-wrapper';
 import { RouteComponentProps, withRouter } from "react-router";
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 type PathProps = RouteComponentProps;
 
@@ -36,12 +37,27 @@ type ProjectItemCalendarState = {
   calendarDate: Date;
 };
 
+let format = {
+  eventTimeRangeFormat: (event: any) => {
+    if (moment(event.start).format("hh:mm:ss") === moment(event.end).format("hh:mm:ss")) {
+      return moment(event.end).format("hh:mm A")
+    }
+    return moment(event.start).format("hh:mm A") + ' — ' + moment(event.end).format("hh:mm A")
+
+
+  }
+}
+
+
+
 class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
   state: ProjectItemCalendarState = {
     viewType: 'agenda',
     calendarEvents: [],
     calendarDate: moment(this.props.startDate).toDate()
   };
+
+
 
   componentDidMount() {
     this.props.updateExpandedMyself(true);
@@ -132,6 +148,10 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
                 return moment(date).format(dateFormat) === moment().format(dateFormat) ? { style: { background: 'rgba(0, 203, 196, 0.12)' } } : {}
               }
             }
+            formats={format}
+
+
+
 
           />);
     }
@@ -247,6 +267,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
   };
 
   render() {
+
     return (
       <div className='todo-list'>
         <div className='todo-panel'>
