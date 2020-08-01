@@ -6,8 +6,9 @@ import java.util.*;
 
 public class DeltaConverter {
 
+    private static Gson gson = new Gson();
+
     public static String mDeltaToDelta(final String mDelta) {
-        Gson gson = new Gson();
         List<Map<String, Object>> mDeltaList = gson.fromJson(mDelta, List.class);
         List<LinkedHashMap<String, Object>> deltaList = new ArrayList<>();
         for (Map<String, Object> eDelta : mDeltaList) {
@@ -47,7 +48,6 @@ public class DeltaConverter {
 
     public static String deltaTomDelta(final String delta) {
 
-        Gson gson = new Gson();
         LinkedHashMap<String, Object> deltaMap = gson.fromJson(delta, LinkedHashMap.class);
         Map<String, Object> opsMap = (Map) deltaMap.get("delta");
         List<LinkedHashMap> opsList = (ArrayList) (opsMap.get("ops"));
