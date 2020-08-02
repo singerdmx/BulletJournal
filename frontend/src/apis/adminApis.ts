@@ -10,11 +10,14 @@ export const setRole = (username: string, role: Role) => {
   });
 };
 
-export const changePoints = (username: string, points: number) => {
+export const changePoints = (username: string, points: number, description: string) => {
   const postBody = JSON.stringify({
     points: points,
+    description: description,
   });
-  return doPost(`/api/users/${username}/changePoints`, postBody).catch(
+  return doPost(`/api/users/${username}/changePoints`, postBody)
+      .then((res) => res.json())
+      .catch(
     (err) => {
       throw Error(err.message);
     }

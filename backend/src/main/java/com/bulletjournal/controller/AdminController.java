@@ -118,13 +118,14 @@ public class AdminController {
     }
 
     @PostMapping(CHANGE_POINTS_ROUTE)
-    public void changePoints(@NotBlank @PathVariable String username,
+    public Myself changePoints(@NotBlank @PathVariable String username,
                              @NotNull @RequestBody ChangePointsParams changePointsParams) {
         username = getUsername(username);
         validateRequester();
         Integer points = changePointsParams.getPoints();
         String description = changePointsParams.getDescription();
         this.userDaoJpa.changeUserPoints(username, points, description);
+        return getUser(username);
     }
 
     @Deprecated
