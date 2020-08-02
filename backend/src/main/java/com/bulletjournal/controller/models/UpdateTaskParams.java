@@ -42,6 +42,13 @@ public class UpdateTaskParams {
         this.labels = labels;
     }
 
+    public void selfClean() {
+        if (this.recurrenceRule != null) {
+            this.dueDate = null;
+            this.dueTime = null;
+        }
+    }
+
     public String getDueDate() {
         return dueDate;
     }

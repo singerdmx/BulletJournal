@@ -444,7 +444,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
-
+        createTaskParams.selfClean();
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
@@ -546,7 +546,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task partialUpdate(String requester, Long taskId, UpdateTaskParams updateTaskParams,
                               List<UpdateTaskAssigneeEvent> events) {
-
+        updateTaskParams.selfClean();
         Task task = this.getProjectItem(taskId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
