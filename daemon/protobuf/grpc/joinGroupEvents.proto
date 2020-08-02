@@ -5,7 +5,7 @@ package joinGroupEvent;
 option java_package = "com.bulletjournal.daemon.protobuf.grpc.types";
 
 service sender {
-  rpc send (JoinGroupEvent) returns (ReplyMessage) {}
+  rpc send (JoinGroupEvents) returns (ReplyMessage) {}
 }
 
 message Event {
@@ -22,6 +22,10 @@ message JoinGroupEvent {
   Event event = 1;
 
   string originator = 2;
+}
+
+message JointGroupEvents {
+  repeated JoinGroupEvent joinGroupEvent = 1;
 }
 
 message ReplyMessage {
