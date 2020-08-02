@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import quillEmoji from 'quill-emoji';
 import 'quill-emoji/dist/quill-emoji.css';

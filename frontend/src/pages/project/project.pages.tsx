@@ -4,7 +4,7 @@ import {Project} from '../../features/project/interface';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {GroupsWithOwner, User} from '../../features/group/interface';
-import {Avatar, BackTop, Badge, Collapse, Popconfirm, Popover, Tag, Tooltip,} from 'antd';
+import {Avatar, BackTop, Badge, Popconfirm, Popover, Tag, Tooltip,} from 'antd';
 import {deleteProject, getProject} from '../../features/project/actions';
 import {iconMapper} from '../../components/side-menu/side-menu.component';
 import {DeleteOutlined, DownOutlined, SyncOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
@@ -33,8 +33,6 @@ import {FrequencyType, LedgerSummaryType,} from '../../features/transactions/int
 import {projectLabelsUpdate, setSelectedLabel,} from '../../features/label/actions';
 import {Label, stringToRGB} from '../../features/label/interface';
 import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
-
-const { Panel } = Collapse;
 
 type ProjectPathParams = {
   projectId: string;

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const backgroundImages = [
   'https://user-images.githubusercontent.com/122956/86581423-f225f580-bf34-11ea-8b89-e0ff2517d8ec.jpg',
   'https://user-images.githubusercontent.com/122956/86581428-f4884f80-bf34-11ea-994b-6cf4ed024f85.jpg',

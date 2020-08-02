@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Form, Button, message } from 'antd';
 import { connect } from 'react-redux';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { modules, formats } from './content-editor-toolbar';
 import {
