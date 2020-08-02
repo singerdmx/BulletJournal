@@ -10,6 +10,7 @@ export type setRoleAction = {
 export type ChangePointsAction = {
   username: string;
   points: number;
+  description: string;
 };
 
 export type SetPointsAction = {

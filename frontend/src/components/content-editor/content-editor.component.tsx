@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Form, Button, message } from 'antd';
 import { connect } from 'react-redux';
 import ReactQuill from 'react-quill';
+import { Delta } from 'quill';
 import 'react-quill/dist/quill.snow.css';
 import { modules, formats } from './content-editor-toolbar';
 import {
@@ -32,9 +33,19 @@ type ContentEditorProps = {
 
 interface ContentEditorHandler {
   createNoteContent: (noteId: number, text: string) => void;
-  patchNoteContent: (noteId: number, contentId: number, text: string, diff?: string) => void;
+  patchNoteContent: (
+    noteId: number,
+    contentId: number,
+    text: string,
+    diff?: string
+  ) => void;
   createTaskContent: (taskId: number, text: string) => void;
-  patchTaskContent: (taskId: number, contentId: number, text: string, diff?: string) => void;
+  patchTaskContent: (
+    taskId: number,
+    contentId: number,
+    text: string,
+    diff?: string
+  ) => void;
   createTransactionContent: (transactionId: number, text: string) => void;
   patchTransactionContent: (
     transactionId: number,
@@ -66,6 +77,14 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   );
   const quillRef = useRef<ReactQuill>(null);
   const [error, setError] = useState('');
+  const createHTML = (oldDelta: any) => {
+    const element = document.createElement('article');
+    const oldEditor = new ReactQuill.Quill(element, { readOnly: true });
+    oldEditor.setContents(oldDelta);
+    return oldEditor.root.innerHTML;
+  };
+
+  const oldContents = content && new Delta(JSON.parse(content.text).delta);
 
   useEffect(() => {
     if (error.length < 1) return;
@@ -163,10 +182,13 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
         form
           .validateFields()
           .then(async () => {
+            const newContent = new Delta(editorContent);
+            const diff = newContent.diff(oldContents!);
             await patchContentFunction(
               projectItemId,
               content.id,
-              JSON.stringify(editorContent)
+              JSON.stringify(editorContent),
+              diff
             );
             afterFinish();
           })

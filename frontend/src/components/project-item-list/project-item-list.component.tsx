@@ -78,7 +78,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
             title: task.name,
             start: new Date(task.startTime),
             end: new Date(task.endTime),
-            resource: `/task/${task.id}`
+            resource: `/task/${task.id}`,
           });
         }
       });
@@ -225,7 +225,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
             style={{ width: '250px' }}
             picker='date'
             allowClear={false}
-            showToday={false}
+            showToday={true}
             value={
               moment(
                 this.state.calendarDate
@@ -251,6 +251,21 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
             }
             format={dateFormat}
             onChange={this.handlePickerChange}
+            renderExtraFooter={
+              () =>
+                <span style={{
+                  color: '#1890ff',
+                  background: '#e6f7ff',
+                  borderColor: '#91d5ff',
+                  padding: '3px',
+                  border: '1px solid',
+                }} onClick={() => this.props.updateMyBuJoDates(
+                  moment().startOf().format(dateFormat),
+                  moment().endOf().format(dateFormat))
+
+                }>This Week</span>
+
+            }
           />);
     }
   };

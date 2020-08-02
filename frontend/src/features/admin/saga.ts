@@ -40,13 +40,13 @@ function* setUserRole(action: PayloadAction<setRoleAction>) {
 
 function* changeUserPoints(action: PayloadAction<ChangePointsAction>) {
   try {
-    const { username, points } = action.payload;
+    const { username, points, description } = action.payload;
     if (!username) {
       yield call(message.error, 'Missing Username');
       return;
     }
-    yield call(changePoints, username, points);
-
+    const data = yield call(changePoints, username, points, description);
+    yield put(adminActions.userInfoReceived({ userInfo: data }));
     yield call(
       message.success,
       `User ${username} changed(+/-) points ${points}`
@@ -140,25 +140,16 @@ function* lockUsersAndIPs(action: PayloadAction<LockUserAndIPAction>) {
 }
 
 export default function* AdminSagas() {
-  yield all([yield takeLatest(adminActions.setRole.type, setUserRole)]);
   yield all([
+    yield takeLatest(adminActions.setRole.type, setUserRole),
     yield takeLatest(adminActions.changePoints.type, changeUserPoints),
-  ]);
-  yield all([
     yield takeLatest(adminActions.getUsersByRole.type, getUsersByRole),
-  ]);
-  yield all([
     yield takeLatest(
-      adminActions.getLockedUsersAndIPs.type,
-      getBlockedUsersAndIPs
-    ),
-  ]);
-  yield all([
+         adminActions.getLockedUsersAndIPs.type,
+         getBlockedUsersAndIPs
+       ),
     yield takeLatest(adminActions.unlockUserandIP.type, unlockUsersAndIPs),
-  ]);
-  yield all([
     yield takeLatest(adminActions.lockUserandIP.type, lockUsersAndIPs),
-  ]);
-  yield all([yield takeLatest(adminActions.getUserInfo.type, getUserInfo)]);
-  yield all([yield takeLatest(adminActions.setPoints.type, setUserPoints)]);
+    yield takeLatest(adminActions.getUserInfo.type, getUserInfo)
+  ])
 }

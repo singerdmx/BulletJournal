@@ -17,12 +17,12 @@ import {
 import {
   getUsersByRole,
   setRole,
-  changePoints,
   getLockedUsersAndIPs,
   unlockUserandIP,
   lockUserandIP,
   getUserInfo,
-  setPoints,
+  changePoints,
+  //setPoints,
 } from '../../features/admin/actions';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
@@ -38,6 +38,7 @@ import {
   FormOutlined,
   CloseCircleOutlined,
 } from '@ant-design/icons';
+import {log} from "util";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -50,8 +51,8 @@ type AdminProps = {
   lockedIPs: LockedIP[];
   getUserInfo: (username: string) => void;
   setRole: (username: string, role: Role) => void;
-  setPoints: (username: string, points: number) => void;
-  changePoints: (username: string, points: number) => void;
+  //setPoints: (username: string, points: number) => void;
+  changePoints: (username: string, points: number, description: string) => void;
   getUsersByRole: (role: Role) => void;
   getLockedUsersAndIPs: () => void;
   unlockUserandIP: (name: string, ip: string) => void;
@@ -70,7 +71,8 @@ const AdminPage: React.FC<AdminProps> = (props) => {
     getLockedUsersAndIPs,
     unlockUserandIP,
     lockUserandIP,
-    setPoints,
+    changePoints
+   //setPoints,
   } = props;
   const [username, setUsername] = useState('');
   const [roleLevel, setRoleLevel] = useState('BASIC' as Role);
@@ -79,6 +81,7 @@ const AdminPage: React.FC<AdminProps> = (props) => {
   const [lockName, setLockName] = useState('');
   const [lockIP, setLockIP] = useState('');
   const [lockReason, setLockReason] = useState('');
+  const [description, setDescription] = useState('');
   const [mode, setMode] = useState('display');
   const columns = [
     {
@@ -209,7 +212,9 @@ const AdminPage: React.FC<AdminProps> = (props) => {
                       style={{ marginLeft: '340px' }}
                       type='primary'
                       onClick={() => {
-                        setPoints(searchName, inputPoints);
+                        console.log('fuck');
+                        console.log(searchName + " " + inputPoints + " " + description);
+                        changePoints(searchName, inputPoints, description);
                         setMode('display');
                       }}
                     >
@@ -235,17 +240,31 @@ const AdminPage: React.FC<AdminProps> = (props) => {
                   {userInfo.theme}
                 </Descriptions.Item>
                 <Descriptions.Item label='Points'>
-                  {mode === 'display' && userInfo.points}
+                  {userInfo.points}
+                </Descriptions.Item>
+                <Descriptions.Item label='AddOrDeletePoints'>
+                  {mode === 'display' && 0}
                   {mode === 'edit' && (
                     <InputNumber
                       style={{ width: '70px' }}
-                      placeholder='Points'
-                      value={inputPoints}
+                      placeholder='AddOrDeletePoints'
                       onChange={(value) => {
                         if (!value || isNaN(value)) setInputPoints(0);
                         else setInputPoints(value);
                       }}
                     />
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label='Description'>
+                  {mode === 'display' && ''}
+                  {mode === 'edit' && (
+                  <Input
+                      placeholder='Description'
+                      style={{ width: '500px' }}
+                      onChange={(e: any) => {
+                        setDescription(e.target.value);
+                      }}
+                  />
                   )}
                 </Descriptions.Item>
               </Descriptions>
@@ -388,7 +407,7 @@ export default connect(mapStateToProps, {
   getLockedUsersAndIPs,
   unlockUserandIP,
   lockUserandIP,
-  changePoints,
   getUserInfo,
-  setPoints,
+  changePoints
+  //setPoints,
 })(AdminPage);

@@ -87,7 +87,7 @@ const GoogleCalendarSyncPage: React.FC<SettingProps> = (props) => {
 
   return (
     <div className="calendar-sync-div">
-      <Tooltip title="Enjoy a 2-way sync between your scheduled tasks and your Google Calendar">
+      <Tooltip title="Enjoy a 2-way sync between your scheduled tasks and your Google Calendar" placement="topLeft">
         <div className="calendar-sync-before">
           Sync Google Calendar :
           <button onClick={() => handleGoogleCalendarLogin()}>
