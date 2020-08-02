@@ -38,7 +38,6 @@ import {
   FormOutlined,
   CloseCircleOutlined,
 } from '@ant-design/icons';
-import {log} from "util";
 
 const { Panel } = Collapse;
 const { Option } = Select;

@@ -1,6 +1,6 @@
 // a editor component for taking and update note
 import React, { useState, useRef, useEffect } from 'react';
-import { Form, Button, message } from 'antd';
+import { Button, message } from 'antd';
 import { connect } from 'react-redux';
 import ReactQuill from 'react-quill';
 import Quill from 'quill';
@@ -71,8 +71,6 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   patchTransactionContent,
   patchTaskContent,
 }) => {
-  // get hook of form from ant form
-  const [form] = Form.useForm();
   const isEdit = !!content;
   const [editorContent, setEditorContent] = useState(
     content ? JSON.parse(content.text) : { delta: '', '###html###': '' }
@@ -86,7 +84,6 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     return oldEditor.root.innerHTML;
   };
   const delta = content && JSON.parse(content.text)['delta'];
-  console.log(delta);
   const oldContents = content && new Delta({ops : delta['ops']});
 
   useEffect(() => {
@@ -170,36 +167,23 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
 
   const handleFormSubmit = () => {
     if (!isEdit) {
-      form
-        .validateFields()
-        .then(async () => {
-          await createContentFunction(
-            projectItemId,
-            JSON.stringify(editorContent)
-          );
-          afterFinish();
-        })
-        .catch((err) => message.error(err));
-    } else {
-      content &&
-        form
-          .validateFields()
-          .then(async () => {
-            const newContent = new Delta(editorContent['delta']);
-            const diff = oldContents!.diff(newContent);
-            console.log(oldContents!)
-            console.log(newContent)
-            console.log(diff)
-            await patchContentFunction(
-              projectItemId,
-              content.id,
-              JSON.stringify(editorContent),
-              JSON.stringify(diff)
-            );
-            afterFinish();
-          })
-          .catch((err) => message.error(err));
+      createContentFunction(
+          projectItemId,
+          JSON.stringify(editorContent));
+    } else if (content) {
+      const newContent = new Delta(editorContent['delta']);
+      const diff = oldContents!.diff(newContent);
+      console.log(oldContents!)
+      console.log(newContent)
+      console.log(diff)
+      patchContentFunction(
+          projectItemId,
+          content.id,
+          JSON.stringify(editorContent),
+          JSON.stringify(diff)
+      );
     }
+    afterFinish();
   };
 
   const handleChange = (
@@ -213,7 +197,6 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       '###html###': content,
     });
   };
-  console.log(isOpen);
   return (
     <div className="content-editor">
       {isOpen && (
