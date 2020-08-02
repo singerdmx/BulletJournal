@@ -185,8 +185,11 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
         form
           .validateFields()
           .then(async () => {
-            const newContent = new Delta(editorContent);
-            const diff = newContent.diff(oldContents!);
+            const newContent = new Delta(editorContent['delta']);
+            const diff = oldContents!.diff(newContent);
+            console.log(oldContents!)
+            console.log(newContent)
+            console.log(diff)
             await patchContentFunction(
               projectItemId,
               content.id,
