@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Form, Button, message } from 'antd';
 import { connect } from 'react-redux';
 import ReactQuill from 'react-quill';
-import { Delta } from 'quill';
+import Quill from 'quill';
 import 'react-quill/dist/quill.snow.css';
 import { modules, formats } from './content-editor-toolbar';
 import {
@@ -23,6 +23,8 @@ import { ContentType } from '../../features/myBuJo/constants';
 import placeholder from '../../assets/placeholder.png';
 import axios from 'axios';
 import './content-editor.style.less';
+
+let Delta = Quill.import('delta');
 
 type ContentEditorProps = {
   projectItemId: number;
@@ -83,8 +85,9 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     oldEditor.setContents(oldDelta);
     return oldEditor.root.innerHTML;
   };
-
-  const oldContents = content && new Delta(JSON.parse(content.text).delta);
+  const delta = content && JSON.parse(content.text)['delta'];
+  console.log(delta);
+  const oldContents = content && new Delta({ops : delta['ops']});
 
   useEffect(() => {
     if (error.length < 1) return;
