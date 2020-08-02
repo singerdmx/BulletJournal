@@ -16,18 +16,55 @@ public class DeltaConverter {
             // each attributes and insert
             for (Map.Entry<String, Object> e : eDelta.entrySet()) {
                 if (Objects.equals(e.getKey(), "attributes")) {
-                    Map<String, String> formatMap = (Map<String, String>) e.getValue();
+                    Map<String, Object> formatMap = (Map<String, Object>) e.getValue();
                     LinkedHashMap clonedAttri = new LinkedHashMap();
-
+                    // bold
                     if (Objects.nonNull(formatMap.get("b"))) {
-                        Boolean val = Objects.nonNull(formatMap.get("b")) ? true : false;
+                        Boolean val = (Boolean) formatMap.get("b");
                         clonedAttri.put("bold", val);
                     }
-
+                    //italic
                     if (Objects.nonNull(formatMap.get("i"))) {
-                        Boolean val = Objects.nonNull(formatMap.get("i")) ? true : false;
+                        Boolean val = (Boolean) formatMap.get("i");
                         clonedAttri.put("italic", val);
                     }
+
+                    //link
+                    if (Objects.nonNull(formatMap.get("a"))) {
+                        String val = (String) formatMap.get("a");
+                        clonedAttri.put("link", val);
+                    }
+                    //heading
+                    if (Objects.nonNull(formatMap.get("heading"))) {
+                        Double val = (Double) formatMap.get("heading");
+                        Integer intVal = val.intValue();
+                        clonedAttri.put("header", intVal);
+                    }
+
+                    //block
+                    //list
+                    if (Objects.nonNull(formatMap.get("block"))) {
+                        String val = (String) formatMap.get("block");
+                        // order list
+                        if (val.equals("ol")) {
+                            clonedAttri.put("list", "ordered");
+                        }
+                        // bullet list
+                        if (val.equals("ul")) {
+                            clonedAttri.put("list", "bullet");
+                        }
+                        //code
+                        if (val.equals("code")) {
+                            clonedAttri.put("code-block", true);
+                        }
+                        //quote
+                        if (val.equals("quote")) {
+                            clonedAttri.put("blockquote", true);
+                        }
+                    }
+
+                    // convert embed : imagine
+
 
                     clonedMap.put("attributes", clonedAttri);
                 } else {
@@ -107,7 +144,7 @@ public class DeltaConverter {
                         clonedAttri.put("block", "quote");
                     }
 
-                    // convert embed
+                    // convert embed : imagine
 
                     clonedMap.put("attributes", clonedAttri);
 
@@ -117,7 +154,6 @@ public class DeltaConverter {
             }
 
             mDeltaList.add(clonedMap);
-
         }
         return gson.toJson(mDeltaList);
     }

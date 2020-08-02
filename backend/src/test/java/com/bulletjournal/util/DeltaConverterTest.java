@@ -12,40 +12,52 @@ public class DeltaConverterTest {
         String deltaBold = "{\"delta\":{\"ops\":[{\"attributes\":{\"bold\":true},\"insert\":\"test Bold\"},{\"insert\":\"\\n\"}]}}";
 
         String mDeltaInsert = "[{\"insert\":\"test Italic\",\"attributes\":{\"i\":true}},{\"insert\":\"\\n\"}]";
-        String detlaInsert = "{\"delta\":{\"ops\":[{\"attributes\":{\"italic\":true},\"insert\":\"test Italic\"},{\"insert\":\"\\n\"}]}}";
+        String deltaInsert = "{\"delta\":{\"ops\":[{\"attributes\":{\"italic\":true},\"insert\":\"test Italic\"},{\"insert\":\"\\n\"}]}}";
 
-        String deltaLink = "{\"delta\":{\"ops\":[{\"attributes\":{\"link\":\"Link\"},\"insert\":\"Link\"},{\"insert\":\"\\n\"}]},\"###html###\":\"<p><a href=\\\"Link\\\" rel=\\\"noopener noreferrer\\\" target=\\\"_blank\\\">Link</a></p>\"}";
-        String mdeltaLink = "[{\"insert\":\"Link\",\"attributes\":{\"a\":\"Link\"}},{\"insert\":\"\\n\"}]";
+        String deltaLink = "{\"delta\":{\"ops\":[{\"attributes\":{\"link\":\"Link\"},\"insert\":\"Link\"},{\"insert\":\"\\n\"}]}}";
+        String mDeltaLink = "[{\"insert\":\"Link\",\"attributes\":{\"a\":\"Link\"}},{\"insert\":\"\\n\"}]";
 
-        String deltaHeading1 = "{\"delta\":{\"ops\":[{\"insert\":\"heading 1\"},{\"attributes\":{\"header\":1},\"insert\":\"\\n\"}]},\"###html###\":\"<h1>heading 1</h1>\"}";
-        String mDltaHeading1 = "[{\"insert\":\"heading 1\"},{\"insert\":\"\\n\",\"attributes\":{\"heading\":1}}]";
+        String deltaHeading1 = "{\"delta\":{\"ops\":[{\"insert\":\"heading 1\"},{\"attributes\":{\"header\":1},\"insert\":\"\\n\"}]}}";
+        String mDeltaHeading1 = "[{\"insert\":\"heading 1\"},{\"insert\":\"\\n\",\"attributes\":{\"heading\":1}}]";
 
-        String deltaHeading2 = "{\"delta\":{\"ops\":[{\"insert\":\"heading 2\"},{\"attributes\":{\"header\":2},\"insert\":\"\\n\"}]},\"###html###\":\"<h2>heading 2</h2>\"}";
+        String deltaHeading2 = "{\"delta\":{\"ops\":[{\"insert\":\"heading 2\"},{\"attributes\":{\"header\":2},\"insert\":\"\\n\"}]}}";
         String mDeltaHeading2 = "[{\"insert\":\"heading 2\"},{\"insert\":\"\\n\",\"attributes\":{\"heading\":2}}]";
 
-        String deltaOrderList = "{\"delta\":{\"ops\":[{\"insert\":\"order list 1\"},{\"attributes\":{\"list\":\"ordered\"},\"insert\":\"\\n\"},{\"insert\":\"order list 2\"},{\"attributes\":{\"list\":\"ordered\"},\"insert\":\"\\n\"}]},\"###html###\":\"<ol><li>order list 1</li><li>order list 2</li></ol>\"}";
-        String mDetlaOrderList = "[{\"insert\":\"order list 1\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}},{\"insert\":\"order list 2\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}}]";
+        String deltaOrderList = "{\"delta\":{\"ops\":[{\"insert\":\"order list 1\"},{\"attributes\":{\"list\":\"ordered\"},\"insert\":\"\\n\"},{\"insert\":\"order list 2\"},{\"attributes\":{\"list\":\"ordered\"},\"insert\":\"\\n\"}]}}";
+        String mDeltaOrderList = "[{\"insert\":\"order list 1\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}},{\"insert\":\"order list 2\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}}]";
 
-        String deltaBulletList = "{\"delta\":{\"ops\":[{\"insert\":\"bullet list 1\"},{\"attributes\":{\"list\":\"bullet\"},\"insert\":\"\\n\"},{\"insert\":\"bullet list 2\"},{\"attributes\":{\"list\":\"bullet\"},\"insert\":\"\\n\"}]},\"###html###\":\"<ul><li>bullet list 1</li><li>bullet list 2</li></ul>\"}";
-        String mDetlaBulletList = "[{\"insert\":\"bullet list 1\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"bullet list 2\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}}]";
+        String deltaBulletList = "{\"delta\":{\"ops\":[{\"insert\":\"bullet list 1\"},{\"attributes\":{\"list\":\"bullet\"},\"insert\":\"\\n\"},{\"insert\":\"bullet list 2\"},{\"attributes\":{\"list\":\"bullet\"},\"insert\":\"\\n\"}]}}";
+        String mDeltaBulletList = "[{\"insert\":\"bullet list 1\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"bullet list 2\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}}]";
 
-        String deltaCodeBlock = "{\"delta\":{\"ops\":[{\"insert\":\"code block\"},{\"attributes\":{\"code-block\":true},\"insert\":\"\\n\"}]},\"###html###\":\"<pre class=\\\"ql-syntax\\\" spellcheck=\\\"false\\\">code block\\n</pre>\"}";
+        String deltaCodeBlock = "{\"delta\":{\"ops\":[{\"insert\":\"code block\"},{\"attributes\":{\"code-block\":true},\"insert\":\"\\n\"}]}}";
         String mDeltaCodeBlock = "[{\"insert\":\"code block\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"code\"}}]";
 
-        String deltaQuoteBlock = "{\"delta\":{\"ops\":[{\"insert\":\"quote block\"},{\"attributes\":{\"blockquote\":true},\"insert\":\"\\n\"}]},\"###html###\":\"<blockquote>quote block</blockquote>\"}";
+        String deltaQuoteBlock = "{\"delta\":{\"ops\":[{\"insert\":\"quote block\"},{\"attributes\":{\"blockquote\":true},\"insert\":\"\\n\"}]}}";
         String mDeltaQuoteBlock = "[{\"insert\":\"quote block\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"quote\"}}]";
 
 
         // test delta -> mdelta
         Assert.assertEquals(JsonParser.parseString(mDeltaBold), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaBold)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaInsert), JsonParser.parseString(DeltaConverter.deltaTomDelta(detlaInsert)));
-        Assert.assertEquals(JsonParser.parseString(mdeltaLink), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaLink)));
-        Assert.assertEquals(JsonParser.parseString(mDltaHeading1), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaHeading1)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaInsert), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaInsert)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaLink), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaLink)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaHeading1), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaHeading1)));
         Assert.assertEquals(JsonParser.parseString(mDeltaHeading2), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaHeading2)));
-        Assert.assertEquals(JsonParser.parseString(mDetlaOrderList), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaOrderList)));
-        Assert.assertEquals(JsonParser.parseString(mDetlaBulletList), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaBulletList)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaOrderList), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaOrderList)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaBulletList), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaBulletList)));
         Assert.assertEquals(JsonParser.parseString(mDeltaCodeBlock), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaCodeBlock)));
         Assert.assertEquals(JsonParser.parseString(mDeltaQuoteBlock), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaQuoteBlock)));
+
+
+        // test mdelta -> delta
+        Assert.assertEquals(JsonParser.parseString(deltaBold), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaBold)));
+        Assert.assertEquals(JsonParser.parseString(deltaInsert), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaInsert)));
+        Assert.assertEquals(JsonParser.parseString(deltaLink), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaLink)));
+        Assert.assertEquals(JsonParser.parseString(deltaHeading1), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaHeading1)));
+        Assert.assertEquals(JsonParser.parseString(deltaHeading2), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaHeading2)));
+        Assert.assertEquals(JsonParser.parseString(deltaOrderList), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaOrderList)));
+        Assert.assertEquals(JsonParser.parseString(deltaBulletList), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaBulletList)));
+        Assert.assertEquals(JsonParser.parseString(deltaCodeBlock), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaCodeBlock)));
+        Assert.assertEquals(JsonParser.parseString(deltaQuoteBlock), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaQuoteBlock)));
 
     }
 
