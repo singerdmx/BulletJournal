@@ -1,0 +1,1 @@
+curl -k -v "http://localhost:9091/send" -d '{"joinGroupEvents": [{"events": [], "originator":"1"}, {"events": [], "originator":"2"}]}'

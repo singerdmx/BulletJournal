@@ -27,9 +27,14 @@ Run grpc server in foreground
 target/hello-server
 ```
 
-Run rpc call to test grpc server
+Run rpc call against daemon server for resting its rpc endpoint
 ```
 Right click and run daemon/clients/grpc/main.go
+```
+
+Run http call against daemon server for resting its rest endpoint
+```
+Right click and run daemon/clients/rest/curl.sh
 ```
 
 Kill grpc server
