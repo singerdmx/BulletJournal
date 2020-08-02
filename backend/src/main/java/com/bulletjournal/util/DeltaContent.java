@@ -1,40 +1,41 @@
 package com.bulletjournal.util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 
-import javax.validation.constraints.NotNull;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeltaContent {
 
+    public static final String DELTA = "delta";
+    public static final String MDELTA = "mdelta";
     public static final String HTML_TAG = "###html###";
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 
-    @NotNull
-    private String delta;
-    @NotNull
-    private String mdelta;
+    @SerializedName(DELTA)
+    private Map deltaMap;
 
+    @SerializedName(MDELTA)
+    private List mdeltaList;
+
+    @SerializedName(value = HTML_TAG)
     private String html;
+
     private List<String> mdiff;
     private List<String> diff;
 
     public DeltaContent(String text) {
-        LinkedHashMap<String, Object> deltaMap = GSON.fromJson(text, LinkedHashMap.class);
-        this.delta = deltaMap.get("delta").toString();
+        LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
+        deltaMap = (Map) map.get(DELTA);
+        mdeltaList = (List) map.get(MDELTA);
+        this.html = map.get(HTML_TAG) == null ? null : map.get(HTML_TAG).toString();
     }
 
-    public String getDelta() {
-        return delta;
-    }
-
-    public void setDelta(String delta) {
-        this.delta = delta;
-    }
-
-    public boolean hasDelta() {
-        return this.delta != null;
+    public boolean hasDeltaMap() {
+        return this.deltaMap != null;
     }
 
     public String getHtml() {
@@ -45,16 +46,24 @@ public class DeltaContent {
         this.html = html;
     }
 
-    public String getMdelta() {
-        return mdelta;
+    public boolean hasMdeltaList() {
+        return this.mdeltaList != null;
     }
 
-    public void setMdelta(String mdelta) {
-        this.mdelta = mdelta;
+    public Map getDeltaMap() {
+        return deltaMap;
     }
 
-    public boolean hasMdelta() {
-        return this.mdelta != null;
+    public void setDeltaMap(Map deltaMap) {
+        this.deltaMap = deltaMap;
+    }
+
+    public List getMdeltaList() {
+        return mdeltaList;
+    }
+
+    public void setMdeltaList(List mdeltaList) {
+        this.mdeltaList = mdeltaList;
     }
 
     public List<String> getMdiff() {
@@ -71,5 +80,9 @@ public class DeltaContent {
 
     public void setDiff(List<String> diff) {
         this.diff = diff;
+    }
+
+    public String toJSON() {
+        return GSON.toJson(this);
     }
 }

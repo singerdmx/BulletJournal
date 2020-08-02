@@ -4,13 +4,15 @@ import com.google.gson.JsonParser;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static com.bulletjournal.util.DeltaConverter.supplementContentText;
+
 public class DeltaConverterTest {
 
     @Test
     public void testDeltaContent() {
         DeltaContent deltaContent = new DeltaContent(
                 "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}");
-        deltaContent.getDelta();
+        deltaContent.getDeltaMap();
     }
 
     /**
@@ -18,12 +20,17 @@ public class DeltaConverterTest {
      */
     @Test
     public void testSupplementContentText() {
-        // input: "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}"
-        // output: "{\"mdelta\":[{ \"insert\":\"test 1 \ntest 2\n\"}],\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}"
+        String delta = "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}";
+        String deltaToMdeltaExpected = "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"mdelta\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}],\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}";
+        String deltaToMdeltaRes = supplementContentText(delta);
+        Assert.assertEquals(deltaToMdeltaExpected, deltaToMdeltaRes);
 
-
-        // input: [{"insert":"test 1 \ntest 2\n"}]
-        // output: "{\"mdelta\":[{ \"insert\":\"test 1 \ntest 2\n\"}],\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}}"
+        String mdelta = "{\"mdelta\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}";
+        String mdeltaToDeltaExpected = "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"mdelta\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}";
+        String  mdeltaToDeltaRes = supplementContentText(mdelta);
+        System.out.println(mdelta);
+        System.out.println(mdeltaToDeltaRes);
+        Assert.assertEquals(mdeltaToDeltaExpected, mdeltaToDeltaRes);
     }
 
     @Test
@@ -57,27 +64,27 @@ public class DeltaConverterTest {
 
 
         // test delta -> mdelta
-        Assert.assertEquals(JsonParser.parseString(mDeltaBold), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaBold)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaInsert), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaInsert)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaLink), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaLink)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaHeading1), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaHeading1)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaHeading2), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaHeading2)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaOrderList), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaOrderList)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaBulletList), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaBulletList)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaCodeBlock), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaCodeBlock)));
-        Assert.assertEquals(JsonParser.parseString(mDeltaQuoteBlock), JsonParser.parseString(DeltaConverter.deltaTomDelta(deltaQuoteBlock)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaBold), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaBold)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaInsert), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaInsert)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaLink), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaLink)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaHeading1), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaHeading1)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaHeading2), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaHeading2)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaOrderList), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaOrderList)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaBulletList), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaBulletList)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaCodeBlock), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaCodeBlock)));
+        Assert.assertEquals(JsonParser.parseString(mDeltaQuoteBlock), JsonParser.parseString(DeltaConverter.deltaTomDeltaStr(deltaQuoteBlock)));
 
 
         // test mdelta -> delta
-        Assert.assertEquals(JsonParser.parseString(deltaBold), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaBold)));
-        Assert.assertEquals(JsonParser.parseString(deltaInsert), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaInsert)));
-        Assert.assertEquals(JsonParser.parseString(deltaLink), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaLink)));
-        Assert.assertEquals(JsonParser.parseString(deltaHeading1), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaHeading1)));
-        Assert.assertEquals(JsonParser.parseString(deltaHeading2), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaHeading2)));
-        Assert.assertEquals(JsonParser.parseString(deltaOrderList), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaOrderList)));
-        Assert.assertEquals(JsonParser.parseString(deltaBulletList), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaBulletList)));
-        Assert.assertEquals(JsonParser.parseString(deltaCodeBlock), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaCodeBlock)));
-        Assert.assertEquals(JsonParser.parseString(deltaQuoteBlock), JsonParser.parseString(DeltaConverter.mDeltaToDelta(mDeltaQuoteBlock)));
+        Assert.assertEquals(JsonParser.parseString(deltaBold), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaBold)));
+        Assert.assertEquals(JsonParser.parseString(deltaInsert), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaInsert)));
+        Assert.assertEquals(JsonParser.parseString(deltaLink), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaLink)));
+        Assert.assertEquals(JsonParser.parseString(deltaHeading1), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaHeading1)));
+        Assert.assertEquals(JsonParser.parseString(deltaHeading2), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaHeading2)));
+        Assert.assertEquals(JsonParser.parseString(deltaOrderList), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaOrderList)));
+        Assert.assertEquals(JsonParser.parseString(deltaBulletList), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaBulletList)));
+        Assert.assertEquals(JsonParser.parseString(deltaCodeBlock), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaCodeBlock)));
+        Assert.assertEquals(JsonParser.parseString(deltaQuoteBlock), JsonParser.parseString(DeltaConverter.mDeltaToDeltaStr(mDeltaQuoteBlock)));
 
     }
 
