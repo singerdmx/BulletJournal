@@ -14,12 +14,12 @@ option java_outer_classname = "Daemon";
 service Daemon {
 
   // Serve rpc call sending JoinGroupEvents
-  rpc Send (types.JoinGroupEvents) returns (types.ReplyMessage) {}
+  rpc JoinGroupEvents (types.JoinGroupEvents) returns (types.ReplyMessage) {}
 
   // Serve rest call sending JoinGroupEvents
-  rpc RestSend (types.JoinGroupEvents) returns (types.ReplyMessage) {
+  rpc Rest (types.JoinGroupEvents) returns (types.ReplyMessage) {
      option (google.api.http) = {
-          post: "/send"
+          post: "/daemon"
           body: "*"
      };
   }

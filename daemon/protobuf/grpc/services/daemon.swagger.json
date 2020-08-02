@@ -11,10 +11,10 @@
     "application/json"
   ],
   "paths": {
-    "/send": {
+    "/daemon": {
       "post": {
         "summary": "Serve rest call sending JoinGroupEvents",
-        "operationId": "Daemon_RestSend",
+        "operationId": "Daemon_Rest",
         "responses": {
           "200": {
             "description": "A successful response.",

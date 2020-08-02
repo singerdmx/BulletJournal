@@ -25,16 +25,16 @@ type server struct {
 	services.UnimplementedDaemonServer
 }
 
-// Send implements the Send rpc endpoint of services.DaemonServer
-func (s *server) Send(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
+// Send implements the JoinGroupEvents rpc endpoint of services.DaemonServer
+func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
 	log.Printf("Received rpc request: %v", request.String())
 	return &types.ReplyMessage{Message: "Hello rpc"}, nil
 }
 
-// RestSend implements the RestSend rest->rpc endpoint of services.DaemonServer
-func (s *server) RestSend(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
-	log.Printf("Received rest request: %v", request.String())
-	return &types.ReplyMessage{Message: "Hello rest"}, nil
+// Rest implements the Rest rest->rpc endpoint of services.DaemonServer
+func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
+	log.Printf("Received request: %v", request.String())
+	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
 
 func main() {
@@ -58,6 +58,13 @@ func main() {
 		log.Fatalf("failed to register rpc server to gateway server: %v", err)
 	}
 	httpServer := &http.Server{Addr: httpPort, Handler: gatewayMux}
+
+	//// Serve the swagger-ui and swagger file
+	//mux := http.NewServeMux()
+	//mux.Handle("/", rmux)
+	//mux.HandleFunc("/swagger.json", serveSwagger)
+	//fs := http.FileServer(http.Dir("www/swagger-ui"))
+	//mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui", fs))
 
 	go func() {
 		if err := rpcServer.Serve(lis); err != nil {

@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
-func request_Daemon_RestSend_0(ctx context.Context, marshaler runtime.Marshaler, client DaemonClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Daemon_Rest_0(ctx context.Context, marshaler runtime.Marshaler, client DaemonClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq types.JoinGroupEvents
 	var metadata runtime.ServerMetadata
 
@@ -44,12 +44,12 @@ func request_Daemon_RestSend_0(ctx context.Context, marshaler runtime.Marshaler,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.RestSend(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Rest(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_Daemon_RestSend_0(ctx context.Context, marshaler runtime.Marshaler, server DaemonServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_Daemon_Rest_0(ctx context.Context, marshaler runtime.Marshaler, server DaemonServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq types.JoinGroupEvents
 	var metadata runtime.ServerMetadata
 
@@ -61,7 +61,7 @@ func local_request_Daemon_RestSend_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.RestSend(ctx, &protoReq)
+	msg, err := server.Rest(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -71,7 +71,7 @@ func local_request_Daemon_RestSend_0(ctx context.Context, marshaler runtime.Mars
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 func RegisterDaemonHandlerServer(ctx context.Context, mux *runtime.ServeMux, server DaemonServer) error {
 
-	mux.Handle("POST", pattern_Daemon_RestSend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_Daemon_Rest_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -80,14 +80,14 @@ func RegisterDaemonHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Daemon_RestSend_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Daemon_Rest_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Daemon_RestSend_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Daemon_Rest_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -132,7 +132,7 @@ func RegisterDaemonHandler(ctx context.Context, mux *runtime.ServeMux, conn *grp
 // "DaemonClient" to call the correct interceptors.
 func RegisterDaemonHandlerClient(ctx context.Context, mux *runtime.ServeMux, client DaemonClient) error {
 
-	mux.Handle("POST", pattern_Daemon_RestSend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_Daemon_Rest_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -141,14 +141,14 @@ func RegisterDaemonHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Daemon_RestSend_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Daemon_Rest_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Daemon_RestSend_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Daemon_Rest_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -156,9 +156,9 @@ func RegisterDaemonHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_Daemon_RestSend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"send"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Daemon_Rest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"daemon"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_Daemon_RestSend_0 = runtime.ForwardResponseMessage
+	forward_Daemon_Rest_0 = runtime.ForwardResponseMessage
 )
