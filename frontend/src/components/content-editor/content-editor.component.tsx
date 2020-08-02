@@ -191,7 +191,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
               projectItemId,
               content.id,
               JSON.stringify(editorContent),
-              diff
+              JSON.stringify(diff)
             );
             afterFinish();
           })
