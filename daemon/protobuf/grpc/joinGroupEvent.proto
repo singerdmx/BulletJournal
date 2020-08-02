@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package joinGroupEvent;
+
+option java_package = "com.bulletjournal.daemon.protobuf.grpc.types";
+
+service sender {
+  rpc send (JoinGroupEvent) returns (ReplyMessage) {}
+}
+
+message Event {
+  string targetUser = 1;
+
+  uint64 contentId = 2;
+
+  string contentName = 3;
+
+  string originatorAlias = 4;
+}
+
+message JoinGroupEvent {
+  Event event = 1;
+
+  string originator = 2;
+}
+
+message ReplyMessage {
+  string message = 1;
+}
