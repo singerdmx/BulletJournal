@@ -8,29 +8,37 @@ import java.util.*;
 
 public class DeltaConverter {
 
-    private static Gson gson = new Gson();
+    private static Gson GSON = new Gson();
 
     public static String supplementContentText(String text) {
         // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}
         // from mobile: {mdelta:XXXXXX }
         DeltaContent deltaContent = new DeltaContent(text);
-        if (deltaContent.hasDelta() && deltaContent.hasMdelta()) {
+
+        if (deltaContent.hasDeltaMap() && deltaContent.hasMdeltaList()) {
             throw new BadRequestException("Cannot have both delta and mdelta");
         }
-        if (deltaContent.hasDelta()) {
-            deltaContent.setMdelta(null);
-        } else if (deltaContent.hasMdelta()) {
-            deltaContent.setDelta(null);
+        if (deltaContent.hasDeltaMap()) {
+            deltaContent.setMdeltaList(deltaTomDelta(deltaContent.getDeltaMap()));
+        } else if (deltaContent.hasMdeltaList()) {
+            deltaContent.setDeltaMap(mDeltaToDelta(deltaContent.getMdeltaList()));
         } else {
             throw new BadRequestException("None of delta and mdelta exists");
         }
 
-        return deltaContent.toString();
+        return deltaContent.toJSON();
     }
 
     @VisibleForTesting
-    protected static String mDeltaToDelta(final String mDelta) {
-        List<Map<String, Object>> mDeltaList = gson.fromJson(mDelta, List.class);
+    protected static String mDeltaToDeltaStr(final String mDelta) {
+        List<Map<String, Object>> mDeltaList = GSON.fromJson(mDelta, List.class);
+        LinkedHashMap opsMap = mDeltaToDelta(mDeltaList);
+        LinkedHashMap deltaMap = new LinkedHashMap();
+        deltaMap.put("delta", opsMap);
+        return GSON.toJson(deltaMap);
+    }
+
+    protected static LinkedHashMap mDeltaToDelta(final List<Map<String, Object>> mDeltaList) {
         List<LinkedHashMap<String, Object>> deltaList = new ArrayList<>();
         for (Map<String, Object> eDelta : mDeltaList) {
             LinkedHashMap<String, Object> clonedMap = new LinkedHashMap<>();
@@ -98,18 +106,21 @@ public class DeltaConverter {
 
         LinkedHashMap opsMap = new LinkedHashMap();
         opsMap.put("ops", deltaList);
-        LinkedHashMap deltaMap = new LinkedHashMap();
-        deltaMap.put("delta", opsMap);
 
-        return gson.toJson(deltaMap);
+
+        return opsMap;
     }
 
     @VisibleForTesting
-    protected static String deltaTomDelta(final String delta) {
+    protected static String deltaTomDeltaStr(final String delta) {
+        LinkedHashMap<String, Object> map = GSON.fromJson(delta, LinkedHashMap.class);
+        Map<String, Object> deltaMap = (Map) map.get("delta");
+        return GSON.toJson(deltaTomDelta(deltaMap));
+    }
 
-        LinkedHashMap<String, Object> deltaMap = gson.fromJson(delta, LinkedHashMap.class);
-        Map<String, Object> opsMap = (Map) deltaMap.get("delta");
-        List<LinkedHashMap> opsList = (ArrayList) (opsMap.get("ops"));
+    protected static List<LinkedHashMap> deltaTomDelta(final Map<String, Object> deltaMap) {
+
+        List<LinkedHashMap> opsList = (ArrayList) (deltaMap.get("ops"));
         List<LinkedHashMap> mDeltaList = new ArrayList<>();
 
         for (Map<String, Object> innerDeltaMap : opsList) {
@@ -177,7 +188,7 @@ public class DeltaConverter {
 
             mDeltaList.add(clonedMap);
         }
-        return gson.toJson(mDeltaList);
+        return mDeltaList;
     }
 }
 
