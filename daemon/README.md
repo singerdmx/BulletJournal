@@ -24,7 +24,7 @@ make clean build
 
 Run grpc server in foreground
 ```
-target/hello-server
+target/daemon-server
 ```
 
 Run rpc call against daemon server for resting its rpc endpoint
