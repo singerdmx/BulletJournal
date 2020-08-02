@@ -194,10 +194,14 @@ export const deleteContent = (noteId: number, contentId: number) => {
 export const updateContent = (
   noteId: number,
   contentId: number,
-  text: string
+  text: string,
+  diff?: string,
+  mdiff?: string,
 ) => {
   const patchBody = JSON.stringify({
     text: text,
+    diff: diff,
+    mdiff: mdiff
   });
   return doPatch(`/api/notes/${noteId}/contents/${contentId}`, patchBody)
     .then((res) => res.json())

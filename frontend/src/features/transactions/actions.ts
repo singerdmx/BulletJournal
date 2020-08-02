@@ -137,12 +137,16 @@ export const deleteContent = (transactionId: number, contentId: number) =>
 export const patchContent = (
   transactionId: number,
   contentId: number,
-  text: string
+  text: string,
+  diff?: string,
+  mdiff?: string
 ) =>
   actions.TransactionContentPatch({
     transactionId: transactionId,
     contentId: contentId,
     text: text,
+    diff: diff,
+    mdiff: mdiff
   });
 
 export const updateTransactionForm = (

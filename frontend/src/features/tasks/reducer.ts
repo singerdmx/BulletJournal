@@ -126,6 +126,8 @@ export type PatchContent = {
   taskId: number;
   contentId: number;
   text: string;
+  diff?: string;
+  mdiff?: string;
 };
 
 export type RevokeSharable = {

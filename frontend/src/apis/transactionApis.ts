@@ -192,10 +192,14 @@ export const deleteContent = (transactionId: number, contentId: number) => {
 export const updateContent = (
   transactionId: number,
   contentId: number,
-  text: string
+  text: string,
+  diff?: string,
+  mdiff?: string,
 ) => {
   const patchBody = JSON.stringify({
     text: text,
+    diff: diff,
+    mdiff: mdiff
   });
   return doPatch(
     `/api/transactions/${transactionId}/contents/${contentId}`,

@@ -302,10 +302,14 @@ export const deleteContent = (taskId: number, contentId: number) => {
 export const updateContent = (
   taskId: number,
   contentId: number,
-  text: string
+  text: string,
+  diff?: string,
+  mdiff?: string,
 ) => {
   const patchBody = JSON.stringify({
     text: text,
+    diff: diff,
+    mdiff: mdiff
   });
   return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody)
     .then((res) => res.json())

@@ -34,6 +34,11 @@ export interface Content {
   revisions: Revision[];
 }
 
+export interface ContentDiff {
+  diff: string;
+  text: string; //  whole content including html, e.g. {“delta”:YYYYY,”###html###”:ZZZZZZ}
+}
+
 export interface Revision {
   id: number;
   createdAt: number;
