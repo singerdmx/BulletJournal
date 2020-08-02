@@ -40,13 +40,12 @@ export const deleteContent = (noteId: number, contentId: number) =>
   actions.NoteContentDelete({ noteId: noteId, contentId: contentId });
 export const patchNote = (noteId: number, name: string, labels?: number[]) =>
   actions.NotePatch({ noteId: noteId, name: name, labels: labels });
-export const patchContent = (noteId: number, contentId: number, text: string, diff?: string, mdiff?: string) =>
+export const patchContent = (noteId: number, contentId: number, text: string, diff?: string) =>
   actions.NoteContentPatch({
     noteId: noteId,
     contentId: contentId,
     text: text,
     diff: diff,
-    mdiff: mdiff
   });
 export const setNoteLabels = (noteId: number, labels: number[]) =>
   actions.NoteSetLabels({ noteId: noteId, labels: labels });

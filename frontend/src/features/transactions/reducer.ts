@@ -42,7 +42,6 @@ export type PatchContent = {
   contentId: number;
   text: string;
   diff?: string;
-  mdiff?: string;
 };
 
 export type UpdateTransactions = {

@@ -32,16 +32,15 @@ type ContentEditorProps = {
 
 interface ContentEditorHandler {
   createNoteContent: (noteId: number, text: string) => void;
-  patchNoteContent: (noteId: number, contentId: number, text: string, diff?: string, mdiff?: string) => void;
+  patchNoteContent: (noteId: number, contentId: number, text: string, diff?: string) => void;
   createTaskContent: (taskId: number, text: string) => void;
-  patchTaskContent: (taskId: number, contentId: number, text: string, diff?: string, mdiff?: string) => void;
+  patchTaskContent: (taskId: number, contentId: number, text: string, diff?: string) => void;
   createTransactionContent: (transactionId: number, text: string) => void;
   patchTransactionContent: (
     transactionId: number,
     contentId: number,
     text: string,
-    diff?: string,
-    mdiff?: string
+    diff?: string
   ) => void;
   afterFinish: Function;
 }

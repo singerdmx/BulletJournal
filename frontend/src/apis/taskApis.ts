@@ -304,12 +304,10 @@ export const updateContent = (
   contentId: number,
   text: string,
   diff?: string,
-  mdiff?: string,
 ) => {
   const patchBody = JSON.stringify({
     text: text,
     diff: diff,
-    mdiff: mdiff
   });
   return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody)
     .then((res) => res.json())

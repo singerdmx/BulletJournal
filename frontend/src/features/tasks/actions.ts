@@ -139,13 +139,12 @@ export const createContent = (taskId: number, text: string) =>
 
 export const deleteContent = (taskId: number, contentId: number) =>
   actions.TaskContentDelete({ taskId: taskId, contentId: contentId });
-export const patchContent = (taskId: number, contentId: number, text: string, diff?: string, mdiff?: string) =>
+export const patchContent = (taskId: number, contentId: number, text: string, diff?: string) =>
   actions.TaskContentPatch({
     taskId: taskId,
     contentId: contentId,
     text: text,
     diff: diff,
-    mdiff: mdiff
   });
 export const updateLoadingCompletedTask = (loadingCompletedTask: boolean) =>
   actions.updateLoadingCompletedTask({
