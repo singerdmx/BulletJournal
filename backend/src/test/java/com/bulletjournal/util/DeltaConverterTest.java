@@ -28,8 +28,6 @@ public class DeltaConverterTest {
         String mdelta = "{\"mdelta\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}";
         String mdeltaToDeltaExpected = "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"mdelta\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}";
         String  mdeltaToDeltaRes = supplementContentText(mdelta);
-        System.out.println(mdelta);
-        System.out.println(mdeltaToDeltaRes);
         Assert.assertEquals(mdeltaToDeltaExpected, mdeltaToDeltaRes);
     }
 
