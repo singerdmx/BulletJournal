@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package types;
+
+option go_package = "github.com/singerdmx/BulletJournal/daemon/protobuf/grpc/types";
+option java_multiple_files = true;
+option java_package = "com.bulletjournal.daemon.protobuf.grpc.types";
+option java_outer_classname = "JoinGroupEvents";
+
+message Event {
+  string targetUser = 1;
+
+  uint64 contentId = 2;
+
+  string contentName = 3;
+
+  string originatorAlias = 4;
+}
+
+message JoinGroupEvent {
+  repeated Event events = 1;
+
+  string originator = 2;
+}
+
+message JoinGroupEvents {
+  repeated JoinGroupEvent joinGroupEvents = 1;
+}
+
+message ReplyMessage {
+  string message = 1;
+}

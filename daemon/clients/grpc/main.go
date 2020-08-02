@@ -20,14 +20,15 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	client := services.NewHelloClient(conn)
+	client := services.NewDaemonClient(conn)
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := client.SayHello(ctx, &types.HelloRequest{Name: "BulletJournal"})
+
+	r, err := client.Send(ctx, &types.JoinGroupEvents{JoinGroupEvents: []*types.JoinGroupEvent{{Events: []*types.Event{}, Originator: "1"},{Events: []*types.Event{}, Originator: "2"}}})
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("Could not send JoinGroupEvents: %v", err)
 	}
-	log.Printf("Greeting: %s", r.Name)
+	log.Printf("Sent JoinGroupEvents with a response: %s", r.Message)
 }

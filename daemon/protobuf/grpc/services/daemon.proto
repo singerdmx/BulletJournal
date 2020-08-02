@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package services;
+
+import "protobuf/grpc/types/join_group_events.proto";
+
+option go_package = "github.com/singerdmx/BulletJournal/daemon/protobuf/grpc/services";
+option java_multiple_files = true;
+option java_package = "com.bulletjournal.daemon.protobuf.grpc.services";
+option java_outer_classname = "Daemon";
+
+// The daemon service definition.
+service Daemon {
+  rpc Send (types.JoinGroupEvents) returns (types.ReplyMessage) {}
+}
