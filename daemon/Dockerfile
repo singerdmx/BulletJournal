@@ -6,7 +6,7 @@ FROM golang:1.13-alpine
 WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
 
 # Copy 
-COPY servers/grpc/. ./servers/grpc/.
+COPY servers/. ./servers/.
 COPY protobuf/. ./protobuf/.
 COPY go.mod .
 COPY Makefile .
@@ -20,7 +20,7 @@ RUN apk update && \
 RUN GOOS=linux TARGET=/go/bin make build
 
 # Run the grpc command by default when the container starts.
-ENTRYPOINT [ "/go/bin/hello-server" ]
+ENTRYPOINT [ "/go/bin/daemon-server" ]
 
 # Document that the service listens on port 50051.
 EXPOSE 50051
