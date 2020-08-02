@@ -1,8 +1,5 @@
 package com.bulletjournal.repository.models;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -17,8 +14,6 @@ public class DeviceToken extends AuditModel {
     @Column(nullable = false)
     private String token;
 
-    @JoinColumn(table = "users", name = "username", referencedColumnName = "name", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "username", nullable = false)
     private String username;
 
