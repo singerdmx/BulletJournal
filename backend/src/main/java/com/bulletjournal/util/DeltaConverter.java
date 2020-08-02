@@ -1,5 +1,7 @@
 package com.bulletjournal.util;
 
+import com.bulletjournal.exceptions.BadRequestException;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 
 import java.util.*;
@@ -8,7 +10,26 @@ public class DeltaConverter {
 
     private static Gson gson = new Gson();
 
-    public static String mDeltaToDelta(final String mDelta) {
+    public static String supplementContentText(String text) {
+        // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}
+        // from mobile: {mdelta:XXXXXX }
+        DeltaContent deltaContent = new DeltaContent(text);
+        if (deltaContent.hasDelta() && deltaContent.hasMdelta()) {
+            throw new BadRequestException("Cannot have both delta and mdelta");
+        }
+        if (deltaContent.hasDelta()) {
+            deltaContent.setMdelta(null);
+        } else if (deltaContent.hasMdelta()) {
+            deltaContent.setDelta(null);
+        } else {
+            throw new BadRequestException("None of delta and mdelta exists");
+        }
+
+        return deltaContent.toString();
+    }
+
+    @VisibleForTesting
+    protected static String mDeltaToDelta(final String mDelta) {
         List<Map<String, Object>> mDeltaList = gson.fromJson(mDelta, List.class);
         List<LinkedHashMap<String, Object>> deltaList = new ArrayList<>();
         for (Map<String, Object> eDelta : mDeltaList) {
@@ -83,7 +104,8 @@ public class DeltaConverter {
         return gson.toJson(deltaMap);
     }
 
-    public static String deltaTomDelta(final String delta) {
+    @VisibleForTesting
+    protected static String deltaTomDelta(final String delta) {
 
         LinkedHashMap<String, Object> deltaMap = gson.fromJson(delta, LinkedHashMap.class);
         Map<String, Object> opsMap = (Map) deltaMap.get("delta");

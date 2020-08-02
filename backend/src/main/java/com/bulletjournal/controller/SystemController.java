@@ -140,22 +140,26 @@ public class SystemController {
         }
 
         if (projectId != null) {
-            Project project = this.projectDaoJpa.getProject(projectId, username).toPresentationModel();
-            switch (project.getProjectType()) {
-                case TODO:
-                    List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
-                    tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                            EtagGenerator.HashType.TO_HASHCODE,
-                            taskList);
-                    break;
-                case NOTE:
-                    List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
-                    notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                            EtagGenerator.HashType.TO_HASHCODE,
-                            noteList);
-                    break;
-                default:
-                    throw new IllegalArgumentException();
+            try {
+                Project project = this.projectDaoJpa.getProject(projectId, username).toPresentationModel();
+                switch (project.getProjectType()) {
+                    case TODO:
+                        List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
+                        tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                                EtagGenerator.HashType.TO_HASHCODE,
+                                taskList);
+                        break;
+                    case NOTE:
+                        List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
+                        notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                                EtagGenerator.HashType.TO_HASHCODE,
+                                noteList);
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
+            } catch (Exception ex) {
+                LOGGER.info("Skipping tasksEtag or notesEtag");
             }
         }
 

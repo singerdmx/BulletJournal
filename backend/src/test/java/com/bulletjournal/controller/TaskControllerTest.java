@@ -4,6 +4,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.util.DeltaContent;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,10 +64,10 @@ public class TaskControllerTest {
      */
     @Test
     public void testGetContentRevision() {
-        String testContent1 = "Test content 1.";
-        String testContent2 = "Test content 2.";
-        String testContent3 = "Test content 3.";
-        String testContent4 = "Test content 4.";
+        String testContent1 = "Test content 1." + DeltaContent.HTML_TAG;
+        String testContent2 = "Test content 2." + DeltaContent.HTML_TAG;
+        String testContent3 = "Test content 3." + DeltaContent.HTML_TAG;
+        String testContent4 = "Test content 4." + DeltaContent.HTML_TAG;
 
         Group group = TestHelpers.createGroup(requestParams, USER, "Group_ProjectItem");
         List<String> users = new ArrayList<>();

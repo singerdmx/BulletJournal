@@ -4,7 +4,8 @@ public class ContentDiff {
 
     private String diff;
 
-    private String html;
+    //  whole content including html, e.g. {“delta”:YYYYY,”###html###”:ZZZZZZ}
+    private String text;
 
     public String getDiff() {
         return diff;
@@ -14,11 +15,11 @@ public class ContentDiff {
         this.diff = diff;
     }
 
-    public String getHtml() {
-        return html;
+    public String getText() {
+        return text;
     }
 
-    public void setHtml(String html) {
-        this.html = html;
+    public void setText(String text) {
+        this.text = text;
     }
 }

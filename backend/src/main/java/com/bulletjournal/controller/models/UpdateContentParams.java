@@ -1,7 +1,6 @@
 package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
-import java.util.List;
 
 public class UpdateContentParams {
 
@@ -10,7 +9,7 @@ public class UpdateContentParams {
 
     private String mdiff;
 
-    private List<ContentDiff> diff;
+    private String diff;
 
     public UpdateContentParams() {
     }
@@ -35,11 +34,11 @@ public class UpdateContentParams {
         this.mdiff = mdiff;
     }
 
-    public List<ContentDiff> getDiff() {
+    public String getDiff() {
         return diff;
     }
 
-    public void setDiff(List<ContentDiff> diff) {
+    public void setDiff(String diff) {
         this.diff = diff;
     }
 }

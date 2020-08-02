@@ -14,6 +14,7 @@ import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.util.ContentDiffTool;
+import com.bulletjournal.util.DeltaContent;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
@@ -152,6 +153,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         T projectItem = getProjectItem(projectItemId, owner);
         content.setProjectItem(projectItem);
         content.setOwner(owner);
+//        content.setText(DeltaConverter.supplementContentText(content.getText()));
         updateRevision(content, content.getText(), owner);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
@@ -175,6 +177,31 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
+        String mdiff = updateContentParams.getMdiff();
+        String diff = updateContentParams.getDiff();
+        if (mdiff != null && diff != null) {
+            throw new BadRequestException("Cannot have both diff and mdiff");
+        }
+        String currentText = content.getText();
+        if (diff != null) {
+            // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}, diff
+            DeltaContent deltaContent = new DeltaContent(updateContentParams.getText());
+            // currentText -> mdelta
+            // convert diff to mdiff d1
+            deltaContent.setMdiff(Collections.emptyList());
+            // save to db: {delta: YYYYY2, ###html###:ZZZZZZ2, mdelta:XXXXXX, mdiff: [d1] }
+            // if currentText contains mdiff, append new mdiff
+        } else if (mdiff != null) {
+            // from mobile: {mdelta:XXXXXX }, mdiff
+            DeltaContent deltaContent = new DeltaContent(updateContentParams.getText());
+            // currentText -> delta
+            // convert mdiff to diff d2
+            deltaContent.setDiff(Collections.emptyList());
+
+            // save to db: {delta: YYYYY, mdelta:XXXXXX2, diff: [d2] }
+            // if currentText contains diff, append new diff
+        } // TODO: else throw exception
+
         updateRevision(content, updateContentParams.getText(), requester);
         content.setText(updateContentParams.getText());
         this.getContentJpaRepository().save(content);
@@ -254,6 +281,10 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     private void updateRevision(K content, String newText, String requester) {
+        if (!newText.contains(DeltaContent.HTML_TAG)) {
+            LOGGER.info("{} does not contain {}", newText, DeltaContent.HTML_TAG);
+            return;
+        }
         String revisionsJson = content.getRevisions();
         if (revisionsJson == null) {
             revisionsJson = "[]";

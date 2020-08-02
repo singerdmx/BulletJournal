@@ -7,6 +7,26 @@ import org.junit.Test;
 public class DeltaConverterTest {
 
     @Test
+    public void testDeltaContent() {
+        DeltaContent deltaContent = new DeltaContent(
+                "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}");
+        deltaContent.getDelta();
+    }
+
+    /**
+     * Tests {@link DeltaConverter#supplementContentText(String)}
+     */
+    @Test
+    public void testSupplementContentText() {
+        // input: "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}"
+        // output: "{\"mdelta\":[{ \"insert\":\"test 1 \ntest 2\n\"}],\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}"
+
+
+        // input: [{"insert":"test 1 \ntest 2\n"}]
+        // output: "{\"mdelta\":[{ \"insert\":\"test 1 \ntest 2\n\"}],\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}}"
+    }
+
+    @Test
     public void converter() {
         String mDeltaBold = "[{\"insert\":\"test Bold\",\"attributes\":{\"b\":true}},{\"insert\":\"\\n\"}]";
         String deltaBold = "{\"delta\":{\"ops\":[{\"attributes\":{\"bold\":true},\"insert\":\"test Bold\"},{\"insert\":\"\\n\"}]}}";
