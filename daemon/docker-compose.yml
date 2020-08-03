@@ -37,3 +37,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Disabled backend controller
+  controller:
+    image: mwangxx/bulletjournal-backend:latest
+    container_name: springboot_app
+    ports:
+      - "8080:8080"
+    environment:
+      spring_profiles_active: dev
+    volumes:
+      - $HOME/docker/volumes/log:/var/log
+    depends_on:
+      database:
+        condition: service_healthy
+    # Remove lines below to enable spring boot container
+    command: "true"
+    entrypoint: "true"

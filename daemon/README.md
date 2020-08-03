@@ -46,3 +46,18 @@ Build grpc server in bin directory for linux platform
 ```
 make clean build GOOS=linux TARGET=bin
 ```
+
+## Docker usage
+Run the following commands to build Docker image after code changes are committed:
+```
+docker build --rm -t bulletjournal-daemon:latest .
+```
+Bring up the image by running:
+```
+docker run -it bulletjournal-daemon
+```
+Then push Docker image to Docker hub:
+```
+docker tag bulletjournal-daemon:latest zywangzy/bulletjournal-daemon:latest
+docker push zywangzy/bulletjournal-daemon
+```
