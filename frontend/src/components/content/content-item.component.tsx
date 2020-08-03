@@ -43,7 +43,11 @@ const ContentItem: React.FC<ContentProps> = ({
   setDisplayRevision,
   setDisplayMore,
 }) => {
-  const contentHtml = JSON.parse(content.text)['###html###'];
+  const contentJson = JSON.parse(content.text);
+  if (contentJson['diff']) {
+    console.log(contentJson['diff'])
+  }
+  const contentHtml = contentJson['###html###'];
 
   const handleRevisionClose = () => {
     setDisplayRevision(false);

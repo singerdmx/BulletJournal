@@ -77,12 +77,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   );
   const quillRef = useRef<ReactQuill>(null);
   const [error, setError] = useState('');
-  const createHTML = (oldDelta: any) => {
-    const element = document.createElement('article');
-    const oldEditor = new ReactQuill.Quill(element, { readOnly: true });
-    oldEditor.setContents(oldDelta);
-    return oldEditor.root.innerHTML;
-  };
+
   const delta = content && JSON.parse(content.text)['delta'];
   const oldContents = content && new Delta({ops : delta['ops']});
 
