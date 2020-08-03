@@ -10,6 +10,9 @@ import {
   setDisplayMore,
   setDisplayRevision,
 } from '../../features/content/actions';
+import Quill from "quill";
+import ReactQuill from "react-quill";
+const Delta = Quill.import('delta');
 
 type ContentProps = {
   content: Content;
@@ -34,6 +37,13 @@ export const isContentEditable = (
   );
 };
 
+const createHTML = (delta: any) => {
+  const element = document.createElement('article');
+  const tmpEditor = new ReactQuill.Quill(element, { readOnly: true });
+  tmpEditor.setContents(delta);
+  return tmpEditor.root.innerHTML;
+};
+
 const ContentItem: React.FC<ContentProps> = ({
   content,
   targetContent,
@@ -47,7 +57,11 @@ const ContentItem: React.FC<ContentProps> = ({
   if (contentJson['diff']) {
     console.log(contentJson['diff'])
   }
-  const contentHtml = contentJson['###html###'];
+  let contentHtml = contentJson['###html###'];
+  if (!contentHtml) {
+    const delta = contentJson['delta'];
+    contentHtml = createHTML(new Delta({ops: delta['ops']}));
+  }
 
   const handleRevisionClose = () => {
     setDisplayRevision(false);

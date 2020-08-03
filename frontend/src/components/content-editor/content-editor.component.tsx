@@ -24,7 +24,7 @@ import placeholder from '../../assets/placeholder.png';
 import axios from 'axios';
 import './content-editor.style.less';
 
-let Delta = Quill.import('delta');
+const Delta = Quill.import('delta');
 
 type ContentEditorProps = {
   projectItemId: number;
