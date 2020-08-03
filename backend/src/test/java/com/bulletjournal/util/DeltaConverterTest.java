@@ -1,12 +1,26 @@
 package com.bulletjournal.util;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import static com.bulletjournal.util.DeltaConverter.supplementContentText;
 
 public class DeltaConverterTest {
+    private static Gson GSON = new Gson();
+    @Test
+    public void testDiffToMdiff() {
+        String input = "{\"ops\":[{\"retain\":5,\"attributes\":{\"bold\":true}}]}";
+        String expected = "[{\"retain\":5.0,\"attributes\":{\"b\":true}}]";
+        Map diffMap = GSON.fromJson(input, LinkedHashMap.class);
+        List res = DeltaConverter.diffToMdiff(diffMap);
+        Assert.assertEquals(expected, GSON.toJson(res));
+    }
 
     @Test
     public void testDeltaContent() {
