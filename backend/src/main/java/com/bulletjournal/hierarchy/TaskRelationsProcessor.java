@@ -33,8 +33,8 @@ public class TaskRelationsProcessor {
 
     private static Task merge(Map<Long, com.bulletjournal.repository.models.Task> taskMap, Task cur) {
         cur.clone(taskMap.get(cur.getId()).toPresentationModel());
-        for (Task subNote : cur.getSubTasks()) {
-            merge(taskMap, subNote);
+        for (Task subTask : cur.getSubTasks()) {
+            merge(taskMap, subTask);
         }
         return cur;
     }
