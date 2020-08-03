@@ -3,6 +3,8 @@ package com.bulletjournal.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ public class DeltaContent {
     public static final String MDELTA = "mdelta";
     public static final String HTML_TAG = "###html###";
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeltaContent.class);
 
     @SerializedName(DELTA)
     private Map deltaMap;
@@ -28,6 +31,7 @@ public class DeltaContent {
     private List<Object> diff;
 
     public DeltaContent(String text) {
+        LOGGER.info("DeltaContent {}", text);
         LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
         deltaMap = (Map) map.get(DELTA);
         mdeltaList = (List) map.get(MDELTA);
