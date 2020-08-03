@@ -54,12 +54,16 @@ const ContentItem: React.FC<ContentProps> = ({
   setDisplayMore,
 }) => {
   const contentJson = JSON.parse(content.text);
+  let delta = contentJson['delta'];
   if (contentJson['diff']) {
     console.log(contentJson['diff'])
+    console.log(delta)
+    delta = new Delta({ops: delta['ops']}).concat(new Delta({ops: contentJson['diff']['ops']}));
+    console.log('new Delta')
+    console.log(delta)
   }
   let contentHtml = contentJson['###html###'];
   if (!contentHtml) {
-    const delta = contentJson['delta'];
     contentHtml = createHTML(new Delta({ops: delta['ops']}));
   }
 
