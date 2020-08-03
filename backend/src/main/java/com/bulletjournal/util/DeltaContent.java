@@ -24,8 +24,8 @@ public class DeltaContent {
     @SerializedName(value = HTML_TAG)
     private String html;
 
-    private List<String> mdiff;
-    private List<String> diff;
+    private List<Object> mdiff;
+    private List<Object> diff;
 
     public DeltaContent(String text) {
         LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
@@ -66,19 +66,26 @@ public class DeltaContent {
         this.mdeltaList = mdeltaList;
     }
 
-    public List<String> getMdiff() {
+    public List<Object> getMdiff() {
         return mdiff;
     }
 
-    public void setMdiff(List<String> mdiff) {
+    public List<Object> getMdiffOrDefault(List<Object> defaultValue) {
+        return mdiff != null ? mdiff : defaultValue;
+    }
+
+    public void setMdiff(List<Object> mdiff) {
         this.mdiff = mdiff;
     }
 
-    public List<String> getDiff() {
+    public List<Object> getDiff() {
         return diff;
     }
+    public List<Object> getDiffOrDefault(List<Object> defaultValue) {
+        return diff != null ? diff : defaultValue;
+    }
 
-    public void setDiff(List<String> diff) {
+    public void setDiff(List<Object> diff) {
         this.diff = diff;
     }
 

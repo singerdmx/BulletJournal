@@ -15,6 +15,7 @@ import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.util.ContentDiffTool;
 import com.bulletjournal.util.DeltaContent;
+import com.bulletjournal.util.DeltaConverter;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
@@ -153,7 +154,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         T projectItem = getProjectItem(projectItemId, owner);
         content.setProjectItem(projectItem);
         content.setOwner(owner);
-//        content.setText(DeltaConverter.supplementContentText(content.getText()));
+        content.setText(DeltaConverter.supplementContentText(content.getText()));
         updateRevision(content, content.getText(), owner);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);

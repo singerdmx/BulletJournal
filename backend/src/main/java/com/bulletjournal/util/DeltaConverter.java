@@ -29,6 +29,22 @@ public class DeltaConverter {
         return deltaContent.toJSON();
     }
 
+    public static String generateDeltaContent(String contentStr) {
+        String content = "{\"delta\":{\"ops\":[{\"insert\":\"TEMPLATE\\n\"}]},\"###html###\":\"<p>TEMPLATE</p><p><br></p>\"}";
+        return content.replace("TEMPLATE", contentStr);
+    }
+
+    public static List<LinkedHashMap> diffToMdiff(final Map diffMap) {
+        return deltaTomDelta(diffMap);
+    }
+
+    public static void main(String[] args) {
+        String input = "{\"ops\":[{\"retain\":5,\"attributes\":{\"bold\":true}}]}";
+        Map diffMap = GSON.fromJson(input, LinkedHashMap.class);
+        List res = diffToMdiff(diffMap);
+        System.out.println(res);
+    }
+
     @VisibleForTesting
     protected static String mDeltaToDeltaStr(final String mDelta) {
         List<Map<String, Object>> mDeltaList = GSON.fromJson(mDelta, List.class);
