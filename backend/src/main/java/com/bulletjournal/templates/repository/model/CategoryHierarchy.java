@@ -7,8 +7,8 @@ import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name = "categories", schema = "template")
-public class Category {
+@Table(name = "categories_hierarchy", schema = "template")
+public class CategoryHierarchy {
 
     @Id
     @Column(name = "onerow_id")
@@ -17,10 +17,10 @@ public class Category {
     @Column(name = "hierarchy", nullable = false)
     String hierarchy;
 
-    public Category() {
+    public CategoryHierarchy() {
     }
 
-    public Category(String hierarchy) {
+    public CategoryHierarchy(String hierarchy) {
         this.hierarchy = hierarchy;
     }
 
@@ -40,9 +40,9 @@ public class Category {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Category category = (Category) o;
-        return getId().equals(category.getId()) &&
-            getHierarchy().equals(category.getHierarchy());
+        CategoryHierarchy categoryHierarchy = (CategoryHierarchy) o;
+        return getId().equals(categoryHierarchy.getId()) &&
+            getHierarchy().equals(categoryHierarchy.getHierarchy());
     }
 
     @Override
