@@ -15,11 +15,13 @@ import {User} from "../../features/group/interface";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {MenuOutlined} from "@ant-design/icons/lib";
+import {Project} from "../../features/project/interface";
 
 const { Panel } = Collapse;
 
 type TaskStatusProps = {
   timezone: string;
+  project: Project | undefined;
   tasksByOrder: Task[];
   getTasksByOrder: (
     projectId: number,
@@ -32,6 +34,7 @@ type TaskStatusProps = {
 
 const TaskStatusPage: React.FC<TaskStatusProps> = ({
   getTasksByOrder,
+  project,
   timezone,
   tasksByOrder,
   getTasksByAssignee
@@ -55,7 +58,11 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
   }, [projectId]);
 
   useEffect(() => {
-    document.title = 'Bullet Journal - Tasks by Status';
+    if (project) {
+      document.title = project.name;
+    } else {
+      document.title = 'Bullet Journal - Tasks by Status';
+    }
   }, []);
 
   const inProgressTasks = [] as Task[];
@@ -221,6 +228,7 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
 const mapStateToProps = (state: IState) => ({
   timezone: state.settings.timezone,
   tasksByOrder: state.task.tasksByOrder,
+  project: state.project.project
 });
 
 export default connect(mapStateToProps, {
