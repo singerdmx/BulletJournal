@@ -898,7 +898,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Collections.reverse(contents);
         // we order contents by getUpdatedAt in descending order
         for (TaskContent content : contents) {
-            this.addContent(newId, content.getOwner(), content);
+            this.addContentForUncompleted(newId, content.getOwner(), content);
         }
         return Pair.of(newId, task);
     }

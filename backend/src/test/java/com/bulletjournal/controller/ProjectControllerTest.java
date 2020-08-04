@@ -934,9 +934,10 @@ public class ProjectControllerTest {
         assertNotNull(content.getId());
         getTaskContents(task, ImmutableList.of(content), text);
 
-        text = DeltaConverter.generateDeltaContent("TEXT2");
+        text = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
+        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"mdelta\":[{\"insert\":\"TEXT1\\n\"}],\"###html###\":\"<p>Test Content 2</p>\",\"mdiff\":[[{\"retain\":13.0},{\"insert\":\"2\"},{\"delete\":1.0}]],\"diff\":[{\"ops\":[{\"retain\":13.0},{\"insert\":\"2\"},{\"delete\":1.0}]}]}";
         Long contentId = content.getId();
-        UpdateContentParams updateContentParams = new UpdateContentParams(text);
+        UpdateContentParams updateContentParams = DeltaConverter.strToUpdateContentParams(text);
         ResponseEntity<Content[]> updateResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
                 HttpMethod.PATCH,
@@ -948,7 +949,7 @@ public class ProjectControllerTest {
         content = Arrays.stream(updateResponse.getBody())
                 .filter(c -> c.getId().equals(contentId)).findFirst().orElse(null);
         assertEquals(expectedOwner, content.getOwner().getName());
-        assertEquals(text, content.getText());
+        assertEquals(expected, content.getText());
         assertNotNull(content.getId());
         getTaskContents(task, ImmutableList.of(content), text);
 

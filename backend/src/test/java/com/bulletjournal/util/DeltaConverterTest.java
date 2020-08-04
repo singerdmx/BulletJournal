@@ -13,12 +13,33 @@ import static com.bulletjournal.util.DeltaConverter.supplementContentText;
 
 public class DeltaConverterTest {
     private static Gson GSON = new Gson();
+
+    @Test
+    public void testUpdateParams() {
+        String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
+        LinkedHashMap e =  GSON.fromJson(testUpdateContent3, LinkedHashMap.class);
+
+        System.out.println(testUpdateContent3);
+    }
+
+    @Test
+    public void testMidffToDiff() {
+        String input = "[{\"retain\":5.0,\"attributes\":{\"b\":true}}]";
+        String expected = "{\"ops\":[{\"retain\":5.0,\"attributes\":{\"bold\":true}}]}";
+        List mdiffList = GSON.fromJson(input, List.class);
+        Map res = DeltaConverter.mdiffToDiff(mdiffList);
+        System.out.println(expected);
+        System.out.println(GSON.toJson(res));
+    }
+
     @Test
     public void testDiffToMdiff() {
+        String s = "{\"ops\":[{\"retain\":4},{\"attributes\":{\"bold\":true},\"insert\":\"hij\"},{\"insert\":\"\\n\"}]}";
         String input = "{\"ops\":[{\"retain\":5,\"attributes\":{\"bold\":true}}]}";
         String expected = "[{\"retain\":5.0,\"attributes\":{\"b\":true}}]";
         Map diffMap = GSON.fromJson(input, LinkedHashMap.class);
         List res = DeltaConverter.diffToMdiff(diffMap);
+        System.out.println(GSON.toJson(DeltaConverter.diffToMdiff(GSON.fromJson(s, LinkedHashMap.class))));
         Assert.assertEquals(expected, GSON.toJson(res));
     }
 

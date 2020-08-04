@@ -1,5 +1,6 @@
 package com.bulletjournal.util;
 
+import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
@@ -29,11 +30,21 @@ public class DeltaConverter {
         return deltaContent.toJSON();
     }
 
+    public static UpdateContentParams strToUpdateContentParams(String text) {
+        return GSON.fromJson(text, UpdateContentParams.class);
+    }
+
     public static String generateDeltaContent(String contentStr) {
         String content = "{\"delta\":{\"ops\":[{\"insert\":\"TEMPLATE\\n\"}]},\"###html###\":\"<p>TEMPLATE</p><p><br></p>\"}";
         return content.replace("TEMPLATE", contentStr);
     }
 
+    @VisibleForTesting
+    public static Map mdiffToDiff(final List<Map<String, Object>> mdiffList) {
+        return mDeltaToDelta(mdiffList);
+    }
+
+    @VisibleForTesting
     public static List<LinkedHashMap> diffToMdiff(final Map diffMap) {
         return deltaTomDelta(diffMap);
     }

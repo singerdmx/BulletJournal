@@ -161,6 +161,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> Pair<ContentModel, T> addContentForUncompleted(Long projectItemId, String owner, K content) {
+        T projectItem = getProjectItem(projectItemId, owner);
+        content.setProjectItem(projectItem);
+        content.setOwner(owner);
+        updateRevision(content, content.getText(), owner);
+        this.getContentJpaRepository().save(content);
+        return Pair.of(content, projectItem);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public K getContent(Long contentId, String requester) {
         K content = this.getContentJpaRepository().findById(contentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Content " + contentId + " not found"));
@@ -186,25 +196,55 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String currentText = content.getText();
         if (diff != null) {
             // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}, diff
-            DeltaContent deltaContent = new DeltaContent(updateContentParams.getText());
-            // currentText -> mdelta
-            // convert diff to mdiff d1
-            deltaContent.setMdiff(Collections.emptyList());
-            // save to db: {delta: YYYYY2, ###html###:ZZZZZZ2, mdelta:XXXXXX, mdiff: [d1] }
-            // if currentText contains mdiff, append new mdiff
-        } else if (mdiff != null) {
-            // from mobile: {mdelta:XXXXXX }, mdiff
-            DeltaContent deltaContent = new DeltaContent(updateContentParams.getText());
-            // currentText -> delta
-            // convert mdiff to diff d2
-            deltaContent.setDiff(Collections.emptyList());
+            Map diffMap = GSON.fromJson(diff, LinkedHashMap.class);
+            DeltaContent oldContent = new DeltaContent(currentText);
 
+            // web delta and html
+            DeltaContent newContent = new DeltaContent(updateContentParams.getText());
+
+            // web diff
+            newContent.setDiff(Arrays.asList(diffMap));
+
+            // mobile mdelta
+            newContent.setMdeltaList(oldContent.getMdeltaList());
+
+            // mobile mdiff
+            List<LinkedHashMap> newMdiff = DeltaConverter.diffToMdiff(diffMap);
+            List<Object> oldMdiffList = oldContent.getDiffOrDefault(new ArrayList<>());
+            oldMdiffList.add(newMdiff);
+            newContent.setMdiff(oldMdiffList);
+
+            content.setText(newContent.toJSON());
+            // save to db: {delta: YYYYY2, ###html###:ZZZZZZ2, mdelta:XXXXXX, mdiff: [d1] }
+        } else if (mdiff != null) {
+            List mdiffList = GSON.fromJson(mdiff, List.class);
+            // from mobile: {mdelta:XXXXXX }, mdiff
+            // mdiff: [{"retain":5,"attributes":{"b":true}}],mdelta: [{"insert":"hello","attributes":{"b":true}},{"insert":"\n"}]
+            DeltaContent oldContent = new DeltaContent(currentText);
+
+            // mobile mdelta
+            DeltaContent newContent = new DeltaContent(updateContentParams.getText());
+
+            // mobile mdiff
+            newContent.setMdiff(Arrays.asList(mdiffList));
+
+            // web delta
+            newContent.setDeltaMap(oldContent.getDeltaMap());
+
+            // web diff
+            List<Object> oldDiffList = oldContent.getDiffOrDefault(new ArrayList<>());
+            Map newDiff = DeltaConverter.mdiffToDiff(mdiffList);
+            oldDiffList.add(newDiff);
+            newContent.setDiff(oldDiffList);
+
+            content.setText(newContent.toJSON());
             // save to db: {delta: YYYYY, mdelta:XXXXXX2, diff: [d2] }
-            // if currentText contains diff, append new diff
-        } // TODO: else throw exception
+        } else {
+            throw new BadRequestException("Cannot have null in both diff and mdiff");
+        }
 
         updateRevision(content, updateContentParams.getText(), requester);
-        content.setText(updateContentParams.getText());
+//        content.setText(updateContentParams.getText());
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
