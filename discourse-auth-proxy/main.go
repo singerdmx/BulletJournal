@@ -305,6 +305,7 @@ func shouldByPass(r *http.Request) bool {
 	return r.Host == "home.bulletjournal.us" ||
 		strings.HasPrefix(r.RequestURI, "/home") ||
 		strings.HasPrefix(r.RequestURI, "/api/public/") ||
+		strings.HasPrefix(r.RequestURI, "/dae/public/") ||
 		strings.HasPrefix(r.RequestURI, "/public/") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/channel/notifications") ||
