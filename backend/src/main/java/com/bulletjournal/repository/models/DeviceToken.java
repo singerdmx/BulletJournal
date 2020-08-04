@@ -18,7 +18,6 @@ public class DeviceToken extends AuditModel {
     private String username;
 
     public DeviceToken() {
-
     }
 
     public DeviceToken(String username, String token) {
