@@ -35,6 +35,8 @@ public class DeltaContent {
         LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
         deltaMap = (Map) map.get(DELTA);
         mdeltaList = (List) map.get(MDELTA);
+        diff = (List) map.get("diff");
+        mdiff = (List) map.get("mdiff");
         this.html = map.get(HTML_TAG) == null ? null : map.get(HTML_TAG).toString();
     }
 

@@ -207,10 +207,11 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
             // mobile mdiff
             List<LinkedHashMap> newMdiff = DeltaConverter.diffToMdiff(diffMap);
-            List<Object> oldMdiffList = oldContent.getDiffOrDefault(new ArrayList<>());
+            List<Object> oldMdiffList = oldContent.getMdiffOrDefault(new ArrayList<>());
             oldMdiffList.add(newMdiff);
             newContent.setMdiff(oldMdiffList);
 
+            LOGGER.info("web -> mobile, the content = " + newContent.toJSON());
             content.setText(newContent.toJSON());
             // save to db: {delta: YYYYY2, ###html###:ZZZZZZ2, mdelta:XXXXXX, mdiff: [d1] }
         } else if (mdiff != null) {
@@ -231,6 +232,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             oldDiffList.add(newDiff);
             newContent.setDiff(oldDiffList);
 
+            LOGGER.info("mobile -> web, the content = " + newContent.toJSON());
             content.setText(newContent.toJSON());
             // save to db: {delta: YYYYY, mdelta:XXXXXX2, diff: [d2] }
         } else {
