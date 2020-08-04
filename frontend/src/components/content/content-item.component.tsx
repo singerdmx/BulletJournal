@@ -58,7 +58,11 @@ const ContentItem: React.FC<ContentProps> = ({
   if (contentJson['diff']) {
     console.log(contentJson['diff'])
     console.log(delta)
-    delta = new Delta({ops: delta['ops']}).concat(new Delta({ops: contentJson['diff']['ops']}));
+    contentJson['diff'].forEach((d: any) => {
+      console.log("Applying diff " + d);
+      delta = new Delta({ops: delta['ops']}).concat(new Delta({ops: d['ops']}));
+    });
+
     console.log('new Delta')
     console.log(delta)
   }
