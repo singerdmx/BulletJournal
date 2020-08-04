@@ -155,7 +155,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         content.setProjectItem(projectItem);
         content.setOwner(owner);
         content.setText(DeltaConverter.supplementContentText(content.getText()));
-        updateRevision(content, content.getText(), owner);
+        updateRevision(content, owner);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
@@ -165,7 +165,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         T projectItem = getProjectItem(projectItemId, owner);
         content.setProjectItem(projectItem);
         content.setOwner(owner);
-        updateRevision(content, content.getText(), owner);
+        updateRevision(content, owner);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
@@ -202,9 +202,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             // web delta and html
             DeltaContent newContent = new DeltaContent(updateContentParams.getText());
 
-            // web diff
-            newContent.setDiff(Arrays.asList(diffMap));
-
             // mobile mdelta
             newContent.setMdeltaList(oldContent.getMdeltaList());
 
@@ -225,9 +222,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             // mobile mdelta
             DeltaContent newContent = new DeltaContent(updateContentParams.getText());
 
-            // mobile mdiff
-            newContent.setMdiff(Arrays.asList(mdiffList));
-
             // web delta
             newContent.setDeltaMap(oldContent.getDeltaMap());
 
@@ -243,7 +237,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             throw new BadRequestException("Cannot have null in both diff and mdiff");
         }
 
-        updateRevision(content, updateContentParams.getText(), requester);
+        updateRevision(content, requester);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
@@ -320,7 +314,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         throw new IllegalStateException("Cannot reach here");
     }
 
-    private void updateRevision(K content, String newText, String requester) {
+    private void updateRevision(K content, String requester) {
+        String newText = content.getText();
         if (!newText.contains(DeltaContent.HTML_TAG)) {
             LOGGER.info("{} does not contain {}", newText, DeltaContent.HTML_TAG);
             return;
