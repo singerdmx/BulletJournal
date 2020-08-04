@@ -244,7 +244,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         updateRevision(content, updateContentParams.getText(), requester);
-//        content.setText(updateContentParams.getText());
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
