@@ -117,7 +117,7 @@ public class DeltaConverter {
 
                     clonedMap.put("attributes", clonedAttri);
                 } else {
-                    clonedMap.put(e.getKey(), e.getValue());
+                    clonedMap.put(e.getKey(), toIntegerIfDouble(e.getValue()));
                 }
 
             }
@@ -202,13 +202,17 @@ public class DeltaConverter {
                     clonedMap.put("attributes", clonedAttri);
 
                 } else {
-                    clonedMap.put(e.getKey(), e.getValue());
+                    clonedMap.put(e.getKey(), toIntegerIfDouble(e.getValue()));
                 }
             }
 
             mDeltaList.add(clonedMap);
         }
         return mDeltaList;
+    }
+
+    private static Object toIntegerIfDouble(final Object o) {
+        return o instanceof Double ? ((Double) o).intValue() : o;
     }
 }
 

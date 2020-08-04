@@ -25,21 +25,18 @@ public class DeltaConverterTest {
     @Test
     public void testMidffToDiff() {
         String input = "[{\"retain\":5.0,\"attributes\":{\"b\":true}}]";
-        String expected = "{\"ops\":[{\"retain\":5.0,\"attributes\":{\"bold\":true}}]}";
+        String expected = "{\"ops\":[{\"retain\":5,\"attributes\":{\"bold\":true}}]}";
         List mdiffList = GSON.fromJson(input, List.class);
         Map res = DeltaConverter.mdiffToDiff(mdiffList);
-        System.out.println(expected);
-        System.out.println(GSON.toJson(res));
+        Assert.assertEquals(expected, GSON.toJson(res));
     }
 
     @Test
     public void testDiffToMdiff() {
-        String s = "{\"ops\":[{\"retain\":4},{\"attributes\":{\"bold\":true},\"insert\":\"hij\"},{\"insert\":\"\\n\"}]}";
-        String input = "{\"ops\":[{\"retain\":5,\"attributes\":{\"bold\":true}}]}";
-        String expected = "[{\"retain\":5.0,\"attributes\":{\"b\":true}}]";
+        String input = "{\"ops\":[{\"retain\":4},{\"attributes\":{\"bold\":true},\"insert\":\"hij\"},{\"insert\":\"\\n\"}]}";
+        String expected = "[{\"retain\":4},{\"attributes\":{\"b\":true},\"insert\":\"hij\"},{\"insert\":\"\\n\"}]";
         Map diffMap = GSON.fromJson(input, LinkedHashMap.class);
         List res = DeltaConverter.diffToMdiff(diffMap);
-        System.out.println(GSON.toJson(DeltaConverter.diffToMdiff(GSON.fromJson(s, LinkedHashMap.class))));
         Assert.assertEquals(expected, GSON.toJson(res));
     }
 

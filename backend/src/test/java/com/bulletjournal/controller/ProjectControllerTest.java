@@ -935,7 +935,7 @@ public class ProjectControllerTest {
         getTaskContents(task, ImmutableList.of(content), text);
 
         text = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
-        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"mdelta\":[{\"insert\":\"TEXT1\\n\"}],\"###html###\":\"<p>Test Content 2</p>\",\"mdiff\":[[{\"retain\":13.0},{\"insert\":\"2\"},{\"delete\":1.0}]]}";
+        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"mdelta\":[{\"insert\":\"TEXT1\\n\"}],\"###html###\":\"<p>Test Content 2</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}]]}";
         Long contentId = content.getId();
         UpdateContentParams updateContentParams = DeltaConverter.strToUpdateContentParams(text);
         ResponseEntity<Content[]> updateResponse = this.restTemplate.exchange(
