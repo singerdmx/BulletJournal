@@ -155,7 +155,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         content.setProjectItem(projectItem);
         content.setOwner(owner);
         content.setText(DeltaConverter.supplementContentText(content.getText()));
-        updateRevision(content, owner);
+        updateRevision(content, owner, content.getText(), content.getText());
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
@@ -165,7 +165,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         T projectItem = getProjectItem(projectItemId, owner);
         content.setProjectItem(projectItem);
         content.setOwner(owner);
-        updateRevision(content, owner);
+        updateRevision(content, owner, content.getText(), content.getText());
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
@@ -193,11 +193,11 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         if (mdiff != null && diff != null) {
             throw new BadRequestException("Cannot have both diff and mdiff");
         }
-        String currentText = content.getText();
+        String oldText = content.getText();
         if (diff != null) {
             // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}, diff
             Map diffMap = GSON.fromJson(diff, LinkedHashMap.class);
-            DeltaContent oldContent = new DeltaContent(currentText);
+            DeltaContent oldContent = new DeltaContent(oldText);
 
             // web delta and html
             DeltaContent newContent = new DeltaContent(updateContentParams.getText());
@@ -217,7 +217,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             List mdiffList = GSON.fromJson(mdiff, List.class);
             // from mobile: {mdelta:XXXXXX }, mdiff
             // mdiff: [{"retain":5,"attributes":{"b":true}}],mdelta: [{"insert":"hello","attributes":{"b":true}},{"insert":"\n"}]
-            DeltaContent oldContent = new DeltaContent(currentText);
+            DeltaContent oldContent = new DeltaContent(oldText);
 
             // mobile mdelta
             DeltaContent newContent = new DeltaContent(updateContentParams.getText());
@@ -237,7 +237,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             throw new BadRequestException("Cannot have null in both diff and mdiff");
         }
 
-        updateRevision(content, requester);
+        updateRevision(content, requester, content.getText(), oldText);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
     }
@@ -314,8 +314,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         throw new IllegalStateException("Cannot reach here");
     }
 
-    private void updateRevision(K content, String requester) {
-        String newText = content.getText();
+    private void updateRevision(K content, String requester, String newText, String oldText) {
         if (!newText.contains(DeltaContent.HTML_TAG)) {
             LOGGER.info("{} does not contain {}", newText, DeltaContent.HTML_TAG);
             return;
@@ -329,7 +328,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
         long nextRevisionId;
         if (revisionList.isEmpty()) {
-            content.setBaseText(content.getText());
+            content.setBaseText(oldText);
             nextRevisionId = 1;
         } else {
             nextRevisionId = revisionList.getLast().getId() + 1;
@@ -339,7 +338,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 content.setBaseText(contentDiffTool.applyDiff(oldBaseText, diffToMerge));
             }
         }
-        String diff = contentDiffTool.computeDiff(content.getText(), newText);
+        String diff = contentDiffTool.computeDiff(oldText, newText);
         Revision newRevision = new Revision(nextRevisionId, diff, Instant.now().toEpochMilli(), new User(requester));
         revisionList.offerLast(newRevision);
         content.setRevisions(GSON.toJson(revisionList));
