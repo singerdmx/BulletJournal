@@ -14,7 +14,7 @@ import PublicNotificationsPage from "./public-notifications";
 
 const store = createStore();
 
-function getCookie(cname: string) {
+export const getCookie = (cname: string) => {
     const name = cname + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(';');
