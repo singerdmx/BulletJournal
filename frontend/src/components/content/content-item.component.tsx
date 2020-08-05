@@ -10,7 +10,7 @@ import {
   setDisplayMore,
   setDisplayRevision,
 } from '../../features/content/actions';
-import Quill from "quill";
+import Quill, {DeltaStatic} from "quill";
 import ReactQuill from "react-quill";
 const Delta = Quill.import('delta');
 
@@ -37,7 +37,7 @@ export const isContentEditable = (
   );
 };
 
-const createHTML = (delta: any) => {
+export const createHTML = (delta: DeltaStatic) => {
   const element = document.createElement('article');
   const tmpEditor = new ReactQuill.Quill(element, { readOnly: true });
   tmpEditor.setContents(delta);
@@ -60,7 +60,7 @@ const ContentItem: React.FC<ContentProps> = ({
     console.log(delta)
     contentJson['diff'].forEach((d: any) => {
       console.log("Applying diff " + JSON.stringify(d));
-      delta = new Delta({ops: delta['ops']}).concat(new Delta({ops: d['ops']}));
+      delta = new Delta(delta).concat(new Delta(d));
     });
 
     console.log('new Delta')
@@ -68,7 +68,7 @@ const ContentItem: React.FC<ContentProps> = ({
   }
   let contentHtml = contentJson['###html###'];
   if (!contentHtml) {
-    contentHtml = createHTML(new Delta({ops: delta['ops']}));
+    contentHtml = createHTML(new Delta(delta));
   }
 
   const handleRevisionClose = () => {
@@ -113,7 +113,7 @@ const ContentItem: React.FC<ContentProps> = ({
       />
 
       <ContentEditorDrawer
-        content={content}
+        delta={delta}
         visible={isDisplayMore()}
         onClose={handleClose}
         projectItem={projectItem}

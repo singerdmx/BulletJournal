@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button, message } from 'antd';
 import { connect } from 'react-redux';
 import ReactQuill from 'react-quill';
-import Quill from 'quill';
+import Quill, {DeltaStatic} from 'quill';
 import 'react-quill/dist/quill.snow.css';
 import { modules, formats } from './content-editor-toolbar';
 import {
@@ -18,16 +18,18 @@ import {
   createContent as createTransactionContent,
   patchContent as patchTransactionContent,
 } from '../../features/transactions/actions';
-import { Content } from '../../features/myBuJo/interface';
 import { ContentType } from '../../features/myBuJo/constants';
 import placeholder from '../../assets/placeholder.png';
 import axios from 'axios';
 import './content-editor.style.less';
+import {Content} from "../../features/myBuJo/interface";
+import {IState} from "../../store";
 
 const Delta = Quill.import('delta');
 
 type ContentEditorProps = {
   projectItemId: number;
+  delta?: DeltaStatic;
   content?: Content;
   contentType: ContentType;
   isOpen: boolean;
@@ -61,6 +63,7 @@ interface ContentEditorHandler {
 const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   projectItemId,
   content,
+  delta,
   createNoteContent,
   patchNoteContent,
   afterFinish,
@@ -71,15 +74,14 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   patchTransactionContent,
   patchTaskContent,
 }) => {
-  const isEdit = !!content;
+  const isEdit = !!delta;
   const [editorContent, setEditorContent] = useState(
-    content ? JSON.parse(content.text) : { delta: '', '###html###': '' }
+    delta ? {delta: delta, '###html###': ''} : { delta: {}, '###html###': '' }
   );
   const quillRef = useRef<ReactQuill>(null);
   const [error, setError] = useState('');
 
-  const delta = content && JSON.parse(content.text)['delta'];
-  const oldContents = content && new Delta({ops : delta['ops']});
+  const oldContents = delta;
 
   useEffect(() => {
     if (error.length < 1) return;
@@ -167,9 +169,9 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
           JSON.stringify(editorContent));
     } else if (content) {
       const newContent = new Delta(editorContent['delta']);
-      const diff = oldContents!.diff(newContent);
       console.log(oldContents!)
       console.log(newContent)
+      const diff = new Delta(oldContents!).diff(newContent);
       console.log(diff)
       patchContentFunction(
           projectItemId,
@@ -197,8 +199,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       {isOpen && (
         <ReactQuill
           bounds={'.content-editor'}
-          defaultValue={editorContent['delta']}
-          value={editorContent['delta']}
+          defaultValue={oldContents}
           ref={quillRef}
           theme="snow"
           onChange={handleChange}
@@ -213,7 +214,11 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   );
 };
 
-export default connect(null, {
+const mapStateToProps = (state: IState) => ({
+  content: state.content.content
+});
+
+export default connect(mapStateToProps, {
   createNoteContent,
   patchNoteContent,
   createTaskContent,

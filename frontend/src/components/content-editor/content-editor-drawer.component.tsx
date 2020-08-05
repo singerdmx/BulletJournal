@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Drawer } from 'antd';
 
-import { Content, ProjectItem } from '../../features/myBuJo/interface';
+import { ProjectItem } from '../../features/myBuJo/interface';
 
 import ContentEditor from './content-editor.component';
+import {DeltaStatic} from "quill";
 
 type ContentEditorDrawerProps = {
-  content?: Content;
+  delta?: DeltaStatic;
   projectItem?: ProjectItem;
   visible: boolean;
   onClose: Function;
@@ -17,7 +18,7 @@ interface ContentEditorDrawerHandler {}
 
 const ContentEditorDrawer: React.FC<
   ContentEditorDrawerProps & ContentEditorDrawerHandler
-> = ({ content, projectItem, visible, onClose }) => {
+> = ({ delta, projectItem, visible, onClose }) => {
   const handleClose = () => {
     onClose();
   };
@@ -36,7 +37,7 @@ const ContentEditorDrawer: React.FC<
     >
       <ContentEditor
         isOpen={visible}
-        content={content || undefined}
+        delta={delta}
         projectItemId={projectItem.id}
         afterFinish={handleClose}
         contentType={projectItem.contentType}
