@@ -138,7 +138,7 @@ export const patchContent = (
   transactionId: number,
   contentId: number,
   text: string,
-  diff?: string,
+  diff: string,
   mdiff?: string
 ) =>
   actions.TransactionContentPatch({

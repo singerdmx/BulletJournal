@@ -303,13 +303,14 @@ export const updateContent = (
   taskId: number,
   contentId: number,
   text: string,
-  diff?: string,
+  etag: string,
+  diff: string,
 ) => {
   const patchBody = JSON.stringify({
     text: text,
     diff: diff,
   });
-  return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody)
+  return doPatch(`/api/tasks/${taskId}/contents/${contentId}`, patchBody, etag)
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err);

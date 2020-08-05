@@ -75,12 +75,20 @@ export function doPut(endpoint: string, body: string, etag?: string) {
   });
 }
 
-export function doPatch(endpoint: string, body: string) {
+export function doPatch(endpoint: string, body: string, etag?: string) {
   if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }
+
+  let headers = {} as any;
+  if (etag) {
+    headers = {'Content-Type': 'application/json', 'request-id': uuidv4(), 'If-None-Match': etag};
+  } else {
+    headers = {'Content-Type': 'application/json', 'request-id': uuidv4()};
+  }
+
   return fetch(endpoint, {
-    headers: {'Content-Type': 'application/json', 'request-id': uuidv4()},
+    headers: headers,
     method: 'PATCH',
     body: body
   }).then(res => {

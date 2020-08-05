@@ -40,7 +40,7 @@ export const deleteContent = (noteId: number, contentId: number) =>
   actions.NoteContentDelete({ noteId: noteId, contentId: contentId });
 export const patchNote = (noteId: number, name: string, labels?: number[]) =>
   actions.NotePatch({ noteId: noteId, name: name, labels: labels });
-export const patchContent = (noteId: number, contentId: number, text: string, diff?: string) =>
+export const patchContent = (noteId: number, contentId: number, text: string, diff: string) =>
   actions.NoteContentPatch({
     noteId: noteId,
     contentId: contentId,

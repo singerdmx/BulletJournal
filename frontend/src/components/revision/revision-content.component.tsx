@@ -26,11 +26,14 @@ import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { ContentType } from '../../features/myBuJo/constants';
 import { isContentEditable } from '../content/content-item.component';
+import Quill from "quill";
+const Delta = Quill.import('delta');
 
 type RevisionProps = {
   revisionIndex: number;
   revisions: Revision[];
   content: Content;
+  targetContent: Content | undefined;
   projectItem: ProjectItem;
   project: Project | undefined;
   myself: string;
@@ -42,13 +45,13 @@ interface RevisionContentHandler {
     contentId: number,
     revisionId: number
   ) => void;
-  patchNoteContent: (noteId: number, contentId: number, text: string) => void;
+  patchNoteContent: (noteId: number, contentId: number, text: string, diff: string) => void;
   updateTaskContentRevision: (
     taskId: number,
     contentId: number,
     revisionId: number
   ) => void;
-  patchTaskContent: (taskId: number, contentId: number, text: string) => void;
+  patchTaskContent: (taskId: number, contentId: number, text: string, diff: string) => void;
   updateTransactionContentRevision: (
     transactionId: number,
     contentId: number,
@@ -57,7 +60,8 @@ interface RevisionContentHandler {
   patchTransactionContent: (
     transactionId: number,
     contentId: number,
-    text: string
+    text: string,
+    diff: string
   ) => void;
   handleClose: () => void;
 }
@@ -66,6 +70,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   revisionIndex,
   revisions,
   content,
+  targetContent,
   projectItem,
   updateNoteContentRevision,
   updateTaskContentRevision,
@@ -120,10 +125,16 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       message.info('Revert Not Work');
       return;
     }
+    const newDelta = JSON.parse(revisions[revisionIndex - 1].content!)['delta']
+    const oldDelta = JSON.parse(targetContent!.text)['delta'];
+    new Delta(newDelta);
+    const diff = new Delta(oldDelta).diff(new Delta(newDelta));
+    console.log(diff)
     patchContentFunction(
       projectItem.id,
       content.id,
-      revisions[revisionIndex - 1].content!
+      revisions[revisionIndex - 1].content!,
+      JSON.stringify(diff)
     );
     handleClose();
   };
@@ -193,6 +204,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   myself: state.myself.username,
+  targetContent: state.content.content
 });
 
 export default connect(mapStateToProps, {

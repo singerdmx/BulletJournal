@@ -193,7 +193,8 @@ export const updateContent = (
   transactionId: number,
   contentId: number,
   text: string,
-  diff?: string,
+  etag: string,
+  diff: string,
 ) => {
   const patchBody = JSON.stringify({
     text: text,
@@ -201,7 +202,8 @@ export const updateContent = (
   });
   return doPatch(
     `/api/transactions/${transactionId}/contents/${contentId}`,
-    patchBody
+    patchBody,
+    etag
   )
     .then((res) => res.json())
     .catch((err) => {

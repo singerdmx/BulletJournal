@@ -29,6 +29,7 @@ export interface Content {
   id: number;
   owner: User;
   text: string;
+  etag: string;
   createdAt: number;
   updatedAt: number;
   revisions: Revision[];

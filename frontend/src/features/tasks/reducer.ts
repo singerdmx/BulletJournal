@@ -126,7 +126,7 @@ export type PatchContent = {
   taskId: number;
   contentId: number;
   text: string;
-  diff?: string;
+  diff: string;
   mdiff?: string;
 };
 

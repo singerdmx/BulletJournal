@@ -139,7 +139,7 @@ export const createContent = (taskId: number, text: string) =>
 
 export const deleteContent = (taskId: number, contentId: number) =>
   actions.TaskContentDelete({ taskId: taskId, contentId: contentId });
-export const patchContent = (taskId: number, contentId: number, text: string, diff?: string) =>
+export const patchContent = (taskId: number, contentId: number, text: string, diff: string) =>
   actions.TaskContentPatch({
     taskId: taskId,
     contentId: contentId,

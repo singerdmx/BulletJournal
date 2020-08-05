@@ -76,7 +76,7 @@ export type PatchContent = {
   noteId: number;
   contentId: number;
   text: string;
-  diff?: string;
+  diff: string;
 };
 
 export type SetNoteLabels = {
