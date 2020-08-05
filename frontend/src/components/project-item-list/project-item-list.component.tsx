@@ -120,6 +120,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
               timeslots={1}
               step={60}
               onSelectEvent={(event: any, e: any) => this.props.history.push(event.resource)}
+              formats={format}
             />
           </div>);
       case 'week':
