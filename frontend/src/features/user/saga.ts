@@ -59,7 +59,7 @@ function* changeAlias(action: PayloadAction<ChangeAlias>) {
     yield put(groupsActions.groupReceived({group: targetGroup}));
 
     yield call(message.success, `User ${targetUser} is aliased to ${alias}. It may take some time to take effect.`);
-    yield put(systemsActions.systemUpdate({}));
+    yield put(systemsActions.systemUpdate({force: true}));
   } catch (error) {
     yield call(message.error, `changeAlias Fail: ${error}`);
   }

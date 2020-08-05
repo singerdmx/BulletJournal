@@ -1,31 +1,43 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { SyncOutlined } from '@ant-design/icons';
-import { Avatar, Popover, Tooltip } from 'antd';
-import { RouteComponentProps, withRouter } from 'react-router';
+import {connect} from 'react-redux';
+import {SyncOutlined} from '@ant-design/icons';
+import {Avatar, Popover, Tooltip} from 'antd';
+import {RouteComponentProps, withRouter} from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
 import Notifications from '../notification/Notifications';
-import { IState } from '../../store/index';
+import {IState} from '../../store/index';
 import AddProject from '../../components/modals/add-project.component';
 import AddProjectItem from '../../components/modals/add-project-item.component';
-import { Project, ProjectsWithOwner } from '../project/interface';
-import { updateExpandedMyself, updateMyself } from './actions';
-import { updateGroups } from '../group/actions';
-import { updateNotifications } from '../notification/actions';
-import { updateSystem } from '../system/actions';
+import {Project, ProjectsWithOwner} from '../project/interface';
+import {updateExpandedMyself, updateMyself} from './actions';
+import {updateGroups} from '../group/actions';
+import {updateNotifications} from '../notification/actions';
+import {updateSystem} from '../system/actions';
 
 import './myself.styles.less';
+import {updateTaskContents} from "../tasks/actions";
+import {Task} from "../tasks/interface";
+import {updateNoteContents} from "../notes/actions";
+import {Note} from "../notes/interface";
+import {updateTransactionContents} from "../transactions/actions";
+import {Transaction} from "../transactions/interface";
 
 type MyselfProps = {
   username: string;
   avatar: string;
   ownedProjects: Project[];
   sharedProjects: ProjectsWithOwner[];
+  task: Task | undefined;
+  note: Note | undefined;
+  transaction: Transaction | undefined;
   updateMyself: () => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateGroups: () => void;
   updateNotifications: () => void;
-  updateSystem: () => void;
+  updateSystem: (force: boolean) => void;
+  updateTaskContents: (taskId: number) => void;
+  updateNoteContents: (noteId: number) => void;
+  updateTransactionContents: (transactionId: number) => void;
 };
 
 type ModalState = {
@@ -44,7 +56,7 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
   componentDidMount() {
     this.props.updateMyself();
     this.interval = setInterval(() => {
-      this.props.updateSystem();
+      this.props.updateSystem(false);
     }, 50000);
   }
 
@@ -54,7 +66,19 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
 
   handleRefreshOnClick = () => {
     this.props.updateExpandedMyself(true);
-    this.props.updateSystem();
+    this.props.updateSystem(true);
+    const hash = window.location.hash.toLowerCase();
+    if (hash.startsWith('#/note/') && this.props.note) {
+      this.props.updateNoteContents(this.props.note.id);
+    }
+
+    if (hash.startsWith('#/task/') && this.props.task) {
+      this.props.updateTaskContents(this.props.task.id);
+    }
+
+    if (hash.startsWith('#/transaction/') && this.props.transaction) {
+      this.props.updateTransactionContents(this.props.transaction.id);
+    }
   };
 
   render() {
@@ -116,6 +140,9 @@ const mapStateToProps = (state: IState) => ({
   avatar: state.myself.avatar,
   ownedProjects: state.project.owned,
   sharedProjects: state.project.shared,
+  task: state.task.task,
+  note: state.note.note,
+  transaction: state.transaction.transaction,
 });
 
 export default connect(mapStateToProps, {
@@ -124,4 +151,7 @@ export default connect(mapStateToProps, {
   updateGroups,
   updateNotifications,
   updateSystem,
+  updateTaskContents,
+  updateNoteContents,
+  updateTransactionContents
 })(withRouter(Myself));

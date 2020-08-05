@@ -8,7 +8,9 @@ export type SystemApiErrorAction = {
   error: string;
 };
 
-export type UpdateSystem = {};
+export type UpdateSystem = {
+  force: boolean;
+};
 
 export type SystemUpdate = {
   tasksEtag: string;

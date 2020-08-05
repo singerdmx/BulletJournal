@@ -77,7 +77,7 @@ function registerAfterGrantedPermissoin(config?: Config) {
 export function register(config?: Config) {
   if ('serviceWorker' in navigator) {
     setInterval(()=>{
-      (window as any).store.dispatch(updateSystem())
+      (window as any).store.dispatch(updateSystem(false))
     }, 8000);
     registerAfterGrantedPermissoin(config);
   }

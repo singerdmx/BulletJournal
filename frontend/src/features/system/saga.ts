@@ -45,6 +45,7 @@ function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
 
 function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
   try {
+    const { force } = action.payload;
     const state = yield select();
     const {
       groupsEtag,
@@ -66,17 +67,17 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     );
 
     if (
-      ownedProjectsEtag !== data.ownedProjectsEtag ||
+      force || ownedProjectsEtag !== data.ownedProjectsEtag ||
       sharedProjectsEtag !== data.sharedProjectsEtag
     ) {
       yield put(updateProjects());
     }
 
-    if (groupsEtag !== data.groupsEtag) {
+    if (force || groupsEtag !== data.groupsEtag) {
       yield put(updateGroups());
     }
 
-    if (notificationsEtag !== data.notificationsEtag) {
+    if (force || notificationsEtag !== data.notificationsEtag) {
       yield put(updateNotifications());
     }
 
@@ -123,16 +124,16 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
     let tasksEtag = state.system.tasksEtag;
     let notesEtag = state.system.notesEtag;
 
-    if (selectedProject) {
+    if (selectedProject && !selectedProject.shared) {
       switch (selectedProject.projectType) {
         case ProjectType.TODO:
-          if (data.tasksEtag !== tasksEtag) {
+          if (force || data.tasksEtag !== tasksEtag) {
             tasksEtag = data.tasksEtag;
             yield put(getProject(selectedProject.id));
           }
           break;
         case ProjectType.NOTE:
-          if (data.notesEtag !== notesEtag) {
+          if (force || data.notesEtag !== notesEtag) {
             notesEtag = data.notesEtag;
             yield put(getProject(selectedProject.id));
           }

@@ -61,7 +61,6 @@ interface TaskPageHandler {
   setDisplayMore: (displayMore: boolean) => void;
   setDisplayRevision: (displayRevision: boolean) => void;
   deleteContent: (taskId: number, contentId: number) => void;
-
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {

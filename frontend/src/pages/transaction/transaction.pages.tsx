@@ -333,7 +333,6 @@ const mapStateToProps = (state: IState) => ({
   currency: state.myself.currency,
   contents: state.transaction.contents,
   content: state.content.content
-
 });
 
 export default connect(mapStateToProps, {
