@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "categories_hierarchy", schema = "template")
-public class CategoryHierarchy {
+public class CategoriesHierarchy {
 
     @Id
     @Column(name = "onerow_id")
@@ -17,10 +17,10 @@ public class CategoryHierarchy {
     @Column(name = "hierarchy", nullable = false)
     String hierarchy;
 
-    public CategoryHierarchy() {
+    public CategoriesHierarchy() {
     }
 
-    public CategoryHierarchy(String hierarchy) {
+    public CategoriesHierarchy(String hierarchy) {
         this.hierarchy = hierarchy;
     }
 
@@ -40,9 +40,9 @@ public class CategoryHierarchy {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CategoryHierarchy categoryHierarchy = (CategoryHierarchy) o;
-        return getId().equals(categoryHierarchy.getId()) &&
-            getHierarchy().equals(categoryHierarchy.getHierarchy());
+        CategoriesHierarchy categoriesHierarchy = (CategoriesHierarchy) o;
+        return getId().equals(categoriesHierarchy.getId()) &&
+            getHierarchy().equals(categoriesHierarchy.getHierarchy());
     }
 
     @Override
