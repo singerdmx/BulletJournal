@@ -55,6 +55,12 @@ public class TaskControllerTest {
         requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
+
+    private String generateUpdateContent(String num) {
+        String content = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content TEMPLATE\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content TEMPLATE</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"TEMPLATE\\\"},{\\\"delete\\\":1}]}\"}";
+        return content.replace("TEMPLATE", num);
+
+    }
     /**
      * Get Groups, use first group
      * Create project
@@ -71,6 +77,9 @@ public class TaskControllerTest {
         String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 3\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 3</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"3\\\"},{\\\"delete\\\":1}]}\"}";
         String testUpdateContent4 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 4\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 4</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"4\\\"},{\\\"delete\\\":1}]}\"}";
 
+        String testUpdateContent2Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"mdelta\":[{\"insert\":\"Test content 1.\\n\"}],\"###html###\":\"<p>Test Content 2</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}]]}";
+        String testUpdateContent3Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 3\\n\"}]},\"mdelta\":[{\"insert\":\"Test content 1.\\n\"}],\"###html###\":\"<p>Test Content 3</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}],[{\"retain\":13},{\"insert\":\"3\"},{\"delete\":1}]]}";
+        String testUpdateContent4Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 4\\n\"}]},\"mdelta\":[{\"insert\":\"Test content 1.\\n\"}],\"###html###\":\"<p>Test Content 4</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}],[{\"retain\":13},{\"insert\":\"3\"},{\"delete\":1}],[{\"retain\":13},{\"insert\":\"4\"},{\"delete\":1}]]}";
         Group group = TestHelpers.createGroup(requestParams, USER, "Group_ProjectItem");
         List<String> users = new ArrayList<>();
         users.add("xlf");
@@ -89,18 +98,18 @@ public class TaskControllerTest {
         List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testUpdateContent2);
         List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testUpdateContent3);
         List<Content> contents3 = updateContent(task1.getId(), content1.getId(), testUpdateContent4);
-//        assertEquals(testContent1, getContentRevision(task1.getId(), content1.getId(), 1L));
-//        assertEquals(testContent2, getContentRevision(task1.getId(), content1.getId(), 2L));
-//        assertEquals(testContent3, getContentRevision(task1.getId(), content1.getId(), 3L));
-//        assertEquals(testContent4, getContentRevision(task1.getId(), content1.getId(), 4L));
+        assertEquals(DeltaConverter.supplementContentText(testContent1), getContentRevision(task1.getId(), content1.getId(), 1L));
+        assertEquals(testUpdateContent2Expected, getContentRevision(task1.getId(), content1.getId(), 2L));
+        assertEquals(testUpdateContent3Expected, getContentRevision(task1.getId(), content1.getId(), 3L));
+        assertEquals(testUpdateContent4Expected, getContentRevision(task1.getId(), content1.getId(), 4L));
         testOtherAssignees(p1, task1, users);
         testUpdateAssignees(p1, task1, users);
-//        int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
-//        for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
-//            contents1 = updateContent(task1.getId(), content1.getId(), testContent1 + i);
-//        }
-//        assertEquals(1, contents1.size());
-//        assertEquals(maxRevisionNumber, contents1.get(0).getRevisions().length);
+        int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
+        for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
+            contents1 = updateContent(task1.getId(), content1.getId(), generateUpdateContent(String.valueOf(i)));
+        }
+        assertEquals(1, contents1.size());
+        assertEquals(maxRevisionNumber, contents1.get(0).getRevisions().length);
 
 
         // borrowing test for testing task pagination

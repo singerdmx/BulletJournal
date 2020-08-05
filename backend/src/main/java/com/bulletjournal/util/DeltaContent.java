@@ -1,11 +1,11 @@
 package com.bulletjournal.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,15 @@ public class DeltaContent {
     public static final String DELTA = "delta";
     public static final String MDELTA = "mdelta";
     public static final String HTML_TAG = "###html###";
-    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().
+            registerTypeAdapter(Double.class,  new JsonSerializer<Double>() {
+                @Override
+                public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
+                    if (src == src.longValue())
+                        return new JsonPrimitive(src.longValue());
+                    return new JsonPrimitive(src);
+                }
+            }).disableHtmlEscaping().create();
     private static final Logger LOGGER = LoggerFactory.getLogger(DeltaContent.class);
 
     @SerializedName(DELTA)
