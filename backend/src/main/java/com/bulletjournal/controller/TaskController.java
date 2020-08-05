@@ -420,9 +420,9 @@ public class TaskController {
 
     @PatchMapping(CONTENT_ROUTE)
     public List<Content> updateContent(@NotNull @PathVariable Long taskId, @NotNull @PathVariable Long contentId,
-            @NotNull @RequestBody UpdateContentParams updateContentParams) {
+            @NotNull @RequestBody UpdateContentParams updateContentParams, @RequestHeader(IF_NONE_MATCH) Optional<String> etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        ProjectItemModel task = this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams)
+        ProjectItemModel task = this.taskDaoJpa.updateContent(contentId, taskId, username, updateContentParams, etag)
                 .getRight();
 
         this.notificationService.trackActivity(new Auditable(task.getProject().getId(),

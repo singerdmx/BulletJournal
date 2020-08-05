@@ -31,7 +31,10 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class TransactionController {
@@ -277,10 +280,10 @@ public class TransactionController {
         @PatchMapping(CONTENT_ROUTE)
         public List<Content> updateContent(@NotNull @PathVariable Long transactionId,
                         @NotNull @PathVariable Long contentId,
-                        @NotNull @RequestBody UpdateContentParams updateContentParams) {
+                        @NotNull @RequestBody UpdateContentParams updateContentParams, @RequestHeader(IF_NONE_MATCH) Optional<String> etag) {
                 String username = MDC.get(UserClient.USER_NAME_KEY);
                 ProjectItemModel transaction = this.transactionDaoJpa
-                                .updateContent(contentId, transactionId, username, updateContentParams).getRight();
+                                .updateContent(contentId, transactionId, username, updateContentParams, etag).getRight();
 
                 this.notificationService.trackActivity(new Auditable(transaction.getProject().getId(),
                                 "updated Content in Transaction ##" + transaction.getName() + "## under BuJo ##"

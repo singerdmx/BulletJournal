@@ -6,6 +6,7 @@ import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.*;
@@ -180,7 +181,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Pair<K, T> updateContent(Long contentId, Long projectItemId, String requester,
-                                                                 UpdateContentParams updateContentParams) {
+                                                                 UpdateContentParams updateContentParams, Optional<String> etag) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
         Preconditions.checkState(Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
@@ -193,7 +194,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         if (mdiff != null && diff != null) {
             throw new BadRequestException("Cannot have both diff and mdiff");
         }
+
         String oldText = content.getText();
+        etag.ifPresent(e -> {
+            String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE, oldText);
+            if (!Objects.equals(etag, itemEtag)) {
+                throw new BadRequestException("Invalid Etag");
+            }
+        });
+
         if (diff != null) {
             // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}, diff
             Map diffMap = GSON.fromJson(diff, LinkedHashMap.class);

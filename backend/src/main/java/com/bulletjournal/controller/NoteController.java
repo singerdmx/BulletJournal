@@ -281,9 +281,9 @@ public class NoteController {
 
     @PatchMapping(CONTENT_ROUTE)
     public List<Content> updateContent(@NotNull @PathVariable Long noteId, @NotNull @PathVariable Long contentId,
-            @NotNull @RequestBody UpdateContentParams updateContentParams) {
+            @NotNull @RequestBody UpdateContentParams updateContentParams, @RequestHeader(IF_NONE_MATCH) Optional<String> etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        ProjectItemModel note = this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams)
+        ProjectItemModel note = this.noteDaoJpa.updateContent(contentId, noteId, username, updateContentParams, etag)
                 .getRight();
 
         this.notificationService.trackActivity(new Auditable(note.getProject().getId(),
