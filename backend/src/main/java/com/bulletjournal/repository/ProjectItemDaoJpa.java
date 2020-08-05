@@ -199,7 +199,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         etag.ifPresent(e -> {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
-            if (!Objects.equals(etag, itemEtag)) {
+            if (!Objects.equals(etag.get(), itemEtag)) {
                 throw new BadRequestException("Invalid Etag");
             }
         });
