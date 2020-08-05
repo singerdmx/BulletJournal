@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.utils.EtagGenerator;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ public class Content {
     @NotBlank
     private String text;
 
+    private String etag;
+
     private String baseText;
 
     @NotNull
@@ -43,6 +46,8 @@ public class Content {
         this.id = id;
         this.owner = owner;
         this.text = text;
+        this.etag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE, text);
         this.baseText = baseText;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -100,6 +105,8 @@ public class Content {
 
     public void setText(String text) {
         this.text = text;
+        this.etag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE, text);
     }
 
     public String getBaseText() {
@@ -132,5 +139,13 @@ public class Content {
 
     public void setRevisions(Revision[] revisions) {
         this.revisions = revisions;
+    }
+
+    public String getEtag() {
+        return etag;
+    }
+
+    public void setEtag(String etag) {
+        this.etag = etag;
     }
 }
