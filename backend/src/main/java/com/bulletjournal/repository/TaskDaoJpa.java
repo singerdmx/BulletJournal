@@ -130,7 +130,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             }
 
             ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(tasks.stream().map(
-                    task -> task.toPresentationModel()
+                    t -> {
+                        com.bulletjournal.controller.models.Task task = t.toPresentationModel();
+                        task.setShared(true);
+                        return task;
+                    }
             ).collect(Collectors.toList())));
 
             return ret;
@@ -142,11 +146,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         final Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project).stream()
                 .collect(Collectors.toMap(Task::getId, n -> n));
         return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks()).stream()
-                .map(t -> {
-                    com.bulletjournal.controller.models.Task task = addLabels(t, tasksMap);
-                    task.setShared(project.isShared());
-                    return task;
-                }).collect(Collectors.toList());
+                .map(t -> addLabels(t, tasksMap)).collect(Collectors.toList());
     }
 
     /**

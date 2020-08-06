@@ -26,6 +26,6 @@ public class ShareProjectItemEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        return String.format("/public/items/" + this.contentType.name() + "%d", contentId);
+        return String.format("/sharedItems/" + this.contentType.name() + "%d", contentId);
     }
 }
