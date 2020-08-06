@@ -110,7 +110,11 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         final Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project).stream()
                 .collect(Collectors.toMap(n -> n.getId(), n -> n));
         return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes()).stream()
-                .map(note -> addLabels(note, notesMap)).collect(Collectors.toList());
+                .map(n -> {
+                    com.bulletjournal.controller.models.Note note = addLabels(n, notesMap);
+                    note.setShared(project.isShared());
+                    return note;
+                }).collect(Collectors.toList());
     }
 
     private com.bulletjournal.controller.models.Note addLabels(com.bulletjournal.controller.models.Note note,
@@ -148,7 +152,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
         return notes.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            com.bulletjournal.controller.models.Note note = t.toPresentationModel(labels);
+            note.setShared(project.isShared());
+            return note;
         }).collect(Collectors.toList());
     }
 
