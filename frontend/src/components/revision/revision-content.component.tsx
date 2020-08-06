@@ -127,7 +127,6 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     }
     const newDelta = JSON.parse(revisions[revisionIndex - 1].content!)['delta']
     const oldDelta = JSON.parse(targetContent!.text)['delta'];
-    new Delta(newDelta);
     const diff = new Delta(oldDelta).diff(new Delta(newDelta));
     console.log(diff)
     patchContentFunction(

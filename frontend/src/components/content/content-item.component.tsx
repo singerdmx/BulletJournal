@@ -56,15 +56,24 @@ const ContentItem: React.FC<ContentProps> = ({
   const contentJson = JSON.parse(content.text);
   let delta = contentJson['delta'];
   if (contentJson['diff']) {
+    let revisionContents = [content.text];
+    if (!contentJson['###html###']) {
+      // first time opened by web and created by mobile
+      const c0 = JSON.stringify({delta: delta, '###html###': createHTML(new Delta(delta))});
+      revisionContents = [c0, c0]; // first revision
+    }
     console.log(contentJson['diff'])
     console.log(delta)
     contentJson['diff'].forEach((d: any) => {
       console.log("Applying diff " + JSON.stringify(d));
       delta = new Delta(delta).compose(new Delta(d));
+      revisionContents.push(JSON.stringify({delta: delta, '###html###': createHTML(new Delta(delta))}));
     });
 
     console.log('new Delta')
     console.log(delta)
+    console.log('revisionContents');
+    console.log(revisionContents)
   }
   let contentHtml = contentJson['###html###'];
   if (!contentHtml) {
