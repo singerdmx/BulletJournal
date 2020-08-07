@@ -1,6 +1,7 @@
 export interface UserPointActivity {
-    name: string;
+    username: string;
     description: string;
     pointChange: number
-    timestamp: number;
+    createdAt: number;
+    updatedAt: number;
 }
