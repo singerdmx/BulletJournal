@@ -6,7 +6,9 @@ import {
     UpdateMyself,
     PatchMyself,
     ThemeUpdate,
-    UpdateExpandedMyself, ClearMyself, UserPointActivities
+    UpdateExpandedMyself,
+    ClearMyself,
+    FetchUserPointActivities
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -146,17 +148,16 @@ function* unsetMyself(action: PayloadAction<ClearMyself>) {
     }
 }
 
-function* fetchUserPointActivities(action: PayloadAction<UserPointActivities>) {
+function* fetchUserPointActivities(action: PayloadAction<FetchUserPointActivities>) {
     try {
-        const data = yield call(getUserPointActivities);
-        const userPointActivities: UserPointActivity[] = yield data.json();
-        yield  put(
+        const data : UserPointActivity[] = yield call(getUserPointActivities);
+        yield put(
             myselfActions.userPointActivitiesReceived( {
-                userPointActivities: userPointActivities
+                userPointActivities: data
             })
         );
     } catch (error) {
-        yield call(message.error, `Notice Error Received: ${error}`);
+        yield call(message.error, `fetchUserPointActivities Error Received: ${error}`);
     }
 }
 
@@ -174,7 +175,7 @@ export default function* myselfSagas() {
       getExpandedMyself
     ),
     yield takeLatest(myselfActions.themeUpdate.type, updateTheme),
-    yield takeLatest(myselfActions.userPointActivitiesReceived.type, fetchUserPointActivities),
+    yield takeLatest(myselfActions.getUserPointActivities.type, fetchUserPointActivities),
   ]);
 }
 

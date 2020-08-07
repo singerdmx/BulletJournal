@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from 'redux-starter-kit';
+import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {UserPointActivity} from "../../pages/points/interface";
 
 export type MyselfWithAvatar = {
@@ -37,9 +37,11 @@ export type PatchMyself = {
 
 export type ClearMyself = {};
 
+export type FetchUserPointActivities = {};
+
 export type UserPointActivities = {
    userPointActivities: UserPointActivity[];
-}
+};
 
 let initialState = {
   username: '',
@@ -51,7 +53,7 @@ let initialState = {
   loading: false,
   points: 0,
   firstTime: false,
-  userPointActivities: []as Array<UserPointActivity>,
+  userPointActivities: [] as Array<UserPointActivity>,
 };
 
 const slice = createSlice({
@@ -86,6 +88,7 @@ const slice = createSlice({
     myselfUpdate: (state, action: PayloadAction<UpdateMyself>) => state,
     patchMyself: (state, action: PayloadAction<PatchMyself>) => state,
     clearMyself: (state, action: PayloadAction<ClearMyself>) => state,
+    getUserPointActivities: (state, action: PayloadAction<FetchUserPointActivities>) => state,
     expandedMyselfLoading: (
       state,
       action: PayloadAction<ExpandedMyselfLoading>
