@@ -137,7 +137,7 @@ public class DeltaConverter {
     }
 
     private static LinkedHashMap mobileToWebImage(Map<String, Object> eDelta) {
-        String imageVal = (String) ((Map)((Map) eDelta.get("attributes")).get("embed")).get("source");
+        String imageVal = (String) ((Map) ((Map) eDelta.get("attributes")).get("embed")).get("source");
         LinkedHashMap insertMap = new LinkedHashMap();
         insertMap.put("image", imageVal);
         LinkedHashMap webElement = new LinkedHashMap();
