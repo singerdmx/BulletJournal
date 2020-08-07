@@ -7,7 +7,7 @@ option java_multiple_files = true;
 option java_package = "com.bulletjournal.daemon.protobuf.grpc.types";
 option java_outer_classname = "JoinGroupEvents";
 
-message Event {
+message EventProto {
   string targetUser = 1;
 
   uint64 contentId = 2;
