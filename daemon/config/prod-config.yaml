@@ -1,0 +1,6 @@
+USERNAME: postgres
+PASSWORD: docker
+DATABASE: postgres
+PORT: 5432
+HOST: localhost
+DBDRIVER: postgresql
