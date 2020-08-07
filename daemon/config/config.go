@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 var (
@@ -24,13 +25,13 @@ type Config struct {
 	DBDriver string
 }
 
-var config Config
+var daemonServiceConfig Config
 
 func SetProdConfig() {
 	setConfig(configNameProd)
 }
 
-func SetDConfig() {
+func SetTestConfig() {
 	setConfig(configNameTest)
 }
 
@@ -47,15 +48,15 @@ func setConfig(configName string) {
 		log.Fatalf("could not read config file: %v", err)
 	}
 
-	err = viper.Unmarshal(&config)
+	err = viper.Unmarshal(&daemonServiceConfig)
 	if err != nil {
 		log.Fatalf("could not decode config into struct: %v", err)
 	}
 
-	fmt.Printf("Username from config: %s\n", config.Username)
-	fmt.Printf("Password from config: %s\n", config.Password)
-	fmt.Printf("Database from config: %s\n", config.Database)
-	fmt.Printf("Port from config: %s\n", config.Port)
-	fmt.Printf("HOST from config: %s\n", config.Host)
-	fmt.Printf("DB Driver from config: %s\n", config.DBDriver)
+	fmt.Printf("Username from config: %s\n", daemonServiceConfig.Username)
+	fmt.Printf("Password from config: %s\n", daemonServiceConfig.Password)
+	fmt.Printf("Database from config: %s\n", daemonServiceConfig.Database)
+	fmt.Printf("Port from config: %s\n", daemonServiceConfig.Port)
+	fmt.Printf("HOST from config: %s\n", daemonServiceConfig.Host)
+	fmt.Printf("DB Driver from config: %s\n", daemonServiceConfig.DBDriver)
 }
