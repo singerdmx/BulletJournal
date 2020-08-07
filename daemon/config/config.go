@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"github.com/spf13/viper"
+	"log"
 )
 
 var (
-	configName  = "prod-config.yaml"
-	configType  = "type"
-	configPaths = []string{
+	configNameProd = "prod-config.yaml"
+	configNameTest = "test-config.yaml"
+	configType     = "type"
+	configPaths    = []string{
 		"./config",
 	}
 )
@@ -23,7 +24,17 @@ type Config struct {
 	DBDriver string
 }
 
-func main() {
+var config Config
+
+func SetProdConfig() {
+	setConfig(configNameProd)
+}
+
+func SetDConfig() {
+	setConfig(configNameTest)
+}
+
+func setConfig(configName string) {
 	viper.SetConfigName(configName)
 
 	for _, p := range configPaths {
@@ -36,7 +47,6 @@ func main() {
 		log.Fatalf("could not read config file: %v", err)
 	}
 
-	var config Config
 	err = viper.Unmarshal(&config)
 	if err != nil {
 		log.Fatalf("could not decode config into struct: %v", err)
@@ -48,5 +58,4 @@ func main() {
 	fmt.Printf("Port from config: %s\n", config.Port)
 	fmt.Printf("HOST from config: %s\n", config.Host)
 	fmt.Printf("DB Driver from config: %s\n", config.DBDriver)
-
 }
