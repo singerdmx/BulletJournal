@@ -41,6 +41,12 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel
     )
     private Long[] labels;
 
+    @Transient
+    private Long[] sharedItemLabels;
+
+    @Transient
+    private boolean shared = false;
+
     public List<Long> getLabels() {
         if (this.labels == null) {
             return Collections.emptyList();
@@ -50,6 +56,25 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel
 
     public void setLabels(List<Long> labels) {
         this.labels = labels == null ? null : labels.toArray(new Long[0]);
+    }
+
+    public List<Long> getSharedItemLabels() {
+        if (this.sharedItemLabels == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(this.sharedItemLabels);
+    }
+
+    public void setSharedItemLabels(List<Long> sharedItemLabels) {
+        this.sharedItemLabels = sharedItemLabels == null ? null : sharedItemLabels.toArray(new Long[0]);
+    }
+
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(boolean shared) {
+        this.shared = shared;
     }
 
     public Project getProject() {

@@ -96,13 +96,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                 notes = notes.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
             }
 
-            ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(notes.stream().map(
-                    n -> {
-                        com.bulletjournal.controller.models.Note note = n.toPresentationModel();
-                        note.setShared(true);
-                        return note;
-                    }
-            ).collect(Collectors.toList())));
+            ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(notes.stream()
+                    .map(Note::toPresentationModel).collect(Collectors.toList())));
 
             return ret;
         }
@@ -150,12 +145,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         }
 
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
-        return notes.stream().map(t -> {
-            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            com.bulletjournal.controller.models.Note note = t.toPresentationModel(labels);
-            note.setShared(project.isShared());
-            return note;
-        }).collect(Collectors.toList());
+        return this.labelDaoJpa.getLabelsForProjectItemList(notes.stream()
+                .map(Note::toPresentationModel).collect(Collectors.toList()));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

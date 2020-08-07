@@ -35,8 +35,8 @@ function* labelsUpdate(action: PayloadAction<UpdateLabels>) {
 
 function* projectLabelsUpdate(action: PayloadAction<UpdateProjectLabels>) {
   try {
-    const {projectId} = action.payload;
-    const data = yield call(fetchProjectLabels, projectId);
+    const {projectId, projectShared} = action.payload;
+    const data = projectShared ? [] : yield call(fetchProjectLabels, projectId);
     yield put(labelActions.projectLabelsReceived({ labels: data }));
   } catch (error) {
     yield call(message.error, `projectLabelsUpdate Error Received: ${error}`);

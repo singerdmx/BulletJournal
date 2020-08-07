@@ -99,7 +99,7 @@ type ProjectPageProps = {
     endDate?: string
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
-  projectLabelsUpdate: (projectId: number) => void;
+  projectLabelsUpdate: (projectId: number, projectShared: boolean) => void;
   setSelectedLabel: (label: Label) => void;
 };
 
@@ -129,10 +129,10 @@ class ProjectPage extends React.Component<
     this.props.updateExpandedMyself(true);
     const projectId = parseInt(this.props.match.params.projectId);
     this.props.getProject(projectId);
-    this.setState({ completeTasksShown: false });
-    this.props.projectLabelsUpdate(projectId);
+    this.setState({completeTasksShown: false});
     if (this.props.project) {
       document.title = this.props.project.name;
+      this.props.projectLabelsUpdate(projectId, this.props.project.shared);
     }
   }
 
@@ -141,7 +141,9 @@ class ProjectPage extends React.Component<
     if (projectId !== prevProps.match.params.projectId) {
       this.props.getProject(parseInt(projectId));
       this.setState({ completeTasksShown: false });
-      this.props.projectLabelsUpdate(parseInt(projectId));
+      if (this.props.project) {
+        this.props.projectLabelsUpdate(parseInt(projectId), this.props.project.shared);
+      }
     }
     if (this.props.project) {
       document.title = this.props.project.name;
@@ -242,12 +244,14 @@ class ProjectPage extends React.Component<
       return null;
     }
 
-    const hasLabel = this.props.projectLabels.length > 0;
+    if (!this.props.project) {
+      return null;
+    }
 
     return (
-      <>
-       {hasLabel &&(<div>
-         <div className="project-labels-icon">
+        <>
+          <div>
+            <div className="project-labels-icon">
            <span>
             {!this.state.hideLabel && <Tooltip
                 placement="top"
@@ -257,13 +261,13 @@ class ProjectPage extends React.Component<
                   onClick={(event) => {
                     event.stopPropagation();
                     const projectId = parseInt(this.props.match.params.projectId);
-                    this.props.projectLabelsUpdate(projectId);
+                    this.props.projectLabelsUpdate(projectId, this.props.project!.shared);
                   }}
               />
             </Tooltip>}
            </span>
-           {" "}
-           <span>
+              {" "}
+              <span>
             {!this.state.hideLabel && (<Tooltip
                 placement="top"
                 title="Hide Labels"
@@ -271,29 +275,29 @@ class ProjectPage extends React.Component<
               this.setState({hideLabel: true});
             }}/>
             </Tooltip>)}
-            {this.state.hideLabel && (<Tooltip
-                placement="top"
-                title="Show Project Labels"
-            ><DownOutlined onClick={() => {
-              this.setState({hideLabel: false});
-            }}/></Tooltip>)}
+                {this.state.hideLabel && (<Tooltip
+                    placement="top"
+                    title="Show Project Labels"
+                ><DownOutlined onClick={() => {
+                  this.setState({hideLabel: false});
+                }}/></Tooltip>)}
           </span>
-         </div>
+            </div>
 
-        {!this.state.hideLabel && <div className="project-labels">
-          {this.props.projectLabels.map((label, index) => (
-            <Tag
-              key={label.id}
-              color={stringToRGB(label.value)}
-              onClick={() => this.toLabelSearching(label)}
-            >
+            {!this.state.hideLabel && <div className="project-labels">
+              {this.props.projectLabels.map((label, index) => (
+                  <Tag
+                      key={label.id}
+                      color={stringToRGB(label.value)}
+                      onClick={() => this.toLabelSearching(label)}
+                  >
               <span>
                 {getIcon(label.icon)} &nbsp;{label.value}
               </span>
-            </Tag>
-          ))}
-        </div>}</div>)
-     }   </>
+                  </Tag>
+              ))}
+            </div>}</div>
+        </>
     );
   };
 

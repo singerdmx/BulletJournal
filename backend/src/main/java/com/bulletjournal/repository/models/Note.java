@@ -33,14 +33,15 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
 
     @Override
     public com.bulletjournal.controller.models.Note toPresentationModel() {
-        return toPresentationModel(this.getLabels().stream()
+        return toPresentationModel((this.isShared() ? this.getSharedItemLabels() : this.getLabels())
+                .stream()
                 .map(Label::new)
                 .collect(Collectors.toList()));
     }
 
     @Override
     public com.bulletjournal.controller.models.Note toPresentationModel(List<Label> labels) {
-        return new com.bulletjournal.controller.models.Note(
+        com.bulletjournal.controller.models.Note note = new com.bulletjournal.controller.models.Note(
                 this.getId(),
                 new User(this.getOwner()),
                 this.getName(),
@@ -48,6 +49,8 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
                 labels,
                 this.getCreatedAt().getTime(),
                 this.getUpdatedAt().getTime());
+        note.setShared(this.isShared());
+        return note;
     }
 
     @Override

@@ -41,6 +41,7 @@ export type UpdateLabels = {
 
 export type UpdateProjectLabels = {
   projectId: number;
+  projectShared: boolean;
 };
 
 export type SelectedLabelAction = {

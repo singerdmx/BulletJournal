@@ -68,9 +68,10 @@ public class SharedProjectItemDaoJpa {
             }
 
             if (contentType == null || contentType == projectItem.getContentType()) {
+                projectItem.setSharedItemLabels(item.getLabels());
+                projectItem.setShared(true);
                 result.add(projectItem);
             }
-            projectItem.setLabels(item.getLabels());
         });
 
         return result;

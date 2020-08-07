@@ -278,7 +278,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     protected <T extends ProjectItemModel> List<com.bulletjournal.controller.models.Label> getLabelsToProjectItem(
             T projectItem) {
-        return this.labelDaoJpa.getLabels(projectItem.getLabels());
+        return this.labelDaoJpa.getLabels(
+                projectItem.isShared() ? projectItem.getSharedItemLabels() : projectItem.getLabels());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

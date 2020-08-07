@@ -267,7 +267,9 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
 
     @Override
     public com.bulletjournal.controller.models.Task toPresentationModel() {
-        return toPresentationModel(this.getLabels().stream().map(Label::new).collect(Collectors.toList()));
+        return toPresentationModel(
+                (this.isShared() ? this.getSharedItemLabels() : this.getLabels())
+                        .stream().map(Label::new).collect(Collectors.toList()));
     }
 
     @Override
@@ -283,12 +285,14 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
             reminderSetting.setBefore(this.getReminderBeforeTask());
         }
 
-        return new com.bulletjournal.controller.models.Task(this.getId(), new User(this.getOwner()),
+        com.bulletjournal.controller.models.Task task = new com.bulletjournal.controller.models.Task(
+                this.getId(), new User(this.getOwner()),
                 this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()), this.getDueDate(),
                 this.getDueTime(), this.getTimezone(), this.getName(), this.getDuration(), this.getProject(), labels,
                 reminderSetting, this.getRecurrenceRule(), this.getCreatedAt().getTime(), this.getUpdatedAt().getTime(),
                 null);
-
+        task.setShared(this.isShared());
+        return task;
     }
 
     @Override

@@ -182,27 +182,17 @@ public class LabelDaoJpa {
 
         List<ProjectItemModel> sharedProjectItems = SharedProjectItemDaoJpa.getProjectItemModelsFromSharedItems(
                 null, this.sharedProjectItemRepository.findSharedProjectItemsByLabelIds(requester, labels));
-        List<Task> sharedTasks = new ArrayList<>();
-        List<Note> sharedNotes = new ArrayList<>();
-        List<Transaction> sharedTransactions = new ArrayList<>();
         for (ProjectItemModel projectItemModel : sharedProjectItems) {
             if (projectItemModel instanceof Task &&
                     tasks.stream().noneMatch(t -> Objects.equals(t.getId(), projectItemModel.getId()))) {
-                sharedTasks.add((Task) projectItemModel);
+                tasks.add((Task) projectItemModel);
             }
             if (projectItemModel instanceof Note &&
                     notes.stream().noneMatch(n -> Objects.equals(n.getId(), projectItemModel.getId()))) {
-                sharedNotes.add((Note) projectItemModel);
-            }
-            if (projectItemModel instanceof Transaction &&
-                    transactions.stream().noneMatch(t -> Objects.equals(t.getId(), projectItemModel.getId()))) {
-                sharedTransactions.add((Transaction) projectItemModel);
+                notes.add((Note) projectItemModel);
             }
         }
 
-        tasks.addAll(sharedTasks);
-        notes.addAll(sharedNotes);
-        transactions.addAll(sharedTransactions);
         // Group project items by date
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
@@ -212,17 +202,6 @@ public class LabelDaoJpa {
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
         projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
-        projectItems.forEach(items -> {
-            items.getTasks().stream().filter(task -> sharedTasks.stream()
-                    .anyMatch(t -> Objects.equals(task.getId(), t.getId())))
-                    .forEach(task -> task.setShared(true));
-            items.getNotes().stream().filter(note -> sharedNotes.stream()
-                    .anyMatch(n -> Objects.equals(note.getId(), n.getId())))
-                    .forEach(note -> note.setShared(true));
-            items.getTransactions().stream().filter(transaction -> sharedTransactions.stream()
-                    .anyMatch(t -> Objects.equals(transaction.getId(), t.getId())))
-                    .forEach(transaction -> transaction.setShared(true));
-        });
         return getLabelsForProjectItems(projectItems);
     }
 

@@ -230,7 +230,7 @@ public class SystemController {
 
         if (!isUUID(itemId)) {
             // For shared item, replace projectItem's labels with shared item's labels
-            projectItem.setLabels(this.labelDaoJpa.getLabels(item.getLabels()));
+            projectItem.setLabels(this.labelDaoJpa.getLabels(item.getSharedItemLabels()));
         }
 
         projectItem.setShared(true);

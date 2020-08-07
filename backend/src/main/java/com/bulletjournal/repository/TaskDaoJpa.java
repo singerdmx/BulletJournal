@@ -129,14 +129,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 tasks = tasks.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
             }
 
-            ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(tasks.stream().map(
-                    t -> {
-                        com.bulletjournal.controller.models.Task task = t.toPresentationModel();
-                        task.setShared(true);
-                        return task;
-                    }
-            ).collect(Collectors.toList())));
-
+            ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(
+                    tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList())));
             return ret;
         }
         if (!projectTasksOptional.isPresent()) {
@@ -199,12 +193,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
 
         tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
-        return tasks.stream().map(t -> {
-            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            com.bulletjournal.controller.models.Task task = t.toPresentationModel(labels);
-            task.setShared(project.isShared());
-            return task;
-        }).collect(Collectors.toList());
+        return this.labelDaoJpa.getLabelsForProjectItemList(tasks.stream()
+                .map(Task::toPresentationModel).collect(Collectors.toList()));
     }
 
     /**
