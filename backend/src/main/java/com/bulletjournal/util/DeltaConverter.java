@@ -62,6 +62,11 @@ public class DeltaConverter {
         List<LinkedHashMap<String, Object>> deltaList = new ArrayList<>();
         for (Map<String, Object> eDelta : mDeltaList) {
             LinkedHashMap<String, Object> clonedMap = new LinkedHashMap<>();
+            if (eDelta.containsKey("attributes") && ((Map) eDelta.get("attributes")).containsKey("embed")) {
+                LinkedHashMap webElement = mobileToWebImage(eDelta);
+                deltaList.add(webElement);
+                continue;
+            }
             // each attributes and insert
             for (Map.Entry<String, Object> e : eDelta.entrySet()) {
                 if (Objects.equals(e.getKey(), "attributes")) {
@@ -131,6 +136,15 @@ public class DeltaConverter {
         return opsMap;
     }
 
+    private static LinkedHashMap mobileToWebImage(Map<String, Object> eDelta) {
+        String imageVal = (String) ((Map)((Map) eDelta.get("attributes")).get("embed")).get("source");
+        LinkedHashMap insertMap = new LinkedHashMap();
+        insertMap.put("image", imageVal);
+        LinkedHashMap webElement = new LinkedHashMap();
+        webElement.put("insert", insertMap);
+        return webElement;
+    }
+
     @VisibleForTesting
     protected static String deltaTomDeltaStr(final String delta) {
         LinkedHashMap<String, Object> map = GSON.fromJson(delta, LinkedHashMap.class);
@@ -145,6 +159,12 @@ public class DeltaConverter {
 
         for (Map<String, Object> innerDeltaMap : opsList) {
             LinkedHashMap clonedMap = new LinkedHashMap();
+            if (innerDeltaMap.containsKey("insert") && (innerDeltaMap.get("insert")) instanceof Map) {
+                LinkedHashMap mobileElement = webToMobileImage(innerDeltaMap);
+                mDeltaList.add(mobileElement);
+                continue;
+            }
+
             for (Map.Entry<String, Object> e : innerDeltaMap.entrySet()) {
                 if (Objects.equals(e.getKey(), "attributes")) {
                     Map<String, Object> formatMap = (Map<String, Object>) e.getValue();
@@ -209,6 +229,21 @@ public class DeltaConverter {
             mDeltaList.add(clonedMap);
         }
         return mDeltaList;
+    }
+
+    private static LinkedHashMap webToMobileImage(Map<String, Object> innerDeltaMap) {
+        LinkedHashMap mobileElement = new LinkedHashMap();
+        Map insertVal = (Map) innerDeltaMap.get("insert");
+        String imageVal = (String) insertVal.get("image");
+        LinkedHashMap mobileElementAttributes = new LinkedHashMap();
+        LinkedHashMap mobileElementAttributesEmbed = new LinkedHashMap();
+        mobileElementAttributesEmbed.put("type", "image");
+        mobileElementAttributesEmbed.put("source", imageVal);
+        mobileElementAttributes.put("embed", mobileElementAttributesEmbed);
+
+        mobileElement.put("insert", "");
+        mobileElement.put("attributes", mobileElementAttributes);
+        return mobileElement;
     }
 
     private static Object toIntegerIfDouble(final Object o) {

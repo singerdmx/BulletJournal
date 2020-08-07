@@ -15,6 +15,23 @@ public class DeltaConverterTest {
     private static Gson GSON = new Gson();
 
     @Test
+    public void testConvertMobileToWebImage() {
+        String mobile = "[{\"insert\":\"\",\"attributes\":{\"embed\":{\"type\":\"image\",\"source\":\"https://s3.us-west-1.amazonaws.com/bulletjournals/202008060434000-4821de84-23b3-47f7-aac6-eed189fa9ac7-WeChat_Image_20191116032740.jpg\"}}},{\"insert\":\"\\n\"}]";
+        String webExpected = "{\"delta\":{\"ops\":[{\"insert\":{\"image\":\"https://s3.us-west-1.amazonaws.com/bulletjournals/202008060434000-4821de84-23b3-47f7-aac6-eed189fa9ac7-WeChat_Image_20191116032740.jpg\"}},{\"insert\":\"\\n\"}]}}";
+
+        Assert.assertEquals(webExpected, DeltaConverter.mDeltaToDeltaStr(mobile));
+    }
+
+    @Test
+    public void testConvertWebToMobileImage() {
+        String web = "{\"delta\":{\"ops\":[{\"insert\":{\"image\":\"https://s3.us-west-1.amazonaws.com/bulletjournals/202008060434000-4821de84-23b3-47f7-aac6-eed189fa9ac7-WeChat_Image_20191116032740.jpg\"}},{\"insert\":\"\\n\"}]}}";
+        String mobileExpected = "[{\"insert\":\"\",\"attributes\":{\"embed\":{\"type\":\"image\",\"source\":\"https://s3.us-west-1.amazonaws.com/bulletjournals/202008060434000-4821de84-23b3-47f7-aac6-eed189fa9ac7-WeChat_Image_20191116032740.jpg\"}}},{\"insert\":\"\\n\"}]";
+        Map<String, Object> webMap = GSON.fromJson(web, Map.class);
+        List mobile = DeltaConverter.deltaTomDelta((Map) webMap.get("delta"));
+        Assert.assertEquals(mobileExpected, GSON.toJson(mobile));
+    }
+
+    @Test
     public void testUpdateParams() {
         String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
         LinkedHashMap e =  GSON.fromJson(testUpdateContent3, LinkedHashMap.class);
