@@ -1,20 +1,23 @@
 import React, {useEffect} from 'react';
 import './points.styles.less';
-import {BackTop, Empty, Tabs} from "antd";
+import {BackTop, Button, Empty, Tabs} from "antd";
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {UserPointActivity} from "./interface";
+import Card from "antd/es/card";
+import {getUserPointActivities} from "../../features/myself/actions";
 
 const {TabPane} = Tabs;
 
 type PointsProps = {
     userPoint: number
-    userPointActivity: UserPointActivity[];
+    userPointActivities: UserPointActivity[];
+    getUserPointActivities:() => void;
 };
 
 const PointsPage: React.FC<PointsProps> = (props) => {
 
-    const {userPoint, userPointActivity} = props;
+    const {userPoint, userPointActivities} = props;
 
     useEffect(() => {
         document.title = 'Bullet Journal - Points';
@@ -26,7 +29,16 @@ const PointsPage: React.FC<PointsProps> = (props) => {
             <Tabs defaultActiveKey="1">
                 <TabPane tab="Activities" key="1">
                     <div style={{textAlign: "right", padding: "2rem"}}>Total Points: {userPoint}</div>
-                    <Empty/>
+
+                    <Button
+                        className='button'
+                        type='primary'
+                        onClick={() => {
+                            getUserPointActivities()
+                        }}
+                    >
+                        Get History
+                    </Button>
                 </TabPane>
                 <TabPane tab="Redeem" key="2">
                     <Empty/>
@@ -42,4 +54,4 @@ const mapStateToProps = (state: IState) => ({
     userPointActivities: state.myself.userPointActivities
 });
 
-export default connect(mapStateToProps)(PointsPage);
+export default connect(mapStateToProps,{getUserPointActivities})(PointsPage);
