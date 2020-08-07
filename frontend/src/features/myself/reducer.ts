@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
+import {UserPointActivity} from "../../pages/points/interface";
 
 export type MyselfWithAvatar = {
   username?: string;
@@ -36,6 +37,10 @@ export type PatchMyself = {
 
 export type ClearMyself = {};
 
+export type UserPointActivities = {
+   userPointActivities: UserPointActivity[];
+}
+
 let initialState = {
   username: '',
   avatar: '',
@@ -45,7 +50,8 @@ let initialState = {
   theme: 'LIGHT',
   loading: false,
   points: 0,
-  firstTime: false
+  firstTime: false,
+  userPointActivities: []as Array<UserPointActivity>,
 };
 
 const slice = createSlice({
@@ -91,6 +97,14 @@ const slice = createSlice({
       state,
       action: PayloadAction<UpdateExpandedMyself>
     ) => state,
+
+    userPointActivitiesReceived: (
+        state,
+        action: PayloadAction<UserPointActivities>
+    ) => {
+      const { userPointActivities } = action.payload;
+      state.userPointActivities = userPointActivities;
+    }
   },
 });
 

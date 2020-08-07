@@ -3,16 +3,18 @@ import './points.styles.less';
 import {BackTop, Empty, Tabs} from "antd";
 import {IState} from '../../store';
 import {connect} from 'react-redux';
+import {UserPointActivity} from "./interface";
 
 const {TabPane} = Tabs;
 
 type PointsProps = {
     userPoint: number
+    userPointActivity: UserPointActivity[];
 };
 
 const PointsPage: React.FC<PointsProps> = (props) => {
 
-    const {userPoint} = props;
+    const {userPoint, userPointActivity} = props;
 
     useEffect(() => {
         document.title = 'Bullet Journal - Points';
@@ -37,6 +39,7 @@ const PointsPage: React.FC<PointsProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
     userPoint: state.myself.points,
+    userPointActivities: state.myself.userPointActivities
 });
 
 export default connect(mapStateToProps)(PointsPage);

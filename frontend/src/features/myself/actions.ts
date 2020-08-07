@@ -26,3 +26,7 @@ export const patchMyself = (
   currency?: string,
   theme?: string,
 ) => actions.patchMyself({ timezone, before, currency, theme });
+
+export const getUserPointActivities = () => {
+    actions.getUserPointActivities({});
+}

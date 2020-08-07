@@ -43,3 +43,11 @@ export const clearMyself = () => {
       });
 };
 
+export const getUserPointActivities = () => {
+    return doFetch(('/api/pointActivities'))
+      .then(res => res)
+      .catch(err => {
+            throw Error(err.message);
+      });
+}
+

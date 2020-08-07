@@ -6,7 +6,7 @@ import {
     UpdateMyself,
     PatchMyself,
     ThemeUpdate,
-    UpdateExpandedMyself, ClearMyself,
+    UpdateExpandedMyself, ClearMyself, UserPointActivities
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -16,10 +16,11 @@ import {
   getProjectItems,
 } from '../../features/myBuJo/actions';
 import { PayloadAction } from 'redux-starter-kit';
-import { fetchMyself, patchMyself, clearMyself } from '../../apis/myselfApis';
+import { fetchMyself, patchMyself, clearMyself, getUserPointActivities} from '../../apis/myselfApis';
 import moment from 'moment';
 import { dateFormat } from '../myBuJo/constants';
 import { expandedMyselfLoading } from './actions';
+import {UserPointActivity} from "../../pages/points/interface";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -145,6 +146,20 @@ function* unsetMyself(action: PayloadAction<ClearMyself>) {
     }
 }
 
+function* fetchUserPointActivities(action: PayloadAction<UserPointActivities>) {
+    try {
+        const data = yield call(getUserPointActivities);
+        const userPointActivities: UserPointActivity[] = yield data.json();
+        yield  put(
+            myselfActions.userPointActivitiesReceived( {
+                userPointActivities: userPointActivities
+            })
+        );
+    } catch (error) {
+        yield call(message.error, `Notice Error Received: ${error}`);
+    }
+}
+
 export default function* myselfSagas() {
   yield all([
     yield takeLatest(
@@ -159,5 +174,7 @@ export default function* myselfSagas() {
       getExpandedMyself
     ),
     yield takeLatest(myselfActions.themeUpdate.type, updateTheme),
+    yield takeLatest(myselfActions.userPointActivitiesReceived.type, fetchUserPointActivities),
   ]);
 }
+
