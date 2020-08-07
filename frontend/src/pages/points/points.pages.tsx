@@ -1,10 +1,9 @@
 import React, {useEffect} from 'react';
 import './points.styles.less';
-import {BackTop, Button, Empty, Tabs} from "antd";
+import {BackTop, Button, Empty, Tabs, Card} from "antd";
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {UserPointActivity} from "./interface";
-import Card from "antd/es/card";
 import {getUserPointActivities} from "../../features/myself/actions";
 
 const {TabPane} = Tabs;
@@ -12,15 +11,17 @@ const {TabPane} = Tabs;
 type PointsProps = {
     userPoint: number
     userPointActivities: UserPointActivity[];
-    getUserPointActivities:() => void;
+    getUserPointActivities: () => void;
 };
 
 const PointsPage: React.FC<PointsProps> = (props) => {
 
-    const {userPoint, userPointActivities} = props;
+    const {userPoint, userPointActivities, getUserPointActivities} = props;
 
     useEffect(() => {
         document.title = 'Bullet Journal - Points';
+        console.log('getUserPointActivities')
+        getUserPointActivities();
     }, []);
 
     return (
@@ -29,16 +30,6 @@ const PointsPage: React.FC<PointsProps> = (props) => {
             <Tabs defaultActiveKey="1">
                 <TabPane tab="Activities" key="1">
                     <div style={{textAlign: "right", padding: "2rem"}}>Total Points: {userPoint}</div>
-
-                    <Button
-                        className='button'
-                        type='primary'
-                        onClick={() => {
-                            getUserPointActivities()
-                        }}
-                    >
-                        Get History
-                    </Button>
                 </TabPane>
                 <TabPane tab="Redeem" key="2">
                     <Empty/>
