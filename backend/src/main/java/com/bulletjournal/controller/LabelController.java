@@ -67,7 +67,7 @@ public class LabelController {
         final Set<String> projectLabelValues = new HashSet<>();
         List<Label> labelsForProject = Collections.emptyList();
         if (projectId != null) {
-            labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
+            labelsForProject = this.systemDaoJpa.getProjectLabels(projectId, username);
             if (labelsForProject != null) {
                 labelsForProject.forEach(l -> projectLabelValues.add(l.getValue()));
             }
@@ -88,7 +88,7 @@ public class LabelController {
     @GetMapping(PROJECT_LABELS_ROUTE)
     public ResponseEntity<List<Label>> getProjectLabels(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<Label> labelsForProject = this.systemDaoJpa.getProjectItemLabels(projectId, username);
+        List<Label> labelsForProject = this.systemDaoJpa.getProjectLabels(projectId, username);
         return ResponseEntity.ok().body(labelsForProject);
     }
 

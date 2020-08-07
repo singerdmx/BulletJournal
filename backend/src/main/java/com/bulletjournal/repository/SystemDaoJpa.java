@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,11 @@ public class SystemDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Label> getProjectItemLabels(Long projectId, String requester) {
+    public List<Label> getProjectLabels(Long projectId, String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
+        if (project.isShared()) {
+            return Collections.emptyList();
+        }
         ProjectType projectType = ProjectType.getType(project.getType());
         ProjectItemDaoJpa dao = daos.get(projectType);
         List<Long> labelIds = dao.findItemLabelsByProject(project);
