@@ -10,6 +10,7 @@ import java.util.*;
 public class DeltaConverter {
 
     private static Gson GSON = new Gson();
+    private static String kPlainTextPlaceholder = new String(Character.toChars(0x200b));
 
     public static String supplementContentText(String text) {
         // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}
@@ -241,7 +242,7 @@ public class DeltaConverter {
         mobileElementAttributesEmbed.put("source", imageVal);
         mobileElementAttributes.put("embed", mobileElementAttributesEmbed);
 
-        mobileElement.put("insert", "");
+        mobileElement.put("insert", kPlainTextPlaceholder);
         mobileElement.put("attributes", mobileElementAttributes);
         return mobileElement;
     }
