@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-
+import { ScheduleOutlined } from '@ant-design/icons';
 import './punch-card.styles.less';
 import {BackTop} from "antd";
 
@@ -15,7 +15,7 @@ const PunchCardPage: React.FC<PunchCardProps> = (props) => {
     <div className='punch-card-page'>
         <BackTop />
 
-        Punch
+        <ScheduleOutlined />
     </div>
   );
 };

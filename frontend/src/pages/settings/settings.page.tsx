@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {BackTop, Tabs} from 'antd';
 import Account from '../../components/settings/account';
-import { DashboardOutlined } from '@ant-design/icons';
+import { DashboardOutlined, GoogleOutlined } from '@ant-design/icons';
 import './setting.style.less';
 import { useLocation } from 'react-use';
 import GoogleCalendarSyncPage from '../../components/settings/google-calendar-sync';
@@ -35,7 +35,7 @@ const SettingPage: React.FC<SettingProps> = (props) => {
         >
           <Account />
         </TabPane>
-        <TabPane tab={<span>Sync Google Calendar</span>} key="#/googleCalendar">
+        <TabPane tab={<span><GoogleOutlined />Sync Google Calendar</span>} key="#/googleCalendar">
           <div>
             <GoogleCalendarSyncPage />
           </div>

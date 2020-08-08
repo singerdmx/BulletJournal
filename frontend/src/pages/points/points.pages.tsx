@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import './points.styles.less';
 import {BackTop, Empty, Tabs, Card} from "antd";
+import { GiftOutlined, FlagOutlined } from '@ant-design/icons';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {UserPointActivity} from "./interface";
@@ -29,7 +30,7 @@ const PointsPage: React.FC<PointsProps> = (props) => {
         <div className='points-page'>
             <BackTop/>
             <Tabs defaultActiveKey="1">
-                <TabPane tab="Activities" key="1">
+                <TabPane tab={<span><FlagOutlined />Activities</span>} key="1">
                     <div style={{textAlign: "right", padding: "2rem"}}>Total Points: {userPoint}</div>
                     <div>
                         {
@@ -41,7 +42,7 @@ const PointsPage: React.FC<PointsProps> = (props) => {
                         }
                     </div>
                 </TabPane>
-                <TabPane tab="Redeem" key="2">
+                <TabPane tab={<span><GiftOutlined />Redeem</span>} key="2">
                     <Empty/>
                 </TabPane>
             </Tabs>
