@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/singerdmx/BulletJournal/daemon/protobuf/grpc/services"
-	"github.com/singerdmx/BulletJournal/daemon/protobuf/grpc/types"
+	"github.com/singerdmx/BulletJournal/protobuf/grpc/services"
+	"github.com/singerdmx/BulletJournal/protobuf/grpc/types"
 	"google.golang.org/grpc"
 	"log"
 	"time"

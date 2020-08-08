@@ -1,4 +1,4 @@
-package mailjet
+package clients
 
 import (
 	"fmt"
