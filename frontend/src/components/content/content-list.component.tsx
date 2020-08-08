@@ -43,28 +43,39 @@ const ContentList: React.FC<ContentListProps> = ({
     updateTargetContent(contents.filter(c => c.id.toString() === key)[0]);
   };
 
+  if (!contents || contents.length === 0) {
+    return null;
+  }
+
+  if (contents.length === 1) {
+    return <ContentItem
+        projectItem={projectItem}
+        key={contents[0].id}
+        content={contents[0]}
+    />
+  }
+
   return (
-    <Tabs
-      activeKey={content ? content.id.toString() : ''}
-      tabPosition='left'
-      style={{ height: '100%' }}
-      onTabClick={onTabClick}
-    >
-      {contents &&
-        contents.map((c, index) => (
-          <Tabs.TabPane
-            key={`${c.id}`}
-            tab={<TabContent content={c} />}
-            forceRender
-          >
-            <ContentItem
-              projectItem={projectItem}
-              key={c.id}
-              content={c}
-            />
-          </Tabs.TabPane>
+      <Tabs
+          activeKey={content ? content.id.toString() : ''}
+          tabPosition='left'
+          style={{height: '100%'}}
+          onTabClick={onTabClick}
+      >
+        {contents.map((c, index) => (
+            <Tabs.TabPane
+                key={`${c.id}`}
+                tab={<TabContent content={c}/>}
+                forceRender
+            >
+              <ContentItem
+                  projectItem={projectItem}
+                  key={c.id}
+                  content={c}
+              />
+            </Tabs.TabPane>
         ))}
-    </Tabs>
+      </Tabs>
   );
 };
 
