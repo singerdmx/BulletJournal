@@ -12,7 +12,27 @@ import java.util.Map;
 import static com.bulletjournal.util.DeltaConverter.supplementContentText;
 
 public class DeltaConverterTest {
-    private static Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
+
+    @Test
+    public void testEmoji() {
+        String webInsert = "{\"emoji\":\"100\"}";
+        String mobileExpected = "{\"insert\":\"\uD83D\uDCAF\"}";
+        LinkedHashMap emojiMap = GSON.fromJson(webInsert, LinkedHashMap.class);
+        String res = GSON.toJson(DeltaConverter.WebToMobile.webToMobileEmoji(emojiMap));
+        Assert.assertEquals(mobileExpected, res);
+    }
+
+    @Test
+    public void testEmojiProvider() {
+        Integer unicode = EmojiRuleProvider.NAME_TO_IDS.get("100");
+        Assert.assertEquals(128175, (int) unicode);
+
+        String mobileExpected = DeltaConverter.EmojiConverter.nameToSurrogatePair("100").get();
+        int codePoint = mobileExpected.codePointAt(0);
+        System.out.println(mobileExpected);
+        System.out.println(codePoint);
+    }
 
     @Test
     public void testConvertMobileToWebImage() {
@@ -29,12 +49,19 @@ public class DeltaConverterTest {
         Map<String, Object> webMap = GSON.fromJson(web, Map.class);
         List mobile = DeltaConverter.deltaTomDelta((Map) webMap.get("delta"));
         Assert.assertEquals(mobileExpected, GSON.toJson(mobile));
+
+        web = "{\"delta\":{\"ops\":[{\"insert\":{\"emoji\":\"joy\"}},{\"insert\":\"\\n\"}]}}";
+        mobileExpected = "[{\"insert\":\"\uD83D\uDE02\"},{\"insert\":\"\\n\"}]";
+        webMap = GSON.fromJson(web, Map.class);
+        mobile = DeltaConverter.deltaTomDelta((Map) webMap.get("delta"));
+        Assert.assertEquals(mobileExpected, GSON.toJson(mobile));
+
     }
 
     @Test
     public void testUpdateParams() {
         String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
-        LinkedHashMap e =  GSON.fromJson(testUpdateContent3, LinkedHashMap.class);
+        LinkedHashMap e = GSON.fromJson(testUpdateContent3, LinkedHashMap.class);
 
         System.out.println(testUpdateContent3);
     }
@@ -76,7 +103,7 @@ public class DeltaConverterTest {
 
         String mdelta = "{\"mdelta\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}";
         String mdeltaToDeltaExpected = "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"mdelta\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]}";
-        String  mdeltaToDeltaRes = supplementContentText(mdelta);
+        String mdeltaToDeltaRes = supplementContentText(mdelta);
         Assert.assertEquals(mdeltaToDeltaExpected, mdeltaToDeltaRes);
     }
 

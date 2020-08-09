@@ -4,13 +4,16 @@ import com.bulletjournal.controller.models.UpdateContentParams;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class DeltaConverter {
-
-    private static Gson GSON = new Gson();
+    // https://github.com/memspace/zefyr/blob/master/packages/notus/lib/src/document/leaf.dart
     private static String kPlainTextPlaceholder = new String(Character.toChars(0x200b));
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeltaConverter.class);
+    private static final Gson GSON = new Gson();
 
     public static String supplementContentText(String text) {
         // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}
@@ -161,7 +164,7 @@ public class DeltaConverter {
         for (Map<String, Object> innerDeltaMap : opsList) {
             LinkedHashMap clonedMap = new LinkedHashMap();
             if (innerDeltaMap.containsKey("insert") && (innerDeltaMap.get("insert")) instanceof Map) {
-                LinkedHashMap mobileElement = webToMobileImage(innerDeltaMap);
+                LinkedHashMap mobileElement = WebToMobile.webToMobileInsertMap(innerDeltaMap);
                 mDeltaList.add(mobileElement);
                 continue;
             }
@@ -232,23 +235,63 @@ public class DeltaConverter {
         return mDeltaList;
     }
 
-    private static LinkedHashMap webToMobileImage(Map<String, Object> innerDeltaMap) {
-        LinkedHashMap mobileElement = new LinkedHashMap();
-        Map insertVal = (Map) innerDeltaMap.get("insert");
-        String imageVal = (String) insertVal.get("image");
-        LinkedHashMap mobileElementAttributes = new LinkedHashMap();
-        LinkedHashMap mobileElementAttributesEmbed = new LinkedHashMap();
-        mobileElementAttributesEmbed.put("type", "image");
-        mobileElementAttributesEmbed.put("source", imageVal);
-        mobileElementAttributes.put("embed", mobileElementAttributesEmbed);
-
-        mobileElement.put("insert", kPlainTextPlaceholder);
-        mobileElement.put("attributes", mobileElementAttributes);
-        return mobileElement;
-    }
-
     private static Object toIntegerIfDouble(final Object o) {
         return o instanceof Double ? ((Double) o).intValue() : o;
+    }
+
+    static class WebToMobile {
+        static LinkedHashMap webToMobileInsertMap(Map map) {
+            Map insertMap = (Map) map.get("insert");
+
+            if (insertMap.containsKey("emoji")) {
+                return webToMobileEmoji(insertMap);
+            }
+
+            if (insertMap.containsKey("image")) {
+                return webToMobileImage(insertMap);
+            }
+
+            return new LinkedHashMap();
+        }
+
+        static LinkedHashMap webToMobileEmoji(Map insertMap) {
+            LinkedHashMap mobileElement = new LinkedHashMap();
+            String val = (String) insertMap.get("emoji");
+            mobileElement.put("insert", EmojiConverter.nameToSurrogatePair(val).get());
+            return mobileElement;
+        }
+
+        static LinkedHashMap webToMobileImage(Map insertVal) {
+            LinkedHashMap mobileElement = new LinkedHashMap();
+
+            String imageVal = (String) insertVal.get("image");
+            LinkedHashMap mobileElementAttributes = new LinkedHashMap();
+            LinkedHashMap mobileElementAttributesEmbed = new LinkedHashMap();
+            mobileElementAttributesEmbed.put("type", "image");
+            mobileElementAttributesEmbed.put("source", imageVal);
+            mobileElementAttributes.put("embed", mobileElementAttributesEmbed);
+
+            mobileElement.put("insert", "");
+            mobileElement.put("attributes", mobileElementAttributes);
+            return mobileElement;
+        }
+    }
+
+    static class EmojiConverter {
+        public static Optional<String> nameToSurrogatePair(final String name) {
+
+            String trimName = name.replace(":", "").trim();
+            try {
+                if (EmojiRuleProvider.NAME_TO_IDS.containsKey(trimName)) {
+                    int codePoint = EmojiRuleProvider.NAME_TO_IDS.get(trimName);
+                    return Optional.of(new String(Character.toChars(codePoint)));
+                }
+            } catch (Exception e) {
+                LOGGER.error("Unable convert emoji name to surrogate pair", e);
+            }
+
+            return Optional.empty();
+        }
     }
 }
 
