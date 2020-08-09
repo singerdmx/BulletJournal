@@ -913,11 +913,10 @@ function* patchContent(action: PayloadAction<PatchContent>) {
 }
 
 function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
-  const state: IState = yield select();
-
   try {
+    const state: IState = yield select();
     const { taskId, taskStatus } = action.payload;
-    const data = yield call(setTaskStatusApi, taskId, taskStatus);
+    const data = yield call(setTaskStatusApi, taskId, taskStatus, state.myself.timezone);
 
     let updateTask = {} as Task;
     let stateTask = state.task.task;
@@ -926,42 +925,13 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
       yield put(tasksActions.taskReceived({ task: updateTask }));
     }
 
-    const tasks = yield data.json();
     yield put(
-        tasksActions.tasksReceived({
-          tasks: tasks,
-        })
-    );
-
-    //get etag from header
-    const etag = data.headers.get('Etag')!;
-    const systemState = state.system;
-    yield put(
-        SystemActions.systemUpdateReceived({
-          ...systemState,
-          tasksEtag: etag,
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: data,
         })
     );
   } catch (error) {
     yield call(message.error, `set Task Status Error Received: ${error}`);
-  }
-
-  if (state.project.project) {
-    const data = yield call(
-        fetchTasks,
-        state.project.project.id,
-        undefined,
-        state.myself.timezone,
-        undefined,
-        undefined,
-        true
-    );
-    const tasksByOrder = yield data.json();
-    yield put(
-        tasksActions.tasksByOrderReceived({
-          tasksByOrder: tasksByOrder,
-        })
-    );
   }
 }
 

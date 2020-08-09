@@ -331,12 +331,15 @@ export const getContentRevision = (
     });
 };
 
-export const setTaskStatus = (taskId: number, taskStatus: TaskStatus) => {
+export const setTaskStatus = (taskId: number, taskStatus: TaskStatus, timezone: string) => {
   const postBody = JSON.stringify({
     status: taskStatus,
+    timezone: timezone
   });
 
-  return doPost(`/api/tasks/${taskId}/setStatus`, postBody).catch((err) => {
+  return doPost(`/api/tasks/${taskId}/setStatus`, postBody)
+      .then((res) => res.json())
+      .catch((err) => {
     throw Error(err);
   });
 };

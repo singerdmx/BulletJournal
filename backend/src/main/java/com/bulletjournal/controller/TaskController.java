@@ -223,7 +223,8 @@ public class TaskController {
                         + updatedTask.getProject().getName() + "##",
                 username, updatedTask.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
 
-        return getTasks(updatedTask.getProject().getId(), null, null, null, null, null);
+        return getTasks(updatedTask.getProject().getId(), null, null, null,
+                true, setTaskStatusParams.getTimezone());
     }
 
     @PostMapping(UNCOMPLETE_TASK_ROUTE)
