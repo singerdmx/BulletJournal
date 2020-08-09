@@ -211,8 +211,6 @@ const AdminPage: React.FC<AdminProps> = (props) => {
                       style={{ marginLeft: '340px' }}
                       type='primary'
                       onClick={() => {
-                        console.log('fuck');
-                        console.log(searchName + " " + inputPoints + " " + description);
                         changePoints(searchName, inputPoints, description);
                         setMode('display');
                       }}
