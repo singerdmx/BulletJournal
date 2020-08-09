@@ -257,6 +257,7 @@ public class DeltaConverter {
         static LinkedHashMap webToMobileEmoji(Map insertMap) {
             LinkedHashMap mobileElement = new LinkedHashMap();
             String val = (String) insertMap.get("emoji");
+            LOGGER.info(" webToMobileEmoji val=" + val);
             mobileElement.put("insert", EmojiConverter.nameToSurrogatePair(val).get());
             return mobileElement;
         }

@@ -1,11 +1,12 @@
 package com.bulletjournal.util;
 
+import com.google.common.io.Resources;
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,20 +15,20 @@ import java.util.Map;
 public final class EmojiRuleProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmojiRuleProvider.class);
     private static final Gson GSON = new Gson();
+    private static final String EMOJI_FILE = "lib/emoji.json";
 
     public static final Map<String, Integer> NAME_TO_IDS = new HashMap<>();
 
     static {
-        String filename = System.getProperty("user.dir")  + "/src/main/resources/lib/emoji.json";
         try {
-            System.out.println(filename);
-            JsonReader reader = new JsonReader(new FileReader(filename));
-            List emojiList = GSON.fromJson(reader, ArrayList.class);
+            URL url = Resources.getResource(EMOJI_FILE);
+            String text = Resources.toString(url, StandardCharsets.UTF_8);
+            List emojiList = GSON.fromJson(text, ArrayList.class);
             for (Object o : emojiList) {
                 if (o instanceof Map) {
                     Map map = (Map) o;
                     String key = (String) (map.get("name"));
-                    Integer val = null;
+                    Integer val;
                     try {
                         val = Integer.parseInt((String) map.get("unicode"), 16);
                     } catch (NumberFormatException e) {
@@ -39,6 +40,7 @@ public final class EmojiRuleProvider {
             }
         } catch (Exception ex) {
             LOGGER.error("Unable to load emoji rules", ex);
+            throw new RuntimeException(ex);
         }
     }
 
