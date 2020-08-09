@@ -2,12 +2,12 @@ syntax = "proto3";
 
 package types;
 
-option go_package = "github.com/singerdmx/BulletJournal/daemon/protobuf/grpc/types";
+option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types";
 option java_multiple_files = true;
-option java_package = "com.bulletjournal.daemon.protobuf.grpc.types";
+option java_package = "com.bulletjournal.protobuf.daemon.grpc.types";
 option java_outer_classname = "JoinGroupEvents";
 
-message EventProto {
+message Event {
   string targetUser = 1;
 
   uint64 contentId = 2;

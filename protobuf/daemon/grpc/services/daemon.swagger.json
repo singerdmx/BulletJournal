@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "protobuf/grpc/services/daemon.proto",
+    "title": "daemon/grpc/services/daemon.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -94,6 +94,10 @@
         },
         "originatorAlias": {
           "type": "string"
+        },
+        "notificationId": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
