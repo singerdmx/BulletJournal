@@ -5,7 +5,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {BackTop, Collapse} from 'antd';
 import {CaretRightOutlined, SyncOutlined, UpSquareOutlined, FieldTimeOutlined} from '@ant-design/icons';
 import {IState} from '../../store';
-import {getTasksByAssignee, getTasksByOrder} from '../../features/tasks/actions';
+import {getTasksByAssignee, getTasksByOrder, setTaskStatus} from '../../features/tasks/actions';
 import {connect} from 'react-redux';
 import {Task, TaskStatus} from '../../features/tasks/interface';
 import {ProjectItemUIType} from '../../features/project/constants';
@@ -30,6 +30,7 @@ type TaskStatusProps = {
     endDate?: string
   ) => void;
   getTasksByAssignee: (projectId: number, assignee: string) => void;
+  setTaskStatus: (taskId: number, taskStatus: TaskStatus) => void;
 };
 
 const TaskStatusPage: React.FC<TaskStatusProps> = ({
@@ -37,7 +38,8 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
   project,
   timezone,
   tasksByOrder,
-  getTasksByAssignee
+  getTasksByAssignee,
+  setTaskStatus
 }) => {
   const { projectId } = useParams();
   const history = useHistory();
@@ -233,5 +235,6 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   getTasksByOrder,
-  getTasksByAssignee
+  getTasksByAssignee,
+  setTaskStatus
 })(TaskStatusPage);

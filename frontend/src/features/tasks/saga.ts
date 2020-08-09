@@ -913,8 +913,9 @@ function* patchContent(action: PayloadAction<PatchContent>) {
 }
 
 function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
+  const state: IState = yield select();
+
   try {
-    const state: IState = yield select();
     const { taskId, taskStatus } = action.payload;
     const data = yield call(setTaskStatusApi, taskId, taskStatus);
 
@@ -943,6 +944,24 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
     );
   } catch (error) {
     yield call(message.error, `set Task Status Error Received: ${error}`);
+  }
+
+  if (state.project.project) {
+    const data = yield call(
+        fetchTasks,
+        state.project.project.id,
+        undefined,
+        state.myself.timezone,
+        undefined,
+        undefined,
+        true
+    );
+    const tasksByOrder = yield data.json();
+    yield put(
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
+    );
   }
 }
 
