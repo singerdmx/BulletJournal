@@ -343,3 +343,18 @@ export const setTaskStatus = (taskId: number, taskStatus: TaskStatus, timezone: 
     throw Error(err);
   });
 };
+
+export const patchRevisionContents = (
+    taskId: number,
+    contentId: number,
+    revisionContents: string[],
+    etag: string,
+) => {
+  const patchBody = JSON.stringify({
+    revisionContents: revisionContents,
+  });
+  return doPost(`/api/tasks/${taskId}/contents/${contentId}/patchRevisionContents`, patchBody, etag)
+      .catch((err) => {
+        throw Error(err);
+      });
+};

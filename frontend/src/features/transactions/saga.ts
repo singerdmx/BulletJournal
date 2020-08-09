@@ -18,6 +18,7 @@ import {
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
   UpdateTransactions,
+  PatchRevisionContents
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -36,6 +37,7 @@ import {
   shareTransactionWithOther,
   updateContent,
   updateTransaction,
+  patchRevisionContents
 } from '../../apis/transactionApis';
 import { LedgerSummary } from './interface';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
@@ -548,6 +550,15 @@ function* getTransactionsByPayer(
   }
 }
 
+function* patchTransactionRevisionContents(action: PayloadAction<PatchRevisionContents>) {
+  try {
+    const {transactionId, contentId, revisionContents, etag} = action.payload;
+    yield call(patchRevisionContents, transactionId, contentId, revisionContents, etag);
+  } catch (error) {
+    yield call(message.error, `patchTransactionRevisionContents Error Received: ${error}`);
+  }
+}
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -607,6 +618,10 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.getTransactionsByPayer.type,
       getTransactionsByPayer
+    ),
+    yield takeLatest(
+        transactionsActions.TransactionPatchRevisionContents.type,
+        patchTransactionRevisionContents
     ),
   ]);
 }

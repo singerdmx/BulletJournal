@@ -197,3 +197,11 @@ export const setTaskStatus = (taskId: number, taskStatus: TaskStatus) =>
     taskId: taskId,
     taskStatus: taskStatus,
   });
+
+export const patchTaskRevisionContents = (
+    taskId: number,
+    contentId: number,
+    revisionContents: string[],
+    etag: string
+) => actions.TaskPatchRevisionContents({
+    taskId: taskId, contentId: contentId, revisionContents: revisionContents, etag: etag});
