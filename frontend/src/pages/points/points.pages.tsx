@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import './points.styles.less';
-import {BackTop, Empty, Tabs, Card, Table, Space} from "antd";
+import {BackTop, Empty, Tabs, Table} from "antd";
 import { GiftOutlined, FlagOutlined } from '@ant-design/icons';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
