@@ -11,7 +11,6 @@ require (
 	github.com/singerdmx/BulletJournal v0.0.0-20200808090459-18caedd774ce
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
-	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/grpc v1.30.0
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
