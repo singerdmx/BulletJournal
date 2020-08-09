@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import './points.styles.less';
-import {BackTop, Empty, Tabs, Card} from "antd";
+import {BackTop, Empty, Tabs, Card, Table, Space} from "antd";
 import { GiftOutlined, FlagOutlined } from '@ant-design/icons';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
@@ -26,18 +26,38 @@ const PointsPage: React.FC<PointsProps> = (props) => {
         getUserPointActivities();
     }, []);
 
+    const columns = [
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
+        },
+        {
+            title: 'Point',
+            dataIndex: 'pointChange',
+            key: 'pointChange',
+        },
+        {
+            title: 'Time',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (text: number) => (
+                 moment(text).fromNow()
+
+            ),
+        },
+    ];
+
     return (
         <div className='points-page'>
             <BackTop/>
             <Tabs defaultActiveKey="1">
                 <TabPane tab={<span><FlagOutlined />Activities</span>} key="1">
-                    <div style={{textAlign: "right", padding: "2rem"}}>Total Points: {userPoint}</div>
+                    <div style={{textAlign: "left", padding: "2rem"}}>Total Points: {userPoint}</div>
                     <div>
                         {
                             userPointActivities.length === 0 ? <Empty/> : <div>
-                                {userPointActivities.map(a => {
-                                    return <Card>{a.username} {a.description} {moment(a.createdAt).fromNow()}</Card>
-                                })}
+                                <Table dataSource={userPointActivities} columns={columns} />
                             </div>
                         }
                     </div>

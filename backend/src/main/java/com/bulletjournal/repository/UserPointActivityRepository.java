@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface UserPointActivityRepository extends JpaRepository<UserPointActivity, Long> {
-    @Query("SELECT t FROM UserPointActivity t WHERE t.username = ?1")
+    @Query("SELECT t FROM UserPointActivity t WHERE t.username = ?1 order by t.createdAt desc ")
     List<UserPointActivity> findUserPointActivitiesByUsername(String username);
 }
