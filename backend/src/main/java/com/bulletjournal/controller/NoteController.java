@@ -305,9 +305,9 @@ public class NoteController {
     @PostMapping(REVISION_CONTENT_ROUTE)
     public void patchRevisionContents(@NotNull @PathVariable Long noteId,
                                       @NotNull @PathVariable Long contentId,
-                                      @NotNull @RequestBody  List<String> revisionContents,
+                                      @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
                                       @RequestHeader(IF_NONE_MATCH) String etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.patchRevisionContentHistory(contentId, noteId, username, revisionContents, Optional.of(etag));
+        this.noteDaoJpa.patchRevisionContentHistory(contentId, noteId, username, revisionContentsParams.getRevisionContents(), Optional.of(etag));
     }
 }
