@@ -68,9 +68,10 @@ public class CategoryController {
                 Collectors.toMap(com.bulletjournal.templates.repository.model.Category::getId, category -> category));
 
         List<Category> ret = new ArrayList<>(CategoryRelationsProcessor.processRelations(categoryIdMap, keptHierarchy));
-        allCategories.stream().filter(category -> !processedIds.contains(category.getId()))
-            .forEach(category -> ret.add(category.toPresentationModel()));
-        ret.sort(Comparator.comparingLong(Category::getId));
+        ret.addAll(allCategories.stream()
+            .filter(category -> !processedIds.contains(category.getId()))
+            .map(com.bulletjournal.templates.repository.model.Category::toPresentationModel)
+            .sorted(Comparator.comparingLong(Category::getId)).collect(Collectors.toList()));
         return ret;
     }
 

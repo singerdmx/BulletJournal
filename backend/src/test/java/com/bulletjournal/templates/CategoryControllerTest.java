@@ -122,13 +122,12 @@ public class CategoryControllerTest {
         HierarchyItem item2 = new HierarchyItem(categoriesIds[2]);
         HierarchyItem item0 = new HierarchyItem(categoriesIds[0]);
         item0.getS().add(item4);
-        List<HierarchyItem> expectedHierarchyItems = new ArrayList<>();
-        expectedHierarchyItems.add(item0);
+        LinkedList<HierarchyItem> expectedHierarchyItems = new LinkedList<>();
         expectedHierarchyItems.add(item2);
         expectedHierarchyItems.add(item3);
-        expectedHierarchyItems.add(item5);
         expectedHierarchyItems.sort(Comparator.comparingLong(HierarchyItem::getId));
-
+        expectedHierarchyItems.addFirst(item0);
+        expectedHierarchyItems.addFirst(item5);
         responseCategoryList = deleteCategory(categoriesIds[1]);
         checkRelations(responseCategoryList, expectedHierarchyItems);
     }
@@ -223,7 +222,6 @@ public class CategoryControllerTest {
         List<HierarchyItem> hierarchyItems = new ArrayList<>();
         hierarchyItems.add(item0);
         hierarchyItems.add(item5);
-        hierarchyItems.sort(Comparator.comparingLong(HierarchyItem::getId));
         this.hierarchyItemList1 = hierarchyItems;
     }
 
