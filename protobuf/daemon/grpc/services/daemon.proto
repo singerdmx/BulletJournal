@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package services;
 
-import "daemon/grpc/types/join_group_events.proto";
+import "grpc/types/join_group_events.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services";
 option java_multiple_files = true;
 option java_package = "com.bulletjournal.protobuf.daemon.grpc.services";
-option java_outer_classname = "Daemon";
+option java_outer_classname = "DaemonProto";
 
 // The daemon service definition.
 service Daemon {

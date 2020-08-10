@@ -2,6 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
+    id 'com.google.protobuf' version '0.8.12'
+    id 'idea'
 }
 
 plugins {
@@ -35,6 +37,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.bitbucket.cowwoc:diff-match-patch:1.2'
+    implementation 'net.devh:grpc-client-spring-boot-starter:2.9.0.RELEASE'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -67,6 +70,27 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
     testCompile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.11'
 }
+
+sourceSets {
+    main {
+        proto {
+            srcDir '../protobuf/daemon'
+        }
+    }
+}
+
+protobuf {
+    generatedFilesBaseDir = "./generatedProto"
+
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+}
+
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
 
 test {
     useJUnit()
