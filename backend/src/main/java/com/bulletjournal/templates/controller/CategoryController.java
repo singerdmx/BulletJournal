@@ -10,7 +10,6 @@ import com.bulletjournal.templates.controller.model.Category;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,6 @@ public class CategoryController {
     public static final String CATEGORIES_ROUTE = "/api/categories";
 
     public static final String CATEGORY_ROUTE = "/api/categories/{categoryId}";
-
-    private static Gson GSON = new Gson();
 
     private CategoryDaoJpa categoryDaoJpa;
 
@@ -78,7 +75,7 @@ public class CategoryController {
     }
 
     @PutMapping(CATEGORIES_ROUTE)
-    public List<Category> updateCategoryRelations(@NotNull @Valid @RequestBody List<Category> categoryList) {
+    public List<Category> updateRelations(@NotNull @Valid @RequestBody List<Category> categoryList) {
         validateRequester();
         String newHierarchy = CategoryRelationsProcessor.processRelations(categoryList);
         hierarchyDaoJpa.updateHierarchy(newHierarchy);
