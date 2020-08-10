@@ -43,6 +43,10 @@ public class ProjectDaoJpa {
     private AuthorizationService authorizationService;
     @Autowired
     private UserGroupRepository userGroupRepository;
+    @Autowired
+    private ProjectNotesRepository projectNotesRepository;
+    @Autowired
+    private ProjectTasksRepository projectTasksRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Projects getProjects(String owner) {
@@ -338,6 +342,20 @@ public class ProjectDaoJpa {
         List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, projectId);
         userProjects.setOwnedProjects(GSON.toJson(hierarchy));
         this.userProjectsRepository.save(userProjects);
+
+        switch (ProjectType.getType(project.getType())) {
+            case TODO:
+                if (this.projectTasksRepository.existsById(projectId)) {
+                    this.projectTasksRepository.deleteById(projectId);
+                }
+                break;
+            case NOTE:
+                if (this.projectNotesRepository.existsById(projectId)) {
+                    this.projectNotesRepository.deleteById(projectId);
+                }
+                break;
+            default:
+        }
 
         // return generated events
         return Pair.of(generateEvents(requester, targetProjects), project);
