@@ -205,3 +205,5 @@ export const patchTaskRevisionContents = (
     etag: string
 ) => actions.TaskPatchRevisionContents({
     taskId: taskId, contentId: contentId, revisionContents: revisionContents, etag: etag});
+
+export const taskReceived = (task: Task | undefined) => actions.taskReceived({task: task});

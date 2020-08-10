@@ -12,7 +12,7 @@ import {
 import {
   deleteTransaction, deleteContent,
   getTransaction,
-  updateTransactionContents,
+  updateTransactionContents, transactionReceived,
 } from '../../features/transactions/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
@@ -63,6 +63,7 @@ type TransactionProps = {
   contents: Content[];
   deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
   updateTransactionContents: (transactionId: number) => void;
+  transactionReceived: (transaction: Transaction | undefined) => void;
 };
 
 interface TransactionPageHandler {
@@ -86,7 +87,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     getTransaction,
     setDisplayMore,
     setDisplayRevision,
-    deleteContent
+    deleteContent,
+    transactionReceived
   } = props;
 
   // get id of Transaction from oruter
@@ -104,22 +106,17 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   }, [transactionId]);
 
   useEffect(() => {
-    transaction && transaction.id && updateTransactionContents(transaction.id);
-    if (transaction) {
-      document.title = transaction.name;
-    }
-  }, [transaction]);
-
-
-  useEffect(() => {
-
     if (!transaction) {
       return;
     }
-    updateTransactionContents(transaction.id);
+    document.title = transaction.name;
+    transaction.id && updateTransactionContents(transaction.id);
     setDisplayMore(false);
     setDisplayRevision(false);
-
+    return () => {
+      console.log('leaving transaction page');
+      transactionReceived(undefined);
+    }
   }, [transaction]);
 
   if (!transaction) return null;
@@ -341,5 +338,6 @@ export default connect(mapStateToProps, {
   updateTransactionContents,
   deleteContent,
   setDisplayMore,
-  setDisplayRevision
+  setDisplayRevision,
+  transactionReceived
 })(TransactionPage);

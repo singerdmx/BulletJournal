@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import {
   completeTask, deleteContent,
   deleteTask,
-  getTask,
+  getTask, taskReceived,
   updateTaskContents,
 } from '../../features/tasks/actions';
 import { IState } from '../../store';
@@ -47,6 +47,7 @@ import { getTaskAssigneesPopoverContent } from '../../components/project-item/ta
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
 import {DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@ant-design/icons/lib";
+import {Task} from "../../features/tasks/interface";
 
 interface TaskPageHandler {
   content: Content | undefined;
@@ -61,6 +62,7 @@ interface TaskPageHandler {
   setDisplayMore: (displayMore: boolean) => void;
   setDisplayRevision: (displayRevision: boolean) => void;
   deleteContent: (taskId: number, contentId: number) => void;
+  taskReceived: (task: Task | undefined) => void;
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
@@ -74,7 +76,8 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     completeTask,
     setDisplayMore,
     setDisplayRevision,
-    deleteContent
+    deleteContent,
+    taskReceived
   } = props;
   // get id of task from router
   const { taskId } = useParams();
@@ -96,7 +99,10 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     updateTaskContents(task.id);
     setDisplayMore(false);
     setDisplayRevision(false);
-
+    return () => {
+      console.log('leaving task page');
+      taskReceived(undefined);
+    }
   }, [task]);
 
   if (!task) return null;
@@ -318,5 +324,6 @@ export default connect(mapStateToProps, {
   completeTask,
   deleteContent,
   setDisplayMore,
-  setDisplayRevision
+  setDisplayRevision,
+  taskReceived
 })(TaskPage);

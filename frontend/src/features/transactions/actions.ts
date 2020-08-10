@@ -1,6 +1,6 @@
 import { actions } from './reducer';
 import { History } from 'history';
-import { FrequencyType, LedgerSummaryType } from './interface';
+import {FrequencyType, LedgerSummaryType, Transaction} from './interface';
 import {ProjectItemUIType} from "../project/constants";
 
 export const updateTransactions = (
@@ -190,3 +190,6 @@ export const patchTransactionRevisionContents = (
     etag: string
 ) => actions.TransactionPatchRevisionContents({
     transactionId: transactionId, contentId: contentId, revisionContents: revisionContents, etag: etag});
+
+export const transactionReceived = (transaction: Transaction | undefined) =>
+    actions.transactionReceived({transaction: transaction});

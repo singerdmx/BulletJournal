@@ -5,7 +5,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 // features
 //actions
-import {deleteNote, getNote, updateNoteContents, deleteContent} from '../../features/notes/actions';
+import {deleteNote, getNote, updateNoteContents, deleteContent, noteReceived} from '../../features/notes/actions';
 
 import {IState} from '../../store';
 // components
@@ -27,6 +27,8 @@ import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-
 import {DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@ant-design/icons/lib";
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
+import {Note} from "../../features/notes/interface";
+import {actions} from "../../features/notes/reducer";
 
 interface NotePageHandler {
     contents: Content[];
@@ -37,6 +39,7 @@ interface NotePageHandler {
     setDisplayMore: (displayMore: boolean) => void;
     setDisplayRevision: (displayRevision: boolean) => void;
     deleteContent: (noteId: number, contentId: number) => void;
+    noteReceived: (note: Note | undefined) => void;
 }
 
 // get icons by string name
@@ -44,7 +47,8 @@ interface NotePageHandler {
 const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     // hook history in router
     const history = useHistory();
-    const {note, deleteNote, contents, content, getNote, updateNoteContents, setDisplayMore, setDisplayRevision, deleteContent} = props;
+    const {note, deleteNote, contents, content, getNote, updateNoteContents,
+        setDisplayMore, setDisplayRevision, deleteContent, noteReceived} = props;
     // get id of note from router
     const {noteId} = useParams();
     // state control drawer displaying
@@ -63,6 +67,10 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         updateNoteContents(note.id);
         setDisplayMore(false);
         setDisplayRevision(false);
+        return () => {
+            console.log('leaving note page');
+            noteReceived(undefined);
+        }
     }, [note]);
 
     // show drawer
@@ -224,5 +232,6 @@ export default connect(mapStateToProps, {
     updateNoteContents,
     deleteContent,
     setDisplayMore,
-    setDisplayRevision
+    setDisplayRevision,
+    noteReceived
 })(NotePage);
