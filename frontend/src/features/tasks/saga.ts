@@ -356,7 +356,7 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
     const task = yield call(completeTaskById, taskId, dateTime);
     const state: IState = yield select();
 
-    if (type === ProjectItemUIType.PROJECT) {
+    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAGE) {
       const data = yield call(fetchTasks, task.projectId);
       const tasks = yield data.json();
       yield put(
