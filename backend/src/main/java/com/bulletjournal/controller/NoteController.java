@@ -46,6 +46,7 @@ public class NoteController {
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/notes/{noteId}/contents/{contentId}/revisions/{revisionId}";
+    protected static final String REVISION_CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}/patchRevisionContents";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -299,5 +300,14 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);
+    }
+
+    @PostMapping(REVISION_CONTENT_ROUTE)
+    public void patchRevisionContents(@NotNull @PathVariable Long noteId,
+                                      @NotNull @PathVariable Long contentId,
+                                      @NotNull @RequestBody  List<String> revisionContents,
+                                      @RequestHeader(IF_NONE_MATCH) String etag) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.patchRevisionContentHistory(contentId, noteId, username, revisionContents, Optional.of(etag));
     }
 }
