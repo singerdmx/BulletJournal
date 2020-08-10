@@ -55,4 +55,12 @@ public class CategoryDaoJpa {
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteById(Long id) {
+        if (getById(id) == null) {
+            throw new ResourceNotFoundException("Category with id: " + id + " doesn't exist, cannot delete.");
+        }
+        categoryRepository.deleteById(id);
+    }
 }

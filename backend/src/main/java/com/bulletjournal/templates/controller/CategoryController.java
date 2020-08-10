@@ -2,6 +2,7 @@ package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.hierarchy.CategoryRelationsProcessor;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -13,17 +14,11 @@ import com.google.gson.Gson;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,7 +26,7 @@ public class CategoryController {
 
     public static final String CATEGORIES_ROUTE = "/api/categories";
 
-    public static final String CATEGORIES_HIERARCHY_ROUTE = "/api/categories/hierarchy";
+    public static final String CATEGORY_ROUTE = "/api/categories/{categoryId}";
 
     private static Gson GSON = new Gson();
 
@@ -52,10 +47,14 @@ public class CategoryController {
         this.userDaoJpa = userDaoJpa;
     }
 
+    @DeleteMapping(CATEGORY_ROUTE)
+    public List<Category> deleteCategory(@NotNull @PathVariable Long categoryId) {
+        categoryDaoJpa.deleteById(categoryId);
+        return getCategories();
+    }
+
     @GetMapping(CATEGORIES_ROUTE)
     public List<Category> getCategories() {
-        validateRequester();
-
         List<com.bulletjournal.templates.repository.model.Category> allCategories
             = categoryDaoJpa.getAllCategories();
         CategoriesHierarchy categoriesHierarchy = hierarchyDaoJpa.getHierarchies();
@@ -70,50 +69,20 @@ public class CategoryController {
         Map<Long, com.bulletjournal.templates.repository.model.Category> categoryIdMap
             = allCategories.stream().collect(
                 Collectors.toMap(com.bulletjournal.templates.repository.model.Category::getId, category -> category));
-        List<Category> ret = copyCategoriesToRepresentanalModelWithHierarchy(categoryIdMap, keptHierarchy);
+
+        List<Category> ret = new ArrayList<>(CategoryRelationsProcessor.processRelations(categoryIdMap, keptHierarchy));
         allCategories.stream().filter(category -> !processedIds.contains(category.getId()))
-            .forEach(category -> ret.add(category.toPresentationalModel()));
+            .forEach(category -> ret.add(category.toPresentationModel()));
+        ret.sort(Comparator.comparingLong(Category::getId));
         return ret;
     }
 
-    @PostMapping(CATEGORIES_HIERARCHY_ROUTE)
-    public void updateHierarchy(@NotNull @Valid @RequestBody List<Category> categoryList) {
+    @PutMapping(CATEGORIES_ROUTE)
+    public List<Category> updateCategoryRelations(@NotNull @Valid @RequestBody List<Category> categoryList) {
         validateRequester();
-        List<HierarchyItem> hierarchyItems
-            = categoryList.stream().map(this::categoryToHierarchyItem).collect(Collectors.toList());
-        hierarchyDaoJpa.updateHierarchy(GSON.toJson(hierarchyItems));
-    }
-
-    private HierarchyItem categoryToHierarchyItem(Category category) {
-        HierarchyItem ret = new HierarchyItem(category.getId());
-        for (Category childCategory : category.getSubCategories()) {
-            HierarchyItem childItem = categoryToHierarchyItem(childCategory);
-            ret.getS().add(childItem);
-        }
-        return ret;
-    }
-
-    private List<Category> copyCategoriesToRepresentanalModelWithHierarchy(
-        Map<Long, com.bulletjournal.templates.repository.model.Category> allCategoryIdMap,
-        List<HierarchyItem> keptHierarchy
-    ) {
-        List<Category> ret = new ArrayList<>();
-        for (HierarchyItem hierarchyItem : keptHierarchy) {
-            ret.add(copyCategory(allCategoryIdMap, hierarchyItem));
-        }
-        return ret;
-    }
-
-    private Category copyCategory(
-        Map<Long, com.bulletjournal.templates.repository.model.Category> allCategories,
-        HierarchyItem hierarchyItem
-    ) {
-        Category ret = allCategories.get(hierarchyItem.getId()).toPresentationalModel();
-        for (HierarchyItem childItem : hierarchyItem.getS()) {
-            Category childCategory = copyCategory(allCategories, childItem);
-            ret.getSubCategories().add(childCategory);
-        }
-        return ret;
+        String newHierarchy = CategoryRelationsProcessor.processRelations(categoryList);
+        hierarchyDaoJpa.updateHierarchy(newHierarchy);
+        return getCategories();
     }
 
     private void validateRequester() {

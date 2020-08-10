@@ -1,6 +1,5 @@
 package com.bulletjournal.templates;
 
-import com.bulletjournal.controller.models.RequestParams;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.templates.controller.CategoryController;
@@ -15,6 +14,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -26,9 +27,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Tests {@link com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa}
@@ -37,6 +36,8 @@ import java.util.List;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class CategoryControllerTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CategoryControllerTest.class);
 
     private static final String[] CATEGORY_NAMES = new String[]{"c0", "c1", "c2", "c3", "c4", "c5"};
     private static final String CATEGORY_DESCRIPTION = "fakeDescription";
@@ -60,8 +61,6 @@ public class CategoryControllerTest {
 
     private TestRestTemplate restTemplate = new TestRestTemplate();
 
-    private RequestParams requestParams;
-
     private final List<Category> categories = new ArrayList<>();
 
     private final Long[] categoriesIds = new Long[6];
@@ -73,7 +72,6 @@ public class CategoryControllerTest {
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @After
@@ -94,7 +92,78 @@ public class CategoryControllerTest {
 
         List<com.bulletjournal.templates.controller.model.Category> responseCategoryList
             = getCategories();
-        System.out.println(responseCategoryList);
+        if (!checkRelations(responseCategoryList, hierarchyItemList1)) {
+            LOGGER.error("category relations mismatch, expected: {}, actual: {}", hierarchyItemList1, categoryList1);
+            Assert.fail();
+        }
+
+        /** Original:
+         *    0
+         *    |----1
+         *    |    |----2
+         *    |    |----3
+         *    |
+         *    |----4
+         *
+         *    5
+         *
+         *  After remove 1, should become
+         *    0
+         *    |----4
+         *
+         *    5
+         *    2
+         *    3
+         */
+        // build expected hierarchy list
+        HierarchyItem item5 = new HierarchyItem(categoriesIds[5]);
+        HierarchyItem item4 = new HierarchyItem(categoriesIds[4]);
+        HierarchyItem item3 = new HierarchyItem(categoriesIds[3]);
+        HierarchyItem item2 = new HierarchyItem(categoriesIds[2]);
+        HierarchyItem item0 = new HierarchyItem(categoriesIds[0]);
+        item0.getS().add(item4);
+        List<HierarchyItem> expectedHierarchyItems = new ArrayList<>();
+        expectedHierarchyItems.add(item0);
+        expectedHierarchyItems.add(item2);
+        expectedHierarchyItems.add(item3);
+        expectedHierarchyItems.add(item5);
+        expectedHierarchyItems.sort(Comparator.comparingLong(HierarchyItem::getId));
+
+        responseCategoryList = deleteCategory(categoriesIds[1]);
+        checkRelations(responseCategoryList, expectedHierarchyItems);
+    }
+
+    private boolean checkRelations(
+        List<com.bulletjournal.templates.controller.model.Category> categoryList,
+        List<HierarchyItem> hierarchyItemList
+    ) {
+        if (categoryList.size() != hierarchyItemList.size()) {
+            return false;
+        }
+        for (int i = 0; i < categoryList.size(); ++i) {
+            if (!checkRelation(categoryList.get(i), hierarchyItemList.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkRelation(
+        com.bulletjournal.templates.controller.model.Category category,
+        HierarchyItem hierarchyItem
+    ) {
+        if (!Objects.equals(category.getId(), hierarchyItem.getId())) {
+            return false;
+        }
+        if (category.getSubCategories().size() != hierarchyItem.getS().size()) {
+            return false;
+        }
+        for (int i = 0; i < category.getSubCategories().size(); ++i) {
+            if (!checkRelation(category.getSubCategories().get(i), hierarchyItem.getS().get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private List<com.bulletjournal.templates.controller.model.Category> getCategories() {
@@ -108,12 +177,25 @@ public class CategoryControllerTest {
         return Arrays.asList(response.getBody());
     }
 
+    private List<com.bulletjournal.templates.controller.model.Category> deleteCategory(Long id) {
+        ResponseEntity<com.bulletjournal.templates.controller.model.Category[]> response
+            = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + CategoryController.CATEGORY_ROUTE,
+            HttpMethod.DELETE,
+            TestHelpers.actAsOtherUser(null, USER),
+            com.bulletjournal.templates.controller.model.Category[].class,
+            categoriesIds[0]);
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+        return Arrays.asList(response.getBody());
+    }
+
     private void updateHierarchy(List<com.bulletjournal.templates.controller.model.Category> categoryList) {
-        ResponseEntity<?> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + CategoryController.CATEGORIES_HIERARCHY_ROUTE,
-                HttpMethod.POST,
+        ResponseEntity<com.bulletjournal.templates.controller.model.Category[]> response
+            = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + CategoryController.CATEGORIES_ROUTE,
+                HttpMethod.PUT,
                 TestHelpers.actAsOtherUser(categoryList, USER),
-                void.class);
+                com.bulletjournal.templates.controller.model.Category[].class);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
@@ -141,6 +223,7 @@ public class CategoryControllerTest {
         List<HierarchyItem> hierarchyItems = new ArrayList<>();
         hierarchyItems.add(item0);
         hierarchyItems.add(item5);
+        hierarchyItems.sort(Comparator.comparingLong(HierarchyItem::getId));
         this.hierarchyItemList1 = hierarchyItems;
     }
 

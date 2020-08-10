@@ -11,10 +11,8 @@ public class Category {
     @Expose
     private Long id;
 
-    @Expose
     private String name;
 
-    @Expose
     private String description;
 
     @Expose
@@ -87,5 +85,11 @@ public class Category {
             ", description='" + description + '\'' +
             ", subCategories=" + subCategories +
             '}';
+    }
+
+    public void clone(Category category) {
+        this.setId(category.getId());
+        this.setName(category.getName());
+        this.setDescription(category.getDescription());
     }
 }

@@ -69,7 +69,7 @@ public class Category extends AuditModel {
         return Objects.hash(getId(), getName(), getDescription());
     }
 
-    public com.bulletjournal.templates.controller.model.Category toPresentationalModel() {
+    public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Category(id, name, description, new ArrayList<>());
     }
 }
