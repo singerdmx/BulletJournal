@@ -587,6 +587,8 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
       );
       yield put(recentItemsReceived(recentItems));
     }
+
+    yield put(tasksActions.taskReceived({task: undefined}));
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
@@ -629,6 +631,8 @@ function* deleteTasks(action: PayloadAction<DeleteTasks>) {
         })
       );
     }
+
+    yield put(tasksActions.taskReceived({task: undefined}));
   } catch (error) {
     yield call(message.error, `Delete Tasks Error Received: ${error}`);
   }
@@ -676,6 +680,8 @@ function* completeTasks(action: PayloadAction<CompleteTasks>) {
         })
       );
     }
+
+    yield put(tasksActions.taskReceived({task: undefined}));
   } catch (error) {
     yield call(message.error, `complete Tasks Error Received: ${error}`);
   }

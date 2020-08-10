@@ -245,6 +245,8 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
       const recentItems = state.recent.items.filter((t) => t.contentType !== ContentType.TRANSACTION || t.id !== transactionId);
       yield put(recentItemsReceived(recentItems));
     }
+
+    yield put(transactionsActions.transactionReceived({transaction: undefined}));
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
@@ -286,6 +288,7 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
         ledgerSummary: ledgerSummary,
       })
     );
+    yield put(transactionsActions.transactionReceived({transaction: undefined}));
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }

@@ -357,6 +357,8 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
       const recentItems = state.recent.items.filter((t) => t.contentType !== ContentType.NOTE || t.id !== noteId);
       yield put(recentItemsReceived(recentItems));
     }
+
+    yield put(notesActions.noteReceived({note: undefined}));
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
   }
@@ -397,6 +399,8 @@ function* notesDelete(action: PayloadAction<DeleteNotes>) {
         })
       );
     }
+
+    yield put(notesActions.noteReceived({note: undefined}));
   } catch (error) {
     yield call(message.error, `Delete Notes Error Received: ${error}`);
   }
