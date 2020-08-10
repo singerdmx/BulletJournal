@@ -180,6 +180,37 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void patchRevisionContentHistory(Long contentId, Long projectItemId,
+                                                                         String requester, List<String> revisionContents,
+                                                                         Optional<String> etag) {
+        T projectItem = getProjectItem(projectItemId, requester);
+        K content = getContent(contentId, requester);
+        int n = revisionContents.size();
+        String lastRevisionContent = revisionContents.get(n - 1);
+        LOGGER.info(GSON.toJson(revisionContents));
+
+        synchronized (this) {
+            // read etag from DB content text column
+            String noteEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE, content.getText());
+            LOGGER.info("web etag =" + etag + " \t db etag =" + noteEtag);
+            if (!Objects.equals(etag, noteEtag)) {
+                throw new BadRequestException("Invalid etag");
+            }
+            content.setText(lastRevisionContent);
+            this.getContentJpaRepository().save(content);
+        }
+
+        // iterate pairs
+        for (int i = 0; i < n - 1; ++i) {
+            String first = revisionContents.get(i);
+            String second = revisionContents.get(i + 1);
+            LOGGER.info("first=" + first + "\t second=" + second);
+            updateRevision(content, requester, second, first);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Pair<K, T> updateContent(Long contentId, Long projectItemId, String requester,
                                                                  UpdateContentParams updateContentParams, Optional<String> etag) {
         T projectItem = getProjectItem(projectItemId, requester);
