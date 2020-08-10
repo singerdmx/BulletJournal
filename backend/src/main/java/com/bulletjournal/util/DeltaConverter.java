@@ -11,7 +11,7 @@ import java.util.*;
 
 public class DeltaConverter {
     // https://github.com/memspace/zefyr/blob/master/packages/notus/lib/src/document/leaf.dart
-    private static String kPlainTextPlaceholder = new String(Character.toChars(0x200b));
+    public static String kPlainTextPlaceholder = new String(Character.toChars(0x200b));
     private static final Logger LOGGER = LoggerFactory.getLogger(DeltaConverter.class);
     private static final Gson GSON = new Gson();
 
@@ -272,7 +272,7 @@ public class DeltaConverter {
             mobileElementAttributesEmbed.put("source", imageVal);
             mobileElementAttributes.put("embed", mobileElementAttributesEmbed);
 
-            mobileElement.put("insert", "");
+            mobileElement.put("insert", kPlainTextPlaceholder);
             mobileElement.put("attributes", mobileElementAttributes);
             return mobileElement;
         }

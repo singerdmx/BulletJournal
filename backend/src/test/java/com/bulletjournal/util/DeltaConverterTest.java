@@ -45,7 +45,8 @@ public class DeltaConverterTest {
     @Test
     public void testConvertWebToMobileImage() {
         String web = "{\"delta\":{\"ops\":[{\"insert\":{\"image\":\"https://s3.us-west-1.amazonaws.com/bulletjournals/202008060434000-4821de84-23b3-47f7-aac6-eed189fa9ac7-WeChat_Image_20191116032740.jpg\"}},{\"insert\":\"\\n\"}]}}";
-        String mobileExpected = "[{\"insert\":\"\",\"attributes\":{\"embed\":{\"type\":\"image\",\"source\":\"https://s3.us-west-1.amazonaws.com/bulletjournals/202008060434000-4821de84-23b3-47f7-aac6-eed189fa9ac7-WeChat_Image_20191116032740.jpg\"}}},{\"insert\":\"\\n\"}]";
+        String mobileExpected = "[{\"insert\":\"" + DeltaConverter.kPlainTextPlaceholder +
+                "\",\"attributes\":{\"embed\":{\"type\":\"image\",\"source\":\"https://s3.us-west-1.amazonaws.com/bulletjournals/202008060434000-4821de84-23b3-47f7-aac6-eed189fa9ac7-WeChat_Image_20191116032740.jpg\"}}},{\"insert\":\"\\n\"}]";
         Map<String, Object> webMap = GSON.fromJson(web, Map.class);
         List mobile = DeltaConverter.deltaTomDelta((Map) webMap.get("delta"));
         Assert.assertEquals(mobileExpected, GSON.toJson(mobile));
