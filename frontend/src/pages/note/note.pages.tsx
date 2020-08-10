@@ -67,10 +67,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         updateNoteContents(note.id);
         setDisplayMore(false);
         setDisplayRevision(false);
-        return () => {
-            console.log('leaving note page');
-            noteReceived(undefined);
-        }
     }, [note]);
 
     // show drawer

@@ -99,10 +99,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     updateTaskContents(task.id);
     setDisplayMore(false);
     setDisplayRevision(false);
-    return () => {
-      console.log('leaving task page');
-      taskReceived(undefined);
-    }
+
   }, [task]);
 
   if (!task) return null;

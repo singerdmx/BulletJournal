@@ -113,10 +113,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     transaction.id && updateTransactionContents(transaction.id);
     setDisplayMore(false);
     setDisplayRevision(false);
-    return () => {
-      console.log('leaving transaction page');
-      transactionReceived(undefined);
-    }
   }, [transaction]);
 
   if (!transaction) return null;

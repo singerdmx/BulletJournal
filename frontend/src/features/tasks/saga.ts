@@ -455,6 +455,8 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
       );
       yield put(recentItemsReceived(recentItems));
     }
+
+    yield put(tasksActions.taskReceived({task: undefined}));
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
   }
