@@ -10,7 +10,6 @@ import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
-import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.NoteRelationsProcessor;
@@ -33,7 +32,6 @@ import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
@@ -69,47 +67,40 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
 
-        if (project.isShared()) {
-            List<Note> notes = this.sharedProjectItemDaoJpa.
-                    getSharedProjectItems(requester, ContentType.NOTE).stream()
-                    .filter(obj -> obj instanceof Note)
-                    .map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList());
+        // source of truth
+        List<Note> notes = project.isShared() ? this.sharedProjectItemDaoJpa.
+                getSharedProjectItems(requester, ContentType.NOTE).stream()
+                .filter(obj -> obj instanceof Note)
+                .map(projectItemModel -> (Note) projectItemModel).collect(Collectors.toList()) :
+                this.noteRepository.findNoteByProject(project);
 
-            List<com.bulletjournal.controller.models.Note> ret = new ArrayList<>();
+        List<com.bulletjournal.controller.models.Note> ret = new ArrayList<>();
+        if (projectNotesOptional.isPresent()) {
+            ProjectNotes projectNotes = projectNotesOptional.get(); // this might have notes that has been deleted
+            Set<Long> existingIds = notes.stream().map(note -> note.getId()).collect(Collectors.toSet());
 
-            if (projectNotesOptional.isPresent()) {
-                ProjectNotes projectNotes = projectNotesOptional.get();
-                Set<Long> existingIds = notes.stream().map(note -> note.getId()).collect(Collectors.toSet());
+            // left is real hierarchy but missing orphaned ones, right is processed ones
+            Pair<List<HierarchyItem>, Set<Long>> hierarchy =
+                    HierarchyProcessor.findAllIds(projectNotes.getNotes(), existingIds);
 
-                Pair<List<HierarchyItem>, Set<Long>> hierarchy =
-                        HierarchyProcessor.findAllIds(projectNotes.getNotes(), existingIds);
+            List<HierarchyItem> keptHierarchy = hierarchy.getLeft();
+            Set<Long> processedIds = hierarchy.getRight();
 
-                List<HierarchyItem> keptHierarchy = hierarchy.getLeft();
-                Set<Long> processedIds = hierarchy.getRight();
+            // add processed ones
+            final Map<Long, Note> noteMap = notes.stream().filter(n -> processedIds.contains(n.getId()))
+                    .collect(Collectors.toMap(n -> n.getId(), n -> n));
 
-                final Map<Long, Note> noteMap = notes.stream().filter(n -> processedIds.contains(n.getId()))
-                        .collect(Collectors.toMap(n -> n.getId(), n -> n));
+            ret.addAll(NoteRelationsProcessor.processRelations(noteMap, keptHierarchy).stream()
+                    .map(note -> addLabels(note, noteMap)).collect(Collectors.toList()));
 
-                ret.addAll(NoteRelationsProcessor.processRelations(noteMap, keptHierarchy).stream()
-                        .map(note -> addLabels(note, noteMap)).collect(Collectors.toList()));
-
-                notes = notes.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
-            }
-
-            ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(notes.stream()
-                    .map(Note::toPresentationModel).collect(Collectors.toList())));
-
-            return ret;
+            // add orphaned ones(not processed means orphaned)
+            notes = notes.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
         }
 
-        if (!projectNotesOptional.isPresent()) {
-            return Collections.emptyList();
-        }
-        ProjectNotes projectNotes = projectNotesOptional.get();
-        final Map<Long, Note> notesMap = this.noteRepository.findNoteByProject(project).stream()
-                .collect(Collectors.toMap(n -> n.getId(), n -> n));
-        return NoteRelationsProcessor.processRelations(notesMap, projectNotes.getNotes()).stream()
-                .map(n -> addLabels(n, notesMap)).collect(Collectors.toList());
+        ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(
+                notes.stream().sorted(Comparator.comparingLong(Note::getId))
+                        .map(Note::toPresentationModel).collect(Collectors.toList())));
+        return ret;
     }
 
     private com.bulletjournal.controller.models.Note addLabels(com.bulletjournal.controller.models.Note note,
@@ -162,13 +153,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         if (createNoteParams.getLabels() != null && !createNoteParams.getLabels().isEmpty()) {
             note.setLabels(createNoteParams.getLabels());
         }
-        note = this.noteRepository.save(note);
-        final ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId).orElseGet(ProjectNotes::new);
-        String newRelations = HierarchyProcessor.addItem(projectNotes.getNotes(), note.getId());
-        projectNotes.setNotes(newRelations);
-        projectNotes.setProjectId(projectId);
-        projectNotesRepository.save(projectNotes);
-        return note;
+        return this.noteRepository.save(note);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -212,7 +197,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateUserNotes(Long projectId, List<com.bulletjournal.controller.models.Note> notes) {
+    public void updateUserNotes(
+            Long projectId, List<com.bulletjournal.controller.models.Note> notes, String requester) {
+        this.projectDaoJpa.getProject(projectId, requester);
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
         final ProjectNotes projectNotes = projectNotesOptional.isPresent() ? projectNotesOptional.get()
                 : new ProjectNotes();
@@ -225,40 +212,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Pair<List<Event>, Note> deleteNote(String requester, Long noteId) {
         Note note = this.getProjectItem(noteId, requester);
-
-        Project project = deleteNoteAndAdjustRelations(requester, note,
-                (targetNotes) -> this.noteRepository.deleteAll(targetNotes), (target) -> {
-                });
-
-        return Pair.of(generateEvents(note, requester, project), note);
-    }
-
-    private Project deleteNoteAndAdjustRelations(String requester, Note note, Consumer<List<Note>> targetNotesOperator,
-                                                 Consumer<HierarchyItem> targetOperator) {
-        Project project = note.getProject();
-        Long projectId = project.getId();
-        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
-                Operation.DELETE, projectId, project.getOwner());
-
-        ProjectNotes projectNotes = this.projectNotesRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("ProjectNotes by " + projectId + " not found"));
-
-        String relations = projectNotes.getNotes();
-
-        // delete notes and its subNotes
-        List<Note> targetNotes = this.noteRepository
-                .findAllById(HierarchyProcessor.getSubItems(relations, note.getId()));
-        targetNotesOperator.accept(targetNotes);
-
-        // Update note relations
-        HierarchyItem[] target = new HierarchyItem[1];
-        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, note.getId(), target);
-        targetOperator.accept(target[0]);
-
-        projectNotes.setNotes(GSON.toJson(hierarchy));
-        this.projectNotesRepository.save(projectNotes);
-
-        return project;
+        this.noteRepository.delete(note);
+        return Pair.of(generateEvents(note, requester, note.getProject()), note);
     }
 
     private List<Event> generateEvents(Note note, String requester, Project project) {
@@ -287,18 +242,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.UPDATE, project.getId(), project.getOwner());
 
-        deleteNoteAndAdjustRelations(requester, note, (targetNotes) -> targetNotes.forEach((t) -> {
-            t.setProject(project);
-            this.noteRepository.save(t);
-        }), (target) -> {
-            final ProjectNotes projectNotes = this.projectNotesRepository.findById(targetProject)
-                    .orElseGet(ProjectNotes::new);
-            String newRelations = HierarchyProcessor.addItem(projectNotes.getNotes(), target);
-            projectNotes.setNotes(newRelations);
-            projectNotes.setProjectId(targetProject);
-            this.projectNotesRepository.save(projectNotes);
-        });
-
+        note.setProject(project);
+        noteRepository.save(note);
         return Pair.of(note, project);
     }
 

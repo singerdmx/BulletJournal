@@ -15,7 +15,12 @@ public class NoteRelationsProcessor {
             .excludeFieldsWithoutExposeAnnotation().create();
     private static final Gson HIERARCHY_ITEM_GSON = new Gson();
 
-    public static List<Note> processRelations(
+    public static List<Note> processRelations(Map<Long, com.bulletjournal.repository.models.Note> noteMap,
+                                              List<HierarchyItem> relations) {
+        return processRelations(noteMap, HIERARCHY_ITEM_GSON.toJson(relations));
+    }
+
+    private static List<Note> processRelations(
             Map<Long, com.bulletjournal.repository.models.Note> noteMap, String relations) {
         Note[] list = GSON.fromJson(
                 relations.replace(HierarchyItem.SUB_ITEMS_KEY_REPLACEMENT, SUB_NOTES_KEY), Note[].class);
@@ -24,11 +29,6 @@ public class NoteRelationsProcessor {
             notes.add(merge(noteMap, note));
         }
         return notes;
-    }
-
-    public static List<Note> processRelations(Map<Long, com.bulletjournal.repository.models.Note> noteMap,
-                                              List<HierarchyItem> relations) {
-        return processRelations(noteMap, HIERARCHY_ITEM_GSON.toJson(relations));
     }
 
     private static Note merge(Map<Long, com.bulletjournal.repository.models.Note> noteMap, Note cur) {

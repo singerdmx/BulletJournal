@@ -168,18 +168,10 @@ public class NoteController {
     }
 
     @PutMapping(NOTES_ROUTE)
-    public ResponseEntity<List<Note>> updateNoteRelations(@NotNull @PathVariable Long projectId,
-            @Valid @RequestBody List<Note> notes, @RequestHeader(IF_NONE_MATCH) Optional<String> notesEtag) {
+    public ResponseEntity<List<Note>> updateNoteRelations(
+            @NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        if (notesEtag.isPresent()) {
-            List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
-            String expectedEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE, noteList);
-            if (!Objects.equals(expectedEtag, notesEtag.get())) {
-                throw new BadRequestException("Invalid Etag");
-            }
-        }
-        this.noteDaoJpa.updateUserNotes(projectId, notes);
+        this.noteDaoJpa.updateUserNotes(projectId, notes, username);
         return getNotes(projectId, null, null, null, null, null);
     }
 
