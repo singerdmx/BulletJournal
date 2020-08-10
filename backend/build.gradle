@@ -74,7 +74,8 @@ dependencies {
 sourceSets {
     main {
         proto {
-            srcDir '../protobuf/daemon'
+            srcDir '../protobuf'
+            exclude 'third_party/**'
         }
     }
 }
