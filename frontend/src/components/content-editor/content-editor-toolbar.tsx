@@ -4,8 +4,11 @@ import 'quill-emoji/dist/quill-emoji.css';
 import 'react-quill/dist/quill.snow.css';
 import { message } from 'antd';
 import axios from 'axios';
+import ImageResize from '../../utils/image-resize/ImageResize';
 
-// Custom Undo button icon component for Quill editor. You can import it directly
+Quill.register('modules/imageResize', ImageResize);
+
+// Custom Undo button çicon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
 // handle them correctly
 // const CustomUndo = () => (
@@ -116,6 +119,9 @@ Quill.register(Font, true);
 
 // Modules object for setting up the Quill editor
 export const modules = {
+  imageResize:{
+    displaySize: true
+  },
   toolbar: {
     container: [
       [
