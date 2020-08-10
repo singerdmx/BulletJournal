@@ -7,7 +7,6 @@ WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
 
 # Copy 
 COPY servers/. ./servers/.
-COPY protobuf/. ./protobuf/.
 COPY go.mod .
 COPY Makefile .
 

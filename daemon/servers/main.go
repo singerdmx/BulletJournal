@@ -5,6 +5,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
+	"github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -79,7 +80,11 @@ func main() {
 		}
 	}()
 
+	jobScheduler := scheduler.NewJobScheduler()
+	jobScheduler.Start()
+
 	<-shutdown
+	jobScheduler.Stop()
 	rpcServer.GracefulStop()
 	err = httpServer.Shutdown(context.Background())
 	if err != nil {
