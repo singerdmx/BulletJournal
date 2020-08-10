@@ -308,6 +308,6 @@ public class NoteController {
                                       @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
                                       @RequestHeader(IF_NONE_MATCH) String etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.patchRevisionContentHistory(contentId, noteId, username, revisionContentsParams.getRevisionContents(), Optional.of(etag));
+        this.noteDaoJpa.patchRevisionContentHistory(contentId, noteId, username, revisionContentsParams.getRevisionContents(), etag);
     }
 }

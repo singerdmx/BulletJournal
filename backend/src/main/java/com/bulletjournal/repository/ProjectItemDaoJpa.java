@@ -182,7 +182,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> void patchRevisionContentHistory(Long contentId, Long projectItemId,
                                                                          String requester, List<String> revisionContents,
-                                                                         Optional<String> etag) {
+                                                                         String etag) {
         T projectItem = getProjectItem(projectItemId, requester);
         K content = getContent(contentId, requester);
         int n = revisionContents.size();
