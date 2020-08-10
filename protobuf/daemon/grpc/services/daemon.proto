@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package services;
 
-import "grpc/types/join_group_events.proto";
+import "daemon/grpc/types/join_group_events.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services";
