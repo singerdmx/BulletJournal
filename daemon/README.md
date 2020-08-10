@@ -3,8 +3,6 @@
 Run the following to initialize the project
 ```
 brew install go
-brew install protobuf
-go get -u github.com/golang/protobuf/protoc-gen-go
 
 git clone https://github.com/singerdmx/BulletJournal.git
 cd <PATH to BulletJournal>/daemon
