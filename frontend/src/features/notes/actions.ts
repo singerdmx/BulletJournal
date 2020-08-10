@@ -104,3 +104,11 @@ export const getNotesByOrder = (
     startDate: startDate,
     endDate: endDate,
   });
+
+export const patchNoteRevisionContents = (
+    noteId: number,
+    contentId: number,
+    revisionContents: string[],
+    etag: string
+) => actions.NotePatchRevisionContents({
+    noteId: noteId, contentId: contentId, revisionContents: revisionContents, etag: etag});

@@ -182,3 +182,11 @@ export const getTransactionsByPayer = (
     endDate: endDate,
     payer: payer,
   });
+
+export const patchTransactionRevisionContents = (
+    transactionId: number,
+    contentId: number,
+    revisionContents: string[],
+    etag: string
+) => actions.TransactionPatchRevisionContents({
+    transactionId: transactionId, contentId: contentId, revisionContents: revisionContents, etag: etag});

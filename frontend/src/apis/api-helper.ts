@@ -20,12 +20,19 @@ export function doFetch(endpoint: string, etag: any = undefined) {
   });
 }
 
-export function doPost(endpoint: string, body?: string) {
+export function doPost(endpoint: string, body?: string, etag?: string) {
   if (process.env.REACT_APP_ENV === 'debug') {
     console.log(endpoint);
   }
+
+  let headers = {} as any;
+  if (etag) {
+    headers = {'Content-Type': 'application/json', 'request-id': uuidv4(), 'If-None-Match': etag};
+  } else {
+    headers = {'Content-Type': 'application/json', 'request-id': uuidv4()};
+  }
   return fetch(endpoint, {
-    headers: {'Content-Type': 'application/json', 'request-id': uuidv4()},
+    headers: headers,
     method: 'POST',
     body: body
   }).then(res => {

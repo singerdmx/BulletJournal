@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/singerdmx/BulletJournal/protobuf/grpc/services"
-	"github.com/singerdmx/BulletJournal/protobuf/grpc/types"
+	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
+	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"google.golang.org/grpc"
 	"log"
 	"net"

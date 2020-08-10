@@ -146,6 +146,13 @@ export type NotesByOrderAction = {
   notesByOrder: Array<Note>;
 };
 
+export type PatchRevisionContents = {
+  noteId: number;
+  contentId: number;
+  revisionContents: string[];
+  etag: string;
+}
+
 let initialState = {
   note: undefined as Note | undefined,
   contents: [] as Array<Content>,
@@ -237,6 +244,7 @@ const slice = createSlice({
     NoteSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
     NoteRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
     NoteRemoveShared: (state, action: PayloadAction<RemoveShared>) => state,
+    NotePatchRevisionContents: (state, action: PayloadAction<PatchRevisionContents>) => state,
   },
 });
 

@@ -16,7 +16,7 @@ import {
   GetTasksByAssignee,
   GetTasksByOrder,
   MoveTask,
-  PatchContent,
+  PatchContent, PatchRevisionContents,
   PatchTask,
   PutTask,
   RemoveShared,
@@ -59,6 +59,7 @@ import {
   uncompleteTaskById,
   updateContent,
   updateTask,
+  patchRevisionContents
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
@@ -1012,6 +1013,15 @@ function* getSearchCompletedTasks(
   }
 }
 
+function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>) {
+  try {
+    const {taskId, contentId, revisionContents, etag} = action.payload;
+    yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
+  } catch (error) {
+    yield call(message.error, `patchTaskRevisionContents Error Received: ${error}`);
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -1062,5 +1072,6 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TasksDelete.type, deleteTasks),
     yield takeLatest(tasksActions.TasksComplete.type, completeTasks),
     yield takeLatest(tasksActions.TaskStatusSet.type, setTaskStatus),
+    yield takeLatest(tasksActions.TaskPatchRevisionContents.type, patchTaskRevisionContents),
   ]);
 }

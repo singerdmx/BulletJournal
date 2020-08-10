@@ -217,6 +217,13 @@ export type SetTaskStatus = {
   taskStatus: TaskStatus;
 };
 
+export type PatchRevisionContents = {
+  taskId: number;
+  contentId: number;
+  revisionContents: string[];
+  etag: string;
+}
+
 let initialState = {
   addTaskVisible: false,
   contents: [] as Array<Content>,
@@ -365,6 +372,7 @@ const slice = createSlice({
     TaskContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
     TaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     TaskStatusSet: (state, action: PayloadAction<SetTaskStatus>) => state,
+    TaskPatchRevisionContents: (state, action: PayloadAction<PatchRevisionContents>) => state,
   },
 });
 

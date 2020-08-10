@@ -1,17 +1,19 @@
 import React from 'react';
-import { Content, ProjectItem } from '../../features/myBuJo/interface';
+import {Content, ProjectItem} from '../../features/myBuJo/interface';
 import ContentEditorDrawer from '../content-editor/content-editor-drawer.component';
 import RevisionDrawer from '../revision/revision-drawer.component';
 import './content-item.styles.less';
-import { Project } from '../../features/project/interface';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import {
-  setDisplayMore,
-  setDisplayRevision,
-} from '../../features/content/actions';
+import {Project} from '../../features/project/interface';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {setDisplayMore, setDisplayRevision,} from '../../features/content/actions';
 import Quill, {DeltaStatic} from "quill";
 import ReactQuill from "react-quill";
+import {patchTransactionRevisionContents} from "../../features/transactions/actions";
+import {patchTaskRevisionContents} from "../../features/tasks/actions";
+import {patchNoteRevisionContents} from "../../features/notes/actions";
+import {ContentType} from "../../features/myBuJo/constants";
+
 const Delta = Quill.import('delta');
 
 type ContentProps = {
@@ -22,6 +24,24 @@ type ContentProps = {
   displayRevision: boolean;
   setDisplayMore: (displayMore: boolean) => void;
   setDisplayRevision: (displayRevision: boolean) => void;
+  patchNoteRevisionContents: (
+      noteId: number,
+      contentId: number,
+      revisionContents: string[],
+      etag: string
+  ) => void;
+  patchTaskRevisionContents: (
+      taskId: number,
+      contentId: number,
+      revisionContents: string[],
+      etag: string
+  ) => void;
+  patchTransactionRevisionContents: (
+      transactionId: number,
+      contentId: number,
+      revisionContents: string[],
+      etag: string
+  ) => void;
 };
 
 export const isContentEditable = (
@@ -52,6 +72,9 @@ const ContentItem: React.FC<ContentProps> = ({
   displayRevision,
   setDisplayRevision,
   setDisplayMore,
+  patchNoteRevisionContents,
+  patchTaskRevisionContents,
+  patchTransactionRevisionContents
 }) => {
   const contentJson = JSON.parse(content.text);
   let delta = contentJson['delta'];
@@ -74,7 +97,21 @@ const ContentItem: React.FC<ContentProps> = ({
     console.log(delta)
     console.log('revisionContents');
     console.log(revisionContents)
+    if (targetContent) {
+      switch (projectItem.contentType) {
+        case ContentType.TASK:
+          patchTaskRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
+          break;
+        case ContentType.NOTE:
+          patchNoteRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
+          break;
+        case ContentType.TRANSACTION:
+          patchTransactionRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
+          break;
+      }
+    }
   }
+
   let contentHtml = contentJson['###html###'];
   if (!contentHtml) {
     contentHtml = createHTML(new Delta(delta));
@@ -141,10 +178,13 @@ const ContentItem: React.FC<ContentProps> = ({
 const mapStateToProps = (state: IState) => ({
   displayMore: state.content.displayMore,
   displayRevision: state.content.displayRevision,
-  targetContent: state.content.content
+  targetContent: state.content.content,
 });
 
 export default connect(mapStateToProps, {
   setDisplayMore,
   setDisplayRevision,
+  patchNoteRevisionContents,
+  patchTaskRevisionContents,
+  patchTransactionRevisionContents
 })(ContentItem);
