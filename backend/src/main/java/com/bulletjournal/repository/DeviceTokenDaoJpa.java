@@ -24,8 +24,7 @@ public class DeviceTokenDaoJpa {
             throw new ResourceAlreadyExistException("DeviceToken " + token + " already exists");
         }
         DeviceToken deviceToken = new DeviceToken(userName, token);
-        deviceTokenRepository.save(deviceToken);
-        return deviceToken;
+        return deviceTokenRepository.save(deviceToken);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -49,4 +49,12 @@ public class CategoriesHierarchy {
     public int hashCode() {
         return Objects.hash(getId(), getHierarchy());
     }
+
+    @Override
+    public String toString() {
+        return "CategoriesHierarchy{" +
+            "id=" + id +
+            ", hierarchy='" + hierarchy + '\'' +
+            '}';
+    }
 }
