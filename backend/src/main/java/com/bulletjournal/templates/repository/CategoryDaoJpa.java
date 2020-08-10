@@ -46,7 +46,7 @@ public class CategoryDaoJpa {
     public Category getById(Long id) {
         Category category = categoryRepository.getById(id);
         if (category == null) {
-            throw new ResourceNotFoundException("Category with id " + id + "doesn't exist");
+            throw new ResourceNotFoundException("Category with id " + id + " doesn't exist");
         }
         return category;
     }
@@ -58,7 +58,7 @@ public class CategoryDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteById(Long id) {
-        if (getById(id) == null) {
+        if (!this.categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category with id: " + id + " doesn't exist, cannot delete.");
         }
         categoryRepository.deleteById(id);
