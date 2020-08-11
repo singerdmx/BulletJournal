@@ -73,7 +73,7 @@ public class NotificationDaoJpa implements Etaggable {
         sendEmail(joinGroupEventNotifications);
     }
 
-    public void sendEmail(List<Notification> joinGroupEventNotifications) {
+    private void sendEmail(List<Notification> joinGroupEventNotifications) {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
