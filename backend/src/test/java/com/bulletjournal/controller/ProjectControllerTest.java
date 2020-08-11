@@ -449,7 +449,7 @@ public class ProjectControllerTest {
                 Note[].class,
                 note.getProjectId());
         Note[] notes = getResponse.getBody();
-        assertEquals(0, notes.length);
+        assertEquals(2, notes.length);
     }
 
     private void createTasks(Project project, Project projectToMoveTo, List<Label> labels) {

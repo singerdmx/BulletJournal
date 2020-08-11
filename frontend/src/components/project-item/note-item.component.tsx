@@ -59,7 +59,7 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Popconfirm
-          title="Deleting Note also deletes its child notes. Are you sure?"
+          title="Are you sure?"
           okText="Yes"
           cancelText="No"
           onConfirm={() => deleteNote(note.id, type)}
@@ -89,7 +89,7 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
         mode="div"
       />
       <Popconfirm
-        title="Deleting Note also deletes its child notes. Are you sure?"
+        title="Are you sure?"
         okText="Yes"
         cancelText="No"
         onConfirm={() => deleteNote(note.id, type)}

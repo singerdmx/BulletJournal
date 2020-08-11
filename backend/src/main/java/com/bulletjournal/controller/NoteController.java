@@ -4,7 +4,6 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
@@ -25,7 +24,6 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -168,18 +166,10 @@ public class NoteController {
     }
 
     @PutMapping(NOTES_ROUTE)
-    public ResponseEntity<List<Note>> updateNoteRelations(@NotNull @PathVariable Long projectId,
-            @Valid @RequestBody List<Note> notes, @RequestHeader(IF_NONE_MATCH) Optional<String> notesEtag) {
+    public ResponseEntity<List<Note>> updateNoteRelations(
+            @NotNull @PathVariable Long projectId, @Valid @RequestBody List<Note> notes) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        if (notesEtag.isPresent()) {
-            List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
-            String expectedEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE, noteList);
-            if (!Objects.equals(expectedEtag, notesEtag.get())) {
-                throw new BadRequestException("Invalid Etag");
-            }
-        }
-        this.noteDaoJpa.updateUserNotes(projectId, notes);
+        this.noteDaoJpa.updateUserNotes(projectId, notes, username);
         return getNotes(projectId, null, null, null, null, null);
     }
 

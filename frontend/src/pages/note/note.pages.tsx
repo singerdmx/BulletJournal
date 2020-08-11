@@ -185,7 +185,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                 <EditNote note={note} mode="icon"/>
                 <Tooltip title="Delete">
                     <Popconfirm
-                        title="Deleting Note also deletes its child notes. Are you sure?"
+                        title="Are you sure?"
                         okText="Yes"
                         cancelText="No"
                         onConfirm={() => {
