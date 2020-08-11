@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class HierarchyProcessor {
 
-    private static final Gson GSON = new Gson();
+    public static final Gson GSON = new Gson();
 
     public static List<HierarchyItem> removeTargetItem(String relations, Long targetId) {
         HierarchyItem[] target = new HierarchyItem[1];
@@ -73,7 +73,6 @@ public class HierarchyProcessor {
 
         return null;
     }
-
 
     public static Pair<List<HierarchyItem>, Set<Long>> findAllIds(String relations, Set<Long> existingIds) {
         List<HierarchyItem> hierarchyItems = getItemsFromJson(relations);

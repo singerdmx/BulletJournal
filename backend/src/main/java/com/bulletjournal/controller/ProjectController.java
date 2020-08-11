@@ -16,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.bulletjournal.exceptions.BadRequestException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -26,9 +25,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
@@ -138,16 +137,6 @@ public class ProjectController {
             @RequestHeader(IF_NONE_MATCH) Optional<String> projectsEtag) {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        if (projectsEtag.isPresent()) {
-            List<Project> projectsList = this.projectDaoJpa.getProjects(username).getOwned();
-            String expectedEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE, projectsList);
-
-            if (!Objects.equals(expectedEtag, projectsEtag.get())) {
-                throw new BadRequestException("Invalid Etag");
-            }
-        }
-
         this.projectDaoJpa.updateUserOwnedProjects(username, projects);
         return getProjects();
     }

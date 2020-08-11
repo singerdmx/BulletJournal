@@ -16,6 +16,7 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -189,12 +190,31 @@ public class ProjectDaoJpa {
 
     private List<com.bulletjournal.controller.models.Project> getOwnerProjects(UserProjects userProjects,
                                                                                String owner) {
-        if (userProjects.getOwnedProjects() == null) {
-            return Collections.emptyList();
+        List<com.bulletjournal.controller.models.Project> ret = new ArrayList<>();
+        List<Project> projects = this.projectRepository.findByOwner(owner);
+        if (userProjects.getOwnedProjects() != null) {
+            Set<Long> existingIds = projects.stream().map(p -> p.getId()).collect(Collectors.toSet());
+            // left is real hierarchy but missing orphaned ones, right is processed ones
+            Pair<List<HierarchyItem>, Set<Long>> hierarchy =
+                    HierarchyProcessor.findAllIds(userProjects.getOwnedProjects(), existingIds);
+
+            List<HierarchyItem> keptHierarchy = hierarchy.getLeft();
+            Set<Long> processedIds = hierarchy.getRight();
+
+            // add processed ones
+            final Map<Long, Project> projectMap = projects.stream().filter(p -> processedIds.contains(p.getId()))
+                    .collect(Collectors.toMap(p -> p.getId(), p -> p));
+
+            ret.addAll(ProjectRelationsProcessor.processRelations(
+                    projectMap, keptHierarchy, null));
+
+            // add orphaned ones(not processed means orphaned)
+            projects = projects.stream().filter(p -> !processedIds.contains(p.getId())).collect(Collectors.toList());
         }
-        Map<Long, Project> projects = this.projectRepository.findByOwner(owner).stream()
-                .collect(Collectors.toMap(p -> p.getId(), p -> p));
-        return ProjectRelationsProcessor.processRelations(projects, userProjects.getOwnedProjects(), null);
+
+        ret.addAll(projects.stream().sorted(Comparator.comparingLong(Project::getId))
+                .map(Project::toPresentationModel).collect(Collectors.toList()));
+        return ret;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -215,15 +235,6 @@ public class ProjectDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " cannot be found"));
         project.setGroup(group);
         project = this.projectRepository.save(project);
-
-        Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
-        final UserProjects userProjects = userProjectsOptional.isPresent() ? userProjectsOptional.get()
-                : new UserProjects();
-
-        String newRelations = HierarchyProcessor.addItem(userProjects.getOwnedProjects(), project.getId());
-        userProjects.setOwnedProjects(newRelations);
-        userProjects.setOwner(owner);
-        this.userProjectsRepository.save(userProjects);
         events.addAll(generateEvents(group, owner, project));
         return project;
     }
@@ -328,20 +339,7 @@ public class ProjectDaoJpa {
         this.authorizationService.checkAuthorizedToOperateOnContent(project.getOwner(), requester, ContentType.PROJECT,
                 Operation.DELETE, projectId);
 
-        UserProjects userProjects = this.userProjectsRepository.findById(requester)
-                .orElseThrow(() -> new ResourceNotFoundException("UserProjects by " + requester + " not found"));
-
-        String relations = userProjects.getOwnedProjects();
-
-        // delete project and its subProjects
-        List<Project> targetProjects = this.projectRepository
-                .findAllById(HierarchyProcessor.getSubItems(relations, projectId));
-        this.projectRepository.deleteAll(targetProjects);
-
-        // Update project relations
-        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, projectId);
-        userProjects.setOwnedProjects(GSON.toJson(hierarchy));
-        this.userProjectsRepository.save(userProjects);
+        this.projectRepository.delete(project);
 
         switch (ProjectType.getType(project.getType())) {
             case TODO:
@@ -358,7 +356,7 @@ public class ProjectDaoJpa {
         }
 
         // return generated events
-        return Pair.of(generateEvents(requester, targetProjects), project);
+        return Pair.of(generateEvents(requester, ImmutableList.of(project)), project);
     }
 
     private List<Event> generateEvents(String owner, List<Project> targetProjects) {

@@ -17,6 +17,13 @@ public class ProjectRelationsProcessor {
             .excludeFieldsWithoutExposeAnnotation().create();
 
     public static List<Project> processRelations(
+            Map<Long, com.bulletjournal.repository.models.Project> projectMap,
+            List<HierarchyItem> projectRelations,
+            Set<Long> selectedProjects) {
+        return processRelations(projectMap, HierarchyProcessor.GSON.toJson(projectRelations), selectedProjects);
+    }
+
+    public static List<Project> processRelations(
             Map<Long, com.bulletjournal.repository.models.Project> projectMap, String projectRelations,
             Set<Long> selectedProjects) {
         Project[] list = GSON.fromJson(

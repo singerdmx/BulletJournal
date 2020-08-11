@@ -1029,7 +1029,7 @@ public class ProjectControllerTest {
                 Projects.class);
         assertEquals(HttpStatus.OK, getResponse.getStatusCode());
         List<Project> projects = getResponse.getBody().getOwned();
-        assertEquals(1, projects.size());
+        assertEquals(10, projects.size());
         assertEquals("P5", projects.get(0).getName());
         assertEquals(1, projects.get(0).getSubProjects().size());
         assertEquals("P6", projects.get(0).getSubProjects().get(0).getName());
@@ -1093,7 +1093,7 @@ public class ProjectControllerTest {
         );
         assertEquals(HttpStatus.OK, updateProjectRelationsResponse.getStatusCode());
         List<Project> projects = updateProjectRelationsResponse.getBody().getOwned();
-        assertEquals(1, projects.size());
+        assertEquals(10, projects.size());
         assertEquals(p5, projects.get(0));
         assertEquals(1, projects.get(0).getSubProjects().size());
         assertEquals(p6, projects.get(0).getSubProjects().get(0));
@@ -1137,7 +1137,7 @@ public class ProjectControllerTest {
         );
         assertEquals(HttpStatus.OK, updateProjectRelationsResponse.getStatusCode());
         List<Project> projects = updateProjectRelationsResponse.getBody().getOwned();
-        assertEquals(2, projects.size());
+        assertEquals(8, projects.size());
         assertEquals(p1, projects.get(0));
         assertEquals(p5, projects.get(1));
         assertEquals(2, projects.get(0).getSubProjects().size());

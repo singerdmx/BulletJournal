@@ -424,7 +424,7 @@ class ProjectPage extends React.Component<
       editContent = <EditProject project={project} />;
       deleteContent = (
         <Popconfirm
-          title="Deleting BuJo also deletes its child BuJo. Are you sure?"
+          title="Are you sure?"
           okText="Yes"
           cancelText="No"
           onConfirm={() => {
