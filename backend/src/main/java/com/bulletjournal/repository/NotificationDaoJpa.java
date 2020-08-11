@@ -4,6 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
+import com.bulletjournal.notifications.JoinGroupEvent;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
@@ -28,6 +29,8 @@ public class NotificationDaoJpa implements Etaggable {
     private UserClient userClient;
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
+    //@GrpcClient("Daemon")
+
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
         List<Notification> notifications = this.notificationRepository.findByTargetUser(username);
@@ -58,8 +61,19 @@ public class NotificationDaoJpa implements Etaggable {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(List<Informed> events) {
         List<Notification> notifications = new ArrayList<>();
-        events.forEach(event -> notifications.addAll(event.toNotifications(userAliasDaoJpa)));
+        List<Notification> joinGroupEventNotifications = new ArrayList<>();
+        events.forEach(event -> {
+            List<Notification> list = event.toNotifications(userAliasDaoJpa);
+            if (event instanceof JoinGroupEvent) {
+                joinGroupEventNotifications.addAll(list);
+            }
+            notifications.addAll(list);
+        });
         this.notificationRepository.saveAll(notifications);
+        sendEmail(joinGroupEventNotifications);
+    }
+
+    public void sendEmail(List<Notification> joinGroupEventNotifications) {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
