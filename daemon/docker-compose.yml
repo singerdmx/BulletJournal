@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   daemon:
-    container_name: daemon
+    container_name: daemon_app
     build:
       context: .
     ports:
