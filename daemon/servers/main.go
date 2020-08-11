@@ -21,9 +21,8 @@ const (
 	httpPort = ":9091"
 )
 
-// server is used to implement services.HelloServer
+// server should implement services.UnimplementedDaemonServer's methods
 type server struct {
-	services.UnimplementedDaemonServer
 }
 
 // Send implements the JoinGroupEvents rpc endpoint of services.DaemonServer
