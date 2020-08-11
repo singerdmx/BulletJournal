@@ -112,7 +112,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
           <CheckCircleTwoTone twoToneColor="#52c41a" />
         </div>
         <Popconfirm
-          title="Deleting Task also deletes its child tasks. Are you sure?"
+          title="Are you sure?"
           okText="Yes"
           cancelText="No"
           onConfirm={() => deleteTask(task.id, type)}
@@ -149,7 +149,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
         <CheckCircleTwoTone twoToneColor="#52c41a" />
       </div>
       <Popconfirm
-        title="Deleting Task also deletes its child tasks. Are you sure?"
+        title="Are you sure?"
         okText="Yes"
         cancelText="No"
         onConfirm={() => deleteTask(task.id, type)}
