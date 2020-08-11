@@ -3,6 +3,7 @@ package com.bulletjournal.templates;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.templates.controller.CategoryController;
+import com.bulletjournal.templates.controller.model.CreateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.CategoryRepository;
@@ -28,6 +29,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Tests {@link com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa}
@@ -130,6 +133,23 @@ public class CategoryControllerTest {
         expectedHierarchyItems.addFirst(item5);
         responseCategoryList = deleteCategory(categoriesIds[1]);
         checkRelations(responseCategoryList, expectedHierarchyItems);
+
+        // create new categories, should not affect hierarchy, and new created category
+        // should appear at the end of list
+        String name1 = "newC1", name2 = "newC2";
+        com.bulletjournal.templates.controller.model.Category category1 = createCategory(name1);
+        Assert.assertEquals(name1, category1.getName());
+        com.bulletjournal.templates.controller.model.Category category2 = createCategory(name2);
+        Assert.assertEquals(name2, category2.getName());
+
+        HierarchyItem newItem1 = new HierarchyItem(category1.getId());
+        HierarchyItem newItem2 = new HierarchyItem(category2.getId());
+        expectedHierarchyItems.addAll(
+            Stream.of(newItem1, newItem2)
+                .sorted(Comparator.comparingLong(HierarchyItem::getId)).collect(Collectors.toList())
+        );
+        List<com.bulletjournal.templates.controller.model.Category> newCategoryList = getCategories();
+        checkRelations(newCategoryList, expectedHierarchyItems);
     }
 
     private boolean checkRelations(
@@ -163,6 +183,17 @@ public class CategoryControllerTest {
             }
         }
         return true;
+    }
+
+    private com.bulletjournal.templates.controller.model.Category createCategory(String name) {
+        ResponseEntity<com.bulletjournal.templates.controller.model.Category> response
+            = this.restTemplate.exchange(
+            ROOT_URL + randomServerPort + CategoryController.CATEGORIES_ROUTE,
+            HttpMethod.POST,
+            TestHelpers.actAsOtherUser(new CreateCategoryParams(name, CATEGORY_DESCRIPTION), USER),
+            com.bulletjournal.templates.controller.model.Category.class);
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+        return response.getBody();
     }
 
     private List<com.bulletjournal.templates.controller.model.Category> getCategories() {

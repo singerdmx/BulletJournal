@@ -7,6 +7,7 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.Category;
+import com.bulletjournal.templates.controller.model.CreateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
@@ -44,12 +45,6 @@ public class CategoryController {
         this.userDaoJpa = userDaoJpa;
     }
 
-    @DeleteMapping(CATEGORY_ROUTE)
-    public List<Category> deleteCategory(@NotNull @PathVariable Long categoryId) {
-        categoryDaoJpa.deleteById(categoryId);
-        return getCategories();
-    }
-
     @GetMapping(CATEGORIES_ROUTE)
     public List<Category> getCategories() {
         List<com.bulletjournal.templates.repository.model.Category> allCategories
@@ -75,11 +70,24 @@ public class CategoryController {
         return ret;
     }
 
+    @PostMapping(CATEGORIES_ROUTE)
+    public Category createCategory(@Valid @RequestBody CreateCategoryParams params) {
+        validateRequester();
+        return this.categoryDaoJpa.create(params.getName(), params.getDescription()).toPresentationModel();
+    }
+
     @PutMapping(CATEGORIES_ROUTE)
     public List<Category> updateRelations(@NotNull @Valid @RequestBody List<Category> categoryList) {
         validateRequester();
         String newHierarchy = CategoryRelationsProcessor.processRelations(categoryList);
         hierarchyDaoJpa.updateHierarchy(newHierarchy);
+        return getCategories();
+    }
+
+    @DeleteMapping(CATEGORY_ROUTE)
+    public List<Category> deleteCategory(@NotNull @PathVariable Long categoryId) {
+        validateRequester();
+        categoryDaoJpa.deleteById(categoryId);
         return getCategories();
     }
 
