@@ -746,18 +746,12 @@ public class ProjectControllerTest {
                 Projects.class);
         assertEquals(HttpStatus.OK, getProjectsResponse.getStatusCode());
         List<ProjectsWithOwner> sharedProjects = getProjectsResponse.getBody().getShared();
-        assertEquals(2, sharedProjects.size());
+        assertEquals(1, sharedProjects.size());
         ProjectsWithOwner sharedProject = sharedProjects.get(0);
-        assertEquals(targetUser, sharedProject.getOwner().getName());
-        assertEquals("https://1o24bbs.com/user_avatar/1o24bbs.com/mqm/75/1671_2.png",
-                sharedProject.getOwner().getAvatar());
+        assertNotEquals(targetUser, sharedProject.getOwner().getName());
         assertEquals(1, sharedProject.getProjects().size());
-        Project p = sharedProject.getProjects().get(0);
-        Group g = p.getGroup();
-        assertEquals("Shared TODO", p.getName());
-        assertEquals("Default", g.getName());
-        assertEquals(ProjectType.TODO, p.getProjectType());
-        assertEquals(targetUser, g.getOwner().getName());
+        List<Project> ownedProjects = getProjectsResponse.getBody().getOwned();
+        Project p = ownedProjects.get(ownedProjects.size() - 1);
 
         // Get Tasks
         ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(

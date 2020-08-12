@@ -70,28 +70,11 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Set<Long> getProjectIdsByOwners(Set<String> owners) {
-        Set<Long> results = new HashSet<>();
-        List<UserProjects> userProjectsList = this.userProjectsRepository.findAllById(owners);
-        userProjectsList.forEach(userProjects -> {
-            Set<Long> ids = HierarchyProcessor.findAllIds(userProjects.getOwnedProjects(), null).getRight();
-            results.addAll(ids);
-        });
-        return results;
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project getProject(Long projectId, String requester) {
         Project project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
         this.authorizationService.validateRequesterInProjectGroup(requester, project);
         return project;
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Project getProject(Long projectId) {
-        return this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
     }
 
     private List<ProjectsWithOwner> getSharedProjects(UserProjects userProjects, String owner) {
@@ -117,64 +100,30 @@ public class ProjectDaoJpa {
             }
         }
 
-        ProjectsWithOwner sharedItems = getSharedItems(user);
         String sharedProjectRelations = userProjects.getSharedProjects();
-        List<String> owners = new ArrayList<>();
-        if (sharedProjectRelations != null) {
-            owners = Arrays.asList(GSON.fromJson(sharedProjectRelations, String[].class));
-        }
+        List<String> owners = sharedProjectRelations == null ? new ArrayList<>() :
+                Arrays.asList(GSON.fromJson(sharedProjectRelations, String[].class));
 
-        List<String> newOwners = new ArrayList<>();
         List<ProjectsWithOwner> result = new ArrayList<>();
         for (String projectOwner : owners) {
             Set<Long> projectsByOwner = projectIds.remove(projectOwner);
-            if (Objects.equals(owner, projectOwner) && sharedItems != null) {
-                result.add(sharedItems);
-            } else {
-                addProjectsByOwner(newOwners, projectOwner, projectsByOwner, result);
-            }
+            addProjectsByOwner(projectOwner, projectsByOwner, result);
         }
 
         for (Map.Entry<String, Set<Long>> entry : projectIds.entrySet()) {
             String projectOwner = entry.getKey();
-            addProjectsByOwner(newOwners, projectOwner, entry.getValue(), result);
+            addProjectsByOwner(projectOwner, entry.getValue(), result);
         }
 
-        if (sharedItems != null && !result.contains(sharedItems)) {
-            result.add(0, sharedItems);
-        }
         return result;
     }
 
-    private ProjectsWithOwner getSharedItems(User user) {
-        List<Project> projects = new ArrayList<>();
-        if (user.hasSharedNotesProject()) {
-            projects.add(user.getSharedNotesProject());
-        }
-        if (user.hasSharedTasksProject()) {
-            projects.add(user.getSharedTasksProject());
-        }
-        if (user.hasSharedTransactionsProject()) {
-            projects.add(user.getSharedTransactionsProject());
-        }
-
-        if (projects.isEmpty()) {
-            return null;
-        }
-
-        ProjectsWithOwner projectsWithOwner = new ProjectsWithOwner(
-                new com.bulletjournal.controller.models.User(user.getName()),
-                projects.stream().map(p -> p.toPresentationModel()).collect(Collectors.toList()));
-        return projectsWithOwner;
-    }
-
-    private void addProjectsByOwner(List<String> newOwners, String o, Set<Long> projectsByOwner,
+    private void addProjectsByOwner(String o, Set<Long> projectsByOwner,
                                     List<ProjectsWithOwner> result) {
         if (projectsByOwner == null) {
             return;
         }
 
-        newOwners.add(o);
         List<Project> projects = this.projectRepository.findByOwner(o);
         String projectRelationsByOwner = this.userProjectsRepository.findById(o).get().getOwnedProjects();
         List<com.bulletjournal.controller.models.Project> l = ProjectRelationsProcessor.processRelations(
