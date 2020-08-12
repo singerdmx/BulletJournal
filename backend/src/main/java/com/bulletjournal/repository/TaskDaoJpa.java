@@ -43,7 +43,6 @@ import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Repository
@@ -102,45 +101,37 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
 
-        if (project.isShared()) {
-            List<Task> tasks = this.sharedProjectItemDaoJpa.
-                    getSharedProjectItems(requester, ContentType.TASK).stream()
-                    .filter(obj -> obj instanceof Task)
-                    .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList());
+        // source of truth
+        List<Task> tasks = project.isShared() ? this.sharedProjectItemDaoJpa.
+                getSharedProjectItems(requester, ContentType.TASK).stream()
+                .filter(obj -> obj instanceof Task)
+                .map(projectItemModel -> (Task) projectItemModel).collect(Collectors.toList()) :
+                this.taskRepository.findTaskByProject(project);
 
-            List<com.bulletjournal.controller.models.Task> ret = new ArrayList<>();
+        List<com.bulletjournal.controller.models.Task> ret = new ArrayList<>();
+        if (projectTasksOptional.isPresent()) {
+            ProjectTasks projectTasks = projectTasksOptional.get();
+            Set<Long> existingIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toSet());
 
-            if (projectTasksOptional.isPresent()) {
-                ProjectTasks projectTasks = projectTasksOptional.get();
-                Set<Long> existingIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toSet());
+            Pair<List<HierarchyItem>, Set<Long>> hierarchy =
+                    HierarchyProcessor.findAllIds(projectTasks.getTasks(), existingIds);
 
-                Pair<List<HierarchyItem>, Set<Long>> hierarchy =
-                        HierarchyProcessor.findAllIds(projectTasks.getTasks(), existingIds);
+            List<HierarchyItem> keptHierarchy = hierarchy.getLeft();
+            Set<Long> processedIds = hierarchy.getRight();
 
-                List<HierarchyItem> keptHierarchy = hierarchy.getLeft();
-                Set<Long> processedIds = hierarchy.getRight();
+            final Map<Long, Task> taskMap = tasks.stream().filter(t -> processedIds.contains(t.getId()))
+                    .collect(Collectors.toMap(n -> n.getId(), n -> n));
 
-                final Map<Long, Task> taskMap = tasks.stream().filter(t -> processedIds.contains(t.getId()))
-                        .collect(Collectors.toMap(n -> n.getId(), n -> n));
+            ret.addAll(TaskRelationsProcessor.processRelations(taskMap, keptHierarchy).stream()
+                    .map(task -> addLabels(task, taskMap)).collect(Collectors.toList()));
 
-                ret.addAll(TaskRelationsProcessor.processRelations(taskMap, keptHierarchy).stream()
-                        .map(task -> addLabels(task, taskMap)).collect(Collectors.toList()));
-
-                tasks = tasks.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
-            }
-
-            ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(
-                    tasks.stream().map(Task::toPresentationModel).collect(Collectors.toList())));
-            return ret;
+            tasks = tasks.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
         }
-        if (!projectTasksOptional.isPresent()) {
-            return Collections.emptyList();
-        }
-        ProjectTasks projectTasks = projectTasksOptional.get();
-        final Map<Long, Task> tasksMap = this.taskRepository.findTaskByProject(project).stream()
-                .collect(Collectors.toMap(Task::getId, n -> n));
-        return TaskRelationsProcessor.processRelations(tasksMap, projectTasks.getTasks()).stream()
-                .map(t -> addLabels(t, tasksMap)).collect(Collectors.toList());
+
+        ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(
+                tasks.stream().sorted(Comparator.comparingLong(Task::getId))
+                        .map(Task::toPresentationModel).collect(Collectors.toList())));
+        return ret;
     }
 
     /**
@@ -473,15 +464,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
                 createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
-        task = this.taskRepository.saveAndFlush(task);
-
-        final ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId).orElseGet(ProjectTasks::new);
-
-        String newRelations = HierarchyProcessor.addItem(projectTasks.getTasks(), task.getId());
-        projectTasks.setProjectId(projectId);
-        projectTasks.setTasks(newRelations);
-        this.projectTasksRepository.save(projectTasks);
-        return task;
+        return this.taskRepository.saveAndFlush(task);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -494,7 +477,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         Task task = create(projectId, owner, createTaskParams);
         task.setGoogleCalendarEventId(eventId);
-        task = this.taskRepository.save(task);
         LOGGER.info("Created task {}", task);
         if (StringUtils.isNotBlank(text)) {
             LOGGER.info("Also created task content {}", text);
@@ -664,18 +646,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             return completeSingleRecurringTask(task, dateTime, contents);
         }
 
-        deleteTaskAndAdjustRelations(requester, task, (targetTasks) -> {
-            targetTasks.forEach(t -> {
-                if (!t.getId().equals(task.getId())) {
-                    this.completedTaskRepository
-                            .save(new CompletedTask(t, GSON_ALLOW_EXPOSE_ONLY.toJson(this.taskContentRepository
-                                    .findTaskContentByTask(t).stream().collect(Collectors.toList()))));
-                }
-            });
-            this.taskRepository.deleteAll(targetTasks);
-        }, (target) -> {
-        });
-
+        this.taskRepository.delete(task);
         CompletedTask completedTask = new CompletedTask(task, contents);
         this.completedTaskRepository.save(completedTask);
         return completedTask;
@@ -719,7 +690,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @param tasks     a list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateUserTasks(Long projectId, List<com.bulletjournal.controller.models.Task> tasks) {
+    public void updateUserTasks(
+            Long projectId, List<com.bulletjournal.controller.models.Task> tasks, String requester) {
+        this.projectDaoJpa.getProject(projectId, requester);
         Optional<ProjectTasks> projectTasksOptional = this.projectTasksRepository.findById(projectId);
         final ProjectTasks projectTasks = projectTasksOptional.orElseGet(ProjectTasks::new);
 
@@ -739,51 +712,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Pair<List<Event>, Task> deleteTask(String requester, Long taskId) {
         Task task = this.getProjectItem(taskId, requester);
-
-        Project project = deleteTaskAndAdjustRelations(requester, task,
-                (targetTasks) -> this.taskRepository.deleteAll(targetTasks), (target) -> {
-                });
-
-        return Pair.of(generateEvents(task, requester, project), task);
-    }
-
-    /**
-     * Delete task and adjust project relations after task completion
-     *
-     * @param requester           the username of action requester
-     * @param task                the task object gets deleted
-     * @param targetTasksOperator Consumer class or Lambda function operates upon
-     *                            target tasks list
-     * @param targetOperator      Consumer class or Lambda function operates upon
-     *                            target HierarchyItem
-     * @retVal Project
-     */
-    private Project deleteTaskAndAdjustRelations(String requester, Task task, Consumer<List<Task>> targetTasksOperator,
-                                                 Consumer<HierarchyItem> targetOperator) {
-        Project project = task.getProject();
-        Long projectId = project.getId();
-        this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
-                Operation.DELETE, projectId, project.getOwner());
-
-        ProjectTasks projectTasks = this.projectTasksRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("ProjectTasks by " + projectId + " not found"));
-
-        String relations = projectTasks.getTasks();
-
-        // delete tasks and its subTasks
-        List<Task> targetTasks = this.taskRepository
-                .findAllById(HierarchyProcessor.getSubItems(relations, task.getId()));
-        targetTasksOperator.accept(targetTasks);
-
-        // Update task relations
-        HierarchyItem[] target = new HierarchyItem[1];
-        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(relations, task.getId(), target);
-        targetOperator.accept(target[0]);
-
-        projectTasks.setTasks(GSON.toJson(hierarchy));
-        this.projectTasksRepository.save(projectTasks);
-
-        return project;
+        this.taskRepository.delete(task);
+        return Pair.of(generateEvents(task, requester, task.getProject()), task);
     }
 
     /**
@@ -931,18 +861,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.UPDATE, project.getId(), project.getOwner());
 
-        deleteTaskAndAdjustRelations(requester, task, (targetTasks) -> targetTasks.forEach((t) -> {
-            t.setProject(project);
-            this.taskRepository.save(t);
-        }), (target) -> {
-            final ProjectTasks projectTasks = this.projectTasksRepository.findById(targetProject)
-                    .orElseGet(ProjectTasks::new);
-            String newRelations = HierarchyProcessor.addItem(projectTasks.getTasks(), target);
-            projectTasks.setTasks(newRelations);
-            projectTasks.setProjectId(targetProject);
-            this.projectTasksRepository.save(projectTasks);
-        });
-
+        task.setProject(project);
+        this.taskRepository.save(task);
         return Pair.of(task, project);
     }
 

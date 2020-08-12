@@ -508,7 +508,7 @@ public class ProjectControllerTest {
         tasks = Arrays.asList(tasksResponse.getBody());
         assertNotEquals(etag1, etag3);
 
-        assertEquals(1, tasks.size());
+        assertEquals(2, tasks.size());
         assertEquals(t1, tasks.get(0));
         assertEquals(0, tasks.get(0).getSubTasks().size());
 
@@ -636,7 +636,7 @@ public class ProjectControllerTest {
                 Task[].class,
                 project.getId());
         taskList = Arrays.asList(tasksResponse.getBody());
-        assertEquals(0, taskList.size());
+        assertEquals(2, taskList.size());
 
         tasksResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
@@ -646,11 +646,8 @@ public class ProjectControllerTest {
                 projectToMoveTo.getId());
         taskList = Arrays.asList(tasksResponse.getBody());
         assertEquals(1, taskList.size());
-        assertEquals(1, taskList.get(0).getSubTasks().size());
-        assertEquals(1, taskList.get(0).getSubTasks().get(0).getSubTasks().size());
+        assertEquals(0, taskList.get(0).getSubTasks().size());
         assertEquals(t1.getId(), taskList.get(0).getId());
-        assertEquals(t2.getId(), taskList.get(0).getSubTasks().get(0).getId());
-        assertEquals(t3.getId(), taskList.get(0).getSubTasks().get(0).getSubTasks().get(0).getId());
 
         // move task t1 back
         moveResponse = this.restTemplate.exchange(

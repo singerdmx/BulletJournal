@@ -2,7 +2,6 @@ package com.bulletjournal.hierarchy;
 
 import com.bulletjournal.controller.models.Project;
 import com.bulletjournal.repository.models.Group;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -103,49 +102,6 @@ public class HierarchyProcessorProcessorTest {
         hierarchy = ret.getLeft();
         assertEquals(2, hierarchy.size());
         assertTrue(CollectionUtils.isEqualCollection(ImmutableSet.of(1L, 4L, 5L), ret.getRight()));
-    }
-
-    /**
-     * Tests {@link HierarchyProcessor#removeTargetItem(String, Long)}
-     */
-    @Test
-    public void testRemoveTargetProject() {
-        List<Project> projects = new ArrayList<>();
-        for (long i = 1; i <= 6; i++) {
-            projects.add(createProject(i));
-        }
-        Project p1 = projects.get(0);
-        Project p2 = projects.get(1);
-        Project p3 = projects.get(2);
-        Project p4 = projects.get(3);
-        Project p5 = projects.get(4);
-        Project p6 = projects.get(5);
-        List<Project> projectHierarchy = createSampleProjectRelations(p1, p2, p3, p4, p5, p6);
-
-        /**
-         * After remove p2
-         *  p1
-         *   |
-         *    -- p4
-         *
-         *  p5
-         *   |
-         *    -- p6
-         */
-        String relations = ProjectRelationsProcessor.processRelations(projectHierarchy);
-        List<Long> subProjects = HierarchyProcessor.getSubItems(relations, p2.getId());
-        Collections.sort(subProjects);
-        assertEquals(ImmutableList.of(2L, 3L), subProjects);
-
-        String projectRelations = ProjectRelationsProcessor.processRelations(projectHierarchy);
-        List<HierarchyItem> hierarchy = HierarchyProcessor.removeTargetItem(projectRelations, p2.getId());
-        assertEquals(2, hierarchy.size());
-        assertEquals(1L, hierarchy.get(0).getId().longValue());
-        assertEquals(1, hierarchy.get(0).getS().size());
-        assertEquals(4L, hierarchy.get(0).getS().get(0).getId().longValue());
-        assertEquals(5L, hierarchy.get(1).getId().longValue());
-        assertEquals(1, hierarchy.get(1).getS().size());
-        assertEquals(6L, hierarchy.get(1).getS().get(0).getId().longValue());
     }
 
     /**

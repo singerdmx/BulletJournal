@@ -201,8 +201,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             Long projectId, List<com.bulletjournal.controller.models.Note> notes, String requester) {
         this.projectDaoJpa.getProject(projectId, requester);
         Optional<ProjectNotes> projectNotesOptional = this.projectNotesRepository.findById(projectId);
-        final ProjectNotes projectNotes = projectNotesOptional.isPresent() ? projectNotesOptional.get()
-                : new ProjectNotes();
+        final ProjectNotes projectNotes = projectNotesOptional.orElseGet(ProjectNotes::new);
 
         projectNotes.setNotes(NoteRelationsProcessor.processRelations(notes));
         projectNotes.setProjectId(projectId);

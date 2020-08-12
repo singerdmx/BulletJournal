@@ -5,7 +5,6 @@ import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
@@ -129,7 +128,6 @@ public class TaskController {
                 "created Task ##" + createdTask.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdTask.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TASK));
         return createdTask.toPresentationModel();
-
     }
 
     @PatchMapping(TASK_ROUTE)
@@ -157,15 +155,7 @@ public class TaskController {
     public ResponseEntity<List<Task>> updateTaskRelations(@NotNull @PathVariable Long projectId,
             @Valid @RequestBody List<Task> tasks, @RequestHeader(IF_NONE_MATCH) Optional<String> tasksEtag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        if (tasksEtag.isPresent()) {
-            List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
-            String expectedEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE, taskList);
-            if (!Objects.equals(expectedEtag, tasksEtag.get())) {
-                throw new BadRequestException("Invalid Etag");
-            }
-        }
-        this.taskDaoJpa.updateUserTasks(projectId, tasks);
+        this.taskDaoJpa.updateUserTasks(projectId, tasks, username);
         return getTasks(projectId, null, null, null, null, null);
     }
 
