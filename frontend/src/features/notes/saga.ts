@@ -14,7 +14,8 @@ import {
   MoveNote,
   NoteApiErrorAction,
   PatchContent,
-  PatchNote, PatchRevisionContents,
+  PatchNote,
+  PatchRevisionContents,
   PutNote,
   RemoveShared,
   RevokeSharable,
@@ -49,7 +50,7 @@ import {
 import {IState} from '../../store';
 import {updateNoteContents, updateNotes} from './actions';
 import {Content, ProjectItems, Revision} from '../myBuJo/interface';
-import {updateItemsByLabels} from '../label/actions';
+import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
 import {actions as SystemActions} from '../system/reducer';
 import {Note} from './interface';
 import {ProjectItemUIType} from "../project/constants";
@@ -194,6 +195,10 @@ function* noteCreate(action: PayloadAction<CreateNote>) {
     const { projectId, name, labels } = action.payload;
     yield call(createNote, projectId, name, labels);
     yield put(updateNotes(projectId));
+    const state: IState = yield select();
+    if (state.project.project) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Note Error Received: ${error}`);
   }
@@ -259,6 +264,7 @@ function* patchNote(action: PayloadAction<PatchNote>) {
     );
 
     const state: IState = yield select();
+
     const labelItems: ProjectItems[] = [];
 
     state.label.items.forEach((projectItem: ProjectItems) => {
@@ -272,6 +278,10 @@ function* patchNote(action: PayloadAction<PatchNote>) {
       labelItems.push(projectItem);
     });
     yield put(updateItemsByLabels(labelItems));
+
+    if (state.project.project) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Patch Note Error Received: ${error}`);
   }
@@ -359,6 +369,10 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
     }
 
     yield put(notesActions.noteReceived({note: undefined}));
+
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Delete Note Error Received: ${error}`);
   }
@@ -401,6 +415,10 @@ function* notesDelete(action: PayloadAction<DeleteNotes>) {
     }
 
     yield put(notesActions.noteReceived({note: undefined}));
+
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Delete Notes Error Received: ${error}`);
   }

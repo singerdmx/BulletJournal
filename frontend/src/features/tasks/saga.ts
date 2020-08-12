@@ -65,7 +65,7 @@ import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './ac
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
 import {IState} from '../../store';
 import {Content, ProjectItems, Revision} from '../myBuJo/interface';
-import {updateItemsByLabels} from '../label/actions';
+import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
 import {actions as SystemActions} from '../system/reducer';
 import {completedTaskPageSize, ProjectItemUIType} from '../project/constants';
 import {Task} from './interface';
@@ -200,6 +200,10 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       labels
     );
     yield put(updateTasks(projectId));
+    const state: IState = yield select();
+    if (state.project.project) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `taskCreate Error Received: ${error}`);
   }
@@ -345,6 +349,10 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       labelItems.push(projectItem);
     });
     yield put(updateItemsByLabels(labelItems));
+
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Patch Task Error Received: ${error}`);
   }
@@ -457,6 +465,10 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
     }
 
     yield put(tasksActions.taskReceived({task: undefined}));
+
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Complete Task Error Received: ${error}`);
   }
@@ -516,6 +528,9 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
         searchCompletedTasks: searchCompletedTasks,
       })
     );
+    if (state.project.project) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Uncomplete Task Error Received: ${error}`);
   }
@@ -589,6 +604,9 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
     }
 
     yield put(tasksActions.taskReceived({task: undefined}));
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Delete Task Error Received: ${error}`);
   }
@@ -633,6 +651,9 @@ function* deleteTasks(action: PayloadAction<DeleteTasks>) {
     }
 
     yield put(tasksActions.taskReceived({task: undefined}));
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Delete Tasks Error Received: ${error}`);
   }
@@ -682,6 +703,9 @@ function* completeTasks(action: PayloadAction<CompleteTasks>) {
     }
 
     yield put(tasksActions.taskReceived({task: undefined}));
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `complete Tasks Error Received: ${error}`);
   }

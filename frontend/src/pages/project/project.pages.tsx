@@ -7,7 +7,7 @@ import {GroupsWithOwner, User} from '../../features/group/interface';
 import {Avatar, BackTop, Badge, Popconfirm, Popover, Tag, Tooltip,} from 'antd';
 import {deleteProject, getProject} from '../../features/project/actions';
 import {iconMapper} from '../../components/side-menu/side-menu.component';
-import {DeleteOutlined, DownOutlined, SyncOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
+import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddNote from '../../components/modals/add-note.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
@@ -252,36 +252,21 @@ class ProjectPage extends React.Component<
         <>
           <div>
             <div className="project-labels-icon">
-           <span>
-            {!this.state.hideLabel && <Tooltip
-                placement="top"
-                title="Refresh Labels"
-            >
-              <SyncOutlined
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    const projectId = parseInt(this.props.match.params.projectId);
-                    this.props.projectLabelsUpdate(projectId, this.props.project!.shared);
-                  }}
-              />
-            </Tooltip>}
-           </span>
-              {" "}
               <span>
-            {!this.state.hideLabel && (<Tooltip
-                placement="top"
-                title="Hide Labels"
-            ><UpOutlined onClick={() => {
-              this.setState({hideLabel: true});
-            }}/>
-            </Tooltip>)}
-                {this.state.hideLabel && (<Tooltip
+                {!this.state.hideLabel && (<Tooltip
                     placement="top"
-                    title="Show Project Labels"
-                ><DownOutlined onClick={() => {
-                  this.setState({hideLabel: false});
-                }}/></Tooltip>)}
-          </span>
+                    title="Hide Labels"
+                ><UpOutlined onClick={() => {
+                  this.setState({hideLabel: true});
+                }}/>
+                </Tooltip>)}
+                    {this.state.hideLabel && (<Tooltip
+                        placement="top"
+                        title="Show Project Labels"
+                    ><DownOutlined onClick={() => {
+                      this.setState({hideLabel: false});
+                    }}/></Tooltip>)}
+              </span>
             </div>
 
             {!this.state.hideLabel && <div className="project-labels">

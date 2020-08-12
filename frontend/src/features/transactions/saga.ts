@@ -43,7 +43,7 @@ import { LedgerSummary } from './interface';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { updateTransactionContents } from './actions';
 import { Content, ProjectItems, Revision } from '../myBuJo/interface';
-import { updateItemsByLabels } from '../label/actions';
+import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
 import { ProjectItemUIType } from "../project/constants";
 import { ContentType } from "../myBuJo/constants";
 import { recentItemsReceived } from "../recent/actions";
@@ -130,6 +130,9 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
         ledgerSummary: ledgerSummary,
       })
     );
+    if (state.project.project) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `transactionCreate Error Received: ${error}`);
   }
@@ -247,6 +250,9 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     }
 
     yield put(transactionsActions.transactionReceived({transaction: undefined}));
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
@@ -289,6 +295,9 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
       })
     );
     yield put(transactionsActions.transactionReceived({transaction: undefined}));
+    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Delete Transaction Error Received: ${error}`);
   }
@@ -370,6 +379,9 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       labelItems.push(projectItem);
     });
     yield put(updateItemsByLabels(labelItems));
+    if (state.project.project) {
+      yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
   } catch (error) {
     yield call(message.error, `Patch Transaction Error Received: ${error}`);
   }
