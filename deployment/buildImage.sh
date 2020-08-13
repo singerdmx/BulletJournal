@@ -32,6 +32,7 @@ docker build -t $DOCKERHUB_NAME/bulletjournal-frontend:$1 .
 cd ..
 
 cd ./backend
+cp -R ../protobuf ./
 DOCKER_BUILDKIT=1 docker build -t $DOCKERHUB_NAME/bulletjournal-backend:$1 .
 cd ../deployment
 
