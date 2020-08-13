@@ -7,5 +7,6 @@ docker build -t mwangxx/bulletjournal-frontend .
 cd ..
 
 cd ./backend
+cp -R ../protobuf ./
 DOCKER_BUILDKIT=1 docker build -t mwangxx/bulletjournal-backend .
 cd ..
