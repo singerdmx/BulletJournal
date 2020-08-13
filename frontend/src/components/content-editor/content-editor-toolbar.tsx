@@ -5,8 +5,11 @@ import 'react-quill/dist/quill.snow.css';
 import { message } from 'antd';
 import axios from 'axios';
 import ImageResize from '../../utils/image-resize/ImageResize';
+import ImageFormat from '../../utils/image-resize/ImageFormat';
+
 
 Quill.register('modules/imageResize', ImageResize);
+Quill.register(ImageFormat, true);
 
 // Custom Undo button çicon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
