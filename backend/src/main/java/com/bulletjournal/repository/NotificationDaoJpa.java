@@ -2,7 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.grpc.EmailService;
+import com.bulletjournal.clients.DaemonServiceClient;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.JoinGroupEvent;
@@ -34,7 +34,7 @@ public class NotificationDaoJpa implements Etaggable {
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
     @Autowired
-    private EmailService emailService;
+    private DaemonServiceClient daemonServiceClient;
     @Value("${sendEmail}")
     private boolean needSendEmail;
 
@@ -102,7 +102,7 @@ public class NotificationDaoJpa implements Etaggable {
         JoinGroupEvents joinGroupEvents = JoinGroupEvents.newBuilder()
                 .addJoinGroupEvents(joinGroupEvent)
                 .build();
-        emailService.sendEmail(joinGroupEvents);
+        daemonServiceClient.sendEmail(joinGroupEvents);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

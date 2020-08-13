@@ -1,4 +1,4 @@
-package com.bulletjournal.grpc;
+package com.bulletjournal.clients;
 
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
 
@@ -9,9 +9,9 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailService {
+public class DaemonServiceClient {
 
-    @GrpcClient("localhost")
+    @GrpcClient("daemonClient")
     private DaemonGrpc.DaemonBlockingStub daemonBlockingStub;
 
     public String sendEmail(JoinGroupEvents joinGroupEvents) {
