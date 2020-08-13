@@ -28,7 +28,6 @@ import {DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@an
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
 import {Note} from "../../features/notes/interface";
-import {actions} from "../../features/notes/reducer";
 
 interface NotePageHandler {
     contents: Content[];
