@@ -2,15 +2,19 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.grpc.EmailService;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.JoinGroupEvent;
+import com.bulletjournal.protobuf.daemon.grpc.types.Event;
+import com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvents;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +33,10 @@ public class NotificationDaoJpa implements Etaggable {
     private UserClient userClient;
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
-    //@GrpcClient("Daemon")
+    @Autowired
+    private EmailService emailService;
+    @Value("${sendEmail}")
+    private boolean needSendEmail;
 
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
@@ -70,10 +77,32 @@ public class NotificationDaoJpa implements Etaggable {
             notifications.addAll(list);
         });
         this.notificationRepository.saveAll(notifications);
-        sendEmail(joinGroupEventNotifications);
+        if (needSendEmail) {
+            sendEmail(joinGroupEventNotifications);
+        }
     }
 
     private void sendEmail(List<Notification> joinGroupEventNotifications) {
+        JoinGroupEvents.Builder joinGroupEventsBuilder = JoinGroupEvents.newBuilder();
+        List<Event> eventListProto = new ArrayList<>();
+        joinGroupEventNotifications.forEach((notification -> {
+            Event event = Event.newBuilder()
+                    .setContentId(notification.getContentId())
+                    .setTargetUser(notification.getTargetUser())
+                    .setContentName(notification.getContent() == null ? "" : notification.getContent())
+                    .setOriginatorAlias(notification.getOriginator())
+                    .setNotificationId(notification.getId())
+                    .build();
+            eventListProto.add(event);
+        }));
+        com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvent joinGroupEvent =
+                com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvent.newBuilder()
+                        .addAllEvents(eventListProto)
+                        .build();
+        JoinGroupEvents joinGroupEvents = JoinGroupEvents.newBuilder()
+                .addJoinGroupEvents(joinGroupEvent)
+                .build();
+        emailService.sendEmail(joinGroupEvents);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
