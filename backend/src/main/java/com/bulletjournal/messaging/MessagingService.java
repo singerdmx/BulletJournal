@@ -102,8 +102,7 @@ public class MessagingService {
         String dueDate = task.getDueDate();
         String dueTime = task.getDueTime();
         Pair<String, String> notificationTitleBody
-            = new ImmutablePair<>("Bullet Journal",
-            "Your task " + taskName + " is due on " + dueDate + " " + dueTime);
+            = new ImmutablePair<>(taskName + " due at " + dueDate + " " + dueTime, "");
         for (String token : targetTokens) {
             paramsList.add(new FcmMessageParams(
                 token,
@@ -129,7 +128,7 @@ public class MessagingService {
         MailjetEmailParams params =
             new MailjetEmailParams(
                 receivers,
-                "[Bullet Journal] Due task notification",
+                taskName + " due at " + dueDate + " " + dueTime,
                 "Your task " + taskName + " is due on " + dueDate + " " + dueTime
             );
         return params;
