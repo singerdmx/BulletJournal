@@ -13,3 +13,10 @@ clean:
 
 .PHONY: build
 build: daemon-server
+
+.PHONY: docker
+docker:
+	rm -rf protobuf
+	mkdir protobuf
+	cp -r ../protobuf/daemon/* protobuf/.
+	docker build --rm -t bulletjournal-daemon:latest .
