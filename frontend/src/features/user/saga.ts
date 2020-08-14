@@ -35,7 +35,7 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
 }
 
 function* changeAlias(action: PayloadAction<ChangeAlias>) {
-  const { targetUser, alias, groupId } = action.payload;
+  const { targetUser, alias, groupId, history } = action.payload;
   try {
     yield call(changeUserAlias, targetUser, alias);
 
@@ -59,7 +59,7 @@ function* changeAlias(action: PayloadAction<ChangeAlias>) {
     yield put(groupsActions.groupReceived({group: targetGroup}));
 
     yield call(message.success, `User ${targetUser} is aliased to ${alias}. It may take some time to take effect.`);
-    yield put(systemsActions.systemUpdate({force: true}));
+    yield put(systemsActions.systemUpdate({force: true, history: history}));
   } catch (error) {
     yield call(message.error, `changeAlias Fail: ${error}`);
   }

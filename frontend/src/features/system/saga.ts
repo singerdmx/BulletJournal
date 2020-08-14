@@ -45,7 +45,7 @@ function* systemApiErrorAction(action: PayloadAction<SystemApiErrorAction>) {
 
 function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
   try {
-    const { force } = action.payload;
+    const { force, history } = action.payload;
     const state = yield select();
     const {
       groupsEtag,
@@ -103,17 +103,14 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
           .map((t) => {
             return data.reminders.find((reminder: any) => reminder.id === t.id);
           })
-          .map((element: Task) => {
-            const targetTime =
-              element.dueDate +
-              ' ' +
-              (element.dueTime ? element.dueTime : '00:00');
-            const leftTime = moment.tz(targetTime, element.timezone);
+          .map((task: Task) => {
             const args: ArgsProps = {
-              message: `Task "${element.name}" due ${leftTime.fromNow()}`,
-              description: `Due: ${element.dueDate} ${element.dueTime}`,
+              message: `"${task.name}" due at ${task.dueDate} ${task.dueTime}`,
               duration: 99999,
               placement: 'topLeft',
+              onClick: () => {
+                history.push(`/task/${task.id}`);
+              },
             };
             return call(notification.open, args);
           }),

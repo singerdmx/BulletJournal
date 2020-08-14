@@ -3,6 +3,7 @@ import {Note} from "../notes/interface";
 import {Content} from "../myBuJo/interface";
 import {Task} from "../tasks/interface";
 import {ContentType} from "../myBuJo/constants";
+import {History} from "history";
 
 export type SystemApiErrorAction = {
   error: string;
@@ -10,6 +11,7 @@ export type SystemApiErrorAction = {
 
 export type UpdateSystem = {
   force: boolean;
+  history: History<History.PoorMansUnknown>;
 };
 
 export type SystemUpdate = {

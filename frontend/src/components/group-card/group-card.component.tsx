@@ -22,7 +22,7 @@ type GroupProps = {
     groupName: string,
     history: History<History.PoorMansUnknown>
   ) => void;
-  changeAlias: (targetUser: string, alias: string, groupId: number) => void;
+  changeAlias: (targetUser: string, alias: string, groupId: number, history: History<History.PoorMansUnknown>) => void;
   removeUserGroupByUsername: (
     groupId: number,
     username: string,
@@ -97,7 +97,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
 
   onAliasChange(alias: string, targetUser: string, groupId: number) {
     if (alias) {
-      this.props.changeAlias(targetUser, alias, groupId);
+      this.props.changeAlias(targetUser, alias, groupId, this.props.history);
     }
   }
 

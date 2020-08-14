@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
+import {History} from "history";
 
 export type UserWithAvatar = {
   name: string;
@@ -19,6 +20,7 @@ export type ChangeAlias = {
   targetUser: string;
   alias: string;
   groupId: number;
+  history: History<History.PoorMansUnknown>;
 };
 
 export type ClearUser = {};

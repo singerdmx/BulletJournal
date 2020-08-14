@@ -21,6 +21,7 @@ import {updateNoteContents} from "../notes/actions";
 import {Note} from "../notes/interface";
 import {updateTransactionContents} from "../transactions/actions";
 import {Transaction} from "../transactions/interface";
+import {History} from "history";
 
 type MyselfProps = {
   username: string;
@@ -34,7 +35,7 @@ type MyselfProps = {
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateGroups: () => void;
   updateNotifications: () => void;
-  updateSystem: (force: boolean) => void;
+  updateSystem: (force: boolean, history: History<History.PoorMansUnknown>) => void;
   updateTaskContents: (taskId: number) => void;
   updateNoteContents: (noteId: number) => void;
   updateTransactionContents: (transactionId: number) => void;
@@ -56,7 +57,7 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
   componentDidMount() {
     this.props.updateMyself();
     this.interval = setInterval(() => {
-      this.props.updateSystem(false);
+      this.props.updateSystem(false, this.props.history);
     }, 50000);
   }
 
@@ -66,7 +67,7 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
 
   handleRefreshOnClick = () => {
     this.props.updateExpandedMyself(true);
-    this.props.updateSystem(true);
+    this.props.updateSystem(true, this.props.history);
     const hash = window.location.hash.toLowerCase();
     if (hash.startsWith('#/note/') && this.props.note) {
       this.props.updateNoteContents(this.props.note.id);
