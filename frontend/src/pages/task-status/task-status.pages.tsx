@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 
 import './task-status.styles.less';
 import {useHistory, useParams} from 'react-router-dom';
-import {BackTop, Collapse} from 'antd';
+import {BackTop, Collapse, Badge} from 'antd';
 import {CaretRightOutlined, SyncOutlined, UpSquareOutlined, FieldTimeOutlined} from '@ant-design/icons';
 import {IState} from '../../store';
 import {getTasksByAssignee, getTasksByOrder, setTaskStatus} from '../../features/tasks/actions';
@@ -119,10 +119,14 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
     if (tasks.length === 0) {
       return null;
     }
-    let header = '';
+    let header = <Badge count={tasks.length} style={{backgroundColor: 'grey'}} title='Number of Tasks'/>;
     let key = 'DEFAULT';
     if (status) {
-      header = status.toString().replace(/_/g, ' ');
+      header = <Badge count={tasks.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Number of Tasks'>
+        <span>
+          {status.toString().replace(/_/g, ' ')}
+        </span>
+      </Badge>;
       key = status.toString();
     }
 
