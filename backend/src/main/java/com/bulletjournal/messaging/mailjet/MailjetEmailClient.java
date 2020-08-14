@@ -80,8 +80,11 @@ public class MailjetEmailClient {
             LOGGER.error("Mailjet key not set up, skip sending email.");
             return null;
         }
-        LOGGER.info("Sending emails: {}", paramsList);
         List<Future<MailjetResponse>> ret = new ArrayList<>();
+        if (paramsList == null || paramsList.isEmpty()) {
+            return ret;
+        }
+        LOGGER.info("Sending emails: {}", paramsList);
         for (MailjetEmailParams params : paramsList) {
             CompletableFuture<MailjetResponse> future = new CompletableFuture<>();
             executorService.submit(() -> {
