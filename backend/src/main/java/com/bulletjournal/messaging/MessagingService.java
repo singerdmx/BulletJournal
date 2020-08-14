@@ -61,35 +61,38 @@ public class MessagingService {
     public void sendTaskDueNotificationAndEmailToUsers(List<Pair<Task, Long>> taskAndTimeList) {
         LOGGER.info("Sending task due notification for tasks: {}",
             taskAndTimeList.stream().map(pair -> pair.getLeft().getName()).collect(Collectors.toList()));
-        Set<String> distinctUsers = taskAndTimeList.stream()
-            .flatMap(pair -> pair.getLeft().getAssignees().stream())
-            .collect(Collectors.toSet());
-        List<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUsers(distinctUsers);
-        List<User> users = userDaoJpa.getUsersByNames(distinctUsers);
-
-        Map<String, List<String>> nameTokensMap = new HashMap<>();
-        for (DeviceToken deviceToken : tokens) {
-            if (!nameTokensMap.containsKey(deviceToken.getUsername())) {
-                nameTokensMap.put(deviceToken.getUsername(), new ArrayList<>());
+        try {
+            Set<String> distinctUsers = taskAndTimeList.stream()
+                .flatMap(pair -> pair.getLeft().getAssignees().stream())
+                .collect(Collectors.toSet());
+            List<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUsers(distinctUsers);
+            List<User> users = userDaoJpa.getUsersByNames(distinctUsers);
+            Map<String, List<String>> nameTokensMap = new HashMap<>();
+            for (DeviceToken deviceToken : tokens) {
+                if (!nameTokensMap.containsKey(deviceToken.getUsername())) {
+                    nameTokensMap.put(deviceToken.getUsername(), new ArrayList<>());
+                }
+                nameTokensMap.get(deviceToken.getUsername()).add(deviceToken.getToken());
             }
-            nameTokensMap.get(deviceToken.getUsername()).add(deviceToken.getToken());
-        }
-        Map<String, String> nameEmailMap = new HashMap<>();
-        for (User user : users) {
-            nameEmailMap.put(user.getName(), user.getEmail());
-        }
+            Map<String, String> nameEmailMap = new HashMap<>();
+            for (User user : users) {
+                nameEmailMap.put(user.getName(), user.getEmail());
+            }
 
-        LOGGER.info("Name email map: {}", nameEmailMap);
-        LOGGER.info("Name token map: {}", nameTokensMap);
-        List<MailjetEmailParams> emailParamsList = new ArrayList<>();
-        List<FcmMessageParams> messageParamsList = new ArrayList<>();
-        for (Pair<Task, Long> taskAndTime : taskAndTimeList) {
-            Task task = DaoHelper.cloneTaskWithDueDateTime(taskAndTime.getLeft(), taskAndTime.getRight());
-            messageParamsList.addAll(createFcmMessageParamsListFromDueTask(task, nameTokensMap));
-            emailParamsList.add(createEmailParamsForDueTask(task, nameEmailMap));
+            LOGGER.info("Name email map: {}", nameEmailMap);
+            LOGGER.info("Name token map: {}", nameTokensMap);
+            List<MailjetEmailParams> emailParamsList = new ArrayList<>();
+            List<FcmMessageParams> messageParamsList = new ArrayList<>();
+            for (Pair<Task, Long> taskAndTime : taskAndTimeList) {
+                Task task = DaoHelper.cloneTaskWithDueDateTime(taskAndTime.getLeft(), taskAndTime.getRight());
+                messageParamsList.addAll(createFcmMessageParamsListFromDueTask(task, nameTokensMap));
+                emailParamsList.add(createEmailParamsForDueTask(task, nameEmailMap));
+            }
+            fcmClient.sendAllMessagesAsync(messageParamsList);
+            mailjetClient.sendAllEmailAsync(emailParamsList);
+        } catch (Exception e) {
+            LOGGER.error(e.toString());
         }
-        fcmClient.sendAllMessagesAsync(messageParamsList);
-        mailjetClient.sendAllEmailAsync(emailParamsList);
     }
 
     private List<FcmMessageParams> createFcmMessageParamsListFromDueTask(
