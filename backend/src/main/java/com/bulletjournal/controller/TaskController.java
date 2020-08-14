@@ -443,6 +443,10 @@ public class TaskController {
         if (type == 0) {
             return new TaskStatistics();
         }
+        // startDate != null && endDate != null
+        // startDate != null && endDate == null => include tasks without due date/time
+        // startDate == null && endDate == null => include tasks without due date/time
+        // other: error
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
