@@ -85,7 +85,10 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       return null;
     }
 
-    let dueDateTitle = moment(task.dueDate, dateFormat).fromNow();
+    const targetTime = task.dueDate + ' ' + (task.dueTime ? task.dueTime : '00:00');
+    const leftTime = moment.tz(targetTime, task.timezone);
+
+    let dueDateTitle = leftTime.fromNow();
     if (task.duration) {
       dueDateTitle += `, duration ${getDuration(task.duration)}`;
     }
