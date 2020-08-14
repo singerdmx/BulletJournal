@@ -45,6 +45,7 @@ const App: React.FC<RootProps> = (props) => {
   }, [props.theme]);
 
   const [helpers, setHelpers] = useState({});
+  const [layoutMarginLeft, setLayoutMarginLeft] = useState(250);
 
   const steps = [
     {
@@ -152,8 +153,8 @@ const App: React.FC<RootProps> = (props) => {
         }}
       />
       <Layout className="layout">
-        <SideLayout />
-        <Layout style={{ marginLeft: '250px' }}>
+        <SideLayout setLayoutMarginLeft={setLayoutMarginLeft}/>
+        <Layout style={{ marginLeft: `${layoutMarginLeft}px` }}>
           <HeaderLayout />
           <ContentLayout />
           <FooterLayout />
