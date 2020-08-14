@@ -59,7 +59,7 @@ class SideLayout extends React.Component<SiderProps, SiderState> {
                         <h2>Bullet Journal</h2>
                     </div>
                 </div>
-                <Tooltip title='Slider' placement='right'>
+                <Tooltip title='Slide' placement='right'>
                     <div id='sideMenuSlider' draggable={true}
                          onDrag={this.onDrag} onDrop={this.onDrop}
                          onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
