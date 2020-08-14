@@ -73,6 +73,7 @@ public class FcmClient {
             LOGGER.error("FirebaseMessaging not initialized, cannot send message.");
             return;
         }
+        LOGGER.info("Sending mobile notifications: {}", paramsList);
         List<Message> messages
             = paramsList.stream().map(this::getMessageFromParams).collect(Collectors.toList());
         ApiFuture<BatchResponse> future

@@ -50,4 +50,13 @@ public class MailjetEmailParams {
     public void setText(String text) {
         this.text = text;
     }
+
+    @Override
+    public String toString() {
+        return "MailjetEmailParams{" +
+            "subject='" + subject + '\'' +
+            ", text='" + text + '\'' +
+            ", receivers=" + receivers +
+            '}';
+    }
 }

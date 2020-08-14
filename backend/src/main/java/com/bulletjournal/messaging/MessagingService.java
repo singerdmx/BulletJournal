@@ -79,6 +79,8 @@ public class MessagingService {
             nameEmailMap.put(user.getName(), user.getEmail());
         }
 
+        LOGGER.info("Name email map: {}", nameEmailMap);
+        LOGGER.info("Name token map: {}", nameTokensMap);
         List<MailjetEmailParams> emailParamsList = new ArrayList<>();
         List<FcmMessageParams> messageParamsList = new ArrayList<>();
         for (Pair<Task, Long> taskAndTime : taskAndTimeList) {
