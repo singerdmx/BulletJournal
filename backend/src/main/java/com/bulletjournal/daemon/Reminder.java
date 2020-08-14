@@ -3,6 +3,7 @@ package com.bulletjournal.daemon;
 import com.bulletjournal.config.ReminderConfig;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
 import com.bulletjournal.repository.models.Task;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -35,6 +37,7 @@ public class Reminder {
     private final ScheduledExecutorService executorService;
     private final ConcurrentHashMap<ReminderRecord, Task> concurrentHashMap;
     private final TaskDaoJpa taskDaoJpa;
+    private final MessagingService messagingService;
 
     @Autowired
     private ReminderConfig reminderConfig;
@@ -43,8 +46,9 @@ public class Reminder {
     private TaskRepository taskRepository;
 
     @Autowired
-    Reminder(TaskDaoJpa taskDaoJpa) {
+    Reminder(TaskDaoJpa taskDaoJpa, MessagingService messagingService) {
         this.taskDaoJpa = taskDaoJpa;
+        this.messagingService = messagingService;
         this.concurrentHashMap = new ConcurrentHashMap();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("Reminder"));
     }
@@ -137,6 +141,7 @@ public class Reminder {
             LOGGER.info("records = " + records);
             if (records.contains(record)) {
                 LOGGER.info("Push notification record = " + record);
+                messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(org.apache.commons.lang3.tuple.Pair.of(task, record.getTimestamp())));
                 concurrentHashMap.remove(record);
             }
         });
