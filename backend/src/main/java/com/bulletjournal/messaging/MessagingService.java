@@ -101,7 +101,12 @@ public class MessagingService {
         List<FcmMessageParams> paramsList = new ArrayList<>();
         List<String> targetTokens = new ArrayList<>();
         for (String username : task.getAssignees()) {
-            targetTokens.addAll(nameTokenMap.get(username));
+            List<String> tokenList = nameTokenMap.get(username);
+            if (tokenList != null) {
+                targetTokens.addAll(nameTokenMap.get(username));
+            } else {
+                LOGGER.info("user {} doesn't have device token", username);
+            }
         }
         String taskName = task.getName();
         String dueDate = task.getDueDate();
