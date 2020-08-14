@@ -108,7 +108,9 @@ public class MessagingService {
                 token,
                 notificationTitleBody,
                 "type",
-                "taskDueNotification"
+                "taskDueNotification",
+                "taskId",
+                String.valueOf(task.getId())
             ));
         }
         return paramsList;
