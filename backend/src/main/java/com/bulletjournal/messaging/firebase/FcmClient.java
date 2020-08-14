@@ -96,7 +96,7 @@ public class FcmClient {
     }
 
     private void processResponse(BatchResponse batchResponse, List<FcmMessageParams> messages) {
-        LOGGER.debug("Got batchResponse, succeeded: {}, failed: {}",
+        LOGGER.info("Got batchResponse, succeeded: {}, failed: {}",
             batchResponse.getSuccessCount(), batchResponse.getFailureCount());
         List<SendResponse> responses = batchResponse.getResponses();
         for (int i = 0; i < responses.size(); ++i) {
