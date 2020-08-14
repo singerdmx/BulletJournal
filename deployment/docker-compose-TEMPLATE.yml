@@ -35,6 +35,8 @@ services:
       MJ_APIKEY_PRIVATE: "${MJ_APIKEY_PRIVATE}"
       MJ_APIKEY_PUBLIC: "${MJ_APIKEY_PUBLIC}"
       FCM_ACCOUNT_KEY: "${FCM_ACCOUNT_KEY}"
+      SENDER_EMAIL: "${SENDER_EMAIL}"
+      SENDER_NAME: "${SENDER_NAME}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
       - $HOME/docker/volumes/etc/key:/etc/key
