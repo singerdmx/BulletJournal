@@ -91,7 +91,7 @@ public class MessagingService {
             fcmClient.sendAllMessagesAsync(messageParamsList);
             mailjetClient.sendAllEmailAsync(emailParamsList);
         } catch (Exception e) {
-            LOGGER.error(e.toString());
+            e.printStackTrace();
         }
     }
 
