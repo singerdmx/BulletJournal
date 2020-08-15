@@ -16,6 +16,8 @@ import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {MenuOutlined} from "@ant-design/icons/lib";
 import {Project} from "../../features/project/interface";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 
 const { Panel } = Collapse;
 
@@ -132,54 +134,80 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
 
     return (
       <Panel header={header} key={key}>
-        {tasks.map((task, index) => {
-          return (
-            <div
-              key={task.id}
-              style={{ display: 'flex', alignItems: 'center' }}
-            >
-              <TaskItem
-                task={task}
-                type={ProjectItemUIType.ORDER}
-                readOnly={false}
-                inProject={true}
-                inModal={false}
-                isComplete={false}
-                showModal={handleGetTasksByAssignee}
-                showOrderModal={handleGetTasksByOrder}
-                completeOnlyOccurrence={false}
-              />
+        <Droppable droppableId={`${key}`}>
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                {tasks.map((task, index) => {
+                  return (
+                    <Draggable draggableId={`${task.id}`} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          key={task.id}
+                        >
+                          <TaskItem
+                            task={task}
+                            type={ProjectItemUIType.ORDER}
+                            readOnly={false}
+                            inProject={true}
+                            inModal={false}
+                            isComplete={false}
+                            showModal={handleGetTasksByAssignee}
+                            showOrderModal={handleGetTasksByOrder}
+                            completeOnlyOccurrence={false}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
+              {provided.placeholder}
             </div>
-          );
-        })}
+          )}
+        </Droppable>
       </Panel>
     );
   };
 
+  const onDragEnd = (result: any) => {
+    const {destination, draggableId} = result;
+    if (!destination) {
+      return;
+    }
+    console.log(destination);
+    console.log(draggableId);
+    const taskId = parseInt(draggableId);
+    const newStatus = destination.droppableId;
+    setTaskStatus(taskId, newStatus);
+  }
+
   return (
     <div className="task-status-page">
       <BackTop />
-
       <div>
-        <Collapse
-          bordered={false}
-          defaultActiveKey={[
-            'IN_PROGRESS',
-            'NEXT_TO_DO',
-            'READY',
-            'ON_HOLD',
-            'DEFAULT',
-          ]}
-          expandIcon={({ isActive }) => (
-            <CaretRightOutlined rotate={isActive ? 90 : 0} />
-          )}
-        >
-          {getPanel(TaskStatus.IN_PROGRESS, inProgressTasks)}
-          {getPanel(TaskStatus.NEXT_TO_DO, nextToDoTasks)}
-          {getPanel(TaskStatus.READY, readyTasks)}
-          {getPanel(TaskStatus.ON_HOLD, onHoldTasks)}
-          {getPanel(undefined, tasks)}
-        </Collapse>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Collapse
+            bordered={false}
+            defaultActiveKey={[
+              'IN_PROGRESS',
+              'NEXT_TO_DO',
+              'READY',
+              'ON_HOLD',
+              'DEFAULT',
+            ]}
+            expandIcon={({ isActive }) => (
+              <CaretRightOutlined rotate={isActive ? 90 : 0} />
+            )}
+          >
+            {getPanel(TaskStatus.IN_PROGRESS, inProgressTasks)}
+            {getPanel(TaskStatus.NEXT_TO_DO, nextToDoTasks)}
+            {getPanel(TaskStatus.READY, readyTasks)}
+            {getPanel(TaskStatus.ON_HOLD, onHoldTasks)}
+            {getPanel(undefined, tasks)}
+          </Collapse>
+        </DragDropContext>
       </div>
       <div>
         <TasksByAssignee
