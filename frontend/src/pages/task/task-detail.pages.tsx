@@ -17,7 +17,6 @@ import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import { convertToTextWithRRule } from '../../features/recurrence/actions';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 import { Content } from '../../features/myBuJo/interface';
 // components

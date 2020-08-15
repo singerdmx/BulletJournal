@@ -1,5 +1,5 @@
 import React from 'react';
-import { Collapse, Empty, List, Timeline } from 'antd';
+import {Badge, Collapse, Empty, List, Timeline} from 'antd';
 import {
   AccountBookOutlined,
   CarryOutOutlined,
@@ -30,7 +30,11 @@ const getTasksPanel = (
   }
   return (
     <Panel
-      header={items.dayOfWeek}
+      header={<Badge count={items.tasks.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Count'>
+        <span>
+          {items.dayOfWeek}
+        </span>
+      </Badge>}
       key={`tasks${index}`}
       extra={<CarryOutOutlined />}
     >
@@ -58,7 +62,11 @@ const getTransactionsPanel = (items: ProjectItems, type: ProjectItemUIType, inde
   }
   return (
     <Panel
-      header={items.dayOfWeek}
+      header={<Badge count={items.transactions.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Count'>
+        <span>
+          {items.dayOfWeek}
+        </span>
+      </Badge>}
       key={`transactions${index}`}
       extra={<AccountBookOutlined />}
     >
@@ -81,7 +89,11 @@ const getNotesPanel = (items: ProjectItems, index: number, type: ProjectItemUITy
   }
   return (
     <Panel
-      header={items.dayOfWeek}
+      header={<Badge count={items.notes.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Count'>
+        <span>
+          {items.dayOfWeek}
+        </span>
+      </Badge>}
       key={`notes${index}`}
       extra={<FileTextOutlined />}
     >

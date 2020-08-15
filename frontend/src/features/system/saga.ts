@@ -17,7 +17,6 @@ import { updateGroups } from '../group/actions';
 import { updateNotifications } from '../notification/actions';
 import { ProjectType } from '../project/constants';
 import { Task } from '../tasks/interface';
-import moment from 'moment-timezone';
 import { ArgsProps } from 'antd/lib/notification';
 import {Content} from "../myBuJo/interface";
 import {updateTargetContent} from "../content/actions";

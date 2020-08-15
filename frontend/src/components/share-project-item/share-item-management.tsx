@@ -1,14 +1,14 @@
 import React from 'react';
-import { Collapse, Avatar, Empty, Tag, Tooltip, Button, message } from 'antd';
+import {Avatar, Badge, Button, Collapse, Empty, message, Tag, Tooltip} from 'antd';
 import moment from 'moment';
-import { LinkOutlined, DeleteOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { revokeTaskSharable } from '../../features/tasks/actions';
-import { revokeNoteSharable } from '../../features/notes/actions';
-import { ProjectType } from '../../features/project/constants';
-import { IState } from '../../store';
-import { User } from '../../features/group/interface';
-import { SharableLink } from '../../features/system/interface';
+import {DeleteOutlined, LinkOutlined} from '@ant-design/icons';
+import {connect} from 'react-redux';
+import {revokeTaskSharable} from '../../features/tasks/actions';
+import {revokeNoteSharable} from '../../features/notes/actions';
+import {ProjectType} from '../../features/project/constants';
+import {IState} from '../../store';
+import {User} from '../../features/group/interface';
+import {SharableLink} from '../../features/system/interface';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
 const { Panel } = Collapse;
@@ -122,10 +122,16 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
   return (
     <div>
       <Collapse defaultActiveKey={['1', '2']}>
-        <Panel header="Shared Users" key="1">
+        <Panel header={<Badge count={sharedUsers ? sharedUsers.length : 0} style={{backgroundColor: 'grey'}}
+                              offset={[13, 6]} title='Count'>
+          <span>Shared Users</span>
+        </Badge>} key="1">
           {showSharedUsers()}
         </Panel>
-        <Panel header="Shared Links" key="2">
+        <Panel header={<Badge count={sharedLinks ? sharedLinks.length : 0} style={{backgroundColor: 'grey'}}
+                              offset={[13, 6]} title='Count'>
+          <span>Shared Links</span>
+        </Badge>} key="2">
           {showSharedLinks()}
         </Panel>
       </Collapse>
