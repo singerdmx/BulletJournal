@@ -1,11 +1,9 @@
 import React, {
-  createRef,
   useState,
-  useRef,
   useCallback,
   useEffect,
 } from 'react';
-import { Layout, Tooltip } from 'antd';
+import { Layout } from 'antd';
 import SideMenu from '../../components/side-menu/side-menu.component';
 import * as logo from '../../assets/favicon466.ico';
 import { RightSquareOutlined } from '@ant-design/icons';
@@ -59,11 +57,9 @@ const SideLayout: React.FC<SiderProps> = (props) => {
         </div>
       </div>
       <SideMenu />
-      <Tooltip title='Slide' placement='right'>
-        <div id='sideMenuSlider'>
-          <RightSquareOutlined />
-        </div>
-      </Tooltip>
+      <div id='sideMenuSlider'>
+        <RightSquareOutlined />
+      </div>
     </Sider>
   );
 };
