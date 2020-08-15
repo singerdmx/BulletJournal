@@ -18,7 +18,7 @@ public class Category extends AuditModel {
     @Column(nullable = false)
     String name;
 
-    @Column(nullable = false)
+    @Column
     String description;
 
     public Category() {

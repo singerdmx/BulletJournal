@@ -74,6 +74,8 @@ public class CategoryControllerTest {
 
     @Before
     public void setup() {
+        hierarchyDaoJpa.updateHierarchy("[]");
+        categoryRepository.deleteAll();
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
