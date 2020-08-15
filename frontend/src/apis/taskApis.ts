@@ -333,7 +333,7 @@ export const getContentRevision = (
 
 export const setTaskStatus = (taskId: number, taskStatus: TaskStatus, timezone: string) => {
   const postBody = JSON.stringify({
-    status: taskStatus,
+    status: taskStatus.toString() === 'DEFAULT' ? null : taskStatus.toString(),
     timezone: timezone
   });
 

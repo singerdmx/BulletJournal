@@ -25,6 +25,9 @@ public enum TaskStatus {
     }
 
     public static String toText(TaskStatus status) {
+        if (status == null) {
+            return "NONE";
+        }
         switch (status) {
             case IN_PROGRESS:
                 return "IN PROGRESS";

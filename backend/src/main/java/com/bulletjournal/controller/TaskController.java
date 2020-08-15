@@ -198,8 +198,9 @@ public class TaskController {
             @RequestBody SetTaskStatusParams setTaskStatusParams) {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        TaskStatus taskStatus = setTaskStatusParams.getStatus();
         Pair<com.bulletjournal.repository.models.Task, List<Event>> res = this.taskDaoJpa
-                .setTaskStatus(setTaskStatusParams.getStatus(), taskId, username);
+                .setTaskStatus(taskStatus, taskId, username);
         com.bulletjournal.repository.models.Task updatedTask = res.getLeft();
         List<Event> events = res.getRight();
 
@@ -209,7 +210,7 @@ public class TaskController {
 
         this.notificationService.trackActivity(new Auditable(updatedTask.getProject().getId(),
                 "set Task ##" + updatedTask.getName() + "## to ##"
-                        + TaskStatus.toText(setTaskStatusParams.getStatus()) + "## in BuJo ##"
+                        + TaskStatus.toText(taskStatus) + "## in BuJo ##"
                         + updatedTask.getProject().getName() + "##",
                 username, updatedTask.getId(), Timestamp.from(Instant.now()), ContentAction.UPDATE_TASK));
 
