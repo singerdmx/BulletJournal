@@ -197,7 +197,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             if (!Objects.equals(etag, noteEtag)) {
                 throw new BadRequestException("Invalid etag");
             }
-            content.setText(lastRevisionContent);
+            content.setText(DeltaConverter.mergeContentText(lastRevisionContent, content.getText()) );
             this.getContentJpaRepository().save(content);
         }
 

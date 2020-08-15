@@ -34,6 +34,13 @@ public class DeltaConverter {
         return deltaContent.toJSON();
     }
 
+    public static String mergeContentText(String webText, String mobileText) {
+        LinkedHashMap<String, Object> webTextMap = GSON.fromJson(webText, LinkedHashMap.class);
+        LinkedHashMap<String, Object> mobileTextMap = GSON.fromJson(mobileText, LinkedHashMap.class);
+        webTextMap.put("mdelta", mobileTextMap.get("mdelta"));
+        return GSON.toJson(webTextMap);
+    }
+
     public static UpdateContentParams strToUpdateContentParams(String text) {
         return GSON.fromJson(text, UpdateContentParams.class);
     }
