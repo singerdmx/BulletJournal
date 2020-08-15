@@ -19,15 +19,8 @@ type SiderProps = {
   setLayoutMarginLeft: (w: number) => void;
 };
 
-type SiderState = {
-  w: number;
-  isDragging: boolean;
-};
-
-const SideLayout: React.FC<SiderProps & SiderState> = (props) => {
+const SideLayout: React.FC<SiderProps> = (props) => {
   const [width, setWidth] = useState(249);
-  const [initWidth, setInitWidth] = useState(0);
-  const dragRef = useRef<HTMLDivElement>(null);
   const dragHandler = useCallback(
     _.throttle((e: MouseEvent) => {
       const ele = document.getElementById('sideMenuSlider');
@@ -44,8 +37,6 @@ const SideLayout: React.FC<SiderProps & SiderState> = (props) => {
   }, []);
 
   const onDragStart = useCallback((e: MouseEvent) => {
-    console.log(e.pageX);
-    setInitWidth(e.pageX);
     document.addEventListener('mousemove', dragHandler, false);
   }, []);
 
