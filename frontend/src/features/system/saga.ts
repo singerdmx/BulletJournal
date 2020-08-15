@@ -21,6 +21,7 @@ import moment from 'moment-timezone';
 import { ArgsProps } from 'antd/lib/notification';
 import {Content} from "../myBuJo/interface";
 import {updateTargetContent} from "../content/actions";
+import {projectLabelsUpdate} from "../label/actions";
 
 const fetchReminderFromLocal = () => {
   const defaultReminders = [] as Task[];
@@ -136,6 +137,9 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
           }
           break;
         default:
+      }
+      if (force) {
+        yield put(projectLabelsUpdate(selectedProject.id, false));
       }
     }
 
