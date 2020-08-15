@@ -13,10 +13,6 @@ IF %1%==elk goto elk
 docker-compose -f ./docker-compose-win.yml up -d
 goto done
 
-:dev
-docker-compose -f ./docker-compose-win-dev.yml -f ./elk/docker-compose-win.yml up -d
-goto done
-
 :elk
 docker-compose -f ./docker-compose-win.yml -f ./elk/docker-compose-win.yml up -d
 goto done
