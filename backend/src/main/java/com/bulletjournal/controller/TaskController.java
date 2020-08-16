@@ -436,14 +436,9 @@ public class TaskController {
     public TaskStatistics getTaskStatistics(
             @NotNull @RequestParam List<Long> projectIds,
             @NotBlank @RequestParam String timezone,
-            @NotNull @RequestParam Integer type,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) List<String> userFilter) {
-    // e.g. /api/taskStatistics?projectIds=11&projectIds=12&timezone=america%2Flos_angeles&type=3&startDate=2020-08-01
-        if (type == 0) {
-            return new TaskStatistics();
-        }
+            @RequestParam(required = false) String endDate) {
+        // e.g. /api/taskStatistics?projectIds=11&projectIds=12&timezone=america%2Flos_angeles&type=3&startDate=2020-08-01
         // startDate != null && endDate != null
         // startDate != null && endDate == null => include tasks without due date/time
         // startDate == null && endDate == null => include tasks without due date/time
