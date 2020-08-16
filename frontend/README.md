@@ -1,14 +1,17 @@
 ## About Frontend
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 Using `--typescript` to work with typescript.
 
 ## How to build and push image
+
 ```
 docker build -t mwangxx/bulletjournal-frontend .
 docker push mwangxx/bulletjournal-frontend:latest
 ```
 
 ## Contribute Guide
+
 - `layout` directory contains component for layout.
 - `pages` directory contains each page when click **side menu item**. The page is controlled by router in the content layout.
 - `features` directory will contain every small features working with redux and saga.
@@ -52,3 +55,7 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+### `npm run electron-dev`
+
+To run BulletJournal Desktop Application, please run `npm run electron-dev`
