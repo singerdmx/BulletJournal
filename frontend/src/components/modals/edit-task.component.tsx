@@ -116,18 +116,24 @@ const EditTask: React.FC<
   }, [projectId]);
 
   const updateTask = (values: any) => {
-    //convert time object to string
-    let dueDate = values.dueDate
-      ? values.dueDate.format(dateFormat)
-      : task.dueDate;
+    // "undefined" means user didn't change it
+    // "null" means user cleared it
+    let dueDate;
     if (values.dueDate === null) {
+      dueDate = null;
+    } else if (values.dueDate === undefined) {
       dueDate = task.dueDate;
+    } else {
+      dueDate = values.dueDate.format(dateFormat);
     }
-    let dueTime = values.dueTime
-      ? values.dueTime.format('HH:mm')
-      : task.dueTime;
+
+    let dueTime;
     if (values.dueTime === null) {
       dueTime = null;
+    } else if (values.dueTime === undefined) {
+      dueTime = task.dueTime;
+    } else {
+      dueTime = values.dueTime.format('HH:mm');
     }
     let recurrence = rRuleString;
     if (dueType === 'dueByRec') {
