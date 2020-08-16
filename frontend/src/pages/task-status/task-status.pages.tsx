@@ -124,7 +124,7 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
     let header = <Badge count={tasks.length} style={{backgroundColor: 'grey'}} title='Number of Tasks'/>;
     let key = 'DEFAULT';
     if (status) {
-      header = <Badge count={tasks.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Number of Tasks'>
+      header = <Badge count={tasks.length} style={{backgroundColor: 'grey'}} offset={[20, 6]} title='Number of Tasks'>
         <span>
           {status.toString().replace(/_/g, ' ')}
         </span>

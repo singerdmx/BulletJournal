@@ -123,13 +123,13 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
     <div>
       <Collapse defaultActiveKey={['1', '2']}>
         <Panel header={<Badge count={sharedUsers ? sharedUsers.length : 0} style={{backgroundColor: 'grey'}}
-                              offset={[13, 6]} title='Count'>
+                              offset={[20, 6]} title='Count'>
           <span>Shared Users</span>
         </Badge>} key="1">
           {showSharedUsers()}
         </Panel>
         <Panel header={<Badge count={sharedLinks ? sharedLinks.length : 0} style={{backgroundColor: 'grey'}}
-                              offset={[13, 6]} title='Count'>
+                              offset={[20, 6]} title='Count'>
           <span>Shared Links</span>
         </Badge>} key="2">
           {showSharedLinks()}

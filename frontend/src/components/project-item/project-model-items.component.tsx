@@ -30,7 +30,7 @@ const getTasksPanel = (
   }
   return (
     <Panel
-      header={<Badge count={items.tasks.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Count'>
+      header={<Badge count={items.tasks.length} style={{backgroundColor: 'grey'}} offset={[20, 6]} title='Count'>
         <span>
           {items.dayOfWeek}
         </span>
@@ -62,7 +62,7 @@ const getTransactionsPanel = (items: ProjectItems, type: ProjectItemUIType, inde
   }
   return (
     <Panel
-      header={<Badge count={items.transactions.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Count'>
+      header={<Badge count={items.transactions.length} style={{backgroundColor: 'grey'}} offset={[20, 6]} title='Count'>
         <span>
           {items.dayOfWeek}
         </span>
@@ -89,7 +89,7 @@ const getNotesPanel = (items: ProjectItems, index: number, type: ProjectItemUITy
   }
   return (
     <Panel
-      header={<Badge count={items.notes.length} style={{backgroundColor: 'grey'}} offset={[13, 6]} title='Count'>
+      header={<Badge count={items.notes.length} style={{backgroundColor: 'grey'}} offset={[20, 6]} title='Count'>
         <span>
           {items.dayOfWeek}
         </span>
