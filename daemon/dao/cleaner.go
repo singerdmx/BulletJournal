@@ -5,6 +5,7 @@ import (
 	"time"
 	"upper.io/db.v3"
 	"upper.io/db.v3/postgresql"
+	"github.com/singerdmx/BulletJournal/daemon/config"
 )
 
 const (
@@ -14,12 +15,7 @@ const (
 	historyMaxRetentionDays = 365
 )
 
-var settings = postgresql.ConnectionURL{
-	Host:     "localhost:5432",
-	Database: "postgres",
-	User:     "postgres",
-	Password: "docker",
-}
+var settings postgresql.ConnectionURL
 
 //Map to table name auditables
 type Auditable struct {
@@ -130,10 +126,22 @@ func renewExpiringGoogleCalendarWatch()  {
 	}
 }
 
+func PopulateConfiguration() *postgresql.ConnectionURL {
+	serviceConfig := config.GetConfig()
+	settings = postgresql.ConnectionURL{
+		Host:     serviceConfig.Host + ":" + serviceConfig.DBPort,
+		Database: serviceConfig.Database,
+		User:     serviceConfig.Username,
+		Password: serviceConfig.Password,
+	}
+	return &settings
+}
+
 func Clean() {
 	t := time.Now()
 	t.AddDate(0, 0, -maxRetentionTimeInDays)
 	log.Println(t)
+	PopulateConfiguration()
 	deleteByUpdatedAtBefore(t, "notifications")
 	deleteByUpdatedAtBefore(t, "auditables")
 	deleteByExpirationTimeBefore("public_project_items")
