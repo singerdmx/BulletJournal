@@ -9,6 +9,7 @@ import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -107,11 +108,9 @@ public class MessagingService {
                 LOGGER.info("user {} doesn't have device token", username);
             }
         }
-        String taskName = task.getName();
-        String dueDate = task.getDueDate();
-        String dueTime = task.getDueTime();
+
         Pair<String, String> notificationTitleBody
-            = new ImmutablePair<>(taskName + " due at " + dueDate + " " + dueTime, "");
+            = new ImmutablePair<>(getTitle(task), "");
         for (String token : targetTokens) {
             paramsList.add(new FcmMessageParams(
                 token,
@@ -125,6 +124,18 @@ public class MessagingService {
         return paramsList;
     }
 
+    private String getTitle(Task task) {
+        String taskName = task.getName();
+        String dueDate = task.getDueDate();
+        String dueTime = task.getDueTime();
+        StringBuilder res = new StringBuilder(taskName + " due at " + dueDate);
+        if (StringUtils.isNotBlank(dueTime)) {
+            res.append(" " + dueTime);
+        }
+        res.append(" (" + task.getTimezone() + ")");
+        return res.toString();
+    }
+
     private MailjetEmailParams createEmailParamsForDueTask(
         Task task, Map<String, String> nameEmailMap
     ) {
@@ -133,14 +144,11 @@ public class MessagingService {
             String email = nameEmailMap.get(username);
             receivers.add(new ImmutablePair<>(username, email));
         }
-        String taskName = task.getName();
-        String dueDate = task.getDueDate();
-        String dueTime = task.getDueTime();
         MailjetEmailParams params =
             new MailjetEmailParams(
                 receivers,
-                taskName + " due at " + dueDate + " " + dueTime,
-                "Your task " + taskName + " is due on " + dueDate + " " + dueTime
+                getTitle(task),
+                getTitle(task)
             );
         return params;
     }
