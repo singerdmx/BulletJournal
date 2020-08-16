@@ -76,7 +76,9 @@ public class MessagingService {
             }
             Map<String, String> nameEmailMap = new HashMap<>();
             for (User user : users) {
-                nameEmailMap.put(user.getName(), user.getEmail());
+                if (user.getEmail() != null && !user.getEmail().endsWith("@anon.1o24bbs.com")) {
+                    nameEmailMap.put(user.getName(), user.getEmail());
+                }
             }
 
             LOGGER.info("Name email map: {}", nameEmailMap);
