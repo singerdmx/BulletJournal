@@ -105,7 +105,7 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
           })
           .map((task: Task) => {
             const args: ArgsProps = {
-              message: `"${task.name}" due at ${task.dueDate} ${task.dueTime ? task.dueTime : ''}`,
+              message: `"${task.name}" due at ${task.dueDate} ${task.dueTime ? task.dueTime : ''} (${task.timezone})`,
               duration: 99999,
               placement: 'topLeft',
               onClick: () => {
