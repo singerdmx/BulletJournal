@@ -3,6 +3,7 @@ syntax = "proto3";
 package services;
 
 import "daemon/grpc/types/join_group_events.proto";
+import "daemon/grpc/types/subscribe_notification.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services";
@@ -14,7 +15,10 @@ option java_outer_classname = "DaemonProto";
 service Daemon {
 
   // Serve rpc call sending JoinGroupEvents
-  rpc JoinGroupEvents (types.JoinGroupEvents) returns (stream types.ReplyMessage) {}
+  rpc JoinGroupEvents (types.JoinGroupEvents) returns (types.ReplyMessage) {}
+
+  // Serve rpc call sending JoinGroupEvents
+  rpc SubscribeNotification (types.SubscribeNotification) returns (stream types.StreamMessage) {}
 
   // Serve rest call sending JoinGroupEvents
   rpc Rest (types.JoinGroupEvents) returns (types.ReplyMessage) {

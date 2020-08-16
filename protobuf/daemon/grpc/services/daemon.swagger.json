@@ -158,6 +158,14 @@
           "type": "string"
         }
       }
+    },
+    "typesStreamMessage": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
     }
   }
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	random "github.com/singerdmx/BulletJournal/daemon/utils"
@@ -15,6 +16,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 const (
@@ -27,8 +29,19 @@ type server struct {
 
 // Send implements the JoinGroupEvents rpc endpoint of services.DaemonServer
 func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
+
+	//log.Printf("Received rpc request: %v", request.String())
+	//var pow = []int{1, 2, 4, 8, 16, 32, 64, 128}
+	//for _, v := range pow {
+	//	time.Sleep(5 * time.Second)
+	//	if err := stream.Send(&types.ReplyMessage{Message: fmt.Sprintf("Hello rpc %d",v) }); err != nil {
+	//		return err
+	//	}
+	//}
+	//
+	//return nil
 	log.Printf("Received rpc request: %v", request.String())
-	return &types.ReplyMessage{Message: "Hello rpc"}, nil
+	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
 
 // Rest implements the Rest rest->rpc endpoint of services.DaemonServer
@@ -66,7 +79,7 @@ func main() {
 	}
 
 	httpAddr := ":" + serviceConfig.HttpPort
-	httpServer := &http.Server{Addr: httpAddr  , Handler: gatewayMux}
+	httpServer := &http.Server{Addr: httpAddr, Handler: gatewayMux}
 
 	//// Serve the swagger-ui and swagger file
 	//mux := http.NewServeMux()
