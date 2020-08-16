@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -138,10 +139,12 @@ public class Reminder {
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
         taskRepository.findById(record.getId()).ifPresent(task -> {
             List<ReminderRecord> records = DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond());
+            Map<ReminderRecord, Task> map = DaoHelper.getReminderRecordMap(task, interval.getFirst(), interval.getSecond());
             LOGGER.info("records = " + records);
-            if (records.contains(record)) {
-                LOGGER.info("Push notification record = " + record);
-                messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(org.apache.commons.lang3.tuple.Pair.of(task, record.getTimestamp())));
+            if (map.keySet().contains(record)) {
+                Task clonedTask = map.get(record);
+                LOGGER.info("Push notification record = " + record + "clonedTask = " + clonedTask);
+                messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(clonedTask));
                 concurrentHashMap.remove(record);
             }
         });

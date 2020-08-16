@@ -9,7 +9,6 @@ import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
-import com.bulletjournal.repository.utils.DaoHelper;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -58,12 +57,11 @@ public class MessagingService {
         fcmClient.sendAllMessagesAsync(params);
     }
 
-    public void sendTaskDueNotificationAndEmailToUsers(List<Pair<Task, Long>> taskAndTimeList) {
-        LOGGER.info("Sending task due notification for tasks: {}",
-            taskAndTimeList.stream().map(pair -> pair.getLeft().getName()).collect(Collectors.toList()));
+    public void sendTaskDueNotificationAndEmailToUsers(List<Task> taskList) {
+        LOGGER.info("Sending task due notification for tasks: {}", taskList);
         try {
-            Set<String> distinctUsers = taskAndTimeList.stream()
-                .flatMap(pair -> pair.getLeft().getAssignees().stream())
+            Set<String> distinctUsers = taskList.stream()
+                .flatMap(task -> task.getAssignees().stream())
                 .collect(Collectors.toSet());
             List<DeviceToken> tokens = deviceTokenDaoJpa.getTokensByUsers(distinctUsers);
             List<User> users = userDaoJpa.getUsersByNames(distinctUsers);
@@ -85,8 +83,7 @@ public class MessagingService {
             LOGGER.info("Name token map: {}", nameTokensMap);
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
             List<FcmMessageParams> messageParamsList = new ArrayList<>();
-            for (Pair<Task, Long> taskAndTime : taskAndTimeList) {
-                Task task = DaoHelper.cloneTaskWithDueDateTime(taskAndTime.getLeft(), taskAndTime.getRight());
+            for (Task task : taskList) {
                 messageParamsList.addAll(createFcmMessageParamsListFromDueTask(task, nameTokensMap));
                 emailParamsList.add(createEmailParamsForDueTask(task, nameEmailMap));
             }

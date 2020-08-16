@@ -10,10 +10,7 @@ import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class DaoHelper {
@@ -35,16 +32,20 @@ public class DaoHelper {
      * @return List<ReminderRecord> - a list of reminder record
      */
     public static List<ReminderRecord> getReminderRecords(Task task, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<ReminderRecord> records = new ArrayList<>();
+        return new ArrayList<>(getReminderRecordMap(task, startTime, endTime).keySet());
+    }
+
+    public static Map<ReminderRecord, Task> getReminderRecordMap(Task task, ZonedDateTime startTime, ZonedDateTime endTime) {
+        Map<ReminderRecord, Task> map = new HashMap<>();
         if (Objects.isNull(task.getRecurrenceRule())) {
-            records.add(new ReminderRecord(task.getId(), task.getReminderDateTime().getTime()));
+            map.put(new ReminderRecord(task.getId(), task.getReminderDateTime().getTime()), task);
         } else {
             List<Task> recurringTasks = getRecurringTask(task, startTime, endTime);
             recurringTasks.forEach(t -> {
-                records.add(new ReminderRecord(t.getId(), t.getReminderDateTime().getTime()));
+                map.put(new ReminderRecord(t.getId(), t.getReminderDateTime().getTime()), t);
             });
         }
-        return records;
+        return map;
     }
 
 
