@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	config "github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"github.com/zywangzy/JobScheduler"
@@ -38,6 +39,10 @@ func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*typ
 }
 
 func main() {
+
+	config.InitConfig()
+	serviceConfig := config.GetConfig()
+
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -45,6 +50,7 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
+	rpcPort := ":" + serviceConfig.RPCPort
 	lis, err := net.Listen("tcp", rpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -53,11 +59,14 @@ func main() {
 	services.RegisterDaemonServer(rpcServer, &server{})
 
 	gatewayMux := runtime.NewServeMux()
-	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, local+rpcPort, []grpc.DialOption{grpc.WithInsecure()})
+	endpoint := serviceConfig.Host + rpcPort
+	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
 		log.Fatalf("failed to register rpc server to gateway server: %v", err)
 	}
-	httpServer := &http.Server{Addr: httpPort, Handler: gatewayMux}
+
+	httpAddr := ":" + serviceConfig.HttpPort
+	httpServer := &http.Server{Addr: httpAddr  , Handler: gatewayMux}
 
 	//// Serve the swagger-ui and swagger file
 	//mux := http.NewServeMux()

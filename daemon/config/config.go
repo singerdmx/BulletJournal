@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
@@ -10,7 +11,7 @@ import (
 var (
 	configNameProd = "prod-config.yaml"
 	configNameTest = "test-config.yaml"
-	configType     = "type"
+	configType     = "yaml"
 	configPaths    = []string{
 		"./config",
 	}
@@ -20,24 +21,26 @@ type Config struct {
 	Username      string
 	Password      string
 	Database      string
-	Port          string
+	DBPort        string
+	RPCPort       string
+	HttpPort      string
 	Host          string
 	DBDriver      string
 	ApiKeyPublic  string
 	ApiKeyPrivate string
 }
 
-var daemonServiceConfig Config
+var serviceConfig Config
 
 func GetConfig() *Config {
-	if IsValid(&daemonServiceConfig) {
-		log.Fatal("invalid configuration")
+	if Validate(&serviceConfig) == false {
+		log.Fatal("Invalid configuration")
 	}
 
-	return &daemonServiceConfig
+	return &serviceConfig
 }
 
-func IsValid(c *Config) bool {
+func Validate(c *Config) bool {
 	valid := true
 	if c.Username == "" {
 		valid = false
@@ -55,9 +58,17 @@ func IsValid(c *Config) bool {
 		valid = false
 		_ = fmt.Errorf("host is missing from config")
 	}
-	if c.Port == "" {
+	if c.DBPort == "" {
 		valid = false
-		_ = fmt.Errorf("port is missing from config")
+		_ = fmt.Errorf("database port is missing from config")
+	}
+	if c.HttpPort == "" {
+		valid = false
+		_ = fmt.Errorf("http port is missing from config")
+	}
+	if c.RPCPort == "" {
+		valid = false
+		_ = fmt.Errorf("rpc port is missing from config")
 	}
 	if c.DBDriver == "" {
 		valid = false
@@ -73,6 +84,17 @@ func IsValid(c *Config) bool {
 	}
 
 	return valid
+}
+
+func InitConfig() {
+	isProd := flag.Bool("prod",  false, "set config to production env")
+	flag.Parse()
+
+	if *isProd == true {
+		SetProdConfig()
+	} else {
+		SetTestConfig()
+	}
 }
 
 func SetProdConfig() {
@@ -96,17 +118,19 @@ func setConfig(configName string) {
 		log.Fatalf("could not read config file: %v", err)
 	}
 
-	err = viper.Unmarshal(&daemonServiceConfig)
+	err = viper.Unmarshal(&serviceConfig)
 	if err != nil {
 		log.Fatalf("could not decode config into struct: %v", err)
 	}
 
-	fmt.Printf("Username from config: %s\n", daemonServiceConfig.Username)
-	fmt.Printf("Password from config: %s\n", daemonServiceConfig.Password)
-	fmt.Printf("Database from config: %s\n", daemonServiceConfig.Database)
-	fmt.Printf("Port from config: %s\n", daemonServiceConfig.Port)
-	fmt.Printf("HOST from config: %s\n", daemonServiceConfig.Host)
-	fmt.Printf("DB Driver from config: %s\n", daemonServiceConfig.DBDriver)
-	fmt.Printf("ApiKeyPublic from config: %s\n", daemonServiceConfig.ApiKeyPublic)
-	fmt.Printf("ApiKeyPrivate from config: %s\n", daemonServiceConfig.ApiKeyPrivate)
+	fmt.Printf("Username: %s\n", serviceConfig.Username)
+	fmt.Printf("Password: %s\n", serviceConfig.Password)
+	fmt.Printf("Database: %s\n", serviceConfig.Database)
+	fmt.Printf("DB Port: %s\n", serviceConfig.DBPort)
+	fmt.Printf("Rpc Port: %s\n", serviceConfig.RPCPort)
+	fmt.Printf("Http Port: %s\n", serviceConfig.HttpPort)
+	fmt.Printf("Host: %s\n", serviceConfig.Host)
+	fmt.Printf("DB Driver: %s\n", serviceConfig.DBDriver)
+	fmt.Printf("ApiKeyPublic: %s\n", serviceConfig.ApiKeyPublic)
+	fmt.Printf("ApiKeyPrivate: %s\n", serviceConfig.ApiKeyPrivate)
 }
