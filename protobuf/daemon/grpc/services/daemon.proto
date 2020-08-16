@@ -14,7 +14,7 @@ option java_outer_classname = "DaemonProto";
 service Daemon {
 
   // Serve rpc call sending JoinGroupEvents
-  rpc JoinGroupEvents (types.JoinGroupEvents) returns (types.ReplyMessage) {}
+  rpc JoinGroupEvents (types.JoinGroupEvents) returns (stream types.ReplyMessage) {}
 
   // Serve rest call sending JoinGroupEvents
   rpc Rest (types.JoinGroupEvents) returns (types.ReplyMessage) {
