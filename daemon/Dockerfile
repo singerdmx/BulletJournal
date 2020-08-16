@@ -25,7 +25,7 @@ FROM alpine:latest
 COPY --from=builder /go/bin/daemon-server /go/bin/
 
 # Run the grpc command by default when the container starts.
-ENTRYPOINT [ "/go/bin/daemon-server" ]
+ENTRYPOINT [ "/go/bin/daemon-server", "-prod"]
 
 # Document that the service listens on port 50051.
 EXPOSE 50051
