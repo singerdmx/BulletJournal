@@ -24,12 +24,13 @@ func GetUrl(uuid uint64, action string) string {
 	return "https://bulletjournal.us/public/notifications/" + strconv.FormatUint(uuid, 10) + "/answer?action=" + action
 }
 
+// Send join group invitation email to users
 func SendJoinGroupEmail(username, email string, groupId, notificationId uint64) {
 	g := Group{groupId, "g1", "X"} // TODO: query group from db
 	acceptUrl := GetUrl(notificationId, ACCEPT)
 	declineUrl := GetUrl(notificationId, DECLINE)
-	c := *config.GetConfig()
-	mailjetClient := mailjet.NewMailjetClient(os.Getenv(c.ApiKeyPublic), os.Getenv(c.ApiKeyPrivate))
+	serviceConfig := *config.GetConfig()
+	mailjetClient := mailjet.NewMailjetClient(os.Getenv(serviceConfig.ApiKeyPublic), os.Getenv(serviceConfig.ApiKeyPrivate))
 	messagesInfo := []mailjet.InfoMessagesV31{
 		{
 			From: &mailjet.RecipientV31{
