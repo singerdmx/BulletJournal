@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	config "github.com/singerdmx/BulletJournal/daemon/config"
+	"github.com/singerdmx/BulletJournal/daemon/config"
+	random "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"github.com/zywangzy/JobScheduler"
@@ -17,9 +18,7 @@ import (
 )
 
 const (
-	local    = "localhost"
-	rpcPort  = ":50051"
-	httpPort = ":9091"
+	requestIDKey string = "requestID"
 )
 
 // server should implement services.UnimplementedDaemonServer's methods
@@ -44,6 +43,7 @@ func main() {
 	serviceConfig := config.GetConfig()
 
 	ctx := context.Background()
+	ctx = context.WithValue(ctx, requestIDKey, random.RandomString())
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
