@@ -239,7 +239,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	writeHttpError func(code int)) {
 
 	query := r.URL.Query()
-	if strings.HasPrefix(r.RequestURI, tokenPage) && len(query.Get("sso")) == 0 {
+	if strings.HasPrefix(r.RequestURI, tokenPage) {
 		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil {
 			token := r.RequestURI[len(tokenPage) : len(tokenPage)+6]
 			logger.Printf("Saving token %s", token)
@@ -247,8 +247,12 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 			tokenCache.Add(token, cookieValue)
 			tokenMutex.Unlock()
 			forwardToNginx(handler, r, w, username, groups)
-		} else {
+		} else if len(query.Get("sso")) == 0 {
 			redirectToSSO(r, w)
+		} else {
+			sso := query.Get("sso")
+			sig := query.Get("sig")
+			handleSSOReturn(sso, fail, r, w, writeHttpError, sig)
 		}
 		return
 	}
