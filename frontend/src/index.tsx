@@ -43,7 +43,7 @@ const detectMobilePage = () => {
 function listen() {
     if (document.readyState === 'complete') {
         if (process.env.NODE_ENV === 'production' &&
-            !inPublicPage()) {
+            !inPublicPage() && !window.navigator.userAgent.toLowerCase().includes('mobile')) {
             const loginCookie = getCookie('__discourse_proxy');
             if (!loginCookie) {
                 if (caches) {
