@@ -5,15 +5,16 @@ import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
-import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.DeviceTokenRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.mailjet.client.MailjetResponse;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import com.mailjet.client.MailjetRequest;
+import com.mailjet.client.resource.Emailv31;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -178,21 +178,23 @@ public class DeviceControllerTest {
 
     @Test
     @Ignore
-    public void testEmail() throws Exception {
-        MailjetEmailParams params = new MailjetEmailParams(
-            Arrays.asList(new ImmutablePair<>("Will", "eg1@gmail.com")),
-            "TestSubject", "TestContentText");
-        MailjetEmailParams params2 = new MailjetEmailParams(
-            Arrays.asList(new ImmutablePair<>("Will2", "eg@gmail.com")),
-            "TestSubject2", "TestContentText2");
-        List<Future<MailjetResponse>> ret
-            = mailjetEmailClient.sendAllEmailAsync(Arrays.asList(params, params2));
-        LOGGER.info("reached here first");
-        if (ret != null) {
-            for (Future<MailjetResponse> future : ret) {
-                MailjetResponse response = future.get();
-                LOGGER.info("response: {}", response.getData());
-            }
-        }
+    public void sendEmail() throws Exception {
+        MailjetRequest request = new MailjetRequest(Emailv31.resource)
+            .property(Emailv31.MESSAGES, new JSONArray()
+                .put(new JSONObject()
+                    .put(Emailv31.Message.FROM, new JSONObject()
+                        .put("Email", "bulletjournal1024@outlook.com")
+                        .put("Name", "bj"))
+                    .put(Emailv31.Message.TO, new JSONArray()
+                        .put(new JSONObject()
+                            .put("Email", "example@gmail.com")
+                            .put("Name", "hahazheng")))
+                    .put(Emailv31.Message.TEMPLATEID, 1625167)
+                    .put(Emailv31.Message.TEMPLATELANGUAGE, true)
+                    .put(Emailv31.Message.SUBJECT, "Your email flight plan!")
+                    .put(Emailv31.Message.VARIABLES, new JSONObject()
+                        .put("taskName", "testname1")
+                        .put("timeStamp", "timestamp1"))));
+        mailjetEmailClient.sendEmail(request);
     }
 }

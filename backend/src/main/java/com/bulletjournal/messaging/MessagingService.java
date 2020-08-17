@@ -126,14 +126,16 @@ public class MessagingService {
 
     private String getTitle(Task task) {
         String taskName = task.getName();
-        String dueDate = task.getDueDate();
-        String dueTime = task.getDueTime();
-        StringBuilder res = new StringBuilder(taskName + " due at " + dueDate);
-        if (StringUtils.isNotBlank(dueTime)) {
-            res.append(" " + dueTime);
+        return taskName + " due at " + getDueTime(task);
+    }
+
+    private String getDueTime(Task task) {
+        StringBuilder ret = new StringBuilder(task.getDueDate());
+        if (StringUtils.isNotBlank(task.getDueTime())) {
+            ret.append(" " + task.getDueTime());
         }
-        res.append(" (" + task.getTimezone() + ")");
-        return res.toString();
+        ret.append(" (" + task.getTimezone() + ")");
+        return ret.toString();
     }
 
     private MailjetEmailParams createEmailParamsForDueTask(
@@ -148,7 +150,12 @@ public class MessagingService {
             new MailjetEmailParams(
                 receivers,
                 getTitle(task),
-                getTitle(task)
+                null,
+                MailjetEmailClient.Template.TASK_DUE_NOTIFICATION,
+                "taskName",
+                task.getName(),
+                "timeStamp",
+                getDueTime(task)
             );
         return params;
     }

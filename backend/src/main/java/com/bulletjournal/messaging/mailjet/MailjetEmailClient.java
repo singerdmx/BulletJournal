@@ -48,6 +48,20 @@ public class MailjetEmailClient {
 
     private ExecutorService executorService;
 
+    public enum Template {
+        TASK_DUE_NOTIFICATION(1625167);
+
+        private final int value;
+
+        Template(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
+    }
+
     @PostConstruct
     private void initializeMailjetClient() {
         this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("EmailClient"));
@@ -108,7 +122,7 @@ public class MailjetEmailClient {
     /**
      * Blocking call to send a single email
      */
-    private MailjetResponse sendEmail(MailjetRequest request) throws MailjetSocketTimeoutException, MailjetException {
+    public MailjetResponse sendEmail(MailjetRequest request) throws MailjetSocketTimeoutException, MailjetException {
         MailjetResponse response = client.post(request);
         LOGGER.debug("Mail sent, response status: {}, response data: {}",
             response.getStatus(), response.getData());
@@ -124,15 +138,24 @@ public class MailjetEmailClient {
                     .put("email", receiver.getRight())
             );
         }
-        return new MailjetRequest(Emailv31.resource)
-            .property(Emailv31.MESSAGES, new JSONArray()
-                .put(new JSONObject()
+        JSONObject properties = new JSONObject()
                     .put(Emailv31.Message.FROM, new JSONObject()
                         .put("Email", this.senderEmail)
                         .put("Name", this.senderName))
                     .put(Emailv31.Message.TO, receivers)
                     .put(Emailv31.Message.SUBJECT, params.getSubject())
-                    .put(Emailv31.Message.TEXTPART, params.getText())));
+                    .put(Emailv31.Message.TEXTPART, params.getText());
+        if (params.getTemplate() != null) {
+            properties.put(Emailv31.Message.TEMPLATEID, params.getTemplate().getValue());
+            JSONObject variables = new JSONObject();
+            for (Pair<String, String> pair : params.getKv()) {
+                variables.put(pair.getKey(), pair.getValue());
+            }
+            properties.put(Emailv31.Message.VARIABLES, variables);
+        }
+        MailjetRequest request = new MailjetRequest(Emailv31.resource)
+            .property(Emailv31.MESSAGES, new JSONArray().put(properties));
+        return request;
     }
 
     @PreDestroy
