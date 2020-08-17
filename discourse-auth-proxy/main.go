@@ -252,22 +252,13 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 		}
 		return
 	}
-	_, _, _, err := getAuthCookie(r, w)
-	if err != nil { // not logged in
-		sso := query.Get("sso")
-		sig := query.Get("sig")
-
-		if len(sso) == 0 {
-			http.Redirect(w, r, "https://"+r.Host+homePage, 302)
-			return
-		}
-
-		handleSSOReturn(sso, fail, r, w, writeHttpError, sig)
-		return
+	logger.Printf("Forwarding to nginx %s", r.RequestURI)
+	if username, groups, _, err := getAuthCookie(r, w); err == nil {
+		forwardToNginx(handler, r, w, username, groups)
+	} else {
+		// act as user "bbs1024"
+		forwardToNginx(handler, r, w, "bbs1024", "")
 	}
-
-	// logged in
-	http.Redirect(w, r, "https://"+r.Host+homePage, 302)
 }
 
 func getApiToken(r *http.Request) (returnCookie string) {
