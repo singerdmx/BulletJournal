@@ -146,7 +146,7 @@
                   <h3>What we do</h3>
                   <p>
                     Track personal and group journals (ToDo, Note, Ledger) from
-                    mutliple views; <br />
+                    multiple views; <br />
                     boost productivity & win back your time.
                   </p>
                 </div>
@@ -393,10 +393,7 @@
         role="document"
       >
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              Download <i class="lni lni-download"></i>
-            </h5>
+          <div class="modal-header" style="padding: 3px 10px 0px 10px;border-bottom: 0px">
             <button
               type="button"
               class="close"
@@ -436,7 +433,7 @@
     <script src="assets/js/contact-form-script.min.js"></script>
     <script>
       function getMobileOperatingSystem() {
-        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
         if (/android/i.test(userAgent)) {
           return "Android";
@@ -450,18 +447,21 @@
         return "unknown";
       }
 
+      console.log(window.location.hash);
       let mobileOperatingSystem = getMobileOperatingSystem();
       switch (mobileOperatingSystem) {
         case "Android":
           $("#mobileControlButton").click();
           $("#downloadLink").html(
-            '<a id="android" href="https://play.google.com/store/apps/details?id=us.bullet_journal"><img src="https://user-images.githubusercontent.com/22899591/88129980-67d1c880-cba7-11ea-8cde-e9eff163872e.png"></a>'
+            '<a id="download_android" href="https://play.google.com/store/apps/details?id=us.bullet_journal"><img width="150px" src="https://user-images.githubusercontent.com/122956/90370138-be54ea00-e021-11ea-92de-f3ab8925e29c.png"></a>' +
+            '<br/><br/><a id="android" href="intent://bulletjournal.us/#Intent;scheme=bullet;end"><img width="150px" src="https://user-images.githubusercontent.com/122956/90372021-9d41c880-e024-11ea-9555-ecf4b6590066.png"></a>'
           );
           break;
         case "iOS":
           $("#mobileControlButton").click();
           $("#downloadLink").html(
-            '<a id="ios" href="https://play.google.com/store/apps/details?id=us.bullet_journal"><img src="https://user-images.githubusercontent.com/22899591/88130068-a2d3fc00-cba7-11ea-8f2a-63210b257e52.png"></a>'
+            '<a id="ios" href="https://play.google.com/store/apps/details?id=us.bullet_journal"><img width="150px" src="https://user-images.githubusercontent.com/122956/90369874-51d9eb00-e021-11ea-9cde-96a06df41df3.png"></a>' +
+            '<br/><br/><a id="ios" href="bullet://bulletjournal.us"><img width="150px" src="https://user-images.githubusercontent.com/122956/90372021-9d41c880-e024-11ea-9555-ecf4b6590066.png"></a>'
           );
           break;
         default:
