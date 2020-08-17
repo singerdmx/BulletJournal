@@ -197,6 +197,8 @@ github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200816222233-d9717ea
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200816222233-d9717ea41bb3/go.mod h1:cs44NK2+Q/ap2aIAJk2LaFNUf4aTQjh0WCa21BbO6Vo=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200816230555-9282f672acae h1:Gjxh/qkiuTp73LVd6D85qCUu0Z9+7WhgQPh1SpFfb1s=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200816230555-9282f672acae/go.mod h1:cs44NK2+Q/ap2aIAJk2LaFNUf4aTQjh0WCa21BbO6Vo=
+github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200816233320-96ed4fcf1053 h1:CJaZM//74fEYoV0oOU5SScOgFv1nOg6wnZBwIQ4ZQvg=
+github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200816233320-96ed4fcf1053/go.mod h1:cs44NK2+Q/ap2aIAJk2LaFNUf4aTQjh0WCa21BbO6Vo=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.6.0 h1:UBcNElsrwanuuMsnGSlYmtmgbb23qDR5dG+6X6Oo89I=
 github.com/sirupsen/logrus v1.6.0/go.mod h1:7uNnSEd1DgxDLC74fIahvMZmmYsHGZGEOFrfsX/uA88=

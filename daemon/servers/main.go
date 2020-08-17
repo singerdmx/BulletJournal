@@ -29,17 +29,6 @@ type server struct {
 
 // Send implements the JoinGroupEvents rpc endpoint of services.DaemonServer
 func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
-
-	//log.Printf("Received rpc request: %v", request.String())
-	//var pow = []int{1, 2, 4, 8, 16, 32, 64, 128}
-	//for _, v := range pow {
-	//	time.Sleep(5 * time.Second)
-	//	if err := stream.Send(&types.ReplyMessage{Message: fmt.Sprintf("Hello rpc %d",v) }); err != nil {
-	//		return err
-	//	}
-	//}
-	//
-	//return nil
 	log.Printf("Received rpc request: %v", request.String())
 	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
@@ -48,6 +37,19 @@ func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEv
 func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
 	log.Printf("Received request: %v", request.String())
 	return &types.ReplyMessage{Message: "Hello daemon"}, nil
+}
+
+func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
+	log.Printf("Received rpc request for subscribtion: %s", subscribe.String())
+	n := 0
+	for n < 5 {
+		time.Sleep(5 * time.Second)
+		if err := stream.Send(&types.StreamMessage{Message: fmt.Sprintf("Hello rpc %s", subscribe.String())}); err != nil {
+			return err
+		}
+		n += 1
+	}
+	return nil
 }
 
 func main() {

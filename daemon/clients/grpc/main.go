@@ -5,7 +5,9 @@ import (
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"google.golang.org/grpc"
+	"io"
 	"log"
+	"os"
 	"time"
 )
 
@@ -26,21 +28,26 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	//_, err := client.SubscribeNotification(ctx,&types.SubscribeNotification)
-	r, err := client.Rest(ctx, &types.JoinGroupEvents{JoinGroupEvents: []*types.JoinGroupEvent{{Events: []*types.Event{}, Originator: "1"},{Events: []*types.Event{}, Originator: "2"}}})
-	if err != nil {
-		log.Fatalf("Could not send JoinGroupEvents: %v", err)
+	id := "A"
+	if len(os.Args) > 1 {
+		id = os.Args[1]
 	}
-	log.Printf("Sent JoinGroupEvents with a response: %s", r.Message)
-	//for {
-	//	message, err := stream.Recv()
-	//	if err == io.EOF {
-	//		break
-	//	}
-	//	if err != nil {
-	//		log.Fatalf("%v.JoinGroupEvents(_) = _, %v", client, err)
-	//	}
-	//	log.Println(message)
+
+	stream, err := client.SubscribeNotification(ctx, &types.SubscribeNotification{Id: id})
+	//r, err := client.Rest(ctx, &types.JoinGroupEvents{JoinGroupEvents: []*types.JoinGroupEvent{{Events: []*types.Event{}, Originator: "1"},{Events: []*types.Event{}, Originator: "2"}}})
+	//if err != nil {
+	//	log.Fatalf("Could not send JoinGroupEvents: %v", err)
 	//}
-	//log.Printf("Received all JoinGroupEvents responses")
+	//log.Printf("Sent JoinGroupEvents with a response: %s", r.Message)
+	for {
+		message, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("%v.JoinGroupEvents(_) = _, %v", client, err)
+		}
+		log.Println(message.Message)
+	}
+	log.Printf("Received all JoinGroupEvents responses")
 }
