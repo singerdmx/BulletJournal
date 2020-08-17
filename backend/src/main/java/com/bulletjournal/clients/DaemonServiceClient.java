@@ -2,6 +2,8 @@ package com.bulletjournal.clients;
 
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
 import com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvents;
+import com.bulletjournal.protobuf.daemon.grpc.types.ReplyMessage;
+import io.grpc.StatusRuntimeException;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +14,12 @@ public class DaemonServiceClient {
     private DaemonGrpc.DaemonBlockingStub daemonBlockingStub;
 
     public String sendEmail(JoinGroupEvents joinGroupEvents) {
-//        image build fail @TODO fix
-//        try {
-//            ReplyMessage replyMessage = this.daemonBlockingStub.joinGroupEvents(joinGroupEvents);
-//            return replyMessage.getMessage();
-//        } catch (final StatusRuntimeException e) {
-//            return "Failed with " + e.getStatus().getCode().name();
-//        }
-        return "";
+        try {
+            ReplyMessage replyMessage = this.daemonBlockingStub.joinGroupEvents(joinGroupEvents);
+            return replyMessage.getMessage();
+        } catch (final StatusRuntimeException e) {
+            return "Failed with " + e.getStatus().getCode().name();
+        }
     }
 
 }
