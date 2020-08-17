@@ -34,6 +34,12 @@ export const inPublicPage = () => {
     return window.location.href.toLowerCase().includes('/public');
 };
 
+const detectMobilePage = () => {
+    if (window.navigator.userAgent.toLowerCase().includes('mobile')) {
+        window.location.href = 'https://bulletjournal.us/home/index.html' + window.location.hash;
+    }
+};
+
 function listen() {
     if (document.readyState === 'complete') {
         if (process.env.NODE_ENV === 'production' &&
@@ -70,6 +76,7 @@ function listen() {
             document.getElementById('root')
         );
     } else {
+        detectMobilePage();
         ReactDOM.render(
             <Provider store={store}>
                 <Loading/>
