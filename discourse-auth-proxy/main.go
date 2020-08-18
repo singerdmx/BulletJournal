@@ -398,6 +398,9 @@ func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 }
 
 func isMobile(r *http.Request) bool {
+	if strings.HasPrefix(r.RequestURI, "/api") {
+		return false
+	}
 	header := strings.ToLower(r.Header.Get("User-Agent"))
 	logger.Printf("User-Agent: %s", header)
 	if strings.Contains(header, "ipad") {
