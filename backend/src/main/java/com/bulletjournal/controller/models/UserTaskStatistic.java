@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserTaskStatistic {
     private User user;
-    private int completed;
-    private int uncompleted;
+    private int completed = 0;
+    private int uncompleted = 0;
 
     public UserTaskStatistic() {
+    }
+
+    public UserTaskStatistic(User user) {
+        this.user = user;
     }
 
     public UserTaskStatistic(User user, int completed, int uncompleted) {
@@ -33,11 +37,19 @@ public class UserTaskStatistic {
         this.completed = completed;
     }
 
+    public void incrementCompleted() {
+        this.completed += 1;
+    }
+
     public int getUncompleted() {
         return uncompleted;
     }
 
     public void setUncompleted(int uncompleted) {
         this.uncompleted = uncompleted;
+    }
+
+    public void incrementUncompleted() {
+        this.uncompleted += 1;
     }
 }

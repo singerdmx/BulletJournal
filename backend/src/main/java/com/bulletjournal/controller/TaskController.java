@@ -6,9 +6,9 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
-import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -60,7 +60,7 @@ public class TaskController {
     private TaskDaoJpa taskDaoJpa;
 
     @Autowired
-    private UserDaoJpa userDaoJpa;
+    private ProjectDaoJpa projectDaoJpa;
 
     @Autowired
     private TaskRepository taskRepository;
@@ -441,55 +441,44 @@ public class TaskController {
             @NotBlank @RequestParam String timezone,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
-        // startDate != null && endDate != null
-        // startDate != null && endDate == null => include tasks without due date/time
-        // startDate == null && endDate == null => include tasks without due date/time
-        // other: error
+
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
+        // validate all projects user can access
+        Set<Long> userProjects = this.projectDaoJpa.getUserProjects(username)
+                .stream().map(p -> p.getId()).collect(Collectors.toSet());
+        // UnAuthorizedException
+
+        // startDate != null && endDate != null => include only tasks with due date/time
+        // startDate != null && endDate == null => include tasks without due date/time
+        // startDate == null && endDate == null => include tasks without due date/time
+        // startDate == null && endDate != null => include only tasks with due date/time
+
         // Set start time and end time
-        String startTime = startDate == null ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
-        String endTime = endDate == null ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(endDate, null, timezone));
+        String startTime = StringUtils.isBlank(startDate) ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
+        String endTime = StringUtils.isBlank(endDate) ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(endDate, null, timezone));
         List<com.bulletjournal.repository.models.CompletedTask> completedTasks = taskDaoJpa.getCompletedTaskByProjectIdInTimePeriod(projectIds, startTime, endTime);
         List<com.bulletjournal.repository.models.Task> uncompletedTasks = taskDaoJpa.getUncompletedTasksByProjectIdInTimePeriod(projectIds, startTime, endTime);
+        return calculateTaskStatistics(completedTasks, uncompletedTasks);
+    }
+
+    private TaskStatistics calculateTaskStatistics(
+            List<CompletedTask> completedTasks, List<com.bulletjournal.repository.models.Task> uncompletedTasks) {
         TaskStatistics taskStatistics = new TaskStatistics();
         taskStatistics.setCompleted(completedTasks.size());
         taskStatistics.setUncompleted(uncompletedTasks.size());
         Map<String, UserTaskStatistic> userToTasks = new HashMap<>();
-        completedTasks.forEach(task -> {
-            task.getAssignees().forEach(assignee -> {
-                com.bulletjournal.repository.models.User user = userDaoJpa.getByName(assignee);
-                if (!userToTasks.containsKey(user.getName())) {
-                    User userFromController = new User();
-                    userFromController.setId(user.getId().intValue());
-                    userFromController.setName(user.getName());
-                    userFromController.setEmail(user.getEmail());
-                    userToTasks.put(user.getName(), new UserTaskStatistic());
-                    userToTasks.get(user.getName()).setUser(userFromController);
-                }
-                userToTasks.get(user.getName()).setCompleted(userToTasks.get(user.getName()).getCompleted() + 1);
-            });
-        });
+        completedTasks.forEach(task ->
+                task.getAssignees().forEach(
+                        assignee -> userToTasks.computeIfAbsent(assignee,
+                                k -> new UserTaskStatistic(this.userClient.getUser(assignee))).incrementCompleted()));
 
-        uncompletedTasks.forEach(task -> {
-            task.getAssignees().forEach(assignee -> {
-                com.bulletjournal.repository.models.User user = userDaoJpa.getByName(assignee);
-                if (!userToTasks.containsKey(user.getName())) {
-                    User userFromController = new User();
-                    userFromController.setId(user.getId().intValue());
-                    userFromController.setName(user.getName());
-                    userFromController.setEmail(user.getEmail());
-                    userToTasks.put(user.getName(), new UserTaskStatistic());
-                    userToTasks.get(user.getName()).setUser(userFromController);
-                }
-                userToTasks.get(user.getName()).setUncompleted(userToTasks.get(user.getName()).getUncompleted() + 1);
-            });
-        });
-        taskStatistics.setUserTaskStatistics(new ArrayList<>());
-        for (UserTaskStatistic userTaskStatistic : userToTasks.values()) {
-            taskStatistics.getUserTaskStatistics().add(userTaskStatistic);
-        }
+        uncompletedTasks.forEach(
+                task -> task.getAssignees().forEach(
+                        assignee -> userToTasks.computeIfAbsent(assignee,
+                                k -> new UserTaskStatistic(this.userClient.getUser(assignee))).incrementUncompleted()));
+        taskStatistics.setUserTaskStatistics(userToTasks.values().stream().collect(Collectors.toList()));
         return taskStatistics;
     }
 }

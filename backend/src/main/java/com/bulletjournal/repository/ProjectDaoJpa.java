@@ -332,4 +332,13 @@ public class ProjectDaoJpa {
         return projects.stream().filter(p -> ProjectType.getType(p.getType()).equals(projectType))
                 .findAny().orElse(null);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Project> getUserProjects(String username) {
+        List<Project> result = new ArrayList<>();
+        this.userDaoJpa.getByName(username).getGroups().forEach(userGroup -> {
+            result.addAll(userGroup.getGroup().getProjects());
+        });
+        return result;
+    }
 }
