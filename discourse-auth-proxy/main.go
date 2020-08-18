@@ -371,8 +371,8 @@ func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 	cookie := http.Cookie{Name: cookieName, Value: cookieValue, Expires: expiration, Path: "/"}
 	http.SetCookie(w, &cookie)
 
+	logger.Printf("returnUrl %s", returnUrl)
 	if isMobile(r) && strings.HasPrefix(returnUrl, tokenPage) {
-		logger.Printf("returnUrl %s", returnUrl)
 		token := strings.TrimPrefix(returnUrl, tokenPage)
 		logger.Printf("Saving token %s", token)
 		tokenMutex.Lock()
