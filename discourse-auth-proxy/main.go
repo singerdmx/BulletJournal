@@ -288,8 +288,13 @@ func getApiToken(r *http.Request) (returnCookie string) {
 }
 
 func redirectToSSO(r *http.Request, w http.ResponseWriter) {
-	logger.Printf("Redirect %s to sso_provider", r.URL)
-	ssoURL := config.SSOURLString + "/session/sso_provider?" + ssoPayload(config.SSOSecret, config.ProxyURLString, r.URL.String())
+	redirectURL := r.URL.String()
+	if strings.HasSuffix(redirectURL, "?ignoreCookie=true") {
+		redirectURL = redirectURL[:(len(redirectURL) - 18)]
+		logger.Printf("redirectURL changed to %s", redirectURL)
+	}
+	logger.Printf("Redirect %s to sso_provider", redirectURL)
+	ssoURL := config.SSOURLString + "/session/sso_provider?" + ssoPayload(config.SSOSecret, config.ProxyURLString, redirectURL)
 	deleteCookie(w)
 	http.Redirect(w, r, ssoURL, 302)
 }
