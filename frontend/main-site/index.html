@@ -453,7 +453,7 @@
           $("#mobileControlButton").click();
           $("#downloadLink").html(
             '<a id="download_android" href="https://play.google.com/store/apps/details?id=us.bullet_journal"><img width="150px" src="https://user-images.githubusercontent.com/122956/90370138-be54ea00-e021-11ea-92de-f3ab8925e29c.png"></a>' +
-            '<br/><br/><a id="android" href="intent://bulletjournal.us/#Intent;scheme=bullet;S.link=' + encodeURIComponent(window.location.hash.substring(1)) + ';end"><img width="150px" src="https://user-images.githubusercontent.com/122956/90372021-9d41c880-e024-11ea-9555-ecf4b6590066.png"></a>'
+            '<br/><br/><a id="android" href="intent://bulletjournal.us?link=' + encodeURIComponent(window.location.hash.substring(1)) + '#Intent;scheme=bullet;end"><img width="150px" src="https://user-images.githubusercontent.com/122956/90372021-9d41c880-e024-11ea-9555-ecf4b6590066.png"></a>'
           );
           break;
         case "iOS":
