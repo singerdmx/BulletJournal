@@ -240,9 +240,8 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 
 	query := r.URL.Query()
 	if strings.HasPrefix(r.RequestURI, tokenPage) {
-		header := r.Header.Get("Ignore-Cookie")
-		logger.Printf("headers: %v", r.Header)
-		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil && header == "" {
+		logger.Printf("ignoreCookie: %v", query.Get("ignoreCookie"))
+		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil && len(query.Get("ignoreCookie")) == 0 {
 			token := r.RequestURI[len(tokenPage) : len(tokenPage)+6]
 			logger.Printf("Saving token %s", token)
 			tokenMutex.Lock()
