@@ -242,8 +242,7 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	if strings.HasPrefix(r.RequestURI, tokenPage) {
 		logger.Printf("ignoreCookie: %v", query.Get("ignoreCookie"))
 		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil &&
-			len(query.Get("ignoreCookie")) == 0 &&
-			len(query.Get("sso")) == 0 {
+			len(query.Get("ignoreCookie")) == 0 {
 			token := r.RequestURI[len(tokenPage) : len(tokenPage)+6]
 			logger.Printf("Saving token %s", token)
 			tokenMutex.Lock()
@@ -313,6 +312,7 @@ func shouldByPass(r *http.Request) bool {
 
 func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 	r *http.Request, w http.ResponseWriter, writeHttpError func(code int), sig string) {
+	logger.Printf("handleSSOReturn %s", sso)
 	decoded, err := base64.StdEncoding.DecodeString(sso)
 	if err != nil {
 		fail("invalid sso query parameter: %s", err)
