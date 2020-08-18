@@ -36,7 +36,7 @@ export const inPublicPage = () => {
 
 const detectMobilePage = () => {
     const userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.includes('mobile') && !window.location.href.toLowerCase().includes('/tokens')) {
+    if (userAgent.includes('mobile') && !inPublicPage() && !window.location.href.toLowerCase().includes('/tokens')) {
         window.location.href = 'https://bulletjournal.us/home/index.html' + window.location.hash;
     }
 };
