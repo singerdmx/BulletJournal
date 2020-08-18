@@ -481,6 +481,7 @@ func ssoPayload(secret string, returnSsoUrl string, returnUrl string) string {
 func addNonce(returnUrl string) string {
 	guid := uuid.New()
 	nonceMutex.Lock()
+	logger.Printf("addNonce %s -> %s", returnUrl, guid)
 	nonceCache.Add(guid, returnUrl)
 	nonceMutex.Unlock()
 	return guid
