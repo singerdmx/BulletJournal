@@ -12,8 +12,7 @@ export const fetchMyself = (expand = false) => {
 };
 
 export const logoutUser = () => {
-  const postBody = JSON.stringify({});
-  return doPost('/api/myself/logout', postBody);
+  return doPost('/api/myself/logout');
 };
 
 export const patchMyself = (

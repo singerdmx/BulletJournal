@@ -189,6 +189,10 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     source: any,
     editor: ReactQuill.UnprivilegedEditor
   ) => {
+    if (source !== 'user') {
+      return;
+    }
+
     setEditorContent({
       delta: editor.getContents(),
       '###html###': content,

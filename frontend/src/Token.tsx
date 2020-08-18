@@ -2,7 +2,6 @@ import React from 'react';
 
 import './styles/main.less';
 import * as logo from './assets/favicon466.ico';
-import {handleLogout} from "./components/dropdown-menu/dropdown-menu.component";
 
 type PageProps = {};
 
@@ -38,14 +37,6 @@ const TokenPage: React.FC<PageProps> = (props) => {
                     </a>
                 </div>
             </h4>
-            <br/>
-            <br/>
-            <br/>
-            <a>
-                <img width="80px"
-                     onClick={handleLogout}
-                     src='https://user-images.githubusercontent.com/122956/90494251-270e9600-e0f8-11ea-8872-45df9b24c6bb.png'/>
-            </a>
         </div>
     );
 };
