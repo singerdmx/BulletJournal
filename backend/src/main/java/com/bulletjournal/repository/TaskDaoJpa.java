@@ -932,7 +932,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .getResultList();
     }
 
-
     public List<String> getDeleteESDocumentIdsForProjectItem(String requester, Long taskId) {
         List<String> deleteESDocumentIds = new ArrayList<>();
         Task task = this.getProjectItem(taskId, requester);
@@ -952,5 +951,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));
 
         return deleteESDocumentIds;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<CompletedTask> getCompletedTaskByProjectIdInTimePeriod(List<Long> projectIds, String startTime, String endTime) {
+        return completedTaskRepository.findCompletedTasks(projectIds, startTime, endTime);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getUncompletedTasksByProjectIdInTimePeriod(List<Long> projectIds, String startTime, String endTime) {
+        return taskRepository.findUncompletedTasks(projectIds, startTime, endTime);
     }
 }

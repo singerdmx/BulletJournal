@@ -27,4 +27,10 @@ public interface CompletedTaskRepository extends JpaRepository<CompletedTask, Lo
                                                            @Param("assignee") String assignee, @Param("startTime") Timestamp startTime,
                                                            @Param("endTime") Timestamp endTime);
 
+    @Query(value = "SELECT * FROM completed_tasks WHERE completed_tasks.project_id in :projectIds " +
+            "AND (:startTime = '' OR completed_tasks.start_time is null OR completed_tasks.start_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS')) AND " +
+            "(:endTime = '' OR completed_tasks.end_time is null OR completed_tasks.end_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS'))", nativeQuery = true)
+    List<CompletedTask> findCompletedTasks(@Param("projectIds") List<Long> projectIds,
+                                  @Param("startTime") String startTime,
+                                  @Param("endTime") String endTime);
 }

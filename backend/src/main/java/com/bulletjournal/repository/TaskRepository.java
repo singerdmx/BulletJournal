@@ -58,4 +58,11 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     List<Task> findTasksBetween(@Param("startTime") Timestamp startTime,
                                 @Param("endTime") Timestamp endTime,
                                 @Param("projects") List<Project> projects);
+
+    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds " +
+            "AND (:startTime = '' OR tasks.start_time is null OR tasks.start_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS')) AND " +
+            "(:endTime = '' OR tasks.end_time is null OR tasks.end_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS'))", nativeQuery = true)
+    List<Task> findUncompletedTasks(@Param("projectIds") List<Long> projectIds,
+                                    @Param("startTime") String startTime,
+                                    @Param("endTime") String endTime);
 }

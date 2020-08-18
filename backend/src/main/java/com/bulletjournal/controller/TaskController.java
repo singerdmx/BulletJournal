@@ -8,6 +8,7 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -26,7 +27,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,6 +58,9 @@ public class TaskController {
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     @Autowired
     private TaskRepository taskRepository;
@@ -438,7 +441,6 @@ public class TaskController {
             @NotBlank @RequestParam String timezone,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
-        // e.g. /api/taskStatistics?projectIds=11&projectIds=12&timezone=america%2Flos_angeles&type=3&startDate=2020-08-01
         // startDate != null && endDate != null
         // startDate != null && endDate == null => include tasks without due date/time
         // startDate == null && endDate == null => include tasks without due date/time
@@ -447,10 +449,47 @@ public class TaskController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // Set start time and end time
-        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
-        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
+        String startTime = startDate == null ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
+        String endTime = endDate == null ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(endDate, null, timezone));
+        List<com.bulletjournal.repository.models.CompletedTask> completedTasks = taskDaoJpa.getCompletedTaskByProjectIdInTimePeriod(projectIds, startTime, endTime);
+        List<com.bulletjournal.repository.models.Task> uncompletedTasks = taskDaoJpa.getUncompletedTasksByProjectIdInTimePeriod(projectIds, startTime, endTime);
+        TaskStatistics taskStatistics = new TaskStatistics();
+        taskStatistics.setCompleted(completedTasks.size());
+        taskStatistics.setUncompleted(uncompletedTasks.size());
+        Map<String, UserTaskStatistic> userToTasks = new HashMap<>();
+        completedTasks.forEach(task -> {
+            task.getAssignees().forEach(assignee -> {
+                com.bulletjournal.repository.models.User user = userDaoJpa.getByName(assignee);
+                if (!userToTasks.containsKey(user.getName())) {
+                    User userFromController = new User();
+                    userFromController.setId(user.getId().intValue());
+                    userFromController.setName(user.getName());
+                    userFromController.setEmail(user.getEmail());
+                    userToTasks.put(user.getName(), new UserTaskStatistic());
+                    userToTasks.get(user.getName()).setUser(userFromController);
+                }
+                userToTasks.get(user.getName()).setCompleted(userToTasks.get(user.getName()).getCompleted() + 1);
+            });
+        });
 
-        return new TaskStatistics();
+        uncompletedTasks.forEach(task -> {
+            task.getAssignees().forEach(assignee -> {
+                com.bulletjournal.repository.models.User user = userDaoJpa.getByName(assignee);
+                if (!userToTasks.containsKey(user.getName())) {
+                    User userFromController = new User();
+                    userFromController.setId(user.getId().intValue());
+                    userFromController.setName(user.getName());
+                    userFromController.setEmail(user.getEmail());
+                    userToTasks.put(user.getName(), new UserTaskStatistic());
+                    userToTasks.get(user.getName()).setUser(userFromController);
+                }
+                userToTasks.get(user.getName()).setUncompleted(userToTasks.get(user.getName()).getUncompleted() + 1);
+            });
+        });
+        taskStatistics.setUserTaskStatistics(new ArrayList<>());
+        for (UserTaskStatistic userTaskStatistic : userToTasks.values()) {
+            taskStatistics.getUserTaskStatistics().add(userTaskStatistic);
+        }
+        return taskStatistics;
     }
-
 }
