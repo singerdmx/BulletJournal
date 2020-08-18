@@ -371,7 +371,7 @@ func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 	cookie := http.Cookie{Name: cookieName, Value: cookieValue, Expires: expiration, Path: "/"}
 	http.SetCookie(w, &cookie)
 
-	logger.Printf("returnUrl %s isMobile %s", returnUrl, isMobile(r))
+	logger.Printf("returnUrl %s isMobile %v", returnUrl, isMobile(r))
 	if strings.HasSuffix(returnUrl, "?ignoreCookie=true") {
 		returnUrl = returnUrl[:(len(returnUrl) - 18)]
 		logger.Printf("returnUrl changed to %s", returnUrl)
