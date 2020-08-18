@@ -16,7 +16,7 @@ import ContactUs from '../modals/contact-us.component';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 
-const handleLogout = () => {
+export const handleLogout = () => {
     logoutUser().then((res) => {
         if (caches) {
             // Service worker cache should be cleared with caches.delete()

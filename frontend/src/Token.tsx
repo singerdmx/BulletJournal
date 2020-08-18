@@ -2,16 +2,11 @@ import React from 'react';
 
 import './styles/main.less';
 import * as logo from './assets/favicon466.ico';
-import {logoutUser} from "./apis/myselfApis";
+import {handleLogout} from "./components/dropdown-menu/dropdown-menu.component";
 
 type PageProps = {};
 
 const TokenPage: React.FC<PageProps> = (props) => {
-    const handleLogout = () => {
-        logoutUser().then((res) => {
-            window.location.href = 'https://1o24bbs.com';
-        });
-    };
 
     let userAgent = navigator.userAgent || navigator.vendor;
     let hrefLink = '';
