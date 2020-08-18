@@ -241,7 +241,9 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 	query := r.URL.Query()
 	if strings.HasPrefix(r.RequestURI, tokenPage) {
 		logger.Printf("ignoreCookie: %v", query.Get("ignoreCookie"))
-		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil && len(query.Get("ignoreCookie")) == 0 {
+		if username, groups, cookieValue, err := getAuthCookie(r, w); err == nil &&
+			len(query.Get("ignoreCookie")) == 0 &&
+			len(query.Get("sso")) == 0 {
 			token := r.RequestURI[len(tokenPage) : len(tokenPage)+6]
 			logger.Printf("Saving token %s", token)
 			tokenMutex.Lock()
@@ -370,6 +372,7 @@ func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 	http.SetCookie(w, &cookie)
 
 	if isMobile(r) && strings.HasPrefix(returnUrl, tokenPage) {
+		logger.Printf("returnUrl %s", returnUrl)
 		token := strings.TrimPrefix(returnUrl, tokenPage)
 		logger.Printf("Saving token %s", token)
 		tokenMutex.Lock()
