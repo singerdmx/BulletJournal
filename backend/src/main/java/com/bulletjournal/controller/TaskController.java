@@ -4,7 +4,7 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
@@ -441,25 +441,24 @@ public class TaskController {
             @NotBlank @RequestParam String timezone,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
-
-
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // validate all projects user can access
         Set<Long> userProjects = this.projectDaoJpa.getUserProjects(username)
                 .stream().map(p -> p.getId()).collect(Collectors.toSet());
         // UnAuthorizedException
+        projectIds.forEach(id -> {
+            if (!userProjects.contains(id)) {
+                throw new UnAuthorizedException("UnAuthorized to access the given projects");
+            }
+        });
 
         // startDate != null && endDate != null => include only tasks with due date/time
         // startDate != null && endDate == null => include tasks without due date/time
         // startDate == null && endDate == null => include tasks without due date/time
         // startDate == null && endDate != null => include only tasks with due date/time
-
-        // Set start time and end time
-        String startTime = StringUtils.isBlank(startDate) ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
-        String endTime = StringUtils.isBlank(endDate) ? "" : ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(endDate, null, timezone));
-        List<com.bulletjournal.repository.models.CompletedTask> completedTasks = taskDaoJpa.getCompletedTaskByProjectIdInTimePeriod(projectIds, startTime, endTime);
-        List<com.bulletjournal.repository.models.Task> uncompletedTasks = taskDaoJpa.getUncompletedTasksByProjectIdInTimePeriod(projectIds, startTime, endTime);
+        List<com.bulletjournal.repository.models.CompletedTask> completedTasks = taskDaoJpa.getCompletedTaskByProjectIdInTimePeriod(projectIds, startDate, endDate, timezone);
+        List<com.bulletjournal.repository.models.Task> uncompletedTasks = taskDaoJpa.getUncompletedTasksByProjectIdInTimePeriod(projectIds, startDate, endDate, timezone);
         return calculateTaskStatistics(completedTasks, uncompletedTasks);
     }
 

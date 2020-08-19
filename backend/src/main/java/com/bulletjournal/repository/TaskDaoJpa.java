@@ -954,12 +954,36 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<CompletedTask> getCompletedTaskByProjectIdInTimePeriod(List<Long> projectIds, String startTime, String endTime) {
-        return completedTaskRepository.findCompletedTasks(projectIds, startTime, endTime);
+    public List<CompletedTask> getCompletedTaskByProjectIdInTimePeriod(List<Long> projectIds, String startDate, String endDate, String timezone) {
+        if (!StringUtils.isBlank(startDate) && !StringUtils.isBlank(endDate)) {
+            String startTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
+            String endTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getEndTime(endDate, null, timezone));
+            return completedTaskRepository.findCompletedTaskWithProjectIdStartTimeEndTime(projectIds, startTime, endTime);
+        } else if (!StringUtils.isBlank(startDate)) {
+            String startTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
+            return completedTaskRepository.findCompletedTaskWithProjectIdStartTime(projectIds, startTime);
+        } else if (!StringUtils.isBlank(endDate)) {
+            String endTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getEndTime(endDate, null, timezone));
+            return completedTaskRepository.findCompletedTaskWithProjectIdEndTime(projectIds, endTime);
+        } else {
+            return completedTaskRepository.findCompletedTaskWithProjectId(projectIds);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getUncompletedTasksByProjectIdInTimePeriod(List<Long> projectIds, String startTime, String endTime) {
-        return taskRepository.findUncompletedTasks(projectIds, startTime, endTime);
+    public List<Task> getUncompletedTasksByProjectIdInTimePeriod(List<Long> projectIds, String startDate, String endDate, String timezone) {
+        if (!StringUtils.isBlank(startDate) && !StringUtils.isBlank(endDate)) {
+            String startTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
+            String endTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getEndTime(endDate, null, timezone));
+            return taskRepository.findTaskWithProjectIdStartTimeEndTime(projectIds, startTime, endTime);
+        } else if (!StringUtils.isBlank(startDate)) {
+            String startTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
+            return taskRepository.findTaskWithProjectIdStartTime(projectIds, startTime);
+        } else if (!StringUtils.isBlank(endDate)) {
+            String endTime = ZonedDateTimeHelper.toDBTimestamp(ZonedDateTimeHelper.getEndTime(endDate, null, timezone));
+            return taskRepository.findTaskWithProjectIdEndTime(projectIds, endTime);
+        } else {
+            return taskRepository.findTaskWithProjectId(projectIds);
+        }
     }
 }
