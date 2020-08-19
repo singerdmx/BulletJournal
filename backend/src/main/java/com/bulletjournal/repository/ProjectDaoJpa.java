@@ -124,12 +124,8 @@ public class ProjectDaoJpa {
             return;
         }
 
-        List<Project> projects = this.projectRepository.findByOwner(o);
-        String projectRelationsByOwner = this.userProjectsRepository.findById(o).get().getOwnedProjects();
-        List<com.bulletjournal.controller.models.Project> l = ProjectRelationsProcessor.processRelations(
-                projects.stream().collect(Collectors.toMap(Project::getId, p -> p)), projectRelationsByOwner,
-                projectsByOwner);
-
+        List<com.bulletjournal.controller.models.Project> l = getOwnerProjects(
+                this.userProjectsRepository.findById(o).get(), o);
         if (l.isEmpty()) {
             return;
         }
