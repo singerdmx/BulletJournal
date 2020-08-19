@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Modal, Input, Form, Button, Select } from 'antd';
+import {Modal, Input, Form, Button, Select, Tooltip} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps, useParams } from 'react-router';
@@ -13,6 +13,8 @@ import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import {onFilterLabel} from "../../utils/Util";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {useHistory} from "react-router-dom";
+import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 const { Option } = Select;
 
 type NoteProps = {
@@ -33,6 +35,7 @@ const AddNote: React.FC<
 > = (props) => {
   const { project, mode } = props;
   const [form] = Form.useForm();
+  const history = useHistory();
   const { projectId } = useParams();
 
   useEffect(() => {
@@ -76,7 +79,13 @@ const AddNote: React.FC<
             <Input placeholder='Enter Note Name' allowClear />
           </Form.Item>
           <div>
-            <Form.Item name='labels' label='Labels'>
+            <Form.Item name="labels" label={
+              <Tooltip title="Click to go to labels page to create label">
+                <span style={{cursor: 'pointer'}} onClick={() => history.push('/labels')}>
+                  Labels&nbsp;<PlusCircleTwoTone />
+                </span>
+              </Tooltip>
+            }>
               <Select
                   mode='multiple'
                   filterOption={(e, t) => onFilterLabel(e, t)}>

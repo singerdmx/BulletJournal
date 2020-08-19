@@ -1,5 +1,5 @@
-import { doFetch, doPost, doDelete, doPut, doPatch } from './api-helper';
-import { Task, ReminderSetting, TaskStatus } from '../features/tasks/interface';
+import {doDelete, doFetch, doPatch, doPost, doPut} from './api-helper';
+import {ReminderSetting, Task, TaskStatus} from '../features/tasks/interface';
 
 export const fetchTasks = (
   projectId: number,
@@ -358,3 +358,30 @@ export const patchRevisionContents = (
         throw Error(err);
       });
 };
+
+export const getTaskStatistics = (
+    projectIds: number[],
+    timezone: string,
+    startDate: string,
+    endDate: string
+) => {
+  // e.g. /api/taskStatistics?projectIds=11&projectIds=12&timezone=America%2FLos_Angeles&startDate=2020-01-01&endDate=2020-09-10
+  if (projectIds.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  return doFetch(
+      '/api/projectItems?' +
+      projectIds.map(p => `projectIds=${p}`).join('&') +
+      '&timezone=' +
+      encodeURIComponent(timezone) +
+      '&startDate=' +
+      startDate +
+      '&endDate=' +
+      endDate
+  )
+      .then(res => res.json())
+      .catch(err => {
+        throw Error(err.message);
+      });
+}

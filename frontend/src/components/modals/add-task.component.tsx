@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {AutoComplete, Avatar, Button, DatePicker, Form, Input, Modal, Radio, Select, TimePicker, Tooltip,} from 'antd';
-import {useParams} from 'react-router-dom';
+import {useHistory, useParams} from 'react-router-dom';
 import {CheckSquareTwoTone, CloseSquareTwoTone, PlusOutlined,} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
@@ -21,6 +21,7 @@ import {Label} from '../../features/label/interface';
 import {getIcon} from '../draggable-labels/draggable-label-list.component';
 import {onFilterAssignees, onFilterLabel} from '../../utils/Util';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
+import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -77,6 +78,7 @@ const AddTask: React.FC<
   RouteComponentProps & TaskProps & TaskCreateFormProps
 > = (props) => {
   const [form] = Form.useForm();
+  const history = useHistory();
   const [dueType, setDueType] = useState('dueByTime');
   const [reminderType, setReminderType] = useState('remindBefore');
   const [dueTimeVisible, setDueTimeVisible] = useState(false);
@@ -419,7 +421,13 @@ const AddTask: React.FC<
 
           {/* label */}
           <div>
-            <Form.Item name="labels" label="Labels">
+            <Form.Item name="labels" label={
+              <Tooltip title="Click to go to labels page to create label">
+                <span style={{cursor: 'pointer'}} onClick={() => history.push('/labels')}>
+                  Labels&nbsp;<PlusCircleTwoTone />
+                </span>
+              </Tooltip>
+            }>
               <Select
                 mode="multiple"
                 filterOption={(e, t) => onFilterLabel(e, t)}

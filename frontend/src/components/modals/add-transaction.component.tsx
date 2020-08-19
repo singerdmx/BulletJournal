@@ -31,6 +31,8 @@ import { labelsUpdate } from '../../features/label/actions';
 import { Label } from '../../features/label/interface';
 import {onFilterLabel} from "../../utils/Util";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {useHistory} from "react-router-dom";
+import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -83,6 +85,7 @@ const AddTransaction: React.FC<
   RouteComponentProps & TransactionProps & TransactionCreateFormProps
 > = (props) => {
   const [form] = Form.useForm();
+  const history = useHistory();
   const [timeVisible, setTimeVisible] = useState(false);
   const { projectId } = useParams();
 
@@ -258,7 +261,13 @@ const AddTransaction: React.FC<
           </div>
           {/* label */}
           <div>
-            <Form.Item name='labels' label='Labels'>
+            <Form.Item name="labels" label={
+              <Tooltip title="Click to go to labels page to create label">
+                <span style={{cursor: 'pointer'}} onClick={() => history.push('/labels')}>
+                  Labels&nbsp;<PlusCircleTwoTone />
+                </span>
+              </Tooltip>
+            }>
               <Select
                   mode='multiple'
                   filterOption={(e, t) => onFilterLabel(e, t)}>

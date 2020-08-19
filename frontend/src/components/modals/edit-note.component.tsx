@@ -8,9 +8,10 @@ import { IState } from '../../store';
 import { Note } from '../../features/notes/interface';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
-import { useParams } from 'react-router-dom';
+import {useHistory, useParams} from 'react-router-dom';
 import { labelsUpdate } from '../../features/label/actions';
 import {onFilterLabel} from "../../utils/Util";
+import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 const { Option } = Select;
 type NoteProps = {
   mode: string;
@@ -23,6 +24,7 @@ type NoteProps = {
 const EditNote: React.FC<NoteProps> = (props) => {
   const { note, patchNote, mode, labelOptions, labelsUpdate } = props;
   const [form] = Form.useForm();
+  const history = useHistory();
   const [visible, setVisible] = useState(false);
   const { projectId } = useParams();
 
@@ -82,7 +84,13 @@ const EditNote: React.FC<NoteProps> = (props) => {
           </Form.Item>
           {/* label */}
           <div>
-            <Form.Item name='labels' label='Labels'>
+            <Form.Item name="labels" label={
+              <Tooltip title="Click to go to labels page to create label">
+                <span style={{cursor: 'pointer'}} onClick={() => history.push('/labels')}>
+                  Labels&nbsp;<PlusCircleTwoTone />
+                </span>
+              </Tooltip>
+            }>
               <Select
                 mode='multiple'
                 filterOption={(e, t) => onFilterLabel(e, t)}

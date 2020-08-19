@@ -28,6 +28,8 @@ import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import { Label } from '../../features/label/interface';
 import { labelsUpdate } from '../../features/label/actions';
 import {onFilterLabel} from "../../utils/Util";
+import {useHistory} from "react-router-dom";
+import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -79,6 +81,7 @@ const EditTransaction: React.FC<
 > = (props) => {
   const { mode, transaction } = props;
   const [form] = Form.useForm();
+  const history = useHistory();
   const [visible, setVisible] = useState(false);
 
   const [transactionName, setTransactionName] = useState(transaction.name);
@@ -305,7 +308,13 @@ const EditTransaction: React.FC<
           </div>
           {/* label */}
           <div>
-            <Form.Item name='labels' label='Labels'>
+            <Form.Item name="labels" label={
+              <Tooltip title="Click to go to labels page to create label">
+                <span style={{cursor: 'pointer'}} onClick={() => history.push('/labels')}>
+                  Labels&nbsp;<PlusCircleTwoTone />
+                </span>
+              </Tooltip>
+            }>
               <Select
                 mode='multiple'
                 filterOption={(e, t) => onFilterLabel(e, t)}
