@@ -15,10 +15,12 @@ type rateLimitedLogger struct {
 }
 
 func newRateLimitedLogger(out io.Writer, prefix string, flag int) *rateLimitedLogger {
-	return &rateLimitedLogger{
+	customLogger := &rateLimitedLogger{
 		logger:  log.New(out, prefix, flag),
 		limiter: rate.NewLimiter(rate.Every(250*time.Millisecond), 30),
 	}
+	customLogger.logger.SetFlags(log.LstdFlags | log.Lshortfile)
+	return customLogger
 }
 
 func (l *rateLimitedLogger) Printf(format string, v ...interface{}) {

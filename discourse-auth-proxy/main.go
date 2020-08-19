@@ -50,7 +50,6 @@ func main() {
 		}
 	}
 
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	dnssrv := httpproxy.NewDNSSRVBackend(config.OriginURL)
 	go dnssrv.Lookup(context.Background(), 50*time.Second, 10*time.Second, config.SRVAbandonAfter)
 	proxy := &httputil.ReverseProxy{Director: dnssrv.Director}
@@ -204,7 +203,7 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 		handler.ServeHTTP(w, r)
 		return
 	}
-	
+
 	if isMobile(r) {
 		processMobileRequest(handler, r, w, fail, writeHttpError)
 		return
@@ -306,7 +305,7 @@ func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 
 func shouldByPass(r *http.Request) bool {
 	if strings.HasPrefix(r.RequestURI, "/api/public/items/NOTE") ||
-			strings.HasPrefix(r.RequestURI, "/api/public/items/TASK") {
+		strings.HasPrefix(r.RequestURI, "/api/public/items/TASK") {
 		return false
 	}
 	return r.Host == "home.bulletjournal.us" ||
