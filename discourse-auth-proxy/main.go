@@ -50,6 +50,7 @@ func main() {
 		}
 	}
 
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	dnssrv := httpproxy.NewDNSSRVBackend(config.OriginURL)
 	go dnssrv.Lookup(context.Background(), 50*time.Second, 10*time.Second, config.SRVAbandonAfter)
 	proxy := &httputil.ReverseProxy{Director: dnssrv.Director}
