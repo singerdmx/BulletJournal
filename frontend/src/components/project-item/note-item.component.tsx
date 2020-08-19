@@ -4,7 +4,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 // antd imports
-import {DeleteTwoTone, FileTextOutlined, FormOutlined, MoreOutlined, CopyOutlined} from '@ant-design/icons';
+import {CopyOutlined, DeleteTwoTone, FileTextOutlined, FormOutlined, MoreOutlined} from '@ant-design/icons';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 // features import
 import {deleteNote} from '../../features/notes/actions';
@@ -187,8 +187,8 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
 
   return (
       <>
-          <MenuProvider id={`note${note.id}`}>
-              <div className="project-item">
+          <div className="project-item">
+              <MenuProvider id={`note${note.id}`}>
                   <div className="project-item-content">
                       <a onClick={handleClick}>
                           <h3 className="project-item-name">
@@ -222,35 +222,34 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
                           </div>
                       </div>
                   </div>
+              </MenuProvider>
 
-                  <div className="project-control">
-                      <div style={{marginLeft: '5px'}}>
-                          <Tooltip
-                              title={
-                                  note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
-                              }
-                          >
-                              {getOrderIcon()}
-                          </Tooltip>
-                      </div>
-                      {getMore()}
+              <Menu id={`note${note.id}`}
+                    theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                    animation={animation.zoom}>
+                  <CopyToClipboard
+                      text={`${note.name} ${window.location.origin.toString()}/#/note/${note.id}`}
+                      onCopy={() => message.success('Link Copied to Clipboard')}
+                  >
+                      <Item>
+                          <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                          <span>Copy Link Address</span>
+                      </Item>
+                  </CopyToClipboard>
+              </Menu>
+              <div className="project-control">
+                  <div style={{marginLeft: '5px'}}>
+                      <Tooltip
+                          title={
+                              note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
+                          }
+                      >
+                          {getOrderIcon()}
+                      </Tooltip>
                   </div>
+                  {getMore()}
               </div>
-          </MenuProvider>
-
-          <Menu id={`note${note.id}`}
-                theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-                animation={animation.zoom}>
-              <CopyToClipboard
-                  text={`${note.name} ${window.location.origin.toString()}/#/note/${note.id}`}
-                  onCopy={() => message.success('Link Copied to Clipboard')}
-              >
-                  <Item>
-                      <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
-                      <span>Copy Link Address</span>
-                  </Item>
-              </CopyToClipboard>
-          </Menu>
+          </div>
       </>
   );
 };

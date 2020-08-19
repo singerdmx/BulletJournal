@@ -453,11 +453,11 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   }
   return (
       <>
-        <MenuProvider id={`task${task.id}`}>
-          <div
-              className="project-item"
-              style={getTaskBackgroundColor(task.status, theme)}
-          >
+        <div
+            className="project-item"
+            style={getTaskBackgroundColor(task.status, theme)}
+        >
+          <MenuProvider id={`task${task.id}`}>
             <div className="project-item-content">
               <a onClick={handleClick}>
                 <h3 className={taskStyle}>
@@ -491,48 +491,48 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
                 {isComplete && getCompletionTime(task)}
               </div>
             </div>
+          </MenuProvider>
 
-            <div className="project-control">
-              <div className="project-item-assignee">{getAssignees()}</div>
-              <div>
-                <Tooltip title={getReminderSettingString(task.reminderSetting)}>
-                  {getOrderIcon()}
-                </Tooltip>
-              </div>
-              {getMore()}
+          <Menu id={`task${task.id}`}
+                theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                animation={animation.zoom}>
+            <CopyToClipboard
+                text={`${task.name} ${linkAddress}`}
+                onCopy={() => message.success('Link Copied to Clipboard')}
+            >
+              <Item>
+                <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                <span>Copy Link Address</span>
+              </Item>
+            </CopyToClipboard>
+            {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.IN_PROGRESS, type)}>
+              <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><LoadingOutlined/></IconFont>
+              <span>Set Status to IN PROGRESS</span>
+            </Item>}
+            {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.NEXT_TO_DO, type)}>
+              <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><RotateRightOutlined/></IconFont>
+              <span>Set Status to NEXT TO DO</span>
+            </Item>}
+            {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.READY, type)}>
+              <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SmileOutlined/></IconFont>
+              <span>Set Status to READY</span>
+            </Item>}
+            {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.ON_HOLD, type)}>
+              <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><PauseCircleOutlined/></IconFont>
+              <span>Set Status to ON HOLD</span>
+            </Item>}
+          </Menu>
+          <div className="project-control">
+            <div className="project-item-assignee">{getAssignees()}</div>
+            <div>
+              <Tooltip title={getReminderSettingString(task.reminderSetting)}>
+                {getOrderIcon()}
+              </Tooltip>
             </div>
+            {getMore()}
           </div>
-        </MenuProvider>
+        </div>
 
-        <Menu id={`task${task.id}`}
-              theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-              animation={animation.zoom}>
-          <CopyToClipboard
-              text={`${task.name} ${linkAddress}`}
-              onCopy={() => message.success('Link Copied to Clipboard')}
-          >
-            <Item>
-              <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
-              <span>Copy Link Address</span>
-            </Item>
-          </CopyToClipboard>
-          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.IN_PROGRESS, type)}>
-            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><LoadingOutlined /></IconFont>
-            <span>Set Status to IN PROGRESS</span>
-          </Item>}
-          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.NEXT_TO_DO, type)}>
-            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><RotateRightOutlined /></IconFont>
-            <span>Set Status to NEXT TO DO</span>
-          </Item>}
-          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.READY, type)}>
-            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SmileOutlined /></IconFont>
-            <span>Set Status to READY</span>
-          </Item>}
-          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.ON_HOLD, type)}>
-            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><PauseCircleOutlined /></IconFont>
-            <span>Set Status to ON HOLD</span>
-          </Item>}
-        </Menu>
       </>
   );
 };
