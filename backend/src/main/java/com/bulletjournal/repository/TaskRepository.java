@@ -59,19 +59,20 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
                                 @Param("endTime") Timestamp endTime,
                                 @Param("projects") List<Project> projects);
 
-    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds AND tasks.due_date is NOT NULL " +
-            "AND tasks.due_date >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') " +
-            "AND tasks.due_date <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')", nativeQuery = true)
+    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds AND tasks.start_time IS NOT NULL AND " +
+            "tasks.end_time IS NOT NULL AND " +
+            "((tasks.start_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.start_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')) OR " +
+            "(tasks.end_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.end_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')))", nativeQuery = true)
     List<Task> findTaskWithProjectIdStartTimeEndTime(List<Long> projectIds, String startTime, String endTime);
 
-    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds AND (tasks.due_date is NULL " +
-            "OR tasks.due_date >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS'))", nativeQuery = true)
+    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds AND (tasks.start_time is NOT NULL " +
+            "AND tasks.start_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS'))", nativeQuery = true)
     List<Task> findTaskWithProjectIdStartTime(List<Long> projectIds, String startTime);
 
-    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds AND (tasks.due_date is NULL " +
-            "OR tasks.due_date <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS'))", nativeQuery = true)
+    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds AND (tasks.end_time is NOT NULL " +
+            "OR tasks.end_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS'))", nativeQuery = true)
     List<Task> findTaskWithProjectIdEndTime(List<Long> projectIds, String endTime);
 
-    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds AND tasks.due_date is NOT NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds", nativeQuery = true)
     List<Task> findTaskWithProjectId(List<Long> projectIds);
 }
