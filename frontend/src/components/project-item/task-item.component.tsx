@@ -536,9 +536,11 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
       </>
   );
 };
+
 const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
 });
+
 export default connect(mapStateToProps, {
   completeTask,
   uncompleteTask,

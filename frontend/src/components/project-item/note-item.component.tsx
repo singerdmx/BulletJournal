@@ -1,21 +1,16 @@
 // note item component for note tree
 // react import
 import React from 'react';
-import { connect } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import {connect} from 'react-redux';
+import {useHistory} from 'react-router-dom';
 // antd imports
-import {
-  DeleteTwoTone,
-  MoreOutlined,
-  FileTextOutlined,
-  FormOutlined,
-} from '@ant-design/icons';
-import { Avatar, Popconfirm, Popover, Tag, Tooltip } from 'antd';
+import {DeleteTwoTone, FileTextOutlined, FormOutlined, MoreOutlined, CopyOutlined} from '@ant-design/icons';
+import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 // features import
-import { deleteNote } from '../../features/notes/actions';
-import { Note } from '../../features/notes/interface';
-import { Label, stringToRGB } from '../../features/label/interface';
-import { setSelectedLabel } from '../../features/label/actions';
+import {deleteNote} from '../../features/notes/actions';
+import {Note} from '../../features/notes/interface';
+import {Label, stringToRGB} from '../../features/label/interface';
+import {setSelectedLabel} from '../../features/label/actions';
 // modals import
 import EditNote from '../modals/edit-note.component';
 import MoveProjectItem from '../modals/move-project-item.component';
@@ -24,18 +19,18 @@ import ShareProjectItem from '../modals/share-project-item.component';
 import moment from 'moment';
 // assets import
 import './project-item.styles.less';
-import {
-  ProjectItemUIType,
-  ProjectType,
-} from '../../features/project/constants';
-import {
-  getIcon,
-  getItemIcon,
-} from '../draggable-labels/draggable-label-list.component';
-import { User } from '../../features/group/interface';
+import {ProjectItemUIType, ProjectType,} from '../../features/project/constants';
+import {getIcon, getItemIcon,} from '../draggable-labels/draggable-label-list.component';
+import {User} from '../../features/group/interface';
+import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
+import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
+import CopyToClipboard from "react-copy-to-clipboard";
+import 'react-contexify/dist/ReactContexify.min.css';
+import {IState} from "../../store";
 
 type ProjectProps = {
   readOnly: boolean;
+  theme: string;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
 };
@@ -108,24 +103,26 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
 const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   props
 ) => {
+    const {
+        note,
+        type,
+        theme,
+        deleteNote,
+        inModal,
+        inProject,
+        showModal,
+        showOrderModal,
+        readOnly,
+        setSelectedLabel
+    } = props;
+
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
-    props.setSelectedLabel(label);
+    setSelectedLabel(label);
     history.push('/labels/search');
   };
-
-  const {
-    note,
-    type,
-    deleteNote,
-    inModal,
-    inProject,
-    showModal,
-    showOrderModal,
-    readOnly,
-  } = props;
 
   const getMore = () => {
     if (readOnly) {
@@ -189,55 +186,77 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
   };
 
   return (
-    <div className="project-item">
-      <div className="project-item-content">
-        <a onClick={handleClick}>
-          <h3 className="project-item-name">
-            <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
-            &nbsp;{getItemIcon(note, <FileTextOutlined />)}&nbsp;
-            {note.name}
-          </h3>
-        </a>
-        <div className="project-item-subs">
-          <div className="project-item-labels">
-            {note.labels &&
-              note.labels.map((label) => {
-                return (
-                  <Tag
-                    key={`label${label.id}`}
-                    className="labels"
-                    onClick={() => toLabelSearching(label)}
-                    color={stringToRGB(label.value)}
-                    style={{ cursor: 'pointer', borderRadius: 10 }}
-                  >
-                    <span>
-                      {getIcon(label.icon)} &nbsp;
-                      {label.value}
-                    </span>
-                  </Tag>
-                );
-              })}
-          </div>
-          <div className="project-item-time">
-            {note.createdAt && `Created ${moment(note.createdAt).fromNow()}`}
-          </div>
-        </div>
-      </div>
+      <>
+          <MenuProvider id={`note${note.id}`}>
+              <div className="project-item">
+                  <div className="project-item-content">
+                      <a onClick={handleClick}>
+                          <h3 className="project-item-name">
+                              <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
+                              &nbsp;{getItemIcon(note, <FileTextOutlined/>)}&nbsp;
+                              {note.name}
+                          </h3>
+                      </a>
+                      <div className="project-item-subs">
+                          <div className="project-item-labels">
+                              {note.labels &&
+                              note.labels.map((label) => {
+                                  return (
+                                      <Tag
+                                          key={`label${label.id}`}
+                                          className="labels"
+                                          onClick={() => toLabelSearching(label)}
+                                          color={stringToRGB(label.value)}
+                                          style={{cursor: 'pointer', borderRadius: 10}}
+                                      >
+                                        <span>
+                                          {getIcon(label.icon)} &nbsp;
+                                            {label.value}
+                                        </span>
+                                      </Tag>
+                                  );
+                              })}
+                          </div>
+                          <div className="project-item-time">
+                              {note.createdAt && `Created ${moment(note.createdAt).fromNow()}`}
+                          </div>
+                      </div>
+                  </div>
 
-      <div className="project-control">
-        <div style={{marginLeft: '5px'}}>
-          <Tooltip
-            title={
-              note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
-            }
-          >
-            {getOrderIcon()}
-          </Tooltip>
-        </div>
-        {getMore()}
-      </div>
-    </div>
+                  <div className="project-control">
+                      <div style={{marginLeft: '5px'}}>
+                          <Tooltip
+                              title={
+                                  note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
+                              }
+                          >
+                              {getOrderIcon()}
+                          </Tooltip>
+                      </div>
+                      {getMore()}
+                  </div>
+              </div>
+          </MenuProvider>
+
+          <Menu id={`note${note.id}`}
+                theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                animation={animation.zoom}>
+              <CopyToClipboard
+                  text={`${note.name} ${window.location.origin.toString()}/#/note/${note.id}`}
+                  onCopy={() => message.success('Link Copied to Clipboard')}
+              >
+                  <Item>
+                      <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                      <span>Copy Link Address</span>
+                  </Item>
+              </CopyToClipboard>
+          </Menu>
+      </>
   );
 };
 
-export default connect(null, { deleteNote, setSelectedLabel })(NoteItem);
+const mapStateToProps = (state: IState) => ({
+    theme: state.myself.theme,
+});
+
+export default connect(mapStateToProps, { deleteNote, setSelectedLabel })(NoteItem);

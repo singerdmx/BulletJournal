@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Avatar, BackTop, Collapse, Empty, List, Popover, Tooltip} from 'antd';
+import {Avatar, BackTop, Collapse, Empty, List, message, Popover, Tooltip} from 'antd';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {IState} from "../../store";
@@ -12,11 +12,16 @@ import {TeamOutlined} from "@ant-design/icons";
 
 import './projects.styles.less';
 import AddProject from "../../components/modals/add-project.component";
+import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
+import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
+import CopyToClipboard from "react-copy-to-clipboard";
+import {CopyOutlined} from "@ant-design/icons/lib";
 
 const {Panel} = Collapse;
 
 // props of projects
 type ProjectsProps = {
+    theme: string;
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     updateProjects: () => void;
@@ -73,7 +78,7 @@ export const getGroupByProject = (
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
-    const {groups, ownedProjects, sharedProjects, updateGroups, updateProjects} = props;
+    const {groups, theme, ownedProjects, sharedProjects, updateGroups, updateProjects} = props;
 
     useEffect(() => {
         updateGroups();
@@ -118,10 +123,29 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                         </Tooltip>
                     }
                     title={
-                        <span>
-                        {iconMapper[project.projectType]}
-                            &nbsp;{project.name}
-                      </span>
+                        <>
+                            <MenuProvider id={`p${project.id}`}>
+                              <span>
+                                {iconMapper[project.projectType]}
+                                    &nbsp;{project.name}
+                              </span>
+                            </MenuProvider>
+
+                            <Menu id={`p${project.id}`}
+                                  theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                                  animation={animation.zoom}>
+                                <CopyToClipboard
+                                    text={`${project.name} ${window.location.origin.toString()}/#/projects/${project.id}`}
+                                    onCopy={() => message.success('Link Copied to Clipboard')}
+                                >
+                                    <Item>
+                                        <IconFont
+                                            style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                                        <span>Copy Link Address</span>
+                                    </Item>
+                                </CopyToClipboard>
+                            </Menu>
+                        </>
                     }
                     description={project.description}
                 />
@@ -171,6 +195,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
 
 const mapStateToProps = (state: IState) => ({
     groups: state.group.groups,
+    theme: state.myself.theme,
     ownedProjects: state.project.owned,
     sharedProjects: state.project.shared
 });

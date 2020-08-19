@@ -5,7 +5,7 @@ import React, {useEffect, useState} from 'react';
 //actions
 import {getReminderSettingString, getTaskBackgroundColor, Task, TaskStatus,} from '../../features/tasks/interface';
 // antd imports
-import {Avatar, BackTop, Divider, Select, Tag, Tooltip} from 'antd';
+import {Avatar, BackTop, Divider, message, Select, Tag, Tooltip} from 'antd';
 import {AlertOutlined, ClockCircleOutlined} from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
@@ -23,6 +23,10 @@ import {connect} from 'react-redux';
 import {setTaskStatus} from '../../features/tasks/actions';
 import {getDuration} from '../../components/project-item/task-item.component';
 import {inPublicPage} from "../../index";
+import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
+import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
+import CopyToClipboard from "react-copy-to-clipboard";
+import {CopyOutlined} from "@ant-design/icons/lib";
 
 const { Option } = Select;
 
@@ -186,7 +190,25 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         </span>
         </Tooltip>
         <div className="task-title">
-            <div className="label-and-name">{task.name}</div>
+            <>
+                <MenuProvider id={`task${task.id}`}>
+                    <div className="label-and-name">{task.name}</div>
+                </MenuProvider>
+                <Menu id={`task${task.id}`}
+                      theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                      animation={animation.zoom}>
+                    <CopyToClipboard
+                        text={`${task.name} ${window.location.origin.toString()}/#/task/${task.id}`}
+                        onCopy={() => message.success('Link Copied to Clipboard')}
+                    >
+                        <Item>
+                            <IconFont
+                                style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                            <span>Copy Link Address</span>
+                        </Item>
+                    </CopyToClipboard>
+                </Menu>
+            </>
             {taskOperation()}
         </div>
         <div className="title-labels">

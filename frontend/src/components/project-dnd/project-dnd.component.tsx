@@ -1,18 +1,19 @@
 import React from 'react';
-import {Tree, Tooltip, Empty} from 'antd';
-import { TreeNodeNormal } from 'antd/lib/tree/Tree';
-import { Project, ProjectsWithOwner } from '../../features/project/interface';
-import { updateSharedProjectsOrder } from '../../features/project/actions';
-import {
-  CarryOutOutlined,
-  AccountBookOutlined,
-  FileTextOutlined
-} from '@ant-design/icons';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { withRouter, RouteComponentProps } from 'react-router';
-import { connect } from 'react-redux';
+import {Empty, message, Tooltip, Tree} from 'antd';
+import {TreeNodeNormal} from 'antd/lib/tree/Tree';
+import {Project, ProjectsWithOwner} from '../../features/project/interface';
+import {updateSharedProjectsOrder} from '../../features/project/actions';
+import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
+import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
+import {RouteComponentProps, withRouter} from 'react-router';
+import {connect} from 'react-redux';
 import {clearCompletedTasks} from "../../features/tasks/actions";
 import {User} from "../../features/group/interface";
+import {IState} from "../../store";
+import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
+import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
+import CopyToClipboard from "react-copy-to-clipboard";
+import {CopyOutlined} from "@ant-design/icons/lib";
 
 export const iconMapper = {
   TODO: <CarryOutOutlined />,
@@ -24,24 +25,43 @@ const getTree = (
   data: Project[],
   owner: User,
   index: number,
+  theme: string,
   onClick: Function
 ): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Project) => {
     const node = {} as TreeNodeNormal;
     if (item.subProjects && item.subProjects.length) {
-      node.children = getTree(item.subProjects, owner, index, onClick);
+      node.children = getTree(item.subProjects, owner, index, theme, onClick);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
     if (item.owner) {
       node.title = (
-        <Tooltip placement="right" title={`Owner: ${item.owner.alias}`}>
-          <span
-            onClick={e => onClick(item.id)}>
-            {iconMapper[item.projectType]}&nbsp;{item.name}
-          </span>
-        </Tooltip>
+          <>
+            <MenuProvider id={`project${item.id}`}>
+              <Tooltip placement="right" title={`Owner: ${item.owner.alias}`}>
+                <span
+                    onClick={e => onClick(item.id)}>
+                  {iconMapper[item.projectType]}&nbsp;{item.name}
+                </span>
+              </Tooltip>
+            </MenuProvider>
+
+            <Menu id={`project${item.id}`}
+                  theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                  animation={animation.zoom}>
+              <CopyToClipboard
+                  text={`${item.name} ${window.location.origin.toString()}/#/projects/${item.id}`}
+                  onCopy={() => message.success('Link Copied to Clipboard')}
+              >
+                <Item>
+                  <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                  <span>Copy Link Address</span>
+                </Item>
+              </CopyToClipboard>
+            </Menu>
+          </>
       );
     } else {
       node.title = (
@@ -72,6 +92,7 @@ const reorder = (
 };
 
 type ProjectProps = {
+  theme: string;
   sharedProjects: ProjectsWithOwner[];
   updateSharedProjectsOrder: (projectOwners: string[]) => void;
   clearCompletedTasks: () => void;
@@ -102,6 +123,7 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
                     item.projects,
                     item.owner,
                     index,
+                    this.props.theme,
                     (itemId: number) => {
                       clearCompletedTasks();
                       this.props.history.push(`/projects/${itemId}`);
@@ -139,6 +161,10 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
   }
 }
 
-export default connect(null, { updateSharedProjectsOrder, clearCompletedTasks })(
+const mapStateToProps = (state: IState) => ({
+  theme: state.myself.theme,
+});
+
+export default connect(mapStateToProps, { updateSharedProjectsOrder, clearCompletedTasks })(
   withRouter(ProjectDnd)
 );

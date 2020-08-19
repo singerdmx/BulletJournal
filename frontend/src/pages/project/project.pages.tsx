@@ -4,7 +4,7 @@ import {Project} from '../../features/project/interface';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {GroupsWithOwner, User} from '../../features/group/interface';
-import {Avatar, BackTop, Badge, Popconfirm, Popover, Tag, Tooltip,} from 'antd';
+import {Avatar, BackTop, Badge, message, Popconfirm, Popover, Tag, Tooltip,} from 'antd';
 import {deleteProject, getProject} from '../../features/project/actions';
 import {iconMapper} from '../../components/side-menu/side-menu.component';
 import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
@@ -33,6 +33,10 @@ import {FrequencyType, LedgerSummaryType,} from '../../features/transactions/int
 import {projectLabelsUpdate, setSelectedLabel,} from '../../features/label/actions';
 import {Label, stringToRGB} from '../../features/label/interface';
 import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
+import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
+import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
+import CopyToClipboard from "react-copy-to-clipboard";
+import {CopyOutlined} from "@ant-design/icons/lib";
 
 type ProjectPathParams = {
   projectId: string;
@@ -60,6 +64,7 @@ interface ProjectPathProps extends RouteComponentProps<ProjectPathParams> {
 }
 
 type ProjectPageProps = {
+  theme: string;
   timezone: string;
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
@@ -486,22 +491,14 @@ class ProjectPage extends React.Component<
         </Tooltip>
         <div className="project-header">
           <h2>
-            {!description && (
-              <span>
-                {iconMapper[project.projectType]}
-                &nbsp;{project.name}
-              </span>
-            )}
+            {!description && this.getProjectNameSpan(project)}
             {description && (
               <Popover
                 className='project-description'
                 placement="bottomLeft"
-                content={description || project.name}
+                content={description}
               >
-                <span>
-                  {iconMapper[project.projectType]}
-                  &nbsp;{project.name}
-                </span>
+                {this.getProjectNameSpan(project)}
               </Popover>
             )}
           </h2>
@@ -543,12 +540,38 @@ class ProjectPage extends React.Component<
       </div>
     );
   }
+
+  getProjectNameSpan = (project: Project) => {
+    return <>
+      <MenuProvider id={`pr${project.id}`}>
+        <span>
+                {iconMapper[project.projectType]}
+          &nbsp;{project.name}
+        </span>
+      </MenuProvider>
+      <Menu id={`pr${project.id}`}
+            theme={this.props.theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+            animation={animation.zoom}>
+        <CopyToClipboard
+            text={`${project.name} ${window.location.origin.toString()}/#/projects/${project.id}`}
+            onCopy={() => message.success('Link Copied to Clipboard')}
+        >
+          <Item>
+            <IconFont
+                style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+            <span>Copy Link Address</span>
+          </Item>
+        </CopyToClipboard>
+      </Menu>
+    </>
+  }
 }
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   groups: state.group.groups,
   myself: state.myself.username,
+  theme: state.myself.theme,
   transactionTimezone: state.transaction.timezone,
   transactionFrequencyType: state.transaction.frequencyType,
   transactionStartDate: state.transaction.startDate,

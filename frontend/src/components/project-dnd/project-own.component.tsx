@@ -1,5 +1,5 @@
 import React from 'react';
-import {Empty, Tree} from 'antd';
+import {Empty, message, Tree} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
 import {updateProjectRelations} from '../../features/project/actions';
@@ -7,6 +7,11 @@ import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-desi
 import {RouteComponentProps, withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {clearCompletedTasks} from "../../features/tasks/actions";
+import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
+import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
+import CopyToClipboard from "react-copy-to-clipboard";
+import {IState} from "../../store";
+import {CopyOutlined} from "@ant-design/icons/lib";
 
 export const iconMapper = {
     TODO: <CarryOutOutlined/>,
@@ -17,20 +22,39 @@ export const iconMapper = {
 const getTree = (
     data: Project[],
     index: number,
+    theme: string,
     onClick: Function
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Project) => {
         const node = {} as TreeNodeNormal;
         if (item.subProjects && item.subProjects.length) {
-            node.children = getTree(item.subProjects, index, onClick);
+            node.children = getTree(item.subProjects, index, theme, onClick);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
         node.title = (
-            <span onClick={e => onClick(item.id)} style={{width: '100%'}}>
-            {iconMapper[item.projectType]}&nbsp;{item.name}
-          </span>
+            <>
+                <MenuProvider id={`project${item.id}`}>
+                  <span onClick={e => onClick(item.id)} style={{width: '100%'}}>
+                    {iconMapper[item.projectType]}&nbsp;{item.name}
+                  </span>
+                </MenuProvider>
+
+                <Menu id={`project${item.id}`}
+                      theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                      animation={animation.zoom}>
+                    <CopyToClipboard
+                        text={`${item.name} ${window.location.origin.toString()}/#/projects/${item.id}`}
+                        onCopy={() => message.success('Link Copied to Clipboard')}
+                    >
+                        <Item>
+                            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                            <span>Copy Link Address</span>
+                        </Item>
+                    </CopyToClipboard>
+                </Menu>
+            </>
         );
         node.key = item.id.toString();
         res.push(node);
@@ -40,6 +64,7 @@ const getTree = (
 
 type ProjectProps = {
     id: number,
+    theme: string,
     ownProjects: Project[];
     updateProjectRelations: (Projects: Project[]) => void;
     clearCompletedTasks: () => void;
@@ -120,9 +145,9 @@ const onDrop = (projects: Project[], updateProject: Function) => (info: any) => 
 };
 
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
-    const {ownProjects, history, id, updateProjectRelations} = props;
+    const {ownProjects, history, id, updateProjectRelations, theme} = props;
 
-    const treeNode = getTree(ownProjects, id, (itemId: number) => {
+    const treeNode = getTree(ownProjects, id, theme, (itemId: number) => {
         clearCompletedTasks();
         history.push(`/projects/${itemId}`);
     });
@@ -142,6 +167,10 @@ const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
             treeData={treeNode}/></div>);
 };
 
-export default connect(null, {updateProjectRelations, clearCompletedTasks})(
+const mapStateToProps = (state: IState) => ({
+    theme: state.myself.theme,
+});
+
+export default connect(mapStateToProps, {updateProjectRelations, clearCompletedTasks})(
     withRouter(OwnProject)
 );

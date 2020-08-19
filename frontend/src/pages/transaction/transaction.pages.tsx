@@ -24,7 +24,7 @@ import {
   BackTop,
   Card,
   Col,
-  Divider,
+  Divider, message,
   Popconfirm,
   Row,
   Statistic,
@@ -53,7 +53,10 @@ import {
   darkColors,
 } from 'react-floating-action-button';
 import { setDisplayMore, setDisplayRevision } from "../../features/content/actions";
-import { DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined } from "@ant-design/icons/lib";
+import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@ant-design/icons/lib";
+import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
+import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
+import CopyToClipboard from "react-copy-to-clipboard";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -67,6 +70,7 @@ type TransactionProps = {
 };
 
 interface TransactionPageHandler {
+  theme: string;
   content: Content | undefined;
   getTransaction: (transactionId: number) => void;
   setDisplayMore: (displayMore: boolean) => void;
@@ -78,6 +82,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props
 ) => {
   const {
+    theme,
     content,
     transaction,
     deleteTransaction,
@@ -238,7 +243,25 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       </Tooltip>
       <div className="transaction-title">
         <div className="label-and-name">
-          {transaction.name}
+          <>
+            <MenuProvider id={`transaction${transaction.id}`}>
+              <span>{transaction.name}</span>
+            </MenuProvider>
+
+            <Menu id={`transaction${transaction.id}`}
+                  theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                  animation={animation.zoom}>
+              <CopyToClipboard
+                  text={`${transaction.name} ${window.location.origin.toString()}/#/transaction/${transaction.id}`}
+                  onCopy={() => message.success('Link Copied to Clipboard')}
+              >
+                <Item>
+                  <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                  <span>Copy Link Address</span>
+                </Item>
+              </CopyToClipboard>
+            </Menu>
+          </>
           <DraggableLabelsList
             mode={ProjectType.LEDGER}
             labels={transaction.labels}
@@ -325,7 +348,8 @@ const mapStateToProps = (state: IState) => ({
   transaction: state.transaction.transaction,
   currency: state.myself.currency,
   contents: state.transaction.contents,
-  content: state.content.content
+  content: state.content.content,
+  theme: state.myself.theme,
 });
 
 export default connect(mapStateToProps, {
