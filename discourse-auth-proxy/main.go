@@ -425,14 +425,14 @@ func getReturnUrl(secret string, payload string, sig string, nonce string) (retu
 	value, ok := nonceCache.Get(nonce)
 	nonceMutex.Unlock()
 	if !ok {
-		err = fmt.Errorf("nonce not found: %s", nonce)
-		return
+		logger.Printf("nonce not found: %s", nonce)
+		returnUrl = "/"
+	} else {
+		returnUrl = value.(string)
+		nonceMutex.Lock()
+		nonceCache.Remove(nonce)
+		nonceMutex.Unlock()
 	}
-
-	returnUrl = value.(string)
-	nonceMutex.Lock()
-	nonceCache.Remove(nonce)
-	nonceMutex.Unlock()
 
 	if computeHMAC(payload, secret) != sig {
 		err = errors.New("signature is invalid")
