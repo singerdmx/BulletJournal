@@ -24,7 +24,7 @@ import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {MenuOutlined} from "@ant-design/icons/lib";
+import {MenuOutlined, ProjectOutlined} from "@ant-design/icons/lib";
 
 type TasksProps = {
   completeTasksShown: boolean;
@@ -334,6 +334,13 @@ const TaskTree: React.FC<TasksProps> = (props) => {
           styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
       >
         <FieldTimeOutlined/>
+      </FloatButton>}
+      {tasks.length > 0 && <FloatButton
+          tooltip="Statistics"
+          onClick={() => history.push(`/projects/${project.id}/statistics`)}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+      >
+        <ProjectOutlined />
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Tasks by Status"

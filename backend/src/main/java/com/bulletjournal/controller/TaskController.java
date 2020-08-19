@@ -441,6 +441,7 @@ public class TaskController {
             @NotBlank @RequestParam String timezone,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate) {
+        // e.g. http://localhost:8080/api/taskStatistics?projectIds=11&projectIds=12&timezone=America%2FLos_Angeles&startDate=2020-01-01&endDate=2020-09-10
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         // validate all projects user can access

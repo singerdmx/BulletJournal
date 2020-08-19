@@ -19,6 +19,7 @@ import SearchPage from "../../pages/search/search.pages";
 import TaskStatusPage from "../../pages/task-status/task-status.pages";
 import PublicPage from "../../Public";
 import PointsPage from "../../pages/points/points.pages";
+import ProjectStatisticsPage from "../../pages/statistics/statistics.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -34,6 +35,7 @@ class ContentLayout extends React.Component {
           <Route exact path='/projects' component={ProjectsPage} />
           <Route exact path='/projects/:projectId' component={ProjectPage} />
           <Route exact path='/projects/:projectId/taskStatus' component={TaskStatusPage} />
+          <Route exact path='/projects/:projectId/statistics' component={ProjectStatisticsPage} />
           <Route exact path='/groups' component={GroupsPage} />
           <Route exact path='/groups/:groupId' component={GroupPage} />
           <Route exact path='/labels/:createOrSearch' component={LabelsPage} />
