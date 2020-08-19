@@ -165,8 +165,8 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
 
   return (
       <>
-          <MenuProvider id={`transaction${transaction.id}`}>
-              <div className='project-item'>
+          <div className='project-item'>
+              <MenuProvider id={`transaction${transaction.id}`}>
                   <div className='project-item-content'>
                       <Link to={`/transaction/${transaction.id}`}>
                           <h3 className='project-item-name'>
@@ -202,53 +202,52 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                           {getPaymentDateTime()}
                       </div>
                   </div>
+              </MenuProvider>
 
-                  <div className='project-control'>
-                      <div className='project-item-owner'>
-                          <Tooltip
-                              title={`Payer ${transaction.payer.alias}`}
-                          >
-                              {getAvatar(transaction.payer)}
-                          </Tooltip>
-                      </div>
-                      <div className='project-item-owner'>
-                          {getTransactionInfo(transaction)}
-                      </div>
-                      <Popover
-                          arrowPointAtCenter
-                          placement='rightTop'
-                          overlayStyle={{width: '150px'}}
-                          content={
-                              <ManageTransaction
-                                  transaction={transaction}
-                                  type={type}
-                                  deleteTransaction={deleteTransaction}
-                                  inModal={inModal}
-                              />
-                          }
-                          trigger='click'
+              <Menu id={`transaction${transaction.id}`}
+                    theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                    animation={animation.zoom}>
+                  <CopyToClipboard
+                      text={`${transaction.name} ${window.location.origin.toString()}/#/transaction/${transaction.id}`}
+                      onCopy={() => message.success('Link Copied to Clipboard')}
+                  >
+                      <Item>
+                          <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                          <span>Copy Link Address</span>
+                      </Item>
+                  </CopyToClipboard>
+              </Menu>
+              <div className='project-control'>
+                  <div className='project-item-owner'>
+                      <Tooltip
+                          title={`Payer ${transaction.payer.alias}`}
                       >
+                          {getAvatar(transaction.payer)}
+                      </Tooltip>
+                  </div>
+                  <div className='project-item-owner'>
+                      {getTransactionInfo(transaction)}
+                  </div>
+                  <Popover
+                      arrowPointAtCenter
+                      placement='rightTop'
+                      overlayStyle={{width: '150px'}}
+                      content={
+                          <ManageTransaction
+                              transaction={transaction}
+                              type={type}
+                              deleteTransaction={deleteTransaction}
+                              inModal={inModal}
+                          />
+                      }
+                      trigger='click'
+                  >
                           <span className='project-control-more'>
                             <MoreOutlined/>
                           </span>
-                      </Popover>
-                  </div>
+                  </Popover>
               </div>
-          </MenuProvider>
-
-          <Menu id={`transaction${transaction.id}`}
-                theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-                animation={animation.zoom}>
-              <CopyToClipboard
-                  text={`${transaction.name} ${window.location.origin.toString()}/#/transaction/${transaction.id}`}
-                  onCopy={() => message.success('Link Copied to Clipboard')}
-              >
-                  <Item>
-                      <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
-                      <span>Copy Link Address</span>
-                  </Item>
-              </CopyToClipboard>
-          </Menu>
+          </div>
       </>
   );
 };
