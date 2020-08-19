@@ -1,5 +1,5 @@
 import React from 'react';
-import {Avatar, Badge, Popconfirm, Popover, Tag, Tooltip} from 'antd';
+import {Avatar, Badge, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 import {
   AlertOutlined,
   CarryOutOutlined,
@@ -38,6 +38,7 @@ import {User} from '../../features/group/interface';
 import {IState} from '../../store';
 import {animation, IconFont, Item, Menu, MenuProvider, theme as ContextMenuTheme} from "react-contexify";
 import 'react-contexify/dist/ReactContexify.min.css';
+import CopyToClipboard from "react-copy-to-clipboard";
 
 type ProjectProps = {
   readOnly: boolean;
@@ -446,6 +447,10 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
     );
   };
 
+  let linkAddress = `${window.location.origin.toString()}/#/task/${task.id}`;
+  if (isComplete) {
+    linkAddress = `${window.location.origin.toString()}/#/completedTask/${task.id}`;
+  }
   return (
       <>
         <MenuProvider id={`task${task.id}`}>
@@ -502,10 +507,15 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
         <Menu id={`task${task.id}`}
               theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
               animation={animation.zoom}>
-          <Item>
-            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined /></IconFont>
-            <span>Copy Link Address</span>
-          </Item>
+          <CopyToClipboard
+              text={`${task.name} ${linkAddress}`}
+              onCopy={() => message.success('Link Copied to Clipboard')}
+          >
+            <Item>
+              <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+              <span>Copy Link Address</span>
+            </Item>
+          </CopyToClipboard>
           {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.IN_PROGRESS, type)}>
             <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><LoadingOutlined /></IconFont>
             <span>Set Status to IN PROGRESS</span>
