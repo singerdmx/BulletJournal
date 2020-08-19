@@ -5,14 +5,25 @@ import {
   CarryOutOutlined,
   CheckCircleTwoTone,
   CloseCircleOutlined,
+  CopyOutlined,
   DeleteTwoTone,
+  LoadingOutlined,
   MoreOutlined,
-  TeamOutlined,
+  PauseCircleOutlined,
+  RotateRightOutlined,
+  SmileOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
-import {getReminderSettingString, getTaskBackgroundColor, Task,} from '../../features/tasks/interface';
+import {getReminderSettingString, getTaskBackgroundColor, Task, TaskStatus,} from '../../features/tasks/interface';
 import {connect} from 'react-redux';
 import {useHistory} from 'react-router-dom';
-import {completeTask, deleteCompletedTask, deleteTask, uncompleteTask,} from '../../features/tasks/actions';
+import {
+  completeTask,
+  deleteCompletedTask,
+  deleteTask,
+  setTaskStatus,
+  uncompleteTask,
+} from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
 import {Label, stringToRGB} from '../../features/label/interface';
@@ -25,6 +36,8 @@ import {getIcon, getItemIcon,} from '../draggable-labels/draggable-label-list.co
 import {setSelectedLabel} from '../../features/label/actions';
 import {User} from '../../features/group/interface';
 import {IState} from '../../store';
+import {animation, IconFont, Item, Menu, MenuProvider, theme as ContextMenuTheme} from "react-contexify";
+import 'react-contexify/dist/ReactContexify.min.css';
 
 type ProjectProps = {
   readOnly: boolean;
@@ -52,6 +65,7 @@ type ManageTaskProps = {
 
 type TaskProps = {
   inProject: boolean;
+  setTaskStatus: (taskId: number, taskStatus: TaskStatus, type: ProjectItemUIType) => void;
 };
 
 const ManageTask: React.FC<ManageTaskProps> = (props) => {
@@ -264,16 +278,35 @@ export const getTaskAssigneesPopoverContent = (
 const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   props
 ) => {
+  const {
+    task,
+    theme,
+    type,
+    inProject,
+    inModal,
+    isComplete,
+    completeOnlyOccurrence,
+    completeTask,
+    uncompleteTask,
+    deleteTask,
+    deleteCompletedTask,
+    showModal,
+    showOrderModal,
+    readOnly,
+    setTaskStatus,
+    setSelectedLabel
+  } = props;
+
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
   const toLabelSearching = (label: Label) => {
-    props.setSelectedLabel(label);
+    setSelectedLabel(label);
     history.push('/labels/search');
   };
 
   const getMore = () => {
-    if (props.readOnly) {
+    if (readOnly) {
       return null;
     }
     return (
@@ -303,22 +336,6 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
       </Popover>
     );
   };
-
-  const {
-    task,
-    theme,
-    type,
-    inProject,
-    inModal,
-    isComplete,
-    completeOnlyOccurrence,
-    completeTask,
-    uncompleteTask,
-    deleteTask,
-    deleteCompletedTask,
-    showModal,
-    showOrderModal,
-  } = props;
 
   const taskStyle = isComplete
     ? 'project-item-name completed-task'
@@ -430,54 +447,83 @@ const TaskItem: React.FC<ProjectProps & ManageTaskProps & TaskProps> = (
   };
 
   return (
-    <div
-      className="project-item"
-      style={getTaskBackgroundColor(task.status, theme)}
-    >
-      <div className="project-item-content">
-        <a onClick={handleClick}>
-          <h3 className={taskStyle}>
-            <Tooltip title={`Created by ${task.owner.alias}`}>
-              {getAssigneesPopupAvatar(task.owner)}
-            </Tooltip>{' '}
-            {getItemIcon(task, <CarryOutOutlined />)} {task.name}
-          </h3>
-        </a>
-        <div className="project-item-subs">
-          <div className="project-item-labels">
-            {task.labels &&
-              task.labels.map((label) => {
-                return (
-                  <Tag
-                    key={`label${label.id}`}
-                    className="labels"
-                    onClick={() => toLabelSearching(label)}
-                    color={stringToRGB(label.value)}
-                    style={{ cursor: 'pointer', borderRadius: 10 }}
-                  >
+      <>
+        <MenuProvider id={`task${task.id}`}>
+          <div
+              className="project-item"
+              style={getTaskBackgroundColor(task.status, theme)}
+          >
+            <div className="project-item-content">
+              <a onClick={handleClick}>
+                <h3 className={taskStyle}>
+                  <Tooltip title={`Created by ${task.owner.alias}`}>
+                    {getAssigneesPopupAvatar(task.owner)}
+                  </Tooltip>{' '}
+                  {getItemIcon(task, <CarryOutOutlined/>)} {task.name}
+                </h3>
+              </a>
+              <div className="project-item-subs">
+                <div className="project-item-labels">
+                  {task.labels &&
+                  task.labels.map((label) => {
+                    return (
+                        <Tag
+                            key={`label${label.id}`}
+                            className="labels"
+                            onClick={() => toLabelSearching(label)}
+                            color={stringToRGB(label.value)}
+                            style={{cursor: 'pointer', borderRadius: 10}}
+                        >
                     <span>
                       {getIcon(label.icon)} &nbsp;
                       {label.value}
                     </span>
-                  </Tag>
-                );
-              })}
-          </div>
-          {getDueDateTime(task)}
-          {isComplete && getCompletionTime(task)}
-        </div>
-      </div>
+                        </Tag>
+                    );
+                  })}
+                </div>
+                {getDueDateTime(task)}
+                {isComplete && getCompletionTime(task)}
+              </div>
+            </div>
 
-      <div className="project-control">
-        <div className="project-item-assignee">{getAssignees()}</div>
-        <div>
-          <Tooltip title={getReminderSettingString(task.reminderSetting)}>
-            {getOrderIcon()}
-          </Tooltip>
-        </div>
-        {getMore()}
-      </div>
-    </div>
+            <div className="project-control">
+              <div className="project-item-assignee">{getAssignees()}</div>
+              <div>
+                <Tooltip title={getReminderSettingString(task.reminderSetting)}>
+                  {getOrderIcon()}
+                </Tooltip>
+              </div>
+              {getMore()}
+            </div>
+          </div>
+        </MenuProvider>
+
+        <Menu id={`task${task.id}`}
+              theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+              animation={animation.zoom}>
+          <Item>
+            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined /></IconFont>
+            <span>Copy Link Address</span>
+          </Item>
+          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.IN_PROGRESS, type)}>
+            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><LoadingOutlined /></IconFont>
+            <span>Set Status to IN PROGRESS</span>
+          </Item>}
+          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.NEXT_TO_DO, type)}>
+            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><RotateRightOutlined /></IconFont>
+            <span>Set Status to NEXT TO DO</span>
+          </Item>}
+          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.READY, type)}>
+            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SmileOutlined /></IconFont>
+            <span>Set Status to READY</span>
+          </Item>}
+          {!isComplete && <Item onClick={() => setTaskStatus(task.id, TaskStatus.ON_HOLD, type)}>
+            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><PauseCircleOutlined /></IconFont>
+            <span>Set Status to ON HOLD</span>
+          </Item>}
+        </Menu>
+      </>
   );
 };
 const mapStateToProps = (state: IState) => ({
@@ -489,4 +535,5 @@ export default connect(mapStateToProps, {
   deleteTask,
   deleteCompletedTask,
   setSelectedLabel,
+  setTaskStatus
 })(TaskItem);

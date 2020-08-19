@@ -30,6 +30,7 @@
     "react": "^16.12.0",
     "react-beautiful-dnd": "^13.0.0",
     "react-big-calendar": "^0.25.0",
+    "react-contexify": "^4.1.1",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.12.0",
     "react-floating-action-button": "^1.0.5",

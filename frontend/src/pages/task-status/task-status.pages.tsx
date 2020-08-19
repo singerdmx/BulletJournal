@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 
 import './task-status.styles.less';
 import {useHistory, useParams} from 'react-router-dom';
-import {BackTop, Collapse, Badge} from 'antd';
-import {CaretRightOutlined, SyncOutlined, UpSquareOutlined, FieldTimeOutlined} from '@ant-design/icons';
+import {BackTop, Badge, Collapse} from 'antd';
+import {CaretRightOutlined, FieldTimeOutlined, SyncOutlined, UpSquareOutlined} from '@ant-design/icons';
 import {IState} from '../../store';
 import {getTasksByAssignee, getTasksByOrder, setTaskStatus} from '../../features/tasks/actions';
 import {connect} from 'react-redux';
@@ -16,7 +16,7 @@ import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {MenuOutlined} from "@ant-design/icons/lib";
 import {Project} from "../../features/project/interface";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 
 
 const { Panel } = Collapse;
@@ -32,7 +32,7 @@ type TaskStatusProps = {
     endDate?: string
   ) => void;
   getTasksByAssignee: (projectId: number, assignee: string) => void;
-  setTaskStatus: (taskId: number, taskStatus: TaskStatus) => void;
+  setTaskStatus: (taskId: number, taskStatus: TaskStatus, type: ProjectItemUIType) => void;
 };
 
 const TaskStatusPage: React.FC<TaskStatusProps> = ({
@@ -180,7 +180,7 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
     console.log(draggableId);
     const taskId = parseInt(draggableId);
     const newStatus = destination.droppableId;
-    setTaskStatus(taskId, newStatus);
+    setTaskStatus(taskId, newStatus, ProjectItemUIType.ORDER);
   }
 
   return (

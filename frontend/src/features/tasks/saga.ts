@@ -320,14 +320,16 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       );
     }
 
-    yield put(
-      getProjectItemsAfterUpdateSelect(
-        state.myBuJo.todoSelected,
-        state.myBuJo.ledgerSelected,
-        state.myBuJo.noteSelected,
-        'today'
-      )
-    );
+    if (type === ProjectItemUIType.TODAY) {
+      yield put(
+          getProjectItemsAfterUpdateSelect(
+              state.myBuJo.todoSelected,
+              state.myBuJo.ledgerSelected,
+              state.myBuJo.noteSelected,
+              'today'
+          )
+      );
+    }
 
     const task = yield call(getTaskById, taskId);
     yield put(
@@ -948,21 +950,66 @@ function* patchContent(action: PayloadAction<PatchContent>) {
 function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
   try {
     const state: IState = yield select();
-    const { taskId, taskStatus } = action.payload;
+    const { taskId, taskStatus, type } = action.payload;
     const data = yield call(setTaskStatusApi, taskId, taskStatus, state.myself.timezone);
-
-    let updateTask = {} as Task;
-    let stateTask = state.task.task;
-    if (stateTask && stateTask.id === taskId) {
-      updateTask = { ...stateTask, status: taskStatus };
-      yield put(tasksActions.taskReceived({ task: updateTask }));
-    }
 
     yield put(
         tasksActions.tasksByOrderReceived({
           tasksByOrder: data,
         })
     );
+
+    const task = yield call(getTaskById, taskId);
+    yield put(
+        tasksActions.taskReceived({
+          task: task,
+        })
+    );
+
+    if (state.project.project && type === ProjectItemUIType.PROJECT) {
+      const data = yield call(fetchTasks, state.project.project.id);
+      const tasks = yield data.json();
+      yield put(
+          tasksActions.tasksReceived({
+            tasks: tasks,
+          })
+      );
+
+      //get etag from header
+      const etag = data.headers.get('Etag')!;
+      const systemState = state.system;
+      yield put(
+          SystemActions.systemUpdateReceived({
+            ...systemState,
+            tasksEtag: etag,
+          })
+      );
+    }
+
+    if (type === ProjectItemUIType.TODAY) {
+      yield put(
+          getProjectItemsAfterUpdateSelect(
+              state.myBuJo.todoSelected,
+              state.myBuJo.ledgerSelected,
+              state.myBuJo.noteSelected,
+              'today'
+          )
+      );
+    }
+
+    //update label search page
+    const labelItems: ProjectItems[] = [];
+    state.label.items.forEach((projectItem: ProjectItems) => {
+      projectItem = { ...projectItem };
+      if (projectItem.tasks) {
+        projectItem.tasks = projectItem.tasks.map((eachTask) => {
+          if (eachTask.id === taskId) return task;
+          else return eachTask;
+        });
+      }
+      labelItems.push(projectItem);
+    });
+    yield put(updateItemsByLabels(labelItems));
   } catch (error) {
     yield call(message.error, `set Task Status Error Received: ${error}`);
   }

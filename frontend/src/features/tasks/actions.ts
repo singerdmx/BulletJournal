@@ -192,10 +192,11 @@ export const getSearchCompletedTasks = (
     timezone: timezone,
   });
 
-export const setTaskStatus = (taskId: number, taskStatus: TaskStatus) =>
+export const setTaskStatus = (taskId: number, taskStatus: TaskStatus, type: ProjectItemUIType) =>
   actions.TaskStatusSet({
     taskId: taskId,
     taskStatus: taskStatus,
+    type: type
   });
 
 export const patchTaskRevisionContents = (

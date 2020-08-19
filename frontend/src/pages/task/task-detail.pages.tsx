@@ -1,33 +1,29 @@
 // page display contents of tasks
 // react imports
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 // features
 //actions
-import {
-  getReminderSettingString,
-  Task,
-  TaskStatus,
-  getTaskBackgroundColor,
-} from '../../features/tasks/interface';
+import {getReminderSettingString, getTaskBackgroundColor, Task, TaskStatus,} from '../../features/tasks/interface';
 // antd imports
-import {Avatar, Divider, Tooltip, Select, Tag, BackTop} from 'antd';
-import { AlertOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import {Avatar, BackTop, Divider, Select, Tag, Tooltip} from 'antd';
+import {AlertOutlined, ClockCircleOutlined} from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
-import { ProjectType } from '../../features/project/constants';
-import { convertToTextWithRRule } from '../../features/recurrence/actions';
+import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
+import {convertToTextWithRRule} from '../../features/recurrence/actions';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
-import { Content } from '../../features/myBuJo/interface';
+import {Content} from '../../features/myBuJo/interface';
 // components
 import TaskContentList from '../../components/content/content-list.component';
 //redux
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 //action
-import { setTaskStatus } from '../../features/tasks/actions';
-import { getDuration } from '../../components/project-item/task-item.component';
+import {setTaskStatus} from '../../features/tasks/actions';
+import {getDuration} from '../../components/project-item/task-item.component';
 import {inPublicPage} from "../../index";
+
 const { Option } = Select;
 
 export type TaskProps = {
@@ -35,7 +31,7 @@ export type TaskProps = {
   theme: string;
   contents: Content[];
   contentEditable?: boolean;
-  setTaskStatus: (taskId: number, taskStatus: TaskStatus) => void;
+  setTaskStatus: (taskId: number, taskStatus: TaskStatus, type: ProjectItemUIType) => void;
   isPublic?: boolean;
 };
 
@@ -121,7 +117,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
           value={inputStatus}
           onChange={(value: TaskStatus) => {
             setInputStatus(value);
-            setTaskStatus(task.id, value);
+            setTaskStatus(task.id, value, ProjectItemUIType.PAGE);
           }}
         >
           {Object.values(TaskStatus).map((s: string) => {
@@ -140,7 +136,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         placeholder="Set Status"
         onChange={(value: TaskStatus) => {
           setInputStatus(value);
-          setTaskStatus(task.id, value);
+          setTaskStatus(task.id, value, ProjectItemUIType.PAGE);
         }}
       >
         {Object.values(TaskStatus).map((s: string) => {

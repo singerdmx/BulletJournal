@@ -215,6 +215,7 @@ export type GetSearchCompletedTasks = {
 export type SetTaskStatus = {
   taskId: number;
   taskStatus: TaskStatus;
+  type: ProjectItemUIType;
 };
 
 export type PatchRevisionContents = {
