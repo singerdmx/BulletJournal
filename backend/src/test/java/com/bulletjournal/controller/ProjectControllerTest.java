@@ -749,7 +749,7 @@ public class ProjectControllerTest {
         assertEquals(1, sharedProjects.size());
         ProjectsWithOwner sharedProject = sharedProjects.get(0);
         assertNotEquals(targetUser, sharedProject.getOwner().getName());
-        assertEquals(1, sharedProject.getProjects().size());
+        assertEquals(11, sharedProject.getProjects().size());
         List<Project> ownedProjects = getProjectsResponse.getBody().getOwned();
         Project p = ownedProjects.get(ownedProjects.size() - 1);
 

@@ -125,7 +125,7 @@ public class ProjectDaoJpa {
         }
 
         List<com.bulletjournal.controller.models.Project> l = getOwnerProjects(
-                this.userProjectsRepository.findById(o).get(), o);
+                this.userProjectsRepository.findById(o).get(), o, projectsByOwner);
         if (l.isEmpty()) {
             return;
         }
@@ -133,10 +133,18 @@ public class ProjectDaoJpa {
         result.add(new ProjectsWithOwner(new com.bulletjournal.controller.models.User(o), l));
     }
 
-    private List<com.bulletjournal.controller.models.Project> getOwnerProjects(UserProjects userProjects,
-                                                                               String owner) {
+    private List<com.bulletjournal.controller.models.Project> getOwnerProjects(
+            UserProjects userProjects, String owner) {
+        return getOwnerProjects(userProjects, owner, null);
+    }
+
+    private List<com.bulletjournal.controller.models.Project> getOwnerProjects(
+            UserProjects userProjects, String owner, Set<Long> projectFilter) {
         List<com.bulletjournal.controller.models.Project> ret = new ArrayList<>();
         List<Project> projects = this.projectRepository.findByOwner(owner);
+        if (projectFilter != null) {
+            projects = projects.stream().filter(p -> projectFilter.contains(p.getId())).collect(Collectors.toList());
+        }
         if (userProjects.getOwnedProjects() != null) {
             Set<Long> existingIds = projects.stream().map(p -> p.getId()).collect(Collectors.toSet());
             // left is real hierarchy but missing orphaned ones, right is processed ones
