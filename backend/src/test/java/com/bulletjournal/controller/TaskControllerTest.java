@@ -22,8 +22,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -180,6 +183,40 @@ public class TaskControllerTest {
         assertNotNull(completedTasksResponse.getBody());
         completedTasks = Arrays.asList(completedTasksResponse.getBody());
         assertEquals(4, completedTasks.size());
+
+        /*task1 = createTask(p1, new CreateTaskParams("task1ForStatTest", "2022-02-22",
+                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+        task2 = createTask(p1, new CreateTaskParams("task2ForStatTest", "2022-02-23",
+                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+        task3 = createTask(p1, new CreateTaskParams("task3ForStatTest", "2022-02-24",
+                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+        task4 = createTask(p1, new CreateTaskParams("task5ForStatTest", "2022-02-25",
+                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+
+        task1 = completeTask(task1.getId());*/
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        Date date = new Date(currentTime.getTime());
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(date);
+        TaskStatistics taskStatistics = getTaskStatistics(Arrays.asList(p1.getId()), TIMEZONE, today, "2022-02-26");
+        assertEquals(4, taskStatistics.getCompleted());
+        assertEquals(1, taskStatistics.getUncompleted());
+        assertEquals(users.size(), taskStatistics.getUserTaskStatistics().size());
+    }
+
+    private TaskStatistics getTaskStatistics(List<Long> projectIds, String timezone, String startTime, String endTime) {
+        String url = ROOT_URL + randomServerPort + TaskController.TASK_STATISTICS_ROUTE;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("projectIds", projectIds)
+                .queryParam("timezone", timezone)
+                .queryParam("startDate", startTime)
+                .queryParam("endDate", endTime);
+        ResponseEntity<TaskStatistics> taskStatisticsResponse = this.restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                TaskStatistics.class);
+        assertEquals(HttpStatus.OK, taskStatisticsResponse.getStatusCode());
+        return taskStatisticsResponse.getBody();
     }
 
     private void testUpdateAssignees(Project p1, Task task, List<String> users) {
