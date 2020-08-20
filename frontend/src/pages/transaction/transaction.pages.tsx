@@ -194,12 +194,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       >
         <PlusOutlined />
       </FloatButton>
-      <FloatButton
-        tooltip="Actions"
-        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
-      >
-        <MenuOutlined />
-      </FloatButton>
     </Container>
 
   );

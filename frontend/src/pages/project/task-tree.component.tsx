@@ -350,12 +350,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
         <UnorderedListOutlined/>
       </FloatButton>}
       <AddTask mode="icon"/>
-      <FloatButton
-          tooltip="Actions"
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-      >
-        <MenuOutlined/>
-      </FloatButton>
     </Container>
   }
 

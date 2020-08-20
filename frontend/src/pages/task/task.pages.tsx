@@ -181,12 +181,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         >
           <PlusOutlined/>
         </FloatButton>
-        <FloatButton
-            tooltip="Actions"
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-        >
-          <MenuOutlined/>
-        </FloatButton>
       </Container>
 
   );

@@ -247,12 +247,6 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
           >
             <SyncOutlined />
           </FloatButton>
-          <FloatButton
-              tooltip="Actions"
-              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-          >
-            <MenuOutlined/>
-          </FloatButton>
         </Container>
       </div>
     </div>

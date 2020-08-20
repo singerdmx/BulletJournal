@@ -145,12 +145,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
             >
                 <PlusOutlined/>
             </FloatButton>
-            <FloatButton
-                tooltip="Actions"
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-            >
-                <MenuOutlined/>
-            </FloatButton>
         </Container>
     );
 
