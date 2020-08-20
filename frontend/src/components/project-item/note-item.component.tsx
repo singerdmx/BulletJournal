@@ -185,72 +185,84 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
     }
   };
 
-  return (
-      <>
-          <div className="project-item">
-              <MenuProvider id={`note${note.id}`}>
-                  <div className="project-item-content">
-                      <a onClick={handleClick}>
-                          <h3 className="project-item-name">
-                              <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
-                              &nbsp;{getItemIcon(note, <FileTextOutlined/>)}&nbsp;
-                              {note.name}
-                          </h3>
-                      </a>
-                      <div className="project-item-subs">
-                          <div className="project-item-labels">
-                              {note.labels &&
-                              note.labels.map((label) => {
-                                  return (
-                                      <Tag
-                                          key={`label${label.id}`}
-                                          className="labels"
-                                          onClick={() => toLabelSearching(label)}
-                                          color={stringToRGB(label.value)}
-                                          style={{cursor: 'pointer', borderRadius: 10}}
-                                      >
+  const getProjectItemContentDiv = () => {
+        return <div className="project-item-content">
+            <a onClick={handleClick}>
+                <h3 className="project-item-name">
+                    <Tooltip title={note.owner.alias}>{getAvatar(note.owner)}</Tooltip>
+                    &nbsp;{getItemIcon(note, <FileTextOutlined/>)}&nbsp;
+                    {note.name}
+                </h3>
+            </a>
+            <div className="project-item-subs">
+                <div className="project-item-labels">
+                    {note.labels &&
+                    note.labels.map((label) => {
+                        return (
+                            <Tag
+                                key={`label${label.id}`}
+                                className="labels"
+                                onClick={() => toLabelSearching(label)}
+                                color={stringToRGB(label.value)}
+                                style={{cursor: 'pointer', borderRadius: 10}}
+                            >
                                         <span>
                                           {getIcon(label.icon)} &nbsp;
                                             {label.value}
                                         </span>
-                                      </Tag>
-                                  );
-                              })}
-                          </div>
-                          <div className="project-item-time">
-                              {note.createdAt && `Created ${moment(note.createdAt).fromNow()}`}
-                          </div>
-                      </div>
-                  </div>
-              </MenuProvider>
+                            </Tag>
+                        );
+                    })}
+                </div>
+                <div className="project-item-time">
+                    {note.createdAt && `Created ${moment(note.createdAt).fromNow()}`}
+                </div>
+            </div>
+        </div>;
+    }
 
-              <Menu id={`note${note.id}`}
-                    theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-                    animation={animation.zoom}>
-                  <CopyToClipboard
-                      text={`${note.name} ${window.location.origin.toString()}/#/note/${note.id}`}
-                      onCopy={() => message.success('Link Copied to Clipboard')}
-                  >
-                      <Item>
-                          <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
-                          <span>Copy Link Address</span>
-                      </Item>
-                  </CopyToClipboard>
-              </Menu>
-              <div className="project-control">
-                  <div style={{marginLeft: '5px'}}>
-                      <Tooltip
-                          title={
-                              note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
-                          }
-                      >
-                          {getOrderIcon()}
-                      </Tooltip>
-                  </div>
-                  {getMore()}
-              </div>
-          </div>
-      </>
+    const getProjectItemContentWithMenu = () => {
+        if (inModal === true) {
+            return getProjectItemContentDiv()
+        }
+
+        return <>
+            <MenuProvider id={`note${note.id}`}>
+                {getProjectItemContentDiv()}
+            </MenuProvider>
+
+            <Menu id={`note${note.id}`}
+                  theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                  animation={animation.zoom}>
+                <CopyToClipboard
+                    text={`${note.name} ${window.location.origin.toString()}/#/note/${note.id}`}
+                    onCopy={() => message.success('Link Copied to Clipboard')}
+                >
+                    <Item>
+                        <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                        <span>Copy Link Address</span>
+                    </Item>
+                </CopyToClipboard>
+            </Menu>
+        </>
+    }
+
+    return (
+        <div className="project-item">
+            {getProjectItemContentWithMenu()}
+            <div className="project-control">
+                <div style={{marginLeft: '5px'}}>
+                    <Tooltip
+                        title={
+                            note.updatedAt && `Updated ${moment(note.updatedAt).fromNow()}`
+                        }
+                    >
+                        {getOrderIcon()}
+                    </Tooltip>
+                </div>
+                {getMore()}
+            </div>
+        </div>
   );
 };
 

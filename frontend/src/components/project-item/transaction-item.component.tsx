@@ -163,92 +163,104 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
     );
   };
 
-  return (
-      <>
-          <div className='project-item'>
-              <MenuProvider id={`transaction${transaction.id}`}>
-                  <div className='project-item-content'>
-                      <Link to={`/transaction/${transaction.id}`}>
-                          <h3 className='project-item-name'>
-                              <Tooltip
-                                  title={`Created by ${transaction.owner.alias}`}
-                              >
-                                  {getAvatar(transaction.owner)}
-                              </Tooltip>
-                              {' '}{getItemIcon(transaction, <AccountBookOutlined/>)}&nbsp;
-                              {transaction.name}
-                          </h3>
-                      </Link>
-                      <div className='project-item-subs'>
-                          <div className='project-item-labels'>
-                              {transaction.labels &&
-                              transaction.labels.map((label) => {
-                                  return (
-                                      <Tag
-                                          key={`label${label.id}`}
-                                          className='labels'
-                                          onClick={() => toLabelSearching(label)}
-                                          color={stringToRGB(label.value)}
-                                          style={{cursor: 'pointer', borderRadius: 10}}
-                                      >
+    const getProjectItemContentDiv = () => {
+        return <div className='project-item-content'>
+            <Link to={`/transaction/${transaction.id}`}>
+                <h3 className='project-item-name'>
+                    <Tooltip
+                        title={`Created by ${transaction.owner.alias}`}
+                    >
+                        {getAvatar(transaction.owner)}
+                    </Tooltip>
+                    {' '}{getItemIcon(transaction, <AccountBookOutlined/>)}&nbsp;
+                    {transaction.name}
+                </h3>
+            </Link>
+            <div className='project-item-subs'>
+                <div className='project-item-labels'>
+                    {transaction.labels &&
+                    transaction.labels.map((label) => {
+                        return (
+                            <Tag
+                                key={`label${label.id}`}
+                                className='labels'
+                                onClick={() => toLabelSearching(label)}
+                                color={stringToRGB(label.value)}
+                                style={{cursor: 'pointer', borderRadius: 10}}
+                            >
                                         <span>
                                           {getIcon(label.icon)} &nbsp;
                                             {label.value}
                                         </span>
-                                      </Tag>
-                                  );
-                              })}
-                          </div>
-                          {getPaymentDateTime()}
-                      </div>
-                  </div>
-              </MenuProvider>
+                            </Tag>
+                        );
+                    })}
+                </div>
+                {getPaymentDateTime()}
+            </div>
+        </div>;
+    }
 
-              <Menu id={`transaction${transaction.id}`}
-                    theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-                    animation={animation.zoom}>
-                  <CopyToClipboard
-                      text={`${transaction.name} ${window.location.origin.toString()}/#/transaction/${transaction.id}`}
-                      onCopy={() => message.success('Link Copied to Clipboard')}
-                  >
-                      <Item>
-                          <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
-                          <span>Copy Link Address</span>
-                      </Item>
-                  </CopyToClipboard>
-              </Menu>
-              <div className='project-control'>
-                  <div className='project-item-owner'>
-                      <Tooltip
-                          title={`Payer ${transaction.payer.alias}`}
-                      >
-                          {getAvatar(transaction.payer)}
-                      </Tooltip>
-                  </div>
-                  <div className='project-item-owner'>
-                      {getTransactionInfo(transaction)}
-                  </div>
-                  <Popover
-                      arrowPointAtCenter
-                      placement='rightTop'
-                      overlayStyle={{width: '150px'}}
-                      content={
-                          <ManageTransaction
-                              transaction={transaction}
-                              type={type}
-                              deleteTransaction={deleteTransaction}
-                              inModal={inModal}
-                          />
-                      }
-                      trigger='click'
-                  >
+    const getProjectItemContentWithMenu = () => {
+        if (inModal === true) {
+            return getProjectItemContentDiv()
+        }
+        
+        return <>
+            <MenuProvider id={`transaction${transaction.id}`}>
+                {getProjectItemContentDiv()}
+            </MenuProvider>
+
+            <Menu id={`transaction${transaction.id}`}
+                  theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
+                  animation={animation.zoom}>
+                <CopyToClipboard
+                    text={`${transaction.name} ${window.location.origin.toString()}/#/transaction/${transaction.id}`}
+                    onCopy={() => message.success('Link Copied to Clipboard')}
+                >
+                    <Item>
+                        <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
+                        <span>Copy Link Address</span>
+                    </Item>
+                </CopyToClipboard>
+            </Menu>
+        </>;
+    }
+
+    return (
+        <div className='project-item'>
+            {getProjectItemContentWithMenu()}
+            <div className='project-control'>
+                <div className='project-item-owner'>
+                    <Tooltip
+                        title={`Payer ${transaction.payer.alias}`}
+                    >
+                        {getAvatar(transaction.payer)}
+                    </Tooltip>
+                </div>
+                <div className='project-item-owner'>
+                    {getTransactionInfo(transaction)}
+                </div>
+                <Popover
+                    arrowPointAtCenter
+                    placement='rightTop'
+                    overlayStyle={{width: '150px'}}
+                    content={
+                        <ManageTransaction
+                            transaction={transaction}
+                            type={type}
+                            deleteTransaction={deleteTransaction}
+                            inModal={inModal}
+                        />
+                    }
+                    trigger='click'
+                >
                           <span className='project-control-more'>
                             <MoreOutlined/>
                           </span>
-                  </Popover>
-              </div>
-          </div>
-      </>
+                </Popover>
+            </div>
+        </div>
   );
 };
 
