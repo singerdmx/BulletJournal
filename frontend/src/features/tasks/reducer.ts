@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Task, ReminderSetting, TaskStatus } from './interface';
+import {Task, ReminderSetting, TaskStatus, TaskStatistics} from './interface';
 import { History } from 'history';
 import { User } from '../group/interface';
 import { Content } from '../myBuJo/interface';
@@ -240,6 +240,7 @@ let initialState = {
   tasksByAssignee: [] as Array<Task>,
   tasksByOrder: [] as Array<Task>,
   searchCompletedTasks: [] as Array<Task>,
+  projectStatistics: undefined as TaskStatistics | undefined,
 };
 
 const slice = createSlice({

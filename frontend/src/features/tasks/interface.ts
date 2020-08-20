@@ -25,6 +25,18 @@ export interface TaskView extends Task {
   endTime?: number;
 }
 
+export interface TaskStatistics {
+  completed: number;
+  uncompleted: number;
+  userTaskStatistics: UserTaskStatistic[];
+}
+
+export interface UserTaskStatistic {
+  user: User;
+  completed: number;
+  uncompleted: number;
+}
+
 export enum TaskStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   NEXT_TO_DO = 'NEXT_TO_DO',
