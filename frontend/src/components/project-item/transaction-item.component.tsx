@@ -205,7 +205,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
         if (inModal === true) {
             return getProjectItemContentDiv()
         }
-        
+
         return <>
             <MenuProvider id={`transaction${transaction.id}`}>
                 {getProjectItemContentDiv()}
