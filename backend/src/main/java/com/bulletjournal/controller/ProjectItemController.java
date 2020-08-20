@@ -1,18 +1,17 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.ProjectItem;
+import com.bulletjournal.controller.models.ProjectItems;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
-import com.bulletjournal.repository.models.Group;
-import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.User;
-import com.bulletjournal.repository.models.UserGroup;
-import com.bulletjournal.repository.models.*;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,17 +44,21 @@ public class ProjectItemController {
 
     private final UserClient userClient;
 
+    private final ProjectDaoJpa projectDaoJpa;
+
     private final Map<ProjectType, ProjectItemDaoJpa> daos;
 
     @Autowired
     public ProjectItemController(TaskDaoJpa taskDaoJpa, TransactionDaoJpa transactionDaoJpa, LabelDaoJpa labelDaoJpa,
-                                 UserDaoJpa userDaoJpa, UserClient userClient, ProjectItemDaos projectItemDaos) {
+                                 UserDaoJpa userDaoJpa, UserClient userClient, ProjectItemDaos projectItemDaos,
+                                 ProjectDaoJpa projectDaoJpa) {
         this.taskDaoJpa = taskDaoJpa;
         this.transactionDaoJpa = transactionDaoJpa;
         this.daos = projectItemDaos.getDaos();
         this.labelDaoJpa = labelDaoJpa;
         this.userDaoJpa = userDaoJpa;
         this.userClient = userClient;
+        this.projectDaoJpa = projectDaoJpa;
     }
 
     @GetMapping(PROJECT_ITEMS_ROUTE)
@@ -131,13 +134,9 @@ public class ProjectItemController {
                                                                     List<ProjectItem> projectItems, final ProjectType projectType) {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        User user = this.userDaoJpa.getByName(username);
-        Set<Long> projectIds = new HashSet<>();
-        for (UserGroup userGroup : user.getGroups()) {
-            if (!userGroup.isAccepted()) continue;
-            Group group = userGroup.getGroup();
-            projectIds.addAll(group.getProjects().stream().map(Project::getId).collect(Collectors.toList()));
-        }
+        Set<Long> projectIds = this.projectDaoJpa.getUserProjects(username)
+                .stream().map(p -> p.getId()).collect(Collectors.toSet());
+
         final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime, new ArrayList<>(projectIds));
 
         projectItems.addAll(items.stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))

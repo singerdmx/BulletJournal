@@ -77,28 +77,16 @@ public class ProjectDaoJpa {
         return project;
     }
 
-    private List<ProjectsWithOwner> getSharedProjects(UserProjects userProjects, String owner) {
-        User user = this.userDaoJpa.getByName(owner);
+    private List<ProjectsWithOwner> getSharedProjects(final UserProjects userProjects, final String owner) {
         // project owner -> project ids
         Map<String, Set<Long>> projectIds = new HashMap<>();
-        for (UserGroup userGroup : user.getGroups()) {
-            Group group = userGroup.getGroup();
-            if (!userGroup.isAccepted()) {
-                continue;
-            }
-            for (Project project : group.getProjects()) {
-                if (project.isShared()) {
-                    // skip shared projects
-                    continue;
-                }
-                String projectOwner = project.getOwner();
-                if (Objects.equals(user.getName(), projectOwner)) {
-                    // skip projects owned by me
-                    continue;
-                }
+        this.getUserProjects(owner).forEach(project -> {
+            String projectOwner = project.getOwner();
+            if (!Objects.equals(owner, projectOwner)) {
+                // skip projects owned by me
                 projectIds.computeIfAbsent(projectOwner, k -> new HashSet<>()).add(project.getId());
             }
-        }
+        });
 
         String sharedProjectRelations = userProjects.getSharedProjects();
         List<String> owners = sharedProjectRelations == null ? new ArrayList<>() :
@@ -340,9 +328,15 @@ public class ProjectDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Project> getUserProjects(String username) {
         List<Project> result = new ArrayList<>();
-        this.userDaoJpa.getByName(username).getGroups().forEach(userGroup -> {
-            result.addAll(userGroup.getGroup().getProjects());
-        });
+        User user = this.userDaoJpa.getByName(username);
+        for (UserGroup userGroup : user.getGroups()) {
+            if (!userGroup.isAccepted()) {
+                continue;
+            }
+            Group group = userGroup.getGroup();
+            result.addAll(group.getProjects().stream().filter(p -> !p.isShared()).collect(Collectors.toList()));
+        }
+
         return result;
     }
 }

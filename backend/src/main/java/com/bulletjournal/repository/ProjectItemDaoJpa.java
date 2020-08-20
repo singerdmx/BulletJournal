@@ -407,6 +407,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> List<T> getRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, List<Long> projectIds) {
+        if (projectIds == null || projectIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         Map<Long, T> projectItemIdMap = new HashMap<>();
 
         List<T> projectItemModels = this.findRecentProjectItemsBetween(startTime, endTime,
