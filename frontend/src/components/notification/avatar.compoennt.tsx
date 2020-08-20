@@ -28,6 +28,7 @@ const TitleAvatar = ({source, type, originator}: titleAvatarProps) => {
   let icon = null;
   switch (type) {
     case EventType.JoinGroupEvent:
+    case EventType.InviteToJoinGroupEvent:
       icon = <UsergroupAddOutlined/>;
       break;
     case EventType.RemoveUserFromGroupEvent:

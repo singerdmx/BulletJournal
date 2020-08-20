@@ -167,8 +167,8 @@ public class GroupController {
         if (Objects.equals(username, addUserGroupParams.getUsername())) {
             throw new BadRequestException("Cannot add yourself to Group");
         }
-        Informed informed = this.groupDaoJpa.addUserGroup(username, addUserGroupParams);
-        if (informed != null) {
+        List<Informed> informeds = this.groupDaoJpa.addUserGroup(username, addUserGroupParams);
+        for (Informed informed : informeds) {
             this.notificationService.inform(informed);
         }
         return getGroup(addUserGroupParams.getGroupId());
