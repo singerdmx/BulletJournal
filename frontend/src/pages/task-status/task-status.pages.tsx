@@ -234,18 +234,18 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
             <UpSquareOutlined/>
           </FloatButton>
           <FloatButton
-              tooltip="Tasks Ordered by Due Date Time"
-              onClick={handleGetTasksByOrder}
-              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-          >
-            <FieldTimeOutlined />
-          </FloatButton>
-          <FloatButton
               onClick={getTasksByStatus}
               tooltip="Refresh"
               styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
           >
             <SyncOutlined />
+          </FloatButton>
+          <FloatButton
+              tooltip="Tasks Ordered by Due Date Time"
+              onClick={handleGetTasksByOrder}
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          >
+            <FieldTimeOutlined />
           </FloatButton>
         </Container>
       </div>
