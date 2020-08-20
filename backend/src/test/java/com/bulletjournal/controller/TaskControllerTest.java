@@ -183,17 +183,7 @@ public class TaskControllerTest {
         assertNotNull(completedTasksResponse.getBody());
         completedTasks = Arrays.asList(completedTasksResponse.getBody());
         assertEquals(4, completedTasks.size());
-
-        /*task1 = createTask(p1, new CreateTaskParams("task1ForStatTest", "2022-02-22",
-                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
-        task2 = createTask(p1, new CreateTaskParams("task2ForStatTest", "2022-02-23",
-                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
-        task3 = createTask(p1, new CreateTaskParams("task3ForStatTest", "2022-02-24",
-                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
-        task4 = createTask(p1, new CreateTaskParams("task5ForStatTest", "2022-02-25",
-                null, null, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
-
-        task1 = completeTask(task1.getId());*/
+        
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         Date date = new Date(currentTime.getTime());
         String today = new SimpleDateFormat("yyyy-MM-dd").format(date);
