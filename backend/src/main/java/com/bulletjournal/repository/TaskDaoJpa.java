@@ -288,7 +288,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<com.bulletjournal.controller.models.Task> - a list of tasks
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getTasksBetween(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Task> getTasksBetween(
+            String assignee, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(assignee,
                 ZonedDateTimeHelper.toDBTimestamp(startTime), ZonedDateTimeHelper.toDBTimestamp(endTime));
         tasks = tasks.stream().filter(t -> {

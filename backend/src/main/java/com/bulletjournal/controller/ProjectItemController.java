@@ -8,10 +8,7 @@ import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
-import com.bulletjournal.repository.models.ProjectItemModel;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.*;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -77,16 +74,19 @@ public class ProjectItemController {
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
 
+        List<Project> projects = this.projectDaoJpa.getUserProjects(username);
         Map<ZonedDateTime, ProjectItems> projectItemsMap = getZonedDateTimeProjectItemsMap(types, username, startTime,
-                endTime, timezone);
+                endTime, timezone, projects);
+
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
         return ProjectItems.addAvatar(this.labelDaoJpa.getLabelsForProjectItems(projectItems), this.userClient);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(List<ProjectType> types, String username,
-                                                                               ZonedDateTime startTime, ZonedDateTime endTime,
-                                                                               String timezone) {
+    protected Map<ZonedDateTime, ProjectItems> getZonedDateTimeProjectItemsMap(
+            List<ProjectType> types, String username,
+            ZonedDateTime startTime, ZonedDateTime endTime,
+            String timezone, List<Project> projects) {
 
         Map<ZonedDateTime, List<Task>> taskMap = null;
         Map<ZonedDateTime, List<Transaction>> transactionMap = null;
@@ -94,14 +94,14 @@ public class ProjectItemController {
 
         // Task query
         if (types.contains(ProjectType.TODO)) {
-            List<Task> tasks = taskDaoJpa.getTasksBetween(user.getName(), startTime, endTime);
+            List<Task> tasks = taskDaoJpa.getTasksBetween(user.getName(), startTime, endTime, projects);
             // Group tasks by date
             taskMap = ProjectItemsGrouper.groupTasksByDate(tasks, false, timezone);
         }
         // Ledger query
         if (types.contains(ProjectType.LEDGER)) {
             List<Transaction> transactions = transactionDaoJpa.getTransactionsBetween(user.getName(), startTime,
-                    endTime);
+                    endTime, projects);
             // Group transaction by date
             transactionMap = ProjectItemsGrouper.groupTransactionsByDate(transactions, timezone);
         }

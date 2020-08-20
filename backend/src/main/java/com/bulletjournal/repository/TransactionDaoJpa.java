@@ -106,7 +106,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      * @param endTime   - End Time to retrieve transaction from ledger repository
      * @retVal List of Transaction
      */
-    public List<Transaction> getTransactionsBetween(String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Transaction> getTransactionsBetween(
+            String payer, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
         return this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
                 Timestamp.from(endTime.toInstant()));
     }
