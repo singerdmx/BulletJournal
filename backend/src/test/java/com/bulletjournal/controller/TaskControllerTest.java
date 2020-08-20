@@ -183,7 +183,7 @@ public class TaskControllerTest {
         assertNotNull(completedTasksResponse.getBody());
         completedTasks = Arrays.asList(completedTasksResponse.getBody());
         assertEquals(4, completedTasks.size());
-        
+
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         Date date = new Date(currentTime.getTime());
         String today = new SimpleDateFormat("yyyy-MM-dd").format(date);
