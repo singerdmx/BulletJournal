@@ -187,6 +187,7 @@ github.com/singerdmx/BulletJournal v0.0.0-20200810030248-926480a80db7 h1:JVT1ECs
 github.com/singerdmx/BulletJournal v0.0.0-20200816160038-e38e9edb4df9 h1:EFOmxs+wRwxcae22c0KkNRCoD8wD2IRObDJpqWOoGWA=
 github.com/singerdmx/BulletJournal v0.0.0-20200816222233-d9717ea41bb3 h1:hytUUOeAH71SwC5azaU8kJpwH/43TLuCHOOCFKYZC8o=
 github.com/singerdmx/BulletJournal v0.0.0-20200816230555-9282f672acae h1:KBEngshlIP08S/NuzMMWIxYQYm91JHGwsMg+0DoYGVo=
+github.com/singerdmx/BulletJournal v0.0.0-20200820191303-01fc43cee291 h1:p68MsGylfU408HOHMIVizoN1I+A/Y5dGfH60epTNy9U=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200809235049-71292613eddd h1:2RcYAKwqU0QNS29ae3geWsvb0QoB6P60iZtTn7eUjOI=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200809235049-71292613eddd/go.mod h1:cs44NK2+Q/ap2aIAJk2LaFNUf4aTQjh0WCa21BbO6Vo=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20200810030248-926480a80db7 h1:FFlNZs05O7rDfJwkI2XQkXYMDc4b1dhb1d73h33Lztw=

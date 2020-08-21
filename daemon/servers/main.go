@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
+<<<<<<< HEAD
 <<<<<<< Updated upstream
+=======
+	logging "github.com/singerdmx/BulletJournal/daemon/logging"
+>>>>>>> Add lnitLogging
 	random "github.com/singerdmx/BulletJournal/daemon/utils"
 =======
 	"github.com/singerdmx/BulletJournal/daemon/logging"
@@ -27,6 +31,8 @@ import (
 const (
 	requestIDKey string = "requestID"
 )
+
+var sugarLogger *zap.SugaredLogger
 
 // server should implement services.UnimplementedDaemonServer's methods
 type server struct {
@@ -57,11 +63,13 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	return nil
 }
 
-func main() {
 
+
+func main() {
 	config.InitConfig()
 	serviceConfig := config.GetConfig()
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 	logger, err := logging.InitLogging(*config.GetEnv())
@@ -72,6 +80,10 @@ func main() {
 	defer logger.Sync()
 
 >>>>>>> Stashed changes
+=======
+	logger := logging.InitLogging()
+
+>>>>>>> Add lnitLogging
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, requestIDKey, generator.GenerateUID())
 	ctx, cancel := context.WithCancel(ctx)
