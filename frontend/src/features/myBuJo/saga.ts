@@ -88,10 +88,10 @@ function* getProjectItemsAfterUpdateSelect(
 
     const state: IState = yield select();
 
+    let currentTime = new Date().toLocaleString('fr-CA', {
+      timeZone: state.myself.timezone,
+    });
     if (forceToday === true) {
-      let currentTime = new Date().toLocaleString('fr-CA', {
-        timeZone: state.myself.timezone,
-      });
       currentTime = currentTime.substring(0, 10);
       yield put(projectItemsActions.datesReceived({startDate: currentTime, endDate: currentTime}));
     }
@@ -143,8 +143,8 @@ function* getProjectItemsAfterUpdateSelect(
         fetchProjectItems,
         types,
         state.myself.timezone,
-        state.myBuJo.startDate,
-        state.myBuJo.endDate
+          forceToday === true ? currentTime : state.myBuJo.startDate,
+          forceToday === true ? currentTime : state.myBuJo.endDate
       );
       yield put(projectItemsActions.projectItemsReceived({ items: data }));
     } else if (category === 'recent') {
