@@ -20,6 +20,7 @@ import TaskStatusPage from "../../pages/task-status/task-status.pages";
 import PublicPage from "../../Public";
 import PointsPage from "../../pages/points/points.pages";
 import ProjectStatisticsPage from "../../pages/statistics/statistics.pages";
+import AdminCategoriesPage from "../../pages/admin/categories.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -53,6 +54,7 @@ class ContentLayout extends React.Component {
             component={SearchCompletedTasksPage}
           />
           <Route exact path='/admin' component={AdminPage} />
+          <Route exact path='/admin/categories' component={AdminCategoriesPage} />
           <Route exact path='/punchCard' component={PunchCardPage} />
           <Route exact path='/search/:term' component={SearchPage} />
           <Route
