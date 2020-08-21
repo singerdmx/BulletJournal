@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	configNameBase = "base_config.yaml"
 	configNameProd = "prod-config.yaml"
 	configNameTest = "test-config.yaml"
 	configType     = "yaml"
@@ -37,6 +38,7 @@ func GetConfig() *Config {
 		log.Fatal("Invalid configuration")
 	}
 
+	PrintConfig()
 	return &serviceConfig
 }
 
@@ -87,9 +89,10 @@ func Validate(c *Config) bool {
 }
 
 func InitConfig() {
-	isProd := flag.Bool("prod",  false, "set config to production env")
+	isProd := flag.Bool("prod", false, "set config to production env")
 	flag.Parse()
 
+	SetConfig(configNameBase)
 	if *isProd == true {
 		SetProdConfig()
 	} else {
@@ -98,14 +101,14 @@ func InitConfig() {
 }
 
 func SetProdConfig() {
-	setConfig(configNameProd)
+	SetConfig(configNameProd)
 }
 
 func SetTestConfig() {
-	setConfig(configNameTest)
+	SetConfig(configNameTest)
 }
 
-func setConfig(configName string) {
+func SetConfig(configName string) {
 	viper.SetConfigName(configName)
 
 	for _, p := range configPaths {
@@ -123,6 +126,9 @@ func setConfig(configName string) {
 		log.Fatalf("could not decode config into struct: %v", err)
 	}
 
+}
+
+func PrintConfig() {
 	fmt.Printf("Username: %s\n", serviceConfig.Username)
 	fmt.Printf("Password: %s\n", serviceConfig.Password)
 	fmt.Printf("Database: %s\n", serviceConfig.Database)
