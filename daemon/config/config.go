@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	configNameBase = "base_config.yaml"
+	configNameBase = "base-config.yaml"
 	configNameProd = "prod-config.yaml"
 	configNameTest = "test-config.yaml"
 	configType     = "yaml"
