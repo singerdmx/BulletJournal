@@ -46,7 +46,7 @@ import {
 import { getTaskAssigneesPopoverContent } from '../../components/project-item/task-item.component';
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
-import {DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@ant-design/icons/lib";
+import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
 import {Task} from "../../features/tasks/interface";
 
 interface TaskPageHandler {

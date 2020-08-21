@@ -53,7 +53,7 @@ import {
   darkColors,
 } from 'react-floating-action-button';
 import { setDisplayMore, setDisplayRevision } from "../../features/content/actions";
-import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@ant-design/icons/lib";
+import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";

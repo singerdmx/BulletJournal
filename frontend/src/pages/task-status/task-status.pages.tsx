@@ -14,7 +14,6 @@ import TasksByAssignee from "../../components/modals/tasks-by-assignee.component
 import {User} from "../../features/group/interface";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {MenuOutlined} from "@ant-design/icons/lib";
 import {Project} from "../../features/project/interface";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 

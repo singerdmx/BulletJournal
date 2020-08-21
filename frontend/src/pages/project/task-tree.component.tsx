@@ -24,7 +24,7 @@ import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {MenuOutlined, ProjectOutlined} from "@ant-design/icons/lib";
+import {ProjectOutlined} from "@ant-design/icons/lib";
 
 type TasksProps = {
   completeTasksShown: boolean;

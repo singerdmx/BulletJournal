@@ -24,7 +24,7 @@ import {ProjectItemUIType, ProjectType,} from '../../features/project/constants'
 import NoteDetailPage, {NoteProps} from './note-detail.pages';
 import LabelManagement from '../project/label-management.compoent';
 import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';
-import {DeleteOutlined, EditOutlined, HighlightOutlined, MenuOutlined} from "@ant-design/icons/lib";
+import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
 import {Note} from "../../features/notes/interface";
