@@ -25,7 +25,7 @@ public class MailjetEmailParams {
     public MailjetEmailParams(
         @NotEmpty List<Pair<String, String>> receivers,
         @NotNull String subject,
-        @NotNull String text,
+        String text,
         MailjetEmailClient.Template template,
         String...kv
     ) {

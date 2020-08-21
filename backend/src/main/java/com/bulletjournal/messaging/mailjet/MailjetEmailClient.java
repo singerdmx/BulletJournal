@@ -143,8 +143,10 @@ public class MailjetEmailClient {
                         .put("Email", this.senderEmail)
                         .put("Name", this.senderName))
                     .put(Emailv31.Message.TO, receivers)
-                    .put(Emailv31.Message.SUBJECT, params.getSubject())
-                    .put(Emailv31.Message.TEXTPART, params.getText());
+                    .put(Emailv31.Message.SUBJECT, params.getSubject());
+        if (params.getText() != null) {
+            properties.put(Emailv31.Message.TEXTPART, params.getText());
+        }
         if (params.getTemplate() != null) {
             properties.put(Emailv31.Message.TEMPLATEID, params.getTemplate().getValue());
             JSONObject variables = new JSONObject();
