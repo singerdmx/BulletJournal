@@ -16,9 +16,9 @@ const (
 var seededRand *rand.Rand = rand.New(
 	rand.NewSource(time.Now().UnixNano()))
 
-// RandomString produces a string made by characters from 'CHARSET' with
-// 'STRING_LENGTH' length.
-func RandomString() string {
+// GenerateUID produces a string made by random characters from 'CHARSET'
+// with 'STRING_LENGTH' length.
+func GenerateUID() string {
 	result := make([]byte, stringLength)
 	for index := range result {
 		result[index] = charset[seededRand.Intn(len(charset))]
