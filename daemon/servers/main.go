@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
+	logging "github.com/singerdmx/BulletJournal/daemon/logging"
 	random "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
@@ -22,6 +23,8 @@ import (
 const (
 	requestIDKey string = "requestID"
 )
+
+var sugarLogger *zap.SugaredLogger
 
 // server should implement services.UnimplementedDaemonServer's methods
 type server struct {
@@ -52,10 +55,13 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	return nil
 }
 
-func main() {
 
+
+func main() {
 	config.InitConfig()
 	serviceConfig := config.GetConfig()
+
+	logger := logging.InitLogging()
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, requestIDKey, random.RandomString())
