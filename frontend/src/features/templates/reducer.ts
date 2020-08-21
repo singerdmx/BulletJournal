@@ -7,6 +7,11 @@ export type CategoriesAction = {
     categories: Category[];
 };
 
+export type AddCategoryAction = {
+    name: string;
+    description: string;
+};
+
 let initialState = {
     categories: [] as Category[],
 };
@@ -19,7 +24,8 @@ const slice = createSlice({
             const {categories} = action.payload;
             state.categories = categories;
         },
-        getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state
+        getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state,
+        addCategory: (state, action: PayloadAction<AddCategoryAction>) => state
     },
 });
 

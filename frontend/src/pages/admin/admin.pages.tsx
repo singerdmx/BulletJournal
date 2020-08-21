@@ -40,7 +40,7 @@ import {
 } from '@ant-design/icons';
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {useHistory} from "react-router-dom";
-import {CopyrightOutlined, UpSquareOutlined} from "@ant-design/icons/lib";
+import {CopyrightOutlined} from "@ant-design/icons/lib";
 
 const { Panel } = Collapse;
 const { Option } = Select;

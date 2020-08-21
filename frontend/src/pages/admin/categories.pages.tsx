@@ -5,6 +5,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getCategories} from "../../features/templates/actions";
 import {Category} from "../../features/templates/interface";
+import AddCategory from "../../components/modals/templates/add-categery.component";
 
 type AdminCategoriesProps = {
     categories: Category[];
@@ -24,6 +25,7 @@ const AdminCategoriesPage: React.FC<AdminCategoriesProps> = (
     return (
         <div className='admin-categories-page'>
             <BackTop/>
+            <AddCategory/>
 
             {categories.map(c => {
                 return <div>{c.name}</div>
