@@ -3,15 +3,14 @@ package config
 import (
 	"flag"
 	"fmt"
-	"log"
-
 	"github.com/spf13/viper"
+	"log"
 )
 
 var (
-	configNameBase = "base-config.yaml"
-	configNameProd = "prod-config.yaml"
-	configNameTest = "test-config.yaml"
+	configNameBase = "config.yaml"
+	configNameProd = "config-prod.yaml"
+	configNameDev  = "config-dev.yaml"
 	configType     = "yaml"
 	configPaths    = []string{
 		"./config",
@@ -32,6 +31,11 @@ type Config struct {
 }
 
 var serviceConfig Config
+var environment string
+
+func GetEnv() *string {
+	return &environment
+}
 
 func GetConfig() *Config {
 	if Validate(&serviceConfig) == false {
@@ -101,11 +105,13 @@ func InitConfig() {
 }
 
 func SetProdConfig() {
+	environment = "prod"
 	SetConfig(configNameProd)
 }
 
 func SetTestConfig() {
-	SetConfig(configNameTest)
+	environment = "dev"
+	SetConfig(configNameDev)
 }
 
 func SetConfig(configName string) {
@@ -129,6 +135,7 @@ func SetConfig(configName string) {
 }
 
 func PrintConfig() {
+	fmt.Printf("Environment: %s\n", environment)
 	fmt.Printf("Username: %s\n", serviceConfig.Username)
 	fmt.Printf("Password: %s\n", serviceConfig.Password)
 	fmt.Printf("Database: %s\n", serviceConfig.Database)
