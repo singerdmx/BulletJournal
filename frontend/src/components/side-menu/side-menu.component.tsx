@@ -47,7 +47,8 @@ type ProjectProps = {
     todoSelected: boolean,
     ledgerSelected: boolean,
     noteSelected: boolean,
-    category: string
+    category: string,
+    forceToday?: boolean
   ) => void;
 };
 
@@ -92,13 +93,24 @@ class SideMenu extends React.Component<
     (window.adsbygoogle = window.adsbygoogle || []).push({});
   }
 
-  handleClickToday = (category: string) => {
-    let { ledgerSelected, todoSelected, noteSelected } = this.props;
+  handleClickToday = () => {
+    const { ledgerSelected, todoSelected, noteSelected } = this.props;
     this.props.getProjectItemsAfterUpdateSelect(
       todoSelected,
       ledgerSelected,
       noteSelected,
-      category
+      'today',
+      true
+    );
+  };
+
+  handleClickCalendar = () => {
+    const { ledgerSelected, todoSelected, noteSelected } = this.props;
+    this.props.getProjectItemsAfterUpdateSelect(
+        todoSelected,
+        ledgerSelected,
+        noteSelected,
+        'calendar'
     );
   };
 
@@ -120,7 +132,7 @@ class SideMenu extends React.Component<
             </span>
           }
         >
-          <Menu.Item key='today' onClick={() => this.handleClickToday('today')}>
+          <Menu.Item key='today' onClick={() => this.handleClickToday()}>
             <BellOutlined />
             Today
           </Menu.Item>
@@ -132,7 +144,7 @@ class SideMenu extends React.Component<
           </Menu.Item>
           <Menu.Item
             key='calendar'
-            onClick={() => this.handleClickToday('calendar')}
+            onClick={() => this.handleClickCalendar()}
           >
             <CalendarOutlined />
             Calendar

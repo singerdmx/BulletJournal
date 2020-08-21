@@ -35,7 +35,8 @@ type BujoProps = {
     todoSelected: boolean,
     ledgerSelected: boolean,
     noteSelected: boolean,
-    category: string
+    category: string,
+    forceToday?: boolean
   ) => void;
   getProjectItems: (
     startDate: string,

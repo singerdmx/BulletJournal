@@ -1,9 +1,6 @@
-import { takeLatest, call, all, put, select } from 'redux-saga/effects';
-import { message } from 'antd';
-import {
-  fetchProjectItems,
-  fetchRecentProjectItems,
-} from '../../apis/projectItemsApis';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
+import {fetchProjectItems, fetchRecentProjectItems,} from '../../apis/projectItemsApis';
 import {
   actions as projectItemsActions,
   ApiErrorAction,
@@ -11,13 +8,13 @@ import {
   GetProjectItemsAfterUpdateSelectAction,
   MyBuJo,
 } from './reducer';
-import { IState } from '../../store';
-import { PayloadAction } from 'redux-starter-kit';
-import { ProjectType } from '../project/constants';
+import {IState} from '../../store';
+import {PayloadAction} from 'redux-starter-kit';
+import {ProjectType} from '../project/constants';
 import moment from 'moment';
-import { recentItemsReceived, updateRecentItemsDates } from '../recent/actions';
-import { dateFormat } from './constants';
-import { ProjectItem } from './interface';
+import {recentItemsReceived, updateRecentItemsDates} from '../recent/actions';
+import {dateFormat} from './constants';
+import {ProjectItem} from './interface';
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(
@@ -86,7 +83,18 @@ function* getProjectItemsAfterUpdateSelect(
       ledgerSelected,
       noteSelected,
       category,
+      forceToday
     } = action.payload;
+
+    const state: IState = yield select();
+
+    if (forceToday === true) {
+      let currentTime = new Date().toLocaleString('fr-CA', {
+        timeZone: state.myself.timezone,
+      });
+      currentTime = currentTime.substring(0, 10);
+      yield put(projectItemsActions.datesReceived({startDate: currentTime, endDate: currentTime}));
+    }
 
     yield put(
       projectItemsActions.updateSelected({
@@ -102,7 +110,6 @@ function* getProjectItemsAfterUpdateSelect(
     if (noteSelected) types.push(ProjectType.NOTE);
 
     let data = [];
-    const state: IState = yield select();
 
     if (category === 'calendar') {
       if (state.myBuJo.calendarMode === 'month') {
@@ -168,7 +175,7 @@ function* updateMyBuJoDates(action: PayloadAction<MyBuJo>) {
 
     let data = [];
     if (!startDate || !endDate) return;
-
+    yield put(projectItemsActions.datesReceived({startDate: startDate, endDate: endDate}));
     data = yield call(fetchProjectItems, types, timezone, startDate, endDate);
 
     yield put(projectItemsActions.projectItemsReceived({ items: data }));
@@ -188,6 +195,6 @@ export default function* myBuJoSagas() {
       projectItemsActions.getProjectItemsAfterUpdateSelect.type,
       getProjectItemsAfterUpdateSelect
     ),
-    yield takeLatest(projectItemsActions.datesReceived.type, updateMyBuJoDates),
+    yield takeLatest(projectItemsActions.updateMyBuJoDates.type, updateMyBuJoDates),
   ]);
 }

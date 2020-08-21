@@ -32,6 +32,7 @@ export type GetProjectItemsAfterUpdateSelectAction = {
   ledgerSelected: boolean;
   noteSelected: boolean;
   category: string;
+  forceToday?: boolean;
 };
 
 export type ProjectItemsReceivedAction = {
@@ -67,6 +68,7 @@ const slice = createSlice({
       state.startDate = startDate;
       state.endDate = endDate;
     },
+    updateMyBuJoDates: (state, action: PayloadAction<MyBuJo>) => state,
     selectedCalendarDayReceived: (state, action: PayloadAction<SelectedCalendarDayAction>) => {
       const { selectedCalendarDay } = action.payload;
       state.selectedCalendarDay = selectedCalendarDay;
