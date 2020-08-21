@@ -12,6 +12,14 @@ export type AddCategoryAction = {
     description: string;
 };
 
+export type DeleteCategoryAction = {
+    id: number;
+};
+
+export type UpdateCategoryRelationsAction = {
+    categories: Category[];
+};
+
 let initialState = {
     categories: [] as Category[],
 };
@@ -25,7 +33,9 @@ const slice = createSlice({
             state.categories = categories;
         },
         getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state,
-        addCategory: (state, action: PayloadAction<AddCategoryAction>) => state
+        addCategory: (state, action: PayloadAction<AddCategoryAction>) => state,
+        deleteCategory: (state, action: PayloadAction<DeleteCategoryAction>) => state,
+        updateCategoryRelations: (state, action: PayloadAction<UpdateCategoryRelationsAction>) => state
     },
 });
 

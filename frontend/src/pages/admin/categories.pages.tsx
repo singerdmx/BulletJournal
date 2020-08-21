@@ -3,19 +3,23 @@ import './categories.less';
 import {BackTop} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getCategories} from "../../features/templates/actions";
+import {deleteCategory, getCategories, updateCategoryRelations} from "../../features/templates/actions";
 import {Category} from "../../features/templates/interface";
 import AddCategory from "../../components/modals/templates/add-categery.component";
 
 type AdminCategoriesProps = {
     categories: Category[];
     getCategories: () => void;
+    updateCategoryRelations: (categories: Category[]) => void;
+    deleteCategory: (id: number) => void;
 };
 
 const AdminCategoriesPage: React.FC<AdminCategoriesProps> = (
     {
         categories,
-        getCategories
+        getCategories,
+        updateCategoryRelations,
+        deleteCategory
     }) => {
     useEffect(() => {
         document.title = 'Bullet Journal - Categories';
@@ -39,5 +43,7 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getCategories
+    getCategories,
+    updateCategoryRelations,
+    deleteCategory
 })(AdminCategoriesPage);
