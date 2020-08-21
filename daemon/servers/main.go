@@ -5,7 +5,12 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
+<<<<<<< Updated upstream
 	random "github.com/singerdmx/BulletJournal/daemon/utils"
+=======
+	"github.com/singerdmx/BulletJournal/daemon/logging"
+	generator "github.com/singerdmx/BulletJournal/daemon/utils"
+>>>>>>> Stashed changes
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"github.com/zywangzy/JobScheduler"
@@ -57,8 +62,18 @@ func main() {
 	config.InitConfig()
 	serviceConfig := config.GetConfig()
 
+<<<<<<< Updated upstream
+=======
+	logger, err := logging.InitLogging(*config.GetEnv())
+	if err != nil {
+		fmt.Printf("Daemon logger initialization failed")
+	}
+
+	defer logger.Sync()
+
+>>>>>>> Stashed changes
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, requestIDKey, random.RandomString())
+	ctx = context.WithValue(ctx, requestIDKey, generator.GenerateUID())
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

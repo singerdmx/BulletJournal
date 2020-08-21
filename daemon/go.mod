@@ -13,5 +13,6 @@ require (
 	github.com/zywangzy/JobScheduler v0.0.0-20200810024552-d2006de1954a
 	go.uber.org/zap v1.15.0 // indirect
 	google.golang.org/grpc v1.31.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	upper.io/db.v3 v3.7.1+incompatible
 )
