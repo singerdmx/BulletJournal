@@ -5,6 +5,7 @@ export enum ActionType {
 
 export enum EventType {
     JoinGroupEvent = 'JoinGroupEvent',
+    InviteToJoinGroupEvent = 'InviteToJoinGroupEvent',
     RemoveUserFromGroupEvent = 'RemoveUserFromGroupEvent',
     DeleteGroupEvent = 'DeleteGroupEvent',
     JoinGroupResponseEvent = 'JoinGroupResponseEvent',

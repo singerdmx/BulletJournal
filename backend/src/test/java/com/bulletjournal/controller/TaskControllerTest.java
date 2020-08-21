@@ -90,7 +90,7 @@ public class TaskControllerTest {
         users.add("Joker");
         int count = 1;
         for (String username : users) {
-            group = addUserToGroup(group, username, ++count);
+            group = TestHelpers.addUserToGroup(this.requestParams, group, username, ++count, USER);
         }
         users.add(USER);
         Project p1 = TestHelpers.createProject(requestParams, USER, "task_project_1", group, ProjectType.TODO);
@@ -345,17 +345,5 @@ public class TaskControllerTest {
         assertEquals(params.getName(), created.getName());
         assertEquals(project.getId(), created.getProjectId());
         return created;
-    }
-
-    private Group addUserToGroup(Group group, String username, int expectedSize) {
-        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
-        ResponseEntity<Group> groupsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUP_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(addUserGroupParams, USER),
-                Group.class);
-        Group updated = groupsResponse.getBody();
-        assertEquals(expectedSize, updated.getUsers().size());
-        return updated;
     }
 }

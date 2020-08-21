@@ -82,7 +82,7 @@ public class ProjectControllerTest {
         Group group = groups.get(0).getGroups().get(0);
         int count = 6;
         for (String username : Arrays.asList(sampleUsers).subList(0, 3)) {
-            group = addUserToGroup(group, username, ++count);
+            group = TestHelpers.addUserToGroup(requestParams, group, username, ++count, expectedOwner);
         }
 
         for (String username : Arrays.asList(sampleUsers).subList(0, 2)) {
@@ -1344,18 +1344,6 @@ public class ProjectControllerTest {
                 .stream().filter(g -> group.getName().equals(g.getName())).findFirst().get();
         assertEquals(usernames.size() + 1, updated.getUsers().size());
         return groups;
-    }
-
-    private Group addUserToGroup(Group group, String username, int expectedSize) {
-        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
-        ResponseEntity<Group> groupsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUP_ROUTE,
-                HttpMethod.POST,
-                new HttpEntity<>(addUserGroupParams),
-                Group.class);
-        Group updated = groupsResponse.getBody();
-        assertEquals(expectedSize, updated.getUsers().size());
-        return updated;
     }
 
     private void removeUsersFromGroup(final Group group, List<String> usernames, int count) {

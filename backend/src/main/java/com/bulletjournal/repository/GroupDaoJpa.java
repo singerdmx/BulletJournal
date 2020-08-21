@@ -12,6 +12,8 @@ import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.Informed;
+import com.bulletjournal.notifications.InviteToJoinGroupEvent;
 import com.bulletjournal.notifications.JoinGroupEvent;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
@@ -19,6 +21,8 @@ import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,6 +34,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class GroupDaoJpa implements Etaggable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupDaoJpa.class);
 
     @Autowired
     private UserGroupRepository userGroupRepository;
@@ -181,6 +186,7 @@ public class GroupDaoJpa implements Etaggable {
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public JoinGroupEvent addUserGroups(
             String owner,
@@ -203,24 +209,38 @@ public class GroupDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public JoinGroupEvent addUserGroup(
+    public List<Informed> addUserGroup(
             String requester,
             AddUserGroupParams addUserGroupParams) {
 
         Long groupId = addUserGroupParams.getGroupId();
         Group group = this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
-        this.authorizationService.checkAuthorizedToOperateOnContent(
-                group.getOwner(), requester, ContentType.GROUP, Operation.UPDATE, groupId);
+        if (!group.getUsers().stream().anyMatch(ug -> Objects.equals(ug.getUser().getName(), requester))) {
+            throw new UnAuthorizedException("User " + requester + " not in group " + group.getName());
+        }
         String username = addUserGroupParams.getUsername();
+        if (Objects.equals(username, requester)) {
+            LOGGER.warn("Cannot invite yourself");
+            return Collections.emptyList();
+        }
         User user = this.userDaoJpa.getByName(username);
         UserGroupKey key = new UserGroupKey(user.getId(), groupId);
         Optional<UserGroup> userGroup = this.userGroupRepository.findById(key);
         if (!userGroup.isPresent()) {
-            this.userGroupRepository.save(new UserGroup(user, group, false));
+            UserGroup ug = new UserGroup(user, group, false);
+            this.userGroupRepository.save(ug);
+            group.getUsers().add(ug);
+            this.groupRepository.save(group);
         }
 
-        return new JoinGroupEvent(new Event(username, groupId, group.getName()), requester);
+        List<Informed> informeds = new ArrayList<>();
+        informeds.add(new JoinGroupEvent(new Event(username, groupId, group.getName()), requester));
+        if (!Objects.equals(requester, group.getOwner())) {
+            informeds.add(new InviteToJoinGroupEvent(
+                    new Event(group.getOwner(), groupId, group.getName()), requester, username));
+        }
+        return informeds;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -230,6 +250,7 @@ public class GroupDaoJpa implements Etaggable {
         return group;
     }
 
+    @Deprecated
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> removeUserGroups(
             String requester,

@@ -254,9 +254,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
           />
         </div>
         <div className='group-card-footer'>
-          {group.owner.name === this.props.myself.username && (
-            <AddUser groupId={group.id} groupName={group.name} />
-          )}
+          <AddUser groupId={group.id} groupName={group.name} />
           <span className='group-card-footer-filter'>
             <Input value={this.state.filter} placeholder="Filter" allowClear={true} prefix={<SearchOutlined />} onChange={e => onFilter(e)} />
           </span>

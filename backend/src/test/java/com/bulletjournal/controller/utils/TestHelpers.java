@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.utils;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.GroupController;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.repository.models.Project;
@@ -122,7 +123,8 @@ public class TestHelpers {
         return created;
     }
 
-    public static com.bulletjournal.controller.models.Project createProject(RequestParams requestParams, String user, String projectName, Group g, ProjectType type) {
+    public static com.bulletjournal.controller.models.Project createProject(
+            RequestParams requestParams, String user, String projectName, Group g, ProjectType type) {
         CreateProjectParams project = new CreateProjectParams(
                 projectName, type, "d15", g.getId());
 
@@ -140,5 +142,18 @@ public class TestHelpers {
         assertEquals(user, created.getGroup().getOwner().getName());
         assertEquals("d15", created.getDescription());
         return created;
+    }
+
+    public static Group addUserToGroup(
+            RequestParams requestParams, Group group, String username, int expectedSize, String requester) {
+        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
+        ResponseEntity<Group> groupsResponse = requestParams.getRestTemplate().exchange(
+                ROOT_URL + requestParams.getRandomServerPort() + GroupController.ADD_USER_GROUP_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(addUserGroupParams, requester),
+                Group.class);
+        Group updated = groupsResponse.getBody();
+        assertEquals(expectedSize, updated.getUsers().size());
+        return updated;
     }
 }

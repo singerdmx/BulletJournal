@@ -127,7 +127,7 @@ public class SystemControllerTest {
 
         String oldGroupsEtag = getGroupsEtag();
         String oldNotificationsEtag = getNotificationsEtag();
-        addUserToGroup(group, sampleUsers[1], 2);
+        TestHelpers.addUserToGroup(requestParams, group, sampleUsers[1], 2, sampleUsers[0]);
         boolean flag = false;
         for (int i = 0; i < ETAG_TEST_RETRY; i++) {
             String newGroupsEtag = getGroupsEtag();
@@ -165,18 +165,6 @@ public class SystemControllerTest {
         SystemUpdates systemUpdates = response.getBody();
         assertNotNull(systemUpdates);
         return systemUpdates.getNotificationsEtag();
-    }
-
-    private Group addUserToGroup(Group group, String username, int expectedSize) {
-        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
-        ResponseEntity<Group> groupsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUP_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(addUserGroupParams, sampleUsers[0]),
-                Group.class);
-        Group updated = groupsResponse.getBody();
-        assertEquals(expectedSize, updated.getUsers().size());
-        return updated;
     }
 
     private String getGroupsEtag() {

@@ -28,7 +28,7 @@ public class GroupController {
     protected static final String GROUPS_ROUTE = "/api/groups";
     protected static final String GROUP_ROUTE = "/api/groups/{groupId}";
     protected static final String ADD_USER_GROUPS_ROUTE = "/api/addUserGroups";
-    protected static final String ADD_USER_GROUP_ROUTE = "/api/addUserGroup";
+    public static final String ADD_USER_GROUP_ROUTE = "/api/addUserGroup";
     protected static final String REMOVE_USER_GROUP_ROUTE = "/api/removeUserGroup";
     protected static final String REMOVE_USER_GROUPS_ROUTE = "/api/removeUserGroups";
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
@@ -167,8 +167,8 @@ public class GroupController {
         if (Objects.equals(username, addUserGroupParams.getUsername())) {
             throw new BadRequestException("Cannot add yourself to Group");
         }
-        Informed informed = this.groupDaoJpa.addUserGroup(username, addUserGroupParams);
-        if (informed != null) {
+        List<Informed> informeds = this.groupDaoJpa.addUserGroup(username, addUserGroupParams);
+        for (Informed informed : informeds) {
             this.notificationService.inform(informed);
         }
         return getGroup(addUserGroupParams.getGroupId());

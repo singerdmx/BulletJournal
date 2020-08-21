@@ -64,7 +64,7 @@ public class TransactionControllerTest {
         users.add("Joker");
         int count = 1;
         for (String username : users) {
-            group = addUserToGroup(group, username, ++count);
+            group = TestHelpers.addUserToGroup(requestParams, group, username, ++count, USER);
         }
 
         Project p1 = TestHelpers.createProject(requestParams, USER, "p_Ledger_transaction", group, ProjectType.LEDGER);
@@ -260,18 +260,6 @@ public class TransactionControllerTest {
                 .stream().filter(g -> group.getName().equals(g.getName())).findFirst().get();
         assertEquals(usernames.size() + 1, updated.getUsers().size());
         return groups;
-    }
-
-    private Group addUserToGroup(Group group, String username, int expectedSize) {
-        AddUserGroupParams addUserGroupParams = new AddUserGroupParams(group.getId(), username);
-        ResponseEntity<Group> groupsResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + GroupController.ADD_USER_GROUP_ROUTE,
-                HttpMethod.POST,
-                TestHelpers.actAsOtherUser(addUserGroupParams, USER),
-                Group.class);
-        Group updated = groupsResponse.getBody();
-        assertEquals(expectedSize, updated.getUsers().size());
-        return updated;
     }
 
     private Transaction createTransaction(Project project, String name, String date, String payer, double amount, Integer type) {
