@@ -290,8 +290,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getTasksBetween(
             String assignee, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
+        List<Long> projectIds = projects.stream().map(Project::getId).collect(Collectors.toList());
         List<Task> tasks = this.taskRepository.findTasksOfAssigneeBetween(assignee,
-                ZonedDateTimeHelper.toDBTimestamp(startTime), ZonedDateTimeHelper.toDBTimestamp(endTime));
+                ZonedDateTimeHelper.toDBTimestamp(startTime), ZonedDateTimeHelper.toDBTimestamp(endTime), projectIds);
         tasks = tasks.stream().filter(t -> {
             if (Objects.isNull(t.getRecurrenceRule())) {
                 LOGGER.error("Recurring Task with Due DateTime.");
