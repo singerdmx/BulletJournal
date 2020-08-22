@@ -5,16 +5,8 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-	logging "github.com/singerdmx/BulletJournal/daemon/logging"
->>>>>>> Add lnitLogging
-	random "github.com/singerdmx/BulletJournal/daemon/utils"
-=======
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	generator "github.com/singerdmx/BulletJournal/daemon/utils"
->>>>>>> Stashed changes
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"github.com/zywangzy/JobScheduler"
@@ -63,15 +55,10 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	return nil
 }
 
-
-
 func main() {
 	config.InitConfig()
 	serviceConfig := config.GetConfig()
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 	logger, err := logging.InitLogging(*config.GetEnv())
 	if err != nil {
 		fmt.Printf("Daemon logger initialization failed")
@@ -79,11 +66,8 @@ func main() {
 
 	defer logger.Sync()
 
->>>>>>> Stashed changes
-=======
 	logger := logging.InitLogging()
 
->>>>>>> Add lnitLogging
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, requestIDKey, generator.GenerateUID())
 	ctx, cancel := context.WithCancel(ctx)

@@ -1,11 +1,8 @@
 package logging
 
 import (
-<<<<<<< HEAD
-	"os"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 const (
@@ -44,7 +41,6 @@ func getZapLevel(level string) zapcore.Level {
 	}
 }
 
-
 func InitLogging(setting string) (*zap.Logger, error) {
 	var logger *zap.Logger
 	var err error
@@ -56,17 +52,4 @@ func InitLogging(setting string) (*zap.Logger, error) {
 	}
 
 	return logger, err
-=======
-	"go.uber.org/zap"
-)
-
-func InitLogging(setting string) (*zap.Logger) {
-	
-	logger, _ := zap.NewProduction()
-	if setting == "dev" {
-		logger, _ = zap.NewDevelopment()
-	}
-
-	return logger
->>>>>>> Add lnitLogging
 }
