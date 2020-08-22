@@ -30,6 +30,7 @@ import {
   UpdateTaskContentRevision,
   UpdateTaskContents,
   UpdateTasks,
+  GetTaskStatisticsAction,
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -59,7 +60,8 @@ import {
   uncompleteTaskById,
   updateContent,
   updateTask,
-  patchRevisionContents
+  patchRevisionContents,
+  getTaskStatistics
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
@@ -68,7 +70,7 @@ import {Content, ProjectItems, Revision} from '../myBuJo/interface';
 import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
 import {actions as SystemActions} from '../system/reducer';
 import {completedTaskPageSize, ProjectItemUIType} from '../project/constants';
-import {Task} from './interface';
+import {Task, TaskStatistics} from './interface';
 import {recentItemsReceived} from '../recent/actions';
 import {ContentType} from '../myBuJo/constants';
 import {updateTargetContent} from "../content/actions";
@@ -1101,6 +1103,20 @@ function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>
   }
 }
 
+function* fetchTaskStatistics(action: PayloadAction<GetTaskStatisticsAction>) {
+  try {
+    const {projectIds, timezone, startDate, endDate} = action.payload;
+    const data : TaskStatistics = yield call(getTaskStatistics, projectIds, timezone, startDate, endDate);
+    yield put(
+      tasksActions.TaskStatisticsReceived({
+        projectStatistics: data,
+      })
+    )
+  } catch (error) {
+    yield call(message.error, `fetchTaskStatistics Error Received: ${error}`);
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -1152,5 +1168,6 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TasksComplete.type, completeTasks),
     yield takeLatest(tasksActions.TaskStatusSet.type, setTaskStatus),
     yield takeLatest(tasksActions.TaskPatchRevisionContents.type, patchTaskRevisionContents),
+    yield takeLatest(tasksActions.GetTaskStatistics.type, fetchTaskStatistics),
   ]);
 }
