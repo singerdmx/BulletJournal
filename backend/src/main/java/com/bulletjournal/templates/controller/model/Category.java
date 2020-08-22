@@ -15,6 +15,12 @@ public class Category {
 
     private String description;
 
+    private String icon;
+
+    private String color;
+
+    private long forumId;
+
     @Expose
     private List<Category> subCategories = new ArrayList<>();
 
@@ -27,6 +33,40 @@ public class Category {
         this.name = name;
         this.subCategories = subCategories;
         this.description = description;
+    }
+
+    public Category(Long id, String name, String description, String icon, String color, long forumId, List<Category> subCategories) {
+        this.id = id;
+        this.name = name;
+        this.subCategories = subCategories;
+        this.description = description;
+        this.icon = icon;
+        this.color = color;
+        this.forumId = forumId;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public long getForumId() {
+        return forumId;
+    }
+
+    public void setForumId(long forumId) {
+        this.forumId = forumId;
     }
 
     public Long getId() {
@@ -69,12 +109,15 @@ public class Category {
         return Objects.equals(getId(), category.getId()) &&
             Objects.equals(getName(), category.getName()) &&
             Objects.equals(getDescription(), category.getDescription()) &&
+            Objects.equals(getIcon(), category.getIcon()) &&
+            Objects.equals(getColor(), category.getColor()) &&
+            Objects.equals(getForumId(), category.getForumId()) &&
             Objects.equals(getSubCategories(), category.getSubCategories());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getDescription(), getSubCategories());
+        return Objects.hash(getId(), getName(), getDescription(), getIcon(), getColor(), getForumId(), getSubCategories());
     }
 
     @Override
@@ -83,6 +126,9 @@ public class Category {
             "id=" + id +
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +
+            ", icon='" + icon + '\'' +
+            ", color='" + color + '\'' +
+            ", forumId='" + forumId + '\'' +
             ", subCategories=" + subCategories +
             '}';
     }
@@ -91,5 +137,8 @@ public class Category {
         this.setId(category.getId());
         this.setName(category.getName());
         this.setDescription(category.getDescription());
+        this.setColor(category.getColor());
+        this.setForumId(category.getForumId());
+        this.setIcon(category.getIcon());
     }
 }
