@@ -178,7 +178,7 @@ public class DeviceControllerTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void sendEmail() throws Exception {
         JSONArray assigneeInfoList = new JSONArray();
         JSONObject info1 = new JSONObject();
@@ -205,7 +205,9 @@ public class DeviceControllerTest {
             MessagingService.TASK_NAME_PROPERTY,
             "exampleTaskName",
             MessagingService.TIMESTAMP_PROPERTY,
-            "Sat Aug 22 01:37:07 PDT 2020"
+            "Sat Aug 22 01:37:07 PDT 2020",
+            MessagingService.TASK_URL_PROPERTY,
+            MessagingService.BASE_TASK_URL + 5903
         );
         LOGGER.info("assigneeInfoList: {}", assigneeInfoList.toString());
         params.addKv(MessagingService.ASSIGNEES_PROPERTY, assigneeInfoList);

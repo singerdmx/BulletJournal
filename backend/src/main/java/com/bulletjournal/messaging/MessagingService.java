@@ -44,6 +44,10 @@ public class MessagingService {
 
     public static final String TIMESTAMP_PROPERTY = "timestamp";
 
+    public static final String TASK_URL_PROPERTY = "taskUrl";
+
+    public static final String BASE_TASK_URL = "https://bulletjournal.us/#/task/";
+
     private FcmClient fcmClient;
 
     private MailjetEmailClient mailjetClient;
@@ -169,7 +173,7 @@ public class MessagingService {
         List<String> assignees = task.getAssignees();
         Map<String, Map<String, String>> aliasMap = getAliasMap(assignees);
         Map<String, String> avatarMap = getAvatarMap(assignees);
-
+        String taskUrl = BASE_TASK_URL + task.getId();
         for (String receiver : assignees) {
             MailjetEmailParams params =
                 new MailjetEmailParams(
@@ -180,7 +184,9 @@ public class MessagingService {
                     TASK_NAME_PROPERTY,
                     task.getName(),
                     TIMESTAMP_PROPERTY,
-                    getDueTime(task)
+                    getDueTime(task),
+                    TASK_URL_PROPERTY,
+                    taskUrl
                 );
             JSONArray assigneeInfoList = new JSONArray();
             JSONObject selfInfo = new JSONObject();
