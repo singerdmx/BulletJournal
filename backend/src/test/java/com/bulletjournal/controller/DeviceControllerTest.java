@@ -178,7 +178,7 @@ public class DeviceControllerTest {
     }
 
     @Test
-//    @Ignore
+    @Ignore
     public void sendEmail() throws Exception {
         JSONArray assigneeInfoList = new JSONArray();
         JSONObject info1 = new JSONObject();
