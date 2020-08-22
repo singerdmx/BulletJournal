@@ -94,15 +94,18 @@ public class Category extends AuditModel {
         Category category = (Category) o;
         return getId().equals(category.getId()) &&
             getName().equals(category.getName()) &&
+            getIcon().equals(category.getIcon()) &&
+            getColor().equals(category.getColor()) &&
+            getForumId() == category.getForumId() &&
             getDescription().equals(category.getDescription());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getDescription());
+        return Objects.hash(getId(), getName(), getIcon(), getColor(), getForumId(), getDescription());
     }
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Category(id, name, description, new ArrayList<>());
+        return new com.bulletjournal.templates.controller.model.Category(id, name, description, icon, color, forumId, new ArrayList<>());
     }
 }

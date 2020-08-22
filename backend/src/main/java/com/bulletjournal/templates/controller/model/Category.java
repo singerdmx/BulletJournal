@@ -19,7 +19,7 @@ public class Category {
 
     private String color;
 
-    private long forumId;
+    private Long forumId;
 
     @Expose
     private List<Category> subCategories = new ArrayList<>();
@@ -35,7 +35,7 @@ public class Category {
         this.description = description;
     }
 
-    public Category(Long id, String name, String description, String icon, String color, long forumId, List<Category> subCategories) {
+    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories) {
         this.id = id;
         this.name = name;
         this.subCategories = subCategories;
@@ -61,11 +61,11 @@ public class Category {
         this.color = color;
     }
 
-    public long getForumId() {
+    public Long getForumId() {
         return forumId;
     }
 
-    public void setForumId(long forumId) {
+    public void setForumId(Long forumId) {
         this.forumId = forumId;
     }
 
