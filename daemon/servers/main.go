@@ -24,8 +24,6 @@ const (
 	requestIDKey string = "requestID"
 )
 
-var sugarLogger *zap.SugaredLogger
-
 // server should implement services.UnimplementedDaemonServer's methods
 type server struct {
 }
@@ -56,15 +54,12 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 }
 
 func main() {
+
 	config.InitConfig()
 	serviceConfig := config.GetConfig()
-	logger, err := logging.InitLogging(*config.GetEnv())
-	if err != nil {
-		fmt.Printf("Daemon logger initialization failed")
-	}
 
-	defer logger.Sync()
-	logger := logging.InitLogging()
+	logging.InitLogging(config.GetEnv())
+	logger := *logging.GetLogger()
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, requestIDKey, generator.GenerateUID())
@@ -77,7 +72,7 @@ func main() {
 	rpcPort := ":" + serviceConfig.RPCPort
 	lis, err := net.Listen("tcp", rpcPort)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Fatalf("failed to listen: %v", err)
 	}
 	rpcServer := grpc.NewServer()
 	services.RegisterDaemonServer(rpcServer, &server{})
@@ -86,7 +81,7 @@ func main() {
 	endpoint := serviceConfig.Host + rpcPort
 	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
-		log.Fatalf("failed to register rpc server to gateway server: %v", err)
+		logger.Fatalf("failed to register rpc server to gateway server: %v", err)
 	}
 
 	httpAddr := ":" + serviceConfig.HttpPort

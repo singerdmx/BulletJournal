@@ -8,6 +8,9 @@ import (
 )
 
 var (
+	serviceConfig Config
+	environment   string
+
 	configNameBase = "config.yaml"
 	configNameProd = "config-prod.yaml"
 	configNameDev  = "config-dev.yaml"
@@ -29,9 +32,6 @@ type Config struct {
 	ApiKeyPublic  string
 	ApiKeyPrivate string
 }
-
-var serviceConfig Config
-var environment string
 
 func GetEnv() *string {
 	return &environment
@@ -98,20 +98,12 @@ func InitConfig() {
 
 	SetConfig(configNameBase)
 	if *isProd == true {
-		SetProdConfig()
+		environment = "prod"
+		SetConfig(configNameProd)
 	} else {
-		SetTestConfig()
+		environment = "dev"
+		SetConfig(configNameDev)
 	}
-}
-
-func SetProdConfig() {
-	environment = "prod"
-	SetConfig(configNameProd)
-}
-
-func SetTestConfig() {
-	environment = "dev"
-	SetConfig(configNameDev)
 }
 
 func SetConfig(configName string) {
