@@ -41,9 +41,9 @@ func GetLoggerConfig(EnableConsole bool,
 func InitLogging(env *string) {
 	var config Configuration
 	if *env == "prod" {
-		config = GetLoggerConfig(true, INFO, true, true, INFO, true, "../tmp/daemon-prod.log")
+		config = GetLoggerConfig(true, INFO, true, true, INFO, true, "./tmp/daemon-prod.log")
 	} else {
-		config = GetLoggerConfig(true, DEBUG, false, true, INFO, true, "../tmp/daemon-dev.log")
+		config = GetLoggerConfig(true, DEBUG, false, true, INFO, true, "./tmp/daemon-dev.log")
 	}
 
 	err := InitializeLogger(config, InstanceZapLogger)

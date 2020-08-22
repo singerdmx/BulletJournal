@@ -117,6 +117,6 @@ func main() {
 	rpcServer.GracefulStop()
 	err = httpServer.Shutdown(context.Background())
 	if err != nil {
-		log.Fatalf("failed to stop http server: %v", err)
+		logger.Fatalf("failed to stop http server: %v", err)
 	}
 }
