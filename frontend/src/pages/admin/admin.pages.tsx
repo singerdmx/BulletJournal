@@ -40,7 +40,7 @@ import {
 } from '@ant-design/icons';
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {useHistory} from "react-router-dom";
-import {CopyrightOutlined} from "@ant-design/icons/lib";
+import {CopyrightOutlined, FundViewOutlined} from "@ant-design/icons/lib";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -182,6 +182,13 @@ const AdminPage: React.FC<AdminProps> = (props) => {
             styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
         >
           <CopyrightOutlined />
+        </FloatButton>
+        <FloatButton
+            tooltip="Workflow"
+            onClick={() => history.push(`/admin/workflow`)}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <FundViewOutlined />
         </FloatButton>
       </Container>
       <Collapse defaultActiveKey={['userRoles', 'lockUsers', 'userInfo']}>
