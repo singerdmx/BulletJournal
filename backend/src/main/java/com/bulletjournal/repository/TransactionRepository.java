@@ -21,11 +21,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     List<Transaction> findTransactionsByProjectBetween(@Param("project") Project project,
                                                        @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
 
-    @Query("SELECT transaction FROM Transaction transaction where transaction.payer = :payer AND "
+    @Query("SELECT transaction FROM Transaction transaction where transaction.project IN :projects AND transaction.payer = :payer AND "
             + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
             + "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
     List<Transaction> findTransactionsOfPayerBetween(@Param("payer") String payer,
-                                                     @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
+                                                     @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime,
+                                                     @Param("projects") List<Project> projects);
 
     @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND transaction.payer = :payer AND "
             + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "

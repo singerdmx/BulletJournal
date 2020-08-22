@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import moment from 'moment';
 import { ContentType, dateFormat } from '../../features/myBuJo/constants';
-import { DatePicker, Divider, Tooltip } from 'antd';
+import {DatePicker, Divider, Empty, Tooltip} from 'antd';
 import { Link } from 'react-router-dom';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
@@ -92,6 +92,19 @@ const RecentItemList: React.FC<RecentItemProps> = ({
     }
   };
 
+  function getRecentItemList() {
+    if (!items || items.length === 0) {
+      return <Empty/>
+    }
+    return items.map((projectItem) => {
+      return (
+          <div className="project-item-div" key={projectItem.id}>
+            {renderItem(projectItem)}
+          </div>
+      );
+    });
+  }
+
   return (
     <>
       <div className="todo-panel">
@@ -114,13 +127,7 @@ const RecentItemList: React.FC<RecentItemProps> = ({
       </div>
       <Divider />
       <div className="todo-contents">
-        {items.map((projectItem) => {
-          return (
-            <div className="project-item-div" key={projectItem.id}>
-              {renderItem(projectItem)}
-            </div>
-          );
-        })}
+        {getRecentItemList()}
       </div>
     </>
   );

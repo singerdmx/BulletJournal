@@ -175,6 +175,9 @@ export const formats = [
   'background',
   'code-block',
   'width',
+  'style',
+  'height',
+  'alt'
 ];
 
 // // Quill Toolbar component

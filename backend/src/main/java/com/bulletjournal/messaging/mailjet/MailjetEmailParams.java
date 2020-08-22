@@ -32,7 +32,6 @@ public class MailjetEmailParams {
         this.receivers = Preconditions.checkNotNull(receivers);
         Preconditions.checkArgument(!receivers.isEmpty());
         this.subject = Preconditions.checkNotNull(subject);
-        this.text = Preconditions.checkNotNull(text);
         this.template = template;
         for (int i = 0; i < kv.length - 1; i += 2) {
             this.kv.add(new ImmutablePair<>(kv[i], kv[i + 1]));

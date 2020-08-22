@@ -1926,7 +1926,16 @@ textarea {
 Mobile
 ========================================================================== */
 
-.modal-mobile{
+.modal-mobile {
   width: 70%;
   margin-left: 15%;
+}
+
+.carousel-control-next,
+.carousel-control-prev {
+  filter: invert(100%);
+}
+
+.carousel-caption {
+  filter: invert(100%);
 }

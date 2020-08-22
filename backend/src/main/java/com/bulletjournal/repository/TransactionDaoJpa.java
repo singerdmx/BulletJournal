@@ -109,7 +109,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public List<Transaction> getTransactionsBetween(
             String payer, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
         return this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
-                Timestamp.from(endTime.toInstant()));
+                Timestamp.from(endTime.toInstant()), projects);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

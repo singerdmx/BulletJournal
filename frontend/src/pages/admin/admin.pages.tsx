@@ -38,6 +38,9 @@ import {
   FormOutlined,
   CloseCircleOutlined,
 } from '@ant-design/icons';
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {useHistory} from "react-router-dom";
+import {CopyrightOutlined, FundViewOutlined} from "@ant-design/icons/lib";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -59,6 +62,7 @@ type AdminProps = {
 };
 
 const AdminPage: React.FC<AdminProps> = (props) => {
+  const history = useHistory();
   const {
     setRole,
     getUserInfo,
@@ -171,6 +175,22 @@ const AdminPage: React.FC<AdminProps> = (props) => {
 
   return (
     <div className='admin-page'>
+      <Container>
+        <FloatButton
+            tooltip="Categories"
+            onClick={() => history.push(`/admin/categories`)}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <CopyrightOutlined />
+        </FloatButton>
+        <FloatButton
+            tooltip="Workflow"
+            onClick={() => history.push(`/admin/workflow`)}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <FundViewOutlined />
+        </FloatButton>
+      </Container>
       <Collapse defaultActiveKey={['userRoles', 'lockUsers', 'userInfo']}>
         <Panel header='User Info' key='userInfo'>
           <div className='admin-row'>

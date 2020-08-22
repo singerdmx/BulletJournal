@@ -1,7 +1,7 @@
 import { actions } from './reducer';
 
 export const updateMyBuJoDates = (startDate: string, endDate: string) =>
-  actions.datesReceived({
+  actions.updateMyBuJoDates({
     startDate: startDate,
     endDate: endDate
   });
@@ -15,13 +15,15 @@ export const getProjectItemsAfterUpdateSelect = (
   todoSelected: boolean,
   ledgerSelected: boolean,
   noteSelected: boolean,
-  category: string
+  category: string,
+  forceToday?: boolean
 ) =>
   actions.getProjectItemsAfterUpdateSelect({
     todoSelected: todoSelected,
     ledgerSelected: ledgerSelected,
     noteSelected: noteSelected,
-    category: category
+    category: category,
+    forceToday: forceToday
   });
 
 export const getProjectItems = (

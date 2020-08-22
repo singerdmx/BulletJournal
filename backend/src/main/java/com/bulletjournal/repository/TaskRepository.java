@@ -38,12 +38,12 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     List<Task> findRemindingTasks(@Param("assignee") String assignee, @Param("now") String now,
                                   @Param("start") String start);
 
-    @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND "
+    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id IN :projectIds AND :assignee = ANY(tasks.assignees) AND tasks.start_time IS NOT NULL AND "
             + "tasks.end_time IS NOT NULL AND "
             + "((tasks.start_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.start_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')) OR "
             + "(tasks.end_time >= to_timestamp(:startTime, 'YYYY-MM-DD HH24:MI:SS') AND tasks.end_time <= to_timestamp(:endTime, 'YYYY-MM-DD HH24:MI:SS')))", nativeQuery = true)
     List<Task> findTasksOfAssigneeBetween(@Param("assignee") String assignee, @Param("startTime") String startTime,
-                                          @Param("endTime") String endTime);
+                                          @Param("endTime") String endTime, @Param("projectIds") List<Long> projectIds);
 
     @Query(value = "SELECT task FROM Task task WHERE task.project = :project AND "
             + "task.startTime IS NOT NULL AND task.endTime IS NOT NULL AND "
