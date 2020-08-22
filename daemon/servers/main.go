@@ -58,14 +58,12 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 func main() {
 	config.InitConfig()
 	serviceConfig := config.GetConfig()
-
 	logger, err := logging.InitLogging(*config.GetEnv())
 	if err != nil {
 		fmt.Printf("Daemon logger initialization failed")
 	}
 
 	defer logger.Sync()
-
 	logger := logging.InitLogging()
 
 	ctx := context.Background()
