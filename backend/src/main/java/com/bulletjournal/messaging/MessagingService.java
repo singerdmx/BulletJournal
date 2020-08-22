@@ -1,10 +1,12 @@
 package com.bulletjournal.messaging;
 
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
 import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
+import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.Task;
@@ -12,6 +14,8 @@ import com.bulletjournal.repository.models.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,18 @@ public class MessagingService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessagingService.class);
 
+    public static final String NONE_STRING = "None";
+
+    public static final String ALIAS_PROPERTY = "alias";
+
+    public static final String AVATAR_PROPERTY = "avatar";
+
+    public static final String ASSIGNEES_PROPERTY = "assignees";
+
+    public static final String TASK_NAME_PROPERTY = "taskName";
+
+    public static final String TIMESTAMP_PROPERTY = "timestamp";
+
     private FcmClient fcmClient;
 
     private MailjetEmailClient mailjetClient;
@@ -36,17 +52,25 @@ public class MessagingService {
 
     private UserDaoJpa userDaoJpa;
 
+    private UserAliasDaoJpa userAliasDaoJpa;
+
+    private UserClient userClient;
+
     @Autowired
     public MessagingService(
         FcmClient fcmClient,
         MailjetEmailClient mailjetClient,
         DeviceTokenDaoJpa deviceTokenDaoJpa,
-        UserDaoJpa userDaoJpa
+        UserDaoJpa userDaoJpa,
+        UserAliasDaoJpa userAliasDaoJpa,
+        UserClient userClient
     ) {
         this.fcmClient = fcmClient;
         this.mailjetClient = mailjetClient;
         this.deviceTokenDaoJpa = deviceTokenDaoJpa;
         this.userDaoJpa = userDaoJpa;
+        this.userAliasDaoJpa = userAliasDaoJpa;
+        this.userClient = userClient;
     }
 
     public void sendEtagUpdateNotificationToUsers(Collection<String> usernames) {
@@ -86,7 +110,7 @@ public class MessagingService {
             List<FcmMessageParams> messageParamsList = new ArrayList<>();
             for (Task task : taskList) {
                 messageParamsList.addAll(createFcmMessageParamsListFromDueTask(task, nameTokensMap));
-                emailParamsList.add(createEmailParamsForDueTask(task, nameEmailMap));
+                emailParamsList.addAll(createEmailParamsForDueTask(task, nameEmailMap));
             }
             fcmClient.sendAllMessagesAsync(messageParamsList);
             mailjetClient.sendAllEmailAsync(emailParamsList);
@@ -138,25 +162,67 @@ public class MessagingService {
         return ret.toString();
     }
 
-    private MailjetEmailParams createEmailParamsForDueTask(
+    private List<MailjetEmailParams> createEmailParamsForDueTask(
         Task task, Map<String, String> nameEmailMap
     ) {
-        List<Pair<String, String>> receivers = new ArrayList<>();
-        for (String username: task.getAssignees()) {
-            String email = nameEmailMap.get(username);
-            receivers.add(new ImmutablePair<>(username, email));
+        List<MailjetEmailParams> ret = new ArrayList<>();
+        List<String> assignees = task.getAssignees();
+        Map<String, Map<String, String>> aliasMap = getAliasMap(assignees);
+        Map<String, String> avatarMap = getAvatarMap(assignees);
+
+        for (String receiver : assignees) {
+            MailjetEmailParams params =
+                new MailjetEmailParams(
+                    Arrays.asList(new ImmutablePair<>(receiver, nameEmailMap.get(receiver))),
+                    getTitle(task),
+                    null,
+                    MailjetEmailClient.Template.TASK_DUE_NOTIFICATION,
+                    TASK_NAME_PROPERTY,
+                    task.getName(),
+                    TIMESTAMP_PROPERTY,
+                    getDueTime(task)
+                );
+            JSONArray assigneeInfoList = new JSONArray();
+            JSONObject selfInfo = new JSONObject();
+            selfInfo.put(ALIAS_PROPERTY, receiver);
+            selfInfo.put(AVATAR_PROPERTY, avatarMap.getOrDefault(receiver, NONE_STRING));
+            assigneeInfoList.put(selfInfo);
+            for (String otherName : assignees) {
+                if (otherName.equals(receiver)) {
+                    continue;
+                }
+                String alias = aliasMap.get(receiver).getOrDefault(otherName, otherName);
+                String avator = avatarMap.getOrDefault(otherName, NONE_STRING);
+                JSONObject obj = new JSONObject();
+                obj.put(ALIAS_PROPERTY, alias);
+                obj.put(AVATAR_PROPERTY, avator);
+                assigneeInfoList.put(obj);
+            }
+            params.addKv(ASSIGNEES_PROPERTY, assigneeInfoList.toString());
+            ret.add(params);
         }
-        MailjetEmailParams params =
-            new MailjetEmailParams(
-                receivers,
-                getTitle(task),
-                null,
-                MailjetEmailClient.Template.TASK_DUE_NOTIFICATION,
-                "taskName",
-                task.getName(),
-                "timeStamp",
-                getDueTime(task)
-            );
-        return params;
+        return ret;
+    }
+
+    private Map<String, String> getAvatarMap(List<String> usernames) {
+        Map<String, String> ret = new HashMap<>();
+        for (String username : usernames) {
+            com.bulletjournal.controller.models.User user = userClient.getUser(username);
+            if (user.getAvatar() != null) {
+                ret.put(username, user.getAvatar());
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * get (baseUser, targetUsername, targetUserAlias) map for each user
+     */
+    private Map<String, Map<String, String>> getAliasMap(List<String> usernames) {
+        Map<String, Map<String, String>> ret = new HashMap<>();
+        for (String username : usernames) {
+            ret.put(username, userAliasDaoJpa.getAliases(username));
+        }
+        return ret;
     }
 }

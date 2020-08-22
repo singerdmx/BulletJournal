@@ -17,7 +17,7 @@ public class MailjetEmailParams {
 
     private MailjetEmailClient.Template template;
 
-    private List<Pair<String, String>> kv = new ArrayList<>();
+    private List<Pair<String, Object>> kv = new ArrayList<>();
 
     // left: name, right: email
     private List<Pair<String, String>> receivers;
@@ -32,10 +32,15 @@ public class MailjetEmailParams {
         this.receivers = Preconditions.checkNotNull(receivers);
         Preconditions.checkArgument(!receivers.isEmpty());
         this.subject = Preconditions.checkNotNull(subject);
+        this.text = text;
         this.template = template;
         for (int i = 0; i < kv.length - 1; i += 2) {
             this.kv.add(new ImmutablePair<>(kv[i], kv[i + 1]));
         }
+    }
+
+    public void addKv(String k, Object v) {
+        this.kv.add(new ImmutablePair<>(k, v));
     }
 
     public MailjetEmailClient.Template getTemplate() {
@@ -46,11 +51,11 @@ public class MailjetEmailParams {
         this.template = template;
     }
 
-    public List<Pair<String, String>> getKv() {
+    public List<Pair<String, Object>> getKv() {
         return kv;
     }
 
-    public void setKv(List<Pair<String, String>> kv) {
+    public void setKv(List<Pair<String, Object>> kv) {
         this.kv = kv;
     }
 
@@ -83,6 +88,8 @@ public class MailjetEmailParams {
         return "MailjetEmailParams{" +
             "subject='" + subject + '\'' +
             ", text='" + text + '\'' +
+            ", template=" + template +
+            ", kv=" + kv +
             ", receivers=" + receivers +
             '}';
     }
