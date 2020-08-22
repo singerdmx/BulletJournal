@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import './categories.less';
+import './categories.styles.less';
 import {BackTop} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";

@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react';
-import { ScheduleOutlined } from '@ant-design/icons';
+import {Container} from "react-floating-action-button";
 import './workflow.styles.less';
 import {BackTop} from "antd";
+import AddChoice from "../../components/modals/templates/add-choice.component";
 
-type WorkflowPageProps = {
-};
+type WorkflowPageProps = {};
 
 const AdminWorkflowPage: React.FC<WorkflowPageProps> = (props) => {
     useEffect(() => {
@@ -12,13 +12,14 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (props) => {
     }, []);
 
     return (
-    <div className='workflow-page'>
-        <BackTop />
+        <div className='workflow-page'>
+            <BackTop/>
 
-        <ScheduleOutlined />
-    </div>
-  );
+            <Container>
+                <AddChoice/>
+            </Container>
+        </div>
+    );
 };
-
 
 export default AdminWorkflowPage;
