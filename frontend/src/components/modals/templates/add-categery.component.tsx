@@ -1,11 +1,14 @@
 import React, {useState} from 'react';
-import {Form, Input, Modal} from 'antd';
+import {Col, Form, Input, Modal, Popover, Row} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router';
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {useHistory} from "react-router-dom";
 import {addCategory} from "../../../features/templates/actions";
+import {icons} from "../../../assets/icons";
+import {QuestionCircleOutlined} from "@ant-design/icons/lib";
+import './add-category.component.styles.less';
 
 type AddCategoryProps = {
     addCategory: (name: string, description: string) => void;
@@ -17,6 +20,37 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
     const [visible, setVisible] = useState(false);
     const history = useHistory();
     const {projectId} = useParams();
+    //label form state
+    const [formCreateLabelIcon, setFormCreateLabelIcon] = useState(
+        <QuestionCircleOutlined />
+    );
+    const [formCreateLabelIconString, setCreateFormLabelIconString] = useState(
+        'QuestionCircleOutlined'
+    );
+
+    const IconsSelector = (mode: any) => {
+        return (
+            <div className='label-icon-selector'>
+                <Row>
+                    {icons.map((icon: any) => {
+                        return (
+                            <Col span={2} key={icon.name}>
+                <span
+                    title={icon.name}
+                    onClick={() => {
+                        setFormCreateLabelIcon(icon.icon);
+                        setCreateFormLabelIconString(icon.name);
+                    }}
+                >
+                  {icon.icon}
+                </span>
+                            </Col>
+                        );
+                    })}
+                </Row>
+            </div>
+        );
+    };
 
     const createCategory = (values: any) => {
         addCategory(values.name, values.description);
@@ -50,6 +84,14 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
                 }}
             >
                 <Form form={form}>
+                    <Popover
+                        title='Select an icon for your category'
+                        placement='bottom'
+                        content={<IconsSelector mode='Create'/>}
+                        style={{width: '800px'}}
+                    >
+                        <div className='label-icon'>{formCreateLabelIcon}</div>
+                    </Popover>
                     <Form.Item
                         name='name'
                         rules={[{required: true, message: 'Name must be between 1 and 30 characters', min: 1, max: 30}]}
