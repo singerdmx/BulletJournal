@@ -127,15 +127,18 @@ func SetConfig(configName string) {
 }
 
 func PrintConfig() {
-	fmt.Printf("Environment: %s\n", environment)
-	fmt.Printf("Username: %s\n", serviceConfig.Username)
-	fmt.Printf("Password: %s\n", serviceConfig.Password)
-	fmt.Printf("Database: %s\n", serviceConfig.Database)
-	fmt.Printf("DB Port: %s\n", serviceConfig.DBPort)
-	fmt.Printf("Rpc Port: %s\n", serviceConfig.RPCPort)
-	fmt.Printf("Http Port: %s\n", serviceConfig.HttpPort)
-	fmt.Printf("Host: %s\n", serviceConfig.Host)
-	fmt.Printf("DB Driver: %s\n", serviceConfig.DBDriver)
-	fmt.Printf("ApiKeyPublic: %s\n", serviceConfig.ApiKeyPublic)
-	fmt.Printf("ApiKeyPrivate: %s\n", serviceConfig.ApiKeyPrivate)
+	tab := "\t\t"
+	fmt.Print("****************************************************\n")
+	fmt.Printf("Profile:%s%s\n", tab, environment)
+	fmt.Printf("Username:%s%s\n", tab, serviceConfig.Username)
+	fmt.Printf("Password:%s%s\n", tab, serviceConfig.Password)
+	fmt.Printf("Database:%s%s\n", tab, serviceConfig.Database)
+	fmt.Printf("Database Port:%s%s\n", tab, serviceConfig.DBPort)
+	fmt.Printf("RPC Port:%s%s\n", tab, serviceConfig.RPCPort)
+	fmt.Printf("HTTP Port:%s%s\n", tab, serviceConfig.HttpPort)
+	fmt.Printf("Host:%s\t%s\n", tab, serviceConfig.Host)
+	fmt.Printf("DB Driver:%s%s\n", tab, serviceConfig.DBDriver)
+	fmt.Printf("Public APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPublic)
+	fmt.Printf("Private APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPrivate)
+	fmt.Print("****************************************************\n")
 }

@@ -43,7 +43,7 @@ func InitLogging(env *string) {
 	if *env == "prod" {
 		config = GetLoggerConfig(true, INFO, true, true, INFO, true, "../tmp/daemon-prod.log")
 	} else {
-		config = GetLoggerConfig(true, DEBUG, true, true, INFO, true, "../tmp/daemon-dev.log")
+		config = GetLoggerConfig(true, DEBUG, false, true, INFO, true, "../tmp/daemon-dev.log")
 	}
 
 	err := InitializeLogger(config, InstanceZapLogger)
@@ -235,10 +235,11 @@ func newZapLogger(config Configuration) (Logger, error) {
 	if config.EnableFile {
 		level := getZapLevel(config.FileLevel)
 		writer := zapcore.AddSync(&lumberjack.Logger{
-			Filename: config.FileLocation,
-			MaxSize:  100,
-			Compress: true,
-			MaxAge:   28,
+			Filename:   config.FileLocation,
+			MaxSize:    100,
+			MaxBackups: 2,
+			MaxAge:     28,
+			Compress:   true,
 		})
 		core := zapcore.NewCore(getEncoder(config.FileJSONFormat), writer, level)
 		cores = append(cores, core)
@@ -247,7 +248,7 @@ func newZapLogger(config Configuration) (Logger, error) {
 	combinedCore := zapcore.NewTee(cores...)
 
 	logger := zap.New(combinedCore,
-		zap.AddCallerSkip(2),
+		zap.AddCallerSkip(1),
 		zap.AddCaller(),
 	).Sugar()
 

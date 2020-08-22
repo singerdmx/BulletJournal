@@ -95,15 +95,17 @@ func main() {
 	//mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui", fs))
 
 	go func() {
+		logger.Infof("rpc server running at port [%v]", serviceConfig.RPCPort)
 		if err := rpcServer.Serve(lis); err != nil {
-			log.Fatalf("rpc server failed to serve: %v", err)
+			logger.Fatalf("rpc server failed to serve: %v", err)
 		}
 	}()
 
 	go func() {
+		logger.Infof("http server running at port [%v]", serviceConfig.HttpPort)
 		// Start HTTP server (and proxy calls to gRPC server endpoint)
 		if err := httpServer.ListenAndServe(); err != nil {
-			log.Fatalf("http server failed to serve: %v", err)
+			logger.Fatalf("http server failed to serve: %v", err)
 		}
 	}()
 
