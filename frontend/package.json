@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "./",
+  "productName": "Bullet Journal",
   "main": "./electron.js",
   "dependencies": {
     "@ant-design/compatible": "0.0.1-rc.0",
@@ -55,6 +56,8 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
+    "build-electron": "mkdir build/electron && cp electron.js build/electron",
+    "release": "electron-builder build --mac --win -c.extraMetadata.main=build/electron/electron.js --publish never",
     "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
