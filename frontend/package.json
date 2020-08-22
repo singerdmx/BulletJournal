@@ -5,6 +5,8 @@
   "homepage": "./",
   "productName": "Bullet Journal",
   "main": "./electron.js",
+  "author": "1024 BBS",
+  "description": "An application for notebook keeping, ledger management, task/project management and coordination with speciality in personal organization, scheduling, reminders, to-do lists, notes sharing, multi-person ledger and team project collaboration.",
   "dependencies": {
     "@ant-design/compatible": "0.0.1-rc.0",
     "@ant-design/icons": "^4.0.0-rc.0",
