@@ -34,11 +34,9 @@ export const inPublicPage = () => {
     return window.location.href.toLowerCase().includes('/public');
 };
 
-const detectMobilePage = () => {
+const isMobilePage = () => {
     const userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.includes('mobile') && !inPublicPage() && !window.location.href.toLowerCase().includes('/tokens')) {
-        window.location.href = 'https://bulletjournal.us/home/index.html' + window.location.hash;
-    }
+    return userAgent.includes('mobile') && !inPublicPage() && !window.location.href.toLowerCase().includes('/tokens');
 };
 
 function listen() {
@@ -56,34 +54,41 @@ function listen() {
                 window.location.reload();
             }
         }
-        ReactDOM.render(
-            <Provider store={store}>
-                <BrowserRouter>
-                    <Switch>
-                        <Route exact path="/public/privacy" component={PrivacyPage}/>
-                        <Route exact path="/public/tos" component={TermsOfServicePage}/>
-                        <Route exact path="/public/templates" component={TemplatesPage}/>
-                        <Route exact path="/public/items/:itemId" component={PublicPage}/>
-                        <Route exact path="/public/notifications/:id" component={PublicNotificationsPage}/>
-                        <Route exact path="/tokens/:token" component={TokenPage}/>
-                        <Route path="/">
-                            <HashRouter>
-                                <Route path="/" component={App}/>
-                            </HashRouter>
-                        </Route>
-                    </Switch>
-                </BrowserRouter>
-            </Provider>,
-            document.getElementById('root')
-        );
+        if (isMobilePage()) {
+            window.location.href = 'https://bulletjournal.us/home/index.html' + window.location.hash;
+        } else {
+            ReactDOM.render(
+                <Provider store={store}>
+                    <BrowserRouter>
+                        <Switch>
+                            <Route exact path="/public/privacy" component={PrivacyPage}/>
+                            <Route exact path="/public/tos" component={TermsOfServicePage}/>
+                            <Route exact path="/public/templates" component={TemplatesPage}/>
+                            <Route exact path="/public/items/:itemId" component={PublicPage}/>
+                            <Route exact path="/public/notifications/:id" component={PublicNotificationsPage}/>
+                            <Route exact path="/tokens/:token" component={TokenPage}/>
+                            <Route path="/">
+                                <HashRouter>
+                                    <Route path="/" component={App}/>
+                                </HashRouter>
+                            </Route>
+                        </Switch>
+                    </BrowserRouter>
+                </Provider>,
+                document.getElementById('root')
+            );
+        }
     } else {
-        detectMobilePage();
-        ReactDOM.render(
-            <Provider store={store}>
-                <Loading/>
-            </Provider>,
-            document.getElementById('root')
-        );
+        if (isMobilePage()) {
+            window.location.href = 'https://bulletjournal.us/home/index.html' + window.location.hash;
+        } else {
+            ReactDOM.render(
+                <Provider store={store}>
+                    <Loading/>
+                </Provider>,
+                document.getElementById('root')
+            );
+        }
     }
 }
 
