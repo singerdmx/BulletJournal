@@ -204,7 +204,7 @@ public class MessagingService {
                 obj.put(AVATAR_PROPERTY, avator);
                 assigneeInfoList.put(obj);
             }
-            params.addKv(ASSIGNEES_PROPERTY, assigneeInfoList.toString());
+            params.addKv(ASSIGNEES_PROPERTY, assigneeInfoList);
             ret.add(params);
         }
         return ret;
