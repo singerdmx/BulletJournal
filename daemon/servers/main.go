@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
+	"github.com/singerdmx/BulletJournal/daemon/dao"
 	random "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
@@ -105,6 +106,13 @@ func main() {
 
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
+	jobScheduler.AddRecurrentJob(
+		func(...interface{}) {
+			dao.Clean(serviceConfig.MaxRetentionTimeInDays)
+		},
+		time.Now(),
+		time.Second*time.Duration(serviceConfig.IntervalInSeconds),
+	)
 
 	<-shutdown
 	jobScheduler.Stop()
