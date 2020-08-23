@@ -32,7 +32,7 @@ import LedgerSummaries from '../../components/ledger-summary/ledger-summary';
 import { RadioChangeEvent } from 'antd/lib/radio';
 import { Project } from '../../features/project/interface';
 import { User } from '../../features/group/interface';
-import { AccountBookOutlined } from '@ant-design/icons';
+import { CreditCardOutlined } from '@ant-design/icons';
 import AddTransaction from "../../components/modals/add-transaction.component";
 import { ProjectItemUIType } from "../../features/project/constants";
 
@@ -343,7 +343,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     if (transactions.length === 0) {
       return <div className='add-transaction-button'>
         <Result
-          icon={<AccountBookOutlined />}
+          icon={<CreditCardOutlined />}
           extra={<AddTransaction mode='button' />}
         />
       </div>

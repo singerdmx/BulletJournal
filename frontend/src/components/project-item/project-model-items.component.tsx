@@ -1,7 +1,7 @@
 import React from 'react';
 import {Badge, Collapse, Empty, List, Timeline} from 'antd';
 import {
-  AccountBookOutlined,
+  CreditCardOutlined,
   CarryOutOutlined,
   FileTextOutlined,
 } from '@ant-design/icons';
@@ -68,7 +68,7 @@ const getTransactionsPanel = (items: ProjectItems, type: ProjectItemUIType, inde
         </span>
       </Badge>}
       key={`transactions${index}`}
-      extra={<AccountBookOutlined />}
+      extra={<CreditCardOutlined />}
     >
       <List>
         {items.transactions.map((item, index) => {

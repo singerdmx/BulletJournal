@@ -735,8 +735,8 @@ export const icons = [
     icon: <Icons.SketchOutlined />,
   },
   {
-    name: 'AccountBookOutlined',
-    icon: <Icons.AccountBookOutlined />,
+    name: 'CreditCardOutlined',
+    icon: <Icons.CreditCardOutlined />,
   },
   {
     name: 'AimOutlined',

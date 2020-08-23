@@ -2,7 +2,7 @@ import React from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
-import {AccountBookOutlined, DeleteTwoTone, DollarOutlined, MoreOutlined,} from '@ant-design/icons';
+import {CreditCardOutlined, DeleteTwoTone, DollarOutlined, MoreOutlined,} from '@ant-design/icons';
 import {deleteTransaction} from '../../features/transactions/actions';
 import {Label, stringToRGB} from '../../features/label/interface';
 import {Transaction} from '../../features/transactions/interface';
@@ -172,7 +172,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                     >
                         {getAvatar(transaction.owner)}
                     </Tooltip>
-                    {' '}{getItemIcon(transaction, <AccountBookOutlined/>)}&nbsp;
+                    {' '}{getItemIcon(transaction, <CreditCardOutlined/>)}&nbsp;
                     {transaction.name}
                 </h3>
             </Link>

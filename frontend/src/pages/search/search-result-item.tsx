@@ -2,7 +2,7 @@ import React from "react";
 import {SearchResultItem} from "../../features/search/interface";
 import {Card} from "antd";
 import {ContentType} from "../../features/myBuJo/constants";
-import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
+import {CreditCardOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
 import {useHistory} from "react-router-dom";
 import './search.styles.less';
 
@@ -15,7 +15,7 @@ type SearchResultItemProps = {
 
 export const contentTypeIconMapper: { [key in ContentType]: React.ReactNode } = {
     [ContentType.TASK]: <CarryOutOutlined/>,
-    [ContentType.TRANSACTION]: <AccountBookOutlined/>,
+    [ContentType.TRANSACTION]: <CreditCardOutlined/>,
     [ContentType.NOTE]: <FileTextOutlined/>,
     [ContentType.PROJECT]: <FileTextOutlined/>,
     [ContentType.GROUP]: <FileTextOutlined/>,

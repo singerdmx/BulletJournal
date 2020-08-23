@@ -31,7 +31,7 @@ import {
   Tooltip,
 } from 'antd';
 import {
-  AccountBookOutlined,
+  CreditCardOutlined,
   DeleteTwoTone,
   DollarCircleOutlined,
   SyncOutlined,
@@ -211,7 +211,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             value={`${transaction.date} ${
               transaction.time ? transaction.time : ''
               }`}
-            prefix={<AccountBookOutlined />}
+            prefix={<CreditCardOutlined />}
           />
         </Card>
       </Col>

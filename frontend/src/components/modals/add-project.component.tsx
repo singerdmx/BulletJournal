@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Avatar, Button, Form, Input, Modal, Select, Tooltip} from 'antd';
 import {
-  AccountBookOutlined,
+  CreditCardOutlined,
   CarryOutOutlined,
   FileTextOutlined,
   FolderAddOutlined,
@@ -132,7 +132,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
                   &nbsp;NOTE
                 </Option>
                 <Option value="LEDGER" title="Project Type: LEDGER">
-                  <AccountBookOutlined />
+                  <CreditCardOutlined />
                   &nbsp;LEDGER
                 </Option>
               </Select>
