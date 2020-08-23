@@ -42,7 +42,8 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
       timezone,
       tasksByOrder,
       getTasksByAssignee,
-      setTaskStatus
+      setTaskStatus,
+      getProject
     }) => {
   const {projectId} = useParams();
   const history = useHistory();
