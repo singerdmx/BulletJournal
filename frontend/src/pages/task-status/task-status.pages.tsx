@@ -16,35 +16,37 @@ import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {Project} from "../../features/project/interface";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
+import {getProject} from "../../features/project/actions";
 
-
-const { Panel } = Collapse;
+const {Panel} = Collapse;
 
 type TaskStatusProps = {
   timezone: string;
   project: Project | undefined;
   tasksByOrder: Task[];
   getTasksByOrder: (
-    projectId: number,
-    timezone: string,
-    startDate?: string,
-    endDate?: string
+      projectId: number,
+      timezone: string,
+      startDate?: string,
+      endDate?: string
   ) => void;
   getTasksByAssignee: (projectId: number, assignee: string) => void;
   setTaskStatus: (taskId: number, taskStatus: TaskStatus, type: ProjectItemUIType) => void;
+  getProject: (projectId: number) => void;
 };
 
-const TaskStatusPage: React.FC<TaskStatusProps> = ({
-  getTasksByOrder,
-  project,
-  timezone,
-  tasksByOrder,
-  getTasksByAssignee,
-  setTaskStatus
-}) => {
-  const { projectId } = useParams();
+const TaskStatusPage: React.FC<TaskStatusProps> = (
+    {
+      getTasksByOrder,
+      project,
+      timezone,
+      tasksByOrder,
+      getTasksByAssignee,
+      setTaskStatus
+    }) => {
+  const {projectId} = useParams();
   const history = useHistory();
-  const [completeTasksShown, setCompleteTasksShown] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const [tasksByUsersShown, setTasksByUsersShown] = useState(false);
   const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
   const [assignee, setAssignee] = useState<User | undefined>(undefined);
@@ -57,8 +59,18 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
   };
 
   useEffect(() => {
-    getTasksByStatus();
-  }, [projectId]);
+    if (!projectId) {
+      return;
+    }
+    if (!project) {
+      getProject(parseInt(projectId));
+      return;
+    }
+    if (project && !initialized) {
+      setInitialized(true);
+      getTasksByStatus();
+    }
+  }, [project]);
 
   useEffect(() => {
     if (project) {
@@ -100,7 +112,7 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
     setTasksByUsersShown(true);
     setAssignee(u);
     // update tasks
-   getTasksByAssignee(parseInt(projectId), u.name);
+    getTasksByAssignee(parseInt(projectId), u.name);
   };
 
   const handleGetTasksByOrder = () => {
@@ -132,41 +144,41 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
     }
 
     return (
-      <Panel header={header} key={key}>
-        <Droppable droppableId={`${key}`}>
+        <Panel header={header} key={key}>
+          <Droppable droppableId={`${key}`}>
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
-                {tasks.map((task, index) => {
-                  return (
-                    <Draggable draggableId={`${task.id}`} index={index}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          key={task.id}
-                        >
-                          <TaskItem
-                            task={task}
-                            type={ProjectItemUIType.ORDER}
-                            readOnly={false}
-                            inProject={true}
-                            inModal={false}
-                            isComplete={false}
-                            showModal={handleGetTasksByAssignee}
-                            showOrderModal={handleGetTasksByOrder}
-                            completeOnlyOccurrence={false}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                })}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </Panel>
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {tasks.map((task, index) => {
+                    return (
+                        <Draggable draggableId={`${task.id}`} index={index}>
+                          {(provided) => (
+                              <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  key={task.id}
+                              >
+                                <TaskItem
+                                    task={task}
+                                    type={ProjectItemUIType.ORDER}
+                                    readOnly={false}
+                                    inProject={true}
+                                    inModal={false}
+                                    isComplete={false}
+                                    showModal={handleGetTasksByAssignee}
+                                    showOrderModal={handleGetTasksByOrder}
+                                    completeOnlyOccurrence={false}
+                                />
+                              </div>
+                          )}
+                        </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
+                </div>
+            )}
+          </Droppable>
+        </Panel>
     );
   };
 
@@ -183,72 +195,74 @@ const TaskStatusPage: React.FC<TaskStatusProps> = ({
   }
 
   return (
-    <div className="task-status-page">
-      <BackTop />
-      <div>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Collapse
-            bordered={false}
-            defaultActiveKey={[
-              'IN_PROGRESS',
-              'NEXT_TO_DO',
-              'READY',
-              'ON_HOLD',
-              'DEFAULT',
-            ]}
-            expandIcon={({ isActive }) => (
-              <CaretRightOutlined rotate={isActive ? 90 : 0} />
-            )}
-          >
-            {getPanel(TaskStatus.IN_PROGRESS, inProgressTasks)}
-            {getPanel(TaskStatus.NEXT_TO_DO, nextToDoTasks)}
-            {getPanel(TaskStatus.READY, readyTasks)}
-            {getPanel(TaskStatus.ON_HOLD, onHoldTasks)}
-            {getPanel(undefined, tasks)}
-          </Collapse>
-        </DragDropContext>
+      <div className="task-status-page">
+        <BackTop/>
+        <div>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Collapse
+                bordered={false}
+                defaultActiveKey={[
+                  'IN_PROGRESS',
+                  'NEXT_TO_DO',
+                  'READY',
+                  'ON_HOLD',
+                  'DEFAULT',
+                ]}
+                expandIcon={({isActive}) => (
+                    <CaretRightOutlined rotate={isActive ? 90 : 0}/>
+                )}
+            >
+              {getPanel(TaskStatus.IN_PROGRESS, inProgressTasks)}
+              {getPanel(TaskStatus.NEXT_TO_DO, nextToDoTasks)}
+              {getPanel(TaskStatus.READY, readyTasks)}
+              {getPanel(TaskStatus.ON_HOLD, onHoldTasks)}
+              {getPanel(undefined, tasks)}
+            </Collapse>
+          </DragDropContext>
+        </div>
+        <div>
+          <TasksByAssignee
+              assignee={assignee}
+              visible={tasksByUsersShown}
+              onCancel={() => setTasksByUsersShown(false)}
+              hideCompletedTask={() => {
+              }}
+          />
+        </div>
+        <div>
+          <TasksByOrder
+              visible={tasksByOrderShown}
+              onCancel={() => setTasksByOrderShown(false)}
+              hideCompletedTask={() => {
+              }}
+          />
+        </div>
+        <div>
+          <Container>
+            <FloatButton
+                onClick={() => history.push(`/projects/${projectId}`)}
+                tooltip="Go to BuJo"
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            >
+              <UpSquareOutlined/>
+            </FloatButton>
+            <FloatButton
+                onClick={getTasksByStatus}
+                tooltip="Refresh"
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            >
+              <SyncOutlined/>
+            </FloatButton>
+            <FloatButton
+                tooltip="Tasks Ordered by Due Date Time"
+                onClick={handleGetTasksByOrder}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            >
+              <FieldTimeOutlined/>
+            </FloatButton>
+          </Container>
+        </div>
       </div>
-      <div>
-        <TasksByAssignee
-            assignee={assignee}
-            visible={tasksByUsersShown}
-            onCancel={() => setTasksByUsersShown(false)}
-            hideCompletedTask={() => setCompleteTasksShown(false)}
-        />
-      </div>
-      <div>
-        <TasksByOrder
-            visible={tasksByOrderShown}
-            onCancel={() => setTasksByOrderShown(false)}
-            hideCompletedTask={() => setCompleteTasksShown(false)}
-        />
-      </div>
-      <div>
-        <Container>
-          <FloatButton
-              onClick={() => history.push(`/projects/${projectId}`)}
-              tooltip="Go to BuJo"
-              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-          >
-            <UpSquareOutlined/>
-          </FloatButton>
-          <FloatButton
-              onClick={getTasksByStatus}
-              tooltip="Refresh"
-              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-          >
-            <SyncOutlined />
-          </FloatButton>
-          <FloatButton
-              tooltip="Tasks Ordered by Due Date Time"
-              onClick={handleGetTasksByOrder}
-              styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
-          >
-            <FieldTimeOutlined />
-          </FloatButton>
-        </Container>
-      </div>
-    </div>
   );
 };
 
@@ -261,5 +275,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   getTasksByOrder,
   getTasksByAssignee,
-  setTaskStatus
+  setTaskStatus,
+  getProject
 })(TaskStatusPage);
