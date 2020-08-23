@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/dao"
@@ -21,7 +20,12 @@ import (
 )
 
 const (
-	requestIDKey string = "requestID"
+	requestIDKey = "requestID"
+)
+
+var (
+	serviceConfig *config.Config
+	subscriptions map[string]services.Daemon_SubscribeNotificationServer
 )
 
 // server should implement services.UnimplementedDaemonServer's methods
@@ -42,21 +46,48 @@ func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*typ
 
 func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
 	log.Printf("Received rpc request for subscribtion: %s", subscribe.String())
-	n := 0
-	for n < 5 {
-		time.Sleep(5 * time.Second)
-		if err := stream.Send(&types.StreamMessage{Message: fmt.Sprintf("Hello rpc %s", subscribe.String())}); err != nil {
-			return err
+	if _, ok := subscriptions[subscribe.Id]; !ok {
+		//Add subscription
+		subscriptions[subscribe.Id] = stream
+		go func() {
+			//To do
+			//Add business logic here=
+
+			//n := 0
+			//for n < 10 {
+			//	time.Sleep(3 * time.Second)
+			//	if err := stream.Send(&types.StreamMessage{Message: fmt.Sprintf("Hello rpc %s", subscribe.String())}); err != nil {
+			//		log.Printf("Unexpected error happened to subscribtion: %s, error: %v", subscribe.String(), err)
+			//	} else {
+			//		log.Printf("Sent data to subscribtion: %s", subscribe.String())
+			//	}
+			//	n += 1
+			//}
+			//delete(subscriptions, subscribe.Id)
+		}()
+		//Keep the subscription session alive
+		for {
+			if _, ok := subscriptions[subscribe.Id]; ok {
+				time.Sleep(3 * time.Second)
+			} else {
+				log.Printf("Subscription expires: %s", subscribe.String())
+				break
+			}
 		}
-		n += 1
+	} else {
+		//Skip subscription
+		log.Printf("Subscription already exists!")
 	}
 	return nil
 }
 
-func main() {
-
+func init() {
 	config.InitConfig()
-	serviceConfig := config.GetConfig()
+	serviceConfig = config.GetConfig()
+	subscriptions = map[string]services.Daemon_SubscribeNotificationServer{}
+}
+
+func main() {
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, requestIDKey, random.GenerateUID())

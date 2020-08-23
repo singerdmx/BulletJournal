@@ -39,15 +39,19 @@ func main() {
 	//	log.Fatalf("Could not send JoinGroupEvents: %v", err)
 	//}
 	//log.Printf("Sent JoinGroupEvents with a response: %s", r.Message)
-	for {
-		message, err := stream.Recv()
-		if err == io.EOF {
-			break
+	go func() {
+		for {
+			message, err := stream.Recv()
+			if err == io.EOF {
+				log.Printf("Subscription: %s expires", id)
+				break
+			}
+			if err != nil {
+				log.Fatalf("%v.JoinGroupEvents(_) = _, %v", client, err)
+			}
+			log.Println(message.Message)
 		}
-		if err != nil {
-			log.Fatalf("%v.JoinGroupEvents(_) = _, %v", client, err)
-		}
-		log.Println(message.Message)
-	}
-	log.Printf("Received all JoinGroupEvents responses")
+		log.Printf("Received all JoinGroupEvents responses")
+	}()
+	time.Sleep(40 * time.Second)
 }
