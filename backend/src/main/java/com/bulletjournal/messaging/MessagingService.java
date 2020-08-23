@@ -181,6 +181,9 @@ public class MessagingService {
         String ownerName = task.getOwner();
         String ownerAvatar = getAvatar(ownerName);
         for (String receiver : assignees) {
+            if (!nameEmailMap.containsKey(receiver)) {
+                continue;
+            }
             MailjetEmailParams params =
                 new MailjetEmailParams(
                     Arrays.asList(new ImmutablePair<>(receiver, nameEmailMap.get(receiver))),
