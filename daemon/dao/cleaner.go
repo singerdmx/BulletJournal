@@ -10,7 +10,6 @@ import (
 
 const (
 	// Configuration value
-	maxRetentionTimeInDays  = 60
 	intervalInSeconds       = 20000
 	historyMaxRetentionDays = 365
 )
@@ -137,7 +136,7 @@ func PopulateConfiguration() *postgresql.ConnectionURL {
 	return &settings
 }
 
-func Clean() {
+func Clean(maxRetentionTimeInDays int) {
 	t := time.Now()
 	t.AddDate(0, 0, -maxRetentionTimeInDays)
 	log.Println(t)

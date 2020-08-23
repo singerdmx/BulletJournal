@@ -58,7 +58,7 @@ func main() {
 	serviceConfig := config.GetConfig()
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, requestIDKey, random.RandomString())
+	ctx = context.WithValue(ctx, requestIDKey, random.GenerateUID())
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
