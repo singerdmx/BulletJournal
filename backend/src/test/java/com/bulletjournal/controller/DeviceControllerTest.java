@@ -2,17 +2,18 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.AddDeviceTokenParams;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
+import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.DeviceTokenRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.mailjet.client.MailjetRequest;
-import com.mailjet.client.resource.Emailv31;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.*;
@@ -179,22 +180,38 @@ public class DeviceControllerTest {
     @Test
     @Ignore
     public void sendEmail() throws Exception {
-        MailjetRequest request = new MailjetRequest(Emailv31.resource)
-            .property(Emailv31.MESSAGES, new JSONArray()
-                .put(new JSONObject()
-                    .put(Emailv31.Message.FROM, new JSONObject()
-                        .put("Email", "bulletjournal1024@outlook.com")
-                        .put("Name", "bj"))
-                    .put(Emailv31.Message.TO, new JSONArray()
-                        .put(new JSONObject()
-                            .put("Email", "example@gmail.com")
-                            .put("Name", "hahazheng")))
-                    .put(Emailv31.Message.TEMPLATEID, 1625167)
-                    .put(Emailv31.Message.TEMPLATELANGUAGE, true)
-                    .put(Emailv31.Message.SUBJECT, "Your email flight plan!")
-                    .put(Emailv31.Message.VARIABLES, new JSONObject()
-                        .put("taskName", "testname1")
-                        .put("timeStamp", "timestamp1"))));
-        mailjetEmailClient.sendEmail(request);
+        JSONArray assigneeInfoList = new JSONArray();
+        JSONObject info1 = new JSONObject();
+        info1.put(MessagingService.ALIAS_PROPERTY, "will");
+        info1.put(MessagingService.AVATAR_PROPERTY, "avatar_url_1");
+        assigneeInfoList.put(info1);
+        JSONObject info2 = new JSONObject();
+        info2.put(MessagingService.ALIAS_PROPERTY, "will2");
+        info2.put(MessagingService.AVATAR_PROPERTY, "avatar_url_2");
+        assigneeInfoList.put(info2);
+        JSONObject info3 = new JSONObject();
+        info3.put(MessagingService.ALIAS_PROPERTY, "will3");
+        info3.put(MessagingService.AVATAR_PROPERTY, "avatar_url_3");
+        assigneeInfoList.put(info3);
+        JSONObject info4 = new JSONObject();
+        info4.put(MessagingService.ALIAS_PROPERTY, "will4");
+        info4.put(MessagingService.AVATAR_PROPERTY, "avatar_url_4");
+        assigneeInfoList.put(info4);
+        MailjetEmailParams params = new MailjetEmailParams(
+            Arrays.asList(new ImmutablePair<>("will", "xguo.tufts@gmail.com")),
+            "TestSubject",
+            null,
+            MailjetEmailClient.Template.TASK_DUE_NOTIFICATION,
+            MessagingService.TASK_NAME_PROPERTY,
+            "exampleTaskName",
+            MessagingService.TIMESTAMP_PROPERTY,
+            "Sat Aug 22 01:37:07 PDT 2020",
+            MessagingService.TASK_URL_PROPERTY,
+            MessagingService.BASE_TASK_URL + 5903
+        );
+        LOGGER.info("assigneeInfoList: {}", assigneeInfoList.toString());
+        params.addKv(MessagingService.ASSIGNEES_PROPERTY, assigneeInfoList);
+
+        mailjetEmailClient.sendAllEmailAsync(Arrays.asList(params));
     }
 }

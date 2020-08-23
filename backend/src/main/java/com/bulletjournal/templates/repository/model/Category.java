@@ -13,13 +13,22 @@ public class Category extends AuditModel {
     @Id
     @GeneratedValue(generator = "category_generator")
     @SequenceGenerator(name = "category_generator", sequenceName = "template.category_sequence", initialValue = 100, allocationSize = 2)
-    Long id;
+    private Long id;
 
     @Column(nullable = false)
-    String name;
+    private String name;
 
     @Column
-    String description;
+    private String description;
+
+    @Column(name = "icon", length = 30)
+    private String icon;
+
+    @Column(name = "color", length = 30)
+    private String color;
+
+    @Column(name = "forum_id")
+    private Long forumId;
 
     public Category() {
 
@@ -28,6 +37,30 @@ public class Category extends AuditModel {
     public Category(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public long getForumId() {
+        return forumId;
+    }
+
+    public void setForumId(long forumId) {
+        this.forumId = forumId;
     }
 
     public Long getId() {
@@ -61,15 +94,18 @@ public class Category extends AuditModel {
         Category category = (Category) o;
         return getId().equals(category.getId()) &&
             getName().equals(category.getName()) &&
+            getIcon().equals(category.getIcon()) &&
+            getColor().equals(category.getColor()) &&
+            getForumId() == category.getForumId() &&
             getDescription().equals(category.getDescription());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getDescription());
+        return Objects.hash(getId(), getName(), getIcon(), getColor(), getForumId(), getDescription());
     }
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Category(id, name, description, new ArrayList<>());
+        return new com.bulletjournal.templates.controller.model.Category(id, name, description, icon, color, forumId, new ArrayList<>());
     }
 }

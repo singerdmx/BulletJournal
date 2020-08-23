@@ -225,6 +225,17 @@ export type PatchRevisionContents = {
   etag: string;
 }
 
+export type GetTaskStatisticsAction = {
+  projectIds: number[];
+  timezone: string;
+  startDate: string;
+  endDate: string;
+}
+
+export type TaskStatisticsAction = {
+  projectStatistics: TaskStatistics;
+}
+
 let initialState = {
   addTaskVisible: false,
   contents: [] as Array<Content>,
@@ -375,6 +386,11 @@ const slice = createSlice({
     TaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     TaskStatusSet: (state, action: PayloadAction<SetTaskStatus>) => state,
     TaskPatchRevisionContents: (state, action: PayloadAction<PatchRevisionContents>) => state,
+    GetTaskStatistics: (state, action: PayloadAction<GetTaskStatisticsAction>) => state,
+    TaskStatisticsReceived: (state, action: PayloadAction<TaskStatisticsAction>) => {
+      const { projectStatistics } = action.payload;
+      state.projectStatistics = projectStatistics;
+    },
   },
 });
 

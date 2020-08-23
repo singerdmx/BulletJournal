@@ -208,3 +208,17 @@ export const patchTaskRevisionContents = (
     taskId: taskId, contentId: contentId, revisionContents: revisionContents, etag: etag});
 
 export const taskReceived = (task: Task | undefined) => actions.taskReceived({task: task});
+
+export const getTaskStatistics = (
+    projectIds: number[],
+    timezone: string,
+    startDate: string,
+    endDate: string
+) => actions.GetTaskStatistics({
+    projectIds: projectIds,
+    timezone: timezone,
+    startDate: startDate,
+    endDate: endDate
+});
+
+

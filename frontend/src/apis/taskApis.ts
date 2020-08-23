@@ -371,7 +371,7 @@ export const getTaskStatistics = (
   }
 
   return doFetch(
-      '/api/projectItems?' +
+      '/api/taskStatistics?' +
       projectIds.map(p => `projectIds=${p}`).join('&') +
       '&timezone=' +
       encodeURIComponent(timezone) +

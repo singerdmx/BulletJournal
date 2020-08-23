@@ -149,8 +149,9 @@ public class MailjetEmailClient {
         }
         if (params.getTemplate() != null) {
             properties.put(Emailv31.Message.TEMPLATEID, params.getTemplate().getValue());
+            properties.put(Emailv31.Message.TEMPLATELANGUAGE, true);
             JSONObject variables = new JSONObject();
-            for (Pair<String, String> pair : params.getKv()) {
+            for (Pair<String, Object> pair : params.getKv()) {
                 variables.put(pair.getKey(), pair.getValue());
             }
             properties.put(Emailv31.Message.VARIABLES, variables);
