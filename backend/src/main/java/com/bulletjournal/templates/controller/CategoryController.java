@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.hierarchy.CategoryRelationsProcessor;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -8,6 +9,7 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.Category;
 import com.bulletjournal.templates.controller.model.CreateCategoryParams;
+import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
@@ -89,6 +91,24 @@ public class CategoryController {
         validateRequester();
         categoryDaoJpa.deleteById(categoryId);
         return getCategories();
+    }
+
+    @PutMapping(CATEGORY_ROUTE)
+    public void updateCategory(@NotNull @PathVariable Long categoryId,
+                               @Valid @RequestBody UpdateCategoryParams updateCategoryParams) {
+        if (!categoryDaoJpa.checkIfExit(categoryId)) {
+            throw new BadRequestException("CategoryId does not exit");
+        }
+        com.bulletjournal.templates.repository.model.Category category =
+                new com.bulletjournal.templates.repository.model.Category();
+        category.setId(categoryId);
+        category.setName(updateCategoryParams.getName());
+        category.setIcon(updateCategoryParams.getIcon());
+        category.setColor(updateCategoryParams.getColor());
+        category.setForumId(updateCategoryParams.getForumId());
+        category.setDescription(updateCategoryParams.getDescription());
+
+        categoryDaoJpa.save(category);
     }
 
     private void validateRequester() {
