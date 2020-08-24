@@ -1,19 +1,16 @@
 package com.bulletjournal.templates.workflow.models;
 
-import com.bulletjournal.templates.workflow.engine.RuleEngine;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * SelectionCombo is multiple Selections combined that can cross choices
  */
-public class SelectionCombo implements Selectable {
+public class SelectionCombo {
     private Set<Selection> selections;
 
-    public SelectionCombo(Set<Selection> selections) {
-        this.selections = selections;
+    public SelectionCombo() {
+        this.selections = new HashSet<>();
     }
 
     public Set<Selection> getSelections() {
@@ -24,10 +21,12 @@ public class SelectionCombo implements Selectable {
         this.selections = selections;
     }
 
-    @Override
-    public List<Step> getNextSteps() {
-        // Set<Selection> => List<Step>
-        return RuleEngine.applyRule(new ArrayList<>(this.selections));
+    public void add(Selection selection) {
+        this.selections.add(selection);
+    }
+
+    public void remove(Selection selection) {
+        this.selections.remove(selection);
     }
 
 }
