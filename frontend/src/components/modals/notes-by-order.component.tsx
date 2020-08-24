@@ -41,6 +41,7 @@ const NotesByOrder: React.FC<NotesByOrderProps> = (props) => {
     setDateArray([dateStrings[0], dateStrings[1]]);
   };
   const handleUpdate = () => {
+    setChecked([] as number[]);
     getNotesByOrder(projectId, timezone, dateArray[0], dateArray[1]);
   };
 
