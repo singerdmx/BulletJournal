@@ -55,11 +55,11 @@ public class Category extends AuditModel {
         this.color = color;
     }
 
-    public Long getForumId() {
+    public long getForumId() {
         return forumId;
     }
 
-    public void setForumId(Long forumId) {
+    public void setForumId(long forumId) {
         this.forumId = forumId;
     }
 

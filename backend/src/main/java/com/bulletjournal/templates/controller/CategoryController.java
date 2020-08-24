@@ -1,7 +1,6 @@
 package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.hierarchy.CategoryRelationsProcessor;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -80,21 +79,6 @@ public class CategoryController {
     @PutMapping(CATEGORIES_ROUTE)
     public List<Category> updateRelations(@NotNull @Valid @RequestBody List<Category> categoryList) {
         validateRequester();
-        List<com.bulletjournal.templates.repository.model.Category> categories = new ArrayList<>();
-        categoryList.forEach(category -> {
-            if (!categoryDaoJpa.checkIfExist(category.getId())) {
-                throw new BadRequestException("Category does not exist");
-            }
-            com.bulletjournal.templates.repository.model.Category categoryFromRepo = new com.bulletjournal.templates.repository.model.Category();
-            categoryFromRepo.setId(category.getId());
-            categoryFromRepo.setName(category.getName());
-            categoryFromRepo.setIcon(category.getIcon());
-            categoryFromRepo.setColor(category.getColor());
-            categoryFromRepo.setDescription(category.getDescription());
-            categoryFromRepo.setForumId(category.getForumId());
-            categories.add(categoryFromRepo);
-        });
-        categoryDaoJpa.updateAll(categories);
         String newHierarchy = CategoryRelationsProcessor.processRelations(categoryList);
         hierarchyDaoJpa.updateHierarchy(newHierarchy);
         return getCategories();

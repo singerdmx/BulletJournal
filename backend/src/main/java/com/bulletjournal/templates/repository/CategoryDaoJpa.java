@@ -63,14 +63,4 @@ public class CategoryDaoJpa {
         }
         categoryRepository.deleteById(id);
     }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateAll(List<Category> categories) {
-        categoryRepository.saveAll(categories);
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public boolean checkIfExist(Long id) {
-        return categoryRepository.findById(id).isPresent();
-    }
 }
