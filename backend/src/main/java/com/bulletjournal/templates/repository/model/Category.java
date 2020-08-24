@@ -39,6 +39,14 @@ public class Category extends AuditModel {
         this.description = description;
     }
 
+    public Category(String name, String description, String icon, String color, Long forumId) {
+        this.name = name;
+        this.description = description;
+        this.icon = icon;
+        this.color = color;
+        this.forumId = forumId;
+    }
+
     public String getIcon() {
         return icon;
     }

@@ -45,6 +45,8 @@ public class CategoryControllerTest {
     private static final String[] CATEGORY_NAMES = new String[]{"c0", "c1", "c2", "c3", "c4", "c5"};
     private static final String CATEGORY_DESCRIPTION = "fakeDescription";
     private static final String ROOT_URL = "http://localhost:";
+    private static final String[] ICONS = new String[]{"SearchOutlined", "FireOutlined", "DingtalkOutlined"};
+    private static final String[] COLORS = new String[]{"#ffb3cc", "#b3b3ff", "#b3f0ff"};
 
     private static final Gson GSON = new Gson();
 
@@ -284,7 +286,7 @@ public class CategoryControllerTest {
     private void addCategories() {
         int i = 0;
         for (String name : CATEGORY_NAMES) {
-            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION);
+            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION, ICONS[0], COLORS[0], null);
             categories.add(category);
             categoriesIds[i] = category.getId();
             i++;

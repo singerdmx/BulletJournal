@@ -74,7 +74,7 @@ public class CategoryController {
     @PostMapping(CATEGORIES_ROUTE)
     public Category createCategory(@Valid @RequestBody CreateCategoryParams params) {
         validateRequester();
-        return this.categoryDaoJpa.create(params.getName(), params.getDescription()).toPresentationModel();
+        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId()).toPresentationModel();
     }
 
     @PutMapping(CATEGORIES_ROUTE)
@@ -103,6 +103,11 @@ public class CategoryController {
         category.setForumId(updateCategoryParams.getForumId());
         category.setDescription(updateCategoryParams.getDescription());
         categoryDaoJpa.save(category);
+    }
+
+    @GetMapping(CATEGORY_ROUTE)
+    public Category getCategoryById(@NotNull @PathVariable Long categoryId) {
+        return categoryDaoJpa.getById(categoryId).toPresentationModel();
     }
 
     private void validateRequester() {

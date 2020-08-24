@@ -25,11 +25,11 @@ public class CategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Category create(String name, String description) {
+    public Category create(String name, String description, String icon, String color, Long forumId) {
         if (categoryRepository.getByName(name) != null) {
             throw new ResourceAlreadyExistException("Category with name " + name + " already exists.");
         }
-        Category category = new Category(name, description);
+        Category category = new Category(name, description, icon, color, forumId);
         return categoryRepository.save(category);
     }
 
