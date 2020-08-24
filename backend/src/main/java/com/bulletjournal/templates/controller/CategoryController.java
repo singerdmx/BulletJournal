@@ -1,7 +1,6 @@
 package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.hierarchy.CategoryRelationsProcessor;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -96,18 +95,13 @@ public class CategoryController {
     @PutMapping(CATEGORY_ROUTE)
     public void updateCategory(@NotNull @PathVariable Long categoryId,
                                @Valid @RequestBody UpdateCategoryParams updateCategoryParams) {
-        if (!categoryDaoJpa.checkIfExit(categoryId)) {
-            throw new BadRequestException("CategoryId does not exit");
-        }
-        com.bulletjournal.templates.repository.model.Category category =
-                new com.bulletjournal.templates.repository.model.Category();
-        category.setId(categoryId);
+        validateRequester();
+        com.bulletjournal.templates.repository.model.Category category = categoryDaoJpa.getById(categoryId);
         category.setName(updateCategoryParams.getName());
         category.setIcon(updateCategoryParams.getIcon());
         category.setColor(updateCategoryParams.getColor());
         category.setForumId(updateCategoryParams.getForumId());
         category.setDescription(updateCategoryParams.getDescription());
-
         categoryDaoJpa.save(category);
     }
 

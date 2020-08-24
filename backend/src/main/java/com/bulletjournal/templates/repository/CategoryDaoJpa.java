@@ -65,11 +65,6 @@ public class CategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public boolean checkIfExit(Long categoryId) {
-        return categoryRepository.findById(categoryId).isPresent();
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void save(Category category) {
         categoryRepository.save(category);
     }
