@@ -5,7 +5,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {deleteCategory, getCategories, updateCategoryRelations} from "../../features/templates/actions";
 import {Category} from "../../features/templates/interface";
-import AddCategory from "../../components/modals/templates/add-categery.component";
+import AddCategory from "../../components/modals/templates/add-category.component";
 
 type AdminCategoriesProps = {
     categories: Category[];

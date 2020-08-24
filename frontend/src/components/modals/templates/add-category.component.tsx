@@ -8,6 +8,7 @@ import {useHistory} from "react-router-dom";
 import {addCategory} from "../../../features/templates/actions";
 import {icons} from "../../../assets/icons";
 import {QuestionCircleOutlined} from "@ant-design/icons/lib";
+import ColorPicker from '../../../utils/color-picker/ColorPickr';
 import './add-category.component.styles.less';
 
 type AddCategoryProps = {
@@ -18,11 +19,12 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
     const {addCategory} = props;
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
+    const [color, setColor] = useState('#7fbba0');
     const history = useHistory();
     const {projectId} = useParams();
     //label form state
     const [formCreateLabelIcon, setFormCreateLabelIcon] = useState(
-        <QuestionCircleOutlined />
+        <QuestionCircleOutlined/>
     );
     const [formCreateLabelIconString, setCreateFormLabelIconString] = useState(
         'QuestionCircleOutlined'
@@ -57,6 +59,11 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
         setVisible(false);
     };
 
+    const changeColorHandler = (input: any) => {
+        console.log(input);
+        setColor(input.color);
+    }
+
     const onCancel = () => {
         setVisible(false);
         form.resetFields();
@@ -67,6 +74,7 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
     const getModal = () => {
         return (
             <Modal
+                key='add-category'
                 title='Create New Category'
                 centered
                 visible={visible}
@@ -103,6 +111,12 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
                     >
                         <Input placeholder='Enter Description' allowClear/>
                     </Form.Item>
+                    <ColorPicker
+                        label='Color  '
+                        color={color}
+                        onChange={changeColorHandler}
+                        mode='RGB'
+                    />
                 </Form>
             </Modal>
         );
