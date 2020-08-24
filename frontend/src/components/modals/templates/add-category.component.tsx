@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Col, Form, Input, Modal, Popover, Row} from 'antd';
+import {Col, Form, Input, InputNumber, Modal, Popover, Row} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router';
@@ -12,7 +12,7 @@ import ColorPicker from '../../../utils/color-picker/ColorPickr';
 import './add-category.component.styles.less';
 
 type AddCategoryProps = {
-    addCategory: (name: string, description: string) => void;
+    addCategory: (name: string, description?: string, icon?: string, color?: string, forumId?: number) => void;
 };
 
 const AddCategory: React.FC<AddCategoryProps> = (props) => {
@@ -32,20 +32,20 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
 
     const IconsSelector = (mode: any) => {
         return (
-            <div className='label-icon-selector'>
+            <div className='label-icon-selector' key='add-category-icon-selector'>
                 <Row>
                     {icons.map((icon: any) => {
                         return (
                             <Col span={2} key={icon.name}>
-                <span
-                    title={icon.name}
-                    onClick={() => {
-                        setFormCreateLabelIcon(icon.icon);
-                        setCreateFormLabelIconString(icon.name);
-                    }}
-                >
-                  {icon.icon}
-                </span>
+                                <span
+                                    title={icon.name}
+                                    onClick={() => {
+                                        setFormCreateLabelIcon(icon.icon);
+                                        setCreateFormLabelIconString(icon.name);
+                                    }}
+                                >
+                                  {icon.icon}
+                                </span>
                             </Col>
                         );
                     })}
@@ -55,7 +55,7 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
     };
 
     const createCategory = (values: any) => {
-        addCategory(values.name, values.description);
+        addCategory(values.name, values.description, formCreateLabelIconString, color, values.forumId);
         setVisible(false);
     };
 
@@ -110,6 +110,11 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
                         name='description'
                     >
                         <Input placeholder='Enter Description' allowClear/>
+                    </Form.Item>
+                    <Form.Item
+                        name='forumId'
+                    >
+                        <InputNumber placeholder='Enter Forum ID'/>
                     </Form.Item>
                     <ColorPicker
                         label='Color  '

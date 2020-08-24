@@ -93,7 +93,7 @@ public class CategoryController {
     }
 
     @PutMapping(CATEGORY_ROUTE)
-    public void updateCategory(@NotNull @PathVariable Long categoryId,
+    public List<Category> updateCategory(@NotNull @PathVariable Long categoryId,
                                @Valid @RequestBody UpdateCategoryParams updateCategoryParams) {
         validateRequester();
         com.bulletjournal.templates.repository.model.Category category = categoryDaoJpa.getById(categoryId);
@@ -103,6 +103,7 @@ public class CategoryController {
         category.setForumId(updateCategoryParams.getForumId());
         category.setDescription(updateCategoryParams.getDescription());
         categoryDaoJpa.save(category);
+        return getCategories();
     }
 
     @GetMapping(CATEGORY_ROUTE)

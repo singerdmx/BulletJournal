@@ -310,7 +310,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                   (transaction.transactionType === 0 ? 'Income' : 'Expense') +
                   ` ${currencyType ? `(${currencyType})` : ''}`
                 }
-                value={transaction.amount + transaction.transactionType}
+                value={transaction.amount}
                 prefix={<DollarCircleOutlined />}
               />
             </Card>

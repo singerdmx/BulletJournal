@@ -9,7 +9,19 @@ export type CategoriesAction = {
 
 export type AddCategoryAction = {
     name: string;
-    description: string;
+    description?: string;
+    icon?: string;
+    color?: string;
+    forumId?: number;
+};
+
+export type UpdateCategoryAction = {
+    categoryId: number;
+    name: string;
+    description?: string;
+    icon?: string;
+    color?: string;
+    forumId?: number;
 };
 
 export type DeleteCategoryAction = {
@@ -34,6 +46,7 @@ const slice = createSlice({
         },
         getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state,
         addCategory: (state, action: PayloadAction<AddCategoryAction>) => state,
+        updateCategory: (state, action: PayloadAction<UpdateCategoryAction>) => state,
         deleteCategory: (state, action: PayloadAction<DeleteCategoryAction>) => state,
         updateCategoryRelations: (state, action: PayloadAction<UpdateCategoryRelationsAction>) => state
     },

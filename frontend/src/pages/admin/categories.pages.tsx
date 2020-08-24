@@ -32,7 +32,7 @@ const AdminCategoriesPage: React.FC<AdminCategoriesProps> = (
             <AddCategory/>
 
             {categories.map(c => {
-                return <div>{c.name}</div>
+                return <div key={c.id}>{c.name}</div>
             })}
         </div>
     );
