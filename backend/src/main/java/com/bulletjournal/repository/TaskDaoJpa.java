@@ -180,6 +180,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
                 tasks = this.taskRepository.findTasksBetween(project, Timestamp.from(startTime.toInstant()),
                         Timestamp.from(endTime.toInstant()));
+                tasks.addAll(getAllRemindingRecurringTasksByProjectBetween(project, startTime, endTime));
             }
         }
 
@@ -376,6 +377,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getAllRemindingRecurringTasksBetween(ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasks = this.taskRepository.findTasksByRecurrenceRuleNotNull();
+        return getRecurringTasks(recurringTasks, startTime, endTime);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getAllRemindingRecurringTasksByProjectBetween(Project project, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Task> recurringTasks = this.taskRepository.findTaskByProjectAndRecurrenceRuleNotNull(project);
         return getRecurringTasks(recurringTasks, startTime, endTime);
     }
 
