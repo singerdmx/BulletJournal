@@ -7,6 +7,8 @@ import com.bulletjournal.util.BuJoRecurrenceRule;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -14,6 +16,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class DaoHelper {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DaoHelper.class);
 
     public static <T> void updateIfPresent(Boolean isPresent, T value, Consumer<T> getter) {
         if (isPresent) {
@@ -42,7 +45,11 @@ public class DaoHelper {
         } else {
             List<Task> recurringTasks = getRecurringTask(task, startTime, endTime);
             recurringTasks.forEach(t -> {
-                map.put(new ReminderRecord(t.getId(), t.getReminderDateTime().getTime()), t);
+                if (t == null || t.getReminderDateTime() == null) {
+                    LOGGER.error("getReminderRecordMap error on {}", t);
+                } else {
+                    map.put(new ReminderRecord(t.getId(), t.getReminderDateTime().getTime()), t);
+                }
             });
         }
         return map;

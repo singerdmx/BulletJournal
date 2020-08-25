@@ -3,6 +3,8 @@ import {Category} from "./interface";
 
 export const getCategories = () => actions.getCategories({});
 
+export const getCategory = (categoryId: number) => actions.getCategory({categoryId: categoryId});
+
 export const addCategory = (name: string, description?: string, icon?: string, color?: string, forumId?: number) =>
     actions.addCategory({
         name: name,

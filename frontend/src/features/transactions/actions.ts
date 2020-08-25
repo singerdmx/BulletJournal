@@ -9,7 +9,9 @@ export const updateTransactions = (
   ledgerSummaryType: string,
   frequencyType?: string,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
+  labelsToKeep?: number[],
+  labelsToRemove?: number[],
 ) =>
   actions.TransactionsUpdate({
     projectId: projectId,
@@ -18,6 +20,8 @@ export const updateTransactions = (
     ledgerSummaryType: ledgerSummaryType,
     startDate: startDate,
     endDate: endDate,
+    labelsToKeep: labelsToKeep,
+    labelsToRemove: labelsToRemove
   });
 export const createTransaction = (
   projectId: number,

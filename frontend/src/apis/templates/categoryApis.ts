@@ -9,6 +9,14 @@ export const getCategories = () => {
         });
 }
 
+export const getCategory = (categoryId: number) => {
+    return doFetch(`/api/categories/${categoryId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
 export const createCategory = (name: string, description?: string, icon?: string, color?: string, forumId?: number) => {
     const postBody = JSON.stringify({
         name: name,

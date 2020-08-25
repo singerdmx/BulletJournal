@@ -65,6 +65,8 @@ type TransactionProps = {
   project: Project | undefined;
   timezone: string;
   ledgerSummary: LedgerSummary;
+  labelsToKeep: number[];
+  labelsToRemove: number[];
   showModal?: (user: User) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
@@ -73,7 +75,9 @@ type TransactionProps = {
     ledgerSummaryType: string,
     frequencyType?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    labelsToKeep?: number[],
+    labelsToRemove?: number[],
   ) => void;
   updateTransactionForm: (
     startDate?: string,
@@ -103,7 +107,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [showPayerExpenseTab, setShowPayerExpenseTab] = useState(false);
   const [showPayerIncomeTab, setShowPayerIncomeTab] = useState(false);
 
-  const { project, ledgerSummary } = props;
+  const { project, ledgerSummary, labelsToRemove, labelsToKeep, updateTransactions } = props;
 
   const {
     balance,
@@ -115,7 +119,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   } = ledgerSummary;
   const { transactions = [] } = ledgerSummary;
 
-  const updateTransactions = (
+  const refreshTransactions = (
     values: any,
     currentLedgerSummaryType: LedgerSummaryType
   ) => {
@@ -130,16 +134,33 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     const frequencyType = values.frequencyType || FrequencyType.MONTHLY;
 
     if (project) {
-      props.updateTransactions(
+      updateTransactions(
         project.id,
         values.timezone,
         currentLedgerSummaryType,
         frequencyType,
         startDate,
-        endDate
+        endDate,
+        labelsToKeep,
+        labelsToRemove
       );
     }
   };
+
+  useEffect(() => {
+    if (project) {
+      props.updateTransactions(
+          project.id,
+          currentZone,
+          ledgerSummaryType,
+          'MONTHLY',
+          startDate,
+          endDate,
+          labelsToKeep,
+          labelsToRemove
+      );
+    }
+  }, [labelsToRemove, labelsToKeep]);
 
   useEffect(() => {
     const startDate = moment().startOf('month').format(dateFormat);
@@ -160,10 +181,12 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         ledgerSummaryType,
         'MONTHLY',
         startDate,
-        endDate
+        endDate,
+        labelsToKeep,
+        labelsToRemove
       );
     }
-  }, []);
+  }, [project]);
 
   useEffect(() => {
     if (ledgerSummaryType === LedgerSummaryType.LABEL) {
@@ -296,7 +319,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     form
       .validateFields()
       .then((values) => {
-        updateTransactions(values, ledgerSummaryType);
+        refreshTransactions(values, ledgerSummaryType);
       })
       .catch((info) => console.log(info));
   };
@@ -469,7 +492,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             form
               .validateFields()
               .then((values) => {
-                updateTransactions(values, LedgerSummaryTypeMap[current]);
+                refreshTransactions(values, LedgerSummaryTypeMap[current]);
               })
               .catch((info) => console.log(info));
           }}
