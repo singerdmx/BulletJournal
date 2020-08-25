@@ -65,15 +65,23 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      * @retVal List<Transaction> - List of transaction
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Transaction> getTransactions(Long projectId,
-            ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
+    public List<com.bulletjournal.controller.models.Transaction> getTransactions(
+            Long projectId,
+            ZonedDateTime startTime,
+            ZonedDateTime endTime,
+            String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
 
         return this.transactionRepository
                 .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()),
                         Timestamp.from(endTime.toInstant()))
-                .stream().sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
-                .map(transaction -> addLabels(transaction)).collect(Collectors.toList());
+                .stream().sorted((a, b) -> {
+                    if (Objects.equals(a.getStartTime(), b.getStartTime())) {
+                        return Long.compare(a.getId(), b.getId());
+                    }
+
+                    return a.getStartTime().compareTo(b.getStartTime());
+                }).map(transaction -> addLabels(transaction)).collect(Collectors.toList());
     }
 
     /**

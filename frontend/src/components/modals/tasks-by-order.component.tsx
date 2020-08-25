@@ -156,6 +156,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
     if (!project) {
       return;
     }
+    setChecked([] as number[]);
     getTasksByOrder(project.id, timezone, dateArray[0], dateArray[1]);
   };
   return (

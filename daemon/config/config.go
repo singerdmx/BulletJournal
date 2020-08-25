@@ -21,16 +21,18 @@ var (
 )
 
 type Config struct {
-	Username      string
-	Password      string
-	Database      string
-	DBPort        string
-	RPCPort       string
-	HttpPort      string
-	Host          string
-	DBDriver      string
-	ApiKeyPublic  string
-	ApiKeyPrivate string
+	Username               string
+	Password               string
+	Database               string
+	DBPort                 string
+	RPCPort                string
+	HttpPort               string
+	Host                   string
+	DBDriver               string
+	ApiKeyPublic           string
+	ApiKeyPrivate          string
+	MaxRetentionTimeInDays int
+	IntervalInSeconds      int
 }
 
 func GetEnv() *string {
@@ -88,6 +90,14 @@ func Validate(c *Config) bool {
 		valid = false
 		_ = fmt.Errorf("apikeyprivate is missing from config")
 	}
+	if c.IntervalInSeconds == 0 {
+		valid = false
+		_ = fmt.Errorf("interval in seconds is missing from config")
+	}
+	if c.MaxRetentionTimeInDays == 0 {
+		valid = false
+		_ = fmt.Errorf("max retention time in days is missing from config")
+	}
 
 	return valid
 }
@@ -140,5 +150,7 @@ func PrintConfig() {
 	fmt.Printf("DB Driver:%s%s\n", tab, serviceConfig.DBDriver)
 	fmt.Printf("Public APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPublic)
 	fmt.Printf("Private APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPrivate)
+	fmt.Printf("IntervalInSeconds: %s%v\n", tab, serviceConfig.IntervalInSeconds)
+	fmt.Printf("MaxRetentionTimeInDays: %s%v\n", tab, serviceConfig.MaxRetentionTimeInDays)
 	fmt.Print("****************************************************\n")
 }

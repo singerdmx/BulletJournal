@@ -478,7 +478,16 @@ public class TaskController {
                 task -> task.getAssignees().forEach(
                         assignee -> userToTasks.computeIfAbsent(assignee,
                                 k -> new UserTaskStatistic(this.userClient.getUser(assignee))).incrementUncompleted()));
-        taskStatistics.setUserTaskStatistics(userToTasks.values().stream().collect(Collectors.toList()));
+        List<UserTaskStatistic> userTaskStatisticList = userToTasks.values().stream().collect(Collectors.toList());
+        userTaskStatisticList.sort((user1TaskStatistic, user2TaskStatistic) -> {
+            int percentage1 = user1TaskStatistic.getCompleted() * 100 / (user1TaskStatistic.getCompleted() + user1TaskStatistic.getUncompleted());
+            int percentage2 = user2TaskStatistic.getCompleted() * 100 / (user2TaskStatistic.getCompleted() + user2TaskStatistic.getUncompleted());
+            if (percentage1 != percentage2) {
+                return percentage1 - percentage2;
+            }
+            return user1TaskStatistic.getUser().getName().compareTo(user2TaskStatistic.getUser().getName());
+        });
+        taskStatistics.setUserTaskStatistics(userTaskStatisticList);
         return taskStatistics;
     }
 }

@@ -3,7 +3,7 @@ import {Empty, message, Tree} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
 import {updateProjectRelations} from '../../features/project/actions';
-import {AccountBookOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
+import {CreditCardOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {clearCompletedTasks} from "../../features/tasks/actions";
@@ -15,7 +15,7 @@ import {CopyOutlined} from "@ant-design/icons/lib";
 
 export const iconMapper = {
     TODO: <CarryOutOutlined/>,
-    LEDGER: <AccountBookOutlined/>,
+    LEDGER: <CreditCardOutlined/>,
     NOTE: <FileTextOutlined/>
 };
 

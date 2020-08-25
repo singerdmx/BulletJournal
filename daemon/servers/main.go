@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	generator "github.com/singerdmx/BulletJournal/daemon/utils"
+	"github.com/singerdmx/BulletJournal/daemon/dao"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"github.com/zywangzy/JobScheduler"
@@ -27,6 +27,11 @@ var (
 	logger logging.Logger
 )
 
+var (
+	serviceConfig *config.Config
+	subscriptions map[string]services.Daemon_SubscribeNotificationServer
+)
+
 // server should implement services.UnimplementedDaemonServer's methods
 type server struct {
 }
@@ -45,13 +50,37 @@ func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*typ
 
 func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
 	logger.Printf("Received rpc request for subscribtion: %s", subscribe.String())
-	n := 0
-	for n < 5 {
-		time.Sleep(5 * time.Second)
-		if err := stream.Send(&types.StreamMessage{Message: fmt.Sprintf("Hello rpc %s", subscribe.String())}); err != nil {
-			return err
+	if _, ok := subscriptions[subscribe.Id]; !ok {
+		//Add subscription
+		subscriptions[subscribe.Id] = stream
+		go func() {
+			//To do
+			//Add business logic here=
+
+			//n := 0
+			//for n < 10 {
+			//	time.Sleep(3 * time.Second)
+			//	if err := stream.Send(&types.StreamMessage{Message: fmt.Sprintf("Hello rpc %s", subscribe.String())}); err != nil {
+			//		log.Printf("Unexpected error happened to subscribtion: %s, error: %v", subscribe.String(), err)
+			//	} else {
+			//		log.Printf("Sent data to subscribtion: %s", subscribe.String())
+			//	}
+			//	n += 1
+			//}
+			//delete(subscriptions, subscribe.Id)
+		}()
+		//Keep the subscription session alive
+		for {
+			if _, ok := subscriptions[subscribe.Id]; ok {
+				time.Sleep(3 * time.Second)
+			} else {
+				logger.Printf("Subscription expires: %s", subscribe.String())
+				break
+			}
 		}
-		n += 1
+	} else {
+		//Skip subscription
+		logger.Printf("Subscription already exists!")
 	}
 	return nil
 }
@@ -76,12 +105,17 @@ func GetRequestID(ctx context.Context) string {
 	return ""
 }
 
-func main() {
-
+func InitServer() {
 	config.InitConfig()
-	serviceConfig := config.GetConfig()
+	serviceConfig = config.GetConfig()
+	subscriptions = map[string]services.Daemon_SubscribeNotificationServer{}
 
 	logging.InitLogging(config.GetEnv())
+}
+
+func main() {
+
+	InitServer()
 
 	ctx := context.Background()
 	ctx = AssignRequestID(ctx)
@@ -135,6 +169,13 @@ func main() {
 
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
+	jobScheduler.AddRecurrentJob(
+		func(...interface{}) {
+			dao.Clean(serviceConfig.MaxRetentionTimeInDays)
+		},
+		time.Now(),
+		time.Second*time.Duration(serviceConfig.IntervalInSeconds),
+	)
 
 	<-shutdown
 	jobScheduler.Stop()

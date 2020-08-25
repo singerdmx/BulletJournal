@@ -48,6 +48,10 @@ public class MessagingService {
 
     public static final String BASE_TASK_URL = "https://bulletjournal.us/#/task/";
 
+    public static final String TASK_OWNER_PROPERTY = "owner_name";
+
+    public static final String TASK_OWNER_AVATAR_PROPERTY = "owner_avatar";
+
     private FcmClient fcmClient;
 
     private MailjetEmailClient mailjetClient;
@@ -174,7 +178,12 @@ public class MessagingService {
         Map<String, Map<String, String>> aliasMap = getAliasMap(assignees);
         Map<String, String> avatarMap = getAvatarMap(assignees);
         String taskUrl = BASE_TASK_URL + task.getId();
+        String ownerName = task.getOwner();
+        String ownerAvatar = getAvatar(ownerName);
         for (String receiver : assignees) {
+            if (!nameEmailMap.containsKey(receiver)) {
+                continue;
+            }
             MailjetEmailParams params =
                 new MailjetEmailParams(
                     Arrays.asList(new ImmutablePair<>(receiver, nameEmailMap.get(receiver))),
@@ -186,7 +195,11 @@ public class MessagingService {
                     TIMESTAMP_PROPERTY,
                     getDueTime(task),
                     TASK_URL_PROPERTY,
-                    taskUrl
+                    taskUrl,
+                    TASK_OWNER_PROPERTY,
+                    ownerName,
+                    TASK_OWNER_AVATAR_PROPERTY,
+                    ownerAvatar
                 );
             JSONArray assigneeInfoList = new JSONArray();
             JSONObject selfInfo = new JSONObject();
@@ -204,7 +217,7 @@ public class MessagingService {
                 obj.put(AVATAR_PROPERTY, avator);
                 assigneeInfoList.put(obj);
             }
-            params.addKv(ASSIGNEES_PROPERTY, assigneeInfoList.toString());
+            params.addKv(ASSIGNEES_PROPERTY, assigneeInfoList);
             ret.add(params);
         }
         return ret;
@@ -213,12 +226,17 @@ public class MessagingService {
     private Map<String, String> getAvatarMap(List<String> usernames) {
         Map<String, String> ret = new HashMap<>();
         for (String username : usernames) {
-            com.bulletjournal.controller.models.User user = userClient.getUser(username);
-            if (user.getAvatar() != null) {
-                ret.put(username, user.getAvatar());
-            }
+            ret.put(username, getAvatar(username));
         }
         return ret;
+    }
+
+    private String getAvatar(String username) {
+        com.bulletjournal.controller.models.User user = userClient.getUser(username);
+        if (user.getAvatar() != null) {
+            return user.getAvatar();
+        }
+        return NONE_STRING;
     }
 
     /**

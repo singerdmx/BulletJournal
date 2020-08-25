@@ -12,7 +12,7 @@ import {
   TeamOutlined,
   UserOutlined,
   CarryOutOutlined,
-  AccountBookOutlined,
+  CreditCardOutlined,
   FileTextOutlined,
   AppstoreOutlined
 } from '@ant-design/icons';
@@ -54,7 +54,7 @@ type ProjectProps = {
 
 export const iconMapper = {
   TODO: <CarryOutOutlined />,
-  LEDGER: <AccountBookOutlined />,
+  LEDGER: <CreditCardOutlined />,
   NOTE: <FileTextOutlined />,
 };
 

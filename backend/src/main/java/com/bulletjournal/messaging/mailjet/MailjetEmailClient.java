@@ -156,6 +156,7 @@ public class MailjetEmailClient {
             }
             properties.put(Emailv31.Message.VARIABLES, variables);
         }
+        LOGGER.info("email properties: {}", properties);
         MailjetRequest request = new MailjetRequest(Emailv31.resource)
             .property(Emailv31.MESSAGES, new JSONArray().put(properties));
         return request;

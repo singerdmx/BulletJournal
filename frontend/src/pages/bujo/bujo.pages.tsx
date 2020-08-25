@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import ProjectItemList from '../../components/project-item-list/project-item-list.component';
 import BujoCalendar from '../../components/bujo-calendar/bujo-calendar.component';
 import {
-  AccountBookOutlined,
+  CreditCardOutlined,
   CarryOutOutlined,
   SyncOutlined,
   FileTextOutlined,
@@ -165,7 +165,7 @@ class BujoPage extends React.Component<
               onChange={(e) => this.handleOnChange(e.target.value, category)}
             >
               <Tooltip placement="top" title="LEDGER">
-                <AccountBookOutlined />
+                <CreditCardOutlined />
               </Tooltip>
             </Checkbox>
             <Tooltip title="Refresh">

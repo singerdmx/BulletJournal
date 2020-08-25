@@ -198,7 +198,7 @@ public class DeviceControllerTest {
         info4.put(MessagingService.AVATAR_PROPERTY, "avatar_url_4");
         assigneeInfoList.put(info4);
         MailjetEmailParams params = new MailjetEmailParams(
-            Arrays.asList(new ImmutablePair<>("will", "xguo.tufts@gmail.com")),
+            Arrays.asList(new ImmutablePair<>("will", "example@example.com")),
             "TestSubject",
             null,
             MailjetEmailClient.Template.TASK_DUE_NOTIFICATION,

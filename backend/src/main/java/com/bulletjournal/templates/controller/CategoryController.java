@@ -8,6 +8,7 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.Category;
 import com.bulletjournal.templates.controller.model.CreateCategoryParams;
+import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
@@ -73,7 +74,7 @@ public class CategoryController {
     @PostMapping(CATEGORIES_ROUTE)
     public Category createCategory(@Valid @RequestBody CreateCategoryParams params) {
         validateRequester();
-        return this.categoryDaoJpa.create(params.getName(), params.getDescription()).toPresentationModel();
+        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId()).toPresentationModel();
     }
 
     @PutMapping(CATEGORIES_ROUTE)
@@ -89,6 +90,25 @@ public class CategoryController {
         validateRequester();
         categoryDaoJpa.deleteById(categoryId);
         return getCategories();
+    }
+
+    @PutMapping(CATEGORY_ROUTE)
+    public List<Category> updateCategory(@NotNull @PathVariable Long categoryId,
+                               @Valid @RequestBody UpdateCategoryParams updateCategoryParams) {
+        validateRequester();
+        com.bulletjournal.templates.repository.model.Category category = categoryDaoJpa.getById(categoryId);
+        category.setName(updateCategoryParams.getName());
+        category.setIcon(updateCategoryParams.getIcon());
+        category.setColor(updateCategoryParams.getColor());
+        category.setForumId(updateCategoryParams.getForumId());
+        category.setDescription(updateCategoryParams.getDescription());
+        categoryDaoJpa.save(category);
+        return getCategories();
+    }
+
+    @GetMapping(CATEGORY_ROUTE)
+    public Category getCategoryById(@NotNull @PathVariable Long categoryId) {
+        return categoryDaoJpa.getById(categoryId).toPresentationModel();
     }
 
     private void validateRequester() {

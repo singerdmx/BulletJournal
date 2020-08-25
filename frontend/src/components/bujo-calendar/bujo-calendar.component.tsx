@@ -8,7 +8,7 @@ import moment from 'moment';
 import {
   CarryOutOutlined,
   FileTextOutlined,
-  AccountBookOutlined,
+  CreditCardOutlined,
 } from '@ant-design/icons';
 import { updateExpandedMyself } from '../../features/myself/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
@@ -122,7 +122,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
           <div key={`transactions${t.id}`}>
             <Badge>
               <div style={{ display: 'flex' }}>
-                <AccountBookOutlined />
+                <CreditCardOutlined />
                 &nbsp;{t.name}&nbsp;{t.time ? t.time : ''}
               </div>
             </Badge>

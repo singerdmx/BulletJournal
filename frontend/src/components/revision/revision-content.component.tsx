@@ -27,6 +27,7 @@ import { Project } from '../../features/project/interface';
 import { ContentType } from '../../features/myBuJo/constants';
 import { isContentEditable } from '../content/content-item.component';
 import Quill from "quill";
+import {getProject} from "../../features/project/actions";
 const Delta = Quill.import('delta');
 
 type RevisionProps = {
@@ -64,6 +65,7 @@ interface RevisionContentHandler {
     diff: string
   ) => void;
   handleClose: () => void;
+  getProject: (projectId: number) => void;
 }
 
 const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
@@ -81,6 +83,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   handleClose,
   project,
   myself,
+  getProject
 }) => {
   //reusable update revision function
   const updateContentRevision: { [key in ContentType]: Function } = {
@@ -119,6 +122,12 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       revisions[revisionIndex - 1].content
     );
   }, [historyContent]);
+
+  useEffect(() => {
+    if (!project && projectItem) {
+      getProject(projectItem.projectId);
+    }
+  }, [project]);
 
   const handleRevert = () => {
     if (!revisions[revisionIndex - 1].content) {
@@ -213,4 +222,5 @@ export default connect(mapStateToProps, {
   patchTaskContent,
   updateTransactionContentRevision,
   patchTransactionContent,
+  getProject
 })(RevisionContent);

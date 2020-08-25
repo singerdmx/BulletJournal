@@ -7,7 +7,9 @@ export const fetchTransactions = (
   frequencyType?: string,
   startDate?: string,
   endDate?: string,
-  payer?: string
+  payer?: string,
+  labelsToKeep?: number[],
+  labelsToRemove?: number[],
 ) => {
   // e.g. /api/projects/105/transactions?frequencyType=MONTHLY&timezone=America%2FLos_Angeles
   let url = `/api/projects/${projectId}/transactions?timezone=${encodeURIComponent(
@@ -22,6 +24,12 @@ export const fetchTransactions = (
   }
   if (payer) {
     url += `&payer=${payer}`;
+  }
+  if (labelsToKeep && labelsToKeep.length > 0) {
+    url += '&' + labelsToKeep.map(l => `labelsToKeep=${l}`).join('&');
+  }
+  if (labelsToRemove && labelsToRemove.length > 0) {
+    url += '&' + labelsToRemove.map(l => `labelsToRemove=${l}`).join('&');
   }
   return doFetch(url)
     .then((res) => res)

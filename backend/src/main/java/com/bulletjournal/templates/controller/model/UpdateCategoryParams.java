@@ -1,13 +1,8 @@
 package com.bulletjournal.templates.controller.model;
 
-import javax.validation.constraints.NotNull;
-
-public class CreateCategoryParams {
-
-    @NotNull
+public class UpdateCategoryParams {
     private String name;
 
-    @NotNull
     private String description;
 
     private String icon;
@@ -16,13 +11,20 @@ public class CreateCategoryParams {
 
     private Long forumId;
 
-    public CreateCategoryParams(@NotNull String name, @NotNull String description) {
-        this.name = name;
-        this.description = description;
+    public String getName() {
+        return name;
     }
 
-    public CreateCategoryParams() {
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getIcon() {
@@ -47,21 +49,5 @@ public class CreateCategoryParams {
 
     public void setForumId(Long forumId) {
         this.forumId = forumId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

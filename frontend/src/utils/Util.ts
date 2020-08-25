@@ -1,4 +1,5 @@
 import {User} from "../features/group/interface";
+import {ProjectItem} from "../features/myBuJo/interface";
 
 const isSubsequence = (longS: string, shortS: string) => {
     let i = 0;
@@ -27,4 +28,21 @@ export const onFilterAssignees = (inputValue: string, option: any) => {
 export const onFilterLabel = (inputValue: string, option: any) => {
     inputValue = inputValue.toLowerCase();
     return isSubsequence(option.key.toString().toLowerCase(), inputValue);
+}
+
+export const includeProjectItem = (labelsToKeep: number[], labelsToRemove: number[], item: ProjectItem) => {
+    const labels = item.labels.map(l => l.id);
+    if (labels.filter(l => labelsToRemove.includes(l)).length > 0) {
+        return false;
+    }
+
+    if (labelsToKeep.length === 0) {
+        return true;
+    }
+
+    // labelsToKeep.length > 0
+    if (labels.filter(l => labelsToKeep.includes(l)).length === 0) {
+        return false;
+    }
+    return true;
 }

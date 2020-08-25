@@ -25,6 +25,7 @@ import {ProjectItemUIType} from "../../features/project/constants";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {ProjectOutlined} from "@ant-design/icons/lib";
+import {includeProjectItem} from "../../utils/Util";
 
 type TasksProps = {
   completeTasksShown: boolean;
@@ -36,6 +37,8 @@ type TasksProps = {
   completedTasks: Task[];
   loadingCompletedTask: boolean;
   nextCompletedTasks: Task[];
+  labelsToKeep: number[];
+  labelsToRemove: number[];
   updateTasks: (projectId: number) => void;
   updateCompletedTasks: (projectId: number) => void;
   putTask: (projectId: number, tasks: Task[]) => void;
@@ -55,6 +58,8 @@ const getTree = (
     inProject: boolean,
     data: Task[],
     readOnly: boolean,
+    labelsToKeep: number[],
+    labelsToRemove: number[],
     showModal?: (user: User) => void,
     showOrderModal?: () => void
 ): TreeNodeNormal[] => {
@@ -66,6 +71,8 @@ const getTree = (
           inProject,
           item.subTasks,
           readOnly,
+          labelsToKeep,
+          labelsToRemove,
           showModal,
           showOrderModal
       );
@@ -86,7 +93,9 @@ const getTree = (
         />
     );
     node.key = item.id.toString();
-    res.push(node);
+    if (includeProjectItem(labelsToKeep, labelsToRemove, item)) {
+      res.push(node);
+    }
   });
   return res;
 };
@@ -194,7 +203,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     completedTaskPageNo,
     completeTasksShown,
     hideCompletedTask,
-    showCompletedTask
+    showCompletedTask,
+    labelsToKeep,
+    labelsToRemove,
   } = props;
 
   useEffect(() => {
@@ -357,6 +368,8 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       !project.shared,
       tasks,
       readOnly,
+      labelsToKeep,
+      labelsToRemove,
       showModal,
       showOrderModal
   );

@@ -4,7 +4,7 @@ import {Project} from '../../features/project/interface';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {GroupsWithOwner, User} from '../../features/group/interface';
-import {Avatar, BackTop, Badge, message, Popconfirm, Popover, Tag, Tooltip,} from 'antd';
+import {Avatar, BackTop, Badge, message, Popconfirm, Popover, Radio, Tag, Tooltip} from 'antd';
 import {deleteProject, getProject} from '../../features/project/actions';
 import {iconMapper} from '../../components/side-menu/side-menu.component';
 import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
@@ -36,7 +36,8 @@ import {getIcon} from '../../components/draggable-labels/draggable-label-list.co
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
-import {CopyOutlined} from "@ant-design/icons/lib";
+import {CheckSquareTwoTone, CloseCircleTwoTone, CopyOutlined, MenuOutlined, StopTwoTone} from "@ant-design/icons/lib";
+import {RadioChangeEvent} from "antd/lib/radio";
 
 type ProjectPathParams = {
   projectId: string;
@@ -53,6 +54,8 @@ type ModalState = {
   assignee: User | undefined;
   notesByOrderShown: boolean;
   tasksByOrderShown: boolean;
+  labelsToKeep: number[];
+  labelsToRemove: number[];
 };
 
 type GroupProps = {
@@ -128,6 +131,8 @@ class ProjectPage extends React.Component<
     notesByOrderShown: false,
     tasksByOrderShown: false,
     assignee: undefined,
+    labelsToKeep: [],
+    labelsToRemove: [],
   };
 
   componentDidMount() {
@@ -253,6 +258,47 @@ class ProjectPage extends React.Component<
       return null;
     }
 
+    const radioStyle = {
+      display: 'block',
+      height: '26px',
+      lineHeight: '26px',
+    };
+
+    const getLabelFilterValue = (labelId: number) => {
+      if (this.state.labelsToRemove.includes(labelId)) {
+        return 2;
+      }
+      if (this.state.labelsToKeep.includes(labelId)) {
+        return 1;
+      }
+
+      return 3;
+    }
+
+    const getLabelFilterIcon = (labelId: number) => {
+      if (this.state.labelsToRemove.includes(labelId)) {
+        return <CloseCircleTwoTone />;
+      }
+      if (this.state.labelsToKeep.includes(labelId)) {
+        return <CheckSquareTwoTone />;
+      }
+      return <MenuOutlined/>
+    }
+
+    const handleLabelFilterChange = (e: RadioChangeEvent, labelId: number) => {
+      const labelsToKeep = this.state.labelsToKeep.filter(l => l !== labelId);
+      const labelsToRemove = this.state.labelsToRemove.filter(l => l !== labelId);
+      switch (e.target.value) {
+        case 1:
+          labelsToKeep.unshift(labelId);
+          break;
+        case 2:
+          labelsToRemove.unshift(labelId);
+          break;
+      }
+      this.setState({labelsToRemove: labelsToRemove, labelsToKeep: labelsToKeep});
+    }
+
     return (
         <>
           <div>
@@ -276,15 +322,35 @@ class ProjectPage extends React.Component<
 
             {!this.state.hideLabel && <div className="project-labels">
               {this.props.projectLabels.map((label, index) => (
-                  <Tag
-                      key={label.id}
-                      color={stringToRGB(label.value)}
-                      onClick={() => this.toLabelSearching(label)}
-                  >
-              <span>
-                {getIcon(label.icon)} &nbsp;{label.value}
-              </span>
-                  </Tag>
+                  <>
+                    <Tag
+                        key={label.id}
+                        color={stringToRGB(label.value)}
+                    >
+                      <span>
+                        <Popover key={`p${label.id}`}
+                                 title='Filter by Label'
+                                 content={<>
+                                   <Radio.Group value={getLabelFilterValue(label.id)} onChange={e => handleLabelFilterChange(e, label.id)}>
+                                     <Radio style={radioStyle} value={1}>
+                                       <CheckSquareTwoTone /> Keep <Tag color={stringToRGB(label.value)} key={`keep${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
+                                     </Radio>
+                                     <Radio style={radioStyle} value={2}>
+                                       <CloseCircleTwoTone /> Without <Tag color={stringToRGB(label.value)} key={`remove${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
+                                     </Radio>
+                                     <Radio style={radioStyle} value={3}>
+                                       <StopTwoTone /> No Effect
+                                     </Radio>
+                                   </Radio.Group>
+                                 </>}>
+                          {getLabelFilterIcon(label.id)}
+                        </Popover>
+                        <span onClick={() => this.toLabelSearching(label)}>&nbsp;
+                        {getIcon(label.icon)} &nbsp;{label.value}
+                        </span>
+                      </span>
+                    </Tag>
+                  </>
               ))}
             </div>}</div>
         </>
@@ -321,6 +387,8 @@ class ProjectPage extends React.Component<
             showOrderModal={() => {
               handleGetProjectItemsByOrder();
             }}
+            labelsToKeep={this.state.labelsToKeep}
+            labelsToRemove={this.state.labelsToRemove}
           />
         );
         projectItemsByUser = (
@@ -362,6 +430,8 @@ class ProjectPage extends React.Component<
             showCompletedTask={() =>
               this.setState({ completeTasksShown: true })
             }
+            labelsToKeep={this.state.labelsToKeep}
+            labelsToRemove={this.state.labelsToRemove}
           />
         );
         projectItemsByUser = (
@@ -395,6 +465,8 @@ class ProjectPage extends React.Component<
             showModal={(user: User) => {
               handleGetProjectItemsByUser(user);
             }}
+            labelsToKeep={this.state.labelsToKeep}
+            labelsToRemove={this.state.labelsToRemove}
           />
         );
         projectItemsByUser = (
@@ -461,7 +533,7 @@ class ProjectPage extends React.Component<
       popContent = (
         <div className="project-users">
           {groupUsers.map((u, index) => (
-            <Tooltip title={u.alias} key={u.id}>
+            <Tooltip title={u.alias} key={`${u.id}#${index}`}>
               <span
                 className="avatar-container"
                 onClick={() => handleGetProjectItemsByUser(u)}
