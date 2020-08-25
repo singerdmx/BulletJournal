@@ -186,7 +186,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         labelsToRemove
       );
     }
-  }, []);
+  }, [project]);
 
   useEffect(() => {
     if (ledgerSummaryType === LedgerSummaryType.LABEL) {
