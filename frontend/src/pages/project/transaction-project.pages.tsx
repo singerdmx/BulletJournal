@@ -75,7 +75,9 @@ type TransactionProps = {
     ledgerSummaryType: string,
     frequencyType?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    labelsToKeep?: number[],
+    labelsToRemove?: number[],
   ) => void;
   updateTransactionForm: (
     startDate?: string,
@@ -138,14 +140,26 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         currentLedgerSummaryType,
         frequencyType,
         startDate,
-        endDate
+        endDate,
+        labelsToKeep,
+        labelsToRemove
       );
     }
   };
 
   useEffect(() => {
-    console.log(labelsToKeep);
-    console.log(labelsToRemove);
+    if (project) {
+      props.updateTransactions(
+          project.id,
+          currentZone,
+          ledgerSummaryType,
+          'MONTHLY',
+          startDate,
+          endDate,
+          labelsToKeep,
+          labelsToRemove
+      );
+    }
   }, [labelsToRemove, labelsToKeep]);
 
   useEffect(() => {
@@ -167,7 +181,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         ledgerSummaryType,
         'MONTHLY',
         startDate,
-        endDate
+        endDate,
+        labelsToKeep,
+        labelsToRemove
       );
     }
   }, []);

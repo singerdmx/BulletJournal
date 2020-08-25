@@ -65,6 +65,8 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
       endDate,
       frequencyType,
       ledgerSummaryType,
+      labelsToKeep,
+      labelsToRemove
     } = action.payload;
 
     const data = yield call(
@@ -74,7 +76,10 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
       ledgerSummaryType,
       frequencyType,
       startDate,
-      endDate
+      endDate,
+      undefined,
+      labelsToKeep,
+      labelsToRemove
     );
     const ledgerSummary: LedgerSummary = yield data.json();
 

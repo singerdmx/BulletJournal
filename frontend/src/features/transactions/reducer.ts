@@ -51,6 +51,8 @@ export type UpdateTransactions = {
   ledgerSummaryType: string;
   startDate?: string;
   endDate?: string;
+  labelsToKeep?: number[];
+  labelsToRemove?: number[];
 };
 
 export type updateVisibleAction = {

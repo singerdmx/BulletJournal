@@ -336,7 +336,7 @@ class ProjectPage extends React.Component<
                                        <CheckSquareTwoTone /> Keep <Tag color={stringToRGB(label.value)} key={`keep${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
                                      </Radio>
                                      <Radio style={radioStyle} value={2}>
-                                       <CloseCircleTwoTone /> Filter out <Tag color={stringToRGB(label.value)} key={`remove${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
+                                       <CloseCircleTwoTone /> Without <Tag color={stringToRGB(label.value)} key={`remove${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
                                      </Radio>
                                      <Radio style={radioStyle} value={3}>
                                        <StopTwoTone /> No Effect
