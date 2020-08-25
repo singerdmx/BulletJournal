@@ -1,20 +1,23 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {deleteCategory, getCategory} from "../../features/templates/actions";
+import {deleteCategory, getCategory, updateCategory} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
 import {BackTop} from "antd";
 import {DeleteFilled} from "@ant-design/icons/lib";
+import ColorPicker from "../../utils/color-picker/ColorPickr";
 
 type AdminCategoryProps = {
     category: Category | undefined;
     deleteCategory: (id: number) => void;
     getCategory: (categoryId: number) => void;
+    updateCategory: (categoryId: number, name: string,
+                     description?: string, icon?: string, color?: string, forumId?: number) => void;
 }
 
 const AdminCategoryPage: React.FC<AdminCategoryProps> = (
-    {category, getCategory, deleteCategory}) => {
+    {category, getCategory, deleteCategory, updateCategory}) => {
     const history = useHistory();
     const {categoryId} = useParams();
     useEffect(() => {
@@ -32,10 +35,23 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
         history.push('/admin/categories');
     }
 
+    const changeColorHandler = (input: any) => {
+        console.log(input);
+        updateCategory(category.id, category.name, category.description, category.icon, input.color, category.forumId);
+    }
+
     return <div className='admin-categories-page'>
         <BackTop/>
         <div><DeleteFilled onClick={handleDelete}/></div>
-        {category.name}
+        <div style={{backgroundColor: `${category.color}`}}>
+            {category.name}
+        </div>
+        <ColorPicker
+            label='Color  '
+            color={category.color}
+            onChange={changeColorHandler}
+            mode='RGB'
+        />
     </div>
 }
 
@@ -45,5 +61,6 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
     getCategory,
-    deleteCategory
+    deleteCategory,
+    updateCategory
 })(AdminCategoryPage);

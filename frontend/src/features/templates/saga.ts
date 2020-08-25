@@ -53,8 +53,8 @@ function* addCategory(action: PayloadAction<AddCategoryAction>) {
 function* updateCategory(action: PayloadAction<UpdateCategoryAction>) {
   try {
     const {categoryId, name, description, icon, color, forumId} = action.payload;
-    const data: Category[] = yield call(putCategory, categoryId, name, description, icon, color, forumId);
-    yield put(templatesActions.categoriesReceived({categories: data}));
+    const data: Category = yield call(putCategory, categoryId, name, description, icon, color, forumId);
+    yield put(templatesActions.categoryReceived({category: data}));
   } catch (error) {
     yield call(message.error, `updateCategory Error Received: ${error}`);
   }
