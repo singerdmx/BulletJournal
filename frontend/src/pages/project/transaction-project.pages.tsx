@@ -65,6 +65,8 @@ type TransactionProps = {
   project: Project | undefined;
   timezone: string;
   ledgerSummary: LedgerSummary;
+  labelsToKeep: number[];
+  labelsToRemove: number[];
   showModal?: (user: User) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   updateTransactions: (
@@ -103,7 +105,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   const [showPayerExpenseTab, setShowPayerExpenseTab] = useState(false);
   const [showPayerIncomeTab, setShowPayerIncomeTab] = useState(false);
 
-  const { project, ledgerSummary } = props;
+  const { project, ledgerSummary, labelsToRemove, labelsToKeep, updateTransactions } = props;
 
   const {
     balance,
@@ -115,7 +117,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
   } = ledgerSummary;
   const { transactions = [] } = ledgerSummary;
 
-  const updateTransactions = (
+  const refreshTransactions = (
     values: any,
     currentLedgerSummaryType: LedgerSummaryType
   ) => {
@@ -130,7 +132,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     const frequencyType = values.frequencyType || FrequencyType.MONTHLY;
 
     if (project) {
-      props.updateTransactions(
+      updateTransactions(
         project.id,
         values.timezone,
         currentLedgerSummaryType,
@@ -140,6 +142,11 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
       );
     }
   };
+
+  useEffect(() => {
+    console.log(labelsToKeep);
+    console.log(labelsToRemove);
+  }, [labelsToRemove, labelsToKeep]);
 
   useEffect(() => {
     const startDate = moment().startOf('month').format(dateFormat);
@@ -296,7 +303,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     form
       .validateFields()
       .then((values) => {
-        updateTransactions(values, ledgerSummaryType);
+        refreshTransactions(values, ledgerSummaryType);
       })
       .catch((info) => console.log(info));
   };
@@ -469,7 +476,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             form
               .validateFields()
               .then((values) => {
-                updateTransactions(values, LedgerSummaryTypeMap[current]);
+                refreshTransactions(values, LedgerSummaryTypeMap[current]);
               })
               .catch((info) => console.log(info));
           }}

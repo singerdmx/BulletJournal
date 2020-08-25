@@ -13,6 +13,7 @@ import {User} from '../../features/group/interface';
 import {FileAddOutlined} from '@ant-design/icons';
 import AddNote from "../modals/add-note.component";
 import {ProjectItemUIType} from "../../features/project/constants";
+import {includeProjectItem} from "../../utils/Util";
 
 type NotesProps = {
   notes: Note[];
@@ -22,12 +23,16 @@ type NotesProps = {
   putNote: (projectId: number, notes: Note[]) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
+  labelsToKeep: number[];
+  labelsToRemove: number[];
 };
 
 const getTree = (
   inProject: boolean,
   data: Note[],
   readOnly: boolean,
+  labelsToKeep: number[],
+  labelsToRemove: number[],
   showModal?: (user: User) => void,
   showOrderModal?: () => void
 ): TreeNodeNormal[] => {
@@ -39,6 +44,8 @@ const getTree = (
         inProject,
         item.subNotes,
         readOnly,
+        labelsToKeep,
+        labelsToRemove,
         showModal,
         showOrderModal
       );
@@ -56,7 +63,9 @@ const getTree = (
       />
     );
     node.key = item.id.toString();
-    res.push(node);
+    if (includeProjectItem(labelsToKeep, labelsToRemove, item)) {
+      res.push(node);
+    }
   });
   return res;
 };
@@ -149,6 +158,8 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     readOnly,
     showModal,
     showOrderModal,
+    labelsToKeep,
+    labelsToRemove
   } = props;
   useEffect(() => {
     if (project) {
@@ -173,7 +184,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     </div>
   }
 
-  let treeNote = getTree(!project.shared, notes, readOnly, showModal, showOrderModal);
+  let treeNote = getTree(!project.shared, notes, readOnly, labelsToKeep, labelsToRemove, showModal, showOrderModal);
 
   return (
     <Tree

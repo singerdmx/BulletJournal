@@ -3,8 +3,16 @@ import {Category} from './interface';
 
 export type GetCategoriesAction = {};
 
+export type GetCategoryAction = {
+    categoryId: number;
+};
+
 export type CategoriesAction = {
     categories: Category[];
+};
+
+export type CategoryAction = {
+    category: Category;
 };
 
 export type AddCategoryAction = {
@@ -34,6 +42,7 @@ export type UpdateCategoryRelationsAction = {
 
 let initialState = {
     categories: [] as Category[],
+    category: undefined as Category | undefined,
 };
 
 const slice = createSlice({
@@ -44,7 +53,12 @@ const slice = createSlice({
             const {categories} = action.payload;
             state.categories = categories;
         },
+        categoryReceived: (state, action: PayloadAction<CategoryAction>) => {
+            const {category} = action.payload;
+            state.category = category;
+        },
         getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state,
+        getCategory: (state, action: PayloadAction<GetCategoryAction>) => state,
         addCategory: (state, action: PayloadAction<AddCategoryAction>) => state,
         updateCategory: (state, action: PayloadAction<UpdateCategoryAction>) => state,
         deleteCategory: (state, action: PayloadAction<DeleteCategoryAction>) => state,

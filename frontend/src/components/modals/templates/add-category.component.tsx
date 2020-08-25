@@ -2,9 +2,7 @@ import React, {useState} from 'react';
 import {Col, Form, Input, InputNumber, Modal, Popover, Row} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
-import {useParams} from 'react-router';
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {useHistory} from "react-router-dom";
 import {addCategory} from "../../../features/templates/actions";
 import {icons} from "../../../assets/icons";
 import {QuestionCircleOutlined} from "@ant-design/icons/lib";
@@ -20,8 +18,6 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
     const [color, setColor] = useState('#7fbba0');
-    const history = useHistory();
-    const {projectId} = useParams();
     //label form state
     const [formCreateLabelIcon, setFormCreateLabelIcon] = useState(
         <QuestionCircleOutlined/>

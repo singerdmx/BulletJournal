@@ -2,9 +2,7 @@ import React, {useState} from 'react';
 import {Form, Input, Modal} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
-import {useParams} from 'react-router';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-import {useHistory} from "react-router-dom";
 import {addCategory} from "../../../features/templates/actions";
 
 type AddChoiceProps = {
@@ -15,8 +13,6 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
     const {addCategory} = props;
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
-    const history = useHistory();
-    const {projectId} = useParams();
 
     const createChoice = (values: any) => {
         addCategory(values.name, values.description);

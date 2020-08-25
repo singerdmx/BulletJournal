@@ -1,6 +1,7 @@
 /**
  * @file ColorPickr
  * @author hongfeng(homfen@gmail.com)
+ * https://developer.aliyun.com/mirror/npm/package/react-input-colorpicker
  */
 
 import React, {Component} from 'react'

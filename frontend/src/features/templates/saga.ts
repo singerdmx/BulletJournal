@@ -5,13 +5,13 @@ import {
   actions as templatesActions,
   AddCategoryAction,
   DeleteCategoryAction,
-  GetCategoriesAction, UpdateCategoryAction,
+  GetCategoriesAction, GetCategoryAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction
 } from './reducer';
 import {
   createCategory,
   deleteCategory,
-  getCategories,
+  getCategories, getCategory,
   putCategories,
   putCategory
 } from '../../apis/templates/categoryApis';
@@ -23,6 +23,16 @@ function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
     yield put(templatesActions.categoriesReceived({categories: data}));
   } catch (error) {
     yield call(message.error, `fetchCategories Error Received: ${error}`);
+  }
+}
+
+function* fetchCategory(action: PayloadAction<GetCategoryAction>) {
+  try {
+    const {categoryId} = action.payload;
+    const data: Category = yield call(getCategory, categoryId);
+    yield put(templatesActions.categoryReceived({category: data}));
+  } catch (error) {
+    yield call(message.error, `fetchCategory Error Received: ${error}`);
   }
 }
 
@@ -75,5 +85,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.updateCategoryRelations.type, updateCategories),
     yield takeLatest(templatesActions.deleteCategory.type, removeCategory),
     yield takeLatest(templatesActions.updateCategory.type, updateCategory),
+    yield takeLatest(templatesActions.getCategory.type, fetchCategory),
   ])
 }

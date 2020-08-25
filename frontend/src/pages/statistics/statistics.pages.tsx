@@ -39,7 +39,6 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
     const {projectId} = useParams();
     const history = useHistory();
     const [initialized, setInitialized] = useState(false);
-    const [projectLoaded, setProjectLoaded] = useState(false);
     const [tasksByUsersShown, setTasksByUsersShown] = useState(false);
     const [assignee, setAssignee] = useState<User | undefined>(undefined);
 
