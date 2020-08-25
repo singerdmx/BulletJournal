@@ -11,7 +11,6 @@ import (
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -21,7 +20,11 @@ import (
 )
 
 const (
-	requestIDKey string = "requestID"
+	RequestIDKey string = "requestID"
+)
+
+var (
+	logger logging.Logger
 )
 
 // server should implement services.UnimplementedDaemonServer's methods
@@ -30,18 +33,18 @@ type server struct {
 
 // Send implements the JoinGroupEvents rpc endpoint of services.DaemonServer
 func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
-	log.Printf("Received rpc request: %v", request.String())
+	logger.Printf("Received rpc request: %v", request.String())
 	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
 
 // Rest implements the Rest rest->rpc endpoint of services.DaemonServer
 func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
-	log.Printf("Received request: %v", request.String())
+	logger.Printf("Received request: %v", request.String())
 	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
 
 func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
-	log.Printf("Received rpc request for subscribtion: %s", subscribe.String())
+	logger.Printf("Received rpc request for subscribtion: %s", subscribe.String())
 	n := 0
 	for n < 5 {
 		time.Sleep(5 * time.Second)
@@ -53,16 +56,37 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	return nil
 }
 
+// AttachRequestID will attach a brand new request ID to a http request
+func AssignRequestID(ctx context.Context) context.Context {
+
+	requestID := generator.GenerateUID()
+
+	return context.WithValue(ctx, RequestIDKey, requestID)
+}
+
+// GetRequestID will get reqID from a http request and return it as a string
+func GetRequestID(ctx context.Context) string {
+
+	reqID := ctx.Value(RequestIDKey)
+
+	if ret, ok := reqID.(string); ok {
+		return ret
+	}
+
+	return ""
+}
+
 func main() {
 
 	config.InitConfig()
 	serviceConfig := config.GetConfig()
 
 	logging.InitLogging(config.GetEnv())
-	logger := *logging.GetLogger()
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, requestIDKey, generator.GenerateUID())
+	ctx = AssignRequestID(ctx)
+	logger = logging.WithFields(logging.Fields{RequestIDKey: GetRequestID(ctx)})
+
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

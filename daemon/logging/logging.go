@@ -46,7 +46,7 @@ func InitLogging(env *string) {
 		config = GetLoggerConfig(true, DEBUG, false, true, INFO, true, "./tmp/daemon-dev.log")
 	}
 
-	err := InitializeLogger(config, InstanceZapLogger)
+	err := newLogger(config, InstanceZapLogger)
 
 	if err != nil {
 		log.Fatalf("Could not instantiate log %s", err.Error())
@@ -84,6 +84,8 @@ type Logger interface {
 
 	Info(v ...interface{})
 
+	Print(v ...interface{})
+
 	Warn(v ...interface{})
 
 	Error(v ...interface{})
@@ -95,6 +97,8 @@ type Logger interface {
 	Debugf(format string, args ...interface{})
 
 	Infof(format string, args ...interface{})
+
+	Printf(format string, args ...interface{})
 
 	Warnf(format string, args ...interface{})
 
@@ -119,7 +123,7 @@ type Configuration struct {
 	FileLocation      string
 }
 
-func InitializeLogger(config Configuration, loggerInstance int) error {
+func newLogger(config Configuration, loggerInstance int) error {
 	if loggerInstance == InstanceZapLogger {
 		zapLogger, err := newZapLogger(config)
 		if err != nil {
@@ -265,6 +269,10 @@ func (l *zapLogger) Info(v ...interface{}) {
 	l.sugaredLogger.Info(v)
 }
 
+func (l *zapLogger) Print(v ...interface{}) {
+	l.sugaredLogger.Info(v)
+}
+
 func (l *zapLogger) Warn(v ...interface{}) {
 	l.sugaredLogger.Warn(v)
 }
@@ -286,6 +294,10 @@ func (l *zapLogger) Debugf(format string, args ...interface{}) {
 }
 
 func (l *zapLogger) Infof(format string, args ...interface{}) {
+	l.sugaredLogger.Infof(format, args...)
+}
+
+func (l *zapLogger) Printf(format string, args ...interface{}) {
 	l.sugaredLogger.Infof(format, args...)
 }
 
