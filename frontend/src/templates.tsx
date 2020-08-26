@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Layout, Menu} from 'antd';
 import './styles/main.less';
 import './templates.styles.less';
@@ -12,7 +12,7 @@ import ReactLoading from "react-loading";
 import * as logo from "./assets/favicon466.ico";
 import FooterLayout from "./layouts/footer/footer.layout";
 
-const { Content, Sider } = Layout;
+const {Content, Sider} = Layout;
 
 type TemplatesProps = {
     categories: Category[];
@@ -31,10 +31,32 @@ const TemplatesPage: React.FC<TemplatesProps> = (
         getCategories,
     }) => {
 
+    const isMobilePage = () => {
+        return window.navigator.userAgent.toLowerCase().includes('mobile');
+    }
+
     useEffect(() => {
         document.title = 'Bullet Journal - Templates';
         getCategories();
+        if (isMobilePage()) {
+            setCollapsed(true);
+            setWidth(collapsedSiderWidth);
+        }
     }, []);
+
+    const expandedSiderWidth = 240;
+    const collapsedSiderWidth = 55;
+    const [collapsed, setCollapsed] = useState(false);
+    const [width, setWidth] = useState(expandedSiderWidth);
+
+    const onCollapse = (collapsed: boolean) => {
+        setCollapsed(collapsed);
+        if (collapsed) {
+            setWidth(collapsedSiderWidth);
+        } else {
+            setWidth(expandedSiderWidth);
+        }
+    }
 
     const getMenuItems = (categories: Category[]) => {
         if (categories && categories.length > 0) {
@@ -54,20 +76,21 @@ const TemplatesPage: React.FC<TemplatesProps> = (
 
     return (
         <Layout style={{minHeight: '100vh'}}>
-            <Sider className='sider' width={245}>
+            <Sider className='sider' collapsedWidth={collapsedSiderWidth} width={width}
+                   collapsible collapsed={collapsed} onCollapse={onCollapse} defaultCollapsed={false}>
                 <div className='sider-header'>
-                    <img src={logo} alt='Icon' className='icon-img' />
+                    <img src={logo} alt='Icon' className='icon-img'/>
                     <div className='title'>
                         <h2>Bullet Journal</h2>
                     </div>
                 </div>
                 {getMenuItems(categories)}
             </Sider>
-            <Layout style={{ marginLeft: '246px' }}>
+            <Layout style={{marginLeft: `${width}px`}}>
                 <Content className='content'>
                     <div></div>
                 </Content>
-                <FooterLayout />
+                {!isMobilePage() && <FooterLayout/>}
             </Layout>
         </Layout>
     )
