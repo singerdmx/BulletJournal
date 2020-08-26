@@ -105,7 +105,7 @@ func GetRequestID(ctx context.Context) string {
 	return ""
 }
 
-func InitServer() {
+func init() {
 	config.InitConfig()
 	serviceConfig = config.GetConfig()
 	subscriptions = map[string]services.Daemon_SubscribeNotificationServer{}
@@ -114,8 +114,6 @@ func InitServer() {
 }
 
 func main() {
-
-	InitServer()
 
 	ctx := context.Background()
 	ctx = AssignRequestID(ctx)
