@@ -1,5 +1,7 @@
 package com.bulletjournal.templates.workflow.models;
 
+import com.bulletjournal.templates.repository.model.Selection;
+
 import java.util.HashSet;
 import java.util.Set;
 

@@ -1,5 +1,8 @@
 package com.bulletjournal.templates.workflow.models;
 
+import com.bulletjournal.templates.repository.model.Choice;
+import com.bulletjournal.templates.repository.model.Selection;
+
 import java.util.List;
 
 public class FlowStep implements Step {

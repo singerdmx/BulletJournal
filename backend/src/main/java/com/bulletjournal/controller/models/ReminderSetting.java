@@ -72,4 +72,13 @@ public class ReminderSetting {
     public int hashCode() {
         return Objects.hash(getDate(), getTime(), getBefore());
     }
+
+    @Override
+    public String toString() {
+        return "ReminderSetting{" +
+                "date='" + date + '\'' +
+                ", time='" + time + '\'' +
+                ", before=" + before +
+                '}';
+    }
 }

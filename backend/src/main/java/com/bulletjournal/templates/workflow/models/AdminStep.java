@@ -1,5 +1,7 @@
 package com.bulletjournal.templates.workflow.models;
 
+import com.bulletjournal.templates.repository.model.Choice;
+
 /**
  * Operations can be done by Admin
  */

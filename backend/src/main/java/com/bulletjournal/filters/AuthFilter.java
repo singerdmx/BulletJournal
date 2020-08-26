@@ -2,9 +2,7 @@ package com.bulletjournal.filters;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
-import com.bulletjournal.config.SSOConfig;
 import com.bulletjournal.controller.GoogleCalendarController;
-import com.bulletjournal.controller.SystemController;
 import com.bulletjournal.controller.UserController;
 import com.bulletjournal.redis.models.LockedUser;
 import com.bulletjournal.redis.RedisLockedUserRepository;
@@ -31,16 +29,12 @@ import java.util.Optional;
 @Order(0)
 public class AuthFilter implements Filter {
     private static final List<String> BYPASS_WHITE_LIST_ROUTES = ImmutableList.of(
-            SystemController.PUBLIC_ITEM_ROUTE_PREFIX, GoogleCalendarController.CHANNEL_NOTIFICATIONS_ROUTE,
+            "/api/public/", GoogleCalendarController.CHANNEL_NOTIFICATIONS_ROUTE,
             GoogleCalendarController.OAUTH_CALL_BACK);
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilter.class);
 
     @Autowired
     private AuthConfig authConfig;
-
-    @Autowired
-    private SSOConfig ssoConfig;
-
 
     @Autowired
     private RedisLockedUserRepository redisLockedUserRepository;
@@ -104,7 +98,7 @@ public class AuthFilter implements Filter {
 
     private boolean shouldBypass(String requestURI) {
         for (String route : BYPASS_WHITE_LIST_ROUTES) {
-            if (requestURI.startsWith(route)) {
+            if (requestURI.toLowerCase().startsWith(route)) {
                 return true;
             }
         }

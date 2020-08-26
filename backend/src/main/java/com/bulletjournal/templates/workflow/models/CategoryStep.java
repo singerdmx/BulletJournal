@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.workflow.models;
 
 import com.bulletjournal.templates.repository.model.Category;
+import com.bulletjournal.templates.repository.model.Choice;
 
 import java.util.List;
 

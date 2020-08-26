@@ -36,10 +36,10 @@ const getTree = (
   showModal?: (user: User) => void,
   showOrderModal?: () => void
 ): TreeNodeNormal[] => {
-  let res = [] as TreeNodeNormal[];
+  const res = [] as TreeNodeNormal[];
   data.forEach((item: Note) => {
     const node = {} as TreeNodeNormal;
-    if (item.subNotes && item.subNotes.length) {
+    if (item.subNotes && item.subNotes.length > 0) {
       node.children = getTree(
         inProject,
         item.subNotes,
@@ -94,22 +94,21 @@ const findNoteById = (notes: Note[], noteId: number): Note => {
 };
 
 const dragNoteById = (notes: Note[], noteId: number): Note[] => {
-  let res = [] as Note[];
+  const res = [] as Note[];
   notes.forEach((item, index) => {
-    let note = {} as Note;
     const subNotes = dragNoteById(item.subNotes, noteId);
-    note = { ...item, subNotes: subNotes };
+    const note = { ...item, subNotes: subNotes };
     if (note.id !== noteId) res.push(note);
   });
   return res;
 };
 
-const DropNoteById = (
+const dropNoteById = (
   notes: Note[],
   dropId: number,
   dropNote: Note
 ): Note[] => {
-  let res = [] as Note[];
+  const res = [] as Note[];
   notes.forEach((item, index) => {
     let note = {} as Note;
     let subNotes = [] as Note[];
@@ -117,7 +116,7 @@ const DropNoteById = (
       subNotes = item.subNotes;
       subNotes.push(dropNote);
     } else {
-      subNotes = DropNoteById(item.subNotes, dropId, dropNote);
+      subNotes = dropNoteById(item.subNotes, dropId, dropNote);
     }
     note = { ...item, subNotes: subNotes };
     res.push(note);
@@ -144,7 +143,7 @@ const onDrop = (notes: Note[], putNote: Function, projectId: number) => (
       resNotes = dragNotes;
     }
   } else {
-    resNotes = DropNoteById(dragNotes, parseInt(info.node.key), targetNote);
+    resNotes = dropNoteById(dragNotes, parseInt(info.node.key), targetNote);
   }
   putNote(projectId, resNotes);
 };
@@ -184,7 +183,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     </div>
   }
 
-  let treeNote = getTree(!project.shared, notes, readOnly, labelsToKeep, labelsToRemove, showModal, showOrderModal);
+  const treeNote = getTree(!project.shared, notes, readOnly, labelsToKeep, labelsToRemove, showModal, showOrderModal);
 
   return (
     <Tree

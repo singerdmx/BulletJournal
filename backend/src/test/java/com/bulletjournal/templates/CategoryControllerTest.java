@@ -203,7 +203,7 @@ public class CategoryControllerTest {
     private List<com.bulletjournal.templates.controller.model.Category> getCategories() {
         ResponseEntity<com.bulletjournal.templates.controller.model.Category[]> response
             = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + CategoryController.CATEGORIES_ROUTE,
+                ROOT_URL + randomServerPort + CategoryController.PUBLIC_CATEGORIES_ROUTE,
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, USER),
                 com.bulletjournal.templates.controller.model.Category[].class);

@@ -1,12 +1,29 @@
-package com.bulletjournal.templates.workflow.models;
+package com.bulletjournal.templates.repository.model;
 
+import com.bulletjournal.repository.models.AuditModel;
+
+import javax.persistence.*;
 import java.util.List;
 
-public class Choice {
+@Entity
+@Table(name = "choices", schema = "template")
+public class Choice extends AuditModel {
+    @Id
+    @GeneratedValue(generator = "choice_generator")
+    @SequenceGenerator(name = "choice_generator",
+            sequenceName = "template.choice_sequence",
+            initialValue = 100,
+            allocationSize = 2)
+    private Long id;
+
+    @OneToMany(mappedBy = "choice", fetch = FetchType.LAZY)
     private List<Selection> selections;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
     // multiple selections or single selection
+    @Column(name = "multiple", nullable = false)
     private boolean multiple;
 
     public Choice() {
