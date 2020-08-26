@@ -26,7 +26,7 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
         'QuestionCircleOutlined'
     );
 
-    const IconsSelector = (mode: any) => {
+    const IconsSelector = () => {
         return (
             <div className='label-icon-selector' key='add-category-icon-selector'>
                 <Row>
@@ -91,7 +91,7 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
                     <Popover
                         title='Select an icon for your category'
                         placement='bottom'
-                        content={<IconsSelector mode='Create'/>}
+                        content={<IconsSelector />}
                         style={{width: '800px'}}
                     >
                         <div className='label-icon'>{formCreateLabelIcon}</div>
