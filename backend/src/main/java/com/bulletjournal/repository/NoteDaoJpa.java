@@ -4,7 +4,6 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateNoteParams;
-import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateNoteParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
@@ -21,7 +20,6 @@ import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -57,9 +55,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
-    /*@Lazy
-    @Autowired
-    private ProjectItemDaoJpa<ProjectItem> projectItemDaoJpa;*/
 
     @Override
     public JpaRepository getJpaRepository() {
