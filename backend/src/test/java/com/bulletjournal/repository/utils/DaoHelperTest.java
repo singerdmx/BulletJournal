@@ -21,6 +21,7 @@ public class DaoHelperTest {
         ReminderSetting reminderSetting = new ReminderSetting(null, null, 1);
 
         Task task = TestHelpers.getTaskRepoModel(1L, "Michael_Zhou", null, null, "America/Los_Angeles", "t1", 0, projectStub, null, reminderSetting);
+        task.setRecurrenceRule("DTSTART:20200825T070000ZRRULE:FREQ=WEEKLY;BYDAY=TU;INTERVAL=1");
         long epochMillis = 1595694480000L; // 2020-7-25 9:28 PST
         Task clonedTask = DaoHelper.cloneTaskWithDueDateTime(task, epochMillis);
 
@@ -28,7 +29,6 @@ public class DaoHelperTest {
         assertEquals("2020-07-25", clonedTask.getDueDate());
         assertEquals("09:28", clonedTask.getDueTime());
     }
-
 
     /*
      * Stub class for Project

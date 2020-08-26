@@ -4,6 +4,8 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.BuJoRecurrenceRule;
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
@@ -45,7 +47,7 @@ public class DaoHelper {
         } else {
             List<Task> recurringTasks = getRecurringTask(task, startTime, endTime);
             recurringTasks.forEach(t -> {
-                if (t == null || t.getReminderDateTime() == null) {
+                if (t == null || !t.hasReminderDateTime()) {
                     LOGGER.error("getReminderRecordMap error on {}", t);
                 } else {
                     map.put(new ReminderRecord(t.getId(), t.getReminderDateTime().getTime()), t);
@@ -103,6 +105,7 @@ public class DaoHelper {
      * @param timestampMillis the input timestamp for task Due DateTime
      * @return Task a task cloned from original task with new Due DateTime and Timezone
      */
+    @VisibleForTesting
     public static Task cloneTaskWithDueDateTime(Task task, Long timestampMillis) {
         try {
             DateTime taskDateTime = ZonedDateTimeHelper.getDateTime(timestampMillis, task.getTimezone());
@@ -114,7 +117,7 @@ public class DaoHelper {
 
     /**
      * Clone a new task and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
-     *
+     * Only used for recurring task
      * @param task         the target task needs to cloned
      * @param timezone     the target timezone for cloned task's due date and due time
      * @param currDateTime the RFC 5545 DateTime Object contains timing information
@@ -122,6 +125,10 @@ public class DaoHelper {
      * @throws CloneNotSupportedException
      */
     private static Task cloneTaskWithDateTime(Task task, String timezone, DateTime currDateTime) throws CloneNotSupportedException {
+        if (StringUtils.isBlank(task.getRecurrenceRule())) {
+            LOGGER.error("Task {} does not have RecurrenceRule", task);
+            throw new IllegalArgumentException("Task " + task.getId() + " does not have RecurrenceRule");
+        }
         Task cloned = (Task) task.clone();
 
         String defaultDate = ZonedDateTimeHelper.getDate(currDateTime);
@@ -143,6 +150,10 @@ public class DaoHelper {
         cloned.setTimezone(timezone);
 
         cloned.setReminderSetting(task.getReminderSetting()); // Set reminding setting to cloned
+
+        if (!cloned.hasReminderDateTime()) {
+            LOGGER.warn("Task {} ReminderDateTime is null", task.getReminderSetting());
+        }
 
         return cloned;
     }

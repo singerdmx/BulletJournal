@@ -324,8 +324,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                                                                                         final ZonedDateTime now) {
         ZonedDateTime maxRemindingTime = now.plusHours(ZonedDateTimeHelper.MAX_HOURS_BEFORE);
         return this.getRecurringTaskOfAssignee(assignee, now, maxRemindingTime).stream()
-                .filter(t -> t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now))
-                        && t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
+                .filter(t -> t.hasReminderDateTime() &&
+                        t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now)) &&
+                        t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList());
     }
 
