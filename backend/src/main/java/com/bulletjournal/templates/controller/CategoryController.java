@@ -107,11 +107,11 @@ public class CategoryController {
         category.setForumId(updateCategoryParams.getForumId());
         category.setDescription(updateCategoryParams.getDescription());
         categoryDaoJpa.save(category);
-        return getCategoryById(categoryId);
+        return getCategory(categoryId);
     }
 
     @GetMapping(PUBLIC_CATEGORY_ROUTE)
-    public Category getCategoryById(@NotNull @PathVariable Long categoryId) {
+    public Category getCategory(@NotNull @PathVariable Long categoryId) {
         return categoryDaoJpa.getById(categoryId).toPresentationModel();
     }
 
