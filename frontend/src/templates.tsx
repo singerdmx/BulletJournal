@@ -1,14 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Layout, Menu} from 'antd';
 import './styles/main.less';
+import './templates.styles.less';
+import './layouts/side/side.styles.less';
 import {IState} from "./store";
 import {connect} from "react-redux";
 import {getCategories} from "./features/templates/actions";
 import {Category} from "./features/templates/interface";
 import {getIcon} from "./components/draggable-labels/draggable-label-list.component";
 import ReactLoading from "react-loading";
+import * as logo from "./assets/favicon466.ico";
+import FooterLayout from "./layouts/footer/footer.layout";
 
-const {Sider} = Layout;
+const { Content, Sider } = Layout;
 
 type TemplatesProps = {
     categories: Category[];
@@ -32,12 +36,6 @@ const TemplatesPage: React.FC<TemplatesProps> = (
         getCategories();
     }, []);
 
-    const [collapsed, setCollapsed] = useState(false);
-
-    const onCollapse = (collapsed: boolean) => {
-        setCollapsed(collapsed);
-    }
-
     const getMenuItems = (categories: Category[]) => {
         if (categories && categories.length > 0) {
             return <Menu theme="dark" mode="inline" defaultSelectedKeys={categories.map(c => `${c.id}`)}>
@@ -56,9 +54,21 @@ const TemplatesPage: React.FC<TemplatesProps> = (
 
     return (
         <Layout style={{minHeight: '100vh'}}>
-            <Sider collapsible collapsed={collapsed} onCollapse={onCollapse} defaultCollapsed={false}>
+            <Sider className='sider' width={245}>
+                <div className='sider-header'>
+                    <img src={logo} alt='Icon' className='icon-img' />
+                    <div className='title'>
+                        <h2>Bullet Journal</h2>
+                    </div>
+                </div>
                 {getMenuItems(categories)}
             </Sider>
+            <Layout style={{ marginLeft: '246px' }}>
+                <Content className='content'>
+                    <div></div>
+                </Content>
+                <FooterLayout />
+            </Layout>
         </Layout>
     )
 };
