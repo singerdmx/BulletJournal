@@ -286,7 +286,7 @@ public class CategoryControllerTest {
     private void addCategories() {
         int i = 0;
         for (String name : CATEGORY_NAMES) {
-            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION, ICONS[0], COLORS[0], null);
+            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION, ICONS[0], COLORS[0], null, null);
             categories.add(category);
             categoriesIds[i] = category.getId();
             i++;

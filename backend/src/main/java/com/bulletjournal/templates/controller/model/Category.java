@@ -21,6 +21,8 @@ public class Category {
 
     private Long forumId;
 
+    private String image;
+
     @Expose
     private List<Category> subCategories = new ArrayList<>();
 
@@ -35,7 +37,7 @@ public class Category {
         this.description = description;
     }
 
-    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories) {
+    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories, String image) {
         this.id = id;
         this.name = name;
         this.subCategories = subCategories;
@@ -43,6 +45,7 @@ public class Category {
         this.icon = icon;
         this.color = color;
         this.forumId = forumId;
+        this.image = image;
     }
 
     public String getIcon() {

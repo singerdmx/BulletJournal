@@ -16,6 +16,8 @@ public class CreateCategoryParams {
 
     private Long forumId;
 
+    private String image;
+
     public CreateCategoryParams(@NotNull String name, @NotNull String description) {
         this.name = name;
         this.description = description;
@@ -23,6 +25,14 @@ public class CreateCategoryParams {
 
     public CreateCategoryParams() {
 
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getIcon() {
