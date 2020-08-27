@@ -18,7 +18,7 @@ type AdminCategoryProps = {
     deleteCategory: (id: number) => void;
     getCategory: (categoryId: number) => void;
     updateCategory: (categoryId: number, name: string,
-                     description?: string, icon?: string, color?: string, forumId?: number) => void;
+                     description?: string, icon?: string, color?: string, forumId?: number, image?: string) => void;
 }
 
 const AdminCategoryPage: React.FC<AdminCategoryProps> = (
@@ -81,27 +81,33 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
 
     const changeColorHandler = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, category.description, category.icon, input.color, category.forumId);
+        updateCategory(category.id, category.name, category.description, category.icon, input.color, category.forumId, category.image);
     }
 
     const nameChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, input, category.description, category.icon, category.color, category.forumId);
+        updateCategory(category.id, input, category.description, category.icon, category.color, category.forumId, category.image);
     }
 
     const descriptionChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, input, category.icon, category.color, category.forumId);
+        updateCategory(category.id, category.name, input, category.icon, category.color, category.forumId, category.image);
     }
 
     const forumIdChange = (input: any) => {
         console.log(input);
         updateCategory(category.id, category.name, category.description, category.icon, category.color,
-            input ? parseInt(input) : undefined);
+            input ? parseInt(input) : undefined, category.image);
+    }
+
+    const imageChange = (input: any) => {
+        console.log(input);
+        updateCategory(category.id, category.name, category.description, category.icon, category.color,
+            category.forumId, input);
     }
 
     const iconChange = (input: any) => {
-        updateCategory(category.id, category.name, category.description, input, category.color, category.forumId);
+        updateCategory(category.id, category.name, category.description, input, category.color, category.forumId, category.image);
     }
 
     return <div className='admin-categories-page'>
@@ -121,6 +127,11 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
                 editable={{onChange: descriptionChange}}>{`${category.description ? category.description : 'description'}`}</Text>
             <br/>
             <Text editable={{onChange: forumIdChange}}>{`${category.forumId ? category.forumId : 'forumId'}`}</Text>
+            <br/>
+            <Text editable={{onChange: imageChange}}>{`${category.image ? category.image : 'Image URL'}`}</Text>
+        </div>
+        <div>
+            {category.image && <img src={category.image} width='300px' style={{padding: '10px'}}/>}
         </div>
         <ColorPicker
             label='Color  '

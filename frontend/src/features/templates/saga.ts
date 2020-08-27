@@ -41,8 +41,8 @@ function* fetchCategory(action: PayloadAction<GetCategoryAction>) {
 function* addCategory(action: PayloadAction<AddCategoryAction>) {
   try {
     console.log(action.payload)
-    const {name, description, icon, color, forumId} = action.payload;
-    yield call(createCategory, name, description, icon, color, forumId);
+    const {name, description, icon, color, forumId, image} = action.payload;
+    yield call(createCategory, name, description, icon, color, forumId, image);
     const data: Category[] = yield call(getCategories);
     yield put(templatesActions.categoriesReceived({categories: data}));
   } catch (error) {
@@ -52,8 +52,8 @@ function* addCategory(action: PayloadAction<AddCategoryAction>) {
 
 function* updateCategory(action: PayloadAction<UpdateCategoryAction>) {
   try {
-    const {categoryId, name, description, icon, color, forumId} = action.payload;
-    const data: Category = yield call(putCategory, categoryId, name, description, icon, color, forumId);
+    const {categoryId, name, description, icon, color, forumId, image} = action.payload;
+    const data: Category = yield call(putCategory, categoryId, name, description, icon, color, forumId, image);
     yield put(templatesActions.categoryReceived({category: data}));
   } catch (error) {
     yield call(message.error, `updateCategory Error Received: ${error}`);

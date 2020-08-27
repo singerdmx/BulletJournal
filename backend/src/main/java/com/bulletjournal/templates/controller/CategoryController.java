@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.hierarchy.CategoryRelationsProcessor;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -106,13 +107,24 @@ public class CategoryController {
         category.setColor(updateCategoryParams.getColor());
         category.setForumId(updateCategoryParams.getForumId());
         category.setDescription(updateCategoryParams.getDescription());
+        category.setImage(updateCategoryParams.getImage());
         categoryDaoJpa.save(category);
         return getCategory(categoryId);
     }
 
     @GetMapping(PUBLIC_CATEGORY_ROUTE)
     public Category getCategory(@NotNull @PathVariable Long categoryId) {
-        return categoryDaoJpa.getById(categoryId).toPresentationModel();
+        List<Category> categoryList = getCategories();
+        Deque<Category> deque = new ArrayDeque<>();
+        categoryList.forEach(deque::offer);
+        while (!deque.isEmpty()) {
+            Category category = deque.poll();
+            if (category.getId().equals(categoryId)) {
+                return category;
+            }
+            category.getSubCategories().forEach(deque::offer);
+        }
+        throw new ResourceNotFoundException("Category id does not exist");
     }
 
     private void validateRequester() {

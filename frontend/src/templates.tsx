@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Layout, Menu, PageHeader} from 'antd';
+import {Card, Layout, Menu, PageHeader} from 'antd';
 import './styles/main.less';
 import './templates.styles.less';
 import './layouts/side/side.styles.less';
@@ -13,6 +13,7 @@ import * as logo from "./assets/favicon466.ico";
 import FooterLayout from "./layouts/footer/footer.layout";
 
 const {Content, Sider} = Layout;
+const {Meta} = Card;
 
 type TemplatesProps = {
     categories: Category[];
@@ -90,7 +91,19 @@ const TemplatesPage: React.FC<TemplatesProps> = (
             <PageHeader
                 title={category.name}
                 tags={getIcon(category.icon!)}/>
-            <div></div>
+            <div className='categories-info'>
+                {category.subCategories.map(c => {
+                    return <div className='category-info' style={{backgroundColor: `${c.color}`}}>
+                        <div>
+                            <img className='category-pic'
+                                 src={c.image!}/>
+                        </div>
+                        <div className='category-name'>
+                            <span>{getIcon(c.icon!)} {c.name}</span>
+                        </div>
+                    </div>
+                })}
+            </div>
         </>
     }
 
