@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Layout, Menu} from 'antd';
+import {Layout, Menu, PageHeader} from 'antd';
 import './styles/main.less';
 import './templates.styles.less';
 import './layouts/side/side.styles.less';
 import {IState} from "./store";
 import {connect} from "react-redux";
-import {getCategories} from "./features/templates/actions";
+import {getCategories, getCategory} from "./features/templates/actions";
 import {Category} from "./features/templates/interface";
 import {getIcon} from "./components/draggable-labels/draggable-label-list.component";
 import ReactLoading from "react-loading";
@@ -16,6 +16,8 @@ const {Content, Sider} = Layout;
 
 type TemplatesProps = {
     categories: Category[];
+    category: Category | undefined;
+    getCategory: (categoryId: number) => void;
     getCategories: () => void;
 };
 
@@ -29,6 +31,8 @@ const TemplatesPage: React.FC<TemplatesProps> = (
     {
         categories,
         getCategories,
+        category,
+        getCategory
     }) => {
 
     const isMobilePage = () => {
@@ -62,8 +66,12 @@ const TemplatesPage: React.FC<TemplatesProps> = (
         if (categories && categories.length > 0) {
             return <Menu theme="dark" mode="inline" defaultSelectedKeys={categories.map(c => `${c.id}`)}>
                 {categories.map(c => {
-                    return <Menu.Item key={`${c.id}`}
-                                      icon={getIcon(c.icon!)} style={{backgroundColor: `${c.color}`}}>
+                    return <Menu.Item
+                        key={`${c.id}`}
+                        icon={getIcon(c.icon!)}
+                        style={{backgroundColor: `${c.color}`}}
+                        onClick={() => getCategory(c.id)}
+                    >
                         {c.name}
                     </Menu.Item>
                 })
@@ -72,6 +80,18 @@ const TemplatesPage: React.FC<TemplatesProps> = (
         }
 
         return <Loading/>
+    }
+
+    const getTemplates = () => {
+        if (!category) {
+            return <div></div>
+        }
+        return <>
+            <PageHeader
+                title={category.name}
+                tags={getIcon(category.icon!)}/>
+            <div></div>
+        </>
     }
 
     return (
@@ -88,7 +108,9 @@ const TemplatesPage: React.FC<TemplatesProps> = (
             </Sider>
             <Layout style={{marginLeft: `${width}px`}}>
                 <Content className='content'>
-                    <div></div>
+                    <div className='template-content'>
+                        {getTemplates()}
+                    </div>
                 </Content>
                 {!isMobilePage() && <FooterLayout/>}
             </Layout>
@@ -97,9 +119,11 @@ const TemplatesPage: React.FC<TemplatesProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
-    categories: state.templates.categories
+    categories: state.templates.categories,
+    category: state.templates.category
 });
 
 export default connect(mapStateToProps, {
     getCategories,
+    getCategory
 })(TemplatesPage);
