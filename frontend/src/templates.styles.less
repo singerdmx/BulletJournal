@@ -7,4 +7,35 @@ div.template-content {
   @media screen and (max-width: 1024px) {
     padding: 1vh !important;
   }
+
+  .categories-info {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+
+    .category-info {
+      cursor: pointer;
+      margin-bottom: 15px;
+      border-radius: 15px;
+      padding: 5px;
+      width: 25%;
+      min-width: 200px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+
+      .category-pic {
+        width: 100%;
+        border-radius: 15px;
+      }
+
+      .category-name {
+        padding-top: 10px;
+        font-size: large;
+        font-weight: bold;
+      }
+    }
+  }
 }

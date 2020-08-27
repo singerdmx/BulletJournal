@@ -104,6 +104,14 @@ public class Category {
         this.description = description;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -143,5 +151,6 @@ public class Category {
         this.setColor(category.getColor());
         this.setForumId(category.getForumId());
         this.setIcon(category.getIcon());
+        this.setImage(category.getImage());
     }
 }

@@ -107,6 +107,7 @@ public class CategoryController {
         category.setColor(updateCategoryParams.getColor());
         category.setForumId(updateCategoryParams.getForumId());
         category.setDescription(updateCategoryParams.getDescription());
+        category.setImage(updateCategoryParams.getImage());
         categoryDaoJpa.save(category);
         return getCategory(categoryId);
     }

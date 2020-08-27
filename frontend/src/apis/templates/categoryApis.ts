@@ -17,13 +17,15 @@ export const getCategory = (categoryId: number) => {
         });
 }
 
-export const createCategory = (name: string, description?: string, icon?: string, color?: string, forumId?: number) => {
+export const createCategory = (
+    name: string, description?: string, icon?: string, color?: string, forumId?: number, image?: string) => {
     const postBody = JSON.stringify({
         name: name,
         description: description,
         icon: icon,
         color: color,
-        forumId: forumId
+        forumId: forumId,
+        image: image
     });
     return doPost('/api/categories', postBody)
         .then(res => res.json())
@@ -33,13 +35,14 @@ export const createCategory = (name: string, description?: string, icon?: string
 }
 
 export const putCategory = (
-    categoryId: number, name: string, description?: string, icon?: string, color?: string, forumId?: number) => {
+    categoryId: number, name: string, description?: string, icon?: string, color?: string, forumId?: number, image?: string) => {
     const putBody = JSON.stringify({
         name: name,
         description: description,
         icon: icon,
         color: color,
-        forumId: forumId
+        forumId: forumId,
+        image: image
     });
     return doPut(`/api/categories/${categoryId}`, putBody)
         .then(res => res.json())

@@ -21,6 +21,7 @@ export type AddCategoryAction = {
     icon?: string;
     color?: string;
     forumId?: number;
+    image?: string;
 };
 
 export type UpdateCategoryAction = {
@@ -30,6 +31,7 @@ export type UpdateCategoryAction = {
     icon?: string;
     color?: string;
     forumId?: number;
+    image?: string;
 };
 
 export type DeleteCategoryAction = {

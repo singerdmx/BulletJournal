@@ -5,5 +5,6 @@ export interface Category {
     icon?: string;
     color?: string;
     forumId?: number;
+    image?: string;
     subCategories: Category[];
 }

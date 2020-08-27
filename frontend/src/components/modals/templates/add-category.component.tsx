@@ -10,7 +10,7 @@ import ColorPicker from '../../../utils/color-picker/ColorPickr';
 import './add-category.component.styles.less';
 
 type AddCategoryProps = {
-    addCategory: (name: string, description?: string, icon?: string, color?: string, forumId?: number) => void;
+    addCategory: (name: string, description?: string, icon?: string, color?: string, forumId?: number, image?: string) => void;
 };
 
 const AddCategory: React.FC<AddCategoryProps> = (props) => {
@@ -51,7 +51,7 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
     };
 
     const createCategory = (values: any) => {
-        addCategory(values.name, values.description, formCreateLabelIconString, color, values.forumId);
+        addCategory(values.name, values.description, formCreateLabelIconString, color, values.forumId, values.image);
         setVisible(false);
     };
 
@@ -108,9 +108,14 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
                         <Input placeholder='Enter Description' allowClear/>
                     </Form.Item>
                     <Form.Item
+                        name='image'
+                    >
+                        <Input placeholder='Enter Image URL'/>
+                    </Form.Item>
+                    <Form.Item
                         name='forumId'
                     >
-                        <InputNumber placeholder='Enter Forum ID'/>
+                        <InputNumber placeholder='Enter Forum ID' width='200px'/>
                     </Form.Item>
                     <ColorPicker
                         label='Color  '
