@@ -130,8 +130,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                 // Set start time and end time
                 ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
                 ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
-                notes = this.noteRepository.findNotesBetween(project, Timestamp.from(startTime.toInstant()),
-                        Timestamp.from(endTime.toInstant()));
+                notes = this.getRecentProjectItemsBetween(Timestamp.from(startTime.toInstant()),
+                        Timestamp.from(endTime.toInstant()), Arrays.asList(projectId));
             }
         }
 

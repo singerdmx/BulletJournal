@@ -30,6 +30,9 @@ public class Category extends AuditModel {
     @Column(name = "forum_id")
     private Long forumId;
 
+    @Column(name = "image")
+    private String image;
+
     public Category() {
 
     }
@@ -39,12 +42,21 @@ public class Category extends AuditModel {
         this.description = description;
     }
 
-    public Category(String name, String description, String icon, String color, Long forumId) {
+    public Category(String name, String description, String icon, String color, Long forumId, String image) {
         this.name = name;
         this.description = description;
         this.icon = icon;
         this.color = color;
         this.forumId = forumId;
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getIcon() {
@@ -114,6 +126,6 @@ public class Category extends AuditModel {
     }
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Category(id, name, description, icon, color, forumId, new ArrayList<>());
+        return new com.bulletjournal.templates.controller.model.Category(id, name, description, icon, color, forumId, new ArrayList<>(), image);
     }
 }
