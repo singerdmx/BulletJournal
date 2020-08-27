@@ -44,7 +44,6 @@ func GetConfig() *Config {
 		log.Fatal("Invalid configuration")
 	}
 
-	PrintConfig()
 	return &serviceConfig
 }
 
@@ -114,6 +113,7 @@ func InitConfig() {
 		environment = "dev"
 		SetConfig(configNameDev)
 	}
+	PrintConfig()
 }
 
 func SetConfig(configName string) {
@@ -137,7 +137,7 @@ func SetConfig(configName string) {
 }
 
 func PrintConfig() {
-	tab := "\t\t"
+	tab := "\t\t\t"
 	fmt.Print("****************************************************\n")
 	fmt.Printf("Profile:%s%s\n", tab, environment)
 	fmt.Printf("Username:%s%s\n", tab, serviceConfig.Username)
@@ -150,7 +150,7 @@ func PrintConfig() {
 	fmt.Printf("DB Driver:%s%s\n", tab, serviceConfig.DBDriver)
 	fmt.Printf("Public APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPublic)
 	fmt.Printf("Private APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPrivate)
-	fmt.Printf("IntervalInSeconds: %s%v\n", tab, serviceConfig.IntervalInSeconds)
-	fmt.Printf("MaxRetentionTimeInDays: %s%v\n", tab, serviceConfig.MaxRetentionTimeInDays)
+	fmt.Printf("IntervalInSeconds:\t\t%v\n", serviceConfig.IntervalInSeconds)
+	fmt.Printf("MaxRetentionTimeInDays:\t\t%v\n", serviceConfig.MaxRetentionTimeInDays)
 	fmt.Print("****************************************************\n")
 }
