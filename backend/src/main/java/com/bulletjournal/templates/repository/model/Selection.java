@@ -24,11 +24,11 @@ public class Selection extends AuditModel {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "choice_id", nullable = true)
+    @JoinColumn(name = "choice_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Choice choice;
 
-    @Column(name = "icon", nullable = false)
+    @Column(name = "icon")
     private String icon;
 
     @Column(name = "text", nullable = false)
