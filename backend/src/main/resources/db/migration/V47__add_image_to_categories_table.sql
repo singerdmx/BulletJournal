@@ -1,0 +1,1 @@
+alter table template.categories add image varchar(255);

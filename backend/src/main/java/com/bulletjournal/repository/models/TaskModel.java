@@ -158,7 +158,11 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
     }
 
     public Timestamp getReminderDateTime() {
-        return reminderDateTime;
+        return this.reminderDateTime;
+    }
+
+    public boolean hasReminderDateTime() {
+        return this.reminderDateTime != null;
     }
 
     public void setReminderDateTime(Timestamp reminderDateTime) {

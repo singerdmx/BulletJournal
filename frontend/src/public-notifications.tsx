@@ -35,7 +35,7 @@ const PublicNotificationsPage: React.FC<PublicNotificationsProps> = (props) => {
 
   if (id && location.search) {
     const action = location.search.substring(8).toLowerCase(); // location.search = ?action=
-    console.log(`/dae/notifications/${id}/answer?action=${action}`);
+    console.log(`/dae/public/notifications/${id}/answer?action=${action}`);
     setTimeout(() => {
       handleAnswer(id, action);
     }, 3000)

@@ -29,6 +29,10 @@ public class CategoryController {
 
     public static final String CATEGORY_ROUTE = "/api/categories/{categoryId}";
 
+    public static final String PUBLIC_CATEGORIES_ROUTE = "/api/public/categories";
+
+    public static final String PUBLIC_CATEGORY_ROUTE = "/api/public/categories/{categoryId}";
+
     private CategoryDaoJpa categoryDaoJpa;
 
     private CategoriesHierarchyDaoJpa hierarchyDaoJpa;
@@ -46,7 +50,7 @@ public class CategoryController {
         this.userDaoJpa = userDaoJpa;
     }
 
-    @GetMapping(CATEGORIES_ROUTE)
+    @GetMapping(PUBLIC_CATEGORIES_ROUTE)
     public List<Category> getCategories() {
         List<com.bulletjournal.templates.repository.model.Category> allCategories
             = categoryDaoJpa.getAllCategories();
@@ -74,7 +78,7 @@ public class CategoryController {
     @PostMapping(CATEGORIES_ROUTE)
     public Category createCategory(@Valid @RequestBody CreateCategoryParams params) {
         validateRequester();
-        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId()).toPresentationModel();
+        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId(), params.getImage()).toPresentationModel();
     }
 
     @PutMapping(CATEGORIES_ROUTE)
@@ -103,11 +107,11 @@ public class CategoryController {
         category.setForumId(updateCategoryParams.getForumId());
         category.setDescription(updateCategoryParams.getDescription());
         categoryDaoJpa.save(category);
-        return getCategoryById(categoryId);
+        return getCategory(categoryId);
     }
 
-    @GetMapping(CATEGORY_ROUTE)
-    public Category getCategoryById(@NotNull @PathVariable Long categoryId) {
+    @GetMapping(PUBLIC_CATEGORY_ROUTE)
+    public Category getCategory(@NotNull @PathVariable Long categoryId) {
         return categoryDaoJpa.getById(categoryId).toPresentationModel();
     }
 

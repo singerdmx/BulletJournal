@@ -2,7 +2,7 @@ import {doDelete, doFetch, doPost, doPut} from '../api-helper';
 import {Category} from "../../features/templates/interface";
 
 export const getCategories = () => {
-    return doFetch('/api/categories')
+    return doFetch('/api/public/categories')
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);
@@ -10,7 +10,7 @@ export const getCategories = () => {
 }
 
 export const getCategory = (categoryId: number) => {
-    return doFetch(`/api/categories/${categoryId}`)
+    return doFetch(`/api/public/categories/${categoryId}`)
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);

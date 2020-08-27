@@ -203,7 +203,7 @@ public class CategoryControllerTest {
     private List<com.bulletjournal.templates.controller.model.Category> getCategories() {
         ResponseEntity<com.bulletjournal.templates.controller.model.Category[]> response
             = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + CategoryController.CATEGORIES_ROUTE,
+                ROOT_URL + randomServerPort + CategoryController.PUBLIC_CATEGORIES_ROUTE,
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, USER),
                 com.bulletjournal.templates.controller.model.Category[].class);
@@ -286,7 +286,7 @@ public class CategoryControllerTest {
     private void addCategories() {
         int i = 0;
         for (String name : CATEGORY_NAMES) {
-            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION, ICONS[0], COLORS[0], null);
+            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION, ICONS[0], COLORS[0], null, null);
             categories.add(category);
             categoriesIds[i] = category.getId();
             i++;
