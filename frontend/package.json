@@ -19,6 +19,7 @@
     "braft-editor": "^2.3.9",
     "browserslist": "^4.13.0",
     "caniuse-lite": "^1.0.30001103",
+    "color-picker": "0.0.1",
     "colr": "^1.2.2",
     "country-code": "0.0.3",
     "electron-is-dev": "^1.1.0",
