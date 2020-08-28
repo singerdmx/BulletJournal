@@ -367,7 +367,7 @@ export const getTaskStatistics = (
 ) => {
   // e.g. /api/taskStatistics?projectIds=11&projectIds=12&timezone=America%2FLos_Angeles&startDate=2020-01-01&endDate=2020-09-10
   if (projectIds.length === 0) {
-    return Promise.resolve({'complete': 0, 'incomplete': 0, 'userTaskStatistics': {}});
+    return Promise.resolve({'complete': 0, 'incomplete': 0, 'userTaskStatistics': []});
   }
   return doFetch(
       '/api/taskStatistics?' +
