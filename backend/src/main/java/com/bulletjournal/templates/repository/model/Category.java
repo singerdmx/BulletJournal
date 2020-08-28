@@ -4,6 +4,7 @@ import com.bulletjournal.repository.models.AuditModel;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -33,6 +34,9 @@ public class Category extends AuditModel {
     @Column(name = "image")
     private String image;
 
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
+    private List<Choice> choices;
+
     public Category() {
 
     }
@@ -49,6 +53,14 @@ public class Category extends AuditModel {
         this.color = color;
         this.forumId = forumId;
         this.image = image;
+    }
+
+    public List<Choice> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
     }
 
     public String getImage() {

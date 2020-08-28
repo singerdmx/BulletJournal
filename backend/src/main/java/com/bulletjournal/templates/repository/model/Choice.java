@@ -19,6 +19,16 @@ public class Choice extends AuditModel {
     @OneToMany(mappedBy = "choice", fetch = FetchType.LAZY)
     private List<Selection> selections;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "choices_categories", schema = "template",
+        joinColumns = {
+            @JoinColumn(name = "choice_id", referencedColumnName = "id",
+                nullable = false, updatable = false)},
+        inverseJoinColumns = {
+            @JoinColumn(name = "category_id", referencedColumnName = "id",
+                nullable = false, updatable = false)})
+    private List<Category> categories;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -33,6 +43,14 @@ public class Choice extends AuditModel {
         this.selections = selections;
         this.multiple = multiple;
         this.name = name;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
     }
 
     public String getName() {
