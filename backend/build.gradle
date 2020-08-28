@@ -37,7 +37,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.bitbucket.cowwoc:diff-match-patch:1.2'
-    implementation 'net.devh:grpc-spring-boot-starter:2.9.0.RELEASE'
+    implementation 'net.devh:grpc-client-spring-boot-starter:2.9.0.RELEASE'
     implementation 'io.grpc:grpc-stub'
     implementation 'io.grpc:grpc-protobuf'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
