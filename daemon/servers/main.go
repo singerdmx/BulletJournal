@@ -57,11 +57,13 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 			if _, ok := subscriptions[subscribe.Id]; ok {
 				if err := stream.Send(&types.StreamMessage{Message: strconv.Itoa(int(<-projectId))}); err != nil {
 					log.Printf("Unexpected error happened to subscribtion: %s, error: %v", subscribe.String(), err)
+					delete(subscriptions, subscribe.Id)
+					log.Printf("Stop streaming to subscribtion: %s", subscribe.String())
 				} else {
 					log.Printf("Sent data to subscribtion: %s", subscribe.String())
 				}
 			} else {
-				log.Printf("Subscription expires: %s", subscribe.String())
+				log.Printf("Subscription: %s has been removed", subscribe.String())
 				break
 			}
 		}
