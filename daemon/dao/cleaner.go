@@ -2,7 +2,7 @@ package dao
 
 import (
 	"github.com/singerdmx/BulletJournal/daemon/config"
-	log "github.com/singerdmx/BulletJournal/daemon/logging"
+	logging "github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 	"upper.io/db.v3"
 	"upper.io/db.v3/postgresql"
@@ -14,7 +14,10 @@ const (
 	historyMaxRetentionDays = 365
 )
 
-var settings postgresql.ConnectionURL
+var (
+	log logging.Logger
+	settings postgresql.ConnectionURL
+)
 
 //Map to table name auditables
 type Auditable struct {
@@ -137,9 +140,10 @@ func PopulateConfiguration() *postgresql.ConnectionURL {
 }
 
 func Clean(maxRetentionTimeInDays int) {
+	log = *logging.GetLogger()
 	t := time.Now()
 	t.AddDate(0, 0, -maxRetentionTimeInDays)
-	log.Println(t)
+	log.Infof("Cleaner starts at %v", t.Format(time.RFC3339))
 	PopulateConfiguration()
 	deleteByUpdatedAtBefore(t, "notifications")
 	deleteByUpdatedAtBefore(t, "auditables")

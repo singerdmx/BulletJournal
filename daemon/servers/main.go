@@ -2,21 +2,22 @@ package main
 
 import (
 	"context"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/singerdmx/BulletJournal/daemon/config"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
-	generator "github.com/singerdmx/BulletJournal/daemon/utils"
-	"github.com/singerdmx/BulletJournal/daemon/dao"
-	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
-	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
-	"github.com/zywangzy/JobScheduler"
-	"google.golang.org/grpc"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/singerdmx/BulletJournal/daemon/config"
+	"github.com/singerdmx/BulletJournal/daemon/dao"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
+	generator "github.com/singerdmx/BulletJournal/daemon/utils"
+	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
+	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
+	scheduler "github.com/zywangzy/JobScheduler"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -49,7 +50,7 @@ func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*typ
 }
 
 func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
-	logger.Printf("Received rpc request for subscribtion: %s", subscribe.String())
+	logger.Printf("Received rpc request for subscription: %s", subscribe.String())
 	if _, ok := subscriptions[subscribe.Id]; !ok {
 		//Add subscription
 		subscriptions[subscribe.Id] = stream
@@ -108,9 +109,9 @@ func GetRequestID(ctx context.Context) string {
 func init() {
 	config.InitConfig()
 	serviceConfig = config.GetConfig()
-	subscriptions = map[string]services.Daemon_SubscribeNotificationServer{}
-
 	logging.InitLogging(config.GetEnv())
+
+	subscriptions = map[string]services.Daemon_SubscribeNotificationServer{}
 }
 
 func main() {
