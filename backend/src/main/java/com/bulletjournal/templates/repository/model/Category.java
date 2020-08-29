@@ -3,9 +3,9 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.AuditModel;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "categories", schema = "template")
@@ -129,15 +129,17 @@ public class Category extends AuditModel {
             getIcon().equals(category.getIcon()) &&
             getColor().equals(category.getColor()) &&
             getForumId() == category.getForumId() &&
-            getDescription().equals(category.getDescription());
+            getDescription().equals(category.getDescription()) &&
+            getChoices().equals(category.getChoices());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getIcon(), getColor(), getForumId(), getDescription());
+        return Objects.hash(getId(), getName(), getIcon(), getColor(), getForumId(), getDescription(), getChoices());
     }
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Category(id, name, description, icon, color, forumId, new ArrayList<>(), image);
+        return new com.bulletjournal.templates.controller.model.Category(id, name, description, icon, color, forumId, image,
+                choices == null ? null : choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
     }
 }

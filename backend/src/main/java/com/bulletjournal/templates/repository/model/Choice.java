@@ -4,6 +4,7 @@ import com.bulletjournal.repository.models.AuditModel;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "choices", schema = "template")
@@ -79,5 +80,11 @@ public class Choice extends AuditModel {
 
     public void setMultiple(boolean multiple) {
         this.multiple = multiple;
+    }
+
+    public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.Choice(id, name, multiple,
+                categories == null ? null : categories.stream().map(Category::toPresentationModel).collect(Collectors.toList()),
+                selections == null ? null : selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
     }
 }
