@@ -23,7 +23,6 @@ public class Category {
 
     private String image;
 
-    @Expose
     private List<Choice> choices = new ArrayList<>();
 
     @Expose
