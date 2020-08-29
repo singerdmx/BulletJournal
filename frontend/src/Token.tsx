@@ -14,7 +14,7 @@ const TokenPage: React.FC<PageProps> = (props) => {
     }
     // iOS detection from: http://stackoverflow.com/a/9039885/177710
     if (/iPad|iPhone|iPod/.test(userAgent)) {
-        hrefLink = 'bullet://us.bulletjournal';
+        hrefLink = 'bullet://bulletjournal.us';
     }
 
     return (
