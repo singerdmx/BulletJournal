@@ -11,6 +11,7 @@ import {getIcon} from "./components/draggable-labels/draggable-label-list.compon
 import ReactLoading from "react-loading";
 import * as logo from "./assets/favicon466.ico";
 import FooterLayout from "./layouts/footer/footer.layout";
+import {useHistory} from "react-router-dom";
 
 const {Content, Sider} = Layout;
 const {Meta} = Card;
@@ -39,15 +40,16 @@ const TemplatesPage: React.FC<TemplatesProps> = (
     const isMobilePage = () => {
         return window.navigator.userAgent.toLowerCase().includes('mobile');
     }
+    const history = useHistory();
 
     useEffect(() => {
-        document.title = 'Bullet Journal - Templates';
+        document.title = category ? `Templates - ${category.name}` : 'Templates';
         getCategories();
         if (isMobilePage()) {
             setCollapsed(true);
             setWidth(collapsedSiderWidth);
         }
-    }, []);
+    }, [category]);
 
     const expandedSiderWidth = 240;
     const collapsedSiderWidth = 55;
@@ -83,6 +85,10 @@ const TemplatesPage: React.FC<TemplatesProps> = (
         return <Loading/>
     }
 
+    const handleOnClickCategory = (categoryId: number) => {
+        history.push(`/public/categories/${categoryId}/steps`);
+    }
+
     const getTemplates = () => {
         if (!category) {
             return <div></div>
@@ -93,7 +99,8 @@ const TemplatesPage: React.FC<TemplatesProps> = (
                 tags={getIcon(category.icon!)}/>
             <div className='categories-info'>
                 {category.subCategories.map(c => {
-                    return <div className='category-info' style={{backgroundColor: `${c.color}`}}>
+                    return <div className='category-info'
+                                onClick={() => handleOnClickCategory(c.id)} style={{backgroundColor: `${c.color}`}}>
                         <div>
                             <img className='category-pic'
                                  src={c.image!}/>

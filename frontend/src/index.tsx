@@ -11,6 +11,7 @@ import TermsOfServicePage from './TermsOfService';
 import TemplatesPage from './templates';
 import TokenPage from "./Token";
 import PublicNotificationsPage from "./public-notifications";
+import StepsPage from "./pages/templates/steps.pages";
 
 const store = createStore();
 
@@ -64,6 +65,7 @@ function listen() {
                             <Route exact path="/public/privacy" component={PrivacyPage}/>
                             <Route exact path="/public/tos" component={TermsOfServicePage}/>
                             <Route exact path="/public/templates" component={TemplatesPage}/>
+                            <Route exact path="/public/categories/:categoryId/steps" component={StepsPage}/>
                             <Route exact path="/public/items/:itemId" component={PublicPage}/>
                             <Route exact path="/public/notifications/:id" component={PublicNotificationsPage}/>
                             <Route exact path="/tokens/:token" component={TokenPage}/>
