@@ -1,6 +1,6 @@
 package com.bulletjournal.templates.repository.model;
 
-import com.bulletjournal.repository.models.AuditModel;
+import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "choices", schema = "template")
-public class Choice extends AuditModel {
+public class Choice extends NamedModel {
     @Id
     @GeneratedValue(generator = "choice_generator")
     @SequenceGenerator(name = "choice_generator",
@@ -30,9 +30,6 @@ public class Choice extends AuditModel {
                 nullable = false, updatable = false)})
     private List<Category> categories = new ArrayList<>();
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
     // multiple selections or single selection
     @Column(name = "multiple", nullable = false)
     private boolean multiple;
@@ -43,7 +40,16 @@ public class Choice extends AuditModel {
     public Choice(List<Selection> selections, boolean multiple, String name) {
         this.selections = selections;
         this.multiple = multiple;
-        this.name = name;
+        setName(name);
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public List<Category> getCategories() {
@@ -52,14 +58,6 @@ public class Choice extends AuditModel {
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<Selection> getSelections() {
@@ -83,6 +81,6 @@ public class Choice extends AuditModel {
     }
 
     public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Choice(id, name, multiple);
+        return new com.bulletjournal.templates.controller.model.Choice(id, getName(), multiple);
     }
 }
