@@ -1,9 +1,6 @@
 package com.bulletjournal.templates.controller.model;
 
-import com.google.gson.annotations.Expose;
-
 public class Selection {
-    @Expose
     private Long id;
 
     private Choice choice;

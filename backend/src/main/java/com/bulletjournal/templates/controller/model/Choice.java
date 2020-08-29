@@ -1,23 +1,18 @@
 package com.bulletjournal.templates.controller.model;
 
-import com.google.gson.annotations.Expose;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Choice {
 
-    @Expose
     private Long id;
 
     private String name;
 
     private boolean multiple;
 
-    @Expose
     private List<Category> categories = new ArrayList<>();
 
-    @Expose
     private List<Selection> selections = new ArrayList<>();
 
     public Choice() {
