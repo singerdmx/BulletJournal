@@ -90,15 +90,18 @@ public class GoogleCalendarProjectDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void renewExpiringGoogleCalendarWatch() throws IOException {
         long expirationTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1);
-        List<GoogleCalendarProject> expiringGoogleCalendarProjects =
-                this.googleCalendarProjectRepository.getByExpirationBefore(new Timestamp(expirationTime));
+        List<String> expiringGoogleCalendarProjectIds =
+                this.googleCalendarProjectRepository.getByExpirationBefore(new Timestamp(expirationTime))
+                        .stream().map(p -> p.getId()).collect(Collectors.toList());
         Channel createdChannel;
-        for (GoogleCalendarProject googleCalendarProject : expiringGoogleCalendarProjects) {
+        for (String googleCalendarProjectId : expiringGoogleCalendarProjectIds) {
             Calendar service = this.googleCalClient.getCalendarService();
-            Calendar.Events.Watch watch = service.events().watch(googleCalendarProject.getId(), Util.getChannel());
+            Calendar.Events.Watch watch = service.events().watch(googleCalendarProjectId, Util.getChannel());
             LOGGER.info("Created watch {}", watch);
             createdChannel = watch.execute();
 
+            GoogleCalendarProject googleCalendarProject =
+                    this.googleCalendarProjectRepository.findById(googleCalendarProjectId).get();
             googleCalendarProject.setChannelId(createdChannel.getId());
             googleCalendarProject.setExpiration(new Timestamp(createdChannel.getExpiration()));
             googleCalendarProject.setChannel(GSON.toString(createdChannel));

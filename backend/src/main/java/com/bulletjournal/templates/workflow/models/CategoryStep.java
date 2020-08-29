@@ -9,8 +9,8 @@ public class CategoryStep extends FlowStep {
 
     private final Category category;
 
-    public CategoryStep(Category category, List<Choice> choices, String name) {
-        super(choices, name);
+    public CategoryStep(Category category, List<Choice> choices) {
+        super(choices, category.getName());
         this.category = category;
     }
 

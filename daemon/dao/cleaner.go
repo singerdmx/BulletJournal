@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"github.com/singerdmx/BulletJournal/daemon/config"
 	logging "github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 	"upper.io/db.v3"
@@ -14,10 +13,12 @@ const (
 	historyMaxRetentionDays = 365
 )
 
-var (
-	log logging.Logger
-	settings postgresql.ConnectionURL
-)
+var log logging.Logger
+
+type Cleaner struct {
+	Settings postgresql.ConnectionURL
+	Receiver chan uint
+}
 
 //Map to table name auditables
 type Auditable struct {
@@ -70,8 +71,8 @@ type PublicProjectItem struct {
 	NoteId         uint      `db:"note_id"`
 }
 
-func getExpiringGoogleCalendarProjects(tableName string) []GoogleCalendarProject {
-	sess, err := postgresql.Open(settings)
+func (s *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []GoogleCalendarProject {
+	sess, err := postgresql.Open(s.Settings)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -92,8 +93,8 @@ func getExpiringGoogleCalendarProjects(tableName string) []GoogleCalendarProject
 	return googleCalendarProjects
 }
 
-func deleteFromTableByCond(cond db.Cond, tableName string) {
-	sess, err := postgresql.Open(settings)
+func (s *Cleaner) deleteFromTableByCond(cond db.Cond, tableName string) {
+	sess, err := postgresql.Open(s.Settings)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -106,49 +107,37 @@ func deleteFromTableByCond(cond db.Cond, tableName string) {
 	res.Delete()
 }
 
-func deleteByUpdatedAtBefore(t time.Time, tableName string) {
+func (s *Cleaner) deleteByUpdatedAtBefore(t time.Time, tableName string) {
 	var updatedAtBeforeCond = db.Cond{
 		"updated_at <": t,
 	}
-	deleteFromTableByCond(updatedAtBeforeCond, tableName)
+	s.deleteFromTableByCond(updatedAtBeforeCond, tableName)
 }
 
-func deleteByExpirationTimeBefore(tableName string) {
+func (s *Cleaner) deleteByExpirationTimeBefore(tableName string) {
 	var expirationTimeBeforeCond = db.Cond{
 		"expiration_time <": time.Now(),
 	}
-	deleteFromTableByCond(expirationTimeBeforeCond, tableName)
+	s.deleteFromTableByCond(expirationTimeBeforeCond, tableName)
 }
 
-func renewExpiringGoogleCalendarWatch() {
-	googleCalendarProjects := getExpiringGoogleCalendarProjects("google_calendar_projects")
+func (s *Cleaner) renewExpiringGoogleCalendarWatch() {
+	googleCalendarProjects := s.getExpiringGoogleCalendarProjects("google_calendar_projects")
 	for _, googleCalendarProject := range googleCalendarProjects {
 		log.Printf("%q (ID: %d)\n", googleCalendarProject.Owner, googleCalendarProject.ID)
-		//TODO Renew based on google Calendar service
+		s.Receiver <- googleCalendarProject.ProjectId
 	}
 }
 
-func PopulateConfiguration() *postgresql.ConnectionURL {
-	serviceConfig := config.GetConfig()
-	settings = postgresql.ConnectionURL{
-		Host:     serviceConfig.Host + ":" + serviceConfig.DBPort,
-		Database: serviceConfig.Database,
-		User:     serviceConfig.Username,
-		Password: serviceConfig.Password,
-	}
-	return &settings
-}
-
-func Clean(maxRetentionTimeInDays int) {
+func (s *Cleaner) Clean(maxRetentionTimeInDays int) {
 	log = *logging.GetLogger()
 	t := time.Now()
 	t.AddDate(0, 0, -maxRetentionTimeInDays)
 	log.Infof("Cleaner starts at %v", t.Format(time.RFC3339))
-	PopulateConfiguration()
-	deleteByUpdatedAtBefore(t, "notifications")
-	deleteByUpdatedAtBefore(t, "auditables")
-	deleteByExpirationTimeBefore("public_project_items")
-	renewExpiringGoogleCalendarWatch()
+	s.deleteByUpdatedAtBefore(t, "notifications")
+	s.deleteByUpdatedAtBefore(t, "auditables")
+	s.deleteByExpirationTimeBefore("public_project_items")
+	s.renewExpiringGoogleCalendarWatch()
 }
 
 //func main()  {

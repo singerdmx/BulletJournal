@@ -66,4 +66,8 @@ public class Selection extends AuditModel {
     public void setChoice(Choice choice) {
         this.choice = choice;
     }
+
+    public com.bulletjournal.templates.controller.model.Selection toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.Selection(id, choice.toPresentationModel(), icon, text);
+    }
 }

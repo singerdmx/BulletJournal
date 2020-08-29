@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	scheduler "github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
+	"upper.io/db.v3/postgresql"
 )
 
 const (
@@ -29,6 +31,7 @@ var (
 )
 
 var (
+	projectId     chan uint
 	serviceConfig *config.Config
 	subscriptions map[string]services.Daemon_SubscribeNotificationServer
 )
@@ -54,28 +57,18 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	if _, ok := subscriptions[subscribe.Id]; !ok {
 		//Add subscription
 		subscriptions[subscribe.Id] = stream
-		go func() {
-			//To do
-			//Add business logic here=
-
-			//n := 0
-			//for n < 10 {
-			//	time.Sleep(3 * time.Second)
-			//	if err := stream.Send(&types.StreamMessage{Message: fmt.Sprintf("Hello rpc %s", subscribe.String())}); err != nil {
-			//		log.Printf("Unexpected error happened to subscribtion: %s, error: %v", subscribe.String(), err)
-			//	} else {
-			//		log.Printf("Sent data to subscribtion: %s", subscribe.String())
-			//	}
-			//	n += 1
-			//}
-			//delete(subscriptions, subscribe.Id)
-		}()
 		//Keep the subscription session alive
 		for {
 			if _, ok := subscriptions[subscribe.Id]; ok {
-				time.Sleep(3 * time.Second)
+				if err := stream.Send(&types.StreamMessage{Message: strconv.Itoa(int(<-projectId))}); err != nil {
+					logger.Printf("Unexpected error happened to subscribtion: %s, error: %v", subscribe.String(), err)
+					delete(subscriptions, subscribe.Id)
+					logger.Printf("Stop streaming to subscribtion: %s", subscribe.String())
+				} else {
+					logger.Printf("Sent data to subscribtion: %s", subscribe.String())
+				}
 			} else {
-				logger.Printf("Subscription expires: %s", subscribe.String())
+				logger.Printf("Subscription: %s has been removed", subscribe.String())
 				break
 			}
 		}
@@ -112,6 +105,7 @@ func init() {
 	logging.InitLogging(config.GetEnv())
 
 	subscriptions = map[string]services.Daemon_SubscribeNotificationServer{}
+	projectId = make(chan uint, 1)
 }
 
 func main() {
@@ -170,7 +164,15 @@ func main() {
 	jobScheduler.Start()
 	jobScheduler.AddRecurrentJob(
 		func(...interface{}) {
-			dao.Clean(serviceConfig.MaxRetentionTimeInDays)
+			cleaner := dao.Cleaner{
+				Receiver: projectId,
+				Settings: postgresql.ConnectionURL{
+					Host:     serviceConfig.Host + ":" + serviceConfig.DBPort,
+					Database: serviceConfig.Database,
+					User:     serviceConfig.Username,
+					Password: serviceConfig.Password,
+				}}
+			cleaner.Clean(serviceConfig.MaxRetentionTimeInDays)
 		},
 		time.Now(),
 		time.Second*time.Duration(serviceConfig.IntervalInSeconds),

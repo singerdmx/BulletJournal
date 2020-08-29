@@ -23,6 +23,8 @@ public class Category {
 
     private String image;
 
+    private List<Choice> choices;
+
     @Expose
     private List<Category> subCategories = new ArrayList<>();
 
@@ -37,7 +39,18 @@ public class Category {
         this.description = description;
     }
 
-    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories, String image) {
+    public Category(Long id, String name, String description, String icon, String color, Long forumId, String image, List<Choice> choices) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.icon = icon;
+        this.color = color;
+        this.forumId = forumId;
+        this.image = image;
+        this.choices = choices;
+    }
+
+    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories, String image, List<Choice> choices) {
         this.id = id;
         this.name = name;
         this.subCategories = subCategories;
@@ -46,6 +59,7 @@ public class Category {
         this.color = color;
         this.forumId = forumId;
         this.image = image;
+        this.choices = choices;
     }
 
     public String getIcon() {
@@ -112,6 +126,14 @@ public class Category {
         this.image = image;
     }
 
+    public List<Choice> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -123,12 +145,13 @@ public class Category {
             Objects.equals(getIcon(), category.getIcon()) &&
             Objects.equals(getColor(), category.getColor()) &&
             Objects.equals(getForumId(), category.getForumId()) &&
-            Objects.equals(getSubCategories(), category.getSubCategories());
+            Objects.equals(getSubCategories(), category.getSubCategories()) &&
+            Objects.equals(getChoices(), category.getChoices());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getDescription(), getIcon(), getColor(), getForumId(), getSubCategories());
+        return Objects.hash(getId(), getName(), getDescription(), getIcon(), getColor(), getForumId(), getSubCategories(), getChoices());
     }
 
     @Override
@@ -141,6 +164,7 @@ public class Category {
             ", color='" + color + '\'' +
             ", forumId='" + forumId + '\'' +
             ", subCategories=" + subCategories +
+            ", choices" + choices +
             '}';
     }
 
@@ -152,5 +176,6 @@ public class Category {
         this.setForumId(category.getForumId());
         this.setIcon(category.getIcon());
         this.setImage(category.getImage());
+        this.setChoices(category.getChoices());
     }
 }
