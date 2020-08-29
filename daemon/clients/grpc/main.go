@@ -47,7 +47,7 @@ func main() {
 				break
 			}
 			if err != nil {
-				log.Fatalf("%v.JoinGroupEvents(_) = _, %v", client, err)
+				log.Fatalf("Server side error happened: %v", err)
 			}
 			log.Println(message.Message)
 		}

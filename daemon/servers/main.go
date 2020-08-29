@@ -179,10 +179,14 @@ func main() {
 	)
 
 	<-shutdown
+	logger.Infof("Shutdown signal received")
 	jobScheduler.Stop()
+	logger.Infof("JobScheduler stopped")
 	rpcServer.GracefulStop()
-	err = httpServer.Shutdown(context.Background())
-	if err != nil {
+	logger.Infof("rpc server stopped")
+	if httpServer.Shutdown(context.Background()) != nil {
 		logger.Fatalf("failed to stop http server: %v", err)
+	} else {
+		logger.Infof("http server stopped")
 	}
 }
