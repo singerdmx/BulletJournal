@@ -1,12 +1,18 @@
 package com.bulletjournal.daemon;
 
+import com.bulletjournal.calendars.google.Util;
+import com.bulletjournal.clients.DaemonServiceClient;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.config.NotificationConfig;
-import com.bulletjournal.repository.AuditableDaoJpa;
-import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
-import com.bulletjournal.repository.NotificationDaoJpa;
-import com.bulletjournal.repository.PublicProjectItemDaoJpa;
+import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
+import com.bulletjournal.protobuf.daemon.grpc.types.StreamMessage;
+import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotification;
+import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.GoogleCalendarProject;
 import com.bulletjournal.util.CustomThreadFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +22,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -24,87 +32,58 @@ import java.util.concurrent.TimeUnit;
 public class Cleaner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Cleaner.class);
-    private final ScheduledExecutorService executorService;
-    private final NotificationDaoJpa notificationDaoJpa;
-    private final PublicProjectItemDaoJpa publicProjectItemDaoJpa;
-    private final GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa;
+
+    private final ExecutorService executorService;
+
+    private static final GsonFactory GSON = new GsonFactory();
 
     @Autowired
-    private NotificationConfig notificationConfig;
+    private GoogleCalClient googleCalClient;
 
     @Autowired
-    private AuditableDaoJpa auditableDaoJpa;
+    private DaemonServiceClient daemonServiceClient;
 
     @Autowired
-    public Cleaner(NotificationDaoJpa notificationDaoJpa, PublicProjectItemDaoJpa publicProjectItemDaoJpa,
-                   GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa, GoogleCalClient googleCalClient) {
-        this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("cleaner"));
-        this.notificationDaoJpa = notificationDaoJpa;
-        this.publicProjectItemDaoJpa = publicProjectItemDaoJpa;
-        this.googleCalendarProjectDaoJpa = googleCalendarProjectDaoJpa;
+    private GoogleCalendarProjectRepository googleCalendarProjectRepository;
+
+    public Cleaner() {
+        executorService = Executors.newFixedThreadPool(3, new CustomThreadFactory("cleaner"));
     }
 
     @PostConstruct
     public void postConstruct() {
-        int intervalInSeconds = notificationConfig.getCleaner().getIntervalInSeconds();
-        if (intervalInSeconds <= 0) {
-            throw new IllegalArgumentException("Invalid intervalInSeconds: " + intervalInSeconds);
-        }
-
-        this.executorService.scheduleWithFixedDelay(this::clean, 0, intervalInSeconds, TimeUnit.SECONDS);
+        executorService.submit(this::subscribeNotification);
     }
 
-    public void clean() {
-        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        try {
-            cleanNotification();
-        } catch (Exception e) {
-            LOGGER.error("cleanNotification error", e);
+    public void subscribeNotification() {
+        Iterator<StreamMessage> projectId = daemonServiceClient.subscribeNotification(SubscribeNotification.newBuilder().setId("cleaner").build());
+        while (projectId != null && projectId.hasNext()) {
+            LOGGER.info("Got a daemon streaming message");
+            String googleCalendarProjectId = projectId.next().getMessage();
+            executorService.submit(() -> {
+                try {
+                    renewGoogleCalendarWatch(googleCalendarProjectId);
+                } catch (Exception e) {
+                    LOGGER.error("renewGoogleCalendarWatch error", e);
+                }
+            });
+            LOGGER.info("Processed a daemon streaming message");
         }
-
-        try {
-            cleanPublicProjectItems();
-        } catch (Exception e) {
-            LOGGER.error("cleanPublicProjectItems error", e);
-        }
-
-        try {
-            cleanHistory();
-        } catch (Exception e) {
-            LOGGER.error("cleanHistory error", e);
-        }
-
-        try {
-            renewGoogleCalendarWatch();
-        } catch (Exception e) {
-            LOGGER.error("renewGoogleCalendarWatch error", e);
-        }
+        LOGGER.info("Stopped receiving GoogleCalendarProjectId");
     }
 
-    private void renewGoogleCalendarWatch() throws IOException {
-        this.googleCalendarProjectDaoJpa.renewExpiringGoogleCalendarWatch();
-        LOGGER.info("Google Calendar Expiring Watch Cleaning Done");
-    }
-
-    private void cleanNotification() {
-        int maxRetentionTimeInDays = notificationConfig.getCleaner().getMaxRetentionTimeInDays();
-        long expirationTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(maxRetentionTimeInDays);
-
-        notificationDaoJpa.deleteAllExpiredNotifications(new Timestamp(expirationTime));
-        LOGGER.info("Notification Cleaning Done");
-    }
-
-    private void cleanPublicProjectItems() {
-        this.publicProjectItemDaoJpa.deleteAllExpiredPublicItems();
-        LOGGER.info("PublicProjectItems Cleaning Done");
-    }
-
-    private void cleanHistory() {
-        int historyMaxRetentionDays = notificationConfig.getCleaner().getHistoryMaxRetentionDays();
-        long expirationTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(historyMaxRetentionDays);
-
-        auditableDaoJpa.deleteAllExpiredHistory(new Timestamp(expirationTime));
-        LOGGER.info("History Cleaning Done");
+    public void renewGoogleCalendarWatch(String googleCalendarProjectId) throws IOException {
+        LOGGER.info("Got googleCalendarProjectId {}", googleCalendarProjectId);
+        Calendar service = googleCalClient.getCalendarService();
+        Calendar.Events.Watch watch = service.events().watch(googleCalendarProjectId, Util.getChannel());
+        LOGGER.info("Created watch {}", watch);
+        Channel createdChannel = watch.execute();
+        GoogleCalendarProject googleCalendarProject = googleCalendarProjectRepository.findById(googleCalendarProjectId).get();
+        googleCalendarProject.setChannelId(createdChannel.getId());
+        googleCalendarProject.setExpiration(new Timestamp(createdChannel.getExpiration()));
+        googleCalendarProject.setChannel(GSON.toString(createdChannel));
+        googleCalendarProjectRepository.save(googleCalendarProject);
+        LOGGER.info("Renew GoogleCalendarProject {}, googleCalendarProjectId {}", googleCalendarProject, googleCalendarProjectId);
     }
 
     @PreDestroy
