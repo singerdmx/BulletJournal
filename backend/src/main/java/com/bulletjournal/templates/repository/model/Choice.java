@@ -3,6 +3,7 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.AuditModel;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class Choice extends AuditModel {
         inverseJoinColumns = {
             @JoinColumn(name = "category_id", referencedColumnName = "id",
                 nullable = false, updatable = false)})
-    private List<Category> categories;
+    private List<Category> categories = new ArrayList<>();
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -83,8 +84,6 @@ public class Choice extends AuditModel {
     }
 
     public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Choice(id, name, multiple,
-                categories == null ? null : categories.stream().map(Category::toPresentationModel).collect(Collectors.toList()),
-                selections == null ? null : selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
+        return new com.bulletjournal.templates.controller.model.Choice(id, name, multiple);
     }
 }

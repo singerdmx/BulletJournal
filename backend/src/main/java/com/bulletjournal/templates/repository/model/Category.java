@@ -3,6 +3,7 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.AuditModel;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class Category extends AuditModel {
     private String image;
 
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
-    private List<Choice> choices;
+    private List<Choice> choices = new ArrayList<>();
 
     public Category() {
 
@@ -140,6 +141,6 @@ public class Category extends AuditModel {
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Category(id, name, description, icon, color, forumId, image,
-                choices == null ? null : choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
+                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
     }
 }

@@ -8,6 +8,7 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.Category;
+import com.bulletjournal.templates.controller.model.Choice;
 import com.bulletjournal.templates.controller.model.CreateCategoryParams;
 import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
@@ -120,6 +121,8 @@ public class CategoryController {
         while (!deque.isEmpty()) {
             Category category = deque.poll();
             if (category.getId().equals(categoryId)) {
+                List<Choice> choices = categoryDaoJpa.getById(categoryId).toPresentationModel().getChoices();
+                category.setChoices(choices);
                 return category;
             }
             category.getSubCategories().forEach(deque::offer);

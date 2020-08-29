@@ -2,6 +2,7 @@ package com.bulletjournal.templates.controller.model;
 
 import com.google.gson.annotations.Expose;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Choice {
@@ -13,11 +14,23 @@ public class Choice {
 
     private boolean multiple;
 
-    private List<Category> categories;
+    @Expose
+    private List<Category> categories = new ArrayList<>();
 
-    private List<Selection> selections;
+    @Expose
+    private List<Selection> selections = new ArrayList<>();
 
-    public Choice(Long id, String name, Boolean multiple, List<Category> categories, List<Selection> selections) {
+    public Choice() {
+
+    }
+
+    public Choice(Long id, String name, boolean multiple) {
+        this.id = id;
+        this.name = name;
+        this.multiple = multiple;
+    }
+
+    public Choice(Long id, String name, boolean multiple, List<Category> categories, List<Selection> selections) {
         this.id = id;
         this.name = name;
         this.multiple = multiple;

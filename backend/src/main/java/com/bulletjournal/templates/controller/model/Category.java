@@ -23,7 +23,8 @@ public class Category {
 
     private String image;
 
-    private List<Choice> choices;
+    @Expose
+    private List<Choice> choices = new ArrayList<>();
 
     @Expose
     private List<Category> subCategories = new ArrayList<>();
@@ -37,6 +38,16 @@ public class Category {
         this.name = name;
         this.subCategories = subCategories;
         this.description = description;
+    }
+
+    public Category(Long id, String name, String description, String icon, String color, Long forumId, String image) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.icon = icon;
+        this.color = color;
+        this.forumId = forumId;
+        this.image = image;
     }
 
     public Category(Long id, String name, String description, String icon, String color, Long forumId, String image, List<Choice> choices) {
