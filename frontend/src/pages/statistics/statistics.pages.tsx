@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import './statistics.styles.less';
-import {Alert, Avatar, BackTop, Empty, Popover, Progress, Tooltip, Select, DatePicker, Space} from "antd";
+import {Alert, Avatar, BackTop, Empty, Popover, Progress, Tooltip, Select, DatePicker, Space, Input} from "antd";
 import {IState} from '../../store';
 import {connect} from 'react-redux';
-import {TaskStatistics} from '../../features/tasks/interface';
+import {TaskStatistics, UserTaskStatistic} from '../../features/tasks/interface';
 import {Project, ProjectsWithOwner} from '../../features/project/interface';
 import {getTasksByAssignee, getTaskStatistics} from '../../features/tasks/actions';
 import {getProject} from "../../features/project/actions";
@@ -11,10 +11,11 @@ import {useHistory, useParams} from "react-router-dom";
 import {User} from "../../features/group/interface";
 import TasksByAssignee from "../../components/modals/tasks-by-assignee.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {SyncOutlined, UpSquareOutlined} from "@ant-design/icons/lib";
+import {SyncOutlined, UpSquareOutlined, SearchOutlined} from "@ant-design/icons/lib";
 import { flattenOwnedProject, flattenSharedProject } from '../projects/projects.pages';
 import { ProjectType } from '../../features/project/constants';
 import { iconMapper } from '../../components/project-dnd/project-dnd.component';
+import { onFilterUser } from '../../utils/Util';
 
 type ProjectStatisticsProps = {
     projectStatistics: TaskStatistics | undefined;
@@ -49,9 +50,11 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
     const [tasksByUsersShown, setTasksByUsersShown] = useState(false);
     const [assignee, setAssignee] = useState<User | undefined>(undefined);
     const [projects, setProjects] = useState<Project[]>([]);
-    const [projectIds, setProjectIds] = useState<number[] | undefined>(project !== undefined ? [project.id] : undefined);
+    const [projectIds, setProjectIds] = useState<number[] | undefined>(project ? [project.id] : undefined);
     const [startTime, setStartTime] = useState<string>('');
     const [endTime, setEndTime] = useState<string>('');
+    const [filter, setFilter] = useState<string>('');
+    const [filteredUserStatistics, setfilteredUserStatistics] = useState<UserTaskStatistic[] | undefined>(projectStatistics?.userTaskStatistics);
 
     useEffect(() => {
         let allProjects = [] as Project[];
@@ -95,6 +98,14 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
         fetchTaskStatistics();
     }, [projectIds, timezone, startTime, endTime]);
 
+    useEffect(() => {
+        if (!projectStatistics?.userTaskStatistics) {
+            return;
+        }
+        const userStatistics = projectStatistics.userTaskStatistics.filter(u => onFilterUser(u.user, filter))
+        setfilteredUserStatistics(userStatistics);
+    }, [projectStatistics, filter])
+
     //by user modal
     const handleGetTasksByAssignee = (u: User) => {
         if (!projectId) {
@@ -106,7 +117,7 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
         getTasksByAssignee(parseInt(projectId), u.name);
     };
 
-    if (!projectStatistics || !project) {
+    if (!projectStatistics || !project || !filteredUserStatistics) {
         return <div className='project-statistics-page'>
             <Empty/>
         </div>;
@@ -143,6 +154,17 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
             setEndTime('');
         }
     }
+
+    const onFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let { value } = e.target;
+        value = value.toLowerCase();
+        if (value) {
+            setFilter(value);
+        }
+        else {
+            setFilter('');
+        }
+    };
 
     return (
         <div className='project-statistics-page'>
@@ -206,12 +228,13 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
                     </Tooltip>
                 </div>
                 <div>
+                    <Input style={{maxWidth: 130}} value={filter} placeholder="Filter User" allowClear={true} prefix={<SearchOutlined />} onChange={e => onFilter(e)} />
                 </div>
             </div>
             
             
             <div className='user-progress-bars'>
-                {projectStatistics.userTaskStatistics.map(t => {
+                {filteredUserStatistics.map(t => {
                     return <Popover
                         title={t.user.alias}
                         content={<>

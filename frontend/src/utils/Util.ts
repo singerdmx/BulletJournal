@@ -2,6 +2,9 @@ import {User} from "../features/group/interface";
 import {ProjectItem} from "../features/myBuJo/interface";
 
 const isSubsequence = (longS: string, shortS: string) => {
+    if (shortS.length === 0) {
+        return true;
+    }
     let i = 0;
     let j = 0;
     while (i < shortS.length && j < longS.length) {
