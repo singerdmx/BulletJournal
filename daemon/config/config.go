@@ -3,15 +3,17 @@ package config
 import (
 	"flag"
 	"fmt"
-	"log"
-
 	"github.com/spf13/viper"
+	"log"
 )
 
 var (
-	configNameBase = "base-config.yaml"
-	configNameProd = "prod-config.yaml"
-	configNameTest = "test-config.yaml"
+	serviceConfig Config
+	environment   string
+
+	configNameBase = "config.yaml"
+	configNameProd = "config-prod.yaml"
+	configNameDev  = "config-dev.yaml"
 	configType     = "yaml"
 	configPaths    = []string{
 		"./config",
@@ -33,14 +35,15 @@ type Config struct {
 	IntervalInSeconds      int
 }
 
-var serviceConfig Config
+func GetEnv() *string {
+	return &environment
+}
 
 func GetConfig() *Config {
 	if Validate(&serviceConfig) == false {
 		log.Fatal("Invalid configuration")
 	}
 
-	PrintConfig()
 	return &serviceConfig
 }
 
@@ -104,18 +107,13 @@ func InitConfig() {
 
 	SetConfig(configNameBase)
 	if *isProd == true {
-		SetProdConfig()
+		environment = "prod"
+		SetConfig(configNameProd)
 	} else {
-		SetTestConfig()
+		environment = "dev"
+		SetConfig(configNameDev)
 	}
-}
-
-func SetProdConfig() {
-	SetConfig(configNameProd)
-}
-
-func SetTestConfig() {
-	SetConfig(configNameTest)
+	PrintConfig()
 }
 
 func SetConfig(configName string) {
@@ -139,16 +137,20 @@ func SetConfig(configName string) {
 }
 
 func PrintConfig() {
-	fmt.Printf("Username: %s\n", serviceConfig.Username)
-	fmt.Printf("Password: %s\n", serviceConfig.Password)
-	fmt.Printf("Database: %s\n", serviceConfig.Database)
-	fmt.Printf("DB Port: %s\n", serviceConfig.DBPort)
-	fmt.Printf("Rpc Port: %s\n", serviceConfig.RPCPort)
-	fmt.Printf("Http Port: %s\n", serviceConfig.HttpPort)
-	fmt.Printf("Host: %s\n", serviceConfig.Host)
-	fmt.Printf("DB Driver: %s\n", serviceConfig.DBDriver)
-	fmt.Printf("ApiKeyPublic: %s\n", serviceConfig.ApiKeyPublic)
-	fmt.Printf("ApiKeyPrivate: %s\n", serviceConfig.ApiKeyPrivate)
-	fmt.Printf("IntervalInSeconds: %v\n", serviceConfig.IntervalInSeconds)
-	fmt.Printf("MaxRetentionTimeInDays: %v\n", serviceConfig.MaxRetentionTimeInDays)
+	tab := "\t\t\t"
+	fmt.Print("****************************************************\n")
+	fmt.Printf("Profile:%s%s\n", tab, environment)
+	fmt.Printf("Username:%s%s\n", tab, serviceConfig.Username)
+	fmt.Printf("Password:%s%s\n", tab, serviceConfig.Password)
+	fmt.Printf("Database:%s%s\n", tab, serviceConfig.Database)
+	fmt.Printf("Database Port:%s%s\n", tab, serviceConfig.DBPort)
+	fmt.Printf("RPC Port:%s%s\n", tab, serviceConfig.RPCPort)
+	fmt.Printf("HTTP Port:%s%s\n", tab, serviceConfig.HttpPort)
+	fmt.Printf("Host:%s\t%s\n", tab, serviceConfig.Host)
+	fmt.Printf("DB Driver:%s%s\n", tab, serviceConfig.DBDriver)
+	fmt.Printf("Public APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPublic)
+	fmt.Printf("Private APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPrivate)
+	fmt.Printf("IntervalInSeconds:\t\t%v\n", serviceConfig.IntervalInSeconds)
+	fmt.Printf("MaxRetentionTimeInDays:\t\t%v\n", serviceConfig.MaxRetentionTimeInDays)
+	fmt.Print("****************************************************\n")
 }

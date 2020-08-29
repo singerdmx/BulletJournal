@@ -45,7 +45,7 @@ func SendJoinGroupEmail(username, email string, groupId, notificationId uint64) 
 			},
 			Subject:  "You are invited to Group " + g.Name + " by " + g.Owner,
 			TextPart: "Dear " + username + ",",
-			HTMLPart: "<a href=\"" + acceptUrl + "\">Accept</a><br /><a href=\"" + declineUrl + "\">Decline</a>",
+			HTMLPart: "Welcome to BulletJournal!\n\nClick the following link to confirm and activate your new account:\n<a href=\"" + acceptUrl + "\">Accept</a><br /><a href=\"" + declineUrl + "\">Decline</a>\n\nIf the above link is not clickable, try copying and pasting it into the address bar of your web browser.",
 		},
 	}
 	messages := mailjet.MessagesV31{Info: messagesInfo}
