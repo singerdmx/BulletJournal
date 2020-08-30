@@ -134,6 +134,6 @@ func (s *Cleaner) Clean(maxRetentionTimeInDays int) {
 	s.renewExpiringGoogleCalendarWatch()
 }
 
-//func main()  {
-//	Clean()
-//}
+func (s *Cleaner) Close() {
+	close(s.Receiver)
+}

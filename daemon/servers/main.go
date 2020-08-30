@@ -51,23 +51,25 @@ func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*typ
 func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
 	logger.Printf("Received rpc request for subscription: %s", subscribe.String())
 	if _, ok := s.subscriptions[subscribe.Id]; ok {
-		logger.Printf("Subscription: %s has not been processed yet, start streaming!", subscribe.String())
-		projectIds := s.subscriptions[subscribe.Id]
+		logger.Printf("Subscription: %s's streaming has been idle, start streaming!", subscribe.String())
+		receiver := s.subscriptions[subscribe.Id]
 		delete(s.subscriptions, subscribe.Id)
 		//Keep the subscription session alive
 		for {
-			if _, ok := s.subscriptions[subscribe.Id]; !ok {
-				if err := stream.Send(&types.StreamMessage{Message: strconv.Itoa(int(<-projectIds))}); err != nil {
-					logger.Printf("Unexpected error happened to subscribtion: %s, error: %v", subscribe.String(), err)
-					s.subscriptions[subscribe.Id] = projectIds
-					logger.Printf("Stop streaming to subscribtion: %s", subscribe.String())
+			if _, idle := s.subscriptions[subscribe.Id]; !idle {
+				projectId := strconv.Itoa(int(<-receiver))
+				if projectId == "0" {
+					logger.Printf("Closing streaming to subscription: %s", subscribe.String())
+					break
+				} else if err := stream.Send(&types.StreamMessage{Message: projectId}); err != nil {
+					logger.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
+					s.subscriptions[subscribe.Id] = receiver
+					logger.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
 				} else {
-					logger.Printf("Streaming to subscribtion: %s", subscribe.String())
+					logger.Printf("Streaming projectId: %s to subscription: %s", projectId, subscribe.String())
 				}
-
 			} else {
-				s.subscriptions[subscribe.Id] = projectIds
-				logger.Printf("Subscription: %s's streaming has been stopped", subscribe.String())
+				logger.Printf("Subscription: %s's streaming has been idle due to previous error", subscribe.String())
 				break
 			}
 		}
@@ -114,7 +116,8 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
-	daemonRpc := &server{serviceConfig: config.GetConfig(), subscriptions: map[string]chan uint{"cleaner":make(chan uint, 1000)}}
+	receiver := make(chan uint, 100)
+	daemonRpc := &server{serviceConfig: config.GetConfig(), subscriptions: map[string]chan uint{"cleaner": receiver}}
 
 	rpcPort := ":" + daemonRpc.serviceConfig.RPCPort
 	lis, err := net.Listen("tcp", rpcPort)
@@ -158,17 +161,17 @@ func main() {
 
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
+	cleaner := dao.Cleaner{
+		Receiver: receiver,
+		Settings: postgresql.ConnectionURL{
+			Host:     daemonRpc.serviceConfig.Host + ":" + daemonRpc.serviceConfig.DBPort,
+			Database: daemonRpc.serviceConfig.Database,
+			User:     daemonRpc.serviceConfig.Username,
+			Password: daemonRpc.serviceConfig.Password,
+		},
+	}
 	jobScheduler.AddRecurrentJob(
 		func(...interface{}) {
-			cleaner := dao.Cleaner{
-				Receiver: daemonRpc.subscriptions["cleaner"],
-				Settings: postgresql.ConnectionURL{
-					Host:     daemonRpc.serviceConfig.Host + ":" + daemonRpc.serviceConfig.DBPort,
-					Database: daemonRpc.serviceConfig.Database,
-					User:     daemonRpc.serviceConfig.Username,
-					Password: daemonRpc.serviceConfig.Password,
-				},
-			}
 			cleaner.Clean(daemonRpc.serviceConfig.MaxRetentionTimeInDays)
 		},
 		time.Now(),
@@ -177,6 +180,7 @@ func main() {
 
 	<-shutdown
 	logger.Infof("Shutdown signal received")
+	cleaner.Close()
 	jobScheduler.Stop()
 	logger.Infof("JobScheduler stopped")
 	rpcServer.GracefulStop()

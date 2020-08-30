@@ -28,7 +28,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	id := "A"
+	id := "cleaner"
 	if len(os.Args) > 1 {
 		id = os.Args[1]
 	}
