@@ -130,6 +130,11 @@ public class CategoryController {
         throw new ResourceNotFoundException("Category id does not exist");
     }
 
+    @PutMapping(PUBLIC_CATEGORY_ROUTE)
+    public void updateChoicesForCategory(@NotNull @PathVariable Long categoryId, @NotNull @RequestBody List<Long> choicesIds) {
+        validateRequester();
+    }
+
     private void validateRequester() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
 
