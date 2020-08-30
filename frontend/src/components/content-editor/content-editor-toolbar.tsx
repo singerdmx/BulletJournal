@@ -149,11 +149,11 @@ export const modules = {
     handlers: {},
   },
   dragAndDrop: {
-    draggables: {
+    draggables: [{
       content_type_pattern:'^image/',
       tag:'img',
       attr:'src'
-    }
+    }]
   },
   'emoji-toolbar': true,
   'emoji-shortname': true,
