@@ -6,12 +6,11 @@ import com.bulletjournal.protobuf.daemon.grpc.types.ReplyMessage;
 import com.bulletjournal.protobuf.daemon.grpc.types.StreamMessage;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotification;
 import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.Iterator;
 
 @Service
 public class DaemonServiceClient {
@@ -20,6 +19,9 @@ public class DaemonServiceClient {
 
     @GrpcClient("daemonClient")
     private DaemonGrpc.DaemonBlockingStub daemonBlockingStub;
+
+    @GrpcClient("daemonClient")
+    private DaemonGrpc.DaemonStub daemonAsyncStub;
 
     public String sendEmail(JoinGroupEvents joinGroupEvents) {
         try {
@@ -31,12 +33,22 @@ public class DaemonServiceClient {
         }
     }
 
-    public Iterator<StreamMessage> subscribeNotification(SubscribeNotification subscribeNotification) {
-        try {
-            return this.daemonBlockingStub.subscribeNotification(subscribeNotification);
-        } catch (final StatusRuntimeException e) {
-            LOGGER.error("Failed with " + e.getStatus().getCode().name());
-            return null;
+    public void subscribeNotification(SubscribeNotification subscribeNotification, StreamObserver<StreamMessage> responseObserver) {
+        while(true) {
+            try {
+                LOGGER.info("Start subscribing to daemon server");
+                this.daemonAsyncStub.subscribeNotification(subscribeNotification, responseObserver);
+                return;
+            } catch (final StatusRuntimeException e) {
+                LOGGER.error("Failed with " + e.getStatus().getCode().name());
+                long wait = 5000L;
+                LOGGER.info("Will try subscribing to daemon server again in {}s", wait);
+                try {
+                    Thread.sleep(wait);
+                } catch (InterruptedException interruptedException) {
+                    LOGGER.info("Internal error happened when subscribing to daemon server: {}", interruptedException.getMessage());
+                }
+            }
         }
     }
 

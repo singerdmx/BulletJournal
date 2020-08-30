@@ -13,6 +13,8 @@ import com.bulletjournal.util.CustomThreadFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Channel;
+import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,24 +54,34 @@ public class Cleaner {
 
     @PostConstruct
     public void postConstruct() {
-        executorService.submit(this::subscribeNotification);
+        subscribeNotification();
     }
 
     public void subscribeNotification() {
-        Iterator<StreamMessage> projectId = daemonServiceClient.subscribeNotification(SubscribeNotification.newBuilder().setId("cleaner").build());
-        while (projectId != null && projectId.hasNext()) {
-            LOGGER.info("Got a daemon streaming message");
-            String googleCalendarProjectId = projectId.next().getMessage();
-            executorService.submit(() -> {
-                try {
-                    renewGoogleCalendarWatch(googleCalendarProjectId);
-                } catch (Exception e) {
-                    LOGGER.error("renewGoogleCalendarWatch error", e);
-                }
-            });
-            LOGGER.info("Processed a daemon streaming message");
-        }
-        LOGGER.info("Stopped receiving GoogleCalendarProjectId");
+        StreamObserver<StreamMessage> responseObserver = new StreamObserver<StreamMessage>() {
+            @Override
+            public void onNext(StreamMessage stream) {
+                LOGGER.info("Got a daemon streaming message");
+                executorService.submit(() -> {
+                    try {
+                        renewGoogleCalendarWatch(stream.getMessage());
+                    } catch (Exception e) {
+                        LOGGER.error("renewGoogleCalendarWatch client side error: ", e);
+                    }
+                });
+                LOGGER.info("Processed a daemon streaming message");
+            }
+            @Override
+            public void onError(Throwable t) {
+                Status status = Status.fromThrowable(t);
+                LOGGER.error("renewGoogleCalendarWatch server side error: ", status);
+            }
+            @Override
+            public void onCompleted() {
+                LOGGER.info("Stopped receiving GoogleCalendarProjectId");
+            }
+        };
+        daemonServiceClient.subscribeNotification(SubscribeNotification.newBuilder().setId("cleaner").build(), responseObserver);
     }
 
     public void renewGoogleCalendarWatch(String googleCalendarProjectId) throws IOException {

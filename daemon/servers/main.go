@@ -60,7 +60,7 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 		//Keep the subscription session alive
 		for {
 			if _, ok := subscriptions[subscribe.Id]; ok {
-				if err := stream.Send(&types.StreamMessage{Message: strconv.Itoa(int(<-projectId))}); err != nil {
+				if err := subscriptions[subscribe.Id].Send(&types.StreamMessage{Message: strconv.Itoa(int(<-projectId))}); err != nil {
 					logger.Printf("Unexpected error happened to subscribtion: %s, error: %v", subscribe.String(), err)
 					delete(subscriptions, subscribe.Id)
 					logger.Printf("Stop streaming to subscribtion: %s", subscribe.String())
