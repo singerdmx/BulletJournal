@@ -69,3 +69,14 @@ export const deleteCategory = (categoryId: number) => {
             throw Error(err.message);
         });
 };
+
+export const updateChoicesForCategory = (categoryId: number, choicesIds: number[]) => {
+    const putBody = JSON.stringify(choicesIds);
+    return doPut(`/api/categories/{categoryId}/setChoices`, putBody)
+        .then(res => res.json())
+        .catch(
+            (err) => {
+                throw Error(err.message);
+            }
+        );
+};

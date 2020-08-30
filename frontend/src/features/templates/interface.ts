@@ -7,4 +7,18 @@ export interface Category {
     forumId?: number;
     image?: string;
     subCategories: Category[];
+    choices: Choice[];
+}
+
+export interface Choice {
+    id: number;
+    name: string;
+    multiple: boolean;
+    selections: Selection[];
+}
+
+export interface Selection {
+    id: number;
+    text: string;
+    icon?: string;
 }

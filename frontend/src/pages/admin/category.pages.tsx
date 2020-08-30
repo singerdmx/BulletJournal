@@ -139,6 +139,12 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             onChange={changeColorHandler}
             mode='RGB'
         />
+        <div>
+            <h3>Choices</h3>
+            {category.choices.map(c => {
+                return <span>{c.name}</span>
+            })}
+        </div>
     </div>
 }
 
