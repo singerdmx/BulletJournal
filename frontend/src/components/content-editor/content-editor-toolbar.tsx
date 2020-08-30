@@ -6,6 +6,7 @@ import { message } from 'antd';
 import axios from 'axios';
 import ImageResize from '../../utils/image-resize/ImageResize';
 import ImageFormat from '../../utils/image-resize/ImageFormat';
+const DragAndDropModule = require('quill-drag-and-drop-module');
 
 
 Quill.register('modules/imageResize', ImageResize);
@@ -146,6 +147,13 @@ export const modules = {
       ['clean'],
     ],
     handlers: {},
+  },
+  dragAndDrop: {
+    draggables: {
+      content_type_pattern:'^image/',
+      tag:'img',
+      attr:'src'
+    }
   },
   'emoji-toolbar': true,
   'emoji-shortname': true,

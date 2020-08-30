@@ -30,6 +30,7 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
     "node-quill-converter": "^0.3.3",
+    "quill-drag-and-drop-module": "^0.3.0",
     "quill-emoji": "^0.1.7",
     "rc-color-picker": "^1.2.6",
     "rc-tween-one": "^2.6.8",
