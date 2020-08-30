@@ -87,6 +87,7 @@ public class GoogleCalendarProjectDaoJpa {
         return this.googleCalendarProjectRepository.save(googleCalendarProject);
     }
 
+    @Deprecated
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void renewExpiringGoogleCalendarWatch() throws IOException {
         long expirationTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1);
@@ -108,5 +109,20 @@ public class GoogleCalendarProjectDaoJpa {
             googleCalendarProjectRepository.save(googleCalendarProject);
             LOGGER.info("Renew GoogleCalendarProject {}", googleCalendarProject);
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void renewGoogleCalendarWatch(String googleCalendarProjectId) throws IOException {
+        LOGGER.info("Got googleCalendarProjectId {}", googleCalendarProjectId);
+        Calendar service = googleCalClient.getCalendarService();
+        Calendar.Events.Watch watch = service.events().watch(googleCalendarProjectId, Util.getChannel());
+        LOGGER.info("Created watch {}", watch);
+        Channel createdChannel = watch.execute();
+        GoogleCalendarProject googleCalendarProject = googleCalendarProjectRepository.findById(googleCalendarProjectId).get();
+        googleCalendarProject.setChannelId(createdChannel.getId());
+        googleCalendarProject.setExpiration(new Timestamp(createdChannel.getExpiration()));
+        googleCalendarProject.setChannel(GSON.toString(createdChannel));
+        googleCalendarProjectRepository.save(googleCalendarProject);
+        LOGGER.info("Renew GoogleCalendarProject {}, googleCalendarProjectId {}", googleCalendarProject, googleCalendarProjectId);
     }
 }
