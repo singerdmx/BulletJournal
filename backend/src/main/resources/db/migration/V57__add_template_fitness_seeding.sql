@@ -8,5 +8,5 @@ INSERT INTO template.categories VALUES (16, 'Muscle Gain', null, current_timesta
 
 
 UPDATE template.categories_hierarchy
-SET hierarchy = '[{"id":10,"s":[{"id":13,"s":[]}]},{"id":11,"s":[{"id":15,"s":[]},{"id":16,"s":[]}]},{"id":12,"s":[]}]'
+SET hierarchy = '[{"id":10,"s":[{"id":13,"s":[]},{"id":14,"s":[]}]},{"id":11,"s":[{"id":15,"s":[]},{"id":16,"s":[]}]},{"id":12,"s":[]}]'
 WHERE onerow_id = 1;
