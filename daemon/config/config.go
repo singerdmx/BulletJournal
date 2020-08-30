@@ -133,7 +133,6 @@ func SetConfig(configName string) {
 	if err != nil {
 		log.Fatalf("could not decode config into struct: %v", err)
 	}
-
 }
 
 func PrintConfig() {

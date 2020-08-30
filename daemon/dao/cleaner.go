@@ -1,7 +1,7 @@
 package dao
 
 import (
-	logging "github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 	"upper.io/db.v3"
 	"upper.io/db.v3/postgresql"
@@ -139,7 +139,3 @@ func (s *Cleaner) Clean(maxRetentionTimeInDays int) {
 	s.deleteByExpirationTimeBefore("public_project_items")
 	s.renewExpiringGoogleCalendarWatch()
 }
-
-//func main()  {
-//	Clean()
-//}
