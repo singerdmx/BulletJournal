@@ -3,6 +3,8 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "steps", schema = "template")
@@ -16,16 +18,16 @@ public class Step extends NamedModel {
     @Column(nullable = false)
     private String name;
 
-//    @ManyToMany(mappedBy = "steps", fetch = FetchType.LAZY)
-//    private List<Choice> choices = new ArrayList<>();
+    @ManyToMany(targetEntity = Choice.class, mappedBy = "steps", fetch = FetchType.LAZY)
+    private List<Choice> choices = new ArrayList<>();
 
-//    public List<Choice> getChoices() {
-//        return choices;
-//    }
-//
-//    public void setChoices(List<Choice> choices) {
-//        this.choices = choices;
-//    }
+    public List<Choice> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
+    }
 
     @Override
     public Long getId() {

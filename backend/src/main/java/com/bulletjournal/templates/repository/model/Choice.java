@@ -27,6 +27,16 @@ public class Choice extends NamedModel {
     @Column(name = "multiple", nullable = false)
     private boolean multiple;
 
+    @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "choices_steps", schema = "template",
+        joinColumns = {
+            @JoinColumn(name = "choice_id", referencedColumnName = "id",
+                nullable = false, updatable = false)},
+        inverseJoinColumns = {
+            @JoinColumn(name = "step_id", referencedColumnName = "id",
+                nullable = false, updatable = false)})
+    private List<Step> steps = new ArrayList<>();
+
     public Choice() {
     }
 
@@ -34,6 +44,14 @@ public class Choice extends NamedModel {
         this.selections = selections;
         this.multiple = multiple;
         setName(name);
+    }
+
+    public List<Step> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
     }
 
     @Override
