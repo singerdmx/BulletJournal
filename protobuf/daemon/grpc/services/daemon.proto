@@ -17,10 +17,10 @@ service Daemon {
   // Serve rpc call sending JoinGroupEvents
   rpc JoinGroupEvents (types.JoinGroupEvents) returns (types.ReplyMessage) {}
 
-  // Serve rpc call sending JoinGroupEvents
+  // Serve rpc call to subscribe server side streaming
   rpc SubscribeNotification (types.SubscribeNotification) returns (stream types.StreamMessage) {}
 
-  // Serve rest call sending JoinGroupEvents
+  // Serve rest call
   rpc Rest (types.JoinGroupEvents) returns (types.ReplyMessage) {
      option (google.api.http) = {
           post: "/daemon"

@@ -13,7 +13,7 @@
   "paths": {
     "/daemon": {
       "post": {
-        "summary": "Serve rest call sending JoinGroupEvents",
+        "summary": "Serve rest call",
         "operationId": "Daemon_Rest",
         "responses": {
           "200": {

@@ -1,16 +1,10 @@
 package dao
 
 import (
-	logging "github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 	"upper.io/db.v3"
 	"upper.io/db.v3/postgresql"
-)
-
-const (
-	// Configuration value
-	intervalInSeconds       = 20000
-	historyMaxRetentionDays = 365
 )
 
 var log logging.Logger

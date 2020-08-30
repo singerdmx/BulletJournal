@@ -127,9 +127,9 @@ const _ = grpc.SupportPackageIsVersion6
 type DaemonClient interface {
 	// Serve rpc call sending JoinGroupEvents
 	JoinGroupEvents(ctx context.Context, in *types.JoinGroupEvents, opts ...grpc.CallOption) (*types.ReplyMessage, error)
-	// Serve rpc call sending JoinGroupEvents
+	// Serve rpc call to subscribe server side streaming
 	SubscribeNotification(ctx context.Context, in *types.SubscribeNotification, opts ...grpc.CallOption) (Daemon_SubscribeNotificationClient, error)
-	// Serve rest call sending JoinGroupEvents
+	// Serve rest call
 	Rest(ctx context.Context, in *types.JoinGroupEvents, opts ...grpc.CallOption) (*types.ReplyMessage, error)
 }
 
@@ -195,9 +195,9 @@ func (c *daemonClient) Rest(ctx context.Context, in *types.JoinGroupEvents, opts
 type DaemonServer interface {
 	// Serve rpc call sending JoinGroupEvents
 	JoinGroupEvents(context.Context, *types.JoinGroupEvents) (*types.ReplyMessage, error)
-	// Serve rpc call sending JoinGroupEvents
+	// Serve rpc call to subscribe server side streaming
 	SubscribeNotification(*types.SubscribeNotification, Daemon_SubscribeNotificationServer) error
-	// Serve rest call sending JoinGroupEvents
+	// Serve rest call
 	Rest(context.Context, *types.JoinGroupEvents) (*types.ReplyMessage, error)
 }
 
