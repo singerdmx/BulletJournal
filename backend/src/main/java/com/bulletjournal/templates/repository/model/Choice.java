@@ -20,14 +20,7 @@ public class Choice extends NamedModel {
     @OneToMany(mappedBy = "choice", fetch = FetchType.LAZY)
     private List<Selection> selections;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "choices_categories", schema = "template",
-        joinColumns = {
-            @JoinColumn(name = "choice_id", referencedColumnName = "id",
-                nullable = false, updatable = false)},
-        inverseJoinColumns = {
-            @JoinColumn(name = "category_id", referencedColumnName = "id",
-                nullable = false, updatable = false)})
+    @ManyToMany(targetEntity = Category.class, mappedBy = "choices", fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();
 
     // multiple selections or single selection

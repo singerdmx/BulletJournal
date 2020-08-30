@@ -32,7 +32,14 @@ public class Category extends NamedModel {
     @Column(name = "image")
     private String image;
 
-    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "choices_categories", schema = "template",
+            joinColumns = {
+                    @JoinColumn(name = "category_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "choice_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)})
     private List<Choice> choices = new ArrayList<>();
 
     public Category() {
