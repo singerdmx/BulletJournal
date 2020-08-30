@@ -13,7 +13,6 @@ import com.bulletjournal.templates.controller.model.CreateCategoryParams;
 import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.ChoiceDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -44,19 +43,16 @@ public class CategoryController {
 
     private UserDaoJpa userDaoJpa;
 
-    private ChoiceDaoJpa choiceDaoJpa;
 
     @Autowired
     public CategoryController(
         CategoryDaoJpa categoryDaoJpa,
         CategoriesHierarchyDaoJpa hierarchyDaoJpa,
-        UserDaoJpa userDaoJpa,
-        ChoiceDaoJpa choiceDaoJpa
+        UserDaoJpa userDaoJpa
     ) {
         this.categoryDaoJpa = categoryDaoJpa;
         this.hierarchyDaoJpa = hierarchyDaoJpa;
         this.userDaoJpa = userDaoJpa;
-        this.choiceDaoJpa = choiceDaoJpa;
     }
 
     @GetMapping(PUBLIC_CATEGORIES_ROUTE)
@@ -142,21 +138,8 @@ public class CategoryController {
             @NotNull @PathVariable Long categoryId,
             @NotNull @RequestBody List<Long> choicesIds) {
         validateRequester();
-        com.bulletjournal.templates.repository.model.Category category = categoryDaoJpa.getById(categoryId);
-        List<com.bulletjournal.templates.repository.model.Choice> choices = new ArrayList<>();
-        choicesIds.forEach(choiceId -> {
-            com.bulletjournal.templates.repository.model.Choice choice = choiceDaoJpa.getById(choiceId);
-            choices.add(choice);
-        });
-        category.setChoices(choices);
-        categoryDaoJpa.save(category);
-        Category categoryPresent = category.toPresentationModel();
-        categoryPresent.setChoices(
-                choices.stream().map(
-                        com.bulletjournal.templates.repository.model.Choice::toPresentationModel).collect(
-                                Collectors.toList()));
-
-        return categoryPresent;
+        categoryDaoJpa.updateChoicesForCategory(categoryId, choicesIds);
+        return getCategory(categoryId);
     }
 
     private void validateRequester() {

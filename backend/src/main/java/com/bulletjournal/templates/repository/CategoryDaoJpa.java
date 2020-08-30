@@ -3,6 +3,7 @@ package com.bulletjournal.templates.repository;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.repository.model.Category;
+import com.bulletjournal.templates.repository.model.Choice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ public class CategoryDaoJpa {
 
     private static Logger LOGGER = LoggerFactory.getLogger(CategoryDaoJpa.class);
 
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
+    private ChoiceDaoJpa choiceDaoJpa;
 
     @Autowired
-    public CategoryDaoJpa(CategoryRepository categoryRepository) {
+    public CategoryDaoJpa(CategoryRepository categoryRepository, ChoiceDaoJpa choiceDaoJpa) {
+        this.choiceDaoJpa = choiceDaoJpa;
         this.categoryRepository = categoryRepository;
     }
 
@@ -67,5 +70,13 @@ public class CategoryDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void save(Category category) {
         categoryRepository.save(category);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void updateChoicesForCategory(Long categoryId, List<Long> choicesIds) {
+        Category category = this.getById(categoryId);
+        List<Choice> choices = choiceDaoJpa.getChoicesById(choicesIds);
+        category.setChoices(choices);
+        this.save(category);
     }
 }
