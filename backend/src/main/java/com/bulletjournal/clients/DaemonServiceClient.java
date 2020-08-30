@@ -34,7 +34,7 @@ public class DaemonServiceClient {
     }
 
     public void subscribeNotification(SubscribeNotification subscribeNotification, StreamObserver<StreamMessage> responseObserver) {
-        while(true) {
+        while (true) {
             try {
                 LOGGER.info("Start subscribing to daemon server");
                 this.daemonAsyncStub.subscribeNotification(subscribeNotification, responseObserver);
@@ -42,7 +42,7 @@ public class DaemonServiceClient {
             } catch (final StatusRuntimeException e) {
                 LOGGER.error("Failed with " + e.getStatus().getCode().name());
                 long wait = 10000L;
-                LOGGER.info("Will retry subscribing to daemon server again in {}s", wait/1000);
+                LOGGER.info("Will retry subscribing to daemon server again in {}s", wait / 1000);
                 try {
                     Thread.sleep(wait);
                 } catch (InterruptedException interruptedException) {
