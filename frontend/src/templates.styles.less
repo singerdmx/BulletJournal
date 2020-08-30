@@ -27,13 +27,17 @@ div.template-content {
       justify-content: center;
       box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
 
-      .category-pic {
+      .category-pic-div {
+        position: relative;
         width: 100%;
-        border-radius: 15px;
-        height: 150px;
+        height: 0;
+        padding-bottom: 56.25%;
 
-        @media screen and (max-width: 1024px) {
-          height: 110px !important;
+        .category-pic {
+          border-radius: 15px;
+          position: absolute;
+          width: 100%;
+          height: 100%;
         }
       }
 

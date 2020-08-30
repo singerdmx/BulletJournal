@@ -101,7 +101,7 @@ const TemplatesPage: React.FC<TemplatesProps> = (
                 {category.subCategories.map(c => {
                     return <div className='category-info'
                                 onClick={() => handleOnClickCategory(c.id)} style={{backgroundColor: `${c.color}`}}>
-                        <div>
+                        <div className='category-pic-div'>
                             <img className='category-pic'
                                  src={c.image!}/>
                         </div>

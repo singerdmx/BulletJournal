@@ -10,6 +10,7 @@ import ColorPicker from "../../utils/color-picker/ColorPickr";
 import {icons} from "../../assets/icons";
 import './categories.styles.less'
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
+import ChoiceElem from "../../components/templates/choice-elem";
 
 const {Title, Text} = Typography;
 
@@ -142,7 +143,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
         <div>
             <h3>Choices</h3>
             {category.choices.map(c => {
-                return <div>{c.name}</div>
+                return <ChoiceElem choice={c}/>
             })}
         </div>
     </div>
