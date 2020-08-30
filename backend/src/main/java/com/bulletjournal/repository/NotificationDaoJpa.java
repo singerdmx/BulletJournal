@@ -83,7 +83,6 @@ public class NotificationDaoJpa implements Etaggable {
     }
 
     private void sendEmail(List<Notification> joinGroupEventNotifications) {
-        JoinGroupEvents.Builder joinGroupEventsBuilder = JoinGroupEvents.newBuilder();
         List<Event> eventListProto = new ArrayList<>();
         joinGroupEventNotifications.forEach((notification -> {
             Event event = Event.newBuilder()
