@@ -142,7 +142,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
         <div>
             <h3>Choices</h3>
             {category.choices.map(c => {
-                return <span>{c.name}</span>
+                return <div>{c.name}</div>
             })}
         </div>
     </div>

@@ -1,10 +1,10 @@
-INSERT INTO template.categories VALUES (15, 'Fat Burn', null, current_timestamp,
-                                        current_timestamp, 'SkinOutlined', '#ff9980',
+INSERT INTO template.categories VALUES (15, 'Fat Loss', null, current_timestamp,
+                                        current_timestamp, 'LikeTwoTone', '#f1ccb8',
                                         null, 'https://user-images.githubusercontent.com/24964756/91668644-17615b00-eac3-11ea-943e-81de6369e9b1.jpg');
 
 INSERT INTO template.categories VALUES (16, 'Muscle Gain', null, current_timestamp,
-                                        current_timestamp, 'UserAddOutlined', '#ff9980',
-                                        null, 'https://user-images.githubusercontent.com/24964756/91668691-66a78b80-eac3-11ea-87f3-03a5c1adaf4e.jpg');
+                                        current_timestamp, 'SkinTwoTone', '#f1f1b8',
+                                        null, 'https://user-images.githubusercontent.com/122956/91668993-30b7d680-eac6-11ea-92ae-7121700baa9a.png');
 
 
 UPDATE template.categories_hierarchy
