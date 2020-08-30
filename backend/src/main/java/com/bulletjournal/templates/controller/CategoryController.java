@@ -35,6 +35,8 @@ public class CategoryController {
 
     public static final String PUBLIC_CATEGORY_ROUTE = "/api/public/categories/{categoryId}";
 
+    protected static final String CATEGORY_SET_CHOICES_ROUTE = "/api/categories/{categoryId}/setChoices";
+
     private CategoryDaoJpa categoryDaoJpa;
 
     private CategoriesHierarchyDaoJpa hierarchyDaoJpa;
@@ -130,9 +132,12 @@ public class CategoryController {
         throw new ResourceNotFoundException("Category id does not exist");
     }
 
-    @PutMapping(PUBLIC_CATEGORY_ROUTE)
-    public void updateChoicesForCategory(@NotNull @PathVariable Long categoryId, @NotNull @RequestBody List<Long> choicesIds) {
+    @PutMapping(CATEGORY_SET_CHOICES_ROUTE)
+    public Category updateChoicesForCategory(
+            @NotNull @PathVariable Long categoryId,
+            @NotNull @RequestBody List<Long> choicesIds) {
         validateRequester();
+        return null;
     }
 
     private void validateRequester() {
