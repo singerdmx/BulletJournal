@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './admin-choice.styles.less';
 import {Choice} from "../../features/templates/interface";
-import {Button, Modal, Popover, Typography} from "antd";
+import {Button, Modal, Popover, Typography, Radio, Divider} from "antd";
 
 const {Title, Text} = Typography;
 
@@ -42,8 +42,17 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                 onCancel={(e) => handleCancel(e)}
                 footer={<span><Button type='primary'>Delete this Choice</Button></span>}
             >
-                <div className='choices-popup'>
-                    {choice.selections.map(s => <span>{s.text} ({s.id})</span>)}
+                <div>
+                    <div>
+                        <Radio.Group value={choice.multiple}>
+                            <Radio value={true}>Multiple Selections</Radio>
+                            <Radio value={false}>Single Selection</Radio>
+                        </Radio.Group>
+                    </div>
+                    <Divider/>
+                    <div className='choices-popup'>
+                        {choice.selections.map(s => <span>{s.text} ({s.id})</span>)}
+                    </div>
                 </div>
             </Modal>
         );
