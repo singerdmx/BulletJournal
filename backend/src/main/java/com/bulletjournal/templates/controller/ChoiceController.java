@@ -1,12 +1,17 @@
 package com.bulletjournal.templates.controller;
 
+import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.Choice;
+import com.bulletjournal.templates.controller.model.CreateChoiceParams;
+import com.bulletjournal.templates.controller.model.UpdateChoiceParams;
 import com.bulletjournal.templates.repository.ChoiceDaoJpa;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,18 +26,58 @@ public class ChoiceController {
 
     public static final String PUBLIC_CHOICE_ROUTE = "/api/public/choices/{choiceId}";
 
+    private final UserDaoJpa userDaoJpa;
+    private final ChoiceDaoJpa choiceDaoJpa;
+
     @Autowired
-    private ChoiceDaoJpa choiceDaoJpa;
+    public ChoiceController(UserDaoJpa userDaoJpa,
+                            ChoiceDaoJpa choiceDaoJpa) {
+        this.userDaoJpa = userDaoJpa;
+        this.choiceDaoJpa = choiceDaoJpa;
+    }
 
     @GetMapping(PUBLIC_CHOICES_ROUTE)
     public List<Choice> getChoices() {
         return choiceDaoJpa.getAllChoices().stream().map(
                 com.bulletjournal.templates.repository.model.Choice::toPresentationModel).collect(
-                        Collectors.toList());
+                Collectors.toList());
     }
 
     @GetMapping(PUBLIC_CHOICE_ROUTE)
     public Choice getChoice(@NotNull @PathVariable Long choiceId) {
         return choiceDaoJpa.getById(choiceId).toPresentationModel();
+    }
+
+    @PostMapping(CHOICES_ROUTE)
+    public Choice createChoice(@Valid @RequestBody CreateChoiceParams params) {
+        validateRequester();
+        return this.choiceDaoJpa.save(params.getName(), params.isMultiple()).toPresentationModel();
+    }
+
+    @PutMapping(CHOICE_ROUTE)
+    public Choice updateChoice(@NotNull @PathVariable Long choiceId,
+                               @Valid @RequestBody UpdateChoiceParams params) {
+        validateRequester();
+
+        com.bulletjournal.templates.repository.model.Choice choice = choiceDaoJpa.getById(choiceId);
+        choice.setName(params.getName());
+        choice.setMultiple(params.isMultiple());
+
+        this.choiceDaoJpa.save(choice);
+        return this.choiceDaoJpa.getById(choiceId).toPresentationModel();
+    }
+
+    @DeleteMapping(CHOICE_ROUTE)
+    public void deleteChoice(@NotNull @PathVariable Long choiceId) {
+        validateRequester();
+        this.choiceDaoJpa.deleteById(choiceId);
+    }
+
+    private void validateRequester() {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+
+        if (!this.userDaoJpa.isAdmin(requester)) {
+            throw new UnAuthorizedException("User: " + requester + " is not admin");
+        }
     }
 }

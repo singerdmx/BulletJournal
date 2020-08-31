@@ -41,6 +41,11 @@ public class Choice extends NamedModel {
     public Choice() {
     }
 
+    public Choice(String name, boolean multiple) {
+        setName(name);
+        this.multiple = multiple;
+    }
+
     public Choice(List<Selection> selections, boolean multiple, String name) {
         this.selections = selections;
         this.multiple = multiple;

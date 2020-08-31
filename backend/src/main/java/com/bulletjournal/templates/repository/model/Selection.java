@@ -19,7 +19,7 @@ public class Selection extends AuditModel {
     @GeneratedValue(generator = "selection_generator")
     @SequenceGenerator(name = "selection_generator",
             sequenceName = "template.selection_sequence",
-            initialValue = 100,
+            initialValue = 8000,
             allocationSize = 2)
     private Long id;
 
