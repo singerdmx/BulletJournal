@@ -32,4 +32,9 @@ public class ChoiceDaoJpa {
         List<Choice> choices = choiceRepository.findAllById(ids);
         return choices;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Choice> getAllChoices() {
+        return choiceRepository.findAll();
+    }
 }

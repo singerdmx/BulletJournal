@@ -25,6 +25,13 @@ public class Choice {
         this.multiple = multiple;
     }
 
+    public Choice(Long id, String name, boolean multiple, List<Selection> selections) {
+        this.id = id;
+        this.name = name;
+        this.multiple = multiple;
+        this.selections = selections;
+    }
+
     public Choice(Long id, String name, boolean multiple, List<Category> categories, List<Selection> selections) {
         this.id = id;
         this.name = name;

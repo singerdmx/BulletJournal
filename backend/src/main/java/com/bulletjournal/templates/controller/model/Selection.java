@@ -16,6 +16,12 @@ public class Selection {
         this.text = text;
     }
 
+    public Selection(Long id, String icon, String text) {
+        this.id = id;
+        this.icon = icon;
+        this.text = text;
+    }
+
     public Long getId() {
         return id;
     }

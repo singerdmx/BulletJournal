@@ -5,6 +5,7 @@ import com.bulletjournal.repository.models.NamedModel;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "choices", schema = "template")
@@ -92,6 +93,7 @@ public class Choice extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Choice(id, getName(), multiple);
+        return new com.bulletjournal.templates.controller.model.Choice(id, getName(), multiple,
+                selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
     }
 }
