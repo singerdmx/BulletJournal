@@ -2,6 +2,11 @@ syntax = "proto3";
 
 package types;
 
+option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types";
+option java_multiple_files = true;
+option java_package = "com.bulletjournal.protobuf.daemon.grpc.types";
+option java_outer_classname = "HealthCheckProto";
+
 message HealthCheckRequest {
   string service = 1;
 }
@@ -14,10 +19,4 @@ message HealthCheckResponse {
     SERVICE_UNKNOWN = 3;  // Used only by the Watch method.
   }
   ServingStatus status = 1;
-}
-
-service Health {
-  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
-
-  rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse);
 }
