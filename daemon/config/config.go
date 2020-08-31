@@ -3,20 +3,21 @@ package config
 import (
 	"flag"
 	"fmt"
-	"github.com/spf13/viper"
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 var (
-	serviceConfig Config
-	environment   string
-
+	serviceConfig  Config
+	environment    string
 	configNameBase = "config.yaml"
 	configNameProd = "config-prod.yaml"
 	configNameDev  = "config-dev.yaml"
 	configType     = "yaml"
 	configPaths    = []string{
 		"./config",
+		"../config",
 	}
 )
 
