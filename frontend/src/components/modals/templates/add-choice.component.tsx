@@ -3,19 +3,20 @@ import {Form, Input, Modal, Radio} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-import {addCategory} from "../../../features/templates/actions";
+import {addChoice} from "../../../features/templates/actions";
 
 type AddChoiceProps = {
-    addCategory: (name: string, description: string) => void;
+    addChoice: (name: string, multiple: boolean) => void;
 };
 
 const AddChoice: React.FC<AddChoiceProps> = (props) => {
-    const {addCategory} = props;
+    const {addChoice} = props;
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
+    const [multiple, setMultiple] = useState(true);
 
     const createChoice = (values: any) => {
-        addCategory(values.name, values.description);
+        addChoice(values.name, multiple);
         setVisible(false);
     };
 
@@ -52,14 +53,10 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
                     >
                         <Input placeholder='Enter Choice Name' allowClear/>
                     </Form.Item>
-                    <Form.Item
-                        name='multiple'
-                    >
-                        <Radio.Group defaultValue={true}>
-                            <Radio value={true}>Multiple Selections</Radio>
-                            <Radio value={false}>Single Selection</Radio>
-                        </Radio.Group>
-                    </Form.Item>
+                    <Radio.Group value={multiple} onChange={(e) => setMultiple(e.target.value)}>
+                        <Radio value={true}>Multiple Selections</Radio>
+                        <Radio value={false}>Single Selection</Radio>
+                    </Radio.Group>
                 </Form>
             </Modal>
         );
@@ -80,5 +77,5 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
 };
 
 export default connect(null, {
-    addCategory
+    addChoice
 })(AddChoice);

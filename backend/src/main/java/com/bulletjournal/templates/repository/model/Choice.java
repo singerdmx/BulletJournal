@@ -4,6 +4,7 @@ import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,7 +79,10 @@ public class Choice extends NamedModel {
     }
 
     public List<Selection> getSelections() {
-        return selections;
+        if (this.selections == null) {
+            return Collections.emptyList();
+        }
+        return this.selections;
     }
 
     public void addSelections(List<Selection> selections) {
@@ -98,7 +102,7 @@ public class Choice extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Choice(id, getName(), multiple,
-                selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
+        return new com.bulletjournal.templates.controller.model.Choice(getId(), getName(), isMultiple(),
+                getSelections().stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
     }
 }

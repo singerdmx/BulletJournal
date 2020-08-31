@@ -38,3 +38,19 @@ export const setCategoryChoices = (id: number, choices: number[]) => actions.set
 });
 
 export const getChoices = () => actions.getChoices({});
+
+export const addChoice = (name: string, multiple: boolean) => actions.addChoice({name: name, multiple: multiple});
+
+export const deleteChoice = (id: number) => actions.deleteChoice({id: id});
+
+export const updateChoice = (id: number, name: string, multiple: boolean) => actions.updateChoice({
+    id: id,
+    name: name,
+    multiple: multiple
+});
+
+export const addSelection = (choiceId: number, text: string) => actions.addSelection({choiceId: choiceId, text: text});
+
+export const deleteSelection = (id: number) => actions.deleteSelection({id: id});
+
+export const updateSelection = (id: number, text: string) => actions.updateSelection({id: id, text: text});

@@ -68,9 +68,10 @@ public class ChoiceController {
     }
 
     @DeleteMapping(CHOICE_ROUTE)
-    public void deleteChoice(@NotNull @PathVariable Long choiceId) {
+    public List<Choice> deleteChoice(@NotNull @PathVariable Long choiceId) {
         validateRequester();
         this.choiceDaoJpa.deleteById(choiceId);
+        return getChoices();
     }
 
     private void validateRequester() {

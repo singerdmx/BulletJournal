@@ -3,10 +3,10 @@ import {message} from 'antd';
 import {PayloadAction} from 'redux-starter-kit';
 import {
   actions as templatesActions,
-  AddCategoryAction,
-  DeleteCategoryAction,
+  AddCategoryAction, AddChoiceAction, AddSelectionAction,
+  DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
   GetCategoriesAction, GetCategoryAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
-  UpdateCategoryRelationsAction
+  UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction
 } from './reducer';
 import {
   createCategory,
@@ -18,9 +18,11 @@ import {
   updateChoicesForCategory
 } from '../../apis/templates/categoryApis';
 import {
-  getChoices
+  createChoice, deleteChoice,
+  getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice} from './interface';
+import {Category, Choice, Selection} from './interface';
+import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -34,7 +36,6 @@ function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
 
 function* fetchChoices(action: PayloadAction<GetChoicesAction>) {
   try {
-    console.log('XXX')
     const data: Choice[] = yield call(getChoices);
     console.log(data)
     yield put(templatesActions.choicesReceived({choices: data}));
@@ -107,6 +108,80 @@ function* setChoices(action: PayloadAction<SetChoicesAction>) {
   }
 }
 
+function* addChoice(action: PayloadAction<AddChoiceAction>) {
+  try {
+    const {name, multiple} = action.payload;
+    const data: Choice = yield call(createChoice, name, multiple);
+    console.log(data)
+    const choices: Choice[] = yield call(getChoices);
+    console.log(choices)
+    yield put(templatesActions.choicesReceived({choices: choices}));
+  } catch (error) {
+    yield call(message.error, `addChoice Error Received: ${error}`);
+  }
+}
+
+function* removeChoice(action: PayloadAction<DeleteChoiceAction>) {
+  try {
+    const {id} = action.payload;
+    const data: Choice[] = yield call(deleteChoice, id);
+    yield put(templatesActions.choicesReceived({choices: data}));
+  } catch (error) {
+    yield call(message.error, `removeChoice Error Received: ${error}`);
+  }
+}
+
+function* addSelection(action: PayloadAction<AddSelectionAction>) {
+  try {
+    const {choiceId, text} = action.payload;
+    const data: Selection = yield call(createSelection, choiceId, text);
+    console.log(data)
+    const choices: Choice[] = yield call(getChoices);
+    console.log(choices)
+    yield put(templatesActions.choicesReceived({choices: choices}));
+  } catch (error) {
+    yield call(message.error, `addSelection Error Received: ${error}`);
+  }
+}
+
+function* removeSelection(action: PayloadAction<DeleteSelectionAction>) {
+  try {
+    const {id} = action.payload;
+    yield call(deleteSelection, id);
+    const choices: Choice[] = yield call(getChoices);
+    console.log(choices)
+    yield put(templatesActions.choicesReceived({choices: choices}));
+  } catch (error) {
+    yield call(message.error, `removeSelection Error Received: ${error}`);
+  }
+}
+
+function* putChoice(action: PayloadAction<UpdateChoiceAction>) {
+  try {
+    const {id, name, multiple} = action.payload;
+    const data: Choice = yield call(updateChoice, id, name, multiple);
+    console.log(data)
+    const choices: Choice[] = yield call(getChoices);
+    console.log(choices)
+    yield put(templatesActions.choicesReceived({choices: choices}));
+  } catch (error) {
+    yield call(message.error, `putChoice Error Received: ${error}`);
+  }
+}
+
+function* putSelection(action: PayloadAction<UpdateSelectionAction>) {
+  try {
+    const {id, text} = action.payload;
+    const data: Selection = yield call(updateSelection, id, text);
+    console.log(data)
+    const choices: Choice[] = yield call(getChoices);
+    console.log(choices)
+    yield put(templatesActions.choicesReceived({choices: choices}));
+  } catch (error) {
+    yield call(message.error, `putSelection Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -114,8 +189,14 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.addCategory.type, addCategory),
     yield takeLatest(templatesActions.updateCategoryRelations.type, updateCategories),
     yield takeLatest(templatesActions.deleteCategory.type, removeCategory),
+    yield takeLatest(templatesActions.deleteChoice.type, removeChoice),
     yield takeLatest(templatesActions.updateCategory.type, updateCategory),
     yield takeLatest(templatesActions.getCategory.type, fetchCategory),
     yield takeLatest(templatesActions.setChoices.type, setChoices),
+    yield takeLatest(templatesActions.addChoice.type, addChoice),
+    yield takeLatest(templatesActions.updateChoice.type, putChoice),
+    yield takeLatest(templatesActions.addSelection.type, addSelection),
+    yield takeLatest(templatesActions.deleteSelection.type, removeSelection),
+    yield takeLatest(templatesActions.updateSelection.type, putSelection),
   ])
 }

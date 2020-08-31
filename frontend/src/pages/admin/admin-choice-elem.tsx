@@ -3,18 +3,28 @@ import './admin-choice.styles.less';
 import {Choice} from "../../features/templates/interface";
 import {Button, Divider, Modal, Popover, Radio, Typography} from "antd";
 import {DeleteFilled} from "@ant-design/icons";
+import {connect} from "react-redux";
+import {deleteChoice, deleteSelection, updateChoice, updateSelection} from "../../features/templates/actions";
 
 const {Title, Text} = Typography;
 
 type ChoiceProps = {
     choice: Choice;
     showPopover: boolean;
+    deleteChoice: (id: number) => void;
+    deleteSelection: (id: number) => void;
+    updateChoice: (id: number, name: string, multiple: boolean) => void;
+    updateSelection: (id: number, text: string) => void;
 };
 
 const AdminChoiceElem: React.FC<ChoiceProps> = (
     {
         choice,
-        showPopover
+        showPopover,
+        deleteChoice,
+        deleteSelection,
+        updateChoice,
+        updateSelection
     }) => {
 
     const [visible, setVisible] = useState(false);
@@ -30,14 +40,22 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
 
     const nameChange = (input: any) => {
         console.log(input);
+        updateChoice(choice.id, input, choice.multiple);
     }
 
-    const selectionTextChane = (e: string, id: number) => {
+    const selectionTextChange = (e: string, id: number) => {
         console.log(e);
+        updateSelection(id, e);
     }
 
-    const deleteSelection = (id: number) => {
+    const deleteSelectionElem = (id: number) => {
+        deleteSelection(id);
+    }
 
+    const choiceMultipleChange = (input: any) => {
+        console.log(input)
+        updateChoice(choice.id, choice.name, input.target.value);
+        setVisible(false);
     }
 
     const getModal = () => {
@@ -49,11 +67,11 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                 destroyOnClose
                 visible={visible}
                 onCancel={(e) => handleCancel(e)}
-                footer={<span><Button type='primary'>Delete this Choice</Button></span>}
+                footer={<span><Button type='primary' onClick={() => deleteChoice(choice.id)}>Delete this Choice</Button></span>}
             >
                 <div>
                     <div>
-                        <Radio.Group value={choice.multiple}>
+                        <Radio.Group value={choice.multiple} onChange={choiceMultipleChange}>
                             <Radio value={true}>Multiple Selections</Radio>
                             <Radio value={false}>Single Selection</Radio>
                         </Radio.Group>
@@ -61,8 +79,8 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                     <Divider/>
                     <div className='choices-popup'>
                         {choice.selections.map(s => <span>
-                            <Text editable={{onChange: (e) => selectionTextChane(e, s.id)}}>{s.text}</Text> ({s.id})
-                            <DeleteFilled style={{cursor: 'pointer'}} onClick={() => deleteSelection(s.id)}/>
+                            <Text editable={{onChange: (e) => selectionTextChange(e, s.id)}}>{s.text}</Text> ({s.id})
+                            <DeleteFilled style={{cursor: 'pointer'}} onClick={() => deleteSelectionElem(s.id)}/>
                         </span>)}
                     </div>
                 </div>
@@ -90,4 +108,9 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
 };
 
 
-export default AdminChoiceElem;
+export default connect(null, {
+    deleteChoice,
+    updateChoice,
+    deleteSelection,
+    updateSelection
+})(AdminChoiceElem);
