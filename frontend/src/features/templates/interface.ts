@@ -22,3 +22,13 @@ export interface Selection {
     text: string;
     icon?: string;
 }
+
+export interface Step {
+    id: number;
+    choices: Choice[];
+}
+
+export interface Steps {
+    steps: Step[];
+    categories: Category[];
+}
