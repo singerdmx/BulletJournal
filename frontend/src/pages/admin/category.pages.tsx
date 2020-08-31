@@ -4,8 +4,8 @@ import {connect} from "react-redux";
 import {deleteCategory, getCategory, setCategoryChoices, updateCategory} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
-import {BackTop, Col, Popover, Row, Typography} from "antd";
-import {DeleteFilled, DeleteTwoTone, TagOutlined} from "@ant-design/icons/lib";
+import {BackTop, Col, InputNumber, Popover, Row, Tooltip, Typography} from "antd";
+import {DeleteFilled, DeleteTwoTone, PlusCircleTwoTone, TagOutlined} from "@ant-design/icons/lib";
 import ColorPicker from "../../utils/color-picker/ColorPickr";
 import {icons} from "../../assets/icons";
 import './categories.styles.less'
@@ -32,6 +32,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
     const [formUpdateLabelIconString, setFormUpdateLabelIconString] = useState(
         'TagOutlined'
     );
+    const [choiceId, setChoiceId] = useState(0);
     const {categoryId} = useParams();
     useEffect(() => {
         if (categoryId) {
@@ -116,6 +117,12 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
         setCategoryChoices(category.id, category.choices.map(c => c.id).filter(c => c !== id));
     }
 
+    const addChoice = (category: Category, id: number) => {
+        const choices = category.choices.map(c => c.id);
+        choices.unshift(id);
+        setCategoryChoices(category.id, choices);
+    }
+
     return <div className='admin-categories-page'>
         <BackTop/>
         <div><DeleteFilled onClick={handleDelete}/></div>
@@ -145,13 +152,26 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             onChange={changeColorHandler}
             mode='RGB'
         />
+        <br/>
         <div>
             <h3>Choices</h3>
+            <div>
+                <Tooltip title='Add Choice'>
+                    <PlusCircleTwoTone onClick={() => addChoice(category, choiceId)}/>
+                </Tooltip>
+                {'  '}
+                <Tooltip title='Choice ID'>
+                    <InputNumber value={choiceId} onChange={(e) => e && setChoiceId(e)}/>
+                </Tooltip>
+            </div>
+            <br/>
             {category.choices.map(c => {
                 return <div>
                     <AdminChoiceElem choice={c} category={category}/>
                     {' '}
-                    <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>
+                    <Tooltip title='Remove Choice'>
+                        <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>
+                    </Tooltip>
                 </div>
             })}
         </div>
