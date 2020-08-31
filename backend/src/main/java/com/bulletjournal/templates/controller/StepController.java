@@ -16,9 +16,9 @@ public class StepController {
 
     public static final String STEPS_ROUTE = "/api/steps";
 
-    private CategoryDaoJpa categoryDaoJpa;
+    private final CategoryDaoJpa categoryDaoJpa;
 
-    private StepDaoJpa stepDaoJpa;
+    private final StepDaoJpa stepDaoJpa;
 
     @Autowired
     public StepController(

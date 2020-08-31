@@ -8,6 +8,7 @@ import com.bulletjournal.templates.controller.model.Selection;
 import com.bulletjournal.templates.controller.model.UpdateSelectionParams;
 import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
@@ -22,7 +23,8 @@ public class SelectionController {
     private final UserDaoJpa userDaoJpa;
     private final SelectionDaoJpa selectionDaoJpa;
 
-    SelectionController(UserDaoJpa userDaoJpa,
+    @Autowired
+    public SelectionController(UserDaoJpa userDaoJpa,
                         SelectionDaoJpa selectionDaoJpa) {
         this.userDaoJpa = userDaoJpa;
         this.selectionDaoJpa = selectionDaoJpa;

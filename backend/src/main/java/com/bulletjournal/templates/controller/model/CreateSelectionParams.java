@@ -3,13 +3,12 @@ package com.bulletjournal.templates.controller.model;
 import javax.validation.constraints.NotNull;
 
 public class CreateSelectionParams {
-    @NotNull
     private String icon;
 
     @NotNull
     private String text;
 
-    public CreateSelectionParams(@NotNull String icon, @NotNull String text) {
+    public CreateSelectionParams(String icon, @NotNull String text) {
         this.icon = icon;
         this.text = text;
     }
