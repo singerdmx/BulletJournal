@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
-import {Category, Choice} from './interface';
+import {Category, Choice, Selection, Step} from './interface';
 
 export type GetCategoriesAction = {};
 
@@ -56,7 +56,9 @@ export type SetChoicesAction = {
 let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
-    choices: [] as Choice[]
+    choices: [] as Choice[],
+    selections: [] as Selection[],
+    steps: [] as Step[]
 };
 
 const slice = createSlice({

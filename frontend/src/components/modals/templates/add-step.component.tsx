@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
-import {Form, Input, Modal, Radio} from 'antd';
+import {Form, Input, Modal} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import {addCategory} from "../../../features/templates/actions";
 
-type AddChoiceProps = {
+type AddStepProps = {
     addCategory: (name: string, description: string) => void;
 };
 
-const AddChoice: React.FC<AddChoiceProps> = (props) => {
+const AddStep: React.FC<AddStepProps> = (props) => {
     const {addCategory} = props;
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
@@ -29,7 +29,7 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
     const getModal = () => {
         return (
             <Modal
-                title='Create New Choice'
+                title='Create New Step'
                 centered
                 visible={visible}
                 okText='Create'
@@ -50,15 +50,12 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
                         name='name'
                         rules={[{required: true, message: 'Name must be between 1 and 30 characters', min: 1, max: 30}]}
                     >
-                        <Input placeholder='Enter Choice Name' allowClear/>
+                        <Input placeholder='Enter Category Name' allowClear/>
                     </Form.Item>
                     <Form.Item
-                        name='multiple'
+                        name='description'
                     >
-                        <Radio.Group defaultValue={true}>
-                            <Radio value={true}>Multiple Selections</Radio>
-                            <Radio value={false}>Single Selection</Radio>
-                        </Radio.Group>
+                        <Input placeholder='Enter Description' allowClear/>
                     </Form.Item>
                 </Form>
             </Modal>
@@ -68,7 +65,7 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
     return (
         <>
             <FloatButton
-                tooltip="Add New Choice"
+                tooltip="Add New Step"
                 onClick={openModal}
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
             >
@@ -81,4 +78,4 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
 
 export default connect(null, {
     addCategory
-})(AddChoice);
+})(AddStep);

@@ -6,6 +6,8 @@ import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
 import {BackTop, Typography} from "antd";
 import './steps.styles.less'
+import {Container} from "react-floating-action-button";
+import AddStep from "../../components/modals/templates/add-step.component";
 
 const {Title, Text} = Typography;
 
@@ -30,6 +32,9 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
     return <div className='steps-page'>
         <BackTop/>
         <h2>{category.name}</h2>
+        <Container>
+            <AddStep/>
+        </Container>
     </div>
 }
 
