@@ -5,7 +5,7 @@ import {
   actions as templatesActions,
   AddCategoryAction,
   DeleteCategoryAction,
-  GetCategoriesAction, GetCategoryAction, SetChoicesAction, UpdateCategoryAction,
+  GetCategoriesAction, GetCategoryAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction
 } from './reducer';
 import {
@@ -17,7 +17,10 @@ import {
   putCategory,
   updateChoicesForCategory
 } from '../../apis/templates/categoryApis';
-import {Category} from './interface';
+import {
+  getChoices
+} from '../../apis/templates/choiceApis';
+import {Category, Choice} from './interface';
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -26,6 +29,17 @@ function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
     yield put(templatesActions.categoriesReceived({categories: data}));
   } catch (error) {
     yield call(message.error, `fetchCategories Error Received: ${error}`);
+  }
+}
+
+function* fetchChoices(action: PayloadAction<GetChoicesAction>) {
+  try {
+    console.log('XXX')
+    const data: Choice[] = yield call(getChoices);
+    console.log(data)
+    yield put(templatesActions.choicesReceived({choices: data}));
+  } catch (error) {
+    yield call(message.error, `fetchChoices Error Received: ${error}`);
   }
 }
 
@@ -96,6 +110,7 @@ function* setChoices(action: PayloadAction<SetChoicesAction>) {
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
+    yield takeLatest(templatesActions.getChoices.type, fetchChoices),
     yield takeLatest(templatesActions.addCategory.type, addCategory),
     yield takeLatest(templatesActions.updateCategoryRelations.type, updateCategories),
     yield takeLatest(templatesActions.deleteCategory.type, removeCategory),

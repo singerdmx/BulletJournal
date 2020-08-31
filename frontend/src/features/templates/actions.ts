@@ -36,3 +36,5 @@ export const setCategoryChoices = (id: number, choices: number[]) => actions.set
     categoryId: id,
     choices: choices
 });
+
+export const getChoices = () => actions.getChoices({});

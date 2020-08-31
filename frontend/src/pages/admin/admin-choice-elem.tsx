@@ -1,23 +1,71 @@
-import React from 'react';
-import './admin-choice-elem.styles.less';
-import {Category, Choice} from "../../features/templates/interface";
+import React, {useState} from 'react';
+import './admin-choice.styles.less';
+import {Choice} from "../../features/templates/interface";
+import {Button, Modal, Popover, Typography} from "antd";
+
+const {Title, Text} = Typography;
 
 type ChoiceProps = {
     choice: Choice;
-    category: Category;
+    showPopover: boolean;
 };
 
 const AdminChoiceElem: React.FC<ChoiceProps> = (
     {
         choice,
-        category
+        showPopover
     }) => {
 
-    return (
-        <span className='choice-elem'>
+    const [visible, setVisible] = useState(false);
+
+    const openModal = () => {
+        setVisible(true);
+    };
+
+    const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.stopPropagation();
+        setVisible(false);
+    };
+
+    const nameChange = (input: any) => {
+        console.log(input);
+    }
+
+    const getModal = () => {
+        return (
+            <Modal
+                width={900}
+                title={<Title editable={{onChange: nameChange}}>{choice.name}</Title>}
+                cancelText='Cancel'
+                destroyOnClose
+                visible={visible}
+                onCancel={(e) => handleCancel(e)}
+                footer={<span><Button type='primary'>Delete this Choice</Button></span>}
+            >
+                <div className='choices-popup'>
+                    {choice.selections.map(s => <span>{s.text} ({s.id})</span>)}
+                </div>
+            </Modal>
+        );
+    }
+
+    if (showPopover) {
+        return (<Popover title='Selections' placement='right'
+                         content={<div className='choices-popup'>
+                             {choice.selections.map(s => <span>{s.text} ({s.id})</span>)}
+                         </div>}>
+               <span className='choice-elem' onClick={openModal}>
+                {choice.name} ({choice.id})
+                   {getModal()}
+                </span>
+            </Popover>
+        );
+    }
+
+    return <span className='choice-elem' onClick={openModal}>
             {choice.name} ({choice.id})
-        </span>
-    );
+        {getModal()}
+    </span>
 };
 
 

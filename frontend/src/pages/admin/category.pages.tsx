@@ -4,13 +4,14 @@ import {connect} from "react-redux";
 import {deleteCategory, getCategory, setCategoryChoices, updateCategory} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
-import {BackTop, Col, InputNumber, Popover, Row, Tooltip, Typography} from "antd";
+import {BackTop, Col, Divider, InputNumber, Popover, Row, Tooltip, Typography} from "antd";
 import {DeleteFilled, DeleteTwoTone, PlusCircleTwoTone, TagOutlined} from "@ant-design/icons/lib";
 import ColorPicker from "../../utils/color-picker/ColorPickr";
 import {icons} from "../../assets/icons";
 import './categories.styles.less'
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import AdminChoiceElem from "./admin-choice-elem";
+import AdminChoices from "./admin-choices";
 
 const {Title, Text} = Typography;
 
@@ -152,28 +153,27 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             onChange={changeColorHandler}
             mode='RGB'
         />
-        <br/>
+        <Divider/>
         <div>
             <h3>Choices</h3>
-            <div>
-                <Tooltip title='Add Choice'>
-                    <PlusCircleTwoTone onClick={() => addChoice(category, choiceId)}/>
-                </Tooltip>
-                {'  '}
-                <Tooltip title='Choice ID'>
-                    <InputNumber value={choiceId} onChange={(e) => e && setChoiceId(e)}/>
-                </Tooltip>
-            </div>
-            <br/>
             {category.choices.map(c => {
                 return <div>
-                    <AdminChoiceElem choice={c} category={category}/>
+                    <AdminChoiceElem choice={c} showPopover={true}/>
                     {' '}
                     <Tooltip title='Remove Choice'>
                         <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>
                     </Tooltip>
                 </div>
             })}
+            <Divider/>
+            <div>
+                <h3>Available Choices to add</h3>
+                <AdminChoices
+                    showPopover={true}
+                    showAddChoice={true}
+                    addChoice={(id) => addChoice(category, id)}
+                    choicesToExclude={category.choices.map(c => c.id)}/>
+            </div>
         </div>
     </div>
 }

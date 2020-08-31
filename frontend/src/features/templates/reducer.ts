@@ -1,7 +1,9 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
-import {Category} from './interface';
+import {Category, Choice} from './interface';
 
 export type GetCategoriesAction = {};
+
+export type GetChoicesAction = {};
 
 export type GetCategoryAction = {
     categoryId: number;
@@ -9,6 +11,10 @@ export type GetCategoryAction = {
 
 export type CategoriesAction = {
     categories: Category[];
+};
+
+export type ChoicesAction = {
+    choices: Choice[];
 };
 
 export type CategoryAction = {
@@ -50,6 +56,7 @@ export type SetChoicesAction = {
 let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
+    choices: [] as Choice[]
 };
 
 const slice = createSlice({
@@ -60,11 +67,16 @@ const slice = createSlice({
             const {categories} = action.payload;
             state.categories = categories;
         },
+        choicesReceived: (state, action: PayloadAction<ChoicesAction>) => {
+            const {choices} = action.payload;
+            state.choices = choices;
+        },
         categoryReceived: (state, action: PayloadAction<CategoryAction>) => {
             const {category} = action.payload;
             state.category = category;
         },
         getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state,
+        getChoices: (state, action: PayloadAction<GetChoicesAction>) => state,
         getCategory: (state, action: PayloadAction<GetCategoryAction>) => state,
         addCategory: (state, action: PayloadAction<AddCategoryAction>) => state,
         updateCategory: (state, action: PayloadAction<UpdateCategoryAction>) => state,
