@@ -6,19 +6,17 @@ import AddChoice from "../../components/modals/templates/add-choice.component";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getChoices} from "../../features/templates/actions";
-import {Choice, Selection} from "../../features/templates/interface";
+import {Choice} from "../../features/templates/interface";
 import AdminChoiceElem from "./admin-choice-elem";
 
 type WorkflowPageProps = {
     choices: Choice[];
-    selections: Selection[];
     getChoices: () => void;
 };
 
 const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
     {
         choices,
-        selections,
         getChoices
     }) => {
     useEffect(() => {
@@ -45,7 +43,7 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
             </div>
             <Divider/>
             <div>
-                <h3>Selections</h3>
+                <h3>Selection</h3>
                 <div>
                     <b>Target Choice: {choice.name} ({choice.id})</b>
                 </div>
@@ -57,11 +55,6 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
                     {' '}
                     <Button type='primary'>Add to Target Choice</Button>
                 </div>
-                <div>
-                    {selections.map(s => {
-                        return <span>{s.text} ({s.id})</span>
-                    })}
-                </div>
             </div>
             <Container>
                 <AddChoice/>
@@ -72,7 +65,6 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
 
 const mapStateToProps = (state: IState) => ({
     choices: state.templates.choices,
-    selections: state.templates.selections
 });
 
 export default connect(mapStateToProps, {

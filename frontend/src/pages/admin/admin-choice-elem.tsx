@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import './admin-choice.styles.less';
 import {Choice} from "../../features/templates/interface";
-import {Button, Modal, Popover, Typography, Radio, Divider} from "antd";
+import {Button, Divider, Modal, Popover, Radio, Typography} from "antd";
+import {DeleteFilled} from "@ant-design/icons";
 
 const {Title, Text} = Typography;
 
@@ -31,6 +32,14 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
         console.log(input);
     }
 
+    const selectionTextChane = (e: string, id: number) => {
+        console.log(e);
+    }
+
+    const deleteSelection = (id: number) => {
+
+    }
+
     const getModal = () => {
         return (
             <Modal
@@ -51,7 +60,10 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                     </div>
                     <Divider/>
                     <div className='choices-popup'>
-                        {choice.selections.map(s => <span>{s.text} ({s.id})</span>)}
+                        {choice.selections.map(s => <span>
+                            <Text editable={{onChange: (e) => selectionTextChane(e, s.id)}}>{s.text}</Text> ({s.id})
+                            <DeleteFilled style={{cursor: 'pointer'}} onClick={() => deleteSelection(s.id)}/>
+                        </span>)}
                     </div>
                 </div>
             </Modal>
