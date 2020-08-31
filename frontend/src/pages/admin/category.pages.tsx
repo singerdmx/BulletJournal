@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {deleteCategory, getCategory, updateCategory} from "../../features/templates/actions";
+import {deleteCategory, getCategory, setCategoryChoices, updateCategory} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
 import {BackTop, Col, Popover, Row, Typography} from "antd";
-import {DeleteFilled, TagOutlined} from "@ant-design/icons/lib";
+import {DeleteFilled, DeleteTwoTone, TagOutlined} from "@ant-design/icons/lib";
 import ColorPicker from "../../utils/color-picker/ColorPickr";
 import {icons} from "../../assets/icons";
 import './categories.styles.less'
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
-import ChoiceElem from "../../components/templates/choice-elem";
+import AdminChoiceElem from "./admin-choice-elem";
 
 const {Title, Text} = Typography;
 
@@ -20,10 +20,11 @@ type AdminCategoryProps = {
     getCategory: (categoryId: number) => void;
     updateCategory: (categoryId: number, name: string,
                      description?: string, icon?: string, color?: string, forumId?: number, image?: string) => void;
+    setCategoryChoices: (id: number, choices: number[]) => void;
 }
 
 const AdminCategoryPage: React.FC<AdminCategoryProps> = (
-    {category, getCategory, deleteCategory, updateCategory}) => {
+    {category, getCategory, deleteCategory, updateCategory, setCategoryChoices}) => {
     const history = useHistory();
     const [formUpdateLabelIcon, setFormUpdateLabelIcon] = useState(
         <TagOutlined/>
@@ -111,6 +112,10 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
         updateCategory(category.id, category.name, category.description, input, category.color, category.forumId, category.image);
     }
 
+    const deleteChoice = (category: Category, id: number) => {
+        setCategoryChoices(category.id, category.choices.map(c => c.id).filter(c => c !== id));
+    }
+
     return <div className='admin-categories-page'>
         <BackTop/>
         <div><DeleteFilled onClick={handleDelete}/></div>
@@ -118,8 +123,8 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <Popover
                 title='Select an icon for your label'
                 placement='right'
-                content={<IconsSelector />}
-                style={{ width: '800px' }}
+                content={<IconsSelector/>}
+                style={{width: '800px'}}
             >
                 <div className='label-icon'>{formUpdateLabelIcon}</div>
             </Popover>
@@ -143,7 +148,11 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
         <div>
             <h3>Choices</h3>
             {category.choices.map(c => {
-                return <ChoiceElem choice={c}/>
+                return <div>
+                    <AdminChoiceElem choice={c} category={category}/>
+                    {' '}
+                    <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>
+                </div>
             })}
         </div>
     </div>
@@ -156,5 +165,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
     getCategory,
     deleteCategory,
-    updateCategory
+    updateCategory,
+    setCategoryChoices
 })(AdminCategoryPage);

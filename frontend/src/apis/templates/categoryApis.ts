@@ -72,7 +72,7 @@ export const deleteCategory = (categoryId: number) => {
 
 export const updateChoicesForCategory = (categoryId: number, choicesIds: number[]) => {
     const putBody = JSON.stringify(choicesIds);
-    return doPut(`/api/categories/{categoryId}/setChoices`, putBody)
+    return doPut(`/api/categories/${categoryId}/setChoices`, putBody)
         .then(res => res.json())
         .catch(
             (err) => {

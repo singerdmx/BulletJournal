@@ -31,3 +31,8 @@ export const updateCategory = (
 export const updateCategoryRelations = (categories: Category[]) => actions.updateCategoryRelations({categories: categories});
 
 export const deleteCategory = (id: number) => actions.deleteCategory({id: id});
+
+export const setCategoryChoices = (id: number, choices: number[]) => actions.setChoices({
+    categoryId: id,
+    choices: choices
+});
