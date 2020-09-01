@@ -15,6 +15,8 @@ export interface Choice {
     name: string;
     multiple: boolean;
     selections: Selection[];
+    categories: Category[];
+    steps: Step[];
 }
 
 export interface Selection {
