@@ -69,6 +69,7 @@ public class Step extends NamedModel {
 
     public com.bulletjournal.templates.controller.model.Step toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Step(id, getName(),
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
+                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
+                excludedSelections);
     }
 }

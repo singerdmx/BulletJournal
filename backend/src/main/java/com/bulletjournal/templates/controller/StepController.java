@@ -5,6 +5,7 @@ import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
+import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,17 +28,20 @@ public class StepController {
 
     protected static final String STEP_SET_CHOICES_ROUTE = "/api/steps/{stepId}/setChoices";
 
-    private CategoryDaoJpa categoryDaoJpa;
+    protected static final String STEP_SET_EXCLUDED_SELECTIONS_ROUTE = "api/steps/{stepId}/setExcludedSelections";
 
-    private StepDaoJpa stepDaoJpa;
+    private final CategoryDaoJpa categoryDaoJpa;
 
-    private UserDaoJpa userDaoJpa;
+    private final StepDaoJpa stepDaoJpa;
+
+    private final UserDaoJpa userDaoJpa;
 
     @Autowired
     public StepController(
         CategoryDaoJpa categoryDaoJpa,
         StepDaoJpa stepDaoJpa,
-        UserDaoJpa userDaoJpa
+        UserDaoJpa userDaoJpa,
+        SelectionDaoJpa selectionDaoJpa
     ) {
         this.categoryDaoJpa = categoryDaoJpa;
         this.stepDaoJpa = stepDaoJpa;
@@ -69,6 +73,13 @@ public class StepController {
             @NotNull @RequestBody List<Long> choicesIds) {
         validateRequester();
         stepDaoJpa.updateChoicesForStep(stepId, choicesIds);
+        return getStep(stepId);
+    }
+
+    @PutMapping(STEP_SET_EXCLUDED_SELECTIONS_ROUTE)
+    public Step setExcludedSelections(@PathVariable Long stepId, @NotNull @RequestBody List<Long> excludedSelectionIds) {
+        validateRequester();
+        stepDaoJpa.updateExcludedSelectionsForStep(excludedSelectionIds, stepId);
         return getStep(stepId);
     }
 

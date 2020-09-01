@@ -13,16 +13,19 @@ import java.util.List;
 @Repository
 public class StepDaoJpa {
 
-    private StepRepository stepRepository;
+    private final StepRepository stepRepository;
 
-    private ChoiceDaoJpa choiceDaoJpa;
+    private final ChoiceDaoJpa choiceDaoJpa;
+
+    private final SelectionDaoJpa selectionDaoJpa;
 
     @Autowired
     public StepDaoJpa(
-        StepRepository stepRepository, ChoiceDaoJpa choiceDaoJpa
+        StepRepository stepRepository, ChoiceDaoJpa choiceDaoJpa, SelectionDaoJpa selectionDaoJpa
     ) {
         this.stepRepository = stepRepository;
         this.choiceDaoJpa = choiceDaoJpa;
+        this.selectionDaoJpa = selectionDaoJpa;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -55,5 +58,14 @@ public class StepDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Step create(String name) {
         return stepRepository.save(new Step(name));
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void updateExcludedSelectionsForStep(List<Long> excludedSelectionIds, Long stepId) {
+        Step step = this.getById(stepId);
+        step.setExcludedSelections(selectionDaoJpa.getSelectionsById(
+                excludedSelectionIds).stream().map(
+                com.bulletjournal.templates.repository.model.Selection::getId).toArray(Long[]::new));
+        this.save(step);
     }
 }
