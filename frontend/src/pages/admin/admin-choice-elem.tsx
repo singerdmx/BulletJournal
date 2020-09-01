@@ -4,7 +4,14 @@ import {Choice} from "../../features/templates/interface";
 import {Button, Divider, Modal, Popover, Radio, Typography} from "antd";
 import {DeleteFilled} from "@ant-design/icons";
 import {connect} from "react-redux";
-import {deleteChoice, deleteSelection, updateChoice, updateSelection} from "../../features/templates/actions";
+import {
+    deleteChoice,
+    deleteSelection,
+    getChoice,
+    updateChoice,
+    updateSelection
+} from "../../features/templates/actions";
+import {useHistory} from "react-router-dom";
 
 const {Title, Text} = Typography;
 
@@ -15,11 +22,13 @@ type ChoiceProps = {
     deleteSelection: (id: number) => void;
     updateChoice: (id: number, name: string, multiple: boolean) => void;
     updateSelection: (id: number, text: string) => void;
+    getChoice: (choiceId: number) => void;
 };
 
 const AdminChoiceElem: React.FC<ChoiceProps> = (
     {
         choice,
+        getChoice,
         showPopover,
         deleteChoice,
         deleteSelection,
@@ -27,10 +36,13 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
         updateSelection
     }) => {
 
+    const history = useHistory();
+
     const [visible, setVisible] = useState(false);
 
     const openModal = () => {
         setVisible(true);
+        getChoice(choice.id);
     };
 
     const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -83,6 +95,16 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                             <DeleteFilled style={{cursor: 'pointer'}} onClick={() => deleteSelectionElem(s.id)}/>
                         </span>)}
                     </div>
+                    <Divider/>
+                    {!showPopover && <div>
+                        <h3>Associated Categories</h3>
+                        {choice.categories.map(category => {
+                            return <span style={{cursor: 'pointer', padding: '5px', backgroundColor: `${category.color}`}}
+                                         onClick={() => history.push(`/admin/categories/${category.id}`)}>
+                                {category.name} ({category.id})
+                            </span>
+                        })}
+                    </div>}
                 </div>
             </Modal>
         );
@@ -109,6 +131,7 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
 
 
 export default connect(null, {
+    getChoice,
     deleteChoice,
     updateChoice,
     deleteSelection,

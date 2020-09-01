@@ -8,6 +8,14 @@ export const getChoices = () => {
         });
 }
 
+export const getChoice = (choiceId: number) => {
+    return doFetch(`/api/public/choices/${choiceId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
 export const createChoice = (name: string, multiple: boolean) => {
     const postBody = JSON.stringify({
         name: name,

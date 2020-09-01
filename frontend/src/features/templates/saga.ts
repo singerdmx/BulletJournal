@@ -1,11 +1,11 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
 import {message} from 'antd';
 import {PayloadAction} from 'redux-starter-kit';
 import {
   actions as templatesActions,
   AddCategoryAction, AddChoiceAction, AddSelectionAction,
   DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
-  GetCategoriesAction, GetCategoryAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
+  GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction
 } from './reducer';
 import {
@@ -18,11 +18,12 @@ import {
   updateChoicesForCategory
 } from '../../apis/templates/categoryApis';
 import {
-  createChoice, deleteChoice,
+  createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
 import {Category, Choice, Selection} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
+import {IState} from "../../store";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -39,6 +40,27 @@ function* fetchChoices(action: PayloadAction<GetChoicesAction>) {
     const data: Choice[] = yield call(getChoices);
     console.log(data)
     yield put(templatesActions.choicesReceived({choices: data}));
+  } catch (error) {
+    yield call(message.error, `fetchChoices Error Received: ${error}`);
+  }
+}
+
+function* fetchChoice(action: PayloadAction<GetChoiceAction>) {
+  try {
+    const {choiceId} = action.payload;
+    const data: Choice = yield call(getChoice, choiceId);
+    console.log(data)
+    const state: IState = yield select();
+    const choices : Choice[] = [];
+    state.templates.choices.forEach(c => {
+      if (c.id === choiceId) {
+        choices.push(data);
+      } else {
+        choices.push(c);
+      }
+    });
+    console.log(choices)
+    yield put(templatesActions.choicesReceived({choices: choices}));
   } catch (error) {
     yield call(message.error, `fetchChoices Error Received: ${error}`);
   }
@@ -186,6 +208,7 @@ export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
     yield takeLatest(templatesActions.getChoices.type, fetchChoices),
+    yield takeLatest(templatesActions.getChoice.type, fetchChoice),
     yield takeLatest(templatesActions.addCategory.type, addCategory),
     yield takeLatest(templatesActions.updateCategoryRelations.type, updateCategories),
     yield takeLatest(templatesActions.deleteCategory.type, removeCategory),

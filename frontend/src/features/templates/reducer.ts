@@ -5,6 +5,10 @@ export type GetCategoriesAction = {};
 
 export type GetChoicesAction = {};
 
+export type GetChoiceAction = {
+    choiceId: number;
+};
+
 export type GetCategoryAction = {
     categoryId: number;
 };
@@ -107,6 +111,7 @@ const slice = createSlice({
         },
         getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state,
         getChoices: (state, action: PayloadAction<GetChoicesAction>) => state,
+        getChoice: (state, action: PayloadAction<GetChoiceAction>) => state,
         getCategory: (state, action: PayloadAction<GetCategoryAction>) => state,
         addCategory: (state, action: PayloadAction<AddCategoryAction>) => state,
         updateCategory: (state, action: PayloadAction<UpdateCategoryAction>) => state,

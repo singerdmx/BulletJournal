@@ -39,6 +39,8 @@ export const setCategoryChoices = (id: number, choices: number[]) => actions.set
 
 export const getChoices = () => actions.getChoices({});
 
+export const getChoice = (choiceId: number) => actions.getChoice({choiceId: choiceId});
+
 export const addChoice = (name: string, multiple: boolean) => actions.addChoice({name: name, multiple: multiple});
 
 export const deleteChoice = (id: number) => actions.deleteChoice({id: id});
