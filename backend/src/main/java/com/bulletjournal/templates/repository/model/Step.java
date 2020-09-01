@@ -17,9 +17,6 @@ public class Step extends NamedModel {
     @SequenceGenerator(name = "step_generator", sequenceName = "template.step_sequence", initialValue = 8000, allocationSize = 10)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
     @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "choices_steps", schema = "template",
             joinColumns = {
@@ -38,7 +35,7 @@ public class Step extends NamedModel {
     private Long[] excludedSelections;
 
     public Step(String name) {
-        this.name = name;
+        super.setName(name);
     }
 
     public Step() {
@@ -62,16 +59,6 @@ public class Step extends NamedModel {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
     public Long getId() {
         return id;
     }
@@ -81,7 +68,7 @@ public class Step extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Step toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Step(id, name,
+        return new com.bulletjournal.templates.controller.model.Step(id, getName(),
                 choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
     }
 }
