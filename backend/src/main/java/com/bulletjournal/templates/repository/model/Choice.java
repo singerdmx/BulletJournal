@@ -29,14 +29,7 @@ public class Choice extends NamedModel {
     @Column(name = "multiple", nullable = false)
     private boolean multiple;
 
-    @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "choices_steps", schema = "template",
-        joinColumns = {
-            @JoinColumn(name = "choice_id", referencedColumnName = "id",
-                nullable = false, updatable = false)},
-        inverseJoinColumns = {
-            @JoinColumn(name = "step_id", referencedColumnName = "id",
-                nullable = false, updatable = false)})
+    @ManyToMany(targetEntity = Step.class, mappedBy = "choices", fetch = FetchType.LAZY)
     private List<Step> steps = new ArrayList<>();
 
     public Choice() {

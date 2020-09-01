@@ -1,13 +1,20 @@
 package com.bulletjournal.templates.controller;
 
-import com.bulletjournal.templates.controller.model.Steps;
+import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 public class StepController {
@@ -16,17 +23,25 @@ public class StepController {
 
     public static final String STEPS_ROUTE = "/api/steps";
 
-    private final CategoryDaoJpa categoryDaoJpa;
+    public static final String PUBLIC_STEP_ROUTE = "/api/public/steps/{stepId}";
 
-    private final StepDaoJpa stepDaoJpa;
+    protected static final String STEP_SET_CHOICES_ROUTE = "/api/steps/{stepId}/setChoices";
+
+    private CategoryDaoJpa categoryDaoJpa;
+
+    private StepDaoJpa stepDaoJpa;
+
+    private UserDaoJpa userDaoJpa;
 
     @Autowired
     public StepController(
         CategoryDaoJpa categoryDaoJpa,
-        StepDaoJpa stepDaoJpa
+        StepDaoJpa stepDaoJpa,
+        UserDaoJpa userDaoJpa
     ) {
         this.categoryDaoJpa = categoryDaoJpa;
         this.stepDaoJpa = stepDaoJpa;
+        this.userDaoJpa = userDaoJpa;
     }
 
     @GetMapping(STEPS_ROUTE)
@@ -35,5 +50,33 @@ public class StepController {
         // get all steps
         // convert them to workflow.Step
         return new Steps();
+    }
+
+    @PostMapping(STEPS_ROUTE)
+    public Step createStep(@Valid @RequestBody CreateStepParams params) {
+        validateRequester();
+        return this.stepDaoJpa.create(params.getName()).toPresentationModel();
+    }
+
+    @GetMapping(PUBLIC_STEP_ROUTE)
+    public Step getStep(@NotNull @PathVariable Long stepId) {
+        return stepDaoJpa.getById(stepId).toPresentationModel();
+    }
+
+    @PutMapping(STEP_SET_CHOICES_ROUTE)
+    public Step updateChoicesForStep(
+            @NotNull @PathVariable Long stepId,
+            @NotNull @RequestBody List<Long> choicesIds) {
+        validateRequester();
+        stepDaoJpa.updateChoicesForStep(stepId, choicesIds);
+        return getStep(stepId);
+    }
+
+    private void validateRequester() {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+
+        if (!this.userDaoJpa.isAdmin(requester)) {
+            throw new UnAuthorizedException("User: " + requester + " is not admin");
+        }
     }
 }

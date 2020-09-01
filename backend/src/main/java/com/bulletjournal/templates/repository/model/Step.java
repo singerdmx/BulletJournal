@@ -5,6 +5,7 @@ import com.bulletjournal.repository.models.NamedModel;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "steps", schema = "template")
@@ -18,8 +19,23 @@ public class Step extends NamedModel {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(targetEntity = Choice.class, mappedBy = "steps", fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
+    @JoinTable(name = "choices_steps", schema = "template",
+            joinColumns = {
+                    @JoinColumn(name = "step_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "choice_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)})
     private List<Choice> choices = new ArrayList<>();
+
+    public Step(String name) {
+        this.name = name;
+    }
+
+    public Step() {
+
+    }
 
     public List<Choice> getChoices() {
         return choices;
@@ -36,5 +52,10 @@ public class Step extends NamedModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public com.bulletjournal.templates.controller.model.Step toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.Step(id, name,
+                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
     }
 }
