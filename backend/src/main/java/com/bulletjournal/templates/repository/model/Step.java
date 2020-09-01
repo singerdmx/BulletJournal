@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository.model;
 
 import com.bulletjournal.repository.models.NamedModel;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,6 +30,13 @@ public class Step extends NamedModel {
                             nullable = false, updatable = false)})
     private List<Choice> choices = new ArrayList<>();
 
+    @Type(type = "long-array")
+    @Column(
+            name = "excluded_selections",
+            columnDefinition = "bigint[]"
+    )
+    private Long[] excludedSelections;
+
     public Step(String name) {
         this.name = name;
     }
@@ -43,6 +51,14 @@ public class Step extends NamedModel {
 
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
+    }
+
+    public Long[] getExcludedSelections() {
+        return excludedSelections;
+    }
+
+    public void setExcludedSelections(Long[] excludedSelections) {
+        this.excludedSelections = excludedSelections;
     }
 
     @Override
