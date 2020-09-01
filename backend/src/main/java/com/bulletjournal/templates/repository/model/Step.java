@@ -20,7 +20,7 @@ public class Step extends NamedModel {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "choices_steps", schema = "template",
             joinColumns = {
                     @JoinColumn(name = "step_id", referencedColumnName = "id",
@@ -59,6 +59,16 @@ public class Step extends NamedModel {
 
     public void setExcludedSelections(Long[] excludedSelections) {
         this.excludedSelections = excludedSelections;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

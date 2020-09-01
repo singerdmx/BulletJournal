@@ -45,7 +45,7 @@ public class ChoiceController {
 
     @GetMapping(PUBLIC_CHOICE_ROUTE)
     public Choice getChoice(@NotNull @PathVariable Long choiceId) {
-        return choiceDaoJpa.getById(choiceId).toPresentationModel();
+        return choiceDaoJpa.getChoiceByIdWithCategoriesSelectionsSteps(choiceId);
     }
 
     @PostMapping(CHOICES_ROUTE)

@@ -14,6 +14,11 @@ public class Step {
     public Step() {
     }
 
+    public Step(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Step(Long id, String name, List<Choice> choices) {
         this.id = id;
         this.name = name;

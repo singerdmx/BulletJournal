@@ -15,6 +15,8 @@ public class Choice {
 
     private List<Selection> selections = new ArrayList<>();
 
+    private List<Step> steps = new ArrayList<>();
+
     public Choice() {
 
     }
@@ -78,5 +80,13 @@ public class Choice {
 
     public void setSelections(List<Selection> selections) {
         this.selections = selections;
+    }
+
+    public List<Step> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
     }
 }
