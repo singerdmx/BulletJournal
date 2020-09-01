@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class SelectionDaoJpa {
@@ -60,7 +62,7 @@ public class SelectionDaoJpa {
         if (ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return selectionRepository.findAllById(ids);
+        return selectionRepository.findAllById(ids).stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
