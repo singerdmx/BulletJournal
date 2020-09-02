@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.templates.controller.model.UpdateStepParams;
 import com.bulletjournal.templates.repository.model.Choice;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.bulletjournal.templates.repository.model.Step;
@@ -84,5 +85,12 @@ public class StepDaoJpa {
         List<Selection> selections = selectionDaoJpa.getSelectionsById(Arrays.asList(step.getExcludedSelections()));
         presentStep.setExcludedSelections(selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
         return presentStep;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void updateStep(Long stepId, UpdateStepParams updateStepParams) {
+        Step step = getById(stepId);
+        step.setName(updateStepParams.getName());
+        save(step);
     }
 }

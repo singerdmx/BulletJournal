@@ -3,9 +3,7 @@ package com.bulletjournal.templates.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.templates.controller.model.CreateStepParams;
-import com.bulletjournal.templates.controller.model.Step;
-import com.bulletjournal.templates.controller.model.Steps;
+import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
@@ -93,6 +91,14 @@ public class StepController {
     public void deleteStep(@NotNull @PathVariable Long stepId) {
         validateRequester();
         stepDaoJpa.deleteById(stepId);
+    }
+
+    @PutMapping(STEP_ROUTE)
+    public Step updateStep(@NotNull @PathVariable Long stepId,
+                                   @Valid @RequestBody UpdateStepParams updateStepParams) {
+        validateRequester();
+        stepDaoJpa.updateStep(stepId, updateStepParams);
+        return getStep(stepId);
     }
 
     private void validateRequester() {
