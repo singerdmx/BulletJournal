@@ -9,7 +9,6 @@ import com.bulletjournal.templates.controller.model.Steps;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
-import com.bulletjournal.templates.workflow.models.FlowStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -54,9 +53,9 @@ public class StepController {
 
     @GetMapping(STEPS_ROUTE)
     public Steps getAllSteps() {
-        List<com.bulletjournal.templates.workflow.models.Step> steps
+        List<Step> steps
             = stepDaoJpa.findAll().stream()
-                .map(step -> new FlowStep(step.getChoices(), step.getName()))
+                .map(step -> step.toPresentationModel())
                 .collect(Collectors.toList());
         return new Steps(steps, null);
     }
