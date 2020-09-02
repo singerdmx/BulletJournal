@@ -11,7 +11,7 @@ public class Step {
 
     private List<Choice> choices = new ArrayList<>();
 
-    private List<Selection> excludedSelections;
+    private List<Selection> excludedSelections = new ArrayList<>();
 
     public Step() {
     }

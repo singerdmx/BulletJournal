@@ -32,7 +32,7 @@ public class Step extends NamedModel {
             name = "excluded_selections",
             columnDefinition = "bigint[]"
     )
-    private Long[] excludedSelections;
+    private Long[] excludedSelections = new Long[0];
 
     public Step(String name) {
         super.setName(name);

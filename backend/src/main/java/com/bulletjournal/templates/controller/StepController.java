@@ -27,6 +27,8 @@ public class StepController {
 
     public static final String STEPS_ROUTE = "/api/steps";
 
+    public static final String STEP_ROUTE = "/api/steps/{stepId}";
+
     public static final String PUBLIC_STEP_ROUTE = "/api/public/steps/{stepId}";
 
     protected static final String STEP_SET_CHOICES_ROUTE = "/api/steps/{stepId}/setChoices";
@@ -85,6 +87,12 @@ public class StepController {
         validateRequester();
         stepDaoJpa.updateExcludedSelectionsForStep(excludedSelectionIds, stepId);
         return getStep(stepId);
+    }
+
+    @DeleteMapping(STEP_ROUTE)
+    public void deleteStep(@NotNull @PathVariable Long stepId) {
+        validateRequester();
+        stepDaoJpa.deleteById(stepId);
     }
 
     private void validateRequester() {
