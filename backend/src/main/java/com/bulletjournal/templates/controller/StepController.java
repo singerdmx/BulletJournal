@@ -3,10 +3,13 @@ package com.bulletjournal.templates.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.templates.controller.model.*;
+import com.bulletjournal.templates.controller.model.CreateStepParams;
+import com.bulletjournal.templates.controller.model.Step;
+import com.bulletjournal.templates.controller.model.Steps;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
+import com.bulletjournal.templates.workflow.models.FlowStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class StepController {
@@ -50,10 +54,11 @@ public class StepController {
 
     @GetMapping(STEPS_ROUTE)
     public Steps getAllSteps() {
-        // get all categories with choices
-        // get all steps
-        // convert them to workflow.Step
-        return new Steps();
+        List<com.bulletjournal.templates.workflow.models.Step> steps
+            = stepDaoJpa.findAll().stream()
+                .map(step -> new FlowStep(step.getChoices(), step.getName()))
+                .collect(Collectors.toList());
+        return new Steps(steps, null);
     }
 
     @PostMapping(STEPS_ROUTE)
