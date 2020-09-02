@@ -13,7 +13,7 @@ public class FlowStep implements Step {
 
     private final List<Choice> choices;
 
-    protected FlowStep(List<Choice> choices, String name) {
+    public FlowStep(List<Choice> choices, String name) {
         this.selections = new SelectionCombo();
         this.choices = choices;
         this.name = name;

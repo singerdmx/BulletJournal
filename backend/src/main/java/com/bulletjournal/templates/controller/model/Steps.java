@@ -1,7 +1,5 @@
 package com.bulletjournal.templates.controller.model;
 
-import com.bulletjournal.templates.workflow.models.Step;
-
 import java.util.ArrayList;
 import java.util.List;
 
