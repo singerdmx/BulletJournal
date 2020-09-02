@@ -8,10 +8,9 @@ import {unregister} from './serviceWorker';
 import PublicPage from './Public';
 import PrivacyPage from './Privacy';
 import TermsOfServicePage from './TermsOfService';
-import TemplatesPage from './templates';
+import TemplatesPage from './template';
 import TokenPage from "./Token";
 import PublicNotificationsPage from "./public-notifications";
-import StepsPage from "./pages/templates/steps.pages";
 
 const store = createStore();
 
@@ -64,11 +63,14 @@ function listen() {
                         <Switch>
                             <Route exact path="/public/privacy" component={PrivacyPage}/>
                             <Route exact path="/public/tos" component={TermsOfServicePage}/>
-                            <Route exact path="/public/templates" component={TemplatesPage}/>
-                            <Route exact path="/public/categories/:categoryId/steps" component={StepsPage}/>
                             <Route exact path="/public/items/:itemId" component={PublicPage}/>
                             <Route exact path="/public/notifications/:id" component={PublicNotificationsPage}/>
                             <Route exact path="/tokens/:token" component={TokenPage}/>
+                            <Route path="/public/templates">
+                                <HashRouter>
+                                    <Route path="/" component={TemplatesPage}/>
+                                </HashRouter>
+                            </Route>
                             <Route path="/">
                                 <HashRouter>
                                     <Route path="/" component={App}/>
