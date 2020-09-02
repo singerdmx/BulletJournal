@@ -2,13 +2,16 @@ package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.repository.model.Choice;
+import com.bulletjournal.templates.repository.model.Selection;
 import com.bulletjournal.templates.repository.model.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class StepDaoJpa {
@@ -67,5 +70,14 @@ public class StepDaoJpa {
                 excludedSelectionIds).stream().map(
                 com.bulletjournal.templates.repository.model.Selection::getId).toArray(Long[]::new));
         this.save(step);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public com.bulletjournal.templates.controller.model.Step getStepByIdWithExcludedSelections(Long stepId) {
+        Step step = getById(stepId);
+        List<Selection> selections = selectionDaoJpa.getSelectionsById(Arrays.asList(step.getExcludedSelections()));
+        com.bulletjournal.templates.controller.model.Step presentStep = step.toPresentationModel();
+        presentStep.setExcludedSelections(selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
+        return presentStep;
     }
 }

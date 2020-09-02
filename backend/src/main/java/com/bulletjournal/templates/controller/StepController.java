@@ -64,7 +64,7 @@ public class StepController {
 
     @GetMapping(PUBLIC_STEP_ROUTE)
     public Step getStep(@NotNull @PathVariable Long stepId) {
-        return stepDaoJpa.getById(stepId).toPresentationModel();
+        return stepDaoJpa.getStepByIdWithExcludedSelections(stepId);
     }
 
     @PutMapping(STEP_SET_CHOICES_ROUTE)
