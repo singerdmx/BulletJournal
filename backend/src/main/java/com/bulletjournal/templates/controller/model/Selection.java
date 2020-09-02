@@ -9,6 +9,9 @@ public class Selection {
 
     private String text;
 
+    public Selection() {
+    }
+
     public Selection(Long id, Choice choice, String icon, String text) {
         this.id = id;
         this.choice = choice;
