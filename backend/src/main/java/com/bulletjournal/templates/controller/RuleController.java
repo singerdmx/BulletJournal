@@ -44,7 +44,7 @@ public class RuleController {
     }
 
     @GetMapping(RULE_ROUTE)
-    public Rule getRule(@NotNull @PathVariable Long ruleId, @RequestParam RuleType ruleType) {
+    public Rule getRule(@NotNull @PathVariable Long ruleId, @NotNull @RequestParam RuleType ruleType) {
         validateRequester();
         if (ruleType == RuleType.CATEGORY_RULE) {
             return ruleDaoJpa.getCategoryRuleById(ruleId).toPresentationModel();
