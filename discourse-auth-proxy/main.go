@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -25,7 +24,7 @@ import (
 )
 
 var (
-	logger = newRateLimitedLogger(os.Stderr, "", 0)
+	logger = newRateLimitedLogger()
 
 	config *Config
 

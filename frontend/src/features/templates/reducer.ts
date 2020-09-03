@@ -1,9 +1,13 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
-import {Category, Choice} from './interface';
+import {Category, Choice, Step} from './interface';
 
 export type GetCategoriesAction = {};
 
 export type GetChoicesAction = {};
+
+export type GetChoiceAction = {
+    choiceId: number;
+};
 
 export type GetCategoryAction = {
     categoryId: number;
@@ -44,6 +48,14 @@ export type DeleteCategoryAction = {
     id: number;
 };
 
+export type DeleteChoiceAction = {
+    id: number;
+};
+
+export type DeleteSelectionAction = {
+    id: number;
+};
+
 export type UpdateCategoryRelationsAction = {
     categories: Category[];
 };
@@ -53,10 +65,32 @@ export type SetChoicesAction = {
     choices: number[];
 };
 
+export type AddChoiceAction = {
+    name: string;
+    multiple: boolean;
+};
+
+export type UpdateChoiceAction = {
+    id: number;
+    name: string;
+    multiple: boolean;
+};
+
+export type AddSelectionAction = {
+    choiceId: number;
+    text: string;
+};
+
+export type UpdateSelectionAction = {
+    id: number;
+    text: string;
+};
+
 let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
-    choices: [] as Choice[]
+    choices: [] as Choice[],
+    steps: [] as Step[]
 };
 
 const slice = createSlice({
@@ -77,12 +111,19 @@ const slice = createSlice({
         },
         getCategories: (state, action: PayloadAction<GetCategoriesAction>) => state,
         getChoices: (state, action: PayloadAction<GetChoicesAction>) => state,
+        getChoice: (state, action: PayloadAction<GetChoiceAction>) => state,
         getCategory: (state, action: PayloadAction<GetCategoryAction>) => state,
         addCategory: (state, action: PayloadAction<AddCategoryAction>) => state,
         updateCategory: (state, action: PayloadAction<UpdateCategoryAction>) => state,
         deleteCategory: (state, action: PayloadAction<DeleteCategoryAction>) => state,
+        deleteChoice: (state, action: PayloadAction<DeleteChoiceAction>) => state,
         updateCategoryRelations: (state, action: PayloadAction<UpdateCategoryRelationsAction>) => state,
         setChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
+        addChoice: (state, action: PayloadAction<AddChoiceAction>) => state,
+        updateChoice: (state, action: PayloadAction<UpdateChoiceAction>) => state,
+        addSelection: (state, action: PayloadAction<AddSelectionAction>) => state,
+        deleteSelection: (state, action: PayloadAction<DeleteSelectionAction>) => state,
+        updateSelection: (state, action: PayloadAction<UpdateSelectionAction>) => state,
     },
 });
 

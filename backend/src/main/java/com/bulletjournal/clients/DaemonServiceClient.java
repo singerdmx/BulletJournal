@@ -1,5 +1,6 @@
 package com.bulletjournal.clients;
 
+import com.bulletjournal.config.DaemonClientConfig;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
 import com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvents;
 import com.bulletjournal.protobuf.daemon.grpc.types.ReplyMessage;
@@ -13,7 +14,6 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -23,8 +23,8 @@ public class DaemonServiceClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DaemonServiceClient.class);
 
-    @Value("${enableStreaming}")
-    private boolean enableStreaming;
+    @Autowired
+    private DaemonClientConfig daemonClientConfig;
 
     @GrpcClient("daemonClient")
     private DaemonGrpc.DaemonBlockingStub daemonBlockingStub;
@@ -37,7 +37,7 @@ public class DaemonServiceClient {
 
     @PostConstruct
     public void postConstruct() {
-        if (enableStreaming) {
+        if (this.daemonClientConfig.isEnabled()) {
             LOGGER.info("We're enabling daemon streaming...");
             subscribeNotification();
         } else {
@@ -45,13 +45,17 @@ public class DaemonServiceClient {
         }
     }
 
-    public String sendEmail(JoinGroupEvents joinGroupEvents) {
+    public void sendEmail(JoinGroupEvents joinGroupEvents) {
+        if (!this.daemonClientConfig.isEnabled()) {
+            LOGGER.info("Daemon Service not enabled: skip sending email");
+            return;
+        }
         try {
             ReplyMessage replyMessage = this.daemonBlockingStub.joinGroupEvents(joinGroupEvents);
-            return replyMessage.getMessage();
+            LOGGER.info("joinGroupEvents reply: {}", replyMessage.getMessage());
         } catch (final StatusRuntimeException e) {
-            LOGGER.error("Failed with " + e.getStatus().getCode().name());
-            return null;
+            LOGGER.error("joinGroupEvents sent and failed with " + e.getStatus().getCode().name(), e);
+            return;
         }
     }
 

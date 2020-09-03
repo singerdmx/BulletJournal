@@ -1,25 +1,25 @@
 package main
 
 import (
-	"io"
-	"log"
 	"net/http"
 	"time"
 
+	"github.com/singerdmx/BulletJournal/discourse-auth-proxy/logging"
 	"golang.org/x/time/rate"
 )
 
 type rateLimitedLogger struct {
-	logger  *log.Logger
+	logger  *logging.Logger
 	limiter *rate.Limiter
 }
 
-func newRateLimitedLogger(out io.Writer, prefix string, flag int) *rateLimitedLogger {
+func newRateLimitedLogger() *rateLimitedLogger {
+	logging.InitLogging()
 	customLogger := &rateLimitedLogger{
-		logger:  log.New(out, prefix, flag),
+		logger:  logging.GetLogger(),
 		limiter: rate.NewLimiter(rate.Every(250*time.Millisecond), 30),
 	}
-	customLogger.logger.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	return customLogger
 }
 
@@ -59,6 +59,6 @@ func logHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		lw := &loggableResponseWriter{next: w}
 		next.ServeHTTP(lw, r)
-		log.Printf("%s %s %s %d", r.RemoteAddr, r.Method, r.URL, lw.StatusCode)
+		logger.Printf("%s %s %s %d", r.RemoteAddr, r.Method, r.URL, lw.StatusCode)
 	})
 }

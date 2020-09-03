@@ -4,6 +4,7 @@ import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,17 +29,15 @@ public class Choice extends NamedModel {
     @Column(name = "multiple", nullable = false)
     private boolean multiple;
 
-    @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "choices_steps", schema = "template",
-        joinColumns = {
-            @JoinColumn(name = "choice_id", referencedColumnName = "id",
-                nullable = false, updatable = false)},
-        inverseJoinColumns = {
-            @JoinColumn(name = "step_id", referencedColumnName = "id",
-                nullable = false, updatable = false)})
+    @ManyToMany(targetEntity = Step.class, mappedBy = "choices", fetch = FetchType.LAZY)
     private List<Step> steps = new ArrayList<>();
 
     public Choice() {
+    }
+
+    public Choice(String name, boolean multiple) {
+        setName(name);
+        this.multiple = multiple;
     }
 
     public Choice(List<Selection> selections, boolean multiple, String name) {
@@ -73,7 +72,10 @@ public class Choice extends NamedModel {
     }
 
     public List<Selection> getSelections() {
-        return selections;
+        if (this.selections == null) {
+            return Collections.emptyList();
+        }
+        return this.selections;
     }
 
     public void addSelections(List<Selection> selections) {
@@ -93,7 +95,7 @@ public class Choice extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Choice(id, getName(), multiple,
-                selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
+        return new com.bulletjournal.templates.controller.model.Choice(getId(), getName(), isMultiple(),
+                getSelections().stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
     }
 }

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChoiceRepository extends JpaRepository<Choice, Long> {
     Choice getById(Long id);
+    Choice getByName(String name);
 }

@@ -23,6 +23,7 @@ import ProjectStatisticsPage from "../../pages/statistics/statistics.pages";
 import AdminCategoriesPage from "../../pages/admin/categories.pages";
 import AdminWorkflowPage from "../../pages/admin/workflow.pages";
 import AdminCategoryPage from "../../pages/admin/category.pages";
+import AdminStepsPage from "../../pages/admin/steps.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -58,6 +59,7 @@ class ContentLayout extends React.Component {
           <Route exact path='/admin' component={AdminPage} />
           <Route exact path='/admin/categories' component={AdminCategoriesPage} />
           <Route exact path='/admin/categories/:categoryId' component={AdminCategoryPage} />
+          <Route exact path='/admin/categories/:categoryId/steps' component={AdminStepsPage} />
           <Route exact path='/admin/workflow' component={AdminWorkflowPage} />
           <Route exact path='/punchCard' component={PunchCardPage} />
           <Route exact path='/search/:term' component={SearchPage} />

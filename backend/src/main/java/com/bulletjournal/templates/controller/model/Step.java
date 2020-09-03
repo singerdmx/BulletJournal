@@ -11,7 +11,14 @@ public class Step {
 
     private List<Choice> choices = new ArrayList<>();
 
+    private List<Selection> excludedSelections = new ArrayList<>();
+
     public Step() {
+    }
+
+    public Step(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Step(Long id, String name, List<Choice> choices) {
@@ -42,5 +49,13 @@ public class Step {
 
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
+    }
+
+    public List<Selection> getExcludedSelections() {
+        return excludedSelections;
+    }
+
+    public void setExcludedSelections(List<Selection> excludedSelections) {
+        this.excludedSelections = excludedSelections;
     }
 }

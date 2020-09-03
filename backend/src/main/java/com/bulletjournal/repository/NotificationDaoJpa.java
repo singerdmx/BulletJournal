@@ -14,7 +14,6 @@ import com.bulletjournal.repository.models.Notification;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +34,6 @@ public class NotificationDaoJpa implements Etaggable {
     private UserAliasDaoJpa userAliasDaoJpa;
     @Autowired
     private DaemonServiceClient daemonServiceClient;
-    @Value("${sendEmail}")
-    private boolean needSendEmail;
 
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
@@ -77,9 +74,7 @@ public class NotificationDaoJpa implements Etaggable {
             notifications.addAll(list);
         });
         this.notificationRepository.saveAll(notifications);
-        if (needSendEmail) {
-            sendEmail(joinGroupEventNotifications);
-        }
+        sendEmail(joinGroupEventNotifications);
     }
 
     private void sendEmail(List<Notification> joinGroupEventNotifications) {

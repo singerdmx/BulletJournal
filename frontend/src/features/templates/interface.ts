@@ -15,10 +15,22 @@ export interface Choice {
     name: string;
     multiple: boolean;
     selections: Selection[];
+    categories: Category[];
+    steps: Step[];
 }
 
 export interface Selection {
     id: number;
     text: string;
     icon?: string;
+}
+
+export interface Step {
+    id: number;
+    choices: Choice[];
+}
+
+export interface Steps {
+    steps: Step[];
+    categories: Category[];
 }
