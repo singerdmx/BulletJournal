@@ -8,19 +8,21 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class Rule extends NamedModel {
 
-    @Column(name = "order")
-    private Integer order;
+    @Column(name = "priority")
+    private Integer priority;
 
     @Column(name = "rule_expression")
     private String ruleExpression;
 
-
-    public Integer getOrder() {
-        return order;
+    public Rule() {
     }
 
-    public void setOrder(Integer order) {
-        this.order = order;
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     public String getRuleExpression() {

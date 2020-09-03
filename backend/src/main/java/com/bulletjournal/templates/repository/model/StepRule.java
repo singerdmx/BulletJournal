@@ -30,4 +30,9 @@ public class StepRule extends Rule {
     public void setStep(Step step) {
         this.step = step;
     }
+
+    public com.bulletjournal.templates.controller.model.Rule toPresentationRule() {
+        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(), step.toPresentationModel());
+
+    }
 }

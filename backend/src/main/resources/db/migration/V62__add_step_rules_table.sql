@@ -12,7 +12,7 @@ create table if not exists template.step_rules (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     rule_expression text,
-    "order" integer,
+    priority integer,
     step_id bigint NOT NULL,
     unique (name)
 );

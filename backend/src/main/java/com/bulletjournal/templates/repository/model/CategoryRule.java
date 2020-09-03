@@ -19,6 +19,9 @@ public class CategoryRule extends Rule {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Category category;
 
+    public CategoryRule() {
+    }
+
     public Category getCategory() {
         return category;
     }
@@ -30,5 +33,9 @@ public class CategoryRule extends Rule {
     @Override
     public Long getId() {
         return id;
+    }
+
+    public com.bulletjournal.templates.controller.model.Rule toPresentationRule() {
+        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(), category.toPresentationModel());
     }
 }
