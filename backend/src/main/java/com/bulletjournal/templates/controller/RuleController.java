@@ -8,11 +8,10 @@ import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.RuleDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @RestController
 public class RuleController {
@@ -21,9 +20,6 @@ public class RuleController {
 
     public static final String RULE_ROUTE = "/api/rules/{ruleId}";
 
-    public static final String PUBLIC_RULES_ROUTE = "/api/public/rules";
-
-    public static final String PUBLIC_RULE_ROUTE = "/api/public/rules/{ruleId}";
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -45,6 +41,18 @@ public class RuleController {
         } else {
             return ruleDaoJpa.createStepRule(params.getStepId(), params.getName(), params.getPriority(), params.getRuleExpression()).toPresentationRule();
         }
+    }
+
+    @GetMapping(RULE_ROUTE)
+    public Rule getRule(@NotNull @PathVariable Long ruleId, @RequestParam String ruleType) {
+        validateRequester();
+        if (ruleType.toLowerCase().equals("categoryrule")) {
+            return ruleDaoJpa.getCategoryRuleById(ruleId).toPresentationRule();
+        }
+        if (ruleType.toLowerCase().equals("steprule")) {
+            return ruleDaoJpa.getStepRuleById(ruleId).toPresentationRule();
+        }
+        throw new BadRequestException("ruleType not match CategoryRule and StepRule");
     }
 
     private void validateRequester() {

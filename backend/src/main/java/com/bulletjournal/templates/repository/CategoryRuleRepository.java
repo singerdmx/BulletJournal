@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoryRuleRepository extends JpaRepository<CategoryRule, Long> {
+    CategoryRule getById(Long id);
 }

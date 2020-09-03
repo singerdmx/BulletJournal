@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository;
 
 
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.CategoryRule;
 import com.bulletjournal.templates.repository.model.Step;
@@ -46,5 +47,23 @@ public class RuleDaoJpa {
         stepRule.setRuleExpression(ruleExpression);
         stepRule.setStep(step);
         return stepRuleRepository.save(stepRule);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public CategoryRule getCategoryRuleById(Long ruleId) {
+        CategoryRule categoryRule = categoryRuleRepository.getById(ruleId);
+        if (categoryRule == null) {
+            throw new ResourceNotFoundException("categoryRule id " + ruleId + " not found");
+        }
+        return categoryRule;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public StepRule getStepRuleById(Long ruleId) {
+        StepRule stepRule = stepRuleRepository.getById(ruleId);
+        if (stepRule == null) {
+            throw new ResourceNotFoundException("stepRule id " + ruleId + " not found");
+        }
+        return stepRule;
     }
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StepRuleRepository extends JpaRepository<StepRule, Long> {
+    StepRule getById(Long id);
 }
