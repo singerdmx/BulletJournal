@@ -44,12 +44,12 @@ public class RuleController {
     }
 
     @GetMapping(RULE_ROUTE)
-    public Rule getRule(@NotNull @PathVariable Long ruleId, @RequestParam String ruleType) {
+    public Rule getRule(@NotNull @PathVariable Long ruleId, @RequestParam RuleType ruleType) {
         validateRequester();
-        if (ruleType.toLowerCase().equals("categoryrule")) {
+        if (ruleType == RuleType.CATEGORY_RULE) {
             return ruleDaoJpa.getCategoryRuleById(ruleId).toPresentationModel();
         }
-        if (ruleType.toLowerCase().equals("steprule")) {
+        if (ruleType == RuleType.STEP_RULE) {
             return ruleDaoJpa.getStepRuleById(ruleId).toPresentationModel();
         }
         throw new BadRequestException("ruleType not match CategoryRule and StepRule");
