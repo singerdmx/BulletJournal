@@ -35,7 +35,7 @@ public class CategoryRule extends Rule {
         return id;
     }
 
-    public com.bulletjournal.templates.controller.model.Rule toPresentationRule() {
+    public com.bulletjournal.templates.controller.model.Rule toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(), category.toPresentationModel());
     }
 }

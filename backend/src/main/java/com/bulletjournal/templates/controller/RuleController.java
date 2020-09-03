@@ -37,9 +37,9 @@ public class RuleController {
             throw new BadRequestException("category id and step id both not null");
         }
         if (params.getCategoryId() != null) {
-            return ruleDaoJpa.createCategoryRule(params.getCategoryId(), params.getName(), params.getPriority(), params.getRuleExpression()).toPresentationRule();
+            return ruleDaoJpa.createCategoryRule(params.getCategoryId(), params.getName(), params.getPriority(), params.getRuleExpression()).toPresentationModel();
         } else {
-            return ruleDaoJpa.createStepRule(params.getStepId(), params.getName(), params.getPriority(), params.getRuleExpression()).toPresentationRule();
+            return ruleDaoJpa.createStepRule(params.getStepId(), params.getName(), params.getPriority(), params.getRuleExpression()).toPresentationModel();
         }
     }
 
@@ -47,10 +47,10 @@ public class RuleController {
     public Rule getRule(@NotNull @PathVariable Long ruleId, @RequestParam String ruleType) {
         validateRequester();
         if (ruleType.toLowerCase().equals("categoryrule")) {
-            return ruleDaoJpa.getCategoryRuleById(ruleId).toPresentationRule();
+            return ruleDaoJpa.getCategoryRuleById(ruleId).toPresentationModel();
         }
         if (ruleType.toLowerCase().equals("steprule")) {
-            return ruleDaoJpa.getStepRuleById(ruleId).toPresentationRule();
+            return ruleDaoJpa.getStepRuleById(ruleId).toPresentationModel();
         }
         throw new BadRequestException("ruleType not match CategoryRule and StepRule");
     }
