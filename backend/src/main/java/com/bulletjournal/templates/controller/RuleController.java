@@ -71,6 +71,24 @@ public class RuleController {
         }
     }
 
+    @PutMapping(RULE_ROUTE)
+    public Rule updateRule(@NotNull @PathVariable Long ruleId, @Valid @RequestBody UpdateRuleParams updateRuleParams) {
+        validateRequester();
+        if (updateRuleParams.getCategoryId() == null && updateRuleParams.getStepId() == null) {
+            throw new BadRequestException("category id and step id both null");
+        }
+        if (updateRuleParams.getCategoryId() != null && updateRuleParams.getStepId() != null) {
+            throw new BadRequestException("category id and step id both not null");
+        }
+        if (updateRuleParams.getCategoryId() != null) {
+            return ruleDaoJpa.updateCategoryRule(ruleId, updateRuleParams.getCategoryId(), updateRuleParams.getName(),
+                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression()).toPresentationModel();
+        } else {
+            return ruleDaoJpa.updateStepRule(ruleId, updateRuleParams.getStepId(), updateRuleParams.getName(),
+                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression()).toPresentationModel();
+        }
+    }
+
     private void validateRequester() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
 
