@@ -93,8 +93,9 @@ To create a backup for the current db status, run "db_backup.sh", it will create
 
 To restore from a database backup:
 ```sh
-docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "DROP SCHEMA public CASCADE;"
+docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "DROP SCHEMA public,template CASCADE;"
 docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "CREATE SCHEMA public;"
+docker exec $(sudo docker ps -aqf "name=db") psql -U postgres -c "CREATE SCHEMA template;"
 docker exec $(sudo docker ps -aqf "name=db") sh -c "gunzip -c /var/db_backup/ReplaceWithBackupFileName | psql  --dbname=postgresql://postgres:docker@localhost:5432/postgres"
 ```
 

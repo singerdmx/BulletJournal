@@ -66,4 +66,42 @@ public class RuleDaoJpa {
         }
         return stepRule;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteCategoryRuleById(Long ruleId) {
+        if (!categoryRuleRepository.existsById(ruleId)) {
+            throw new ResourceNotFoundException("categoryRule id " + ruleId + " not exit");
+        }
+        categoryRuleRepository.deleteById(ruleId);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteStepRuleById(Long ruleId) {
+        if (!stepRuleRepository.existsById(ruleId)) {
+            throw new ResourceNotFoundException("stepRule id " + ruleId + " not exit");
+        }
+        stepRuleRepository.deleteById(ruleId);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public CategoryRule updateCategoryRule(Long ruleId, Long categoryId, String name, Integer priority, String ruleExpression) {
+        CategoryRule categoryRule = getCategoryRuleById(ruleId);
+        Category category = categoryDaoJpa.getById(categoryId);
+        categoryRule.setCategory(category);
+        categoryRule.setName(name);
+        categoryRule.setPriority(priority);
+        categoryRule.setRuleExpression(ruleExpression);
+        return categoryRuleRepository.save(categoryRule);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public StepRule updateStepRule(Long ruleId, Long stepId, String name, Integer priority, String ruleExpression) {
+        StepRule stepRule = getStepRuleById(ruleId);
+        Step step = stepDaoJpa.getById(stepId);
+        stepRule.setStep(step);
+        stepRule.setName(name);
+        stepRule.setPriority(priority);
+        stepRule.setRuleExpression(ruleExpression);
+        return stepRuleRepository.save(stepRule);
+    }
 }

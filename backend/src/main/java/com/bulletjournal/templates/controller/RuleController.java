@@ -46,13 +46,47 @@ public class RuleController {
     @GetMapping(RULE_ROUTE)
     public Rule getRule(@NotNull @PathVariable Long ruleId, @NotNull @RequestParam RuleType ruleType) {
         validateRequester();
-        if (ruleType == RuleType.CATEGORY_RULE) {
-            return ruleDaoJpa.getCategoryRuleById(ruleId).toPresentationModel();
+        switch (ruleType) {
+            case CATEGORY_RULE:
+                return ruleDaoJpa.getCategoryRuleById(ruleId).toPresentationModel();
+            case STEP_RULE:
+                return ruleDaoJpa.getStepRuleById(ruleId).toPresentationModel();
+            default:
+                throw new BadRequestException("ruleType not match CategoryRule and StepRule");
         }
-        if (ruleType == RuleType.STEP_RULE) {
-            return ruleDaoJpa.getStepRuleById(ruleId).toPresentationModel();
+    }
+
+    @DeleteMapping(RULE_ROUTE)
+    public void deleteRule(@NotNull @PathVariable Long ruleId, @NotNull @RequestParam RuleType ruleType) {
+        validateRequester();
+        switch (ruleType) {
+            case CATEGORY_RULE:
+                ruleDaoJpa.deleteCategoryRuleById(ruleId);
+                break;
+            case STEP_RULE:
+                ruleDaoJpa.deleteStepRuleById(ruleId);
+                break;
+            default:
+                throw new BadRequestException("ruleType not match CategoryRule and StepRule");
         }
-        throw new BadRequestException("ruleType not match CategoryRule and StepRule");
+    }
+
+    @PutMapping(RULE_ROUTE)
+    public Rule updateRule(@NotNull @PathVariable Long ruleId, @Valid @RequestBody UpdateRuleParams updateRuleParams) {
+        validateRequester();
+        if (updateRuleParams.getCategoryId() == null && updateRuleParams.getStepId() == null) {
+            throw new BadRequestException("category id and step id both null");
+        }
+        if (updateRuleParams.getCategoryId() != null && updateRuleParams.getStepId() != null) {
+            throw new BadRequestException("category id and step id both not null");
+        }
+        if (updateRuleParams.getCategoryId() != null) {
+            return ruleDaoJpa.updateCategoryRule(ruleId, updateRuleParams.getCategoryId(), updateRuleParams.getName(),
+                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression()).toPresentationModel();
+        } else {
+            return ruleDaoJpa.updateStepRule(ruleId, updateRuleParams.getStepId(), updateRuleParams.getName(),
+                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression()).toPresentationModel();
+        }
     }
 
     private void validateRequester() {
