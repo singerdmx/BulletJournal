@@ -29,6 +29,8 @@ public class StepController {
 
     public static final String PUBLIC_STEP_ROUTE = "/api/public/steps/{stepId}";
 
+    public static final String STEP_CLONE_ROUTE = "/api/steps/{stepId}/clone";
+
     protected static final String STEP_SET_CHOICES_ROUTE = "/api/steps/{stepId}/setChoices";
 
     protected static final String STEP_SET_EXCLUDED_SELECTIONS_ROUTE = "api/steps/{stepId}/setExcludedSelections";
@@ -99,6 +101,10 @@ public class StepController {
         validateRequester();
         stepDaoJpa.updateStep(stepId, updateStepParams);
         return getStep(stepId);
+    }
+
+    @PostMapping(STEP_CLONE_ROUTE)
+    public void cloneStep() {
     }
 
     private void validateRequester() {
