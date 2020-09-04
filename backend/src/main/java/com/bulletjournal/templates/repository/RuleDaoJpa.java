@@ -66,4 +66,20 @@ public class RuleDaoJpa {
         }
         return stepRule;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteCategoryRuleById(Long ruleId) {
+        if (!categoryRuleRepository.existsById(ruleId)) {
+            throw new ResourceNotFoundException("categoryRule id " + ruleId + " not exit");
+        }
+        categoryRuleRepository.deleteById(ruleId);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteStepRuleById(Long ruleId) {
+        if (!stepRuleRepository.existsById(ruleId)) {
+            throw new ResourceNotFoundException("stepRule id " + ruleId + " not exit");
+        }
+        stepRuleRepository.deleteById(ruleId);
+    }
 }
