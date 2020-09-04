@@ -104,6 +104,7 @@ func Validate(c *Config) bool {
 
 func InitConfig() {
 	isProd := flag.Bool("prod", false, "set config to production env")
+	isDev := flag.Bool("dev", false, "set config to development env")
 	flag.Parse()
 
 	SetConfig(configNameBase)
@@ -111,6 +112,9 @@ func InitConfig() {
 		environment = "prod"
 		SetConfig(configNameProd)
 	} else {
+		if *isDev == false {
+			log.Printf("Env is not recognized, default to dev")
+		}
 		environment = "dev"
 		SetConfig(configNameDev)
 	}

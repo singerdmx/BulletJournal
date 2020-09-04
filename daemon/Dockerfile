@@ -24,14 +24,20 @@ RUN apk update && \
 
 # Target image with only executables
 FROM alpine:latest
-ARG tier=dev
 
 # Copy executable to target folder
 COPY --from=builder /go/bin/daemon-server /go/bin/
-COPY config/config-${tier}.yaml /config/config.yaml
+
+# Copy configuration files to /config folder
+ARG tier=dev
+ARG sourceConfigPath=config/config-${tier}.yaml
+ARG destConfigPath=/${sourceConfigPath}
+ENV tierEnv $tier
+COPY config/config.yaml /config/config.yaml
+COPY ${sourceConfigPath} ${destConfigPath}
 
 # Run the grpc command by default when the container starts.
-ENTRYPOINT [ "/go/bin/daemon-server", "-prod"]
+ENTRYPOINT /go/bin/daemon-server -${tierEnv}
 
 # Document that the service listens on port 50051.
 EXPOSE 50051
