@@ -10,6 +10,7 @@ COPY servers servers
 COPY config config
 COPY utils utils
 COPY dao dao
+COPY logging logging
 COPY go.mod .
 COPY Makefile .
 
@@ -23,9 +24,11 @@ RUN apk update && \
 
 # Target image with only executables
 FROM alpine:latest
+ARG tier=dev
 
 # Copy executable to target folder
 COPY --from=builder /go/bin/daemon-server /go/bin/
+COPY config/config-${tier}.yaml /config/config.yaml
 
 # Run the grpc command by default when the container starts.
 ENTRYPOINT [ "/go/bin/daemon-server", "-prod"]
