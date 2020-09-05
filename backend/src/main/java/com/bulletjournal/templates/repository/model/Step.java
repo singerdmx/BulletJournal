@@ -34,12 +34,24 @@ public class Step extends NamedModel {
     )
     private Long[] excludedSelections = new Long[0];
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "next_step", referencedColumnName = "id")
+    private Step nextStep;
+
     public Step(String name) {
         super.setName(name);
     }
 
     public Step() {
 
+    }
+
+    public Step getNextStep() {
+        return nextStep;
+    }
+
+    public void setNextStep(Step nextStep) {
+        this.nextStep = nextStep;
     }
 
     public List<Choice> getChoices() {
@@ -68,7 +80,11 @@ public class Step extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Step toPresentationModel() {
+        if (nextStep == null) {
+            return new com.bulletjournal.templates.controller.model.Step(id, getName(),
+                    choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
+        }
         return new com.bulletjournal.templates.controller.model.Step(id, getName(),
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
+                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()), nextStep.toPresentationModel());
     }
 }

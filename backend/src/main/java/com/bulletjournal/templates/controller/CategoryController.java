@@ -8,11 +8,11 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.Category;
-import com.bulletjournal.templates.controller.model.Choice;
 import com.bulletjournal.templates.controller.model.CreateCategoryParams;
 import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
+import com.bulletjournal.templates.repository.StepDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -48,7 +48,8 @@ public class CategoryController {
     public CategoryController(
         CategoryDaoJpa categoryDaoJpa,
         CategoriesHierarchyDaoJpa hierarchyDaoJpa,
-        UserDaoJpa userDaoJpa
+        UserDaoJpa userDaoJpa,
+        StepDaoJpa stepDaoJpa
     ) {
         this.categoryDaoJpa = categoryDaoJpa;
         this.hierarchyDaoJpa = hierarchyDaoJpa;
@@ -83,7 +84,7 @@ public class CategoryController {
     @PostMapping(CATEGORIES_ROUTE)
     public Category createCategory(@Valid @RequestBody CreateCategoryParams params) {
         validateRequester();
-        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId(), params.getImage()).toPresentationModel();
+        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId(), params.getImage(), params.getNextStepId()).toPresentationModel();
     }
 
     @PutMapping(CATEGORIES_ROUTE)
@@ -105,14 +106,10 @@ public class CategoryController {
     public Category updateCategory(@NotNull @PathVariable Long categoryId,
                                @Valid @RequestBody UpdateCategoryParams updateCategoryParams) {
         validateRequester();
-        com.bulletjournal.templates.repository.model.Category category = categoryDaoJpa.getById(categoryId);
-        category.setName(updateCategoryParams.getName());
-        category.setIcon(updateCategoryParams.getIcon());
-        category.setColor(updateCategoryParams.getColor());
-        category.setForumId(updateCategoryParams.getForumId());
-        category.setDescription(updateCategoryParams.getDescription());
-        category.setImage(updateCategoryParams.getImage());
-        categoryDaoJpa.save(category);
+        categoryDaoJpa.updateCategory(categoryId, updateCategoryParams.getName(),
+                updateCategoryParams.getIcon(), updateCategoryParams.getColor(),
+                updateCategoryParams.getForumId(), updateCategoryParams.getDescription(),
+                updateCategoryParams.getImage(), updateCategoryParams.getNextStepId());
         return getCategory(categoryId);
     }
 
@@ -124,8 +121,9 @@ public class CategoryController {
         while (!deque.isEmpty()) {
             Category category = deque.poll();
             if (category.getId().equals(categoryId)) {
-                List<Choice> choices = categoryDaoJpa.getById(categoryId).toPresentationModel().getChoices();
-                category.setChoices(choices);
+                Category categoryFromDb = categoryDaoJpa.getById(categoryId).toPresentationModel();
+                category.setChoices(categoryFromDb.getChoices());
+                category.setNextStep(categoryFromDb.getNextStep());
                 return category;
             }
             category.getSubCategories().forEach(deque::offer);

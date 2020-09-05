@@ -65,8 +65,14 @@ public class StepDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Step create(String name) {
-        return stepRepository.save(new Step(name));
+    public Step create(String name, Long nextStepId) {
+        Step step = new Step(name);
+        Step nextStep = null;
+        if (nextStepId != null) {
+            nextStep = getById(nextStepId);
+        }
+        step.setNextStep(nextStep);
+        return stepRepository.save(step);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -91,6 +97,25 @@ public class StepDaoJpa {
     public void updateStep(Long stepId, UpdateStepParams updateStepParams) {
         Step step = getById(stepId);
         step.setName(updateStepParams.getName());
+        Step nextStep = null;
+        if (updateStepParams.getNextStepId() != null) {
+            nextStep = getById(updateStepParams.getNextStepId());
+        }
+        step.setNextStep(nextStep);
         save(step);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Step clone(Long stepId) {
+        Step step = getById(stepId);
+        Step newStep = new Step();
+        newStep.setName(step.getName());
+        newStep.setExcludedSelections(step.getExcludedSelections());
+        newStep.setNextStep(step.getNextStep());
+        stepRepository.save(newStep);
+        if (step.getChoices() != null) {
+            updateChoicesForStep(newStep.getId(), step.getChoices().stream().map(Choice::getId).collect(Collectors.toList()));
+        }
+        return getById(newStep.getId());
     }
 }

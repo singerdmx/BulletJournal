@@ -32,6 +32,10 @@ public class Category extends NamedModel {
     @Column(name = "image")
     private String image;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "next_step", referencedColumnName = "id")
+    private Step nextStep;
+
     @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "choices_categories", schema = "template",
             joinColumns = {
@@ -46,13 +50,22 @@ public class Category extends NamedModel {
 
     }
 
-    public Category(String name, String description, String icon, String color, Long forumId, String image) {
+    public Category(String name, String description, String icon, String color, Long forumId, String image, Step nextStep) {
         setName(name);
         this.description = description;
         this.icon = icon;
         this.color = color;
         this.forumId = forumId;
         this.image = image;
+        this.nextStep = nextStep;
+    }
+
+    public Step getNextStep() {
+        return nextStep;
+    }
+
+    public void setNextStep(Step nextStep) {
+        this.nextStep = nextStep;
     }
 
     public List<Choice> getChoices() {
@@ -132,8 +145,13 @@ public class Category extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
+        if (nextStep == null) {
+            return new com.bulletjournal.templates.controller.model.Category(
+                    id, getName(), description, icon, color, forumId, image,
+                    choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
+        }
         return new com.bulletjournal.templates.controller.model.Category(
                 id, getName(), description, icon, color, forumId, image,
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
+                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()), nextStep.toPresentationModel());
     }
 }

@@ -13,6 +13,16 @@ public class UpdateCategoryParams {
 
     private String image;
 
+    private Long nextStepId;
+
+    public Long getNextStepId() {
+        return nextStepId;
+    }
+
+    public void setNextStepId(Long nextStepId) {
+        this.nextStepId = nextStepId;
+    }
+
     public String getImage() {
         return image;
     }

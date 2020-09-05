@@ -18,6 +18,8 @@ public class CreateCategoryParams {
 
     private String image;
 
+    private Long nextStepId;
+
     public CreateCategoryParams(@NotNull String name, @NotNull String description) {
         this.name = name;
         this.description = description;
@@ -25,6 +27,14 @@ public class CreateCategoryParams {
 
     public CreateCategoryParams() {
 
+    }
+
+    public Long getNextStepId() {
+        return nextStepId;
+    }
+
+    public void setNextStepId(Long nextStepId) {
+        this.nextStepId = nextStepId;
     }
 
     public String getImage() {

@@ -4,6 +4,16 @@ public class UpdateStepParams {
 
     private String name;
 
+    private Long nextStepId;
+
+    public Long getNextStepId() {
+        return nextStepId;
+    }
+
+    public void setNextStepId(Long nextStepId) {
+        this.nextStepId = nextStepId;
+    }
+
     public String getName() {
         return name;
     }

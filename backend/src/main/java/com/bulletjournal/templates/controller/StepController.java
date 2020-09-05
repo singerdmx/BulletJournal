@@ -65,7 +65,7 @@ public class StepController {
     @PostMapping(STEPS_ROUTE)
     public Step createStep(@Valid @RequestBody CreateStepParams params) {
         validateRequester();
-        return this.stepDaoJpa.create(params.getName()).toPresentationModel();
+        return this.stepDaoJpa.create(params.getName(), params.getNextStepId()).toPresentationModel();
     }
 
     @GetMapping(PUBLIC_STEP_ROUTE)
@@ -104,7 +104,9 @@ public class StepController {
     }
 
     @PostMapping(STEP_CLONE_ROUTE)
-    public void cloneStep() {
+    public Step cloneStep(@NotNull @PathVariable Long stepId) {
+        validateRequester();
+        return stepDaoJpa.clone(stepId).toPresentationModel();
     }
 
     private void validateRequester() {

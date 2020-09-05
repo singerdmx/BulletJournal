@@ -25,6 +25,8 @@ public class Category {
 
     private List<Choice> choices = new ArrayList<>();
 
+    private Step nextStep;
+
     @Expose
     private List<Category> subCategories = new ArrayList<>();
 
@@ -60,7 +62,19 @@ public class Category {
         this.choices = choices;
     }
 
-    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories, String image, List<Choice> choices) {
+    public Category(Long id, String name, String description, String icon, String color, Long forumId, String image, List<Choice> choices, Step nextStep) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.icon = icon;
+        this.color = color;
+        this.forumId = forumId;
+        this.image = image;
+        this.choices = choices;
+        this.nextStep = nextStep;
+    }
+
+    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories, String image, List<Choice> choices, Step nextStep) {
         this.id = id;
         this.name = name;
         this.subCategories = subCategories;
@@ -70,6 +84,15 @@ public class Category {
         this.forumId = forumId;
         this.image = image;
         this.choices = choices;
+        this.nextStep = nextStep;
+    }
+
+    public Step getNextStep() {
+        return nextStep;
+    }
+
+    public void setNextStep(Step nextStep) {
+        this.nextStep = nextStep;
     }
 
     public String getIcon() {
