@@ -88,7 +88,7 @@ func InitLogging() {
 		EnableFile:        true,
 		FileLevel:         Info,
 		FileJSONFormat:    true,
-		FileLocation:      "~/docker/volumes/log/bulletjournal/auth-proxy",
+		FileLocation:      "/var/log/auth-proxy",
 	}
 
 	err := newLogger(config)
@@ -161,7 +161,7 @@ func newZapLogger(config Configuration) (*Logger, error) {
 	combinedCore := zapcore.NewTee(cores...)
 
 	logger := zap.New(combinedCore,
-		zap.AddCallerSkip(2),
+		zap.AddCallerSkip(3),
 		zap.AddCaller(),
 	)
 	if config.DevEnv {

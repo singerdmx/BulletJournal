@@ -2,13 +2,14 @@
 version: '2.1'
 services:
   auth-proxy:
-    image: xcode1024/auth-proxy:v56
+    image: xcode1024/auth-proxy:v57
     container_name: auth-proxy
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - $HOME/docker/auth_proxy/bin:/tmp
+      - $HOME/docker/auth_proxy/log:/var/log
     depends_on:
       - frontend
 
