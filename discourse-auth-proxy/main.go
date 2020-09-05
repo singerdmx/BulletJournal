@@ -39,6 +39,8 @@ const cookieName = "__discourse_proxy"
 const homePage = "/home/index.html"
 const tokenPage = "/tokens/"
 const tokenForCookieUrl = "/api/tokens/"
+const guestUsername = "Guest"
+var guestToken string = ""
 
 func main() {
 	{
@@ -176,6 +178,12 @@ func getAuthCookie(r *http.Request, w http.ResponseWriter) (string, string, stri
 		logger.Printf("parseCookie err: %v", err)
 		deleteCookie(w)
 	}
+
+	if username == guestUsername {
+		logger.Printf("guest log in")
+		guestToken = cookie.Value
+	}
+
 	return username, groups, cookie.Value, err
 }
 
@@ -267,6 +275,13 @@ func processMobileRequest(handler http.Handler, r *http.Request, w http.Response
 }
 
 func getApiToken(r *http.Request) (returnCookie string) {
+
+	if len(r.URL.Query().Get("guest")) > 0 {
+		returnCookie = guestToken
+		logger.Printf("guest token found: %s", returnCookie)
+		return
+	}
+	
 	token := r.RequestURI[len(tokenForCookieUrl) : len(tokenForCookieUrl)+6]
 	tokenMutex.Lock()
 	value, ok := tokenCache.Get(token)
