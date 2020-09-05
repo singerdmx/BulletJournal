@@ -20,7 +20,22 @@ func newRateLimitedLogger() *rateLimitedLogger {
 		limiter: rate.NewLimiter(rate.Every(250*time.Millisecond), 30),
 	}
 
+	customLogger.Print("Initialize logger for Auth Proxy")
 	return customLogger
+}
+
+func (l *rateLimitedLogger) Fatalf(format string, v ...interface{}) {
+	if !l.limiter.Allow() {
+		return
+	}
+	l.logger.Fatalf(format, v...)
+}
+
+func (l *rateLimitedLogger) Fatal(format string) {
+	if !l.limiter.Allow() {
+		return
+	}
+	l.logger.Fatal(format)
 }
 
 func (l *rateLimitedLogger) Printf(format string, v ...interface{}) {
@@ -28,6 +43,13 @@ func (l *rateLimitedLogger) Printf(format string, v ...interface{}) {
 		return
 	}
 	l.logger.Printf(format, v...)
+}
+
+func (l *rateLimitedLogger) Print(format string) {
+	if !l.limiter.Allow() {
+		return
+	}
+	l.logger.Print(format)
 }
 
 type loggableResponseWriter struct {
