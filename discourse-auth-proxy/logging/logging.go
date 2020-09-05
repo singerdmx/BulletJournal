@@ -161,7 +161,7 @@ func newZapLogger(config Configuration) (*Logger, error) {
 	combinedCore := zapcore.NewTee(cores...)
 
 	logger := zap.New(combinedCore,
-		zap.AddCallerSkip(1),
+		zap.AddCallerSkip(2),
 		zap.AddCaller(),
 	)
 	if config.DevEnv {
