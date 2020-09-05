@@ -1,4 +1,4 @@
-package com.bulletjournal.templates.controller.model;
+package com.bulletjournal.templates.workflow.models;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -6,29 +6,41 @@ import java.util.List;
 
 public class RuleExpression {
     @SerializedName("rule")
-    private Criteria criteria;
+    private List<Criteria> criteriaList;
+
+    @SerializedName("logicOperator")
+    private LogicOperator logicOperator;
 
     RuleExpression() {
     }
 
-    RuleExpression(Criteria criteria) {
-        this.criteria = criteria;
+    public RuleExpression(List<Criteria> criteriaList, LogicOperator logicOperator) {
+        this.criteriaList = criteriaList;
+        this.logicOperator = logicOperator;
     }
 
-    public Criteria getRule() {
-        return criteria;
+    public List<Criteria> getCriteriaList() {
+        return criteriaList;
     }
 
-    public void setRule(Criteria rule) {
-        this.criteria = rule;
+    public void setCriteriaList(List<Criteria> criteriaList) {
+        this.criteriaList = criteriaList;
     }
 
-    static class Criteria {
+    public LogicOperator getLogicOperator() {
+        return logicOperator;
+    }
+
+    public void setLogicOperator(LogicOperator logicOperator) {
+        this.logicOperator = logicOperator;
+    }
+
+    public static class Criteria {
         private Long choiceId;
         private Condition condition;
         private List<Long> selectionIds;
 
-        Criteria(Long choiceId, Condition condition, List<Long> selectionIds) {
+        public Criteria(Long choiceId, Condition condition, List<Long> selectionIds) {
             this.choiceId = choiceId;
             this.condition = condition;
             this.selectionIds = selectionIds;
@@ -59,7 +71,45 @@ public class RuleExpression {
         }
     }
 
-    enum Condition {
+    public enum LogicOperator {
+        AND(0), OR(1);
+        private final int value;
+
+        LogicOperator(int value) {
+            this.value = value;
+        }
+
+        public static LogicOperator getType(int type) {
+            switch (type) {
+                case 0:
+                    return AND;
+                case 1:
+                    return OR;
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+
+        public static String toText(LogicOperator type) {
+            if (type == null) {
+                return "NONE";
+            }
+            switch (type) {
+                case AND:
+                    return "AND";
+                case OR:
+                    return "OR";
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    public enum Condition {
 
         EXACT(0), CONTAINS(1), NOT_CONTAIN(2), IGNORE(3);
 
