@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
 import {getCategory, getSteps} from "../../features/templates/actions";
 import {IState} from "../../store";
@@ -20,7 +20,7 @@ type AdminStepsProps = {
 
 const AdminStepsPage: React.FC<AdminStepsProps> = (
     {category, steps, getCategory, getSteps}) => {
-
+    const history = useHistory();
     const {categoryId} = useParams();
 
     useEffect(() => {
@@ -41,7 +41,8 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
             {steps.map((s) => {
                 return (
                     <div>
-                        <span>{s.name} + ' ' + {s.nextStep}</span>
+                        <span style={{cursor: 'pointer', padding: '5px'}}
+                              onClick={() => history.push(`/admin/steps/${s.id}`)}>{s.name} ({s.id})</span>
                     </div>
                 );
             })}

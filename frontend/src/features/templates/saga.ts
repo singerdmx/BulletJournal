@@ -21,10 +21,10 @@ import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, Selection, Steps} from './interface';
+import {Category, Choice, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import { getSteps, createStep } from '../../apis/templates/stepApis';
+import {getSteps, createStep, getStep} from '../../apis/templates/stepApis';
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -227,6 +227,17 @@ function* addStep(action: PayloadAction<CreateStepAction>) {
   }
 }
 
+function* fetchStep(action: PayloadAction<GetStepAction>) {
+  try {
+    const {stepId} = action.payload;
+    const data: Step = yield call(getStep, stepId);
+    console.log(data)
+    yield put(templatesActions.stepReceived({step: data}));
+  } catch (error) {
+    yield call(message.error, `fetchStep Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -245,6 +256,7 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.deleteSelection.type, removeSelection),
     yield takeLatest(templatesActions.updateSelection.type, putSelection),
     yield takeLatest(templatesActions.getSteps.type, fetchSteps),
+    yield takeLatest(templatesActions.getStep.type, fetchStep),
     yield takeLatest(templatesActions.createStep.type, addStep),
   ])
 }
