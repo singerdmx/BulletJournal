@@ -1,9 +1,9 @@
 import React, {useEffect} from "react";
 import {useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {getCategory} from "../../features/templates/actions";
+import {getCategory, getSteps} from "../../features/templates/actions";
 import {IState} from "../../store";
-import {Category} from "../../features/templates/interface";
+import {Category, Step} from "../../features/templates/interface";
 import {BackTop, Typography} from "antd";
 import './steps.styles.less'
 import {Container} from "react-floating-action-button";
@@ -13,16 +13,21 @@ const {Title, Text} = Typography;
 
 type AdminStepsProps = {
     category: Category | undefined;
+    steps: Step[];
+    getCategory: (categoryId: number) => void;
+    getSteps: () => void;
 }
 
 const AdminStepsPage: React.FC<AdminStepsProps> = (
-    {category}) => {
+    {category, steps, getCategory, getSteps}) => {
 
     const {categoryId} = useParams();
+
     useEffect(() => {
         if (categoryId) {
             getCategory(parseInt(categoryId));
         }
+        getSteps();
     }, [categoryId]);
 
     if (!category) {
@@ -32,6 +37,15 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
     return <div className='steps-page'>
         <BackTop/>
         <h2>{category.name}</h2>
+        <div>
+            {steps.map((s) => {
+                return (
+                    <div>
+                        <span>{s.name} + ' ' + {s.nextStep}</span>
+                    </div>
+                );
+            })}
+        </div>
         <Container>
             <AddStep/>
         </Container>
@@ -39,9 +53,10 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
 }
 
 const mapStateToProps = (state: IState) => ({
+    steps: state.templates.steps,
     category: state.templates.category
 });
 
 export default connect(mapStateToProps, {
-    getCategory,
+    getCategory, getSteps
 })(AdminStepsPage);

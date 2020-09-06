@@ -6,7 +6,7 @@ import {
   AddCategoryAction, AddChoiceAction, AddSelectionAction,
   DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
   GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
-  UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction
+  UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction
 } from './reducer';
 import {
   createCategory,
@@ -21,9 +21,10 @@ import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, Selection} from './interface';
+import {Category, Choice, Selection, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
+import { getSteps, createStep } from '../../apis/templates/stepApis';
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -204,6 +205,28 @@ function* putSelection(action: PayloadAction<UpdateSelectionAction>) {
   }
 }
 
+function* fetchSteps(action: PayloadAction<GetStepsAction>) {
+  try {
+    const data: Steps = yield call(getSteps);
+    console.log(data)
+    yield put(templatesActions.stepsReceived({steps: data.steps}));
+  } catch (error) {
+    yield call(message.error, `fetchSteps Error Received: ${error}`);
+  }
+}
+
+function* addStep(action: PayloadAction<CreateStepAction>) {
+  try {
+    console.log(action.payload)
+    const {name, nextStepId} = action.payload;
+    yield call(createStep, name, nextStepId);
+    const data: Steps = yield call(getSteps);
+    yield put(templatesActions.stepsReceived({steps: data.steps}));
+  } catch (error) {
+    yield call(message.error, `addStep Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -221,5 +244,7 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.addSelection.type, addSelection),
     yield takeLatest(templatesActions.deleteSelection.type, removeSelection),
     yield takeLatest(templatesActions.updateSelection.type, putSelection),
+    yield takeLatest(templatesActions.getSteps.type, fetchSteps),
+    yield takeLatest(templatesActions.createStep.type, addStep),
   ])
 }

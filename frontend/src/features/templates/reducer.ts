@@ -1,6 +1,31 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {Category, Choice, Step} from './interface';
 
+export type GetStepsAction = {};
+
+export type GetStepAction = {
+    stepId: number;
+};
+
+export type CreateStepAction = {
+    name: string;
+    nextStepId: number | undefined;
+};
+
+export type UpdateStepAction = {
+    stepId: number;
+    name: string;
+    nextStepId: number | undefined;
+};
+
+export type StepsAction = {
+    steps: Step[];
+};
+
+export type StepAction = {
+    step: Step;
+};
+
 export type GetCategoriesAction = {};
 
 export type GetChoicesAction = {};
@@ -90,7 +115,8 @@ let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
     choices: [] as Choice[],
-    steps: [] as Step[]
+    steps: [] as Step[],
+    step: undefined as Step | undefined
 };
 
 const slice = createSlice({
@@ -124,6 +150,18 @@ const slice = createSlice({
         addSelection: (state, action: PayloadAction<AddSelectionAction>) => state,
         deleteSelection: (state, action: PayloadAction<DeleteSelectionAction>) => state,
         updateSelection: (state, action: PayloadAction<UpdateSelectionAction>) => state,
+        getSteps: (state, action: PayloadAction<GetStepsAction>) => state,
+        stepsReceived: (state, action: PayloadAction<StepsAction>) => {
+            const {steps} = action.payload;
+            state.steps = steps;
+        },
+        getStep: (state, action: PayloadAction<GetStepAction>) => state,
+        stepReceived: (state, action: PayloadAction<StepAction>) => {
+            const {step} = action.payload;
+            state.step = step;
+        },
+        createStep: (state, action: PayloadAction<CreateStepAction>) => state,
+        updateStep: (state, action: PayloadAction<UpdateStepAction>) => state,
     },
 });
 

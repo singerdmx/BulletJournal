@@ -3,19 +3,19 @@ import {Form, Input, Modal} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-import {addCategory} from "../../../features/templates/actions";
+import {createStep} from "../../../features/templates/actions";
 
 type AddStepProps = {
-    addCategory: (name: string, description: string) => void;
+    createStep: (name: string, nextStepId: number | undefined) => void;
 };
 
 const AddStep: React.FC<AddStepProps> = (props) => {
-    const {addCategory} = props;
+    const {createStep} = props;
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
 
-    const createChoice = (values: any) => {
-        addCategory(values.name, values.description);
+    const addStep = (values: any) => {
+        createStep(values.name, values.nextStepId);
         setVisible(false);
     };
 
@@ -40,7 +40,7 @@ const AddStep: React.FC<AddStepProps> = (props) => {
                         .then((values) => {
                             console.log(values);
                             form.resetFields();
-                            createChoice(values);
+                            addStep(values);
                         })
                         .catch((info) => console.log(info));
                 }}
@@ -50,12 +50,12 @@ const AddStep: React.FC<AddStepProps> = (props) => {
                         name='name'
                         rules={[{required: true, message: 'Name must be between 1 and 30 characters', min: 1, max: 30}]}
                     >
-                        <Input placeholder='Enter Category Name' allowClear/>
+                        <Input placeholder='Enter Step Name' allowClear/>
                     </Form.Item>
                     <Form.Item
-                        name='description'
+                        name='nextStepId'
                     >
-                        <Input placeholder='Enter Description' allowClear/>
+                        <Input placeholder='Enter NextStepId' allowClear/>
                     </Form.Item>
                 </Form>
             </Modal>
@@ -77,5 +77,5 @@ const AddStep: React.FC<AddStepProps> = (props) => {
 };
 
 export default connect(null, {
-    addCategory
+    createStep
 })(AddStep);
