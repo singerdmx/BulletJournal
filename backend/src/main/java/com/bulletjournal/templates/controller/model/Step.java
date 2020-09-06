@@ -13,6 +13,8 @@ public class Step {
 
     private List<Selection> excludedSelections = new ArrayList<>();
 
+    private List<Rule> rules = new ArrayList<>();
+
     private Step nextStep;
 
     public Step() {
@@ -34,6 +36,14 @@ public class Step {
         this.name = name;
         this.choices = choices;
         this.nextStep = nextStep;
+    }
+
+    public List<Rule> getStepRules() {
+        return rules;
+    }
+
+    public void setStepRules(List<Rule> rules) {
+        this.rules = rules;
     }
 
     public Step getNextStep() {

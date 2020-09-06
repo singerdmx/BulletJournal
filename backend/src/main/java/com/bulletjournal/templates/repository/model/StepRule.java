@@ -18,6 +18,9 @@ public class StepRule extends Rule {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Step step;
 
+    public StepRule() {
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -33,6 +36,5 @@ public class StepRule extends Rule {
 
     public com.bulletjournal.templates.controller.model.Rule toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(), step.toPresentationModel());
-
     }
 }

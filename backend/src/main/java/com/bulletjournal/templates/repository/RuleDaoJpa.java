@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public class RuleDaoJpa {
 
@@ -103,5 +105,10 @@ public class RuleDaoJpa {
         stepRule.setPriority(priority);
         stepRule.setRuleExpression(ruleExpression);
         return stepRuleRepository.save(stepRule);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void saveStepRules(List<StepRule> stepRules) {
+        stepRuleRepository.saveAll(stepRules);
     }
 }

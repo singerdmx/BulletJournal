@@ -5,11 +5,14 @@ import com.bulletjournal.templates.controller.model.UpdateStepParams;
 import com.bulletjournal.templates.repository.model.Choice;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.bulletjournal.templates.repository.model.Step;
+import com.bulletjournal.templates.repository.model.StepRule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,13 +26,16 @@ public class StepDaoJpa {
 
     private final SelectionDaoJpa selectionDaoJpa;
 
+    private final RuleDaoJpa ruleDaoJpa;
+
     @Autowired
     public StepDaoJpa(
-        StepRepository stepRepository, ChoiceDaoJpa choiceDaoJpa, SelectionDaoJpa selectionDaoJpa
+        StepRepository stepRepository, ChoiceDaoJpa choiceDaoJpa, SelectionDaoJpa selectionDaoJpa, @Lazy RuleDaoJpa ruleDaoJpa
     ) {
         this.stepRepository = stepRepository;
         this.choiceDaoJpa = choiceDaoJpa;
         this.selectionDaoJpa = selectionDaoJpa;
+        this.ruleDaoJpa = ruleDaoJpa;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -111,6 +117,16 @@ public class StepDaoJpa {
         Step newStep = new Step();
         newStep.clone(step);
         stepRepository.save(newStep);
+        if (step.getStepRules() != null) {
+            List<StepRule> stepRules = new ArrayList<>();
+            step.getStepRules().forEach(stepRule -> {
+                StepRule rule = new StepRule();
+                rule.clone(stepRule);
+                rule.setStep(newStep);
+                stepRules.add(rule);
+            });
+            ruleDaoJpa.saveStepRules(stepRules);
+        }
         return newStep;
     }
 }

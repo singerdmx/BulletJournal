@@ -34,6 +34,9 @@ public class Selection extends AuditModel {
     @Column(name = "text", nullable = false)
     private String text;
 
+    @Column(name = "page", length = 350)
+    private String page;
+
     public Selection() {
     }
 
@@ -41,6 +44,14 @@ public class Selection extends AuditModel {
         this.choice = choice;
         this.icon = icon;
         this.text = text;
+    }
+
+    public String getPage() {
+        return page;
+    }
+
+    public void setPage(String page) {
+        this.page = page;
     }
 
     public Long getId() {

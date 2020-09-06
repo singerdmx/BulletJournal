@@ -1,0 +1,1 @@
+alter table template.selections add page varchar(350);

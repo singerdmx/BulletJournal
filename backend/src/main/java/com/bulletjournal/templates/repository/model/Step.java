@@ -38,12 +38,23 @@ public class Step extends NamedModel {
     @JoinColumn(name = "next_step", referencedColumnName = "id")
     private Step nextStep;
 
+    @OneToMany(mappedBy = "step", fetch = FetchType.LAZY)
+    private List<StepRule> stepRules = new ArrayList<>();
+
     public Step(String name) {
         super.setName(name);
     }
 
     public Step() {
 
+    }
+
+    public List<StepRule> getStepRules() {
+        return stepRules;
+    }
+
+    public void setStepRules(List<StepRule> stepRules) {
+        this.stepRules = stepRules;
     }
 
     public Step getNextStep() {
