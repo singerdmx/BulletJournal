@@ -305,6 +305,9 @@ func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 	redirectURL := r.URL.String()
 	if strings.HasPrefix(redirectURL, "/api") {
 		w.Header().Set("reload", "true")
+		expiration := time.Now().Add(365 * 24 * time.Hour)
+		cookie := http.Cookie{Name: "reload", Value: "true", Expires: expiration, Path: "/"}
+		http.SetCookie(w, &cookie)
 		fmt.Fprintf(w, "Not Logged in")
 		return
 	}
