@@ -16,6 +16,10 @@ export type MyselfApiErrorAction = {
   error: string;
 };
 
+export type ReloadAction = {
+  reload: boolean;
+};
+
 export type UpdateMyself = {};
 
 export type ThemeUpdate = {};
@@ -53,6 +57,7 @@ let initialState = {
   loading: false,
   points: 0,
   firstTime: false,
+  reload: false,
   userPointActivities: [] as Array<UserPointActivity>,
 };
 
@@ -79,6 +84,10 @@ const slice = createSlice({
       if (theme) state.theme = theme;
       if (points) state.points = points;
       if (firstTime) state.firstTime = firstTime;
+    },
+    reloadReceived: (state, action: PayloadAction<ReloadAction>) => {
+      const { reload } = action.payload;
+      state.reload = reload;
     },
     myselfApiErrorReceived: (
       state,

@@ -14,6 +14,7 @@ import {Notification} from './interface';
 import {IState} from '../../store';
 import {EventType} from './constants';
 import {actions as SystemActions} from '../system/reducer';
+import {reloadReceived} from "../myself/actions";
 
 function* noticeApiErrorReceived(action: PayloadAction<NoticeApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -50,7 +51,11 @@ function* notificationsUpdate(action: PayloadAction<NotificationsAction>) {
         })
     );
   } catch (error) {
-    yield call(message.error, `Notice Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Notice Error Received: ${error}`);
+    }
   }
 }
 
@@ -69,7 +74,9 @@ function* answerNotice(act: PayloadAction<AnswerNotificationAction>) {
       }
     }
   } catch (error) {
-    if (error.message === '404') {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else if (error.message === '404') {
       yield call(message.error, 'The notification is no longer valid');
     } else {
       yield call(message.error, `User answers notification failed: ${error}`);
@@ -105,7 +112,11 @@ function* notificationsDelete(action: PayloadAction<DeleteNotificationsAction>) 
         })
     );
   } catch (error) {
-    yield call(message.error, `Delete all notification failed: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete all notification failed: ${error}`);
+    }
   }
 }
 

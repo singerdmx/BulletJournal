@@ -21,6 +21,7 @@ import { ArgsProps } from 'antd/lib/notification';
 import {Content} from "../myBuJo/interface";
 import {updateTargetContent} from "../content/actions";
 import {projectLabelsUpdate} from "../label/actions";
+import {reloadReceived} from "../myself/actions";
 
 const fetchReminderFromLocal = () => {
   const defaultReminders = [] as Task[];
@@ -155,7 +156,11 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `SystemUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `SystemUpdate Error Received: ${error}`);
+    }
   }
 }
 
@@ -179,7 +184,11 @@ function* getPublicItem(action: PayloadAction<GetPublicProjectItem>) {
 
     yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
   } catch (error) {
-    yield call(message.error, `getPublicItem Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getPublicItem Received: ${error}`);
+    }
   }
 }
 
@@ -200,7 +209,11 @@ function* putSharedItemLabels(action: PayloadAction<SetSharedItemLabels>) {
         })
     );
   } catch (error) {
-    yield call(message.error, `setSharedItemLabels Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `setSharedItemLabels Received: ${error}`);
+    }
   }
 }
 

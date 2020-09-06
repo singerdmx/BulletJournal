@@ -15,6 +15,7 @@ import moment from 'moment';
 import {recentItemsReceived, updateRecentItemsDates} from '../recent/actions';
 import {dateFormat} from './constants';
 import {ProjectItem} from './interface';
+import {reloadReceived} from "../myself/actions";
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(
@@ -70,7 +71,11 @@ function* getProjectItems(action: PayloadAction<GetProjectItemsAction>) {
       yield put(recentItemsReceived(recentItems));
     }
   } catch (error) {
-    yield call(message.error, `Get ProjectItems Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get ProjectItems Error Received: ${error}`);
+    }
   }
 }
 
@@ -158,7 +163,11 @@ function* getProjectItemsAfterUpdateSelect(
       yield put(recentItemsReceived(recentItems));
     }
   } catch (error) {
-    yield call(message.error, `Get ProjectItems Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get ProjectItems Error Received: ${error}`);
+    }
   }
 }
 
@@ -180,7 +189,11 @@ function* updateMyBuJoDates(action: PayloadAction<MyBuJo>) {
 
     yield put(projectItemsActions.projectItemsReceived({ items: data }));
   } catch (error) {
-    yield call(message.error, `update Date Saga Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `update Date Saga Error Received: ${error}`);
+    }
   }
 }
 

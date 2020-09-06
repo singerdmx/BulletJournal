@@ -21,7 +21,7 @@ import { PayloadAction } from 'redux-starter-kit';
 import { fetchMyself, patchMyself, clearMyself, getUserPointActivities} from '../../apis/myselfApis';
 import moment from 'moment';
 import { dateFormat } from '../myBuJo/constants';
-import { expandedMyselfLoading } from './actions';
+import {expandedMyselfLoading, reloadReceived} from './actions';
 import {UserPointActivity} from "../../pages/points/interface";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
@@ -75,7 +75,11 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
       yield put(settingsActions.updateTheme({ theme: data.theme }));
     }
   } catch (error) {
-    yield call(message.error, `Myself (Expand) Error Received: ${error}`);
+      if (error.message === 'reload') {
+          yield put(reloadReceived(true));
+      } else {
+          yield call(message.error, `Myself (Expand) Error Received: ${error}`);
+      }
   }
 }
 
@@ -112,7 +116,11 @@ function* myselfUpdate(action: PayloadAction<UpdateMyself>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `Myself Error Received: ${error}`);
+      if (error.message === 'reload') {
+          yield put(reloadReceived(true));
+      } else {
+          yield call(message.error, `Myself Error Received: ${error}`);
+      }
   }
 }
 
@@ -135,7 +143,11 @@ function* myselfPatch(action: PayloadAction<PatchMyself>) {
     yield put(updateMyBuJoDates(currentTime, currentTime));
     yield call(message.success, 'User Settings updated successfully');
   } catch (error) {
-    yield call(message.error, `Myself Patch Error Received: ${error}`);
+      if (error.message === 'reload') {
+          yield put(reloadReceived(true));
+      } else {
+          yield call(message.error, `Myself Patch Error Received: ${error}`);
+      }
   }
 }
 
@@ -144,7 +156,11 @@ function* unsetMyself(action: PayloadAction<ClearMyself>) {
         yield call(clearMyself);
         yield put(myselfActions.myselfDataReceived({firstTime: false}));
     } catch (error) {
-        yield call(message.error, `unsetMyself Error Received: ${error}`);
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `unsetMyself Error Received: ${error}`);
+        }
     }
 }
 
@@ -157,7 +173,11 @@ function* fetchUserPointActivities(action: PayloadAction<FetchUserPointActivitie
             })
         );
     } catch (error) {
-        yield call(message.error, `fetchUserPointActivities Error Received: ${error}`);
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `fetchUserPointActivities Error Received: ${error}`);
+        }
     }
 }
 

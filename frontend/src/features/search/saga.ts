@@ -5,6 +5,7 @@ import {fetchSearchResults} from '../../apis/queryApis';
 import {PayloadAction} from "redux-starter-kit";
 import {actions as searchActions, SearchAction} from "./reducer";
 import {SearchResult, searchResultPageSize} from "./interface";
+import {reloadReceived} from "../myself/actions";
 
 function* search(action: PayloadAction<SearchAction>) {
     try {
@@ -34,7 +35,11 @@ function* search(action: PayloadAction<SearchAction>) {
             searchPageNo: pageNo + 1
         }));
     } catch (error) {
-        yield call(message.error, `search Error Received: ${error}`);
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `search Error Received: ${error}`);
+        }
     }
     yield put(searchActions.updateSearching({searching: false}));
     yield put(searchActions.updateLoadingMore({loadingMore: false}));

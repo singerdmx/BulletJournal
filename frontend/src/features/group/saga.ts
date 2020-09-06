@@ -25,6 +25,7 @@ import {
 import { IState } from '../../store';
 import { clearUser } from '../user/actions';
 import { actions as SystemActions } from '../system/reducer';
+import {reloadReceived} from "../myself/actions";
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -48,7 +49,11 @@ function* groupsUpdate(action: PayloadAction<GroupsAction>) {
     const groups = yield data.json();
     yield put(groupsActions.groupsReceived({ groups: groups }));
   } catch (error) {
-    yield call(message.error, `groupsUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `groupsUpdate Error Received: ${error}`);
+    }
   }
 }
 
@@ -68,7 +73,9 @@ function* createGroup(action: PayloadAction<GroupCreateAction>) {
     yield put(groupsActions.groupReceived({ group: data }));
     yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
-    if (error.message === '400') {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else if (error.message === '400') {
       yield call(message.error, `Group with name "${name}" already exists`);
     } else {
       yield call(message.error, `Group Create Fail: ${error}`);
@@ -90,7 +97,11 @@ function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
       `User ${username} added into Group ${groupName}`
     );
   } catch (error) {
-    yield call(message.error, `Add user group fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Add user group fail: ${error}`);
+    }
   }
 }
 
@@ -107,7 +118,11 @@ function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
       `User ${username} removed from Group ${groupName}`
     );
   } catch (error) {
-    yield call(message.error, `Remove user group fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Remove user group fail: ${error}`);
+    }
   }
 }
 
@@ -126,7 +141,11 @@ function* deleteUserGroup(action: PayloadAction<DeleteGroupAction>) {
     yield call(message.success, `Group "${groupName}" deleted`);
     history.push('/groups');
   } catch (error) {
-    yield call(message.error, `Delete group fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete group fail: ${error}`);
+    }
   }
 }
 
@@ -140,7 +159,11 @@ function* getUserGroup(action: PayloadAction<GetGroupAction>) {
     if (hideError) {
       return;
     }
-    yield call(message.error, `Get Group Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get Group Error Received: ${error}`);
+    }
   }
 }
 
@@ -152,7 +175,9 @@ function* patchGroup(action: PayloadAction<PatchGroupAction>) {
     yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
     const { name } = action.payload;
-    if (error.message === '400') {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else if (error.message === '400') {
       yield call(message.error, `Group with name "${name}" already exists`);
     } else {
       yield call(message.error, `Patch group Fail: ${error}`);

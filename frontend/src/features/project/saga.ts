@@ -33,6 +33,7 @@ import {
   flattenOwnedProject,
   flattenSharedProject,
 } from '../../pages/projects/projects.pages';
+import {reloadReceived} from "../myself/actions";
 
 function* projectApiErrorAction(action: PayloadAction<ProjectApiErrorAction>) {
   yield call(message.error, `Project Error Received: ${action.payload.error}`);
@@ -83,7 +84,11 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
       }
     }
   } catch (error) {
-    yield call(message.error, `projectsUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `projectsUpdate Error Received: ${error}`);
+    }
   }
 }
 
@@ -101,7 +106,9 @@ function* addProject(action: PayloadAction<ProjectCreateAction>) {
     yield put(projectActions.projectsUpdate({}));
     history.push(`/projects/${data.id}`);
   } catch (error) {
-    if (error.message === '400') {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else if (error.message === '400') {
       yield call(message.error, `Project with ${name} already exists`);
     } else {
       yield call(message.error, `Project Create Fail: ${error}`);
@@ -130,7 +137,11 @@ function* updateSharedProjectOwnersOrder(
     yield call(updateSharedProjectsOrder, projectOwners);
   } catch (error) {
     console.log(error);
-    yield call(message.error, `updateSharedProjectsOrder Fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateSharedProjectsOrder Fail: ${error}`);
+    }
   }
 }
 
@@ -156,7 +167,11 @@ function* deleteUserProject(action: PayloadAction<DeleteProjectAction>) {
     yield call(message.success, `BuJo ${name} deleted`);
     history.push('/projects');
   } catch (error) {
-    yield call(message.error, `Delete project fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete project fail: ${error}`);
+    }
   }
 }
 
@@ -175,7 +190,11 @@ function* patchProject(action: PayloadAction<PatchProjectAction>) {
     yield put(groupsActions.getGroup({ groupId: data.group.id }));
     yield call(message.success, 'Successfully updated BuJo');
   } catch (error) {
-    yield call(message.error, `update Project Fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `update Project Fail: ${error}`);
+    }
   }
 }
 
@@ -209,7 +228,11 @@ function* putProjectRelations(
       })
     );
   } catch (error) {
-    yield call(message.error, `update Project relations Fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `update Project relations Fail: ${error}`);
+    }
   }
 }
 
@@ -235,7 +258,11 @@ function* getProjectHistory(action: PayloadAction<GetProjectHistoryAction>) {
 
     yield put(projectActions.historyReceived({ projectHistory: data }));
   } catch (error) {
-    yield call(message.error, `Get Project History Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get Project History Error Received: ${error}`);
+    }
   }
 }
 

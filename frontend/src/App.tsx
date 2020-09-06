@@ -1,27 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Layout } from 'antd';
-import Joyride, {
-  CallBackProps,
-  STATUS,
-  Step,
-  StoreHelpers,
-} from 'react-joyride';
+import React, {useEffect, useState} from 'react';
+import {Layout} from 'antd';
+import Joyride, {CallBackProps, STATUS, Step, StoreHelpers,} from 'react-joyride';
 import SideLayout from './layouts/side/side.layout';
 import HeaderLayout from './layouts/header/header.layout';
 import ContentLayout from './layouts/content/content.layout';
 import FooterLayout from './layouts/footer/footer.layout';
-import { clearMyself, updateTheme } from './features/myself/actions';
+import {clearMyself, updateTheme} from './features/myself/actions';
 import ReactLoading from 'react-loading';
 import getThemeColorVars from './utils/theme';
 
 import './styles/main.less';
-import { connect } from 'react-redux';
-import { IState } from './store';
+import {connect} from 'react-redux';
+import {IState} from './store';
+import {deleteAllCookies} from "./index";
 
 export const Loading = () => (
-  <div className="loading">
-    <ReactLoading type="bubbles" color="#0984e3" height="75" width="75" />
-  </div>
+    <div className="loading">
+      <ReactLoading type="bubbles" color="#0984e3" height="75" width="75"/>
+    </div>
 );
 
 type RootProps = {
@@ -29,20 +25,36 @@ type RootProps = {
   clearMyself: () => void;
   theme: string;
   loading: boolean;
+  reload: boolean;
   firstTime: boolean;
 };
 
-const App: React.FC<RootProps> = (props) => {
+const App: React.FC<RootProps> = (
+    {
+      theme,
+      reload,
+      loading,
+      firstTime,
+      updateTheme,
+      clearMyself
+    }) => {
   useEffect(() => {
-    props.updateTheme();
+    updateTheme();
   }, []);
 
   useEffect(() => {
-    const vars = getThemeColorVars(props.theme);
+    const vars = getThemeColorVars(theme);
     window.less.modifyVars(vars).then(() => {
       console.log('Theme updated at first successfully', vars);
     });
-  }, [props.theme]);
+  }, [theme]);
+
+  useEffect(() => {
+    if (reload) {
+      deleteAllCookies();
+      window.location.reload();
+    }
+  }, [reload]);
 
   const [helpers, setHelpers] = useState({});
   const [layoutMarginLeft, setLayoutMarginLeft] = useState(250);
@@ -52,7 +64,7 @@ const App: React.FC<RootProps> = (props) => {
       title: 'Welcome to Bullet Journal',
       content: <h2>Let's walk the Journey of Bullet Journal</h2>,
       placement: 'center',
-      locale: { skip: <strong aria-label="skip">SKIP</strong> },
+      locale: {skip: <strong aria-label="skip">SKIP</strong>},
       target: 'body',
       styles: {
         options: {
@@ -63,7 +75,7 @@ const App: React.FC<RootProps> = (props) => {
     {
       title: 'Create new group here',
       content: (
-        <h4>Invite people to join your group to collaborate and share</h4>
+          <h4>Invite people to join your group to collaborate and share</h4>
       ),
       spotlightPadding: 30,
       placement: 'bottom',
@@ -72,7 +84,7 @@ const App: React.FC<RootProps> = (props) => {
     {
       title: 'Create a new BuJo here',
       content: (
-        <h4>'BuJo' is a folder for notes or a project for To-Do list</h4>
+          <h4>'BuJo' is a folder for notes or a project for To-Do list</h4>
       ),
       floaterProps: {
         disableAnimation: true,
@@ -83,7 +95,7 @@ const App: React.FC<RootProps> = (props) => {
     {
       title: 'View your created BuJo here',
       content: (
-        <h4>You can change ordering or move your BuJo under other BuJo</h4>
+          <h4>You can change ordering or move your BuJo under other BuJo</h4>
       ),
       spotlightPadding: 30,
       target: '#ownBuJos',
@@ -91,7 +103,7 @@ const App: React.FC<RootProps> = (props) => {
     {
       title: 'Create label here',
       content: (
-        <h4>Attach label to note or task so you can find them by label</h4>
+          <h4>Attach label to note or task so you can find them by label</h4>
       ),
       floaterProps: {
         disableAnimation: true,
@@ -120,11 +132,11 @@ const App: React.FC<RootProps> = (props) => {
   ] as Step[];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type } = data;
+    const {status, type} = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
-      props.clearMyself();
+      clearMyself();
     }
   };
 
@@ -132,35 +144,35 @@ const App: React.FC<RootProps> = (props) => {
     setHelpers(helpers);
   };
 
-  return props.loading ? (
-    <Loading />
+  return loading ? (
+      <Loading/>
   ) : (
-    <div className="App">
-      <Joyride
-        callback={handleJoyrideCallback}
-        continuous={true}
-        getHelpers={getHelpers}
-        run={props.firstTime}
-        scrollToFirstStep={true}
-        showProgress={true}
-        showSkipButton={true}
-        steps={steps}
-        styles={{
-          options: {
-            zIndex: 10000,
-            primaryColor: '#428bca',
-          },
-        }}
-      />
-      <Layout className="layout">
-        <SideLayout setLayoutMarginLeft={setLayoutMarginLeft}/>
-        <Layout style={{ marginLeft: `${layoutMarginLeft}px` }}>
-          <HeaderLayout />
-          <ContentLayout />
-          <FooterLayout />
+      <div className="App">
+        <Joyride
+            callback={handleJoyrideCallback}
+            continuous={true}
+            getHelpers={getHelpers}
+            run={firstTime}
+            scrollToFirstStep={true}
+            showProgress={true}
+            showSkipButton={true}
+            steps={steps}
+            styles={{
+              options: {
+                zIndex: 10000,
+                primaryColor: '#428bca',
+              },
+            }}
+        />
+        <Layout className="layout">
+          <SideLayout setLayoutMarginLeft={setLayoutMarginLeft}/>
+          <Layout style={{marginLeft: `${layoutMarginLeft}px`}}>
+            <HeaderLayout/>
+            <ContentLayout/>
+            <FooterLayout/>
+          </Layout>
         </Layout>
-      </Layout>
-    </div>
+      </div>
   );
 };
 
@@ -168,6 +180,7 @@ const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
   loading: state.myself.loading,
   firstTime: state.myself.firstTime,
+  reload: state.myself.reload
 });
 
-export default connect(mapStateToProps, { updateTheme, clearMyself })(App);
+export default connect(mapStateToProps, {updateTheme, clearMyself})(App);

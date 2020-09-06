@@ -48,6 +48,7 @@ import { ProjectItemUIType } from "../project/constants";
 import { ContentType } from "../myBuJo/constants";
 import { recentItemsReceived } from "../recent/actions";
 import { updateTargetContent } from "../content/actions";
+import {reloadReceived} from "../myself/actions";
 
 
 function* transactionApiErrorReceived(
@@ -89,7 +90,11 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `Transaction Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Transaction Error Received: ${error}`);
+    }
   }
 }
 
@@ -139,7 +144,11 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `transactionCreate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `transactionCreate Error Received: ${error}`);
+    }
   }
 }
 
@@ -150,7 +159,11 @@ function* transactionMove(action: PayloadAction<MoveTransaction>) {
     yield call(message.success, 'Transaction moved successfully');
     history.push(`/projects/${targetProject}`);
   } catch (error) {
-    yield call(message.error, `transactionMove Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `transactionMove Error Received: ${error}`);
+    }
   }
 }
 
@@ -171,7 +184,11 @@ function* shareTransaction(action: PayloadAction<ShareTransaction>) {
     );
     yield call(message.success, 'Transaction shared successfully');
   } catch (error) {
-    yield call(message.error, `shareTransaction Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `shareTransaction Error Received: ${error}`);
+    }
   }
 }
 
@@ -180,7 +197,11 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
     const data = yield call(getTransactionById, action.payload.transactionId);
     yield put(transactionsActions.transactionReceived({ transaction: data }));
   } catch (error) {
-    yield call(message.error, 'Transaction Unavailable');
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, 'Transaction Unavailable');
+    }
   }
 }
 
@@ -259,7 +280,11 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Delete Transaction Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete Transaction Error Received: ${error}`);
+    }
   }
 }
 
@@ -304,7 +329,11 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Delete Transaction Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete Transaction Error Received: ${error}`);
+    }
   }
 }
 
@@ -388,7 +417,11 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Patch Transaction Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Transaction Error Received: ${error}`);
+    }
   }
 }
 
@@ -398,7 +431,11 @@ function* transactionSetLabels(action: PayloadAction<SetTransactionLabels>) {
     const data = yield call(setTransactionLabels, transactionId, labels);
     yield put(transactionsActions.transactionReceived({ transaction: data }));
   } catch (error) {
-    yield call(message.error, `transactionSetLabels Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `transactionSetLabels Error Received: ${error}`);
+    }
   }
 }
 
@@ -410,10 +447,14 @@ function* createTransactionContent(action: PayloadAction<CreateContent>) {
     yield put(updateTargetContent(content));
 
   } catch (error) {
-    yield call(
-      message.error,
-      `createTransactionContent Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `createTransactionContent Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -430,10 +471,14 @@ function* transactionContentsUpdate(
     yield put(updateTargetContent(contents[0]));
 
   } catch (error) {
-    yield call(
-      message.error,
-      `transactionContentsUpdate Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `transactionContentsUpdate Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -484,10 +529,14 @@ function* transactionContentRevisionUpdate(
       );
     }
   } catch (error) {
-    yield call(
-      message.error,
-      `transactionContentRevisionUpdate Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `transactionContentRevisionUpdate Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -509,7 +558,11 @@ function* patchContent(action: PayloadAction<PatchContent>) {
     yield put(updateTargetContent(contents.filter(c => c.id === contentId)[0]));
 
   } catch (error) {
-    yield call(message.error, `Patch Content Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Content Error Received: ${error}`);
+    }
   }
 }
 
@@ -526,10 +579,14 @@ function* deleteTransactionContent(action: PayloadAction<DeleteContent>) {
     yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
 
   } catch (error) {
-    yield call(
-      message.error,
-      `transactionContentDelete Transaction Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `transactionContentDelete Transaction Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -563,10 +620,14 @@ function* getTransactionsByPayer(
       })
     );
   } catch (error) {
-    yield call(
-      message.error,
-      `getTransactionsByPayer Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `getTransactionsByPayer Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -575,7 +636,11 @@ function* patchTransactionRevisionContents(action: PayloadAction<PatchRevisionCo
     const {transactionId, contentId, revisionContents, etag} = action.payload;
     yield call(patchRevisionContents, transactionId, contentId, revisionContents, etag);
   } catch (error) {
-    yield call(message.error, `patchTransactionRevisionContents Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `patchTransactionRevisionContents Error Received: ${error}`);
+    }
   }
 }
 

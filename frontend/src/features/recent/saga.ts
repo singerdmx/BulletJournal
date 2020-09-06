@@ -5,6 +5,7 @@ import { ProjectType } from '../project/constants';
 import { fetchRecentProjectItems } from '../../apis/projectItemsApis';
 import { message } from 'antd';
 import { actions as recentActions, DatesReceivedAction } from './reducer';
+import {reloadReceived} from "../myself/actions";
 
 function* updateRecentDates(action: PayloadAction<DatesReceivedAction>) {
   try {
@@ -34,7 +35,11 @@ function* updateRecentDates(action: PayloadAction<DatesReceivedAction>) {
       recentActions.datesReceived({ startDate: startDate, endDate: endDate })
     );
   } catch (error) {
-    yield call(message.error, `updateRecentDates Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateRecentDates Error Received: ${error}`);
+    }
   }
 }
 

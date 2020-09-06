@@ -74,6 +74,7 @@ import {Task, TaskStatistics} from './interface';
 import {recentItemsReceived} from '../recent/actions';
 import {ContentType} from '../myBuJo/constants';
 import {updateTargetContent} from "../content/actions";
+import {reloadReceived} from "../myself/actions";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -90,7 +91,11 @@ function* getTasksByAssignee(action: PayloadAction<GetTasksByAssignee>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `getTasksByAssignee Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getTasksByAssignee Error Received: ${error}`);
+    }
   }
 }
 
@@ -116,7 +121,11 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `tasksUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `tasksUpdate Error Received: ${error}`);
+    }
   }
 }
 
@@ -169,7 +178,11 @@ function* completedTasksUpdate(action: PayloadAction<UpdateCompletedTasks>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `completedTasksUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `completedTasksUpdate Error Received: ${error}`);
+    }
   }
   yield put(updateLoadingCompletedTask(false));
 }
@@ -207,7 +220,11 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `taskCreate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `taskCreate Error Received: ${error}`);
+    }
   }
 }
 
@@ -233,7 +250,11 @@ function* taskPut(action: PayloadAction<PutTask>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `Put Task Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Put Task Error Received: ${error}`);
+    }
   }
 }
 
@@ -244,7 +265,11 @@ function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
     yield put(tasksActions.taskReceived({ task: data }));
     yield put(updateTasks(data.projectId));
   } catch (error) {
-    yield call(message.error, `taskSetLabels Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `taskSetLabels Error Received: ${error}`);
+    }
   }
 }
 
@@ -253,7 +278,11 @@ function* getTask(action: PayloadAction<GetTask>) {
     const data = yield call(getTaskById, action.payload.taskId);
     yield put(tasksActions.taskReceived({ task: data }));
   } catch (error) {
-    yield call(message.error, 'Task Unavailable');
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, 'Task Unavailable');
+    }
   }
 }
 
@@ -262,7 +291,11 @@ function* getCompletedTask(action: PayloadAction<GetTask>) {
     const data = yield call(getCompletedTaskById, action.payload.taskId);
     yield put(tasksActions.taskReceived({ task: data }));
   } catch (error) {
-    yield call(message.error, `Get Task Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get Task Error Received: ${error}`);
+    }
   }
 }
 
@@ -358,7 +391,11 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Patch Task Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Task Error Received: ${error}`);
+    }
   }
 }
 
@@ -474,7 +511,11 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Complete Task Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Complete Task Error Received: ${error}`);
+    }
   }
 }
 
@@ -536,7 +577,11 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Uncomplete Task Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Uncomplete Task Error Received: ${error}`);
+    }
   }
 }
 
@@ -612,7 +657,11 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Delete Task Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete Task Error Received: ${error}`);
+    }
   }
 }
 
@@ -659,7 +708,11 @@ function* deleteTasks(action: PayloadAction<DeleteTasks>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Delete Tasks Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete Tasks Error Received: ${error}`);
+    }
   }
 }
 
@@ -711,7 +764,11 @@ function* completeTasks(action: PayloadAction<CompleteTasks>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `complete Tasks Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `complete Tasks Error Received: ${error}`);
+    }
   }
 }
 
@@ -736,7 +793,11 @@ function* deleteCompletedTask(action: PayloadAction<DeleteCompleteTask>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `Delete Completed Task Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete Completed Task Error Received: ${error}`);
+    }
   }
 }
 
@@ -747,7 +808,11 @@ function* moveTask(action: PayloadAction<MoveTask>) {
     yield call(message.success, 'Task moved successfully');
     history.push(`/projects/${targetProject}`);
   } catch (error) {
-    yield call(message.error, `moveTask Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `moveTask Error Received: ${error}`);
+    }
   }
 }
 
@@ -773,7 +838,11 @@ function* shareTask(action: PayloadAction<ShareTask>) {
     }
     yield call(message.success, 'Task shared successfully');
   } catch (error) {
-    yield call(message.error, `shareTask Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `shareTask Error Received: ${error}`);
+    }
   }
 }
 
@@ -789,7 +858,11 @@ function* getTaskSharables(action: PayloadAction<GetSharables>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `getTaskSharables Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getTaskSharables Error Received: ${error}`);
+    }
   }
 }
 
@@ -818,7 +891,11 @@ function* revokeTaskSharable(action: PayloadAction<RevokeSharable>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `revokeTaskSharable Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `revokeTaskSharable Error Received: ${error}`);
+    }
   }
 }
 
@@ -827,7 +904,11 @@ function* removeSharedTask(action: PayloadAction<RemoveShared>) {
     const {taskId} = action.payload;
     yield call(removeShared, taskId);
   } catch (error) {
-    yield call(message.error, `removeSharedTask Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeSharedTask Error Received: ${error}`);
+    }
   }
 }
 
@@ -838,7 +919,11 @@ function* createTaskContent(action: PayloadAction<CreateContent>) {
     yield put(updateTaskContents(taskId));
     yield put(updateTargetContent(content));
   } catch (error) {
-    yield call(message.error, `createTaskContent Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `createTaskContent Error Received: ${error}`);
+    }
   }
 }
 
@@ -852,7 +937,11 @@ function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
     );
     yield put(updateTargetContent(contents[0]));
   } catch (error) {
-    yield call(message.error, `taskContentsUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `taskContentsUpdate Error Received: ${error}`);
+    }
   }
 }
 
@@ -870,10 +959,14 @@ function* completeTaskContentsUpdate(
       })
     );
   } catch (error) {
-    yield call(
-      message.error,
-      `completeTaskContentsUpdate Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `completeTaskContentsUpdate Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -921,10 +1014,14 @@ function* taskContentRevisionUpdate(
       );
     }
   } catch (error) {
-    yield call(
-      message.error,
-      `taskContentRevisionUpdate Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `taskContentRevisionUpdate Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -945,7 +1042,11 @@ function* patchContent(action: PayloadAction<PatchContent>) {
     );
     yield put(updateTargetContent(contents.filter(c => c.id === contentId)[0]));
   } catch (error) {
-    yield call(message.error, `Patch Content Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Content Error Received: ${error}`);
+    }
   }
 }
 
@@ -1013,7 +1114,11 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
     });
     yield put(updateItemsByLabels(labelItems));
   } catch (error) {
-    yield call(message.error, `set Task Status Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `set Task Status Error Received: ${error}`);
+    }
   }
 }
 
@@ -1029,10 +1134,14 @@ function* deleteTaskContent(action: PayloadAction<DeleteContent>) {
     );
     yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
   } catch (error) {
-    yield call(
-      message.error,
-      `taskContentDelete Task Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `taskContentDelete Task Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -1055,7 +1164,11 @@ function* getTasksByOrder(action: PayloadAction<GetTasksByOrder>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `getTasksByOrder Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getTasksByOrder Error Received: ${error}`);
+    }
   }
 }
 
@@ -1087,10 +1200,14 @@ function* getSearchCompletedTasks(
       })
     );
   } catch (error) {
-    yield call(
-      message.error,
-      `get search completed tasks Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `get search completed tasks Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -1099,7 +1216,11 @@ function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>
     const {taskId, contentId, revisionContents, etag} = action.payload;
     yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
   } catch (error) {
-    yield call(message.error, `patchTaskRevisionContents Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `patchTaskRevisionContents Error Received: ${error}`);
+    }
   }
 }
 
@@ -1113,7 +1234,11 @@ function* fetchTaskStatistics(action: PayloadAction<GetTaskStatisticsAction>) {
       })
     )
   } catch (error) {
-    yield call(message.error, `fetchTaskStatistics Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `fetchTaskStatistics Error Received: ${error}`);
+    }
   }
 }
 

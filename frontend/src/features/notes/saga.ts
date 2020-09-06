@@ -57,6 +57,7 @@ import {ProjectItemUIType} from "../project/constants";
 import {ContentType} from "../myBuJo/constants";
 import {recentItemsReceived} from "../recent/actions";
 import {updateTargetContent} from "../content/actions";
+import {reloadReceived} from "../myself/actions";
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -84,7 +85,11 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `Note Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Note Error Received: ${error}`);
+    }
   }
 }
 
@@ -98,7 +103,11 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
     );
     yield put(updateTargetContent(contents[0]));
   } catch (error) {
-    yield call(message.error, `noteContentsUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `noteContentsUpdate Error Received: ${error}`);
+    }
   }
 }
 
@@ -145,10 +154,14 @@ function* noteContentRevisionUpdate(
       );
     }
   } catch (error) {
-    yield call(
-      message.error,
-      `noteContentRevisionUpdate Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `noteContentRevisionUpdate Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -163,7 +176,11 @@ function* getNotesByOwner(action: PayloadAction<GetNotesByOwner>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `getNotesByOwner Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getNotesByOwner Error Received: ${error}`);
+    }
   }
 }
 
@@ -186,7 +203,11 @@ function* getNotesByOrder(action: PayloadAction<GetNotesByOrder>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `getNotesByOrder Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getNotesByOrder Error Received: ${error}`);
+    }
   }
 }
 
@@ -200,7 +221,11 @@ function* noteCreate(action: PayloadAction<CreateNote>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Note Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Note Error Received: ${error}`);
+    }
   }
 }
 
@@ -211,7 +236,11 @@ function* createNoteContent(action: PayloadAction<CreateContent>) {
     yield put(updateNoteContents(noteId));
     yield put(updateTargetContent(content));
   } catch (error) {
-    yield call(message.error, `createNoteContent Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `createNoteContent Error Received: ${error}`);
+    }
   }
 }
 
@@ -233,7 +262,11 @@ function* notePut(action: PayloadAction<PutNote>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `Put Note Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Put Note Error Received: ${error}`);
+    }
   }
 }
 
@@ -242,7 +275,11 @@ function* getNote(action: PayloadAction<GetNote>) {
     const data = yield call(getNoteById, action.payload.noteId);
     yield put(notesActions.noteReceived({ note: data }));
   } catch (error) {
-    yield call(message.error, 'Note Unavailable');
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, 'Note Unavailable');
+    }
   }
 }
 
@@ -283,7 +320,11 @@ function* patchNote(action: PayloadAction<PatchNote>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Patch Note Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Note Error Received: ${error}`);
+    }
   }
 }
 
@@ -304,7 +345,11 @@ function* patchContent(action: PayloadAction<PatchContent>) {
     );
     yield put(updateTargetContent(contents.filter(c => c.id === contentId)[0]));
   } catch (error) {
-    yield call(message.error, `Patch Content Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Content Error Received: ${error}`);
+    }
   }
 }
 
@@ -315,7 +360,11 @@ function* noteSetLabels(action: PayloadAction<SetNoteLabels>) {
     yield put(notesActions.noteReceived({ note: data }));
     yield put(updateNotes(data.projectId));
   } catch (error) {
-    yield call(message.error, `noteSetLabels Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `noteSetLabels Error Received: ${error}`);
+    }
   }
 }
 
@@ -374,7 +423,11 @@ function* noteDelete(action: PayloadAction<DeleteNote>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Delete Note Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete Note Error Received: ${error}`);
+    }
   }
 }
 
@@ -420,7 +473,11 @@ function* notesDelete(action: PayloadAction<DeleteNotes>) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
   } catch (error) {
-    yield call(message.error, `Delete Notes Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete Notes Error Received: ${error}`);
+    }
   }
 }
 
@@ -436,10 +493,14 @@ function* deleteNoteContent(action: PayloadAction<DeleteContent>) {
     );
     yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
   } catch (error) {
-    yield call(
-      message.error,
-      `noteContentDelete Note Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `noteContentDelete Note Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -450,7 +511,11 @@ function* noteMove(action: PayloadAction<MoveNote>) {
     yield call(message.success, 'Note moved successfully');
     history.push(`/projects/${targetProject}`);
   } catch (error) {
-    yield call(message.error, `noteMove Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `noteMove Error Received: ${error}`);
+    }
   }
 }
 
@@ -476,7 +541,11 @@ function* shareNote(action: PayloadAction<ShareNote>) {
     }
     yield call(message.success, 'Note shared successfully');
   } catch (error) {
-    yield call(message.error, `noteShare Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `noteShare Error Received: ${error}`);
+    }
   }
 }
 
@@ -492,7 +561,11 @@ function* getNoteSharables(action: PayloadAction<GetSharables>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `getNoteSharables Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getNoteSharables Error Received: ${error}`);
+    }
   }
 }
 
@@ -521,7 +594,11 @@ function* revokeNoteSharable(action: PayloadAction<RevokeSharable>) {
       })
     );
   } catch (error) {
-    yield call(message.error, `revokeNoteSharable Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `revokeNoteSharable Error Received: ${error}`);
+    }
   }
 }
 
@@ -530,7 +607,11 @@ function* removeSharedNote(action: PayloadAction<RemoveShared>) {
     const {noteId} = action.payload;
     yield call(removeShared, noteId);
   } catch (error) {
-    yield call(message.error, `removeSharedNote Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeSharedNote Error Received: ${error}`);
+    }
   }
 }
 
@@ -539,7 +620,11 @@ function* patchNoteRevisionContents(action: PayloadAction<PatchRevisionContents>
     const {noteId, contentId, revisionContents, etag} = action.payload;
     yield call(patchRevisionContents, noteId, contentId, revisionContents, etag);
   } catch (error) {
-    yield call(message.error, `patchNoteRevisionContents Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `patchNoteRevisionContents Error Received: ${error}`);
+    }
   }
 }
 

@@ -28,3 +28,5 @@ export const patchMyself = (
 ) => actions.patchMyself({ timezone, before, currency, theme });
 
 export const getUserPointActivities = () => actions.getUserPointActivities({});
+
+export const reloadReceived = (reload: boolean) => actions.reloadReceived({reload: reload});

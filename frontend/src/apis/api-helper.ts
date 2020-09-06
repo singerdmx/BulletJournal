@@ -16,6 +16,10 @@ export function doFetch(endpoint: string, etag: any = undefined) {
     if (!res.ok) {
       throw Error(res.status.toString());
     }
+    const reload = res.headers.get('reload');
+    if (reload && reload === 'true') {
+      throw Error('reload');
+    }
     return res;
   });
 }
@@ -39,6 +43,10 @@ export function doPost(endpoint: string, body?: string, etag?: string) {
     if (!res.ok) {
       throw Error(res.status.toString());
     }
+    const reload = res.headers.get('reload');
+    if (reload && reload === 'true') {
+      throw Error('reload');
+    }
     return res;
   });
 }
@@ -53,6 +61,10 @@ export function doDelete(endpoint: string, returnError = false) {
   }).then(res => {
     if (!res.ok && !returnError) {
       throw Error(res.status.toString());
+    }
+    const reload = res.headers.get('reload');
+    if (reload && reload === 'true') {
+      throw Error('reload');
     }
     return res;
   });
@@ -78,6 +90,10 @@ export function doPut(endpoint: string, body: string, etag?: string) {
     if (!res.ok) {
       throw Error(res.status.toString());
     }
+    const reload = res.headers.get('reload');
+    if (reload && reload === 'true') {
+      throw Error('reload');
+    }
     return res;
   });
 }
@@ -101,6 +117,10 @@ export function doPatch(endpoint: string, body: string, etag?: string) {
   }).then(res => {
     if (!res.ok) {
       throw Error(res.status.toString());
+    }
+    const reload = res.headers.get('reload');
+    if (reload && reload === 'true') {
+      throw Error('reload');
     }
     return res;
   });

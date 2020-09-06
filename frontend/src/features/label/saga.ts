@@ -15,6 +15,7 @@ import { PayloadAction } from 'redux-starter-kit';
 import {
   fetchLabels, addLabel, updateLabel, deleteLabel, fetchItemsByLabels, fetchProjectLabels
 } from '../../apis/labelApis';
+import {reloadReceived} from "../myself/actions";
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Label Error Received: ${action.payload.error}`);
@@ -29,7 +30,11 @@ function* labelsUpdate(action: PayloadAction<UpdateLabels>) {
 
     yield put(labelActions.labelsReceived({ labels: labels, etag: etag }));
   } catch (error) {
-    yield call(message.error, `Get Labels Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get Labels Error Received: ${error}`);
+    }
   }
 }
 
@@ -39,7 +44,11 @@ function* projectLabelsUpdate(action: PayloadAction<UpdateProjectLabels>) {
     const data = projectShared ? [] : yield call(fetchProjectLabels, projectId);
     yield put(labelActions.projectLabelsReceived({ labels: data }));
   } catch (error) {
-    yield call(message.error, `projectLabelsUpdate Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `projectLabelsUpdate Error Received: ${error}`);
+    }
   }
 }
 
@@ -54,7 +63,9 @@ function* createLabel(action: PayloadAction<LabelCreateAction>) {
     yield put(labelActions.labelsReceived({ labels: labels, etag: '' }));
     yield call(message.info, `Label ${value} created`);
   } catch (error) {
-    if (error.message === '400') {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else if (error.message === '400') {
       yield call(message.error, `Label "${action.payload.value}" already exists`);
     } else {
       yield call(message.error, `Label Create Fail: ${error}`);
@@ -68,7 +79,11 @@ function* patchLabel(action: PayloadAction<PatchLabelAction>) {
     yield call(updateLabel, labelId, value, icon);
     yield put(labelActions.labelsUpdate({}));
   } catch (error) {
-    yield call(message.error, `Patch label Fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch label Fail: ${error}`);
+    }
   }
 }
 
@@ -79,7 +94,11 @@ function* removeLabel(action: PayloadAction<DeleteLabelAction>) {
     yield put(labelActions.labelsUpdate({}));
     yield call(message.success, `Label "${value}" deleted`);
   } catch (error) {
-    yield call(message.error, `Delete label fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Delete label fail: ${error}`);
+    }
   }
 }
 
@@ -89,7 +108,11 @@ function* getItemsByLabels(action: PayloadAction<GetItemsByLabelsAction>) {
     const data = yield call(fetchItemsByLabels, labels);
     yield put(labelActions.itemsByLabelsReceived({items: data}));
   } catch (error) {
-    yield call(message.error, `getItemsByLabels fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getItemsByLabels fail: ${error}`);
+    }
   }
 }
 

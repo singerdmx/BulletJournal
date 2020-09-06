@@ -30,6 +30,7 @@ import {
 } from './interface';
 import { Project } from '../project/interface';
 import { IState } from '../../store';
+import {reloadReceived} from "../myself/actions";
 
 function* googleTokenExpirationTimeUpdate(
   action: PayloadAction<UpdateExpirationTimeAction>
@@ -61,10 +62,14 @@ function* googleTokenExpirationTimeUpdate(
       );
     }
   } catch (error) {
-    yield call(
-      message.error,
-      `googleTokenExpirationTimeUpdate Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `googleTokenExpirationTimeUpdate Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -88,10 +93,14 @@ function* googleCalendarEventListUpdate(
     const eventsLength = data.length;
     yield call(message.info, `${eventsLength} event(s) pulled`);
   } catch (error) {
-    yield call(
-      message.error,
-      `googleCalendarEventListUpdate Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `googleCalendarEventListUpdate Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -102,10 +111,14 @@ function* googleCalendarCreateEvents(
     const { projectId, events } = action.payload;
     yield call(createGoogleCalendarEvents, projectId, events);
   } catch (error) {
-    yield call(
-      message.error,
-      `googleCalendarCreateEvents Error Received: ${error}`
-    );
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(
+          message.error,
+          `googleCalendarCreateEvents Error Received: ${error}`
+      );
+    }
   }
 }
 
@@ -121,7 +134,11 @@ function* updateWatchedProject(
       })
     );
   } catch (error) {
-    yield call(message.error, `updateWatchedProject Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateWatchedProject Error Received: ${error}`);
+    }
   }
 }
 

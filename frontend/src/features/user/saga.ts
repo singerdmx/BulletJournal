@@ -11,6 +11,7 @@ import {actions as groupsActions} from "../group/reducer";
 import {actions as systemsActions} from "../system/reducer";
 import {IState} from "../../store";
 import {GroupsWithOwner} from "../group/interface";
+import {reloadReceived} from "../myself/actions";
 
 function* userApiErrorAction(action: PayloadAction<UserApiErrorAction>) {
   yield call(message.error, `${action.payload.error}`);
@@ -30,7 +31,11 @@ function* userUpdate(action: PayloadAction<UpdateUser>) {
     );
   } catch (error) {
     yield put(userActions.userClear({}));
-    yield call(message.error, `User ${name} Not Found`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `User ${name} Not Found`);
+    }
   }
 }
 
@@ -61,7 +66,11 @@ function* changeAlias(action: PayloadAction<ChangeAlias>) {
     yield call(message.success, `User ${targetUser} is aliased to ${alias}. It may take some time to take effect.`);
     yield put(systemsActions.systemUpdate({force: true, history: history}));
   } catch (error) {
-    yield call(message.error, `changeAlias Fail: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `changeAlias Fail: ${error}`);
+    }
   }
 }
 
