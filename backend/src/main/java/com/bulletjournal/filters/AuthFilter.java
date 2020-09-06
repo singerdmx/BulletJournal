@@ -2,6 +2,7 @@ package com.bulletjournal.filters;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.AuthConfig;
+import com.bulletjournal.config.VersionConfig;
 import com.bulletjournal.controller.GoogleCalendarController;
 import com.bulletjournal.controller.UserController;
 import com.bulletjournal.redis.models.LockedUser;
@@ -35,6 +36,9 @@ public class AuthFilter implements Filter {
 
     @Autowired
     private AuthConfig authConfig;
+
+    @Autowired
+    private VersionConfig versionConfig;
 
     @Autowired
     private RedisLockedUserRepository redisLockedUserRepository;
@@ -92,6 +96,7 @@ public class AuthFilter implements Filter {
             cookie.setMaxAge(0);
             response.addCookie(cookie);
             response.addHeader("Location", "https://bulletjournal.us/home/index.html");
+            response.addHeader("version", versionConfig.getVersion());
         }
         chain.doFilter(req, res);
     }
