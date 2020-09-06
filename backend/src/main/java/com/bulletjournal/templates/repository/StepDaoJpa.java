@@ -109,13 +109,8 @@ public class StepDaoJpa {
     public Step clone(Long stepId) {
         Step step = getById(stepId);
         Step newStep = new Step();
-        newStep.setName(step.getName());
-        newStep.setExcludedSelections(step.getExcludedSelections());
-        newStep.setNextStep(step.getNextStep());
+        newStep.clone(step);
         stepRepository.save(newStep);
-        if (step.getChoices() != null) {
-            updateChoicesForStep(newStep.getId(), step.getChoices().stream().map(Choice::getId).collect(Collectors.toList()));
-        }
-        return getById(newStep.getId());
+        return newStep;
     }
 }

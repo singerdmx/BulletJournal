@@ -32,4 +32,10 @@ public abstract class Rule extends NamedModel {
     public void setRuleExpression(String ruleExpression) {
         this.ruleExpression = ruleExpression;
     }
+
+    public void clone(Rule rule) {
+        setName(rule.getName());
+        setPriority(rule.getPriority());
+        setRuleExpression(rule.getRuleExpression());
+    }
 }
