@@ -12,13 +12,23 @@ import getThemeColorVars from './utils/theme';
 import './styles/main.less';
 import {connect} from 'react-redux';
 import {IState} from './store';
-import {deleteAllCookies} from "./index";
 
 export const Loading = () => (
     <div className="loading">
       <ReactLoading type="bubbles" color="#0984e3" height="75" width="75"/>
     </div>
 );
+
+const deleteAllCookies = () => {
+  const cookies = document.cookie.split(";");
+
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i];
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }
+}
 
 type RootProps = {
   updateTheme: () => void;

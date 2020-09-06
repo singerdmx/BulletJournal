@@ -30,21 +30,6 @@ export const getCookie = (cname: string) => {
     return "";
 }
 
-const shouldReload = () => {
-    return getCookie('reload') === 'true'
-}
-
-export const deleteAllCookies = () => {
-    const cookies = document.cookie.split(";");
-
-    for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i];
-        const eqPos = cookie.indexOf("=");
-        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    }
-}
-
 export const inPublicPage = () => {
     return window.location.href.toLowerCase().includes('/public');
 };
@@ -71,9 +56,6 @@ function listen() {
         }
         if (isMobilePage()) {
             window.location.href = 'https://bulletjournal.us/home/index.html' + window.location.hash;
-        } else if (shouldReload()) {
-            deleteAllCookies();
-            window.location.reload();
         } else {
             ReactDOM.render(
                 <Provider store={store}>
@@ -103,9 +85,6 @@ function listen() {
     } else {
         if (isMobilePage()) {
             window.location.href = 'https://bulletjournal.us/home/index.html' + window.location.hash;
-        } else if (shouldReload()) {
-            deleteAllCookies();
-            window.location.reload();
         } else {
             ReactDOM.render(
                 <Provider store={store}>
