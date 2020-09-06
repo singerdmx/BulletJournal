@@ -9,11 +9,7 @@ public class VersionConfig {
     }
 
     public String getVersion() {
-        try {
-            return System.getenv("API_VERSION");
-        } catch (Exception e) {
-            return "";
-        }
+        return System.getenv("API_VERSION") != null ? System.getenv("API_VERSION") : "";
     }
 
 }

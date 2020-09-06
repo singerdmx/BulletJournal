@@ -96,8 +96,8 @@ public class AuthFilter implements Filter {
             cookie.setMaxAge(0);
             response.addCookie(cookie);
             response.addHeader("Location", "https://bulletjournal.us/home/index.html");
-            response.addHeader("version", versionConfig.getVersion());
         }
+        response.addHeader("version", versionConfig.getVersion());
         chain.doFilter(req, res);
     }
 
