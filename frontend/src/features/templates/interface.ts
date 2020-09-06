@@ -27,7 +27,10 @@ export interface Selection {
 
 export interface Step {
     id: number;
+    name: string;
     choices: Choice[];
+    excludedSelections: Selection[];
+    nextStep: Step | undefined;
 }
 
 export interface Steps {

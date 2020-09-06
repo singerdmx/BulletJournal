@@ -56,3 +56,15 @@ export const addSelection = (choiceId: number, text: string) => actions.addSelec
 export const deleteSelection = (id: number) => actions.deleteSelection({id: id});
 
 export const updateSelection = (id: number, text: string) => actions.updateSelection({id: id, text: text});
+
+export const getSteps = () => actions.getSteps({});
+
+export const getStep = (stepId: number) => actions.getStep({stepId: stepId});
+
+export const createStep = (name: string, nextStepId: number | undefined) => actions.createStep({name: name, nextStepId: nextStepId});
+
+export const updateStep = (stepId: number, name: string, nextStepId: number | undefined) => actions.createStep({
+    stepId: stepId, 
+    name: name, 
+    nextStepId: nextStepId
+});
