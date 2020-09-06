@@ -1,11 +1,14 @@
 import React, {useEffect} from "react";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
 import {getStep} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Step} from "../../features/templates/interface";
-import {BackTop, Typography} from "antd";
+import {BackTop, Divider, Tooltip, Typography} from "antd";
 import './steps.styles.less'
+import {DeleteFilled, DeleteTwoTone} from "@ant-design/icons";
+import AdminChoiceElem from "./admin-choice-elem";
+import AdminChoices from "./admin-choices";
 
 const {Title, Text} = Typography;
 
@@ -16,7 +19,7 @@ type AdminStepProps = {
 
 const AdminStepPage: React.FC<AdminStepProps> = (
     {step, getStep}) => {
-
+    const history = useHistory();
     const {stepId} = useParams();
 
     useEffect(() => {
@@ -29,10 +32,43 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         return <div>{stepId} Not Found</div>
     }
 
+    const handleDelete = (e: any) => {
+        // deleteStep(step.id);
+        history.goBack();
+    }
+
+    const deleteStep = (step: Step, id: number) => {
+
+    }
+
+    const addStep = (step: Step, id: number) => {
+
+    }
+
     return <div className='steps-page'>
         <BackTop/>
+        <div><DeleteFilled onClick={handleDelete}/></div>
         <h2>{step.name}</h2>
+        <div></div>
+        <Divider/>
+        <h3>Choices</h3>
+        {step.choices.map(c => {
+            return <div>
+                <AdminChoiceElem choice={c} showPopover={true}/>
+                {' '}
+                <Tooltip title='Remove Choice'>
+                    <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteStep(step, c.id)}/>
+                </Tooltip>
+            </div>
+        })}
+        <Divider/>
         <div>
+            <h3>Available Choices to add</h3>
+            <AdminChoices
+                showPopover={true}
+                showAddChoice={true}
+                addChoice={(id) => addStep(step, id)}
+                choicesToExclude={step.choices.map(c => c.id)}/>
         </div>
     </div>
 }
