@@ -304,6 +304,7 @@ func getApiToken(r *http.Request) (returnCookie string) {
 func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 	redirectURL := r.URL.String()
 	if strings.HasPrefix(redirectURL, "/api") {
+		w.Header().Set("reload", "true")
 		fmt.Fprintf(w, "Not Logged in")
 		return
 	}
