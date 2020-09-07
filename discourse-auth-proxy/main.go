@@ -422,7 +422,7 @@ func isMobile(r *http.Request) bool {
 	header := strings.ToLower(r.Header.Get("User-Agent"))
 	logger.Printf("User-Agent: %s", header)
 	if strings.Contains(header, "ipad") {
-		return true
+		return strings.HasPrefix(r.RequestURI, tokenForCookieUrl)
 	}
 	return strings.Contains(header, "mobile")
 }
