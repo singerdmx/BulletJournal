@@ -7,7 +7,7 @@ import {
   DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
   GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction,
-  GetStepAction
+  GetStepAction, DeleteStepAction
 } from './reducer';
 import {
   createCategory,
@@ -25,7 +25,7 @@ import {
 import {Category, Choice, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import {getSteps, createStep, getStep} from '../../apis/templates/stepApis';
+import {getSteps, createStep, getStep, deleteStep} from '../../apis/templates/stepApis';
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -240,6 +240,17 @@ function* fetchStep(action: PayloadAction<GetStepAction>) {
   }
 }
 
+function* removeStep(action: PayloadAction<DeleteStepAction>) {
+  try {
+    const {stepId} = action.payload;
+    yield call(deleteStep, stepId);
+    const data: Steps = yield call(getSteps);
+    yield put(templatesActions.stepsReceived({steps: data.steps}));
+  } catch (error) {
+    yield call(message.error, `removeStep Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -260,5 +271,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getSteps.type, fetchSteps),
     yield takeLatest(templatesActions.getStep.type, fetchStep),
     yield takeLatest(templatesActions.createStep.type, addStep),
+    yield takeLatest(templatesActions.deleteStep.type, removeStep),
   ])
 }

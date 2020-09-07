@@ -40,3 +40,11 @@ export const updateStep = (stepId: number, name?: string, nextStepId?: number) =
             throw Error(err.message);
         });
 }
+
+export const deleteStep = (stepId: number) => {
+    return doDelete(`/api/steps/${stepId}`)
+        .then(res => res)
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}

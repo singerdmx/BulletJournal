@@ -26,6 +26,10 @@ export type StepAction = {
     step: Step;
 };
 
+export type DeleteStepAction = {
+    stepId: number;
+};
+
 export type GetCategoriesAction = {};
 
 export type GetChoicesAction = {};
@@ -164,6 +168,7 @@ const slice = createSlice({
         },
         createStep: (state, action: PayloadAction<CreateStepAction>) => state,
         updateStep: (state, action: PayloadAction<UpdateStepAction>) => state,
+        deleteStep: (state, action: PayloadAction<DeleteStepAction>) => state,
     },
 });
 

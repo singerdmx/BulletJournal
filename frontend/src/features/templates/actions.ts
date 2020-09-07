@@ -70,3 +70,6 @@ export const updateStep = (stepId: number, name: string, nextStepId: number | un
     name: name, 
     nextStepId: nextStepId
 });
+
+export const deleteStep = (stepId: number) => actions.deleteStep({stepId: stepId});
+

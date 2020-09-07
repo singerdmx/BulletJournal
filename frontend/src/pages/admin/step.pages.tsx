@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {getStep} from "../../features/templates/actions";
+import {getStep, deleteStep} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Step} from "../../features/templates/interface";
 import {BackTop, Divider, Tooltip, Typography} from "antd";
@@ -15,10 +15,11 @@ const {Title, Text} = Typography;
 type AdminStepProps = {
     step: Step | undefined;
     getStep: (stepId: number) => void;
+    deleteStep: (stepId: number) => void;
 }
 
 const AdminStepPage: React.FC<AdminStepProps> = (
-    {step, getStep}) => {
+    {step, getStep, deleteStep}) => {
     const history = useHistory();
     const {stepId} = useParams();
 
@@ -33,11 +34,11 @@ const AdminStepPage: React.FC<AdminStepProps> = (
     }
 
     const handleDelete = (e: any) => {
-        // deleteStep(step.id);
+        deleteStep(step.id);
         history.goBack();
     }
 
-    const deleteStep = (step: Step, id: number) => {
+    const removeStep = (step: Step, id: number) => {
 
     }
 
@@ -57,7 +58,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
                 <AdminChoiceElem choice={c} showPopover={true}/>
                 {' '}
                 <Tooltip title='Remove Choice'>
-                    <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteStep(step, c.id)}/>
+                    <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => removeStep(step, c.id)}/>
                 </Tooltip>
             </div>
         })}
@@ -78,5 +79,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getStep
+    getStep, deleteStep
 })(AdminStepPage);

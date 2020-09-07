@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {getCategory, getSteps} from "../../features/templates/actions";
+import {getCategory, getSteps, deleteStep} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category, Step} from "../../features/templates/interface";
 import {BackTop, Typography} from "antd";
@@ -16,10 +16,11 @@ type AdminStepsProps = {
     steps: Step[];
     getCategory: (categoryId: number) => void;
     getSteps: () => void;
+    deleteStep: (stepId: number) => void
 }
 
 const AdminStepsPage: React.FC<AdminStepsProps> = (
-    {category, steps, getCategory, getSteps}) => {
+    {category, steps, getCategory, getSteps, deleteStep}) => {
     const history = useHistory();
     const {categoryId} = useParams();
 
@@ -42,8 +43,11 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
                 return (
                     <div>
                         <span style={{cursor: 'pointer', padding: '5px'}}
-                              onClick={() => history.push(`/admin/steps/${s.id}`)}>{s.name} ({s.id})</span>
+                              onClick={() => history.push(`/admin/steps/${s.id}`)}>{s.name} ({s.id}) 
+                        </span>
+                        <button onClick={() => deleteStep(s.id)}>Delete Step</button>
                     </div>
+                    
                 );
             })}
         </div>
@@ -59,5 +63,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getCategory, getSteps
+    getCategory, getSteps, deleteStep
 })(AdminStepsPage);
