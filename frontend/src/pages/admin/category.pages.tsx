@@ -20,7 +20,9 @@ type AdminCategoryProps = {
     deleteCategory: (id: number) => void;
     getCategory: (categoryId: number) => void;
     updateCategory: (categoryId: number, name: string,
-                     description?: string, icon?: string, color?: string, forumId?: number, image?: string) => void;
+                     description?: string, icon?: string,
+                     color?: string, forumId?: number,
+                     image?: string, nextStepId?: number) => void;
     setCategoryChoices: (id: number, choices: number[]) => void;
 }
 
@@ -85,33 +87,37 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
 
     const changeColorHandler = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, category.description, category.icon, input.color, category.forumId, category.image);
+        updateCategory(category.id, category.name, category.description, category.icon,
+            input.color, category.forumId, category.image, category.nextStepId);
     }
 
     const nameChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, input, category.description, category.icon, category.color, category.forumId, category.image);
+        updateCategory(category.id, input, category.description, category.icon,
+            category.color, category.forumId, category.image, category.nextStepId);
     }
 
     const descriptionChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, input, category.icon, category.color, category.forumId, category.image);
+        updateCategory(category.id, category.name, input, category.icon,
+            category.color, category.forumId, category.image, category.nextStepId);
     }
 
     const forumIdChange = (input: any) => {
         console.log(input);
         updateCategory(category.id, category.name, category.description, category.icon, category.color,
-            input ? parseInt(input) : undefined, category.image);
+            input ? parseInt(input) : undefined, category.image, category.nextStepId);
     }
 
     const imageChange = (input: any) => {
         console.log(input);
         updateCategory(category.id, category.name, category.description, category.icon, category.color,
-            category.forumId, input);
+            category.forumId, input, category.nextStepId);
     }
 
     const iconChange = (input: any) => {
-        updateCategory(category.id, category.name, category.description, input, category.color, category.forumId, category.image);
+        updateCategory(category.id, category.name, category.description, input,
+            category.color, category.forumId, category.image, category.nextStepId);
     }
 
     const deleteChoice = (category: Category, id: number) => {

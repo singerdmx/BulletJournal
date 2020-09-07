@@ -57,6 +57,7 @@ export type AddCategoryAction = {
     color?: string;
     forumId?: number;
     image?: string;
+    nextStepId?: number;
 };
 
 export type UpdateCategoryAction = {
@@ -67,6 +68,7 @@ export type UpdateCategoryAction = {
     color?: string;
     forumId?: number;
     image?: string;
+    nextStepId?: number;
 };
 
 export type DeleteCategoryAction = {

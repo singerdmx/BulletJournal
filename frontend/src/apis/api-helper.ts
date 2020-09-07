@@ -25,7 +25,7 @@ export function doFetch(endpoint: string, etag: any = undefined) {
     const v = res.headers.get('version');
     console.log(`current version is ${version} and server version is ${v}`);
     if (v && v !== version) {
-      throw Error('reload');
+      // throw Error('reload');
     }
     return res;
   });

@@ -6,6 +6,7 @@ export interface Category {
     color?: string;
     forumId?: number;
     image?: string;
+    nextStepId?: number;
     subCategories: Category[];
     choices: Choice[];
 }

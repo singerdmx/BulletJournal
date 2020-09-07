@@ -17,7 +17,8 @@ export const addCategory = (
     });
 
 export const updateCategory = (
-    categoryId: number, name: string, description?: string, icon?: string, color?: string, forumId?: number, image?: string) =>
+    categoryId: number, name: string, description?: string, icon?: string,
+    color?: string, forumId?: number, image?: string, nextStepId?: number) =>
     actions.updateCategory({
         categoryId: categoryId,
         name: name,
@@ -25,7 +26,8 @@ export const updateCategory = (
         icon: icon,
         color: color,
         forumId: forumId,
-        image: image
+        image: image,
+        nextStepId: nextStepId
     });
 
 export const updateCategoryRelations = (categories: Category[]) => actions.updateCategoryRelations({categories: categories});
