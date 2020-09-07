@@ -38,3 +38,12 @@ export interface Steps {
     steps: Step[];
     categories: Category[];
 }
+
+export interface Rule {
+    id: number;
+    name: string;
+    priority: number;
+    ruleExpression: string;
+    category: Category;
+    step: Step;
+}
