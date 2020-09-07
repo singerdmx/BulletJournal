@@ -286,7 +286,7 @@ func getApiToken(r *http.Request) (returnCookie string) {
 	tokenMutex.Lock()
 	value, ok := tokenCache.Get(token)
 	tokenMutex.Unlock()
-
+	
 	if !ok {
 		logger.Printf("token not found: %s", token)
 		returnCookie = ""
@@ -422,7 +422,7 @@ func isMobile(r *http.Request) bool {
 	header := strings.ToLower(r.Header.Get("User-Agent"))
 	logger.Printf("User-Agent: %s", header)
 	if strings.Contains(header, "ipad") {
-		return false
+		return true
 	}
 	return strings.Contains(header, "mobile")
 }
