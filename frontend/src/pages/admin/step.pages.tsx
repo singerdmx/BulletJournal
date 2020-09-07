@@ -9,6 +9,8 @@ import './steps.styles.less'
 import {DeleteFilled, DeleteTwoTone} from "@ant-design/icons";
 import AdminChoiceElem from "./admin-choice-elem";
 import AdminChoices from "./admin-choices";
+import {Container} from "react-floating-action-button";
+import AddRule from "../../components/modals/templates/add-rule.component";
 
 const {Title, Text} = Typography;
 
@@ -71,6 +73,9 @@ const AdminStepPage: React.FC<AdminStepProps> = (
                 addChoice={(id) => addStep(step, id)}
                 choicesToExclude={step.choices.map(c => c.id)}/>
         </div>
+        <Container>
+            <AddRule step={step}/>
+        </Container>
     </div>
 }
 
