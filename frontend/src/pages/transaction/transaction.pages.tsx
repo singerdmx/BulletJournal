@@ -57,16 +57,22 @@ import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined} from "@an
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
+import {getProject} from "../../features/project/actions";
+import {Project} from "../../features/project/interface";
+import {contentEditable} from "../note/note.pages";
 
 const LocaleCurrency = require('locale-currency');
 
 type TransactionProps = {
+  myself: string;
+  project: Project | undefined;
   currency: string;
   transaction: Transaction | undefined;
   contents: Content[];
   deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
   updateTransactionContents: (transactionId: number) => void;
   transactionReceived: (transaction: Transaction | undefined) => void;
+  getProject: (projectId: number) => void;
 };
 
 interface TransactionPageHandler {
@@ -82,6 +88,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props
 ) => {
   const {
+    myself,
+    project,
     theme,
     content,
     transaction,
@@ -93,7 +101,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     setDisplayMore,
     setDisplayRevision,
     deleteContent,
-    transactionReceived
+    transactionReceived,
+    getProject
   } = props;
 
   // get id of Transaction from oruter
@@ -118,6 +127,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     transaction.id && updateTransactionContents(transaction.id);
     setDisplayMore(false);
     setDisplayRevision(false);
+    getProject(transaction.projectId);
   }, [transaction]);
 
   if (!transaction) return null;
@@ -166,21 +176,21 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       >
         <SyncOutlined/>
       </FloatButton>
-      {content && <FloatButton
+      {contentEditable(myself, content, transaction, project) && <FloatButton
         tooltip="Delete Content"
         onClick={handleDelete}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
       >
         <DeleteOutlined />
       </FloatButton>}
-      {content && content.revisions.length > 1 && <FloatButton
+      {content && content.revisions.length > 1 && contentEditable(myself, content, transaction, project) && <FloatButton
         tooltip={`View Revision History (${content.revisions.length - 1})`}
         onClick={handleOpenRevisions}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
       >
         <HighlightOutlined />
       </FloatButton>}
-      {content && <FloatButton
+      {contentEditable(myself, content, transaction, project) && <FloatButton
         tooltip="Edit Content"
         onClick={handleEdit}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
@@ -344,6 +354,8 @@ const mapStateToProps = (state: IState) => ({
   contents: state.transaction.contents,
   content: state.content.content,
   theme: state.myself.theme,
+  myself: state.myself.username,
+  project: state.project.project
 });
 
 export default connect(mapStateToProps, {
@@ -353,5 +365,6 @@ export default connect(mapStateToProps, {
   deleteContent,
   setDisplayMore,
   setDisplayRevision,
-  transactionReceived
+  transactionReceived,
+  getProject
 })(TransactionPage);

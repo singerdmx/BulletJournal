@@ -26,10 +26,14 @@ import LabelManagement from '../project/label-management.compoent';
 import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';
 import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
-import {Content} from "../../features/myBuJo/interface";
+import {Content, ProjectItem} from "../../features/myBuJo/interface";
 import {Note} from "../../features/notes/interface";
+import {getProject} from "../../features/project/actions";
+import {Project} from "../../features/project/interface";
 
 interface NotePageHandler {
+    myself: string;
+    project: Project | undefined;
     contents: Content[];
     content: Content | undefined;
     getNote: (noteId: number) => void;
@@ -39,15 +43,26 @@ interface NotePageHandler {
     setDisplayRevision: (displayRevision: boolean) => void;
     deleteContent: (noteId: number, contentId: number) => void;
     noteReceived: (note: Note | undefined) => void;
+    getProject: (projectId: number) => void;
 }
 
-// get icons by string name
+export const contentEditable = (
+    myself: string, content: Content | undefined, item: ProjectItem, project: Project | undefined) => {
+    if (!content) {
+        return false;
+    }
+
+    if (project && project.owner.name === myself) {
+        return true;
+    }
+    return content.owner.name === myself || item.owner.name === myself;
+}
 
 const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     // hook history in router
     const history = useHistory();
-    const {note, deleteNote, contents, content, getNote, updateNoteContents,
-        setDisplayMore, setDisplayRevision, deleteContent, noteReceived} = props;
+    const {myself, note, project, deleteNote, contents, content, getNote, updateNoteContents,
+        setDisplayMore, setDisplayRevision, deleteContent, noteReceived, getProject} = props;
     // get id of note from router
     const {noteId} = useParams();
     // state control drawer displaying
@@ -66,6 +81,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         updateNoteContents(note.id);
         setDisplayMore(false);
         setDisplayRevision(false);
+        getProject(note.projectId);
     }, [note]);
 
     // show drawer
@@ -117,21 +133,21 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
             >
                 <SyncOutlined/>
             </FloatButton>
-            {content && <FloatButton
+            {contentEditable(myself, content, note, project) && <FloatButton
                 tooltip="Delete Content"
                 onClick={handleDelete}
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
             >
                 <DeleteOutlined/>
             </FloatButton>}
-            {content && content.revisions.length > 1 && <FloatButton
+            {content && content.revisions.length > 1 && contentEditable(myself, content, note, project) && <FloatButton
                 tooltip={`View Revision History (${content.revisions.length - 1})`}
                 onClick={handleOpenRevisions}
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
             >
                 <HighlightOutlined/>
             </FloatButton>}
-            {content && <FloatButton
+            {contentEditable(myself, content, note, project) && <FloatButton
                 tooltip="Edit Content"
                 onClick={handleEdit}
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
@@ -212,7 +228,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
     note: state.note.note,
     contents: state.note.contents,
-    content: state.content.content
+    content: state.content.content,
+    myself: state.myself.username,
+    project: state.project.project
 });
 
 export default connect(mapStateToProps, {
@@ -222,5 +240,6 @@ export default connect(mapStateToProps, {
     deleteContent,
     setDisplayMore,
     setDisplayRevision,
-    noteReceived
+    noteReceived,
+    getProject
 })(NotePage);

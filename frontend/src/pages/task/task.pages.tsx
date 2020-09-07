@@ -48,8 +48,13 @@ import {setDisplayMore, setDisplayRevision} from "../../features/content/actions
 import {Content} from "../../features/myBuJo/interface";
 import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
 import {Task} from "../../features/tasks/interface";
+import {getProject} from "../../features/project/actions";
+import {Project} from "../../features/project/interface";
+import {contentEditable} from "../note/note.pages";
 
 interface TaskPageHandler {
+  myself: string;
+  project: Project | undefined;
   content: Content | undefined;
   getTask: (taskId: number) => void;
   deleteTask: (taskId: number, type: ProjectItemUIType) => void;
@@ -63,10 +68,13 @@ interface TaskPageHandler {
   setDisplayRevision: (displayRevision: boolean) => void;
   deleteContent: (taskId: number, contentId: number) => void;
   taskReceived: (task: Task | undefined) => void;
+  getProject: (projectId: number) => void;
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   const {
+    myself,
+    project,
     content,
     task,
     deleteTask,
@@ -77,7 +85,8 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     setDisplayMore,
     setDisplayRevision,
     deleteContent,
-    taskReceived
+    taskReceived,
+    getProject
   } = props;
   // get id of task from router
   const { taskId } = useParams();
@@ -99,7 +108,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     updateTaskContents(task.id);
     setDisplayMore(false);
     setDisplayRevision(false);
-
+    getProject(task.projectId);
   }, [task]);
 
   if (!task) return null;
@@ -153,21 +162,21 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         >
           <SyncOutlined/>
         </FloatButton>
-        {content && <FloatButton
+        {contentEditable(myself, content, task, project) && <FloatButton
             tooltip="Delete Content"
             onClick={handleDelete}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
         >
           <DeleteOutlined/>
         </FloatButton>}
-        {content && content.revisions.length > 1 && <FloatButton
+        {content && content.revisions.length > 1 && contentEditable(myself, content, task, project) && <FloatButton
             tooltip={`View Revision History (${content.revisions.length - 1})`}
             onClick={handleOpenRevisions}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
         >
           <HighlightOutlined/>
         </FloatButton>}
-        {content && <FloatButton
+        {contentEditable(myself, content, task, project) && <FloatButton
             tooltip="Edit Content"
             onClick={handleEdit}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
@@ -305,7 +314,9 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   task: state.task.task,
   contents: state.task.contents,
-  content: state.content.content
+  content: state.content.content,
+  myself: state.myself.username,
+  project: state.project.project
 });
 
 export default connect(mapStateToProps, {
@@ -316,5 +327,6 @@ export default connect(mapStateToProps, {
   deleteContent,
   setDisplayMore,
   setDisplayRevision,
-  taskReceived
+  taskReceived,
+  getProject
 })(TaskPage);
