@@ -20,7 +20,7 @@ import {
   GiftTwoTone
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { ContentAction } from '../../features/project/constants';
+import {ContentAction, ProjectType} from '../../features/project/constants';
 import { iconMapper } from '../side-menu/side-menu.component';
 import {
   flattenOwnedProject,
@@ -106,6 +106,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   );
   const [selectGroup, setSelectGroup] = useState([] as User[]);
   const [selectUser, setSelectUser] = useState('Everyone');
+  const [actions, setActions] = useState(Object.values(ContentAction));
 
   const onCancel = () => setVisible(false);
   const openModal = () => {
@@ -147,6 +148,20 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
 
   if (!project || project.shared) {
     return null;
+  }
+
+  const filterActions = (action: ContentAction, projectType: ProjectType) => {
+    const s = action.toString().toLowerCase();
+    switch (projectType) {
+      case ProjectType.LEDGER:
+        return !s.includes('note') && !s.includes('task');
+      case ProjectType.TODO:
+        return !s.includes('transaction') && !s.includes('note');
+      case ProjectType.NOTE:
+        return !s.includes('transaction') && !s.includes('task');
+      default:
+        return true;
+    }
   }
 
   return (
@@ -196,6 +211,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                       if (p.id === id) {
                         getGroup(p.group.id);
                         setSelectUser('Everyone');
+                        setActions(Object.values(ContentAction).filter(action => filterActions(action, p.projectType)));
                       }
                     });
                   }}
@@ -231,7 +247,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                   setSelectAction(actionKey as ContentAction);
                 }}
               >
-                {Object.values(ContentAction).map((action) => {
+                {actions.map((action) => {
                   return (
                     <Option value={action} key={action}>
                       <Tooltip key={action} title={action} placement='left'>
