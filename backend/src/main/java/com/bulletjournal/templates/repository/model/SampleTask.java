@@ -28,7 +28,7 @@ public class SampleTask extends NamedModel {
 
     @Override
     public Long getId() {
-        return null;
+        return id;
     }
 
     public void setId(Long id) {
