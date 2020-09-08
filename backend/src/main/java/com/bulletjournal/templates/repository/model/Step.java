@@ -41,6 +41,16 @@ public class Step extends NamedModel {
     @OneToMany(mappedBy = "step", fetch = FetchType.LAZY)
     private List<StepRule> stepRules = new ArrayList<>();
 
+    @ManyToMany(targetEntity = SampleTask.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "steps_sample_tasks", schema = "template",
+            joinColumns = {
+                    @JoinColumn(name = "step_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "sample_task_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)})
+    private List<SampleTask> sampleTasks = new ArrayList<>();
+
     public Step(String name) {
         super.setName(name);
     }
