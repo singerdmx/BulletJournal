@@ -1,11 +1,13 @@
 package com.bulletjournal.templates.controller;
 
+import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.NextStep;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.bulletjournal.templates.controller.model.SampleTask;
+import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -13,6 +15,10 @@ import java.util.List;
 public class WorkflowController {
 
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
+    public static final String SAMPLE_TASKS_ROUTE = "/api/sampletasks";
+
+    @Autowired
+    SampleTaskDaoJpa sampleTaskDaoJpa;
 
     @GetMapping(NEXT_STEP_ROUTE)
     public NextStep getNext(
@@ -21,5 +27,10 @@ public class WorkflowController {
             @NotNull @RequestParam(required = false, defaultValue = "false") boolean first
     ) {
         return null;
+    }
+
+    @PostMapping(SAMPLE_TASKS_ROUTE)
+    public SampleTask createSampleTask(@Valid @RequestBody CreateSampleTaskParams createSampleTaskParams) {
+        return sampleTaskDaoJpa.createSampleTask(createSampleTaskParams).toPresentationModel();
     }
 }

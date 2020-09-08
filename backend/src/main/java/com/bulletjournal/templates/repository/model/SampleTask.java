@@ -5,6 +5,7 @@ import com.bulletjournal.repository.models.NamedModel;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "sample_tasks", schema = "template")
@@ -23,7 +24,14 @@ public class SampleTask extends NamedModel {
     @Column(name = "metadata")
     private String metadata;
 
-    @ManyToMany(targetEntity = Step.class, mappedBy = "sampleTasks", fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "steps_sample_tasks", schema = "template",
+            joinColumns = {
+                    @JoinColumn(name = "sample_task_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "step_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)})
     private List<Step> steps = new ArrayList<>();
 
     @Override
@@ -57,5 +65,9 @@ public class SampleTask extends NamedModel {
 
     public void setSteps(List<Step> steps) {
         this.steps = steps;
+    }
+
+    public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.SampleTask(id, content, metadata, steps.stream().map(Step::toPresentationModel).collect(Collectors.toList()));
     }
 }
