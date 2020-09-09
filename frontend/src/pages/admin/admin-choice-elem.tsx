@@ -17,7 +17,6 @@ const {Title, Text} = Typography;
 
 type ChoiceProps = {
     choice: Choice;
-    showPopover: boolean;
     deleteChoice: (id: number) => void;
     deleteSelection: (id: number) => void;
     updateChoice: (id: number, name: string, multiple: boolean) => void;
@@ -29,7 +28,6 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
     {
         choice,
         getChoice,
-        showPopover,
         deleteChoice,
         deleteSelection,
         updateChoice,
@@ -96,7 +94,7 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                         </span>)}
                     </div>
                     <Divider/>
-                    {!showPopover && <div>
+                    <div>
                         <h3>Associated Categories</h3>
                         {choice.categories.map(category => {
                             return <span style={{cursor: 'pointer', padding: '5px', backgroundColor: `${category.color}`}}
@@ -104,22 +102,9 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                                 {category.name} ({category.id})
                             </span>
                         })}
-                    </div>}
+                    </div>
                 </div>
             </Modal>
-        );
-    }
-
-    if (showPopover) {
-        return (<Popover title='Selections' placement='right'
-                         content={<div className='choices-popup'>
-                             {choice.selections.map(s => <span>{s.text} ({s.id})</span>)}
-                         </div>}>
-               <span className='choice-elem' onClick={openModal}>
-                {choice.name} ({choice.id})
-                   {getModal()}
-                </span>
-            </Popover>
         );
     }
 

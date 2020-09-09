@@ -164,7 +164,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <h3>Choices</h3>
             {category.choices.map(c => {
                 return <div>
-                    <AdminChoiceElem choice={c} showPopover={true}/>
+                    <AdminChoiceElem choice={c} />
                     {' '}
                     <Tooltip title='Remove Choice'>
                         <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>
@@ -175,7 +175,6 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <div>
                 <h3>Available Choices to add</h3>
                 <AdminChoices
-                    showPopover={true}
                     showAddChoice={true}
                     addChoice={(id) => addChoice(category, id)}
                     choicesToExclude={category.choices.map(c => c.id)}/>
