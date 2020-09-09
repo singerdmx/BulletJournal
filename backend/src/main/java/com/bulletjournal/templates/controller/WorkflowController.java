@@ -20,8 +20,8 @@ import java.util.List;
 public class WorkflowController {
 
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
-    public static final String SAMPLE_TASKS_ROUTE = "/api/sampletasks";
-    public static final String SAMPLE_TASK_ROUTE = "/api/sampletasks/{sampleTaskId}";
+    public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
+    public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
