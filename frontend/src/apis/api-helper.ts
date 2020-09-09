@@ -1,6 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
+import versions from './versions.json';
 
-const version = '1.1.202009060605';
+const version = versions['version'];
 
 export function doFetch(endpoint: string, etag: any = undefined) {
   if (process.env.REACT_APP_ENV === 'debug') {
