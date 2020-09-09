@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SampleTaskRepository extends JpaRepository<SampleTask, Long> {
+    SampleTask getById(Long id);
 }

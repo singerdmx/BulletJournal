@@ -68,6 +68,6 @@ public class SampleTask extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.SampleTask(id, content, metadata, steps.stream().map(Step::toPresentationModel).collect(Collectors.toList()));
+        return new com.bulletjournal.templates.controller.model.SampleTask(id, getName(), content, metadata, steps.stream().map(Step::toPresentationModel).collect(Collectors.toList()));
     }
 }

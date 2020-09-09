@@ -1,0 +1,1 @@
+DELETE FROM template.choices_categories WHERE choice_id = 11 AND category_id = 13;
