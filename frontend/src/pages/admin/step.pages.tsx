@@ -57,7 +57,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <h3>Choices</h3>
         {step.choices.map(c => {
             return <div>
-                <AdminChoiceElem choice={c} showPopover={true}/>
+                <AdminChoiceElem choice={c} />
                 {' '}
                 <Tooltip title='Remove Choice'>
                     <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => removeStep(step, c.id)}/>
@@ -68,7 +68,6 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <div>
             <h3>Available Choices to add</h3>
             <AdminChoices
-                showPopover={true}
                 showAddChoice={true}
                 addChoice={(id) => addStep(step, id)}
                 choicesToExclude={step.choices.map(c => c.id)}/>

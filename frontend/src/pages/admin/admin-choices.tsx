@@ -12,7 +12,6 @@ type Choices = {
     choices: Choice[];
     choicesToExclude: number[];
     showAddChoice: boolean;
-    showPopover: boolean;
     getChoices: () => void;
     addChoice: (choiceId: number) => void;
 };
@@ -21,7 +20,6 @@ const AdminChoices: React.FC<Choices> = (
     {
         choices,
         showAddChoice,
-        showPopover,
         getChoices,
         addChoice,
         choicesToExclude
@@ -35,7 +33,7 @@ const AdminChoices: React.FC<Choices> = (
         <div>
             {choices.filter(c => !choicesToExclude.includes(c.id)).map(c => {
                 return <div>
-                    <AdminChoiceElem choice={c} showPopover={showPopover}/>
+                    <AdminChoiceElem choice={c} />
                     {showAddChoice && <Tooltip title='Add Choice'>
                         <PlusCircleTwoTone onClick={() => addChoice(c.id)}/>
                     </Tooltip>}
