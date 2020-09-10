@@ -54,6 +54,8 @@ public class UserController {
         String currency = null;
         String theme = null;
         Integer points = 0;
+        User self = userClient.getUser(username);
+
         if (Objects.equals(expand, TRUE)) {
             com.bulletjournal.repository.models.User user = this.userDaoJpa.getByName(username);
             timezone = user.getTimezone();
@@ -63,7 +65,6 @@ public class UserController {
             points = user.getPoints();
             this.userClient.updateEmail(user); //TODO: remove this line
         }
-        User self = userClient.getUser(username);
         return new Myself(self, timezone, before, currency, theme, points,
                 this.firstTimeUserRepository.existsById(username));
     }
