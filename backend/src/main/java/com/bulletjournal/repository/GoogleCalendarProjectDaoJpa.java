@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.calendars.google.CalendarWatchedProject;
 import com.bulletjournal.calendars.google.Util;
 import com.bulletjournal.clients.GoogleCalClient;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -13,6 +14,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -96,13 +98,14 @@ public class GoogleCalendarProjectDaoJpa {
                         .stream().map(p -> p.getId()).collect(Collectors.toList());
         Channel createdChannel;
         for (String googleCalendarProjectId : expiringGoogleCalendarProjectIds) {
+            GoogleCalendarProject googleCalendarProject =
+                    this.googleCalendarProjectRepository.findById(googleCalendarProjectId).get();
+            MDC.put(UserClient.USER_NAME_KEY, googleCalendarProject.getOwner());
             Calendar service = this.googleCalClient.getCalendarService();
             Calendar.Events.Watch watch = service.events().watch(googleCalendarProjectId, Util.getChannel());
             LOGGER.info("Created watch {}", watch);
             createdChannel = watch.execute();
 
-            GoogleCalendarProject googleCalendarProject =
-                    this.googleCalendarProjectRepository.findById(googleCalendarProjectId).get();
             googleCalendarProject.setChannelId(createdChannel.getId());
             googleCalendarProject.setExpiration(new Timestamp(createdChannel.getExpiration()));
             googleCalendarProject.setChannel(GSON.toString(createdChannel));
