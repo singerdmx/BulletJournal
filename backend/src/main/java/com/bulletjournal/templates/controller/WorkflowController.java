@@ -7,7 +7,12 @@ import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.NextStep;
 import com.bulletjournal.templates.controller.model.SampleTask;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
+import com.bulletjournal.templates.repository.RuleDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import com.bulletjournal.templates.repository.model.CategoryRule;
+import com.bulletjournal.templates.repository.model.StepRule;
+import com.bulletjournal.templates.workflow.models.RuleExpression;
+import com.google.gson.Gson;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +34,24 @@ public class WorkflowController {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
+    @Autowired
+    private RuleDaoJpa ruleDaoJpa;
+
     @GetMapping(NEXT_STEP_ROUTE)
     public NextStep getNext(
             @NotNull @PathVariable Long stepId,
             @NotNull @RequestParam List<Long> selections,
             @NotNull @RequestParam(required = false, defaultValue = "false") boolean first
     ) {
+        Gson gson = new Gson();
+        if (first) {
+            List<CategoryRule> categoryRules = ruleDaoJpa.getAllCategoryRules();
+            categoryRules.forEach(categoryRule -> {
+                RuleExpression ruleExpression = gson.fromJson(categoryRule.getRuleExpression(), RuleExpression.class);
+            });
+        } else {
+            List<StepRule> stepRules = ruleDaoJpa.getAllStepRules();
+        }
         return null;
     }
 

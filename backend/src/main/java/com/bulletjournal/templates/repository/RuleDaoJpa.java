@@ -111,4 +111,14 @@ public class RuleDaoJpa {
     public void saveStepRules(List<StepRule> stepRules) {
         stepRuleRepository.saveAll(stepRules);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<CategoryRule> getAllCategoryRules() {
+        return categoryRuleRepository.findAll();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<StepRule> getAllStepRules() {
+        return stepRuleRepository.findAll();
+    }
 }
