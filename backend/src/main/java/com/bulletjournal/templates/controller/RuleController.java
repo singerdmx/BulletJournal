@@ -37,9 +37,9 @@ public class RuleController {
             throw new BadRequestException("category id and step id both not null");
         }
         if (params.getCategoryId() != null) {
-            return ruleDaoJpa.createCategoryRule(params.getCategoryId(), params.getName(), params.getPriority(), params.getRuleExpression()).toPresentationModel();
+            return ruleDaoJpa.createCategoryRule(params.getCategoryId(), params.getName(), params.getPriority(), params.getRuleExpression(), params.getConnectedStepId()).toPresentationModel();
         } else {
-            return ruleDaoJpa.createStepRule(params.getStepId(), params.getName(), params.getPriority(), params.getRuleExpression()).toPresentationModel();
+            return ruleDaoJpa.createStepRule(params.getStepId(), params.getName(), params.getPriority(), params.getRuleExpression(), params.getConnectedStepId()).toPresentationModel();
         }
     }
 
@@ -82,10 +82,10 @@ public class RuleController {
         }
         if (updateRuleParams.getCategoryId() != null) {
             return ruleDaoJpa.updateCategoryRule(ruleId, updateRuleParams.getCategoryId(), updateRuleParams.getName(),
-                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression()).toPresentationModel();
+                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression(), updateRuleParams.getConnectedStepId()).toPresentationModel();
         } else {
             return ruleDaoJpa.updateStepRule(ruleId, updateRuleParams.getStepId(), updateRuleParams.getName(),
-                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression()).toPresentationModel();
+                    updateRuleParams.getPriority(), updateRuleParams.getRuleExpression(), updateRuleParams.getConnectedStepId()).toPresentationModel();
         }
     }
 

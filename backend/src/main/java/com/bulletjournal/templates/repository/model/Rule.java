@@ -1,6 +1,8 @@
 package com.bulletjournal.templates.repository.model;
 
 import com.bulletjournal.repository.models.NamedModel;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -13,8 +15,10 @@ public abstract class Rule extends NamedModel {
     @Column(name = "rule_expression")
     private String ruleExpression;
 
-    @Column(name = "connected_step_id")
-    private Long connectedStepId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "connected_step_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Step connectedStep;
 
     public Rule() {
     }
@@ -35,12 +39,12 @@ public abstract class Rule extends NamedModel {
         this.ruleExpression = ruleExpression;
     }
 
-    public Long getConnectedStepId() {
-        return connectedStepId;
+    public Step getConnectedStep() {
+        return connectedStep;
     }
 
-    public void setConnectedStepId(Long connectedStepId) {
-        this.connectedStepId = connectedStepId;
+    public void setConnectedStep(Step connectedStep) {
+        this.connectedStep = connectedStep;
     }
 
     public void clone(Rule rule) {

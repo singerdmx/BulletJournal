@@ -11,6 +11,8 @@ public class CreateRuleParams {
 
     private Integer priority;
 
+    private Long connectedStepId;
+
     public Long getCategoryId() {
         return categoryId;
     }
@@ -49,5 +51,13 @@ public class CreateRuleParams {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public Long getConnectedStepId() {
+        return connectedStepId;
+    }
+
+    public void setConnectedStepId(Long connectedStepId) {
+        this.connectedStepId = connectedStepId;
     }
 }

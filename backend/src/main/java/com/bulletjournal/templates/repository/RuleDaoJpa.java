@@ -30,24 +30,28 @@ public class RuleDaoJpa {
 
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CategoryRule createCategoryRule(Long categoryId, String name, Integer priority, String ruleExpression) {
+    public CategoryRule createCategoryRule(Long categoryId, String name, Integer priority, String ruleExpression, Long connectedStepId) {
         Category category = categoryDaoJpa.getById(categoryId);
+        Step connectedStep = stepDaoJpa.getById(connectedStepId);
         CategoryRule categoryRule = new CategoryRule();
         categoryRule.setName(name);
         categoryRule.setPriority(priority);
         categoryRule.setRuleExpression(ruleExpression);
         categoryRule.setCategory(category);
+        categoryRule.setConnectedStep(connectedStep);
         return categoryRuleRepository.save(categoryRule);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public StepRule createStepRule(Long stepId, String name, Integer priority, String ruleExpression) {
+    public StepRule createStepRule(Long stepId, String name, Integer priority, String ruleExpression, Long connectedStepId) {
         Step step = stepDaoJpa.getById(stepId);
+        Step connectedStep = stepDaoJpa.getById(connectedStepId);
         StepRule stepRule = new StepRule();
         stepRule.setName(name);
         stepRule.setPriority(priority);
         stepRule.setRuleExpression(ruleExpression);
         stepRule.setStep(step);
+        stepRule.setConnectedStep(connectedStep);
         return stepRuleRepository.save(stepRule);
     }
 
@@ -86,24 +90,28 @@ public class RuleDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CategoryRule updateCategoryRule(Long ruleId, Long categoryId, String name, Integer priority, String ruleExpression) {
+    public CategoryRule updateCategoryRule(Long ruleId, Long categoryId, String name, Integer priority, String ruleExpression, Long connectedStepId) {
         CategoryRule categoryRule = getCategoryRuleById(ruleId);
         Category category = categoryDaoJpa.getById(categoryId);
+        Step connectedStep = stepDaoJpa.getById(connectedStepId);
         categoryRule.setCategory(category);
         categoryRule.setName(name);
         categoryRule.setPriority(priority);
         categoryRule.setRuleExpression(ruleExpression);
+        categoryRule.setConnectedStep(connectedStep);
         return categoryRuleRepository.save(categoryRule);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public StepRule updateStepRule(Long ruleId, Long stepId, String name, Integer priority, String ruleExpression) {
+    public StepRule updateStepRule(Long ruleId, Long stepId, String name, Integer priority, String ruleExpression, Long connectedStepId) {
         StepRule stepRule = getStepRuleById(ruleId);
         Step step = stepDaoJpa.getById(stepId);
+        Step connectedStep = stepDaoJpa.getById(connectedStepId);
         stepRule.setStep(step);
         stepRule.setName(name);
         stepRule.setPriority(priority);
         stepRule.setRuleExpression(ruleExpression);
+        stepRule.setConnectedStep(connectedStep);
         return stepRuleRepository.save(stepRule);
     }
 
