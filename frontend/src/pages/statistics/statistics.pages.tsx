@@ -212,7 +212,7 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
                                     <Option value={project.id} key={project.id}>
                                     <Tooltip
                                         title={`${project.name} (Owner ${project.owner.alias}) (Group ${project.group.name})`}
-                                        placement='right'
+                                        placement='left'
                                     >
                                         <span>
                                         <Avatar size='small' src={project.owner.avatar} />
