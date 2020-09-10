@@ -117,11 +117,13 @@ public class GoogleCalendarProjectDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void renewGoogleCalendarWatch(String googleCalendarProjectId) throws IOException {
         LOGGER.info("Got googleCalendarProjectId {}", googleCalendarProjectId);
+        GoogleCalendarProject googleCalendarProject =
+                googleCalendarProjectRepository.findById(googleCalendarProjectId).get();
+        MDC.put(UserClient.USER_NAME_KEY, googleCalendarProject.getOwner());
         Calendar service = googleCalClient.getCalendarService();
         Calendar.Events.Watch watch = service.events().watch(googleCalendarProjectId, Util.getChannel());
         LOGGER.info("Created watch {}", watch);
         Channel createdChannel = watch.execute();
-        GoogleCalendarProject googleCalendarProject = googleCalendarProjectRepository.findById(googleCalendarProjectId).get();
         googleCalendarProject.setChannelId(createdChannel.getId());
         googleCalendarProject.setExpiration(new Timestamp(createdChannel.getExpiration()));
         googleCalendarProject.setChannel(GSON.toString(createdChannel));
