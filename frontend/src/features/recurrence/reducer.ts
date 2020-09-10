@@ -162,7 +162,10 @@ const slice = createSlice({
         end.count = Math.max(1, endCount);
       } else if (endDate) {
         //end until use date type because .toText only recognize Date() type
-        end.until = new Date(endDate);
+        const year = parseInt(endDate.substring(0, 4));
+        const month = parseInt(endDate.substring(5, 7));
+        const day = parseInt(endDate.substring(8, 10));
+        end.until = new Date(year, month - 1, day);
       }
       state.end = end;
       state.rRuleString = new RRule({
