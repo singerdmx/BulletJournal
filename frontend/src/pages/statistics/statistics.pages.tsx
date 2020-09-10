@@ -211,7 +211,7 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
                                 return (    
                                     <Option value={project.id} key={project.id}>
                                     <Tooltip
-                                        title={project.owner.alias}
+                                        title={`${project.name} (Owner ${project.owner.alias}) (Group ${project.group.name})`}
                                         placement='right'
                                     >
                                         <span>
