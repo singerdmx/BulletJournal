@@ -1,39 +1,34 @@
 import React from 'react';
-import { Layout, Menu } from 'antd';
+import {Layout, Menu} from 'antd';
 import * as logo from "../../assets/favicon466.ico";
 import {connect} from "react-redux";
-import { IState } from '../../store';
-import { getCategory } from "../../features/templates/actions";
-import { Loading } from '../../App';
-import { Category } from '../../features/templates/interface';
-import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
-import { useHistory } from 'react-router-dom';
+import {IState} from '../../store';
+import {Loading} from '../../App';
+import {Category} from '../../features/templates/interface';
+import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
+import {useHistory} from 'react-router-dom';
 
-const { Sider } = Layout;
+const {Sider} = Layout;
 
 type SiderProps = {
     categories: Category[];
-    category: Category | undefined;
     collapsedSiderWidth: number;
     width: number;
     collapsed: boolean;
     onCollapse: (collapsed: boolean) => void;
-    getCategory:(categoryId: number) => void;
 };
 
-const SideLayout: React.FC<SiderProps> = ({
-    categories,
-    category,
-    collapsedSiderWidth,
-    width,
-    collapsed,
-    onCollapse,
-    getCategory,
-}) => {
+const SideLayout: React.FC<SiderProps> = (
+    {
+        categories,
+        collapsedSiderWidth,
+        width,
+        collapsed,
+        onCollapse,
+    }) => {
     const history = useHistory();
     const handleOnClick = (categoryId: number) => {
-        getCategory(categoryId);
-        history.push("/");
+        history.push(`/categories/${categoryId}`);
     }
 
     const getMenuItems = (categories: Category[]) => {
@@ -57,7 +52,7 @@ const SideLayout: React.FC<SiderProps> = ({
 
     return (
         <Sider className="sider" collapsedWidth={collapsedSiderWidth} width={width}
-        collapsible collapsed={collapsed} onCollapse={onCollapse} defaultCollapsed={false}>
+               collapsible collapsed={collapsed} onCollapse={onCollapse} defaultCollapsed={false}>
             <div className='sider-header'>
                 <img src={logo} alt='Icon' className='icon-img'/>
                 <div className='title'>
@@ -71,10 +66,7 @@ const SideLayout: React.FC<SiderProps> = ({
 
 const mapStateToProps = (state: IState) => ({
     categories: state.templates.categories,
-    category: state.templates.category
 });
 
-export default connect(mapStateToProps, {
-    getCategory
-})(SideLayout);
+export default connect(mapStateToProps, {})(SideLayout);
   
