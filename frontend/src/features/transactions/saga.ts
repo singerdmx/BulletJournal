@@ -468,8 +468,9 @@ function* transactionContentsUpdate(
         contents: contents,
       })
     );
-    yield put(updateTargetContent(contents[0]));
-
+    if (contents && contents.length > 0) {
+      yield put(updateTargetContent(contents[0]));
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

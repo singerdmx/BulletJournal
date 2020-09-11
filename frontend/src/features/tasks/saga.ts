@@ -15,8 +15,10 @@ import {
   GetTask,
   GetTasksByAssignee,
   GetTasksByOrder,
+  GetTaskStatisticsAction,
   MoveTask,
-  PatchContent, PatchRevisionContents,
+  PatchContent,
+  PatchRevisionContents,
   PatchTask,
   PutTask,
   RemoveShared,
@@ -30,7 +32,6 @@ import {
   UpdateTaskContentRevision,
   UpdateTaskContents,
   UpdateTasks,
-  GetTaskStatisticsAction,
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -50,7 +51,9 @@ import {
   getContents,
   getSharables,
   getTaskById,
+  getTaskStatistics,
   moveToTargetProject,
+  patchRevisionContents,
   putTasks,
   removeShared,
   revokeSharable,
@@ -59,9 +62,7 @@ import {
   shareTaskWithOther,
   uncompleteTaskById,
   updateContent,
-  updateTask,
-  patchRevisionContents,
-  getTaskStatistics
+  updateTask
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
@@ -82,13 +83,13 @@ function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
 
 function* getTasksByAssignee(action: PayloadAction<GetTasksByAssignee>) {
   try {
-    const { projectId, assignee } = action.payload;
+    const {projectId, assignee} = action.payload;
     const data = yield call(fetchTasks, projectId, assignee);
     const tasksByAssignee = yield data.json();
     yield put(
-      tasksActions.tasksByAssigneeReceived({
-        tasksByAssignee: tasksByAssignee,
-      })
+        tasksActions.tasksByAssigneeReceived({
+          tasksByAssignee: tasksByAssignee,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -101,13 +102,13 @@ function* getTasksByAssignee(action: PayloadAction<GetTasksByAssignee>) {
 
 function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
   try {
-    const { projectId } = action.payload;
+    const {projectId} = action.payload;
     const data = yield call(fetchTasks, projectId);
     const tasks = yield data.json();
     yield put(
-      tasksActions.tasksReceived({
-        tasks: tasks,
-      })
+        tasksActions.tasksReceived({
+          tasks: tasks,
+        })
     );
 
     //get etag from header
@@ -115,10 +116,10 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
     const state = yield select();
     const systemState = state.system;
     yield put(
-      SystemActions.systemUpdateReceived({
-        ...systemState,
-        tasksEtag: etag,
-      })
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -131,7 +132,7 @@ function* tasksUpdate(action: PayloadAction<UpdateTasks>) {
 
 function* completedTasksUpdate(action: PayloadAction<UpdateCompletedTasks>) {
   try {
-    const { projectId } = action.payload;
+    const {projectId} = action.payload;
 
     const state: IState = yield select();
     if (state.task.loadingCompletedTask) {
@@ -141,41 +142,41 @@ function* completedTasksUpdate(action: PayloadAction<UpdateCompletedTasks>) {
     yield put(updateLoadingCompletedTask(true));
     if (state.task.completedTaskPageNo === 0) {
       const tasks = yield call(
-        fetchCompletedTasks,
-        projectId,
-        state.task.completedTaskPageNo,
-        completedTaskPageSize
+          fetchCompletedTasks,
+          projectId,
+          state.task.completedTaskPageNo,
+          completedTaskPageSize
       );
       yield put(
-        tasksActions.completedTasksReceived({
-          tasks: tasks,
-        })
+          tasksActions.completedTasksReceived({
+            tasks: tasks,
+          })
       );
     } else {
       yield put(
-        tasksActions.completedTasksReceived({
-          tasks: state.task.completedTasks.concat(
-            state.task.nextCompletedTasks
-          ),
-        })
+          tasksActions.completedTasksReceived({
+            tasks: state.task.completedTasks.concat(
+                state.task.nextCompletedTasks
+            ),
+          })
       );
     }
 
     const tasks = yield call(
-      fetchCompletedTasks,
-      projectId,
-      state.task.completedTaskPageNo + 1,
-      completedTaskPageSize
+        fetchCompletedTasks,
+        projectId,
+        state.task.completedTaskPageNo + 1,
+        completedTaskPageSize
     );
     yield put(
-      tasksActions.nextCompletedTasksReceived({
-        tasks: tasks,
-      })
+        tasksActions.nextCompletedTasksReceived({
+          tasks: tasks,
+        })
     );
     yield put(
-      tasksActions.updateCompletedTaskPageNo({
-        completedTaskPageNo: state.task.completedTaskPageNo + 1,
-      })
+        tasksActions.updateCompletedTaskPageNo({
+          completedTaskPageNo: state.task.completedTaskPageNo + 1,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -202,17 +203,17 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       labels,
     } = action.payload;
     yield call(
-      createTask,
-      projectId,
-      name,
-      assignees,
-      reminderSetting,
-      timezone,
-      dueDate,
-      dueTime,
-      duration,
-      recurrenceRule,
-      labels
+        createTask,
+        projectId,
+        name,
+        assignees,
+        reminderSetting,
+        timezone,
+        dueDate,
+        dueTime,
+        duration,
+        recurrenceRule,
+        labels
     );
     yield put(updateTasks(projectId));
     const state: IState = yield select();
@@ -230,24 +231,24 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
 
 function* taskPut(action: PayloadAction<PutTask>) {
   try {
-    const { projectId, tasks } = action.payload;
+    const {projectId, tasks} = action.payload;
     const state: IState = yield select();
     const data = yield call(putTasks, projectId, tasks, state.system.tasksEtag);
     const updatedTasks = yield data.json();
     yield put(
-      tasksActions.tasksReceived({
-        tasks: updatedTasks,
-      })
+        tasksActions.tasksReceived({
+          tasks: updatedTasks,
+        })
     );
 
     //get etag from header
     const etag = data.headers.get('Etag')!;
     const systemState = state.system;
     yield put(
-      SystemActions.systemUpdateReceived({
-        ...systemState,
-        tasksEtag: etag,
-      })
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -260,9 +261,9 @@ function* taskPut(action: PayloadAction<PutTask>) {
 
 function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
   try {
-    const { taskId, labels } = action.payload;
+    const {taskId, labels} = action.payload;
     const data = yield call(setTaskLabels, taskId, labels);
-    yield put(tasksActions.taskReceived({ task: data }));
+    yield put(tasksActions.taskReceived({task: data}));
     yield put(updateTasks(data.projectId));
   } catch (error) {
     if (error.message === 'reload') {
@@ -276,7 +277,7 @@ function* taskSetLabels(action: PayloadAction<SetTaskLabels>) {
 function* getTask(action: PayloadAction<GetTask>) {
   try {
     const data = yield call(getTaskById, action.payload.taskId);
-    yield put(tasksActions.taskReceived({ task: data }));
+    yield put(tasksActions.taskReceived({task: data}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -289,7 +290,7 @@ function* getTask(action: PayloadAction<GetTask>) {
 function* getCompletedTask(action: PayloadAction<GetTask>) {
   try {
     const data = yield call(getCompletedTaskById, action.payload.taskId);
-    yield put(tasksActions.taskReceived({ task: data }));
+    yield put(tasksActions.taskReceived({task: data}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -316,23 +317,23 @@ function* patchTask(action: PayloadAction<PatchTask>) {
     } = action.payload;
 
     const data = yield call(
-      updateTask,
-      taskId,
-      name,
-      assignees,
-      dueDate,
-      dueTime,
-      duration,
-      timezone,
-      reminderSetting,
-      recurrenceRule,
-      labels
+        updateTask,
+        taskId,
+        name,
+        assignees,
+        dueDate,
+        dueTime,
+        duration,
+        timezone,
+        reminderSetting,
+        recurrenceRule,
+        labels
     );
 
     yield put(
-      tasksActions.tasksReceived({
-        tasks: data,
-      })
+        tasksActions.tasksReceived({
+          tasks: data,
+        })
     );
 
     const state: IState = yield select();
@@ -368,15 +369,15 @@ function* patchTask(action: PayloadAction<PatchTask>) {
 
     const task = yield call(getTaskById, taskId);
     yield put(
-      tasksActions.taskReceived({
-        task: task,
-      })
+        tasksActions.taskReceived({
+          task: task,
+        })
     );
 
     //update label search page
     const labelItems: ProjectItems[] = [];
     state.label.items.forEach((projectItem: ProjectItems) => {
-      projectItem = { ...projectItem };
+      projectItem = {...projectItem};
       if (projectItem.tasks) {
         projectItem.tasks = projectItem.tasks.map((eachTask) => {
           if (eachTask.id === taskId) return task;
@@ -401,7 +402,7 @@ function* patchTask(action: PayloadAction<PatchTask>) {
 
 function* completeTask(action: PayloadAction<CompleteTask>) {
   try {
-    const { taskId, dateTime, type } = action.payload;
+    const {taskId, dateTime, type} = action.payload;
     const task = yield call(completeTaskById, taskId, dateTime);
     const state: IState = yield select();
 
@@ -409,88 +410,88 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
       const data = yield call(fetchTasks, task.projectId);
       const tasks = yield data.json();
       yield put(
-        tasksActions.tasksReceived({
-          tasks: tasks,
-        })
+          tasksActions.tasksReceived({
+            tasks: tasks,
+          })
       );
 
       //get etag from header
       const etag = data.headers.get('Etag')!;
       const systemState = state.system;
       yield put(
-        SystemActions.systemUpdateReceived({
-          ...systemState,
-          tasksEtag: etag,
-        })
+          SystemActions.systemUpdateReceived({
+            ...systemState,
+            tasksEtag: etag,
+          })
       );
 
       const completedTaskPageNo = state.task.completedTaskPageNo;
       if (completedTaskPageNo > 0) {
         const completedTasks = yield call(
-          fetchCompletedTasks,
-          task.projectId,
-          0,
-          completedTaskPageNo * completedTaskPageSize
+            fetchCompletedTasks,
+            task.projectId,
+            0,
+            completedTaskPageNo * completedTaskPageSize
         );
         yield put(
-          tasksActions.completedTasksReceived({
-            tasks: completedTasks,
-          })
+            tasksActions.completedTasksReceived({
+              tasks: completedTasks,
+            })
         );
         const tasks = yield call(
-          fetchCompletedTasks,
-          task.projectId,
-          completedTaskPageNo,
-          completedTaskPageSize
+            fetchCompletedTasks,
+            task.projectId,
+            completedTaskPageNo,
+            completedTaskPageSize
         );
         yield put(
-          tasksActions.nextCompletedTasksReceived({
-            tasks: tasks,
-          })
+            tasksActions.nextCompletedTasksReceived({
+              tasks: tasks,
+            })
         );
       }
     }
 
     if (type === ProjectItemUIType.TODAY) {
       yield put(
-        getProjectItemsAfterUpdateSelect(
-          state.myBuJo.todoSelected,
-          state.myBuJo.ledgerSelected,
-          state.myBuJo.noteSelected,
-          'today'
-        )
+          getProjectItemsAfterUpdateSelect(
+              state.myBuJo.todoSelected,
+              state.myBuJo.ledgerSelected,
+              state.myBuJo.noteSelected,
+              'today'
+          )
       );
     }
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-        (t) => t.id !== taskId
+          (t) => t.id !== taskId
       );
       yield put(
-        tasksActions.tasksByAssigneeReceived({
-          tasksByAssignee: tasksByAssignee,
-        })
+          tasksActions.tasksByAssigneeReceived({
+            tasksByAssignee: tasksByAssignee,
+          })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
       const tasksByOrder = state.task.tasksByOrder.filter(
-        (t) => t.id !== taskId
+          (t) => t.id !== taskId
       );
       yield put(
-        tasksActions.tasksByOrderReceived({
-          tasksByOrder: tasksByOrder,
-        })
+          tasksActions.tasksByOrderReceived({
+            tasksByOrder: tasksByOrder,
+          })
       );
     }
 
     if (type === ProjectItemUIType.LABEL) {
       const labelItems: ProjectItems[] = [];
       state.label.items.forEach((projectItem: ProjectItems) => {
-        projectItem = { ...projectItem };
+        projectItem = {...projectItem};
         if (projectItem.tasks) {
           projectItem.tasks = projectItem.tasks.filter(
-            (task) => task.id !== taskId
+              (task) => task.id !== taskId
           );
         }
         labelItems.push(projectItem);
@@ -500,7 +501,7 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
 
     if (type === ProjectItemUIType.RECENT) {
       const recentItems = state.recent.items.filter(
-        (t) => t.contentType !== ContentType.TASK || t.id !== taskId
+          (t) => t.contentType !== ContentType.TASK || t.id !== taskId
       );
       yield put(recentItemsReceived(recentItems));
     }
@@ -521,57 +522,57 @@ function* completeTask(action: PayloadAction<CompleteTask>) {
 
 function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
   try {
-    const { taskId } = action.payload;
+    const {taskId} = action.payload;
     const task = yield call(uncompleteTaskById, taskId);
     const data = yield call(fetchTasks, task.projectId);
     const tasks = yield data.json();
     yield put(
-      tasksActions.tasksReceived({
-        tasks: tasks,
-      })
+        tasksActions.tasksReceived({
+          tasks: tasks,
+        })
     );
     const state: IState = yield select();
     //get etag from header
     const etag = data.headers.get('Etag')!;
     const systemState = state.system;
     yield put(
-      SystemActions.systemUpdateReceived({
-        ...systemState,
-        tasksEtag: etag,
-      })
+        SystemActions.systemUpdateReceived({
+          ...systemState,
+          tasksEtag: etag,
+        })
     );
     const completedTaskPageNo = state.task.completedTaskPageNo;
     if (completedTaskPageNo > 0) {
       const completedTasks = yield call(
-        fetchCompletedTasks,
-        task.projectId,
-        0,
-        completedTaskPageNo * completedTaskPageSize
+          fetchCompletedTasks,
+          task.projectId,
+          0,
+          completedTaskPageNo * completedTaskPageSize
       );
       yield put(
-        tasksActions.completedTasksReceived({
-          tasks: completedTasks,
-        })
+          tasksActions.completedTasksReceived({
+            tasks: completedTasks,
+          })
       );
       const tasks = yield call(
-        fetchCompletedTasks,
-        task.projectId,
-        completedTaskPageNo,
-        completedTaskPageSize
+          fetchCompletedTasks,
+          task.projectId,
+          completedTaskPageNo,
+          completedTaskPageSize
       );
       yield put(
-        tasksActions.nextCompletedTasksReceived({
-          tasks: tasks,
-        })
+          tasksActions.nextCompletedTasksReceived({
+            tasks: tasks,
+          })
       );
     }
     const searchCompletedTasks = state.task.searchCompletedTasks.filter(
-      (t) => t.id !== taskId
+        (t) => t.id !== taskId
     );
     yield put(
-      tasksActions.searchCompletedTasksReceived({
-        searchCompletedTasks: searchCompletedTasks,
-      })
+        tasksActions.searchCompletedTasksReceived({
+          searchCompletedTasks: searchCompletedTasks,
+        })
     );
     if (state.project.project) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
@@ -587,35 +588,35 @@ function* uncompleteTask(action: PayloadAction<UncompleteTask>) {
 
 function* deleteTask(action: PayloadAction<DeleteTask>) {
   try {
-    const { taskId, type } = action.payload;
+    const {taskId, type} = action.payload;
     const data = yield call(deleteTaskById, taskId);
     const updatedTasks = yield data.json();
     yield put(
-      tasksActions.tasksReceived({
-        tasks: updatedTasks,
-      })
+        tasksActions.tasksReceived({
+          tasks: updatedTasks,
+        })
     );
-    yield put(tasksActions.taskReceived({ task: undefined }));
+    yield put(tasksActions.taskReceived({task: undefined}));
     const state: IState = yield select();
 
     if (type === ProjectItemUIType.TODAY) {
       yield put(
-        getProjectItemsAfterUpdateSelect(
-          state.myBuJo.todoSelected,
-          state.myBuJo.ledgerSelected,
-          state.myBuJo.noteSelected,
-          'today'
-        )
+          getProjectItemsAfterUpdateSelect(
+              state.myBuJo.todoSelected,
+              state.myBuJo.ledgerSelected,
+              state.myBuJo.noteSelected,
+              'today'
+          )
       );
     }
 
     if (type === ProjectItemUIType.LABEL) {
       const labelItems: ProjectItems[] = [];
       state.label.items.forEach((projectItem: ProjectItems) => {
-        projectItem = { ...projectItem };
+        projectItem = {...projectItem};
         if (projectItem.tasks) {
           projectItem.tasks = projectItem.tasks.filter(
-            (task) => task.id !== taskId
+              (task) => task.id !== taskId
           );
         }
         labelItems.push(projectItem);
@@ -625,29 +626,29 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-        (t) => t.id !== taskId
+          (t) => t.id !== taskId
       );
       yield put(
-        tasksActions.tasksByAssigneeReceived({
-          tasksByAssignee: tasksByAssignee,
-        })
+          tasksActions.tasksByAssigneeReceived({
+            tasksByAssignee: tasksByAssignee,
+          })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
       const tasksByOrder = state.task.tasksByOrder.filter(
-        (t) => t.id !== taskId
+          (t) => t.id !== taskId
       );
       yield put(
-        tasksActions.tasksByOrderReceived({
-          tasksByOrder: tasksByOrder,
-        })
+          tasksActions.tasksByOrderReceived({
+            tasksByOrder: tasksByOrder,
+          })
       );
     }
 
     if (type === ProjectItemUIType.RECENT) {
       const recentItems = state.recent.items.filter(
-        (t) => t.contentType !== ContentType.TASK || t.id !== taskId
+          (t) => t.contentType !== ContentType.TASK || t.id !== taskId
       );
       yield put(recentItemsReceived(recentItems));
     }
@@ -667,39 +668,39 @@ function* deleteTask(action: PayloadAction<DeleteTask>) {
 
 function* deleteTasks(action: PayloadAction<DeleteTasks>) {
   try {
-    const { projectId, tasksId, type } = action.payload;
+    const {projectId, tasksId, type} = action.payload;
 
     const data = yield call(deleteTasksApi, projectId, tasksId);
     const tasks: Task[] = yield data.json();
 
     yield put(
-      tasksActions.tasksReceived({
-        tasks: tasks,
-      })
+        tasksActions.tasksReceived({
+          tasks: tasks,
+        })
     );
 
-    yield put(tasksActions.taskReceived({ task: undefined }));
+    yield put(tasksActions.taskReceived({task: undefined}));
     const state: IState = yield select();
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-        (t) => !tasksId.includes(t.id)
+          (t) => !tasksId.includes(t.id)
       );
       yield put(
-        tasksActions.tasksByAssigneeReceived({
-          tasksByAssignee: tasksByAssignee,
-        })
+          tasksActions.tasksByAssigneeReceived({
+            tasksByAssignee: tasksByAssignee,
+          })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
       const tasksByOrder = state.task.tasksByOrder.filter(
-        (t) => !tasksId.includes(t.id)
+          (t) => !tasksId.includes(t.id)
       );
       yield put(
-        tasksActions.tasksByOrderReceived({
-          tasksByOrder: tasksByOrder,
-        })
+          tasksActions.tasksByOrderReceived({
+            tasksByOrder: tasksByOrder,
+          })
       );
     }
 
@@ -718,44 +719,44 @@ function* deleteTasks(action: PayloadAction<DeleteTasks>) {
 
 function* completeTasks(action: PayloadAction<CompleteTasks>) {
   try {
-    const { projectId, tasksId, type } = action.payload;
+    const {projectId, tasksId, type} = action.payload;
     const state: IState = yield select();
     const data = yield call(completeTasksApi, projectId, tasksId);
     const tasks: Task[] = yield data.json();
 
     yield put(
-      tasksActions.tasksReceived({
-        tasks: tasks,
-      })
+        tasksActions.tasksReceived({
+          tasks: tasks,
+        })
     );
 
     //refetch completed tasks
     yield put(
-      tasksActions.updateCompletedTaskPageNo({ completedTaskPageNo: 0 })
+        tasksActions.updateCompletedTaskPageNo({completedTaskPageNo: 0})
     );
-    yield put(tasksActions.completedTasksReceived({ tasks: [] }));
+    yield put(tasksActions.completedTasksReceived({tasks: []}));
 
-    yield put(tasksActions.taskReceived({ task: undefined }));
+    yield put(tasksActions.taskReceived({task: undefined}));
 
     if (type === ProjectItemUIType.ASSIGNEE) {
       const tasksByAssignee = state.task.tasksByAssignee.filter(
-        (t) => !tasksId.includes(t.id)
+          (t) => !tasksId.includes(t.id)
       );
       yield put(
-        tasksActions.tasksByAssigneeReceived({
-          tasksByAssignee: tasksByAssignee,
-        })
+          tasksActions.tasksByAssigneeReceived({
+            tasksByAssignee: tasksByAssignee,
+          })
       );
     }
 
     if (type === ProjectItemUIType.ORDER) {
       const tasksByOrder = state.task.tasksByOrder.filter(
-        (t) => !tasksId.includes(t.id)
+          (t) => !tasksId.includes(t.id)
       );
       yield put(
-        tasksActions.tasksByOrderReceived({
-          tasksByOrder: tasksByOrder,
-        })
+          tasksActions.tasksByOrderReceived({
+            tasksByOrder: tasksByOrder,
+          })
       );
     }
 
@@ -774,23 +775,23 @@ function* completeTasks(action: PayloadAction<CompleteTasks>) {
 
 function* deleteCompletedTask(action: PayloadAction<DeleteCompleteTask>) {
   try {
-    const { taskId } = action.payload;
+    const {taskId} = action.payload;
     const data = yield call(deleteCompletedTaskById, taskId);
     const updatedCompletedTasks = yield data.json();
     yield put(
-      tasksActions.completedTasksReceived({
-        tasks: updatedCompletedTasks,
-      })
+        tasksActions.completedTasksReceived({
+          tasks: updatedCompletedTasks,
+        })
     );
 
     const state: IState = yield select();
     const searchCompletedTasks = state.task.searchCompletedTasks.filter(
-      (t) => t.id !== taskId
+        (t) => t.id !== taskId
     );
     yield put(
-      tasksActions.searchCompletedTasksReceived({
-        searchCompletedTasks: searchCompletedTasks,
-      })
+        tasksActions.searchCompletedTasksReceived({
+          searchCompletedTasks: searchCompletedTasks,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -803,7 +804,7 @@ function* deleteCompletedTask(action: PayloadAction<DeleteCompleteTask>) {
 
 function* moveTask(action: PayloadAction<MoveTask>) {
   try {
-    const { taskId, targetProject, history } = action.payload;
+    const {taskId, targetProject, history} = action.payload;
     yield call(moveToTargetProject, taskId, targetProject);
     yield call(message.success, 'Task moved successfully');
     history.push(`/projects/${targetProject}`);
@@ -826,15 +827,15 @@ function* shareTask(action: PayloadAction<ShareTask>) {
       ttl,
     } = action.payload;
     const data = yield call(
-      shareTaskWithOther,
-      taskId,
-      generateLink,
-      targetUser,
-      targetGroup,
-      ttl
+        shareTaskWithOther,
+        taskId,
+        generateLink,
+        targetUser,
+        targetGroup,
+        ttl
     );
     if (generateLink) {
-      yield put(tasksActions.sharedLinkReceived({ link: data.link }));
+      yield put(tasksActions.sharedLinkReceived({link: data.link}));
     }
     yield call(message.success, 'Task shared successfully');
   } catch (error) {
@@ -848,14 +849,14 @@ function* shareTask(action: PayloadAction<ShareTask>) {
 
 function* getTaskSharables(action: PayloadAction<GetSharables>) {
   try {
-    const { taskId } = action.payload;
+    const {taskId} = action.payload;
     const data = yield call(getSharables, taskId);
 
     yield put(
-      tasksActions.taskSharablesReceived({
-        users: data.users,
-        links: data.links,
-      })
+        tasksActions.taskSharablesReceived({
+          users: data.users,
+          links: data.links,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -868,7 +869,7 @@ function* getTaskSharables(action: PayloadAction<GetSharables>) {
 
 function* revokeTaskSharable(action: PayloadAction<RevokeSharable>) {
   try {
-    const { taskId, user, link } = action.payload;
+    const {taskId, user, link} = action.payload;
     yield call(revokeSharable, taskId, user, link);
 
     const state: IState = yield select();
@@ -885,10 +886,10 @@ function* revokeTaskSharable(action: PayloadAction<RevokeSharable>) {
     }
 
     yield put(
-      tasksActions.taskSharablesReceived({
-        users: sharedUsers,
-        links: sharedLinks,
-      })
+        tasksActions.taskSharablesReceived({
+          users: sharedUsers,
+          links: sharedLinks,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -914,7 +915,7 @@ function* removeSharedTask(action: PayloadAction<RemoveShared>) {
 
 function* createTaskContent(action: PayloadAction<CreateContent>) {
   try {
-    const { taskId, text } = action.payload;
+    const {taskId, text} = action.payload;
     const content: Content = yield call(addContent, taskId, text);
     yield put(updateTaskContents(taskId));
     yield put(updateTargetContent(content));
@@ -931,11 +932,13 @@ function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
   try {
     const contents = yield call(getContents, action.payload.taskId);
     yield put(
-      tasksActions.taskContentsReceived({
-        contents: contents,
-      })
+        tasksActions.taskContentsReceived({
+          contents: contents,
+        })
     );
-    yield put(updateTargetContent(contents[0]));
+    if (contents && contents.length > 0) {
+      yield put(updateTargetContent(contents[0]));
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -946,18 +949,25 @@ function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
 }
 
 function* completeTaskContentsUpdate(
-  action: PayloadAction<UpdateTaskContents>
+    action: PayloadAction<UpdateTaskContents>
 ) {
   try {
-    const contents = yield call(
-      getCompletedTaskContents,
-      action.payload.taskId
+    const data: Content[] = yield call(
+        getCompletedTaskContents,
+        action.payload.taskId
     );
+    const contents = [] as Content[];
+    data.forEach((c, index) => {
+      contents.push({...c, id: index});
+    });
     yield put(
-      tasksActions.taskContentsReceived({
-        contents: contents,
-      })
+        tasksActions.taskContentsReceived({
+          contents: contents,
+        })
     );
+    if (contents && contents.length > 0) {
+      yield put(updateTargetContent(contents[0]));
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -971,25 +981,25 @@ function* completeTaskContentsUpdate(
 }
 
 function* taskContentRevisionUpdate(
-  action: PayloadAction<UpdateTaskContentRevision>
+    action: PayloadAction<UpdateTaskContentRevision>
 ) {
   try {
-    const { taskId, contentId, revisionId } = action.payload;
+    const {taskId, contentId, revisionId} = action.payload;
     const state: IState = yield select();
 
     const targetContent: Content = state.task.contents.find(
-      (c) => c.id === contentId
+        (c) => c.id === contentId
     )!;
     const revision: Revision = targetContent.revisions.find(
-      (r) => r.id === revisionId
+        (r) => r.id === revisionId
     )!;
 
     if (!revision.content) {
       const data = yield call(
-        getContentRevision,
-        taskId,
-        contentId,
-        revisionId
+          getContentRevision,
+          taskId,
+          contentId,
+          revisionId
       );
 
       const taskContents: Content[] = [];
@@ -998,19 +1008,19 @@ function* taskContentRevisionUpdate(
           const newRevisions: Revision[] = [];
           taskContent.revisions.forEach((revision) => {
             if (revision.id === revisionId) {
-              revision = { ...revision, content: data.content };
+              revision = {...revision, content: data.content};
             }
             newRevisions.push(revision);
           });
-          taskContent = { ...taskContent, revisions: newRevisions };
+          taskContent = {...taskContent, revisions: newRevisions};
         }
         taskContents.push(taskContent);
       });
 
       yield put(
-        tasksActions.taskContentsReceived({
-          contents: taskContents,
-        })
+          tasksActions.taskContentsReceived({
+            contents: taskContents,
+          })
       );
     }
   } catch (error) {
@@ -1027,18 +1037,18 @@ function* taskContentRevisionUpdate(
 
 function* patchContent(action: PayloadAction<PatchContent>) {
   try {
-    const { taskId, contentId, text, diff } = action.payload;
+    const {taskId, contentId, text, diff} = action.payload;
     const state: IState = yield select();
     const order = state.note.contents.map(c => c.id);
 
-    const contents : Content[] = yield call(updateContent, taskId, contentId, text, state.content.content!.etag, diff);
+    const contents: Content[] = yield call(updateContent, taskId, contentId, text, state.content.content!.etag, diff);
     contents.sort((a: Content, b: Content) => {
       return order.findIndex((o) => o === a.id) - order.findIndex((o) => o === b.id);
     });
     yield put(
-      tasksActions.taskContentsReceived({
-        contents: contents,
-      })
+        tasksActions.taskContentsReceived({
+          contents: contents,
+        })
     );
     yield put(updateTargetContent(contents.filter(c => c.id === contentId)[0]));
   } catch (error) {
@@ -1053,7 +1063,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
 function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
   try {
     const state: IState = yield select();
-    const { taskId, taskStatus, type } = action.payload;
+    const {taskId, taskStatus, type} = action.payload;
     const data = yield call(setTaskStatusApi, taskId, taskStatus, state.myself.timezone);
 
     yield put(
@@ -1103,7 +1113,7 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
     //update label search page
     const labelItems: ProjectItems[] = [];
     state.label.items.forEach((projectItem: ProjectItems) => {
-      projectItem = { ...projectItem };
+      projectItem = {...projectItem};
       if (projectItem.tasks) {
         projectItem.tasks = projectItem.tasks.map((eachTask) => {
           if (eachTask.id === taskId) return task;
@@ -1124,13 +1134,13 @@ function* setTaskStatus(action: PayloadAction<SetTaskStatus>) {
 
 function* deleteTaskContent(action: PayloadAction<DeleteContent>) {
   try {
-    const { taskId, contentId } = action.payload;
+    const {taskId, contentId} = action.payload;
     const data = yield call(deleteContent, taskId, contentId);
     const contents = yield data.json();
     yield put(
-      tasksActions.taskContentsReceived({
-        contents: contents,
-      })
+        tasksActions.taskContentsReceived({
+          contents: contents,
+        })
     );
     yield put(updateTargetContent(contents.length > 0 ? contents[0] : undefined));
   } catch (error) {
@@ -1147,21 +1157,21 @@ function* deleteTaskContent(action: PayloadAction<DeleteContent>) {
 
 function* getTasksByOrder(action: PayloadAction<GetTasksByOrder>) {
   try {
-    const { projectId, timezone, startDate, endDate } = action.payload;
+    const {projectId, timezone, startDate, endDate} = action.payload;
     const data = yield call(
-      fetchTasks,
-      projectId,
-      undefined,
-      timezone,
-      startDate,
-      endDate,
-      true
+        fetchTasks,
+        projectId,
+        undefined,
+        timezone,
+        startDate,
+        endDate,
+        true
     );
     const tasksByOrder = yield data.json();
     yield put(
-      tasksActions.tasksByOrderReceived({
-        tasksByOrder: tasksByOrder,
-      })
+        tasksActions.tasksByOrderReceived({
+          tasksByOrder: tasksByOrder,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -1173,7 +1183,7 @@ function* getTasksByOrder(action: PayloadAction<GetTasksByOrder>) {
 }
 
 function* getSearchCompletedTasks(
-  action: PayloadAction<GetSearchCompletedTasks>
+    action: PayloadAction<GetSearchCompletedTasks>
 ) {
   try {
     const {
@@ -1184,20 +1194,20 @@ function* getSearchCompletedTasks(
       timezone,
     } = action.payload;
     const searchCompletedTasks = yield call(
-      fetchCompletedTasks,
-      projectId,
-      1,
-      1,
-      assignee,
-      startDate,
-      endDate,
-      timezone
+        fetchCompletedTasks,
+        projectId,
+        1,
+        1,
+        assignee,
+        startDate,
+        endDate,
+        timezone
     );
 
     yield put(
-      tasksActions.searchCompletedTasksReceived({
-        searchCompletedTasks: searchCompletedTasks,
-      })
+        tasksActions.searchCompletedTasksReceived({
+          searchCompletedTasks: searchCompletedTasks,
+        })
     );
   } catch (error) {
     if (error.message === 'reload') {
@@ -1227,11 +1237,11 @@ function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>
 function* fetchTaskStatistics(action: PayloadAction<GetTaskStatisticsAction>) {
   try {
     const {projectIds, timezone, startDate, endDate} = action.payload;
-    const data : TaskStatistics = yield call(getTaskStatistics, projectIds, timezone, startDate, endDate);
+    const data: TaskStatistics = yield call(getTaskStatistics, projectIds, timezone, startDate, endDate);
     yield put(
-      tasksActions.TaskStatisticsReceived({
-        projectStatistics: data,
-      })
+        tasksActions.TaskStatisticsReceived({
+          projectStatistics: data,
+        })
     )
   } catch (error) {
     if (error.message === 'reload') {
@@ -1245,8 +1255,8 @@ function* fetchTaskStatistics(action: PayloadAction<GetTaskStatisticsAction>) {
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
-      tasksActions.taskApiErrorReceived.type,
-      taskApiErrorReceived
+        tasksActions.taskApiErrorReceived.type,
+        taskApiErrorReceived
     ),
     yield takeLatest(tasksActions.TasksUpdate.type, tasksUpdate),
     yield takeLatest(tasksActions.TasksCreate.type, taskCreate),
@@ -1258,8 +1268,8 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskUncomplete.type, uncompleteTask),
     yield takeLatest(tasksActions.TaskDelete.type, deleteTask),
     yield takeLatest(
-      tasksActions.CompletedTaskDelete.type,
-      deleteCompletedTask
+        tasksActions.CompletedTaskDelete.type,
+        deleteCompletedTask
     ),
     yield takeLatest(tasksActions.TaskSetLabels.type, taskSetLabels),
     yield takeLatest(tasksActions.TaskMove.type, moveTask),
@@ -1268,26 +1278,26 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskRevokeSharable.type, revokeTaskSharable),
     yield takeLatest(tasksActions.TaskRemoveShared.type, removeSharedTask),
     yield takeLatest(
-      tasksActions.CompletedTasksUpdate.type,
-      completedTasksUpdate
+        tasksActions.CompletedTasksUpdate.type,
+        completedTasksUpdate
     ),
     yield takeLatest(tasksActions.TaskContentsUpdate.type, taskContentsUpdate),
     yield takeLatest(
-      tasksActions.TaskContentRevisionUpdate.type,
-      taskContentRevisionUpdate
+        tasksActions.TaskContentRevisionUpdate.type,
+        taskContentRevisionUpdate
     ),
     yield takeLatest(tasksActions.TaskContentCreate.type, createTaskContent),
     yield takeLatest(tasksActions.TaskContentPatch.type, patchContent),
     yield takeLatest(tasksActions.TaskContentDelete.type, deleteTaskContent),
     yield takeLatest(
-      tasksActions.CompleteTaskContentsUpdate.type,
-      completeTaskContentsUpdate
+        tasksActions.CompleteTaskContentsUpdate.type,
+        completeTaskContentsUpdate
     ),
     yield takeLatest(tasksActions.getTasksByAssignee.type, getTasksByAssignee),
     yield takeLatest(tasksActions.getTasksByOrder.type, getTasksByOrder),
     yield takeLatest(
-      tasksActions.getSearchCompletedTasks.type,
-      getSearchCompletedTasks
+        tasksActions.getSearchCompletedTasks.type,
+        getSearchCompletedTasks
     ),
     yield takeLatest(tasksActions.TasksDelete.type, deleteTasks),
     yield takeLatest(tasksActions.TasksComplete.type, completeTasks),
