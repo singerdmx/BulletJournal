@@ -28,3 +28,19 @@
     }
   }
 }
+
+div.coming-soon {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+
+  & img {
+    width: 50%;
+    @media screen and (max-width: 1440px) {
+      width: 90% !important;
+    }
+    border-radius: 10px;
+  }
+
+}
