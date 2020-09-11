@@ -5,6 +5,8 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +34,7 @@ public class Step extends NamedModel {
             name = "excluded_selections",
             columnDefinition = "bigint[]"
     )
-    private Long[] excludedSelections = new Long[0];
+    private Long[] excludedSelections;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "next_step", referencedColumnName = "id")
@@ -83,12 +85,15 @@ public class Step extends NamedModel {
         this.choices = choices;
     }
 
-    public Long[] getExcludedSelections() {
-        return excludedSelections;
+    public List<Long> getExcludedSelections() {
+        if (this.excludedSelections == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(this.excludedSelections);
     }
 
-    public void setExcludedSelections(Long[] excludedSelections) {
-        this.excludedSelections = excludedSelections;
+    public void setExcludedSelections(List<Long> excludedSelections) {
+        this.excludedSelections = excludedSelections == null ? null : excludedSelections.toArray(new Long[0]);
     }
 
     @Override

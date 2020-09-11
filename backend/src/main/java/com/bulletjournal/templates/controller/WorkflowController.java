@@ -49,13 +49,36 @@ public class WorkflowController {
             @NotNull @RequestParam(required = false, defaultValue = "false") boolean first
     ) {
         Gson gson = new Gson();
+        NextStep nextStep = new NextStep();
         if (first) {
             List<CategoryRule> categoryRules = ruleDaoJpa.getAllCategoryRules();
             Category category = categoryDaoJpa.getById(stepId);
-            categoryRules.forEach(categoryRule -> {
+            for (CategoryRule categoryRule : categoryRules) {
                 RuleExpression ruleExpression = gson.fromJson(categoryRule.getRuleExpression(), RuleExpression.class);
-                //ruleExpression.getCriteriaList()
-            });
+                switch (ruleExpression.getLogicOperator()) {
+                    case OR:
+                        for (RuleExpression.Criteria criteria : ruleExpression.getCriteriaList()) {
+                            switch (criteria.getCondition()) {
+                                case EXACT:
+                                    if (criteria.getSelectionIds().containsAll(selections) && selections.containsAll(criteria.getSelectionIds())) {
+                                        nextStep.setStep(categoryRule.getConnectedStep().toPresentationModel());
+                                        return nextStep;
+                                    }
+                                    break;
+                                case CONTAINS:
+                                    if (criteria.getSelectionIds().containsAll(selections)) {
+                                        nextStep.setStep(categoryRule.getConnectedStep().toPresentationModel());
+                                        return nextStep;
+                                    }
+                                    break;
+
+                            }
+                        }
+                        break;
+                    case AND:
+                        break;
+                }
+            }
         } else {
             List<StepRule> stepRules = ruleDaoJpa.getAllStepRules();
         }

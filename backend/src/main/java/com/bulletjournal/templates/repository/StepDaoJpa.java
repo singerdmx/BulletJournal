@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,7 +85,7 @@ public class StepDaoJpa {
         Step step = this.getById(stepId);
         step.setExcludedSelections(selectionDaoJpa.getSelectionsById(
                 excludedSelectionIds).stream().map(
-                com.bulletjournal.templates.repository.model.Selection::getId).toArray(Long[]::new));
+                com.bulletjournal.templates.repository.model.Selection::getId).collect(Collectors.toList()));
         this.save(step);
     }
 
@@ -94,7 +93,7 @@ public class StepDaoJpa {
     public com.bulletjournal.templates.controller.model.Step getStepByIdWithExcludedSelections(Long stepId) {
         Step step = getById(stepId);
         com.bulletjournal.templates.controller.model.Step presentStep = step.toPresentationModel();
-        List<Selection> selections = selectionDaoJpa.getSelectionsById(Arrays.asList(step.getExcludedSelections()));
+        List<Selection> selections = selectionDaoJpa.getSelectionsById(step.getExcludedSelections());
         presentStep.setExcludedSelections(selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
         return presentStep;
     }
