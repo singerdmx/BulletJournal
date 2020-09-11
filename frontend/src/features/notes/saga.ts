@@ -107,6 +107,8 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
+    } else if (error.message === '404') {
+      console.log(`Note ${action.payload.noteId} not found`);
     } else {
       yield call(message.error, `noteContentsUpdate Error Received: ${error}`);
     }

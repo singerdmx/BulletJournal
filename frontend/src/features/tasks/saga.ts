@@ -942,6 +942,8 @@ function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
+    } else if (error.message === '404') {
+      console.log(`Task ${action.payload.taskId} not found`);
     } else {
       yield call(message.error, `taskContentsUpdate Error Received: ${error}`);
     }
