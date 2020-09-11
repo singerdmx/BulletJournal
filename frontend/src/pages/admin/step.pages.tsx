@@ -40,11 +40,11 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         history.goBack();
     }
 
-    const removeStep = (step: Step, id: number) => {
+    const removeChoice = (step: Step, id: number) => {
 
     }
 
-    const addStep = (step: Step, id: number) => {
+    const addChoice = (step: Step, id: number) => {
 
     }
 
@@ -60,7 +60,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
                 <AdminChoiceElem choice={c} />
                 {' '}
                 <Tooltip title='Remove Choice'>
-                    <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => removeStep(step, c.id)}/>
+                    <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => removeChoice(step, c.id)}/>
                 </Tooltip>
             </div>
         })}
@@ -69,7 +69,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
             <h3>Available Choices to add</h3>
             <AdminChoices
                 showAddChoice={true}
-                addChoice={(id) => addStep(step, id)}
+                addChoice={(id) => addChoice(step, id)}
                 choicesToExclude={step.choices.map(c => c.id)}/>
         </div>
         <Container>
