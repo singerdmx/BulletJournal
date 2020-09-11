@@ -3,7 +3,7 @@ import { Layout, Menu } from 'antd';
 import * as logo from "../../assets/favicon466.ico";
 import {connect} from "react-redux";
 import { IState } from '../../store';
-import {getCategories, getCategory} from "../../features/templates/actions";
+import { getCategory } from "../../features/templates/actions";
 import { Loading } from '../../App';
 import { Category } from '../../features/templates/interface';
 import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
@@ -75,7 +75,6 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getCategories,
     getCategory
 })(SideLayout);
   
