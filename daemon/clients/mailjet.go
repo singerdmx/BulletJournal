@@ -16,8 +16,8 @@ type Group struct {
 }
 
 const (
-	ACCEPT  string = "accept"
-	DECLINE string = "decline"
+	Accept  string = "accept"
+	Decline string = "decline"
 )
 
 func GetUrl(uuid uint64, action string) string {
@@ -27,8 +27,8 @@ func GetUrl(uuid uint64, action string) string {
 // Send join group invitation email to users
 func SendJoinGroupEmail(username, email string, groupId, notificationId uint64) {
 	g := Group{groupId, "g1", "X"} // TODO: query group from db
-	acceptUrl := GetUrl(notificationId, ACCEPT)
-	declineUrl := GetUrl(notificationId, DECLINE)
+	acceptUrl := GetUrl(notificationId, Accept)
+	declineUrl := GetUrl(notificationId, Decline)
 	serviceConfig := *config.GetConfig()
 	mailjetClient := mailjet.NewMailjetClient(os.Getenv(serviceConfig.ApiKeyPublic), os.Getenv(serviceConfig.ApiKeyPrivate))
 	messagesInfo := []mailjet.InfoMessagesV31{
