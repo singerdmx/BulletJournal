@@ -102,6 +102,7 @@ const EditTask: React.FC<
   const [reminderType, setReminderType] = useState('remindBefore');
   const [dueTimeVisible, setDueTimeVisible] = useState(!!task.dueTime);
   const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
+  const [durationU, setDurationU] = useState(task && task.duration && task.duration % 60 === 0 ? 'Hours' : 'Minutes');
   const [remindButton, setRemindButton] = useState('remindBefore');
   const [rRuleText, setRRuleText] = useState(
     convertToTextWithRRule(props.rRuleString)
@@ -166,6 +167,28 @@ const EditTask: React.FC<
       reminderSetting.before = undefined;
     }
 
+    let duration = values.duration;
+    if (duration === '') {
+      // user clears duration
+      duration = 0;
+    } else if (duration) {
+      // user changed duration
+      if (durationU === 'Hours') {
+        duration *= 60;
+      }
+    } else if (values.durationUnit && task.duration) {
+      // user changed durationUnit but didn't change duration
+      duration = task.duration;
+      const oldDurationUnit = task.duration % 60 === 0 ? 'Hours' : 'Minutes';
+      if (oldDurationUnit !== durationU) {
+        if (durationU === 'Hours') {
+          duration *= 60;
+        } else {
+          duration /= 60;
+        }
+      }
+    }
+
     patchTask(
       task.id,
       timezone,
@@ -174,7 +197,7 @@ const EditTask: React.FC<
       assignees,
       dueDate,
       dueTime,
-      values.duration,
+      duration,
       reminderSetting,
       recurrence,
       values.labels
@@ -212,6 +235,10 @@ const EditTask: React.FC<
   const clearAll = () => {
     form.setFields([{ name: 'assignees', value: [] }]);
   };
+
+  const handleDurationUnitChange = (e: string) => {
+    setDurationU(e);
+  }
 
   useEffect(() => {
     updateExpandedMyself(true);
@@ -408,7 +435,7 @@ const EditTask: React.FC<
             <Tooltip title="Time Zone" placement="bottom">
               <Form.Item
                 name="timezone"
-                style={{ display: 'inline-block', width: '70%' }}
+                style={{ display: 'inline-block', width: '50%' }}
               >
                 <Select
                   showSearch={true}
@@ -428,15 +455,25 @@ const EditTask: React.FC<
             <Form.Item
               name="duration"
               rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Duration' }]}
-              style={{ display: 'inline-block', width: '30%' }}
+              style={{ display: 'inline-block', width: '25%' }}
             >
               <AutoComplete
                 placeholder="Duration"
                 options={options}
-                defaultValue={task.duration ? task.duration.toString() : ''}
+                defaultValue={task.duration ? (task.duration % 60 === 0 ? task.duration / 60 : task.duration).toString() : ''}
               >
-                <Input suffix="Minutes" />
+                <Input />
               </AutoComplete>
+            </Form.Item>
+            <Form.Item
+                name="durationUnit"
+                style={{ display: 'inline-block', width: '25%' }}
+            >
+              <Select onChange={handleDurationUnitChange}
+                      defaultValue={task.duration && task.duration % 60 === 0 ? 'Hours' : 'Minutes'}>
+                <Option value="Minutes">Minute(s)</Option>
+                <Option value="Hours">Hour(s)</Option>
+              </Select>
             </Form.Item>
           </Form.Item>
 

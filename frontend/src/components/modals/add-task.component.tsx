@@ -126,6 +126,10 @@ const AddTask: React.FC<
       reminderSetting.before = undefined;
     }
 
+    let duration = values.duration;
+    if (duration && values.durationUnit && values.durationUnit === 'Hours') {
+      duration *= 60;
+    }
     if (props.project) {
       props.createTask(
         props.project.id,
@@ -133,7 +137,7 @@ const AddTask: React.FC<
         assignees,
         dueDate,
         dueTime,
-        values.duration,
+        duration,
         reminderSetting,
         recurrence,
         timezone,
@@ -323,7 +327,7 @@ const AddTask: React.FC<
             <Tooltip title="Time Zone" placement="bottom">
               <Form.Item
                 name="timezone"
-                style={{ display: 'inline-block', width: '70%' }}
+                style={{ display: 'inline-block', width: '50%' }}
               >
                 <Select
                   showSearch={true}
@@ -343,11 +347,20 @@ const AddTask: React.FC<
             <Form.Item
               name="duration"
               rules={[{ pattern: /^[0-9]*$/, message: 'Invalid Duration' }]}
-              style={{ display: 'inline-block', width: '30%' }}
+              style={{ display: 'inline-block', width: '25%' }}
             >
               <AutoComplete placeholder="Duration" options={options}>
-                <Input suffix="Minutes" />
+                <Input />
               </AutoComplete>
+            </Form.Item>
+            <Form.Item
+                name="durationUnit"
+                style={{ display: 'inline-block', width: '25%' }}
+            >
+              <Select defaultValue={'Minutes'}>
+                <Option value="Minutes">Minute(s)</Option>
+                <Option value="Hours">Hour(s)</Option>
+              </Select>
             </Form.Item>
           </Form.Item>
 
