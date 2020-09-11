@@ -1,24 +1,65 @@
 import React, {useEffect} from 'react';
 import './steps.styles.less';
 import {useParams} from "react-router-dom";
+import {IState} from "../../store";
+import {connect} from "react-redux";
+import {getCategory} from "../../features/templates/actions";
+import {Category} from "../../features/templates/interface";
+import {Avatar, Card, Empty} from "antd";
+
+const {Meta} = Card;
 
 type StepsProps = {
+    category: Category | undefined;
+    getCategory: (categoryId: number) => void;
 };
 
-const StepsPage: React.FC<StepsProps> = () => {
+const StepsPage: React.FC<StepsProps> = (
+    {category, getCategory}
+) => {
+    const {categoryId} = useParams();
+
+    useEffect(() => {
+        if (categoryId) {
+            getCategory(parseInt(categoryId));
+        }
+    }, [categoryId]);
 
     useEffect(() => {
         document.title = 'Bullet Journal - Steps';
-    }, []);
+        if (category) {
+            document.title = category.name;
+        }
+    }, [category]);
 
-    const {categoryId} = useParams();
-    
+    if (!category) {
+        return <Empty/>
+    }
+
     return (
-        <div>
-            <div>this is step pages</div>
-            <div>{categoryId}</div>
+        <div className='steps-page'>
+            <div className='steps-info'>
+                <Card
+                    className='category'
+                    style={{backgroundColor: `${category.color}`}}
+                    cover={
+                        <img src={category.image}/>
+                    }
+                >
+                    <Meta
+                        title={category.name}
+                        description={category.description}
+                    />
+                </Card>
+            </div>
         </div>
     );
 };
 
-export default StepsPage;
+const mapStateToProps = (state: IState) => ({
+    category: state.templates.category
+});
+
+export default connect(mapStateToProps, {
+    getCategory
+})(StepsPage);
