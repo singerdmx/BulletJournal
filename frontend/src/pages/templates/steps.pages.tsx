@@ -5,7 +5,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getCategory} from "../../features/templates/actions";
 import {Category} from "../../features/templates/interface";
-import {Avatar, Card, Empty} from "antd";
+import {Card, Empty} from "antd";
 
 const {Meta} = Card;
 
@@ -43,7 +43,7 @@ const StepsPage: React.FC<StepsProps> = (
                     className='category'
                     style={{backgroundColor: `${category.color}`}}
                     cover={
-                        <img src={category.image}/>
+                        <img alt={category.name} src={category.image}/>
                     }
                 >
                     <Meta
@@ -53,7 +53,7 @@ const StepsPage: React.FC<StepsProps> = (
                 </Card>
             </div>
             <div className='coming-soon'>
-                <img src='https://user-images.githubusercontent.com/122956/92905797-d299c600-f3d8-11ea-813a-3ac75c2f5677.gif'/>
+                <img alt='Coming Soon' src='https://user-images.githubusercontent.com/122956/92905797-d299c600-f3d8-11ea-813a-3ac75c2f5677.gif'/>
             </div>
         </div>
     );
