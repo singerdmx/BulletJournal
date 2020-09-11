@@ -462,7 +462,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         task.setName(createTaskParams.getName());
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
-        if (createTaskParams.getDuration() <= 0) {
+        if (createTaskParams.hasDuration() && createTaskParams.getDuration() <= 0) {
             task.setDuration(null);
         }
         task.setAssignees(createTaskParams.getAssignees());
@@ -564,7 +564,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         DaoHelper.updateIfPresent(updateTaskParams.hasTimezone(), timezone, task::setTimezone);
         DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(), task::setDuration);
-        if (updateTaskParams.getDuration() <= 0) {
+        if (updateTaskParams.hasDuration() && updateTaskParams.getDuration() <= 0) {
             task.setDuration(null);
         }
 

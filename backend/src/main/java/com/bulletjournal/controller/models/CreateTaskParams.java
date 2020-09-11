@@ -106,6 +106,10 @@ public class CreateTaskParams {
         this.duration = duration;
     }
 
+    public boolean hasDuration() {
+        return this.duration != null;
+    }
+
     public String getTimezone() {
         return timezone;
     }
