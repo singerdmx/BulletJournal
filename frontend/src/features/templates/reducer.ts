@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
-import {Category, Choice, Step} from './interface';
+import {Category, Choice, NextStep, Step} from './interface';
 
 export type GetStepsAction = {};
 
@@ -24,6 +24,10 @@ export type StepsAction = {
 
 export type StepAction = {
     step: Step;
+};
+
+export type NextStepAction = {
+    step: NextStep;
 };
 
 export type DeleteStepAction = {
@@ -122,7 +126,8 @@ let initialState = {
     category: undefined as Category | undefined,
     choices: [] as Choice[],
     steps: [] as Step[],
-    step: undefined as Step | undefined
+    step: undefined as Step | undefined,
+    nextStep: undefined as NextStep | undefined
 };
 
 const slice = createSlice({
@@ -160,6 +165,10 @@ const slice = createSlice({
         stepsReceived: (state, action: PayloadAction<StepsAction>) => {
             const {steps} = action.payload;
             state.steps = steps;
+        },
+        nextStepReceived: (state, action: PayloadAction<NextStepAction>) => {
+            const {step} = action.payload;
+            state.nextStep = step;
         },
         getStep: (state, action: PayloadAction<GetStepAction>) => state,
         stepReceived: (state, action: PayloadAction<StepAction>) => {

@@ -47,3 +47,7 @@ export interface Rule {
     category: Category;
     step: Step;
 }
+
+export interface NextStep {
+    step: Step;
+}
