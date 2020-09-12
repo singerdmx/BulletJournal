@@ -47,7 +47,7 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
             <div>
                 <h3>Selection</h3>
                 <div>
-                    <b>Target Choice: {choice.name} ({choice.id})</b>
+                    <b>Target Choice: {choice && choice.name} ({choice && choice.id})</b>
                 </div>
                 <div>
                     Add Selection:{' '}
