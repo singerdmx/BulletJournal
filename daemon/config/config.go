@@ -102,7 +102,7 @@ func Validate(c *Config) bool {
 	return valid
 }
 
-func InitConfig() {
+func init() {
 	isProd := flag.Bool("prod", false, "set config to production env")
 	flag.Parse()
 

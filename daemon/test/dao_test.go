@@ -198,7 +198,6 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
 func (suite *DaoTestSuite) SetupTest() {
-	config.InitConfig()
 	logging.InitLogging(config.GetEnv())
 	serviceConfig := config.GetConfig()
 	cleaner := dao.Cleaner{

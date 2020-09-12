@@ -100,7 +100,6 @@ func GetRequestID(ctx context.Context) string {
 }
 
 func init() {
-	config.InitConfig()
 	logging.InitLogging(config.GetEnv())
 	log = *logging.GetLogger()
 }

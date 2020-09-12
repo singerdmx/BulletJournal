@@ -15,7 +15,10 @@ const (
 	SessionIDKey string = "sessionID"
 )
 
-var logger Logger
+var (
+	logger Logger
+	config Configuration
+)
 
 //Fields Type to pass when we want to call WithFields for structured logging
 type Fields map[string]interface{}
@@ -80,7 +83,6 @@ func GetLoggerConfig(DevEnv bool,
 }
 
 func InitLogging(env *string) {
-	var config Configuration
 	if *env == "prod" {
 		config = GetLoggerConfig(false, true, Info, true, true, Info, true, "./tmp/daemon-prod.log")
 	} else {
