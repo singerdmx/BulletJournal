@@ -144,7 +144,7 @@ func (s *Cleaner) CountForTable(tableName string) *uint64 {
 	return nil
 }
 
-//Clean ...Main method for excuting cleaning jobs
+//Clean ...Main method for executing cleaning jobs
 func (s *Cleaner) Clean(maxRetentionTimeInDays int) {
 	log = *logging.GetLogger()
 	t := time.Now()
