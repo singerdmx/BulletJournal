@@ -10,8 +10,10 @@ import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.RuleDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import com.bulletjournal.templates.repository.StepDaoJpa;
 import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.CategoryRule;
+import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.repository.model.StepRule;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.google.gson.Gson;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -42,47 +45,112 @@ public class WorkflowController {
     @Autowired
     private CategoryDaoJpa categoryDaoJpa;
 
+    @Autowired
+    private StepDaoJpa stepDaoJpa;
+
+    private static final Gson GSON = new Gson();
+
     @GetMapping(NEXT_STEP_ROUTE)
     public NextStep getNext(
             @NotNull @PathVariable Long stepId,
             @NotNull @RequestParam List<Long> selections,
             @NotNull @RequestParam(required = false, defaultValue = "false") boolean first
     ) {
-        Gson gson = new Gson();
-        NextStep nextStep = new NextStep();
         if (first) {
-            List<CategoryRule> categoryRules = ruleDaoJpa.getAllCategoryRules();
-            Category category = categoryDaoJpa.getById(stepId);
-            for (CategoryRule categoryRule : categoryRules) {
-                RuleExpression ruleExpression = gson.fromJson(categoryRule.getRuleExpression(), RuleExpression.class);
-                switch (ruleExpression.getLogicOperator()) {
-                    case OR:
-                        for (RuleExpression.Criteria criteria : ruleExpression.getCriteriaList()) {
-                            switch (criteria.getCondition()) {
-                                case EXACT:
-                                    if (criteria.getSelectionIds().containsAll(selections) && selections.containsAll(criteria.getSelectionIds())) {
-                                        nextStep.setStep(categoryRule.getConnectedStep().toPresentationModel());
-                                        return nextStep;
-                                    }
-                                    break;
-                                case CONTAINS:
-                                    if (criteria.getSelectionIds().containsAll(selections)) {
-                                        nextStep.setStep(categoryRule.getConnectedStep().toPresentationModel());
-                                        return nextStep;
-                                    }
-                                    break;
-
-                            }
-                        }
-                        break;
-                    case AND:
-                        break;
-                }
-            }
+            return checkIfSelectionsMatchCategoryRules(stepId, selections);
         } else {
-            List<StepRule> stepRules = ruleDaoJpa.getAllStepRules();
+            return checkIfSelectionsMatchStepRules(stepId, selections);
         }
-        return null;
+    }
+
+    private NextStep checkIfSelectionsMatchCategoryRules(Long stepId, List<Long> selections) {
+        Category category = categoryDaoJpa.getById(stepId);
+        List<CategoryRule> categoryRules = category.getCategoryRules();
+        NextStep nextStep = new NextStep();
+        for (CategoryRule categoryRule : categoryRules) {
+            RuleExpression ruleExpression = GSON.fromJson(categoryRule.getRuleExpression(), RuleExpression.class);
+            if (ruleMatch(ruleExpression, selections)) {
+                if (categoryRule.getConnectedStep() != null) {
+                    nextStep.setStep(categoryRule.getConnectedStep().toPresentationModel());
+                }
+                return nextStep;
+            }
+        }
+        if (category.getNextStep() != null) {
+            nextStep.setStep(category.getNextStep().toPresentationModel());
+        }
+        return nextStep;
+    }
+
+    private NextStep checkIfSelectionsMatchStepRules(Long stepId, List<Long> selections) {
+        Step step = stepDaoJpa.getById(stepId);
+        List<StepRule> stepRules = step.getStepRules();
+        NextStep nextStep = new NextStep();
+        for (StepRule stepRule : stepRules) {
+            RuleExpression ruleExpression = GSON.fromJson(stepRule.getRuleExpression(), RuleExpression.class);
+            if (ruleMatch(ruleExpression, selections)) {
+                if (stepRule.getConnectedStep() != null) {
+                    nextStep.setStep(stepRule.getConnectedStep().toPresentationModel());
+                }
+                return nextStep;
+            }
+        }
+        if (step.getNextStep() != null) {
+            nextStep.setStep(step.getNextStep().toPresentationModel());
+        }
+        return nextStep;
+    }
+
+    private boolean ruleMatch(RuleExpression ruleExpression, List<Long> selections) {
+        switch (ruleExpression.getLogicOperator()) {
+            case OR:
+                for (RuleExpression.Criteria criteria : ruleExpression.getCriteriaList()) {
+                    switch (criteria.getCondition()) {
+                        case EXACT:
+                            if (criteria.getSelectionIds().containsAll(selections) && selections.containsAll(criteria.getSelectionIds())) {
+                                return true;
+                            }
+                            break;
+                        case CONTAINS:
+                            if (criteria.getSelectionIds().containsAll(selections)) {
+                                return true;
+                            }
+                            break;
+                        case NOT_CONTAIN:
+                            if (Collections.disjoint(criteria.getSelectionIds(), selections)) {
+                                return true;
+                            }
+                            break;
+                        case IGNORE:
+                            break;
+                    }
+                }
+                return false;
+            case AND:
+                for (RuleExpression.Criteria criteria : ruleExpression.getCriteriaList()) {
+                    switch (criteria.getCondition()) {
+                        case EXACT:
+                            if (!(criteria.getSelectionIds().containsAll(selections) && selections.containsAll(criteria.getSelectionIds()))) {
+                                return false;
+                            }
+                            break;
+                        case CONTAINS:
+                            if (!criteria.getSelectionIds().containsAll(selections)) {
+                                return false;
+                            }
+                            break;
+                        case NOT_CONTAIN:
+                            if (!Collections.disjoint(criteria.getSelectionIds(), selections)) {
+                                return false;
+                            }
+                            break;
+                        case IGNORE:
+                            break;
+                    }
+                }
+                return true;
+        }
+        return false;
     }
 
     @PostMapping(SAMPLE_TASKS_ROUTE)

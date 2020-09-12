@@ -46,6 +46,9 @@ public class Category extends NamedModel {
                             nullable = false, updatable = false)})
     private List<Choice> choices = new ArrayList<>();
 
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<CategoryRule> categoryRules;
+
     public Category() {
 
     }
@@ -58,6 +61,14 @@ public class Category extends NamedModel {
         this.forumId = forumId;
         this.image = image;
         this.nextStep = nextStep;
+    }
+
+    public List<CategoryRule> getCategoryRules() {
+        return categoryRules;
+    }
+
+    public void setCategoryRules(List<CategoryRule> categoryRules) {
+        this.categoryRules = categoryRules;
     }
 
     public Step getNextStep() {

@@ -1,6 +1,5 @@
 package com.bulletjournal.templates.controller.model;
 
-import com.bulletjournal.controller.models.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,7 @@ public class NextStep {
 
     private Step step;
 
-    private List<Task> tasks = new ArrayList<>();
+    private List<SampleTask> sampleTasks = new ArrayList<>();
 
     public Step getStep() {
         return step;
@@ -19,11 +18,11 @@ public class NextStep {
         this.step = step;
     }
 
-    public List<Task> getTasks() {
-        return tasks;
+    public List<SampleTask> getTasks() {
+        return sampleTasks;
     }
 
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
+    public void setTasks(List<SampleTask> sampleTasks) {
+        this.sampleTasks = sampleTasks;
     }
 }
