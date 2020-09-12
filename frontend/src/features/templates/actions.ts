@@ -34,8 +34,8 @@ export const updateCategoryRelations = (categories: Category[]) => actions.updat
 
 export const deleteCategory = (id: number) => actions.deleteCategory({id: id});
 
-export const setCategoryChoices = (id: number, choices: number[]) => actions.setChoices({
-    categoryId: id,
+export const setCategoryChoices = (id: number, choices: number[]) => actions.setCategoryChoices({
+    id: id,
     choices: choices
 });
 
@@ -76,3 +76,7 @@ export const deleteStep = (stepId: number) => actions.deleteStep({stepId: stepId
 export const getNextStep = (stepId: number, selections: number[], first?: boolean) =>
     actions.getNextStep({stepId: stepId, selections: selections, first: first});
 
+export const setStepChoices = (id: number, choices: number[]) => actions.setStepChoices({
+    id: id,
+    choices: choices
+});

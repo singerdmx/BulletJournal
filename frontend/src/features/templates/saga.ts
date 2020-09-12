@@ -25,7 +25,7 @@ import {
 import {Category, Choice, NextStep, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import {getSteps, createStep, getStep, deleteStep} from '../../apis/templates/stepApis';
+import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
 import {getNext} from "../../apis/templates/workflowApis";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
@@ -123,14 +123,25 @@ function* updateCategories(action: PayloadAction<UpdateCategoryRelationsAction>)
   }
 }
 
-function* setChoices(action: PayloadAction<SetChoicesAction>) {
+function* setCategoryChoices(action: PayloadAction<SetChoicesAction>) {
   try {
-    const {categoryId, choices} = action.payload;
-    const data: Category = yield call(updateChoicesForCategory, categoryId, choices);
+    const {id, choices} = action.payload;
+    const data: Category = yield call(updateChoicesForCategory, id, choices);
     console.log(data)
     yield put(templatesActions.categoryReceived({category: data}));
   } catch (error) {
-    yield call(message.error, `setChoices Error Received: ${error}`);
+    yield call(message.error, `setCategoryChoices Error Received: ${error}`);
+  }
+}
+
+function* setStepChoices(action: PayloadAction<SetChoicesAction>) {
+  try {
+    const {id, choices} = action.payload;
+    const data: Step = yield call(updateChoicesForStep, id, choices);
+    console.log(data)
+    yield put(templatesActions.stepReceived({step: data}));
+  } catch (error) {
+    yield call(message.error, `setStepChoices Error Received: ${error}`);
   }
 }
 
@@ -273,7 +284,8 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.deleteChoice.type, removeChoice),
     yield takeLatest(templatesActions.updateCategory.type, updateCategory),
     yield takeLatest(templatesActions.getCategory.type, fetchCategory),
-    yield takeLatest(templatesActions.setChoices.type, setChoices),
+    yield takeLatest(templatesActions.setCategoryChoices.type, setCategoryChoices),
+    yield takeLatest(templatesActions.setStepChoices.type, setStepChoices),
     yield takeLatest(templatesActions.addChoice.type, addChoice),
     yield takeLatest(templatesActions.updateChoice.type, putChoice),
     yield takeLatest(templatesActions.addSelection.type, addSelection),

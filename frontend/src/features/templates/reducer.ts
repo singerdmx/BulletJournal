@@ -102,7 +102,7 @@ export type UpdateCategoryRelationsAction = {
 };
 
 export type SetChoicesAction = {
-    categoryId: number;
+    id: number;
     choices: number[];
 };
 
@@ -161,7 +161,8 @@ const slice = createSlice({
         deleteCategory: (state, action: PayloadAction<DeleteCategoryAction>) => state,
         deleteChoice: (state, action: PayloadAction<DeleteChoiceAction>) => state,
         updateCategoryRelations: (state, action: PayloadAction<UpdateCategoryRelationsAction>) => state,
-        setChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
+        setCategoryChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
+        setStepChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
         addChoice: (state, action: PayloadAction<AddChoiceAction>) => state,
         updateChoice: (state, action: PayloadAction<UpdateChoiceAction>) => state,
         addSelection: (state, action: PayloadAction<AddSelectionAction>) => state,

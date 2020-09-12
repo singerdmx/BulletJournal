@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {getStep, deleteStep} from "../../features/templates/actions";
+import {getStep, deleteStep, setStepChoices} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Step} from "../../features/templates/interface";
 import {BackTop, Divider, Tooltip, Typography} from "antd";
@@ -18,10 +18,11 @@ type AdminStepProps = {
     step: Step | undefined;
     getStep: (stepId: number) => void;
     deleteStep: (stepId: number) => void;
+    setStepChoices: (id: number, choices: number[]) => void;
 }
 
 const AdminStepPage: React.FC<AdminStepProps> = (
-    {step, getStep, deleteStep}) => {
+    {step, getStep, deleteStep, setStepChoices}) => {
     const history = useHistory();
     const {stepId} = useParams();
 
@@ -41,11 +42,13 @@ const AdminStepPage: React.FC<AdminStepProps> = (
     }
 
     const removeChoice = (step: Step, id: number) => {
-
+        setStepChoices(step.id, step.choices.map(c => c.id).filter(c => c !== id));
     }
 
     const addChoice = (step: Step, id: number) => {
-
+        const choices = step.choices.map(c => c.id);
+        choices.unshift(id);
+        setStepChoices(step.id, choices);
     }
 
     return <div className='steps-page'>
@@ -83,5 +86,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getStep, deleteStep
+    getStep, deleteStep, setStepChoices
 })(AdminStepPage);
