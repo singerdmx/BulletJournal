@@ -73,3 +73,6 @@ export const updateStep = (stepId: number, name: string, nextStepId: number | un
 
 export const deleteStep = (stepId: number) => actions.deleteStep({stepId: stepId});
 
+export const getNextStep = (stepId: number, selections: number[], first?: boolean) =>
+    actions.getNextStep({stepId: stepId, selections: selections, first: first});
+

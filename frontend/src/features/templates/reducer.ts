@@ -30,6 +30,12 @@ export type NextStepAction = {
     step: NextStep;
 };
 
+export type GetNextStepAction = {
+    stepId: number;
+    selections: number[];
+    first?: boolean;
+};
+
 export type DeleteStepAction = {
     stepId: number;
 };
@@ -178,6 +184,7 @@ const slice = createSlice({
         createStep: (state, action: PayloadAction<CreateStepAction>) => state,
         updateStep: (state, action: PayloadAction<UpdateStepAction>) => state,
         deleteStep: (state, action: PayloadAction<DeleteStepAction>) => state,
+        getNextStep: (state, action: PayloadAction<GetNextStepAction>) => state,
     },
 });
 

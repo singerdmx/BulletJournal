@@ -15,6 +15,9 @@ type StepsProps = {
     getCategory: (categoryId: number) => void;
 };
 
+const STEPS = 'steps';
+const SELECTIONS = 'selections';
+
 const StepsPage: React.FC<StepsProps> = (
     {category, getCategory}
 ) => {
@@ -48,6 +51,10 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const onChoiceChange = (e: any, choice: Choice) => {
+        const selectionsText = localStorage.getItem(SELECTIONS);
+        const selections: any = selectionsText ? JSON.parse(selectionsText) : {};
+        selections[choice.id] = e ? e : null;
+        localStorage.setItem(SELECTIONS, JSON.stringify(selections));
         console.log(e);
     }
 
@@ -55,8 +62,8 @@ const StepsPage: React.FC<StepsProps> = (
         if (!category || category.choices.length === 0) {
             return null;
         }
-        const steps : Step[] = [{...category, excludedSelections: []}];
-        localStorage.setItem('steps', JSON.stringify(steps));
+        const steps: Step[] = [{...category, excludedSelections: []}];
+        localStorage.setItem(STEPS, JSON.stringify(steps));
         return <div>
             <div>
                 <div className='choices-card'>

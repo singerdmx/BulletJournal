@@ -7,7 +7,7 @@ import {
   DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
   GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction,
-  GetStepAction, DeleteStepAction
+  GetStepAction, DeleteStepAction, GetNextStepAction
 } from './reducer';
 import {
   createCategory,
@@ -22,10 +22,11 @@ import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, Selection, Step, Steps} from './interface';
+import {Category, Choice, NextStep, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
 import {getSteps, createStep, getStep, deleteStep} from '../../apis/templates/stepApis';
+import {getNext} from "../../apis/templates/workflowApis";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -251,6 +252,16 @@ function* removeStep(action: PayloadAction<DeleteStepAction>) {
   }
 }
 
+function* getNextStep(action: PayloadAction<GetNextStepAction>) {
+  try {
+    const {stepId, selections, first} = action.payload;
+    const nextStep: NextStep = yield call(getNext, stepId, selections, first);
+    yield put(templatesActions.nextStepReceived({step: nextStep}));
+  } catch (error) {
+    yield call(message.error, `getNextStep Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -272,5 +283,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getStep.type, fetchStep),
     yield takeLatest(templatesActions.createStep.type, addStep),
     yield takeLatest(templatesActions.deleteStep.type, removeStep),
+    yield takeLatest(templatesActions.getNextStep.type, getNextStep),
   ])
 }
