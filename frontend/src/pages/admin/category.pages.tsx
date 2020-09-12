@@ -126,7 +126,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
 
     const addChoice = (category: Category, id: number) => {
         const choices = category.choices.map(c => c.id);
-        choices.unshift(id);
+        choices.push(id);
         setCategoryChoices(category.id, choices);
     }
 

@@ -1,10 +1,10 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {getStep, deleteStep, setStepChoices} from "../../features/templates/actions";
+import {deleteStep, getStep, setStepChoices} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Step} from "../../features/templates/interface";
-import {BackTop, Divider, Tooltip, Typography} from "antd";
+import {BackTop, Button, Divider, InputNumber, Tooltip, Typography} from "antd";
 import './steps.styles.less'
 import {DeleteFilled, DeleteTwoTone} from "@ant-design/icons";
 import AdminChoiceElem from "./admin-choice-elem";
@@ -47,8 +47,12 @@ const AdminStepPage: React.FC<AdminStepProps> = (
 
     const addChoice = (step: Step, id: number) => {
         const choices = step.choices.map(c => c.id);
-        choices.unshift(id);
+        choices.push(id);
         setStepChoices(step.id, choices);
+    }
+
+    const removeExcludedSelection = (id: number) => {
+        
     }
 
     return <div className='steps-page'>
@@ -60,7 +64,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <h3>Choices</h3>
         {step.choices.map(c => {
             return <div>
-                <AdminChoiceElem choice={c} />
+                <AdminChoiceElem choice={c}/>
                 {' '}
                 <Tooltip title='Remove Choice'>
                     <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => removeChoice(step, c.id)}/>
@@ -74,6 +78,19 @@ const AdminStepPage: React.FC<AdminStepProps> = (
                 showAddChoice={true}
                 addChoice={(id) => addChoice(step, id)}
                 choicesToExclude={step.choices.map(c => c.id)}/>
+        </div>
+        <Divider/>
+        <div>
+            <h3>Excluded Selections</h3>
+            <div>
+                <InputNumber/> <Button type='primary'>Add to Exclusion</Button>
+            </div>
+            <div>
+                {step.excludedSelections.map(s => <span>
+                            {s.text} ({s.id})
+                    <DeleteFilled style={{cursor: 'pointer'}} onClick={() => removeExcludedSelection(s.id)}/>
+                        </span>)}
+            </div>
         </div>
         <Container>
             <AddRule step={step}/>
