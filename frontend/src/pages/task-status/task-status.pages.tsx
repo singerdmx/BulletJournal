@@ -255,7 +255,7 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
               <SyncOutlined/>
             </FloatButton>
             <FloatButton
-                tooltip="Tasks Ordered by Due Date Time"
+                tooltip="Tasks Ordered by Due Date"
                 onClick={handleGetTasksByOrder}
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
             >

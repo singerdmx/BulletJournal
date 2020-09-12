@@ -117,7 +117,7 @@ const AddNote: React.FC<
     );
   }
   return (
-      <Container>
+      <>
         <FloatButton
             tooltip="Add New Note"
             onClick={openModal}
@@ -126,7 +126,7 @@ const AddNote: React.FC<
           <PlusOutlined/>
         </FloatButton>
         {getModal()}
-      </Container>
+      </>
   );
 };
 

@@ -340,7 +340,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
         <CheckCircleOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
-          tooltip="Tasks Ordered by Due Date Time"
+          tooltip="Task(s) Ordered by Due Date"
           onClick={handleShowTasksOrdered}
           styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
       >
@@ -351,7 +351,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
           onClick={() => history.push(`/projects/${project.id}/statistics`)}
           styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
       >
-        <ProjectOutlined />
+        <ProjectOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Tasks by Status"
@@ -380,7 +380,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
         <div>
           <TasksByOrder
               visible={tasksByOrderShown}
-              onCancel={() => {setTasksByOrderShown(false)}}
+              onCancel={() => {
+                setTasksByOrderShown(false)
+              }}
               hideCompletedTask={hideCompletedTask}
           />
         </div>
