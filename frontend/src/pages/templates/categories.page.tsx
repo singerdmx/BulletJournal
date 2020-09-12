@@ -36,20 +36,20 @@ const CategoriesPage: React.FC<CategoryProps> = (
 
     return (
         <div className='template-content'>
-            return <div>
-            {categories.map(c => {
-                return <>
-                    <Divider>
-                        <span>{getIcon(c.icon!)} {c.name}</span>
-                    </Divider>
-                    <div className='categories-info'>
-                        {c.subCategories.map(sub => {
-                            return renderCategory(sub, history);
-                        })}
-                    </div>
-                </>
-            })}
-        </div>
+            <div>
+                {categories.map(c => {
+                    return <>
+                        <Divider>
+                            <span>{getIcon(c.icon!)} {c.name}</span>
+                        </Divider>
+                        <div className='categories-info'>
+                            {c.subCategories.map(sub => {
+                                return renderCategory(sub, history);
+                            })}
+                        </div>
+                    </>
+                })}
+            </div>
         </div>
     );
 
