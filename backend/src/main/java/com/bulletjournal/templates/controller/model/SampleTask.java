@@ -13,17 +13,35 @@ public class SampleTask {
 
     private String metadata;
 
+    private String uid;
+
     private List<Step> steps = new ArrayList<>();
 
     public SampleTask() {
     }
 
-    public SampleTask(Long id, String name, String content, String metadata, List<Step> steps) {
+    public SampleTask(
+        Long id,
+        String name,
+        String content,
+        String metadata,
+        List<Step> steps,
+        String uid
+    ) {
         this.id = id;
         this.name = name;
         this.content = content;
         this.metadata = metadata;
         this.steps = steps;
+        this.uid = uid;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public Long getId() {
