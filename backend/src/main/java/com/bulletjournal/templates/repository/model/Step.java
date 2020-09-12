@@ -111,7 +111,7 @@ public class Step extends NamedModel {
                     choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
         }
         return new com.bulletjournal.templates.controller.model.Step(id, getName(),
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()), nextStep.toPresentationModel());
+                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
     }
 
     public void clone(Step step) {

@@ -4,7 +4,7 @@ import {useParams} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getCategory} from "../../features/templates/actions";
-import {Category} from "../../features/templates/interface";
+import {Category, Choice, Step} from "../../features/templates/interface";
 import {Card, Empty, Select} from "antd";
 
 const {Meta} = Card;
@@ -47,16 +47,23 @@ const StepsPage: React.FC<StepsProps> = (
         </div>
     }
 
+    const onChoiceChange = (e: any, choice: Choice) => {
+        console.log(e);
+    }
+
     const getStepsDiv = () => {
         if (!category || category.choices.length === 0) {
             return null;
         }
+        const steps : Step[] = [{...category, excludedSelections: []}];
+        localStorage.setItem('steps', JSON.stringify(steps));
         return <div>
             <div>
                 <div className='choices-card'>
                     {category.choices.map(choice => {
                         return <div key={choice.id} className='choice-card'>
                             <Select mode={choice.multiple ? 'multiple' : undefined}
+                                    onChange={(e) => onChoiceChange(e, choice)}
                                     placeholder={choice.name}
                                     style={{padding: '3px'}}
                                     allowClear>

@@ -31,7 +31,6 @@ export interface Step {
     name: string;
     choices: Choice[];
     excludedSelections: Selection[];
-    nextStep: Step | undefined;
 }
 
 export interface Steps {
