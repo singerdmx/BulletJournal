@@ -107,6 +107,13 @@ const StepsPage: React.FC<StepsProps> = (
         return isSubsequence(option.key.toString().toLowerCase(), inputValue);
     };
 
+    const selectAll = (choice: Choice) => {
+        const curStep = getCurrentStep();
+        const selections = getSelections();
+        selections[choice.id] = curStep.choices.filter(c => c.id === choice.id)[0].selections.map(s => s.id);
+        localStorage.setItem(SELECTIONS, JSON.stringify(selections));
+    }
+
     const renderChoice = (choice: Choice) => {
         const selections = getSelections();
         return <div key={choice.id} className='choice-card'>
@@ -123,6 +130,11 @@ const StepsPage: React.FC<StepsProps> = (
                     return <Option key={selection.text} value={selection.id}>{selection.text}</Option>
                 })}
             </Select>
+            {choice.multiple && <Button
+                onClick={() => selectAll(choice)}
+                style={{color: '#4ddbff'}} shape="round" size='small'>
+                All
+            </Button>}
         </div>
     }
 
