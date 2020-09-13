@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Layout, Menu} from 'antd';
 import * as logo from "../../assets/favicon466.ico";
 import {connect} from "react-redux";
@@ -18,6 +18,13 @@ type SiderProps = {
     onCollapse: (collapsed: boolean) => void;
 };
 
+// declare window
+declare global {
+    interface Window {
+        adsbygoogle: any;
+    }
+}
+
 const SideLayout: React.FC<SiderProps> = (
     {
         categories,
@@ -26,6 +33,10 @@ const SideLayout: React.FC<SiderProps> = (
         collapsed,
         onCollapse,
     }) => {
+    useEffect(() => {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }, []);
+
     const history = useHistory();
     const handleOnClick = (categoryId: number) => {
         history.push(`/categories/${categoryId}`);
@@ -34,17 +45,28 @@ const SideLayout: React.FC<SiderProps> = (
     const getMenuItems = (categories: Category[]) => {
         if (categories && categories.length > 0) {
             return <Menu theme="dark" mode="inline" defaultSelectedKeys={categories.map(c => `${c.id}`)}>
-                {categories.map(c => {
-                    return <Menu.Item
-                        key={`${c.id}`}
-                        icon={getIcon(c.icon!)}
-                        style={{backgroundColor: `${c.color}`}}
-                        onClick={() => handleOnClick(c.id)}
-                    >
-                        {c.name}
-                    </Menu.Item>
-                })
+                {
+                    categories.map(c => {
+                        return <Menu.Item
+                            key={`${c.id}`}
+                            icon={getIcon(c.icon!)}
+                            style={{backgroundColor: `${c.color}`}}
+                            onClick={() => handleOnClick(c.id)}
+                        >
+                            {c.name}
+                        </Menu.Item>
+                    })
                 }
+                <Menu.Item key='ads'>
+                    <ins
+                        className='adsbygoogle'
+                        style={{ display: 'block' }}
+                        data-ad-client='ca-pub-8783793954376932'
+                        data-ad-slot='1070434431'
+                        data-ad-format='auto'
+                        data-full-width-responsive='true'
+                    ></ins>
+                </Menu.Item>
             </Menu>
         }
         return <Loading/>
