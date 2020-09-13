@@ -112,7 +112,7 @@ public class WorkflowController {
                             }
                             break;
                         case CONTAINS:
-                            if (criteria.getSelectionIds().containsAll(selections)) {
+                            if (selections.containsAll(criteria.getSelectionIds())) {
                                 return true;
                             }
                             break;
@@ -135,7 +135,7 @@ public class WorkflowController {
                             }
                             break;
                         case CONTAINS:
-                            if (!criteria.getSelectionIds().containsAll(selections)) {
+                            if (!selections.containsAll(criteria.getSelectionIds())) {
                                 return false;
                             }
                             break;
