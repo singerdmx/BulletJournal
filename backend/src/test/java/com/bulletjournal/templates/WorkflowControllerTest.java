@@ -7,7 +7,6 @@ import com.bulletjournal.templates.controller.StepController;
 import com.bulletjournal.templates.controller.WorkflowController;
 import com.bulletjournal.templates.controller.model.*;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,7 +43,6 @@ public class WorkflowControllerTest {
     }
 
     @Test
-    @Ignore
     public void testWorkflow() {
         CreateStepParams createStepParams1 = new CreateStepParams();
         createStepParams1.setName("step1");
@@ -58,7 +56,7 @@ public class WorkflowControllerTest {
         createRuleParams.setConnectedStepId(step2.getId());
         createRuleParams.setRuleExpression("{\"rule\":[{\"condition\":\"CONTAINS\",\"selectionIds\":[1,2,3,4]},{\"condition\":\"CONTAINS\",\"selectionIds\":[3,4,5,6]}],\"logicOperator\":\"AND\"}");
         createRule(createRuleParams);
-        checkWorkflow(step1.getId(), step2.getId(), Arrays.asList(3L, 4L), false);
+        checkWorkflow(step1.getId(), step2.getId(), Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L), false);
 
         CreateCategoryParams createCategoryParams = new CreateCategoryParams();
         createCategoryParams.setNextStepId(step1.getId());
@@ -70,7 +68,7 @@ public class WorkflowControllerTest {
         createRuleParams2.setConnectedStepId(step2.getId());
         createRuleParams2.setRuleExpression("{\"rule\":[{\"condition\":\"EXACT\",\"selectionIds\":[1,2,3,4]},{\"condition\":\"CONTAINS\",\"selectionIds\":[3,4,5,6]}],\"logicOperator\":\"OR\"}");
         createRule(createRuleParams2);
-        checkWorkflow(category.getId(), step2.getId(), Arrays.asList(3L, 4L), true);
+        checkWorkflow(category.getId(), step2.getId(), Arrays.asList(1L, 2L, 3L, 4L), true);
     }
 
     private void checkWorkflow(Long id, Long matchId, List<Long> selections, boolean categorOrStep) {
