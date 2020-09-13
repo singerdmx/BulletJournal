@@ -1,5 +1,5 @@
 import {actions} from './reducer';
-import {Category} from "./interface";
+import {Category, NextStep} from "./interface";
 
 export const getCategories = () => actions.getCategories({});
 
@@ -80,3 +80,5 @@ export const setStepChoices = (id: number, choices: number[]) => actions.setStep
     id: id,
     choices: choices
 });
+
+export const nextStepReceived = (nextStep: NextStep | undefined) => actions.nextStepReceived({step: nextStep});

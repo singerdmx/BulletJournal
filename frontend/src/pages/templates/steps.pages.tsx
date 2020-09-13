@@ -3,11 +3,11 @@ import './steps.styles.less';
 import {useParams} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getCategory, getNextStep} from "../../features/templates/actions";
+import {getCategory, getNextStep, nextStepReceived} from "../../features/templates/actions";
 import {Category, Choice, NextStep, Step} from "../../features/templates/interface";
-import {Card, Empty, Select} from "antd";
-import {isSubsequence, onFilterAssignees} from "../../utils/Util";
-import {CloseSquareTwoTone} from "@ant-design/icons";
+import {Button, Card, Empty, Select} from "antd";
+import {isSubsequence} from "../../utils/Util";
+import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
 
 const {Meta} = Card;
 const {Option} = Select;
@@ -17,13 +17,14 @@ type StepsProps = {
     nextStep: NextStep | undefined;
     getCategory: (categoryId: number) => void;
     getNextStep: (stepId: number, selections: number[], first?: boolean) => void;
+    nextStepReceived: (nextStep: NextStep | undefined) => void;
 };
 
 const STEPS = 'steps';
 const SELECTIONS = 'selections';
 
 const StepsPage: React.FC<StepsProps> = (
-    {category, nextStep, getCategory, getNextStep}
+    {category, nextStep, getCategory, getNextStep, nextStepReceived}
 ) => {
     const {categoryId} = useParams();
 
@@ -110,7 +111,7 @@ const StepsPage: React.FC<StepsProps> = (
         const selections = getSelections();
         return <div key={choice.id} className='choice-card'>
             <Select mode={choice.multiple ? 'multiple' : undefined}
-                    clearIcon={<CloseSquareTwoTone />}
+                    clearIcon={<CloseSquareTwoTone/>}
                     showSearch={true}
                     filterOption={(e, t) => onFilterChoices(e, t)}
                     onChange={(e) => onChoiceChange(e, choice)}
@@ -125,6 +126,21 @@ const StepsPage: React.FC<StepsProps> = (
         </div>
     }
 
+    const goBack = () => {
+        const steps : Step[] = getSteps();
+        const selections = getSelections();
+        steps[steps.length - 1].choices.forEach(c => {
+            selections[c.id] = null;
+        });
+        steps.pop();
+        steps[steps.length - 1].choices.forEach(c => {
+            selections[c.id] = null;
+        });
+        localStorage.setItem(SELECTIONS, JSON.stringify(selections));
+        localStorage.setItem(STEPS, JSON.stringify(steps));
+        nextStepReceived(undefined);
+    }
+
     const getStepsDiv = () => {
         if (!category || category.choices.length === 0) {
             return null;
@@ -137,9 +153,19 @@ const StepsPage: React.FC<StepsProps> = (
                 localStorage.removeItem(SELECTIONS);
             } else {
                 return <div className='choices-card'>
-                    {getCurrentStep().choices.map(choice => {
-                        return renderChoice(choice);
-                    })}
+                    {((nextStep && nextStep.step) || getSteps().length > 1) && <div className='go-back'>
+                        <Button
+                            onClick={goBack}
+                            style={{color: '#4ddbff'}} shape="round"
+                            icon={<UpCircleTwoTone />} size='large'>
+                            Go Back
+                        </Button>
+                    </div>}
+                    <div>
+                        {getCurrentStep().choices.map(choice => {
+                            return renderChoice(choice);
+                        })}
+                    </div>
                 </div>
             }
         }
@@ -182,5 +208,6 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
     getCategory,
-    getNextStep
+    getNextStep,
+    nextStepReceived
 })(StepsPage);
