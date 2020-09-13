@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import './steps.styles.less';
 import {useParams} from "react-router-dom";
 import {IState} from "../../store";
@@ -49,6 +49,8 @@ const StepsPage: React.FC<StepsProps> = (
         }
     }, [nextStep]);
 
+    const [curSelections, setCurSelections] = useState<any>({});
+
     if (!category) {
         return <Empty/>
     }
@@ -85,12 +87,15 @@ const StepsPage: React.FC<StepsProps> = (
         return selections;
     }
 
-    const onChoiceChange = (e: any, choice: Choice) => {
-        console.log(e);
+    const setSelections = (selections : any) => {
+        setCurSelections(selections);
+        localStorage.setItem(SELECTIONS, JSON.stringify(selections));
+    }
 
+    const onChoiceChange = (e: any, choice: Choice) => {
         const selections = getSelections();
         selections[choice.id] = e ? (Array.isArray(e) ? e : [e]) : null;
-        localStorage.setItem(SELECTIONS, JSON.stringify(selections));
+        setSelections(selections);
 
         const curStep = getCurrentStep();
         if (curStep.choices.every(c => selections[c.id])) {
@@ -111,7 +116,19 @@ const StepsPage: React.FC<StepsProps> = (
         const curStep = getCurrentStep();
         const selections = getSelections();
         selections[choice.id] = curStep.choices.filter(c => c.id === choice.id)[0].selections.map(s => s.id);
-        localStorage.setItem(SELECTIONS, JSON.stringify(selections));
+        setSelections(selections);
+    }
+
+    const getChoiceValue = (choice: Choice) => {
+        if (curSelections[choice.id]) {
+            return curSelections[choice.id];
+        }
+        const selections = getSelections();
+        if (selections[choice.id]) {
+            return selections[choice.id];
+        }
+
+        return [];
     }
 
     const renderChoice = (choice: Choice) => {
@@ -123,7 +140,7 @@ const StepsPage: React.FC<StepsProps> = (
                     filterOption={(e, t) => onFilterChoices(e, t)}
                     onChange={(e) => onChoiceChange(e, choice)}
                     placeholder={choice.name}
-                    defaultValue={selections[choice.id] ? selections[choice.id] : []}
+                    value={getChoiceValue(choice)}
                     style={{padding: '3px', minWidth: '60%'}}
                     allowClear>
                 {choice.selections.map(selection => {
@@ -148,7 +165,7 @@ const StepsPage: React.FC<StepsProps> = (
         steps[steps.length - 1].choices.forEach(c => {
             selections[c.id] = null;
         });
-        localStorage.setItem(SELECTIONS, JSON.stringify(selections));
+        setSelections(selections);
         localStorage.setItem(STEPS, JSON.stringify(steps));
         nextStepReceived(undefined);
     }
