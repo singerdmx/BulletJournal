@@ -36,6 +36,12 @@ type server struct {
 	subscriptions map[string]chan uint
 }
 
+// HealthCheck implements the rest endpoint healthcheck -> rpc
+func (s *server) HealthCheck(ctx context.Context, request *types.HealthCheckRequest) (*types.HealthCheckResponse, error) {
+	log.Printf("Received request: %v", request.String())
+	return &types.HealthCheckResponse{}, nil
+}
+
 // Send implements the JoinGroupEvents rpc endpoint of services.DaemonServer
 func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
 	log.Printf("Received rpc request: %v", request.String())
@@ -170,6 +176,7 @@ func main() {
 			Password: daemonRpc.serviceConfig.Password,
 		},
 	}
+
 	jobScheduler.AddRecurrentJob(
 		func(...interface{}) {
 			cleaner.Clean(daemonRpc.serviceConfig.MaxRetentionTimeInDays)
