@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"github.com/singerdmx/BulletJournal/daemon/middleware"
+	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -22,9 +25,7 @@ import (
 	"upper.io/db.v3/postgresql"
 )
 
-const (
-	RequestIDKey string = "requestID"
-)
+
 
 var (
 	log logging.Logger
@@ -50,6 +51,16 @@ func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEv
 
 // Rest implements the Rest rest->rpc endpoint of services.DaemonServer
 func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
+	if meta, ok := metadata.FromIncomingContext(ctx); ok {
+		if requestId, ok := meta[strings.ToLower(middleware.RequestIDKey)]; ok {
+			log.Printf(middleware.RequestIDKey+": %v", requestId[0])
+			grpc.SendHeader(ctx, metadata.Pairs(middleware.RequestIDKey, requestId[0]))
+		} else {
+			requestId := uid.GenerateUID()
+			log.Printf(middleware.RequestIDKey+": %v", requestId)
+			grpc.SendHeader(ctx, metadata.Pairs(middleware.RequestIDKey, requestId))
+		}
+	}
 	log.Printf("Received request: %v", request.String())
 	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
@@ -85,26 +96,6 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	return nil
 }
 
-// AttachRequestID will attach a brand new request ID to a http request
-func AssignRequestID(ctx context.Context) context.Context {
-
-	requestID := uid.GenerateUID()
-
-	return context.WithValue(ctx, RequestIDKey, requestID)
-}
-
-// GetRequestID will get reqID from a http request and return it as a string
-func GetRequestID(ctx context.Context) string {
-
-	reqID := ctx.Value(RequestIDKey)
-
-	if ret, ok := reqID.(string); ok {
-		return ret
-	}
-
-	return ""
-}
-
 func init() {
 	logging.InitLogging(config.GetEnv())
 	log = *logging.GetLogger()
@@ -113,7 +104,6 @@ func init() {
 func main() {
 
 	ctx := context.Background()
-	ctx = AssignRequestID(ctx)
 	log.WithContext(ctx)
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -133,7 +123,7 @@ func main() {
 	rpcServer := grpc.NewServer()
 	services.RegisterDaemonServer(rpcServer, daemonRpc)
 
-	gatewayMux := runtime.NewServeMux()
+	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher),)
 	endpoint := daemonRpc.serviceConfig.Host + rpcPort
 	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
