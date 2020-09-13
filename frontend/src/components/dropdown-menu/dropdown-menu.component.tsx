@@ -1,10 +1,11 @@
 import React from 'react';
 import {
-    AndroidOutlined, AppleOutlined,
+    AndroidOutlined,
+    AppleOutlined,
     CustomerServiceOutlined,
     ExportOutlined,
+    GlobalOutlined,
     MailOutlined,
-    SettingOutlined,
     UserOutlined,
     WalletOutlined,
 } from '@ant-design/icons';
@@ -38,8 +39,8 @@ type menuProps = {
     handleContact: () => void;
 };
 
-const onClickSetting = (history: History<History.PoorMansUnknown>) => {
-    history.push('/settings');
+const onClickTemplates = (history: History<History.PoorMansUnknown>) => {
+    window.location.href = '/public/templates';
 };
 
 const onClickPoint = (history: History<History.PoorMansUnknown>) => {
@@ -59,17 +60,12 @@ const DropdownMenu = ({
             <UserOutlined/>
             {username}
         </Menu.Item>
-        <Menu.Item className='modified-item'
-                   onClick={() => onClickPoint(history)}>
-            <WalletOutlined/>
-            <strong>{points}</strong>&nbsp;Points
-        </Menu.Item>
         <Menu.Item
             className='modified-item'
-            onClick={() => onClickSetting(history)}
+            onClick={() => onClickTemplates(history)}
         >
-            <SettingOutlined/>
-            Settings
+            <GlobalOutlined />
+            Templates
         </Menu.Item>
         <Menu.Item
             className='modified-item'
@@ -84,6 +80,11 @@ const DropdownMenu = ({
             <CustomerServiceOutlined/>
             Contact Us
             <ContactUs visible={showContactUs} onCancel={onCancelShowContactUs}/>
+        </Menu.Item>
+        <Menu.Item className='modified-item'
+                   onClick={() => onClickPoint(history)}>
+            <WalletOutlined/>
+            <strong>{points}</strong>&nbsp;Points
         </Menu.Item>
         <Menu.Item
             className='modified-item'
