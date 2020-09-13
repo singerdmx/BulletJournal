@@ -75,6 +75,7 @@ function* fetchCategory(action: PayloadAction<GetCategoryAction>) {
     const data: Category = yield call(getCategory, categoryId);
     console.log(data)
     yield put(templatesActions.categoryReceived({category: data}));
+    yield put(templatesActions.nextStepReceived({step: undefined}));
   } catch (error) {
     yield call(message.error, `fetchCategory Error Received: ${error}`);
   }

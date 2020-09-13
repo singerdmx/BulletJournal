@@ -27,7 +27,7 @@ export type StepAction = {
 };
 
 export type NextStepAction = {
-    step: NextStep;
+    step: NextStep | undefined;
 };
 
 export type GetNextStepAction = {
