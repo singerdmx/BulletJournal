@@ -25,8 +25,6 @@ import (
 	"upper.io/db.v3/postgresql"
 )
 
-
-
 var (
 	log logging.Logger
 )
@@ -70,20 +68,34 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	if _, ok := s.subscriptions[subscribe.Id]; ok {
 		log.Printf("Subscription: %s's streaming has been idle, start streaming!", subscribe.String())
 		receiver := s.subscriptions[subscribe.Id]
+		// Prevent requests with the same subscribe.Id from new subscriptions
 		delete(s.subscriptions, subscribe.Id)
-		//Keep the subscription session alive
+		// Keep the subscription session alive
 		for {
 			if _, idle := s.subscriptions[subscribe.Id]; !idle {
-				projectId := strconv.Itoa(int(<-receiver))
-				if projectId == "0" {
+				Id := strconv.Itoa(int(<-receiver))
+				if Id == "0" {
 					log.Printf("Closing streaming to subscription: %s", subscribe.String())
 					break
-				} else if err := stream.Send(&types.StreamMessage{Message: projectId}); err != nil {
-					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
-					s.subscriptions[subscribe.Id] = receiver
-					log.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
 				} else {
-					log.Printf("Streaming projectId: %s to subscription: %s", projectId, subscribe.String())
+					notification := &types.StreamMessage{}
+					switch id := subscribe.Id; id {
+					case "cleaner":
+						notification.Message = id
+					case "reminder":
+						notification.Message = "Placeholder for reminder"
+					default:
+						log.Printf("ClientId: %s's is not authorized for subscription", subscribe.Id)
+						break
+					}
+					if err := stream.Send(notification); err != nil {
+						log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
+						// Allow future requests with the same subscribe.Id from new subscriptions
+						s.subscriptions[subscribe.Id] = receiver
+						log.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
+					} else {
+						log.Printf("Streaming Id: %s to subscription: %s", Id, subscribe.String())
+					}
 				}
 			} else {
 				log.Printf("Subscription: %s's streaming has been idle due to previous error", subscribe.String())
@@ -91,7 +103,7 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 			}
 		}
 	} else {
-		log.Printf("Subscription %s is streaming!", subscribe.String())
+		log.Printf("Subscription %s is already streaming!", subscribe.String())
 	}
 	return nil
 }
@@ -112,8 +124,9 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
-	receiver := make(chan uint, 100)
-	daemonRpc := &server{serviceConfig: config.GetConfig(), subscriptions: map[string]chan uint{"cleaner": receiver}}
+	cleanerReceiver := make(chan uint, 100)
+	reminderReceiver := make(chan uint, 100)
+	daemonRpc := &server{serviceConfig: config.GetConfig(), subscriptions: map[string]chan uint{"cleaner": cleanerReceiver, "reminder": reminderReceiver}}
 
 	rpcPort := ":" + daemonRpc.serviceConfig.RPCPort
 	lis, err := net.Listen("tcp", rpcPort)
@@ -123,7 +136,7 @@ func main() {
 	rpcServer := grpc.NewServer()
 	services.RegisterDaemonServer(rpcServer, daemonRpc)
 
-	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher),)
+	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher), )
 	endpoint := daemonRpc.serviceConfig.Host + rpcPort
 	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
@@ -158,7 +171,7 @@ func main() {
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
 	cleaner := dao.Cleaner{
-		Receiver: receiver,
+		Receiver: cleanerReceiver,
 		Settings: postgresql.ConnectionURL{
 			Host:     daemonRpc.serviceConfig.Host + ":" + daemonRpc.serviceConfig.DBPort,
 			Database: daemonRpc.serviceConfig.Database,

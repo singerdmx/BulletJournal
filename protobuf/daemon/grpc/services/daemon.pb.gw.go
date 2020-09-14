@@ -105,7 +105,6 @@ func local_request_Daemon_HealthCheck_0(ctx context.Context, marshaler runtime.M
 // RegisterDaemonHandlerServer registers the http handlers for service Daemon to "mux".
 // UnaryRPC     :call DaemonServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features (such as grpc.SendHeader, etc) to stop working. Consider using RegisterDaemonHandlerFromEndpoint instead.
 func RegisterDaemonHandlerServer(ctx context.Context, mux *runtime.ServeMux, server DaemonServer) error {
 
 	mux.Handle("POST", pattern_Daemon_Rest_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
