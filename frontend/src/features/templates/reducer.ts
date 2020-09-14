@@ -134,6 +134,7 @@ export type RuleAction = {
 export type AddRuleAction = {
     name: string;
     priority: number;
+    connectedStepId: number;
     ruleExpression: string;
     categoryId?: number;
     stepId?: number;

@@ -10,9 +10,10 @@ export const getRule = (ruleId: number, ruleType: string) => {
 }
 
 export const createRule = (
-    name: string, ruleExpression: string, priority: number, stepId?: number, categoryId?: number) => {
+    name: string, connectedStepId: number, ruleExpression: string, priority: number, stepId?: number, categoryId?: number) => {
     const postBody = JSON.stringify({
         name: name,
+        connectedStepId: connectedStepId,
         ruleExpression: ruleExpression,
         priority: priority,
         stepId: stepId,

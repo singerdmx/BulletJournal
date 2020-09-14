@@ -277,8 +277,8 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
 
 function* addRule(action: PayloadAction<AddRuleAction>) {
   try {
-    const {name, priority, ruleExpression, categoryId, stepId} = action.payload;
-    const data: Rule = yield call(createRule, name, ruleExpression, priority, stepId, categoryId);
+    const {name, priority, connectedStepId, ruleExpression, categoryId, stepId} = action.payload;
+    const data: Rule = yield call(createRule, name, connectedStepId, ruleExpression, priority, stepId, categoryId);
     console.log(data)
   } catch (error) {
     yield call(message.error, `addRule Error Received: ${error}`);
