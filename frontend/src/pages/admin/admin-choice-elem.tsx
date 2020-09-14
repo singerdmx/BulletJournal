@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './admin-choice.styles.less';
 import {Choice} from "../../features/templates/interface";
-import {Button, Divider, Modal, Popover, Radio, Typography} from "antd";
+import {Button, Divider, Modal, Radio, Typography} from "antd";
 import {DeleteFilled} from "@ant-design/icons";
 import {connect} from "react-redux";
 import {

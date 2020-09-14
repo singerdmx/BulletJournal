@@ -93,7 +93,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
             </div>
         </div>
         <Container>
-            <AddRule step={step}/>
+            <AddRule step={step} category={undefined}/>
         </Container>
     </div>
 }

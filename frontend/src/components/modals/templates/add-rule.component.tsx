@@ -1,23 +1,25 @@
 import React, {useState} from 'react';
-import {Form, Input, Modal} from 'antd';
+import {Form, Input, InputNumber, Modal} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-import {createStep} from "../../../features/templates/actions";
-import {Step} from "../../../features/templates/interface";
+import {createRule} from "../../../features/templates/actions";
+import {Category, Step} from "../../../features/templates/interface";
 
 type AddRuleProps = {
-    step: Step;
-    createStep: (name: string, nextStepId: number | undefined) => void;
+    step: Step | undefined;
+    category: Category | undefined;
+    createRule: (name: string, priority: number,
+                 ruleExpression: string, categoryId?: number, stepId?: number) => void;
 };
 
 const AddRule: React.FC<AddRuleProps> = (props) => {
-    const {createStep, step} = props;
+    const {createRule, step, category} = props;
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
 
-    const addStep = (values: any) => {
-        createStep(values.name, values.nextStepId);
+    const addRule = (values: any) => {
+        //createStep(values.name, values.nextStepId);
         setVisible(false);
     };
 
@@ -42,7 +44,7 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
                         .then((values) => {
                             console.log(values);
                             form.resetFields();
-                            addStep(values);
+                            addRule(values);
                         })
                         .catch((info) => console.log(info));
                 }}
@@ -52,12 +54,23 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
                         name='name'
                         rules={[{required: true, message: 'Name must be between 1 and 30 characters', min: 1, max: 30}]}
                     >
-                        <Input placeholder='Enter Step Name' allowClear/>
+                        <Input placeholder='Rule Name' allowClear/>
                     </Form.Item>
                     <Form.Item
-                        name='nextStepId'
+                        name='priority'
+                        rules={[{required: true}]}
                     >
-                        <Input placeholder='Enter NextStepId' allowClear/>
+                        <InputNumber placeholder='Priority'/>
+                    </Form.Item>
+                    <Form.Item
+                        name='stepId'
+                    >
+                        <InputNumber placeholder='Step ID'/>
+                    </Form.Item>
+                    <Form.Item
+                        name='categoryId'
+                    >
+                        <InputNumber placeholder='Category ID'/>
                     </Form.Item>
                 </Form>
             </Modal>
@@ -79,5 +92,5 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
 };
 
 export default connect(null, {
-    createStep
+    createRule
 })(AddRule);

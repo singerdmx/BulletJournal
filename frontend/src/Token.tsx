@@ -32,7 +32,7 @@ const TokenPage: React.FC<PageProps> = (props) => {
                 </div>
                 <div style={{marginTop: '15px'}}>
                     <a href={hrefLink}>
-                        <img width="200px"
+                        <img alt='Open Mobile App' width="200px"
                              src="https://user-images.githubusercontent.com/122956/90372021-9d41c880-e024-11ea-9555-ecf4b6590066.png"/>
                     </a>
                 </div>

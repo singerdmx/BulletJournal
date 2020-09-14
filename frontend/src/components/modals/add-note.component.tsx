@@ -12,7 +12,7 @@ import { labelsUpdate } from '../../features/label/actions';
 import { Label } from '../../features/label/interface';
 import { getIcon } from '../draggable-labels/draggable-label-list.component';
 import {onFilterLabel} from "../../utils/Util";
-import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
+import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import {useHistory} from "react-router-dom";
 import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 const { Option } = Select;

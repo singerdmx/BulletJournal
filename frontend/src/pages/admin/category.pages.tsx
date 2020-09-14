@@ -12,6 +12,8 @@ import './categories.styles.less'
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import AdminChoiceElem from "./admin-choice-elem";
 import AdminChoices from "./admin-choices";
+import {Container} from "react-floating-action-button";
+import AddRule from "../../components/modals/templates/add-rule.component";
 
 const {Title, Text} = Typography;
 
@@ -187,6 +189,9 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
                         Go to Steps
                     </Button>)}
             </div>
+            <Container>
+                <AddRule step={undefined} category={category}/>
+            </Container>
         </div>
     </div>
 }
