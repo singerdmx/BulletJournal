@@ -118,6 +118,12 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             input ? parseInt(input) : undefined, category.image, category.nextStepId);
     }
 
+    const nextStepIdChange = (input: any) => {
+        console.log(input);
+        updateCategory(category.id, category.name, category.description, category.icon, category.color,
+            category.forumId, category.image, input ? parseInt(input) : undefined);
+    }
+
     const imageChange = (input: any) => {
         console.log(input);
         updateCategory(category.id, category.name, category.description, category.icon, category.color,
@@ -156,6 +162,8 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
                 editable={{onChange: descriptionChange}}>{`${category.description ? category.description : 'description'}`}</Text>
             <br/>
             <Text editable={{onChange: forumIdChange}}>{`${category.forumId ? category.forumId : 'forumId'}`}</Text>
+            <br/>
+            <Text editable={{onChange: nextStepIdChange}}>{`${category.nextStepId ? category.nextStepId : 'nextStepId'}`}</Text>
             <br/>
             <Text editable={{onChange: imageChange}}>{`${category.image ? category.image : 'Image URL'}`}</Text>
         </div>

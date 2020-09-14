@@ -280,6 +280,12 @@ function* addRule(action: PayloadAction<AddRuleAction>) {
     const {name, priority, connectedStepId, ruleExpression, categoryId, stepId} = action.payload;
     const data: Rule = yield call(createRule, name, connectedStepId, ruleExpression, priority, stepId, categoryId);
     console.log(data)
+    if (stepId) {
+      yield put(templatesActions.getStep({stepId: stepId}));
+    }
+    if (categoryId) {
+      yield put(templatesActions.getCategory({categoryId: categoryId}));
+    }
   } catch (error) {
     yield call(message.error, `addRule Error Received: ${error}`);
   }
