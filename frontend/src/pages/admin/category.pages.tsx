@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import {deleteCategory, getCategory, setCategoryChoices, updateCategory} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
-import {BackTop, Button, Col, Divider, Popover, Row, Tooltip, Typography} from "antd";
+import {BackTop, Button, Col, Divider, Popover, Row, Tag, Tooltip, Typography} from "antd";
 import {DeleteFilled, DeleteTwoTone, TagOutlined} from "@ant-design/icons/lib";
 import ColorPicker from "../../utils/color-picker/ColorPickr";
 import {icons} from "../../assets/icons";
@@ -166,7 +166,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <h3>Choices</h3>
             {category.choices.map(c => {
                 return <div>
-                    <AdminChoiceElem choice={c} />
+                    <AdminChoiceElem choice={c}/>
                     {' '}
                     <Tooltip title='Remove Choice'>
                         <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>
@@ -184,10 +184,11 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <Divider/>
             <div>
                 <h3>Rules</h3>
-                {category.rules.map(rule => {
-                    return <div>
-                        {rule.name}: {rule.ruleExpression} Priority: {rule.priority} ID: {rule.id}
-                        Step: {rule.step.name} ({rule.step.id})
+                {category && category.rules && category.rules.map(rule => {
+                    return <div><span>
+                        <Tag>{rule.ruleExpression}</Tag> [{rule.name}] (Priority: {rule.priority} ID: {rule.id})</span>
+                        {rule.step && <span>Step: {rule.step.name} ({rule.step.id})</span>}
+                        <DeleteTwoTone />
                     </div>
                 })}
             </div>

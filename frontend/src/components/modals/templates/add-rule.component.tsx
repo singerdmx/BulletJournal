@@ -22,7 +22,13 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
     const [condition, setCondition] = useState('EXACT');
 
     const addRule = (values: any) => {
-        //createStep(values.name, values.nextStepId);
+        if (ruleExpression.length === 0) {
+            message.error('Missing Rule Expression');
+            return;
+        }
+        const logicalOp = values.logicOperator ? values.logicOperator : 'AND';
+        createRule(values.name, values.priority, values.connectedStepId, JSON.stringify(ruleExpression),
+            category ? category.id : undefined, step ? step.id : undefined);
         setVisible(false);
     };
 
@@ -57,7 +63,7 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
     }
 
     const removeCondition = (i: number) => {
-        let r = ruleExpression.length === 1 ?  [] : ruleExpression.splice(i, 1);
+        let r = ruleExpression.length === 1 ? [] : ruleExpression.splice(i, 1);
         console.log(r);
         setRuleExpression(r);
         setSelectionIds('');
@@ -108,7 +114,6 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
                     <Form.Item
                         name='logicOperator'
                         label='Logic Operator for Rules'
-                        rules={[{required: true}]}
                     >
                         <Radio.Group defaultValue='AND'>
                             <Radio value='AND'>AND</Radio>
