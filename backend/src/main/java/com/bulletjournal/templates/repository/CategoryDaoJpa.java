@@ -64,20 +64,11 @@ public class CategoryDaoJpa {
     }
 
     private void sortChoicesForCategory(Category category) {
-        if (category.getChoiceOrder() != null && category.getChoices() != null) {
-            List<String> choiceIdOrder = Arrays.asList(category.getChoiceOrder().split(","));
-            Map<String, Choice> idChoiceMapping = new HashMap<>();
-            List<Choice> choicesWithOrder = new ArrayList<>();
-            category.getChoices().forEach(choice -> {
-                idChoiceMapping.put(Long.toString(choice.getId()), choice);
-            });
-            choiceIdOrder.forEach(choiceId -> {
-                if (idChoiceMapping.containsKey(choiceId)) {
-                    choicesWithOrder.add(idChoiceMapping.get(choiceId));
-                }
-            });
-            category.setChoices(choicesWithOrder);
+        if (category.getChoiceOrder() == null || category.getChoices() == null) {
+            return;
         }
+        List<Long> choiceIdOrder = Arrays.stream(category.getChoiceOrder().split(",")).map(Long::parseLong).collect(Collectors.toList());
+        category.getChoices().sort(Comparator.comparingInt(a -> choiceIdOrder.indexOf(a.getId())));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

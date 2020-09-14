@@ -36,7 +36,7 @@ public class Category extends NamedModel {
     @JoinColumn(name = "next_step", referencedColumnName = "id")
     private Step nextStep;
 
-    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
     @JoinTable(name = "choices_categories", schema = "template",
             joinColumns = {
                     @JoinColumn(name = "category_id", referencedColumnName = "id",
