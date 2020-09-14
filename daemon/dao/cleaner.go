@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/logging"
+	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/model"
 	"upper.io/db.v3"
 	"upper.io/db.v3/postgresql"
 )
@@ -13,7 +14,7 @@ var log logging.Logger
 //Cleaner ...
 type Cleaner struct {
 	Settings postgresql.ConnectionURL
-	Receiver chan uint
+	Service  daemonservices.DaemonStreamingService
 }
 
 //Auditable ...Map to table name auditables
@@ -68,8 +69,8 @@ type PublicProjectItem struct {
 	TaskID         uint      `db:"task_id"`
 }
 
-func (s *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []GoogleCalendarProject {
-	sess, err := postgresql.Open(s.Settings)
+func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []GoogleCalendarProject {
+	sess, err := postgresql.Open(c.Settings)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,8 +91,8 @@ func (s *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []GoogleCa
 	return googleCalendarProjects
 }
 
-func (s *Cleaner) deleteFromTableByCond(cond db.Cond, tableName string) {
-	sess, err := postgresql.Open(s.Settings)
+func (c *Cleaner) deleteFromTableByCond(cond db.Cond, tableName string) {
+	sess, err := postgresql.Open(c.Settings)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -104,31 +105,31 @@ func (s *Cleaner) deleteFromTableByCond(cond db.Cond, tableName string) {
 	res.Delete()
 }
 
-func (s *Cleaner) deleteByUpdatedAtBefore(t time.Time, tableName string) {
+func (c *Cleaner) deleteByUpdatedAtBefore(t time.Time, tableName string) {
 	var updatedAtBeforeCond = db.Cond{
 		"updated_at <": t,
 	}
-	s.deleteFromTableByCond(updatedAtBeforeCond, tableName)
+	c.deleteFromTableByCond(updatedAtBeforeCond, tableName)
 }
 
-func (s *Cleaner) deleteByExpirationTimeBefore(tableName string) {
+func (c *Cleaner) deleteByExpirationTimeBefore(tableName string) {
 	var expirationTimeBeforeCond = db.Cond{
 		"expiration_time <": time.Now(),
 	}
-	s.deleteFromTableByCond(expirationTimeBeforeCond, tableName)
+	c.deleteFromTableByCond(expirationTimeBeforeCond, tableName)
 }
 
-func (s *Cleaner) renewExpiringGoogleCalendarWatch() {
-	googleCalendarProjects := s.getExpiringGoogleCalendarProjects("google_calendar_projects")
+func (c *Cleaner) renewExpiringGoogleCalendarWatch() {
+	googleCalendarProjects := c.getExpiringGoogleCalendarProjects("google_calendar_projects")
 	for _, googleCalendarProject := range googleCalendarProjects {
 		log.Printf("%q (ID: %d)\n", googleCalendarProject.Owner, googleCalendarProject.ID)
-		s.Receiver <- googleCalendarProject.ProjectID
+		c.Service.ServiceChannel <- &daemonservices.ServiceMessage{Message: googleCalendarProject.ProjectID}
 	}
 }
 
 //CountForTable ...Helper method used for testing
-func (s *Cleaner) CountForTable(tableName string) *uint64 {
-	sess, err := postgresql.Open(s.Settings)
+func (c *Cleaner) CountForTable(tableName string) *uint64 {
+	sess, err := postgresql.Open(c.Settings)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -145,18 +146,18 @@ func (s *Cleaner) CountForTable(tableName string) *uint64 {
 }
 
 //Clean ...Main method for executing cleaning jobs
-func (s *Cleaner) Clean(maxRetentionTimeInDays int) {
+func (c *Cleaner) Clean(maxRetentionTimeInDays int) {
 	log = *logging.GetLogger()
 	t := time.Now()
 	t = t.AddDate(0, 0, -maxRetentionTimeInDays)
 	log.Infof("Cleaner starts at %v", t.Format(time.RFC3339))
-	s.deleteByUpdatedAtBefore(t, "notifications")
-	s.deleteByUpdatedAtBefore(t, "auditables")
-	s.deleteByExpirationTimeBefore("public_project_items")
-	s.renewExpiringGoogleCalendarWatch()
+	c.deleteByUpdatedAtBefore(t, "notifications")
+	c.deleteByUpdatedAtBefore(t, "auditables")
+	c.deleteByExpirationTimeBefore("public_project_items")
+	c.renewExpiringGoogleCalendarWatch()
 }
 
 //Close ...Close channel
-func (s *Cleaner) Close() {
-	close(s.Receiver)
+func (c *Cleaner) Close() {
+	close(c.Service.ServiceChannel)
 }

@@ -23,6 +23,12 @@ public class DaemonServiceClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DaemonServiceClient.class);
 
+    private static final String clientId = "bulletJournal";
+
+    private static final String cleanerServiceName = "cleaner";
+
+    private static final String reminderServiceName = "reminder";
+
     @Autowired
     private DaemonClientConfig daemonClientConfig;
 
@@ -39,7 +45,7 @@ public class DaemonServiceClient {
     public void postConstruct() {
         if (this.daemonClientConfig.isEnabled()) {
             LOGGER.info("We're enabling daemon streaming...");
-            subscribeNotification(SubscribeNotification.newBuilder().setId("cleaner").build(), newResponseObserver());
+            subscribeNotification(SubscribeNotification.newBuilder().setId(clientId).build(), newResponseObserver());
         } else {
             LOGGER.info("We don't enable daemon streaming as for now...");
         }
@@ -70,10 +76,20 @@ public class DaemonServiceClient {
             public void onNext(StreamMessage stream) {
                 LOGGER.info("Got a daemon streaming message");
                 try {
-                    DaemonServiceClient.this.googleCalendarProjectDaoJpa
-                            .renewGoogleCalendarWatch(stream.getMessage());
+                    switch (stream.getId()) {
+                        case cleanerServiceName:
+                            DaemonServiceClient.this.googleCalendarProjectDaoJpa.renewGoogleCalendarWatch(stream.getMessage());
+                            break;
+                        case reminderServiceName:
+                            // TODO: implement reminder handler
+                            LOGGER.info("Reminder service message is not handled: {}", stream);
+                            break;
+                        default:
+                            LOGGER.warn("No need to handle unsupported service message: {}", stream);
+                            break;
+                    }
                 } catch (Exception e) {
-                    LOGGER.error("renewGoogleCalendarWatch client side error: {}", e);
+                    LOGGER.error("RenewGoogleCalendarWatch client side error: {}", e);
                 }
                 LOGGER.info("Processed a daemon streaming message");
             }
@@ -81,12 +97,12 @@ public class DaemonServiceClient {
             @Override
             public void onError(Throwable t) {
                 Status status = Status.fromThrowable(t);
-                LOGGER.error("renewGoogleCalendarWatch server side error: {}", status);
+                LOGGER.error("RenewGoogleCalendarWatch server side error: {}", status);
                 long wait = 10000L;
                 LOGGER.info("Will retry subscribing to daemon server again in {}s", wait / 1000);
                 try {
                     Thread.sleep(wait);
-                    subscribeNotification(SubscribeNotification.newBuilder().setId("cleaner").build(), newResponseObserver());
+                    subscribeNotification(SubscribeNotification.newBuilder().setId(clientId).build(), newResponseObserver());
                 } catch (InterruptedException interruptedException) {
                     LOGGER.error("Internal error happened before attempting to retry subscribing to daemon server: {}", interruptedException.getMessage());
                     LOGGER.error("Stop subscribing to daemon server due to the previous server side error");

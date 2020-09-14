@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/singerdmx/BulletJournal/daemon/middleware"
+	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/model"
 	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
@@ -25,6 +26,13 @@ import (
 	"upper.io/db.v3/postgresql"
 )
 
+const (
+	bulletJournalId     string = "bulletJournal"
+	fanInServiceName    string = "fanIn"
+	cleanerServiceName  string = "cleaner"
+	reminderServiceName string = "reminder"
+)
+
 var (
 	log logging.Logger
 )
@@ -32,7 +40,7 @@ var (
 // server should implement services.UnimplementedDaemonServer's methods
 type server struct {
 	serviceConfig *config.Config
-	subscriptions map[string]chan uint
+	subscriptions map[string][]daemonservices.DaemonStreamingService
 }
 
 // HealthCheck implements the rest endpoint healthcheck -> rpc
@@ -67,39 +75,42 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	log.Printf("Received rpc request for subscription: %s", subscribe.String())
 	if _, ok := s.subscriptions[subscribe.Id]; ok {
 		log.Printf("Subscription: %s's streaming has been idle, start streaming!", subscribe.String())
-		receiver := s.subscriptions[subscribe.Id]
+		daemonServices := s.subscriptions[subscribe.Id]
 		// Prevent requests with the same subscribe.Id from new subscriptions
 		delete(s.subscriptions, subscribe.Id)
 		// Keep the subscription session alive
-		for {
-			if _, idle := s.subscriptions[subscribe.Id]; !idle {
-				Id := strconv.Itoa(int(<-receiver))
-				if Id == "0" {
-					log.Printf("Closing streaming to subscription: %s", subscribe.String())
+		var fanInChannel chan *daemonservices.ServiceMessage
+		for _, service := range daemonServices {
+			if service.ServiceName == fanInServiceName {
+				fanInChannel = service.ServiceChannel
+			} else {
+				go func(service daemonservices.DaemonStreamingService) {
+					for message := range service.ServiceChannel {
+						message.ServiceName = service.ServiceName
+						log.Printf("Preparing streaming: %v to subscription: %s", message, subscribe.String())
+						fanInChannel <- message
+					}
+				}(service)
+			}
+		}
+		for service := range fanInChannel {
+			if service == nil {
+				log.Printf("Service: %s for subscription: %s is closed", service.ServiceName, subscribe.String())
+				log.Printf("Closing streaming to subscription: %s", subscribe.String())
+				break
+			} else if service.ServiceName == cleanerServiceName {
+				projectId := strconv.Itoa(int(service.Message))
+				if err := stream.Send(&types.StreamMessage{Id: cleanerServiceName, Message: projectId}); err != nil {
+					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
+					// Allow future requests with the same subscribe.Id from new subscriptions
+					s.subscriptions[subscribe.Id] = daemonServices
+					log.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
 					break
 				} else {
-					notification := &types.StreamMessage{}
-					switch id := subscribe.Id; id {
-					case "cleaner":
-						notification.Message = id
-					case "reminder":
-						notification.Message = "Placeholder for reminder"
-					default:
-						log.Printf("ClientId: %s's is not authorized for subscription", subscribe.Id)
-						break
-					}
-					if err := stream.Send(notification); err != nil {
-						log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
-						// Allow future requests with the same subscribe.Id from new subscriptions
-						s.subscriptions[subscribe.Id] = receiver
-						log.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
-					} else {
-						log.Printf("Streaming Id: %s to subscription: %s", Id, subscribe.String())
-					}
+					log.Printf("Streaming projectId: %s to subscription: %s", projectId, subscribe.String())
 				}
 			} else {
-				log.Printf("Subscription: %s's streaming has been idle due to previous error", subscribe.String())
-				break
+				log.Printf("Service: %s for subscription: %s is not implemented as for now", service.ServiceName, subscribe.String())
 			}
 		}
 	} else {
@@ -124,9 +135,13 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
-	cleanerReceiver := make(chan uint, 100)
-	reminderReceiver := make(chan uint, 100)
-	daemonRpc := &server{serviceConfig: config.GetConfig(), subscriptions: map[string]chan uint{"cleaner": cleanerReceiver, "reminder": reminderReceiver}}
+	fanInService := daemonservices.DaemonStreamingService{ServiceName: fanInServiceName, ServiceChannel: make(chan *daemonservices.ServiceMessage, 100)}
+	cleanerService := daemonservices.DaemonStreamingService{ServiceName: cleanerServiceName, ServiceChannel: make(chan *daemonservices.ServiceMessage, 100)}
+	reminderService := daemonservices.DaemonStreamingService{ServiceName: reminderServiceName, ServiceChannel: make(chan *daemonservices.ServiceMessage, 100)}
+	daemonRpc := &server{
+		serviceConfig: config.GetConfig(),
+		subscriptions: map[string][]daemonservices.DaemonStreamingService{bulletJournalId: {fanInService, cleanerService, reminderService}},
+	}
 
 	rpcPort := ":" + daemonRpc.serviceConfig.RPCPort
 	lis, err := net.Listen("tcp", rpcPort)
@@ -171,7 +186,7 @@ func main() {
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
 	cleaner := dao.Cleaner{
-		Receiver: cleanerReceiver,
+		Service: cleanerService,
 		Settings: postgresql.ConnectionURL{
 			Host:     daemonRpc.serviceConfig.Host + ":" + daemonRpc.serviceConfig.DBPort,
 			Database: daemonRpc.serviceConfig.Database,
@@ -191,6 +206,8 @@ func main() {
 	<-shutdown
 	log.Infof("Shutdown signal received")
 	cleaner.Close()
+	close(reminderService.ServiceChannel)
+	close(fanInService.ServiceChannel)
 	jobScheduler.Stop()
 	log.Infof("JobScheduler stopped")
 	rpcServer.GracefulStop()
