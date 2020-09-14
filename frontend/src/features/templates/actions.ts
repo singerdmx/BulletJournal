@@ -93,4 +93,4 @@ export const createRule = (name: string, priority: number, connectedStepId: numb
     categoryId: categoryId
 });
 
-export const deleteRule = (ruleId: number) => actions.removeRule({ruleId: ruleId});
+export const deleteRule = (ruleId: number, ruleType: string) => actions.removeRule({ruleId: ruleId, ruleType: ruleType});

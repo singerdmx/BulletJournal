@@ -42,8 +42,9 @@ export const updateRule = (ruleId: number, name?: string,
         });
 }
 
-export const deleteRule = (ruleId: number) => {
-    return doDelete(`/api/rules/${ruleId}`)
+export const deleteRule = (ruleId: number, ruleType: string) => {
+    // ruleType is CATEGORY_RULE or STEP_RULE
+    return doDelete(`/api/rules/${ruleId}?ruleType=${ruleType}`)
         .then(res => res)
         .catch((err) => {
             throw Error(err.message);

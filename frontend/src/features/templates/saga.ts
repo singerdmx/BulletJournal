@@ -13,9 +13,9 @@ import {
   createCategory,
   deleteCategory,
   getCategories,
-  getCategory,
   putCategories,
   putCategory,
+  getCategory,
   updateChoicesForCategory
 } from '../../apis/templates/categoryApis';
 import {
@@ -287,8 +287,14 @@ function* addRule(action: PayloadAction<AddRuleAction>) {
 
 function* removeRule(action: PayloadAction<RemoveRuleAction>) {
   try {
-    const {ruleId} = action.payload;
-    yield call(deleteRule, ruleId);
+    const {ruleId, ruleType} = action.payload;
+    yield call(deleteRule, ruleId, ruleType);
+    const state: IState = yield select();
+    if (ruleType === 'CATEGORY_RULE') {
+      yield put(templatesActions.getCategory({categoryId: state.templates.category!.id}));
+    } else {
+      yield put(templatesActions.getStep({stepId: state.templates.step!.id}));
+    }
   } catch (error) {
     yield call(message.error, `removeRule Error Received: ${error}`);
   }

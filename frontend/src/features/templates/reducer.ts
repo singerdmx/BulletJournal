@@ -142,6 +142,7 @@ export type AddRuleAction = {
 
 export type RemoveRuleAction = {
     ruleId: number;
+    ruleType: string;
 };
 
 let initialState = {

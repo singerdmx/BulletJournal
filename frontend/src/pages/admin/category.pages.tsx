@@ -1,7 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {deleteCategory, getCategory, setCategoryChoices, updateCategory} from "../../features/templates/actions";
+import {
+    deleteCategory,
+    deleteRule,
+    getCategory,
+    setCategoryChoices,
+    updateCategory
+} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
 import {BackTop, Button, Col, Divider, Popover, Row, Tag, Tooltip, Typography} from "antd";
@@ -26,10 +32,11 @@ type AdminCategoryProps = {
                      color?: string, forumId?: number,
                      image?: string, nextStepId?: number) => void;
     setCategoryChoices: (id: number, choices: number[]) => void;
+    deleteRule: (ruleId: number, ruleType: string) => void;
 }
 
 const AdminCategoryPage: React.FC<AdminCategoryProps> = (
-    {category, getCategory, deleteCategory, updateCategory, setCategoryChoices}) => {
+    {category, getCategory, deleteCategory, updateCategory, setCategoryChoices, deleteRule}) => {
     const history = useHistory();
     const [formUpdateLabelIcon, setFormUpdateLabelIcon] = useState(
         <TagOutlined/>
@@ -188,7 +195,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
                     return <div><span>
                         <Tag>{rule.ruleExpression}</Tag> [{rule.name}] (Priority: {rule.priority} ID: {rule.id})</span>
                         {rule.step && <span>Step: {rule.step.name} ({rule.step.id})</span>}
-                        <DeleteTwoTone />
+                        <DeleteTwoTone onClick={() => deleteRule(rule.id, 'CATEGORY_RULE')}/>
                     </div>
                 })}
             </div>
@@ -215,5 +222,6 @@ export default connect(mapStateToProps, {
     getCategory,
     deleteCategory,
     updateCategory,
-    setCategoryChoices
+    setCategoryChoices,
+    deleteRule
 })(AdminCategoryPage);
