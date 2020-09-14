@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class CategoryDaoJpa {
@@ -67,7 +66,7 @@ public class CategoryDaoJpa {
         if (category.getChoiceOrder() == null || category.getChoices() == null) {
             return;
         }
-        List<Long> choiceIdOrder = Arrays.stream(category.getChoiceOrder().split(",")).map(Long::parseLong).collect(Collectors.toList());
+        List<Long> choiceIdOrder = category.getChoiceOrderById();
         category.getChoices().sort(Comparator.comparingInt(a -> choiceIdOrder.indexOf(a.getId())));
     }
 
@@ -96,8 +95,7 @@ public class CategoryDaoJpa {
         Category category = this.getById(categoryId);
         List<Choice> choices = choiceDaoJpa.getChoicesById(choicesIds);
         category.setChoices(choices);
-        String choiceOrder = choicesIds.stream().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
-        category.setChoiceOrder(choiceOrder);
+        category.setChoiceOrder(choicesIds);
         this.save(category);
     }
 

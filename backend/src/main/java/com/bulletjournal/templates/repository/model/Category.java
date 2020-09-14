@@ -3,9 +3,7 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -36,7 +34,7 @@ public class Category extends NamedModel {
     @JoinColumn(name = "next_step", referencedColumnName = "id")
     private Step nextStep;
 
-    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(name = "choices_categories", schema = "template",
             joinColumns = {
                     @JoinColumn(name = "category_id", referencedColumnName = "id",
@@ -72,6 +70,17 @@ public class Category extends NamedModel {
 
     public void setChoiceOrder(String choiceOrder) {
         this.choiceOrder = choiceOrder;
+    }
+
+    public void setChoiceOrder(List<Long> choicesIds) {
+        this.choiceOrder = choicesIds.stream().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
+    }
+
+    public List<Long> getChoiceOrderById() {
+        if (choiceOrder == null || choiceOrder.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(choiceOrder.split(",")).map(Long::parseLong).collect(Collectors.toList());
     }
 
     public List<CategoryRule> getCategoryRules() {
