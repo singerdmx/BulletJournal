@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Entity
@@ -97,5 +98,18 @@ public class Choice extends NamedModel {
     public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Choice(getId(), getName(), isMultiple(),
                 getSelections().stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Choice choice = (Choice) o;
+        return Objects.equals(getId(), choice.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

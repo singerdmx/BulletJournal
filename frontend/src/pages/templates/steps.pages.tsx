@@ -20,8 +20,8 @@ type StepsProps = {
     nextStepReceived: (nextStep: NextStep | undefined) => void;
 };
 
-const STEPS = 'steps';
-const SELECTIONS = 'selections';
+export const STEPS = 'steps';
+export const SELECTIONS = 'selections';
 
 const StepsPage: React.FC<StepsProps> = (
     {category, nextStep, getCategory, getNextStep, nextStepReceived}

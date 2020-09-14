@@ -34,7 +34,7 @@ public class Category extends NamedModel {
     @JoinColumn(name = "next_step", referencedColumnName = "id")
     private Step nextStep;
 
-    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
     @JoinTable(name = "choices_categories", schema = "template",
             joinColumns = {
                     @JoinColumn(name = "category_id", referencedColumnName = "id",
@@ -73,7 +73,8 @@ public class Category extends NamedModel {
     }
 
     public void setChoiceOrder(List<Long> choicesIds) {
-        this.choiceOrder = choicesIds.stream().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
+        this.choiceOrder = new HashSet<>(choicesIds)
+                .stream().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
     }
 
     public List<Long> getChoiceOrderById() {
@@ -100,11 +101,11 @@ public class Category extends NamedModel {
     }
 
     public List<Choice> getChoices() {
-        return choices;
+        return new ArrayList<>(new HashSet<>(choices));
     }
 
     public void setChoices(List<Choice> choices) {
-        this.choices = choices;
+        this.choices = new ArrayList<>(new HashSet<>(choices));
     }
 
     public String getImage() {
