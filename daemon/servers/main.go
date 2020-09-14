@@ -45,7 +45,7 @@ type server struct {
 
 // HealthCheck implements the rest endpoint healthcheck -> rpc
 func (s *server) HealthCheck(ctx context.Context, request *types.HealthCheckRequest) (*types.HealthCheckResponse, error) {
-	log.Printf("Received request: %v", request.String())
+	log.Printf("Received health check request: %v", request.String())
 	return &types.HealthCheckResponse{}, nil
 }
 

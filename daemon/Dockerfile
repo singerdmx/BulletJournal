@@ -1,6 +1,6 @@
 # Start from a Debian image with Go 1.13 installed and a workspace (GOPATH)
 # configured at /go.
-FROM golang:1.13-alpine as builder
+FROM golang:1.15-alpine as builder
 
 # Set working directory to be daemon in this repository
 WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
@@ -24,6 +24,9 @@ RUN apk update && \
 
 # Target image with only executables
 FROM alpine:latest
+
+# Add curl for health check
+RUN apk update && apk add curl
 
 # Copy executable to target folder
 COPY --from=builder /go/bin/daemon-server /go/bin/
