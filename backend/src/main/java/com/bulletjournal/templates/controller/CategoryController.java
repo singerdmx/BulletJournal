@@ -119,6 +119,10 @@ public class CategoryController {
         while (!deque.isEmpty()) {
             Category category = deque.poll();
             if (category.getId().equals(categoryId)) {
+                Category categoryFromDb = categoryDaoJpa.getById(categoryId).toPresentationModel();
+                category.setChoices(categoryFromDb.getChoices());
+                category.setNextStepId(categoryFromDb.getNextStepId());
+                category.setRules(categoryFromDb.getRules());
                 return category;
             }
             category.getSubCategories().forEach(deque::offer);

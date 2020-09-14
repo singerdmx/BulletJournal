@@ -73,8 +73,8 @@ public class Category extends NamedModel {
     }
 
     public void setChoiceOrder(List<Long> choicesIds) {
-        this.choiceOrder = new HashSet<>(choicesIds)
-                .stream().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
+        this.choiceOrder = choicesIds
+                .stream().distinct().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
     }
 
     public List<Long> getChoiceOrderById() {
@@ -107,11 +107,12 @@ public class Category extends NamedModel {
         if (choices == null) {
             return Collections.emptyList();
         }
-        return new ArrayList<>(new HashSet<>(choices));
+        choices = choices.stream().distinct().collect(Collectors.toList());
+        return choices;
     }
 
     public void setChoices(List<Choice> choices) {
-        this.choices = new ArrayList<>(new HashSet<>(choices));
+        this.choices = choices.stream().distinct().collect(Collectors.toList());
     }
 
     public String getImage() {
@@ -186,6 +187,7 @@ public class Category extends NamedModel {
         return new com.bulletjournal.templates.controller.model.Category(
                 id, getName(), description, icon, color, forumId, Collections.emptyList(), image,
                 getChoices().stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
-                getCategoryRules().stream().map(CategoryRule::toPresentationModel).collect(Collectors.toList()));
+                getCategoryRules().stream().map(CategoryRule::toPresentationModel).collect(Collectors.toList()),
+                nextStep == null ? null : nextStep.getId());
     }
 }

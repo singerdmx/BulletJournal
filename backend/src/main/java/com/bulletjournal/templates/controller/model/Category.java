@@ -27,6 +27,8 @@ public class Category {
 
     private List<Rule> rules = new ArrayList<>();
 
+    private Long nextStepId;
+
     @Expose
     private List<Category> subCategories = new ArrayList<>();
 
@@ -63,7 +65,7 @@ public class Category {
     }
 
     public Category(Long id, String name, String description, String icon, String color,
-                    Long forumId, List<Category> subCategories, String image, List<Choice> choices, List<Rule> rules) {
+                    Long forumId, List<Category> subCategories, String image, List<Choice> choices, List<Rule> rules, Long nextStepId) {
         this.id = id;
         this.name = name;
         this.subCategories = subCategories;
@@ -74,6 +76,15 @@ public class Category {
         this.image = image;
         this.choices = choices;
         this.rules = rules;
+        this.nextStepId = nextStepId;
+    }
+
+    public Long getNextStepId() {
+        return nextStepId;
+    }
+
+    public void setNextStepId(Long nextStepId) {
+        this.nextStepId = nextStepId;
     }
 
     public List<Rule> getRules() {
