@@ -49,6 +49,9 @@ public class Category extends NamedModel {
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<CategoryRule> categoryRules;
 
+    @Column(name = "choice_order")
+    private String choiceOrder;
+
     public Category() {
 
     }
@@ -61,6 +64,14 @@ public class Category extends NamedModel {
         this.forumId = forumId;
         this.image = image;
         this.nextStep = nextStep;
+    }
+
+    public String getChoiceOrder() {
+        return choiceOrder;
+    }
+
+    public void setChoiceOrder(String choiceOrder) {
+        this.choiceOrder = choiceOrder;
     }
 
     public List<CategoryRule> getCategoryRules() {

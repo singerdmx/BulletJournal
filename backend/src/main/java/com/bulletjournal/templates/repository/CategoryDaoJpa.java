@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class CategoryDaoJpa {
@@ -58,12 +59,32 @@ public class CategoryDaoJpa {
         if (category == null) {
             throw new ResourceNotFoundException("Category with id " + id + " doesn't exist");
         }
+        sortChoicesForCategory(category);
         return category;
+    }
+
+    private void sortChoicesForCategory(Category category) {
+        if (category.getChoiceOrder() != null && category.getChoices() != null) {
+            List<String> choiceIdOrder = Arrays.asList(category.getChoiceOrder().split(","));
+            Map<String, Choice> idChoiceMapping = new HashMap<>();
+            List<Choice> choicesWithOrder = new ArrayList<>();
+            category.getChoices().forEach(choice -> {
+                idChoiceMapping.put(Long.toString(choice.getId()), choice);
+            });
+            choiceIdOrder.forEach(choiceId -> {
+                if (idChoiceMapping.containsKey(choiceId)) {
+                    choicesWithOrder.add(idChoiceMapping.get(choiceId));
+                }
+            });
+            category.setChoices(choicesWithOrder);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll();
+        categories.forEach(this::sortChoicesForCategory);
+        return categories;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -84,6 +105,8 @@ public class CategoryDaoJpa {
         Category category = this.getById(categoryId);
         List<Choice> choices = choiceDaoJpa.getChoicesById(choicesIds);
         category.setChoices(choices);
+        String choiceOrder = choicesIds.stream().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
+        category.setChoiceOrder(choiceOrder);
         this.save(category);
     }
 
