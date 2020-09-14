@@ -140,6 +140,10 @@ export type AddRuleAction = {
     stepId?: number;
 };
 
+export type RemoveRuleAction = {
+    ruleId: number;
+};
+
 let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
@@ -205,6 +209,7 @@ const slice = createSlice({
             state.rule = rule;
         },
         createRule: (state, action: PayloadAction<AddRuleAction>) => state,
+        removeRule: (state, action: PayloadAction<RemoveRuleAction>) => state,
     },
 });
 

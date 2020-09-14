@@ -7,7 +7,7 @@ import {
   DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
   GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction,
-  GetStepAction, DeleteStepAction, GetNextStepAction, AddRuleAction
+  GetStepAction, DeleteStepAction, GetNextStepAction, AddRuleAction, RemoveRuleAction
 } from './reducer';
 import {
   createCategory,
@@ -27,7 +27,7 @@ import {createSelection, deleteSelection, updateSelection} from "../../apis/temp
 import {IState} from "../../store";
 import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
 import {getNext} from "../../apis/templates/workflowApis";
-import {createRule} from "../../apis/templates/ruleApis";
+import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -285,6 +285,15 @@ function* addRule(action: PayloadAction<AddRuleAction>) {
   }
 }
 
+function* removeRule(action: PayloadAction<RemoveRuleAction>) {
+  try {
+    const {ruleId} = action.payload;
+    yield call(deleteRule, ruleId);
+  } catch (error) {
+    yield call(message.error, `removeRule Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -309,5 +318,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.deleteStep.type, removeStep),
     yield takeLatest(templatesActions.getNextStep.type, getNextStep),
     yield takeLatest(templatesActions.createRule.type, addRule),
+    yield takeLatest(templatesActions.removeRule.type, removeRule),
   ])
 }
