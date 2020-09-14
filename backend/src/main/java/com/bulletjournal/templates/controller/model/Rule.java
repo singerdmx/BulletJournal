@@ -17,19 +17,16 @@ public class Rule {
     public Rule() {
     }
 
-    public Rule(Long id, String name, Integer priority, String ruleExpression, Category category) {
+    public Rule(Long id, String name, Integer priority, String ruleExpression) {
+        this(id, name, priority, ruleExpression, null, null);
+    }
+
+    public Rule(Long id, String name, Integer priority, String ruleExpression, Category category, Step step) {
         this.id = id;
         this.name = name;
         this.priority = priority;
         this.ruleExpression = ruleExpression;
         this.category = category;
-    }
-
-    public Rule(Long id, String name, Integer priority, String ruleExpression, Step step) {
-        this.id = id;
-        this.name = name;
-        this.priority = priority;
-        this.ruleExpression = ruleExpression;
         this.step = step;
     }
 

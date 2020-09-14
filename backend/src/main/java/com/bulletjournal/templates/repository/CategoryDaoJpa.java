@@ -108,11 +108,13 @@ public class CategoryDaoJpa {
         category.setForumId(forumId);
         category.setDescription(description);
         category.setImage(image);
-        Step step = null;
-        if (nextStepId != null) {
-            step = stepDaoJpa.getById(nextStepId);
+        if (nextStepId == null) {
+            category.setNextStep(null);
+        } else if (nextStepId > 0) {
+            // negative means no change
+            Step step = stepDaoJpa.getById(nextStepId);
+            category.setNextStep(step);
         }
-        category.setNextStep(step);
         save(category);
     }
 }

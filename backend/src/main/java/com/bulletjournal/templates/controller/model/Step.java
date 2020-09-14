@@ -23,10 +23,11 @@ public class Step {
         this.name = name;
     }
 
-    public Step(Long id, String name, List<Choice> choices) {
+    public Step(Long id, String name, List<Choice> choices, List<Rule> rules) {
         this.id = id;
         this.name = name;
         this.choices = choices;
+        this.rules = rules;
     }
 
     public List<Rule> getStepRules() {

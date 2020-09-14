@@ -9,6 +9,7 @@ export interface Category {
     nextStepId?: number;
     subCategories: Category[];
     choices: Choice[];
+    rules: Rule[];
 }
 
 export interface Choice {
@@ -31,6 +32,7 @@ export interface Step {
     name: string;
     choices: Choice[];
     excludedSelections: Selection[];
+    rules: Rule[];
 }
 
 export interface Steps {

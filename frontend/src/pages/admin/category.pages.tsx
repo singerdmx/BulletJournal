@@ -183,6 +183,16 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             </div>
             <Divider/>
             <div>
+                <h3>Rules</h3>
+                {category.rules.map(rule => {
+                    return <div>
+                        {rule.name}: {rule.ruleExpression} Priority: {rule.priority} ID: {rule.id}
+                        Step: {rule.step.name} ({rule.step.id})
+                    </div>
+                })}
+            </div>
+            <Divider/>
+            <div>
                 {category.choices.length > 0 && (
                     <Button type='primary'
                             onClick={() => history.push(`/admin/categories/${categoryId}/steps`)}>

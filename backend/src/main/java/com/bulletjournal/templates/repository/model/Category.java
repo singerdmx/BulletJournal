@@ -42,7 +42,7 @@ public class Category extends NamedModel {
             inverseJoinColumns = {
                     @JoinColumn(name = "choice_id", referencedColumnName = "id",
                             nullable = false, updatable = false)})
-    private List<Choice> choices = new ArrayList<>();
+    private List<Choice> choices;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<CategoryRule> categoryRules;
@@ -85,6 +85,9 @@ public class Category extends NamedModel {
     }
 
     public List<CategoryRule> getCategoryRules() {
+        if (categoryRules == null) {
+            return Collections.emptyList();
+        }
         return categoryRules;
     }
 
@@ -101,6 +104,9 @@ public class Category extends NamedModel {
     }
 
     public List<Choice> getChoices() {
+        if (choices == null) {
+            return Collections.emptyList();
+        }
         return new ArrayList<>(new HashSet<>(choices));
     }
 
@@ -177,13 +183,9 @@ public class Category extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
-        if (nextStep == null) {
-            return new com.bulletjournal.templates.controller.model.Category(
-                    id, getName(), description, icon, color, forumId, image,
-                    choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
-        }
         return new com.bulletjournal.templates.controller.model.Category(
-                id, getName(), description, icon, color, forumId, image,
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()), nextStep.toPresentationModel());
+                id, getName(), description, icon, color, forumId, Collections.emptyList(), image,
+                getChoices().stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
+                getCategoryRules().stream().map(CategoryRule::toPresentationModel).collect(Collectors.toList()));
     }
 }

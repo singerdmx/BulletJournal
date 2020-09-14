@@ -27,7 +27,7 @@ public class Step extends NamedModel {
             inverseJoinColumns = {
                     @JoinColumn(name = "choice_id", referencedColumnName = "id",
                             nullable = false, updatable = false)})
-    private List<Choice> choices = new ArrayList<>();
+    private List<Choice> choices;
 
     @Type(type = "long-array")
     @Column(
@@ -62,6 +62,9 @@ public class Step extends NamedModel {
     }
 
     public List<StepRule> getStepRules() {
+        if (stepRules == null) {
+            return Collections.emptyList();
+        }
         return stepRules;
     }
 
@@ -78,6 +81,9 @@ public class Step extends NamedModel {
     }
 
     public List<Choice> getChoices() {
+        if (choices == null) {
+            return Collections.emptyList();
+        }
         return choices;
     }
 
@@ -106,12 +112,9 @@ public class Step extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Step toPresentationModel() {
-        if (nextStep == null) {
-            return new com.bulletjournal.templates.controller.model.Step(id, getName(),
-                    choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
-        }
         return new com.bulletjournal.templates.controller.model.Step(id, getName(),
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
+                getChoices().stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
+                getStepRules().stream().map(StepRule::toPresentationModel).collect(Collectors.toList()));
     }
 
     public void clone(Step step) {
