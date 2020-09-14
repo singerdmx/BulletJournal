@@ -82,3 +82,12 @@ export const setStepChoices = (id: number, choices: number[]) => actions.setStep
 });
 
 export const nextStepReceived = (nextStep: NextStep | undefined) => actions.nextStepReceived({step: nextStep});
+
+export const createRule = (name: string, priority: number,
+                           ruleExpression: string, categoryId?: number, stepId?: number) => actions.createRule({
+    name: name,
+    priority: priority,
+    ruleExpression: ruleExpression,
+    stepId: stepId,
+    categoryId: categoryId
+});

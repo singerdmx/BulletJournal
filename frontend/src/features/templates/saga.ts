@@ -7,7 +7,7 @@ import {
   DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
   GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction,
-  GetStepAction, DeleteStepAction, GetNextStepAction
+  GetStepAction, DeleteStepAction, GetNextStepAction, AddRuleAction
 } from './reducer';
 import {
   createCategory,
@@ -22,11 +22,12 @@ import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, NextStep, Selection, Step, Steps} from './interface';
+import {Category, Choice, NextStep, Rule, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
 import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
 import {getNext} from "../../apis/templates/workflowApis";
+import {createRule} from "../../apis/templates/ruleApis";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -274,6 +275,16 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
   }
 }
 
+function* addRule(action: PayloadAction<AddRuleAction>) {
+  try {
+    const {name, priority, ruleExpression, categoryId, stepId} = action.payload;
+    const data: Rule = yield call(createRule, name, ruleExpression, priority, stepId, categoryId);
+    console.log(data)
+  } catch (error) {
+    yield call(message.error, `addRule Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -297,5 +308,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.createStep.type, addStep),
     yield takeLatest(templatesActions.deleteStep.type, removeStep),
     yield takeLatest(templatesActions.getNextStep.type, getNextStep),
+    yield takeLatest(templatesActions.createRule.type, addRule),
   ])
 }
