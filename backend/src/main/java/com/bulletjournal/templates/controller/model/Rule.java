@@ -46,12 +46,12 @@ public class Rule {
         this.name = name;
     }
 
-    public Integer getOrder() {
+    public Integer getPriority() {
         return priority;
     }
 
-    public void setOrder(Integer order) {
-        this.priority = order;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     public String getRuleExpression() {
