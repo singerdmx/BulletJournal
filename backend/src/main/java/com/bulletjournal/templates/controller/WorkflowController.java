@@ -25,6 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class WorkflowController {
@@ -32,6 +33,7 @@ public class WorkflowController {
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
+    public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks/filter/{filter}";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -165,6 +167,14 @@ public class WorkflowController {
     public SampleTask getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         validateRequester();
         return sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel();
+    }
+
+    @GetMapping(SAMPLE_TASK_BY_METADATA)
+    public List<SampleTask> getSampleTasksByFilter(@NotNull @PathVariable String filter) {
+        validateRequester();
+        return sampleTaskDaoJpa.findSampleTasksByFilter(filter).stream()
+                .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
+                .collect(Collectors.toList());
     }
 
     @PutMapping(SAMPLE_TASK_ROUTE)
