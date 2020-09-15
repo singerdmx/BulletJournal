@@ -1,5 +1,6 @@
 package com.bulletjournal.templates.repository.model;
 
+import com.bulletjournal.templates.controller.model.CategoryInfo;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -36,6 +37,6 @@ public class CategoryRule extends Rule {
     }
 
     public com.bulletjournal.templates.controller.model.Rule toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression());
+        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(), new CategoryInfo(getId(), getName()), null);
     }
 }
