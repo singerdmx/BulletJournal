@@ -19,7 +19,7 @@ public class Step extends NamedModel {
     @SequenceGenerator(name = "step_generator", sequenceName = "template.step_sequence", initialValue = 8000, allocationSize = 10)
     private Long id;
 
-    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
     @JoinTable(name = "choices_steps", schema = "template",
             joinColumns = {
                     @JoinColumn(name = "step_id", referencedColumnName = "id",
