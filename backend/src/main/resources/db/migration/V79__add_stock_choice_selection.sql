@@ -1,5 +1,5 @@
 INSERT INTO "template".choices (id,created_at,updated_at,multiple,"name") VALUES
-(18,'2020-09-14 19:56:08.900','2020-09-14 19:56:08.900',false,'Stock Market')
+(18,'2020-09-14 19:56:08.900','2020-09-14 19:56:08.900',true,'Stock Market Sector')
 ;
 ------------------------------------------------
 INSERT INTO "template".selections (id,created_at,updated_at,icon,"text",choice_id,page) VALUES
@@ -13,5 +13,5 @@ INSERT INTO "template".selections (id,created_at,updated_at,icon,"text",choice_i
 ,(257,'2020-09-14 19:56:08.900','2020-09-14 19:56:08.900',NULL,'Information Technology',18,NULL)
 ,(258,'2020-09-14 19:56:08.900','2020-09-14 19:56:08.900',NULL,'Materials',18,NULL)
 ,(259,'2020-09-14 19:56:08.900','2020-09-14 19:56:08.900',NULL,'Real Estate',18,NULL)
-,(260,'2020-09-14 19:56:08.900','2020-09-14 19:56:08.900',NULL,'Utilies',18,NULL)
+,(260,'2020-09-14 19:56:08.900','2020-09-14 19:56:08.900',NULL,'Utilities',18,NULL)
 ;
