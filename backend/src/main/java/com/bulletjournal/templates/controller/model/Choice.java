@@ -11,6 +11,8 @@ public class Choice {
 
     private boolean multiple;
 
+    private boolean instructionIncluded;
+
     private List<Category> categories = new ArrayList<>();
 
     private List<Selection> selections = new ArrayList<>();
@@ -27,10 +29,11 @@ public class Choice {
         this.multiple = multiple;
     }
 
-    public Choice(Long id, String name, boolean multiple, List<Selection> selections) {
+    public Choice(Long id, String name, boolean multiple, boolean instructionIncluded, List<Selection> selections) {
         this.id = id;
         this.name = name;
         this.multiple = multiple;
+        this.instructionIncluded = instructionIncluded;
         this.selections = selections;
     }
 
@@ -88,5 +91,13 @@ public class Choice {
 
     public void setSteps(List<Step> steps) {
         this.steps = steps;
+    }
+
+    public boolean isInstructionIncluded() {
+        return instructionIncluded;
+    }
+
+    public void setInstructionIncluded(boolean instructionIncluded) {
+        this.instructionIncluded = instructionIncluded;
     }
 }

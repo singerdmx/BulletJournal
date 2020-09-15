@@ -51,7 +51,7 @@ public class ChoiceController {
     @PostMapping(CHOICES_ROUTE)
     public Choice createChoice(@Valid @RequestBody CreateChoiceParams params) {
         validateRequester();
-        return this.choiceDaoJpa.save(params.getName(), params.isMultiple()).toPresentationModel();
+        return this.choiceDaoJpa.save(params.getName(), params.isMultiple(), params.isInstructionIncluded()).toPresentationModel();
     }
 
     @PutMapping(CHOICE_ROUTE)
@@ -62,6 +62,7 @@ public class ChoiceController {
         com.bulletjournal.templates.repository.model.Choice choice = choiceDaoJpa.getById(choiceId);
         choice.setName(params.getName());
         choice.setMultiple(params.isMultiple());
+        choice.setInstructionIncluded(params.isInstructionIncluded());
 
         this.choiceDaoJpa.save(choice);
         return this.choiceDaoJpa.getById(choiceId).toPresentationModel();
