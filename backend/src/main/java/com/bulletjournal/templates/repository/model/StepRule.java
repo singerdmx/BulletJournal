@@ -1,7 +1,6 @@
 package com.bulletjournal.templates.repository.model;
 
 
-import com.bulletjournal.templates.controller.model.StepInfo;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -37,6 +36,7 @@ public class StepRule extends Rule {
     }
 
     public com.bulletjournal.templates.controller.model.Rule toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(), null, new StepInfo(getId(), getName()));
+        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(),
+                null, new com.bulletjournal.templates.controller.model.Step(getId(), getName()));
     }
 }

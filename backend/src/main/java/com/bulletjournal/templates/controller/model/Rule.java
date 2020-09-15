@@ -10,20 +10,20 @@ public class Rule {
 
     private String ruleExpression;
 
-    private CategoryInfo categoryInfo;
+    private Category category;
 
-    private StepInfo stepInfo;
+    private Step step;
 
     public Rule() {
     }
 
-    public Rule(Long id, String name, Integer priority, String ruleExpression, CategoryInfo categoryInfo, StepInfo stepInfo) {
+    public Rule(Long id, String name, Integer priority, String ruleExpression, Category category, Step step) {
         this.id = id;
         this.name = name;
         this.priority = priority;
         this.ruleExpression = ruleExpression;
-        this.categoryInfo = categoryInfo;
-        this.stepInfo = stepInfo;
+        this.category = category;
+        this.step = step;
     }
 
     public Long getId() {
@@ -58,19 +58,19 @@ public class Rule {
         this.ruleExpression = ruleExpression;
     }
 
-    public CategoryInfo getCategoryInfo() {
-        return categoryInfo;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategoryInfo(CategoryInfo categoryInfo) {
-        this.categoryInfo = categoryInfo;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public StepInfo getStepInfo() {
-        return stepInfo;
+    public Step getStep() {
+        return step;
     }
 
-    public void setStepInfo(StepInfo stepInfo) {
-        this.stepInfo = stepInfo;
+    public void setStep(Step step) {
+        this.step = step;
     }
 }

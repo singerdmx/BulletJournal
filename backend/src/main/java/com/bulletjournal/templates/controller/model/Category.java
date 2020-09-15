@@ -3,6 +3,7 @@ package com.bulletjournal.templates.controller.model;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +35,10 @@ public class Category {
 
     public Category() {
 
+    }
+
+    public Category(Long id, String name) {
+        this(id, name, null, Collections.emptyList());
     }
 
     public Category(Long id, String name, String description, List<Category> subCategories) {
