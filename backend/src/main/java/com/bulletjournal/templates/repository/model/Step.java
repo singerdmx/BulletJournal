@@ -53,12 +53,35 @@ public class Step extends NamedModel {
                             nullable = false, updatable = false)})
     private List<SampleTask> sampleTasks = new ArrayList<>();
 
+    @Column(name = "choice_order")
+    private String choiceOrder;
+
     public Step(String name) {
         super.setName(name);
     }
 
     public Step() {
 
+    }
+
+    public String getChoiceOrder() {
+        return choiceOrder;
+    }
+
+    public void setChoiceOrder(String choiceOrder) {
+        this.choiceOrder = choiceOrder;
+    }
+
+    public void setChoiceOrder(List<Long> choicesIds) {
+        this.choiceOrder = choicesIds
+                .stream().distinct().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
+    }
+
+    public List<Long> getChoiceOrderById() {
+        if (choiceOrder == null || choiceOrder.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(choiceOrder.split(",")).map(Long::parseLong).collect(Collectors.toList());
     }
 
     public List<StepRule> getStepRules() {
@@ -84,11 +107,12 @@ public class Step extends NamedModel {
         if (choices == null) {
             return Collections.emptyList();
         }
+        choices = choices.stream().distinct().collect(Collectors.toList());
         return choices;
     }
 
     public void setChoices(List<Choice> choices) {
-        this.choices = choices;
+        this.choices = choices.stream().distinct().collect(Collectors.toList());
     }
 
     public List<Long> getExcludedSelections() {

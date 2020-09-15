@@ -2,10 +2,7 @@ package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.controller.model.UpdateStepParams;
-import com.bulletjournal.templates.repository.model.Choice;
-import com.bulletjournal.templates.repository.model.Selection;
-import com.bulletjournal.templates.repository.model.Step;
-import com.bulletjournal.templates.repository.model.StepRule;
+import com.bulletjournal.templates.repository.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
@@ -13,6 +10,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,7 +56,16 @@ public class StepDaoJpa {
         if (step == null) {
             throw new ResourceNotFoundException("Step with id " + stepId + " doesn't exist");
         }
+        sortChoicesForStep(step);
         return step;
+    }
+
+    private void sortChoicesForStep(Step step) {
+        if (step.getChoiceOrder() == null || step.getChoices() == null) {
+            return;
+        }
+        List<Long> choiceIdOrder = step.getChoiceOrderById();
+        step.getChoices().sort(Comparator.comparingInt(a -> choiceIdOrder.indexOf(a.getId())));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -66,6 +73,7 @@ public class StepDaoJpa {
         Step step = this.getById(stepId);
         List<Choice> choices = choiceDaoJpa.getChoicesById(choicesIds);
         step.setChoices(choices);
+        step.setChoiceOrder(choicesIds);
         this.save(step);
     }
 
