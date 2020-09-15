@@ -52,6 +52,7 @@ public class WorkflowControllerTest {
         Step step2 = createStep(createStepParams2);
         CreateRuleParams createRuleParams = new CreateRuleParams();
         createRuleParams.setName("rule1");
+        createRuleParams.setPriority(10);
         createRuleParams.setStepId(step1.getId());
         createRuleParams.setConnectedStepId(step2.getId());
         createRuleParams.setRuleExpression("{\"rule\":[{\"condition\":\"CONTAINS\",\"selectionIds\":[1,2,3,4]},{\"condition\":\"CONTAINS\",\"selectionIds\":[3,4,5,6]}],\"logicOperator\":\"AND\"}");
@@ -64,6 +65,7 @@ public class WorkflowControllerTest {
         Category category = createCategory(createCategoryParams);
         CreateRuleParams createRuleParams2 = new CreateRuleParams();
         createRuleParams2.setName("rule2");
+        createRuleParams2.setPriority(11);
         createRuleParams2.setCategoryId(category.getId());
         createRuleParams2.setConnectedStepId(step2.getId());
         createRuleParams2.setRuleExpression("{\"rule\":[{\"condition\":\"EXACT\",\"selectionIds\":[1,2,3,4]},{\"condition\":\"CONTAINS\",\"selectionIds\":[3,4,5,6]}],\"logicOperator\":\"OR\"}");

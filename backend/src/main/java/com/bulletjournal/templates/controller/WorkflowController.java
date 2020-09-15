@@ -66,6 +66,7 @@ public class WorkflowController {
     private NextStep checkIfSelectionsMatchCategoryRules(Long stepId, List<Long> selections) {
         Category category = categoryDaoJpa.getById(stepId);
         List<CategoryRule> categoryRules = category.getCategoryRules();
+        categoryRules.sort((rule1, rule2) -> rule2.getPriority() - rule1.getPriority());
         NextStep nextStep = new NextStep();
         for (CategoryRule categoryRule : categoryRules) {
             RuleExpression ruleExpression = GSON.fromJson(categoryRule.getRuleExpression(), RuleExpression.class);
@@ -85,6 +86,7 @@ public class WorkflowController {
     private NextStep checkIfSelectionsMatchStepRules(Long stepId, List<Long> selections) {
         Step step = stepDaoJpa.getById(stepId);
         List<StepRule> stepRules = step.getStepRules();
+        stepRules.sort((rule1, rule2) -> rule2.getPriority() - rule1.getPriority());
         NextStep nextStep = new NextStep();
         for (StepRule stepRule : stepRules) {
             RuleExpression ruleExpression = GSON.fromJson(stepRule.getRuleExpression(), RuleExpression.class);

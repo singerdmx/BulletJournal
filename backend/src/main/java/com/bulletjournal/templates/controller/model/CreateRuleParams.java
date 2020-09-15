@@ -1,5 +1,7 @@
 package com.bulletjournal.templates.controller.model;
 
+import javax.validation.constraints.NotNull;
+
 public class CreateRuleParams {
     private Long categoryId;
 
@@ -9,6 +11,7 @@ public class CreateRuleParams {
 
     private String name;
 
+    @NotNull
     private Integer priority;
 
     private Long connectedStepId;
