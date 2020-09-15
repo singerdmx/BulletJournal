@@ -9,9 +9,13 @@ public class CreateChoiceParams {
     @NotNull
     private boolean multiple;
 
-    public CreateChoiceParams(@NotNull String name, @NotNull boolean multiple) {
+    @NotNull
+    private boolean instructionIncluded;
+
+    public CreateChoiceParams(@NotNull String name, @NotNull boolean multiple, @NotNull boolean instructionIncluded) {
         this.name = name;
         this.multiple = multiple;
+        this.instructionIncluded = instructionIncluded;
     }
 
     public String getName() {
@@ -28,5 +32,13 @@ public class CreateChoiceParams {
 
     public void setMultiple(boolean multiple) {
         this.multiple = multiple;
+    }
+
+    public boolean isInstructionIncluded() {
+        return instructionIncluded;
+    }
+
+    public void setInstructionIncluded(boolean instructionIncluded) {
+        this.instructionIncluded = instructionIncluded;
     }
 }
