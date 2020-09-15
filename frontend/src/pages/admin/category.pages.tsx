@@ -163,7 +163,8 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <br/>
             <Text editable={{onChange: forumIdChange}}>{`${category.forumId ? category.forumId : 'forumId'}`}</Text>
             <br/>
-            <Text editable={{onChange: nextStepIdChange}}>{`${category.nextStepId ? category.nextStepId : 'nextStepId'}`}</Text>
+            <Text
+                editable={{onChange: nextStepIdChange}}>{`${category.nextStepId ? category.nextStepId : 'nextStepId'}`}</Text>
             <br/>
             <Text editable={{onChange: imageChange}}>{`${category.image ? category.image : 'Image URL'}`}</Text>
         </div>
@@ -201,8 +202,9 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
                 <h3>Rules</h3>
                 {category && category.rules && category.rules.map(rule => {
                     return <div><span>
-                        <Tag>{rule.ruleExpression}</Tag> [{rule.name}] (Priority: {rule.priority} ID: {rule.id})</span>
-                        {rule.step && <span>Step: {rule.step.name} ({rule.step.id})</span>}
+                        <Tag>{rule.ruleExpression}</Tag> [{rule.name}] (Priority: {rule.priority}, ID: {rule.id})</span>
+                        {' '} <span style={{cursor: 'pointer', color: 'lightBlue'}} onClick={() => history.push(`/admin/steps/${rule.connectedStep.id}`)}>
+                            Step: {rule.connectedStep.name} ({rule.connectedStep.id})</span>
                         <DeleteTwoTone onClick={() => deleteRule(rule.id, 'CATEGORY_RULE')}/>
                     </div>
                 })}

@@ -5,30 +5,41 @@ import {BackTop, Button, Divider, Input, Tabs} from "antd";
 import AddChoice from "../../components/modals/templates/add-choice.component";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {addSelection, getChoices} from "../../features/templates/actions";
-import {Choice} from "../../features/templates/interface";
+import {addSelection, getChoices, getSteps} from "../../features/templates/actions";
+import {Choice, Step} from "../../features/templates/interface";
 import AdminChoiceElem from "./admin-choice-elem";
+import Search from "antd/es/input/Search";
+import {CheckCircleTwoTone, FilterOutlined} from "@ant-design/icons";
+import {useHistory} from "react-router-dom";
 
 const {TabPane} = Tabs;
 
 type WorkflowPageProps = {
     choices: Choice[];
+    steps: Step[];
     getChoices: () => void;
+    getSteps: () => void;
     addSelection: (choiceId: number, text: string) => void;
 };
 
 const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
     {
         choices,
+        steps,
         getChoices,
-        addSelection
+        addSelection,
+        getSteps,
     }) => {
+    const history = useHistory();
+
     useEffect(() => {
         document.title = 'Bullet Journal - Workflow';
         getChoices();
+        getSteps();
     }, []);
     const [choice, setChoice] = useState(choices[0]);
     const [selectionText, setSelectionText] = useState('');
+    const [targetStep, setTargetStep] = useState<Step | undefined>(undefined);
 
     if (choices.length === 0) {
         return <div></div>
@@ -36,7 +47,7 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
     return (
         <div className='workflow-page'>
             <BackTop/>
-            <Tabs defaultActiveKey="1">
+            <Tabs defaultActiveKey="2">
                 <TabPane tab="Choices" key="1">
                     <div>
                         <h3>Choices</h3>
@@ -70,10 +81,30 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
                 <TabPane tab="Sample Tasks" key="2">
                     <div>
                         <h3>Steps</h3>
+                        {steps.map((s) => {
+                            return (
+                                <div>
+                                    <span style={{cursor: 'pointer', padding: '5px'}}
+                                          onClick={() => history.push(`/admin/steps/${s.id}`)}>{s.name} ({s.id})
+                                    </span>
+                                    <CheckCircleTwoTone onClick={() => setTargetStep(s)}/>
+                                </div>
+
+                            );
+                        })}
                     </div>
                     <Divider/>
                     <div>
+                        <div>
+                            <b>Target Step:</b> {targetStep ? targetStep.name : 'None'}
+                        </div>
                         <h3>Tasks</h3>
+                        <div>
+                            <Search style={{width: '40%', padding: '5px'}} placeholder="Search Sample Tasks"
+                                    onSearch={value => console.log(value)} enterButton/>
+                            <Input style={{width: '40%', padding: '5px', margin: '5px'}} placeholder="Filter"
+                                   prefix={<FilterOutlined/>}/>
+                        </div>
                     </div>
                 </TabPane>
             </Tabs>
@@ -86,9 +117,11 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
 
 const mapStateToProps = (state: IState) => ({
     choices: state.templates.choices,
+    steps: state.templates.steps,
 });
 
 export default connect(mapStateToProps, {
     getChoices,
-    addSelection
+    addSelection,
+    getSteps,
 })(AdminWorkflowPage);

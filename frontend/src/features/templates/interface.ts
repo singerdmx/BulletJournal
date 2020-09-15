@@ -15,6 +15,7 @@ export interface Category {
 export interface Choice {
     id: number;
     name: string;
+    instructionIncluded: boolean;
     multiple: boolean;
     selections: Selection[];
     categories: Category[];
@@ -46,8 +47,9 @@ export interface Rule {
     name: string;
     priority: number;
     ruleExpression: string;
-    category: Category;
-    step: Step;
+    category?: Category;
+    step?: Step;
+    connectedStep: Step;
 }
 
 export interface NextStep {
