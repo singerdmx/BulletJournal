@@ -5,7 +5,6 @@ import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.Step;
-import javassist.tools.rmi.Sample;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 public class SampleTaskDaoJpa {
@@ -47,13 +45,11 @@ public class SampleTaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<SampleTask> findSampleTasksByFilter(String filter) {
-        List<SampleTask> allSampleTasks = sampleTaskRepository.findAll();
-        if (TextUtils.isBlank(filter)) {
-            return allSampleTasks;
+    public List<SampleTask> findSampleTasksByMetadataFilter(String metadataFilter) {
+        if (TextUtils.isBlank(metadataFilter)) {
+            return sampleTaskRepository.findAll();
         }
-
-        return allSampleTasks.stream().filter(task -> task.getMetadata().contains(filter)).collect(Collectors.toList());
+        return sampleTaskRepository.getByMetadataFilter(metadataFilter);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

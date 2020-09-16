@@ -3,10 +3,7 @@ package com.bulletjournal.templates.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
-import com.bulletjournal.templates.controller.model.NextStep;
-import com.bulletjournal.templates.controller.model.SampleTask;
-import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
+import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.RuleDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
@@ -33,7 +30,7 @@ public class WorkflowController {
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
-    public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks/filter/{filter}";
+    public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks/filter";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -170,9 +167,9 @@ public class WorkflowController {
     }
 
     @GetMapping(SAMPLE_TASK_BY_METADATA)
-    public List<SampleTask> getSampleTasksByFilter(@NotNull @PathVariable String filter) {
+    public List<SampleTask> getSampleTasksByFilter(@RequestParam(value = "metadata", required = false) String metadataFilter) {
         validateRequester();
-        return sampleTaskDaoJpa.findSampleTasksByFilter(filter).stream()
+        return sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
                 .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
                 .collect(Collectors.toList());
     }
