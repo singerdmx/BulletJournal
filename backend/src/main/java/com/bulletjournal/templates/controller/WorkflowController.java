@@ -30,7 +30,7 @@ public class WorkflowController {
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
-    public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks/filter";
+    public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -167,7 +167,8 @@ public class WorkflowController {
     }
 
     @GetMapping(SAMPLE_TASK_BY_METADATA)
-    public List<SampleTask> getSampleTasksByFilter(@RequestParam(value = "metadata", required = false) String metadataFilter) {
+    public List<SampleTask> getSampleTasksByFilter(@RequestParam(value = "filter") String metadataFilter) {
+        // http://localhost:8080/api/sampleTasks?filter={filter}
         validateRequester();
         return sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
                 .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
