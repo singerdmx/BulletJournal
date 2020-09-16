@@ -8,6 +8,8 @@ import {SampleTask, Step} from "../../features/templates/interface";
 import Search from "antd/es/input/Search";
 import {CheckCircleTwoTone, FilterOutlined} from "@ant-design/icons";
 import {useHistory} from "react-router-dom";
+import {Container} from "react-floating-action-button";
+import AddSampleTask from "../../components/modals/templates/add-sample-task.component";
 
 type WorkflowPageProps = {
     steps: Step[];
@@ -73,7 +75,9 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
                     </div>
                 </div>
             </div>
-
+            <Container>
+                <AddSampleTask />
+            </Container>
         </div>
     );
 };

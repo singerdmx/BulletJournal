@@ -7,6 +7,8 @@ import {addSelection, getChoices} from "../../features/templates/actions";
 import {Choice} from "../../features/templates/interface";
 import AdminChoiceElem from "./admin-choice-elem";
 import {useHistory} from "react-router-dom";
+import {Container} from "react-floating-action-button";
+import AddChoice from "../../components/modals/templates/add-choice.component";
 
 type WorkflowPageProps = {
     choices: Choice[];
@@ -60,6 +62,9 @@ const AdminWorkflowChoices: React.FC<WorkflowPageProps> = (
                         Add to Target Choice</Button>
                 </div>
             </div>
+            <Container>
+                <AddChoice/>
+            </Container>
         </div>
     );
 };

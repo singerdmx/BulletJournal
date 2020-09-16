@@ -164,6 +164,12 @@ let initialState = {
     sampleTasks: [] as SampleTask[],
 };
 
+export type AddSampleTaskAction = {
+    name: string;
+    content: string;
+    metadata: string;
+};
+
 const slice = createSlice({
     name: 'templates',
     initialState,
@@ -225,6 +231,7 @@ const slice = createSlice({
             state.sampleTasks = tasks;
         },
         getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
+        addSampleTask: (state, action: PayloadAction<AddSampleTaskAction>) => state
     },
 });
 

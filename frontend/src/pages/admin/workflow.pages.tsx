@@ -1,8 +1,6 @@
 import React, {useEffect} from 'react';
-import {Container} from "react-floating-action-button";
 import './workflow.styles.less';
 import {BackTop, Tabs} from "antd";
-import AddChoice from "../../components/modals/templates/add-choice.component";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {useHistory} from "react-router-dom";
@@ -31,9 +29,6 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
                     <AdminWorkflowTasks/>
                 </TabPane>
             </Tabs>
-            <Container>
-                <AddChoice/>
-            </Container>
         </div>
     );
 };

@@ -3,11 +3,30 @@ import {message} from 'antd';
 import {PayloadAction} from 'redux-starter-kit';
 import {
   actions as templatesActions,
-  AddCategoryAction, AddChoiceAction, AddSelectionAction,
-  DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
-  GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
-  UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction,
-  GetStepAction, DeleteStepAction, GetNextStepAction, AddRuleAction, RemoveRuleAction, GetSampleTasksAction
+  AddCategoryAction,
+  AddChoiceAction,
+  AddSelectionAction,
+  DeleteCategoryAction,
+  DeleteChoiceAction,
+  DeleteSelectionAction,
+  GetCategoriesAction,
+  GetCategoryAction,
+  GetChoiceAction,
+  GetChoicesAction,
+  SetChoicesAction,
+  UpdateCategoryAction,
+  UpdateCategoryRelationsAction,
+  UpdateChoiceAction,
+  UpdateSelectionAction,
+  GetStepsAction,
+  CreateStepAction,
+  GetStepAction,
+  DeleteStepAction,
+  GetNextStepAction,
+  AddRuleAction,
+  RemoveRuleAction,
+  GetSampleTasksAction,
+  AddSampleTaskAction
 } from './reducer';
 import {
   createCategory,
@@ -26,7 +45,7 @@ import {Category, Choice, NextStep, Rule, SampleTask, Selection, Step, Steps} fr
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
 import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
-import {getNext, getSampleTasksByFilter} from "../../apis/templates/workflowApis";
+import {createSampleTask, getNext, getSampleTasksByFilter} from "../../apis/templates/workflowApis";
 import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 import {reloadReceived} from "../myself/actions";
 
@@ -409,6 +428,19 @@ function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `getSampleTasks Error Received: ${error}`);
+    }
+  }
+}
+
+function* addSampleTask(action: PayloadAction<AddSampleTaskAction>) {
+  try {
+    const {name, content, metadata} = action.payload;
+    yield call(createSampleTask, name, content, metadata);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `addSampleTask Error Received: ${error}`);
     }
   }
 }
