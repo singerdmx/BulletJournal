@@ -26,7 +26,7 @@ import {
   AddRuleAction,
   RemoveRuleAction,
   GetSampleTasksAction,
-  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction
+  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction
 } from './reducer';
 import {
   createCategory,
@@ -50,7 +50,7 @@ import {
   deleteSampleTask,
   fetchSampleTask,
   getNext,
-  getSampleTasksByFilter
+  getSampleTasksByFilter, putSampleTask
 } from "../../apis/templates/workflowApis";
 import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 import {reloadReceived} from "../myself/actions";
@@ -479,6 +479,20 @@ function* removeSampleTask(action: PayloadAction<RemoveSampleTaskAction>) {
   }
 }
 
+function* updateSampleTask(action: PayloadAction<UpdateSampleTaskAction>) {
+  try {
+    const {sampleTaskId, name, content, metadata} = action.payload;
+    const data : SampleTask = yield call(putSampleTask, sampleTaskId, name, content, metadata);
+    yield put(templatesActions.sampleTaskReceived({task: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateSampleTask Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -508,5 +522,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.addSampleTask.type, addSampleTask),
     yield takeLatest(templatesActions.getSampleTask.type, getSampleTask),
     yield takeLatest(templatesActions.removeSampleTask.type, removeSampleTask),
+    yield takeLatest(templatesActions.updateSampleTask.type, updateSampleTask),
   ])
 }

@@ -104,3 +104,6 @@ export const getSampleTask = (sampleTaskId: number) => actions.getSampleTask({sa
 
 export const removeSampleTask = (sampleTaskId: number) =>
     actions.removeSampleTask({taskId: sampleTaskId});
+
+export const updateSampleTask = (sampleTaskId: number, name: string, content: string, metadata: string) =>
+    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, content: content, metadata: metadata});

@@ -167,6 +167,13 @@ export type AddSampleTaskAction = {
     metadata: string;
 };
 
+export type UpdateSampleTaskAction = {
+    sampleTaskId: number;
+    name: string;
+    content: string;
+    metadata: string;
+};
+
 export type GetSampleTaskAction = {
     sampleTaskId: number;
 };
@@ -245,6 +252,7 @@ const slice = createSlice({
         },
         getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
         addSampleTask: (state, action: PayloadAction<AddSampleTaskAction>) => state,
+        updateSampleTask: (state, action: PayloadAction<UpdateSampleTaskAction>) => state,
         getSampleTask: (state, action: PayloadAction<GetSampleTaskAction>) => state,
         sampleTaskReceived: (state, action: PayloadAction<SampleTaskAction>) => {
             const {task} = action.payload;
