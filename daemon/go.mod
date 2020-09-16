@@ -3,7 +3,7 @@ module github.com/singerdmx/BulletJournal/daemon
 go 1.15
 
 require (
-	github.com/go-redis/redis/v8 v8.0.0-beta.7 // indirect
+	github.com/go-redis/redis/v8 v8.0.0-beta.7
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
 	github.com/lib/pq v1.8.0 // indirect
 	github.com/mailjet/mailjet-apiv3-go v0.0.0-20190724151621-55e56f74078c
