@@ -470,6 +470,8 @@ function* transactionContentsUpdate(
     );
     if (contents && contents.length > 0) {
       yield put(updateTargetContent(contents[0]));
+    } else {
+      yield put(updateTargetContent(undefined));
     }
   } catch (error) {
     if (error.message === 'reload') {
