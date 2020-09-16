@@ -7,16 +7,18 @@ import {Category} from "./features/templates/interface";
 import FooterLayout from "./layouts/footer/footer.layout";
 import SideLayout from './layouts/templates/side.layout';
 import ContentLayout from './layouts/templates/content.layout';
+import {SELECTIONS, STEPS} from "./pages/templates/steps.pages";
 
 
 type TemplatesProps = {
+    reload: boolean;
     category: Category | undefined;
     getCategories: () => void;
 };
 
 const TemplatesPage: React.FC<TemplatesProps> = (
     {
-        category,
+        reload,
         getCategories,
     }) => {
 
@@ -25,13 +27,18 @@ const TemplatesPage: React.FC<TemplatesProps> = (
     }
 
     useEffect(() => {
-        document.title = category ? `Templates - ${category.name}` : 'Templates';
+        document.title = 'Templates';
         getCategories();
         if (isMobilePage()) {
             setCollapsed(true);
             setWidth(collapsedSiderWidth);
         }
-    }, [category]);
+        if (reload) {
+            localStorage.removeItem(STEPS);
+            localStorage.removeItem(SELECTIONS);
+            window.location.reload();
+        }
+    }, []);
 
     const expandedSiderWidth = 240;
     const collapsedSiderWidth = 55;
@@ -60,7 +67,7 @@ const TemplatesPage: React.FC<TemplatesProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
-    category: state.templates.category
+    reload: state.myself.reload
 });
 
 export default connect(mapStateToProps, {

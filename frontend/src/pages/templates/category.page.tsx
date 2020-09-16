@@ -27,6 +27,10 @@ const CategoryPage: React.FC<CategoryProps> = (
         }
     }, [categoryId]);
 
+    useEffect(() => {
+        document.title = category ? category.name : 'Templates';
+    }, [category]);
+
     const history = useHistory();
 
     if (!category) {
