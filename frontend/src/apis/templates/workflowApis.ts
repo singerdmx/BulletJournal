@@ -1,4 +1,4 @@
-import {doFetch, doPost} from '../api-helper';
+import {doDelete, doFetch, doPost} from '../api-helper';
 
 export const getNext = (stepId: number, selections: number[], first?: boolean) => {
     let url = `/api/public/steps/${stepId}/next?`;
@@ -30,6 +30,22 @@ export const createSampleTask = (name: string, content: string, metadata: string
     return doPost('/api/sampleTasks', postBody)
         .then(res => res.json())
         .catch(err => {
+            throw Error(err.message);
+        });
+}
+
+export const fetchSampleTask = (sampleTaskId: number) => {
+    return doFetch(`/api/sampleTasks/${sampleTaskId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const deleteSampleTask = (sampleTaskId: number) => {
+    return doDelete(`/api/sampleTasks/${sampleTaskId}`)
+        .then(res => res)
+        .catch((err) => {
             throw Error(err.message);
         });
 }

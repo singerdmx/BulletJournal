@@ -99,3 +99,8 @@ export const getSampleTasks = (filter: string) => actions.getSampleTasks({filter
 
 export const addSampleTask = (name: string, content: string, metadata: string) =>
     actions.addSampleTask({name: name, content: content, metadata: metadata});
+
+export const getSampleTask = (sampleTaskId: number) => actions.getSampleTask({sampleTaskId: sampleTaskId});
+
+export const removeSampleTask = (sampleTaskId: number) =>
+    actions.removeSampleTask({taskId: sampleTaskId});

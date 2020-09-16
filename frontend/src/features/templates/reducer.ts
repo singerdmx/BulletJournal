@@ -145,12 +145,30 @@ export type RemoveRuleAction = {
     ruleType: string;
 };
 
+export type RemoveSampleTaskAction = {
+    taskId: number;
+};
+
 export type GetSampleTasksAction = {
     filter: string;
 };
 
 export type SampleTasksAction = {
     tasks: SampleTask[];
+};
+
+export type SampleTaskAction = {
+    task: SampleTask | undefined;
+};
+
+export type AddSampleTaskAction = {
+    name: string;
+    content: string;
+    metadata: string;
+};
+
+export type GetSampleTaskAction = {
+    sampleTaskId: number;
 };
 
 let initialState = {
@@ -162,12 +180,7 @@ let initialState = {
     nextStep: undefined as NextStep | undefined,
     rule: undefined as Rule | undefined,
     sampleTasks: [] as SampleTask[],
-};
-
-export type AddSampleTaskAction = {
-    name: string;
-    content: string;
-    metadata: string;
+    sampleTask: undefined as SampleTask | undefined,
 };
 
 const slice = createSlice({
@@ -231,7 +244,13 @@ const slice = createSlice({
             state.sampleTasks = tasks;
         },
         getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
-        addSampleTask: (state, action: PayloadAction<AddSampleTaskAction>) => state
+        addSampleTask: (state, action: PayloadAction<AddSampleTaskAction>) => state,
+        getSampleTask: (state, action: PayloadAction<GetSampleTaskAction>) => state,
+        sampleTaskReceived: (state, action: PayloadAction<SampleTaskAction>) => {
+            const {task} = action.payload;
+            state.sampleTask = task;
+        },
+        removeSampleTask: (state, action: PayloadAction<RemoveSampleTaskAction>) => state,
     },
 });
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './workflow.styles.less';
-import {Divider, Input, message} from "antd";
+import {Divider, Input, message, Tag} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getSampleTasks, getSteps} from "../../features/templates/actions";
@@ -70,7 +70,11 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
                            prefix={<FilterOutlined/>}/>
                     <div>
                         {sampleTasks.map(sampleTask => {
-                            return <div>{sampleTask.name}</div>
+                            return <div style={{cursor: 'pointer'}}
+                                        onClick={() => history.push(`/admin/sampleTasks/${sampleTask.id}`)}>
+                                <b>{sampleTask.name}</b>{' '}
+                                <Tag>{sampleTask.metadata}</Tag>
+                            </div>
                         })}
                     </div>
                 </div>

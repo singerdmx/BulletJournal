@@ -15,7 +15,7 @@ const AddSampleTask: React.FC<AddSampleTaskProps> = (props) => {
     const [visible, setVisible] = useState(false);
 
     const createTask = (values: any) => {
-        //addSampleTask(values.name);
+        addSampleTask(values.name, '', values.metadata);
         setVisible(false);
     };
 
