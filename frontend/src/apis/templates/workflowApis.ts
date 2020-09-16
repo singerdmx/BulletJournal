@@ -12,3 +12,11 @@ export const getNext = (stepId: number, selections: number[], first?: boolean) =
             throw Error(err.message);
         });
 }
+
+export const getSampleTasksByFilter = (filter: string) => {
+    return doFetch(`/api/sampleTasks?filter=${filter}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}

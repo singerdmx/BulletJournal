@@ -55,3 +55,12 @@ export interface Rule {
 export interface NextStep {
     step: Step;
 }
+
+export interface SampleTask {
+    id: number;
+    name: string;
+    content: string;
+    metadata: string;
+    uid: string;
+    steps: Step[];
+}

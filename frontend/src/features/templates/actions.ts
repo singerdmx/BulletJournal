@@ -94,3 +94,5 @@ export const createRule = (name: string, priority: number, connectedStepId: numb
 });
 
 export const deleteRule = (ruleId: number, ruleType: string) => actions.removeRule({ruleId: ruleId, ruleType: ruleType});
+
+export const getSampleTasks = (filter: string) => actions.getSampleTasks({filter: filter});

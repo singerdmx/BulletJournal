@@ -7,7 +7,7 @@ import {
   DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
   GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
   UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction,
-  GetStepAction, DeleteStepAction, GetNextStepAction, AddRuleAction, RemoveRuleAction
+  GetStepAction, DeleteStepAction, GetNextStepAction, AddRuleAction, RemoveRuleAction, GetSampleTasksAction
 } from './reducer';
 import {
   createCategory,
@@ -22,11 +22,11 @@ import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, NextStep, Rule, Selection, Step, Steps} from './interface';
+import {Category, Choice, NextStep, Rule, SampleTask, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
 import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
-import {getNext} from "../../apis/templates/workflowApis";
+import {getNext, getSampleTasksByFilter} from "../../apis/templates/workflowApis";
 import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
@@ -306,6 +306,16 @@ function* removeRule(action: PayloadAction<RemoveRuleAction>) {
   }
 }
 
+function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
+  try {
+    const {filter} = action.payload;
+    const data : SampleTask[] = yield call(getSampleTasksByFilter, filter);
+    yield put(templatesActions.sampleTasksReceived({tasks: data}));
+  } catch (error) {
+    yield call(message.error, `getSampleTasks Error Received: ${error}`);
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -331,5 +341,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getNextStep.type, getNextStep),
     yield takeLatest(templatesActions.createRule.type, addRule),
     yield takeLatest(templatesActions.removeRule.type, removeRule),
+    yield takeLatest(templatesActions.getSampleTasks.type, getSampleTasks),
   ])
 }

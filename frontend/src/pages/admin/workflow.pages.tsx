@@ -5,7 +5,7 @@ import {BackTop, Button, Divider, Input, Tabs} from "antd";
 import AddChoice from "../../components/modals/templates/add-choice.component";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {addSelection, getChoices, getSteps} from "../../features/templates/actions";
+import {addSelection, getChoices, getSampleTasks, getSteps} from "../../features/templates/actions";
 import {Choice, Step} from "../../features/templates/interface";
 import AdminChoiceElem from "./admin-choice-elem";
 import Search from "antd/es/input/Search";
@@ -20,6 +20,7 @@ type WorkflowPageProps = {
     getChoices: () => void;
     getSteps: () => void;
     addSelection: (choiceId: number, text: string) => void;
+    getSampleTasks: (filter: string) => void;
 };
 
 const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
@@ -29,6 +30,7 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
         getChoices,
         addSelection,
         getSteps,
+        getSampleTasks
     }) => {
     const history = useHistory();
 
@@ -118,10 +120,12 @@ const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
 const mapStateToProps = (state: IState) => ({
     choices: state.templates.choices,
     steps: state.templates.steps,
+    sampleTasks: state.templates.sampleTasks
 });
 
 export default connect(mapStateToProps, {
     getChoices,
     addSelection,
     getSteps,
+    getSampleTasks
 })(AdminWorkflowPage);

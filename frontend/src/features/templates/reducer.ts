@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
-import {Category, Choice, NextStep, Rule, Step} from './interface';
+import {Category, Choice, NextStep, Rule, SampleTask, Step} from './interface';
 
 export type GetStepsAction = {};
 
@@ -145,6 +145,14 @@ export type RemoveRuleAction = {
     ruleType: string;
 };
 
+export type GetSampleTasksAction = {
+    filter: string;
+};
+
+export type SampleTasksAction = {
+    tasks: SampleTask[];
+};
+
 let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
@@ -153,6 +161,7 @@ let initialState = {
     step: undefined as Step | undefined,
     nextStep: undefined as NextStep | undefined,
     rule: undefined as Rule | undefined,
+    sampleTasks: [] as SampleTask[],
 };
 
 const slice = createSlice({
@@ -211,6 +220,11 @@ const slice = createSlice({
         },
         createRule: (state, action: PayloadAction<AddRuleAction>) => state,
         removeRule: (state, action: PayloadAction<RemoveRuleAction>) => state,
+        sampleTasksReceived: (state, action: PayloadAction<SampleTasksAction>) => {
+            const {tasks} = action.payload;
+            state.sampleTasks = tasks;
+        },
+        getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
     },
 });
 
