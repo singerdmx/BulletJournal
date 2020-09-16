@@ -101,10 +101,16 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
         contents: contents,
       })
     );
-    yield put(updateTargetContent(contents[0]));
+    if (contents && contents.length > 0) {
+      yield put(updateTargetContent(contents[0]));
+    } else {
+      yield put(updateTargetContent(undefined));
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
+    } else if (error.message === '404') {
+      console.log(`Note ${action.payload.noteId} not found`);
     } else {
       yield call(message.error, `noteContentsUpdate Error Received: ${error}`);
     }

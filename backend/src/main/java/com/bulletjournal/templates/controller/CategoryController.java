@@ -12,7 +12,6 @@ import com.bulletjournal.templates.controller.model.CreateCategoryParams;
 import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.StepDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -48,8 +47,7 @@ public class CategoryController {
     public CategoryController(
         CategoryDaoJpa categoryDaoJpa,
         CategoriesHierarchyDaoJpa hierarchyDaoJpa,
-        UserDaoJpa userDaoJpa,
-        StepDaoJpa stepDaoJpa
+        UserDaoJpa userDaoJpa
     ) {
         this.categoryDaoJpa = categoryDaoJpa;
         this.hierarchyDaoJpa = hierarchyDaoJpa;
@@ -123,7 +121,8 @@ public class CategoryController {
             if (category.getId().equals(categoryId)) {
                 Category categoryFromDb = categoryDaoJpa.getById(categoryId).toPresentationModel();
                 category.setChoices(categoryFromDb.getChoices());
-                category.setNextStep(categoryFromDb.getNextStep());
+                category.setNextStepId(categoryFromDb.getNextStepId());
+                category.setRules(categoryFromDb.getRules());
                 return category;
             }
             category.getSubCategories().forEach(deque::offer);

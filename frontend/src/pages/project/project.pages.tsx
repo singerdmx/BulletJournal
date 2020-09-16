@@ -9,7 +9,6 @@ import {deleteProject, getProject} from '../../features/project/actions';
 import {iconMapper} from '../../components/side-menu/side-menu.component';
 import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
-import AddNote from '../../components/modals/add-note.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
 import {ProjectType} from '../../features/project/constants';
 import {NoteTree} from '../../components/note-tree';
@@ -79,32 +78,32 @@ type ProjectPageProps = {
   projectLabels: Label[];
   getProject: (projectId: number) => void;
   deleteProject: (
-    projectId: number,
-    name: string,
-    history: History<History.PoorMansUnknown>
+      projectId: number,
+      name: string,
+      history: History<History.PoorMansUnknown>
   ) => void;
   getTasksByAssignee: (projectId: number, assignee: string) => void;
   getNotesByOwner: (projectId: number, owner: string) => void;
   getTransactionsByPayer: (
-    projectId: number,
-    timezone: string,
-    ledgerSummaryType: string,
-    frequencyType?: string,
-    startDate?: string,
-    endDate?: string,
-    payer?: string
+      projectId: number,
+      timezone: string,
+      ledgerSummaryType: string,
+      frequencyType?: string,
+      startDate?: string,
+      endDate?: string,
+      payer?: string
   ) => void;
   getNotesByOrder: (
-    projectId: number,
-    timezone: string,
-    startDate?: string,
-    endDate?: string
+      projectId: number,
+      timezone: string,
+      startDate?: string,
+      endDate?: string
   ) => void;
   getTasksByOrder: (
-    projectId: number,
-    timezone: string,
-    startDate?: string,
-    endDate?: string
+      projectId: number,
+      timezone: string,
+      startDate?: string,
+      endDate?: string
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   projectLabelsUpdate: (projectId: number, projectShared: boolean) => void;
@@ -115,10 +114,8 @@ type MyselfProps = {
   myself: string;
 };
 
-class ProjectPage extends React.Component<
-  ProjectPageProps & ProjectPathProps & GroupProps & MyselfProps,
-  ModalState
-> {
+class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & GroupProps & MyselfProps,
+    ModalState> {
   state: ModalState = {
     isShow: false,
     hideLabel: false,
@@ -150,7 +147,7 @@ class ProjectPage extends React.Component<
     const projectId = this.props.match.params.projectId;
     if (projectId !== prevProps.match.params.projectId) {
       this.props.getProject(parseInt(projectId));
-      this.setState({ completeTasksShown: false });
+      this.setState({completeTasksShown: false});
       if (this.props.project) {
         this.props.projectLabelsUpdate(parseInt(projectId), this.props.project.shared);
       }
@@ -171,26 +168,26 @@ class ProjectPage extends React.Component<
   };
 
   onCancel = () => {
-    this.setState({ isShow: false });
+    this.setState({isShow: false});
   };
   //by user modal
   handleGetTasksByAssignee = (u: User) => {
-    this.setState({ tasksByUsersShown: true });
-    this.setState({ assignee: u });
+    this.setState({tasksByUsersShown: true});
+    this.setState({assignee: u});
     // update tasks
     this.props.getTasksByAssignee(
-      parseInt(this.props.match.params.projectId),
-      u.name
+        parseInt(this.props.match.params.projectId),
+        u.name
     );
   };
 
   handleGetNotesByOwner = (u: User) => {
-    this.setState({ notesByUsersShown: true });
-    this.setState({ assignee: u });
+    this.setState({notesByUsersShown: true});
+    this.setState({assignee: u});
     // update tasks
     this.props.getNotesByOwner(
-      parseInt(this.props.match.params.projectId),
-      u.name
+        parseInt(this.props.match.params.projectId),
+        u.name
     );
   };
   handleGetTransactionByPayer = (u: User) => {
@@ -201,40 +198,40 @@ class ProjectPage extends React.Component<
       transactionEndDate,
       transactionLedgerSummaryType,
     } = this.props;
-    this.setState({ transactionsByUsersShown: true });
-    this.setState({ assignee: u });
+    this.setState({transactionsByUsersShown: true});
+    this.setState({assignee: u});
     // update tasks
     this.props.getTransactionsByPayer(
-      parseInt(this.props.match.params.projectId),
-      transactionTimezone,
-      transactionLedgerSummaryType,
-      transactionFrequencyType,
-      transactionStartDate,
-      transactionEndDate,
-      u.name
+        parseInt(this.props.match.params.projectId),
+        transactionTimezone,
+        transactionLedgerSummaryType,
+        transactionFrequencyType,
+        transactionStartDate,
+        transactionEndDate,
+        u.name
     );
   };
 
   //by order modal
   handleGetNotesByOrder = () => {
-    const { timezone } = this.props;
-    this.setState({ notesByOrderShown: true });
+    const {timezone} = this.props;
+    this.setState({notesByOrderShown: true});
     this.props.getNotesByOrder(
-      parseInt(this.props.match.params.projectId),
-      timezone,
-      undefined,
-      undefined
+        parseInt(this.props.match.params.projectId),
+        timezone,
+        undefined,
+        undefined
     );
   };
 
   handleGetTasksByOrder = () => {
-    const { timezone } = this.props;
-    this.setState({ tasksByOrderShown: true });
+    const {timezone} = this.props;
+    this.setState({tasksByOrderShown: true});
     this.props.getTasksByOrder(
-      parseInt(this.props.match.params.projectId),
-      timezone,
-      undefined,
-      undefined
+        parseInt(this.props.match.params.projectId),
+        timezone,
+        undefined,
+        undefined
     );
   };
 
@@ -246,7 +243,8 @@ class ProjectPage extends React.Component<
   handleGetProjectItemsByOrderCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOrder,
     [ProjectType.TODO]: this.handleGetTasksByOrder,
-    [ProjectType.LEDGER]: () => {},
+    [ProjectType.LEDGER]: () => {
+    },
   };
 
   getProjectLabels = () => {
@@ -277,10 +275,10 @@ class ProjectPage extends React.Component<
 
     const getLabelFilterIcon = (labelId: number) => {
       if (this.state.labelsToRemove.includes(labelId)) {
-        return <CloseCircleTwoTone />;
+        return <CloseCircleTwoTone/>;
       }
       if (this.state.labelsToKeep.includes(labelId)) {
-        return <CheckSquareTwoTone />;
+        return <CheckSquareTwoTone/>;
       }
       return <MenuOutlined/>
     }
@@ -311,12 +309,12 @@ class ProjectPage extends React.Component<
                   this.setState({hideLabel: true});
                 }}/>
                 </Tooltip>)}
-                    {this.state.hideLabel && (<Tooltip
-                        placement="top"
-                        title="Show Project Labels"
-                    ><DownOutlined onClick={() => {
-                      this.setState({hideLabel: false});
-                    }}/></Tooltip>)}
+                {this.state.hideLabel && (<Tooltip
+                    placement="top"
+                    title="Show Project Labels"
+                ><DownOutlined onClick={() => {
+                  this.setState({hideLabel: false});
+                }}/></Tooltip>)}
               </span>
             </div>
 
@@ -331,22 +329,25 @@ class ProjectPage extends React.Component<
                         <Popover key={`p${label.id}`}
                                  title='Filter by Label'
                                  content={<>
-                                   <Radio.Group value={getLabelFilterValue(label.id)} onChange={e => handleLabelFilterChange(e, label.id)}>
+                                   <Radio.Group value={getLabelFilterValue(label.id)}
+                                                onChange={e => handleLabelFilterChange(e, label.id)}>
                                      <Radio style={radioStyle} value={1}>
-                                       <CheckSquareTwoTone /> Keep <Tag color={stringToRGB(label.value)} key={`keep${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
+                                       <CheckSquareTwoTone/> Keep <Tag color={stringToRGB(label.value)}
+                                                                       key={`keep${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
                                      </Radio>
                                      <Radio style={radioStyle} value={2}>
-                                       <CloseCircleTwoTone /> Without <Tag color={stringToRGB(label.value)} key={`remove${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
+                                       <CloseCircleTwoTone/> Without <Tag color={stringToRGB(label.value)}
+                                                                          key={`remove${label.id}`}>{getIcon(label.icon)} &nbsp;{label.value}</Tag>
                                      </Radio>
                                      <Radio style={radioStyle} value={3}>
-                                       <StopTwoTone /> No Effect
+                                       <StopTwoTone/> No Effect
                                      </Radio>
                                    </Radio.Group>
                                  </>}>
                           {getLabelFilterIcon(label.id)}
                         </Popover>
                         <span onClick={() => this.toLabelSearching(label)}>&nbsp;
-                        {getIcon(label.icon)} &nbsp;{label.value}
+                          {getIcon(label.icon)} &nbsp;{label.value}
                         </span>
                       </span>
                     </Tag>
@@ -358,18 +359,18 @@ class ProjectPage extends React.Component<
   };
 
   render() {
-    const { project, myself, history } = this.props;
+    const {project, myself, history} = this.props;
 
     if (!project) {
       return null;
     }
 
     const handleGetProjectItemsByUser = this.handleGetProjectItemsByUserCall[
-      project.projectType
-    ];
+        project.projectType
+        ];
     const handleGetProjectItemsByOrder = this.handleGetProjectItemsByOrderCall[
-      project.projectType
-    ];
+        project.projectType
+        ];
     let createContent = null;
     let projectContent = null;
     let projectItemsByUser = null;
@@ -377,143 +378,144 @@ class ProjectPage extends React.Component<
 
     switch (project.projectType) {
       case ProjectType.NOTE:
-        createContent = <AddNote mode="icon" />;
+        createContent = null; // NOTE has createContent in note-tree.component.tsx
         projectContent = (
-          <NoteTree
-            readOnly={project.shared}
-            showModal={(user: User) => {
-              handleGetProjectItemsByUser(user);
-            }}
-            showOrderModal={() => {
-              handleGetProjectItemsByOrder();
-            }}
-            labelsToKeep={this.state.labelsToKeep}
-            labelsToRemove={this.state.labelsToRemove}
-          />
+            <NoteTree
+                timezone={this.props.timezone}
+                readOnly={project.shared}
+                showModal={(user: User) => {
+                  handleGetProjectItemsByUser(user);
+                }}
+                showOrderModal={() => {
+                  handleGetProjectItemsByOrder();
+                }}
+                labelsToKeep={this.state.labelsToKeep}
+                labelsToRemove={this.state.labelsToRemove}
+            />
         );
         projectItemsByUser = (
-          <NotesByOwner
-            owner={this.state.assignee}
-            visible={this.state.notesByUsersShown}
-            onCancel={() => {
-              this.setState({ notesByUsersShown: false });
-            }}
-          />
+            <NotesByOwner
+                owner={this.state.assignee}
+                visible={this.state.notesByUsersShown}
+                onCancel={() => {
+                  this.setState({notesByUsersShown: false});
+                }}
+            />
         );
         projectItemsByOrder = (
-          <NotesByOrder
-            projectId={project.id}
-            visible={this.state.notesByOrderShown}
-            onCancel={() => {
-              this.setState({ notesByOrderShown: false });
-            }}
-          />
+            <NotesByOrder
+                projectId={project.id}
+                visible={this.state.notesByOrderShown}
+                onCancel={() => {
+                  this.setState({notesByOrderShown: false});
+                }}
+            />
         );
         break;
       case ProjectType.TODO:
         createContent = null; // TODO has createContent in task-tree.component.tsx
 
         projectContent = (
-          <TaskTree
-            timezone={this.props.timezone}
-            readOnly={project.shared}
-            showModal={(user: User) => {
-              handleGetProjectItemsByUser(user);
-            }}
-            showOrderModal={() => {
-              handleGetProjectItemsByOrder();
-            }}
-            completeTasksShown={this.state.completeTasksShown}
-            hideCompletedTask={() =>
-              this.setState({ completeTasksShown: false })
-            }
-            showCompletedTask={() =>
-              this.setState({ completeTasksShown: true })
-            }
-            labelsToKeep={this.state.labelsToKeep}
-            labelsToRemove={this.state.labelsToRemove}
-          />
+            <TaskTree
+                timezone={this.props.timezone}
+                readOnly={project.shared}
+                showModal={(user: User) => {
+                  handleGetProjectItemsByUser(user);
+                }}
+                showOrderModal={() => {
+                  handleGetProjectItemsByOrder();
+                }}
+                completeTasksShown={this.state.completeTasksShown}
+                hideCompletedTask={() =>
+                    this.setState({completeTasksShown: false})
+                }
+                showCompletedTask={() =>
+                    this.setState({completeTasksShown: true})
+                }
+                labelsToKeep={this.state.labelsToKeep}
+                labelsToRemove={this.state.labelsToRemove}
+            />
         );
         projectItemsByUser = (
-          <TasksByAssignee
-            assignee={this.state.assignee}
-            visible={this.state.tasksByUsersShown}
-            onCancel={() => {
-              this.setState({ tasksByUsersShown: false });
-            }}
-            hideCompletedTask={() =>
-              this.setState({ completeTasksShown: false })
-            }
-          />
+            <TasksByAssignee
+                assignee={this.state.assignee}
+                visible={this.state.tasksByUsersShown}
+                onCancel={() => {
+                  this.setState({tasksByUsersShown: false});
+                }}
+                hideCompletedTask={() =>
+                    this.setState({completeTasksShown: false})
+                }
+            />
         );
         projectItemsByOrder = (
-          <TasksByOrder
-            visible={this.state.tasksByOrderShown}
-            onCancel={() => {
-              this.setState({ tasksByOrderShown: false });
-            }}
-            hideCompletedTask={() =>
-              this.setState({ completeTasksShown: false })
-            }
-          />
+            <TasksByOrder
+                visible={this.state.tasksByOrderShown}
+                onCancel={() => {
+                  this.setState({tasksByOrderShown: false});
+                }}
+                hideCompletedTask={() =>
+                    this.setState({completeTasksShown: false})
+                }
+            />
         );
         break;
       case ProjectType.LEDGER:
-        createContent = <AddTransaction mode="icon" />;
+        createContent = <AddTransaction mode="icon"/>;
         projectContent = (
-          <TransactionProject
-            showModal={(user: User) => {
-              handleGetProjectItemsByUser(user);
-            }}
-            labelsToKeep={this.state.labelsToKeep}
-            labelsToRemove={this.state.labelsToRemove}
-          />
+            <TransactionProject
+                showModal={(user: User) => {
+                  handleGetProjectItemsByUser(user);
+                }}
+                labelsToKeep={this.state.labelsToKeep}
+                labelsToRemove={this.state.labelsToRemove}
+            />
         );
         projectItemsByUser = (
-          <TransactionsByPayer
-            payer={this.state.assignee}
-            visible={this.state.transactionsByUsersShown}
-            onCancel={() => {
-              this.setState({ transactionsByUsersShown: false });
-            }}
-          />
+            <TransactionsByPayer
+                payer={this.state.assignee}
+                visible={this.state.transactionsByUsersShown}
+                onCancel={() => {
+                  this.setState({transactionsByUsersShown: false});
+                }}
+            />
         );
     }
 
     let editContent = null;
     let deleteContent = null;
     if (project && myself === project.owner.name) {
-      editContent = <EditProject project={project} />;
+      editContent = <EditProject project={project}/>;
       deleteContent = (
-        <Popconfirm
-          title="Are you sure?"
-          okText="Yes"
-          cancelText="No"
-          onConfirm={() => {
-            this.props.deleteProject(project.id, project.name, history);
-          }}
-          className="group-setting"
-          placement="bottom"
-        >
-          <Tooltip placement="top" title="Delete BuJo">
-            <div className="project-delete">
-              <DeleteOutlined
-                style={{ paddingLeft: '0.5em', cursor: 'pointer' }}
-              />
-            </div>
-          </Tooltip>
-        </Popconfirm>
+          <Popconfirm
+              title="Are you sure?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => {
+                this.props.deleteProject(project.id, project.name, history);
+              }}
+              className="group-setting"
+              placement="bottom"
+          >
+            <Tooltip placement="top" title="Delete BuJo">
+              <div className="project-delete">
+                <DeleteOutlined
+                    style={{paddingLeft: '0.5em', cursor: 'pointer'}}
+                />
+              </div>
+            </Tooltip>
+          </Popconfirm>
       );
     }
 
     let description = null;
     if (project && project.description) {
       description = (
-        <div className="project-description">
-          {project.description.split('\n').map((s, key) => {
-            return <p key={key}>{s}</p>;
-          })}
-        </div>
+          <div className="project-description">
+            {project.description.split('\n').map((s, key) => {
+              return <p key={key}>{s}</p>;
+            })}
+          </div>
       );
     }
 
@@ -531,85 +533,85 @@ class ProjectPage extends React.Component<
     let popContent = null;
     if (group) {
       popContent = (
-        <div className="project-users">
-          {groupUsers.map((u, index) => (
-            <Tooltip title={u.alias} key={`${u.id}#${index}`}>
+          <div className="project-users">
+            {groupUsers.map((u, index) => (
+                <Tooltip title={u.alias} key={`${u.id}#${index}`}>
               <span
-                className="avatar-container"
-                onClick={() => handleGetProjectItemsByUser(u)}
+                  className="avatar-container"
+                  onClick={() => handleGetProjectItemsByUser(u)}
               >
-                <Avatar size="small" src={u.avatar} />
+                <Avatar size="small" src={u.avatar}/>
               </span>
-            </Tooltip>
-          ))}
-        </div>
+                </Tooltip>
+            ))}
+          </div>
       );
     }
 
     return (
-      <div
-        className={`project ${
-          project.projectType === ProjectType.LEDGER && 'ledger'
-        }`}
-      >
-        <Tooltip
-          placement="top"
-          title={project.owner.alias}
-          className="project-avatar"
+        <div
+            className={`project ${
+                project.projectType === ProjectType.LEDGER && 'ledger'
+            }`}
         >
+          <Tooltip
+              placement="top"
+              title={project.owner.alias}
+              className="project-avatar"
+          >
           <span>
-            <Avatar size="large" src={project.owner.avatar} />
+            <Avatar size="large" src={project.owner.avatar}/>
           </span>
-        </Tooltip>
-        <div className="project-header">
-          <h2>
-            {!description && this.getProjectNameSpan(project)}
-            {description && (
+          </Tooltip>
+          <div className="project-header">
+            <h2>
+              {!description && this.getProjectNameSpan(project)}
+              {description && (
+                  <Popover
+                      className='project-description'
+                      placement="bottomLeft"
+                      content={description}
+                  >
+                    {this.getProjectNameSpan(project)}
+                  </Popover>
+              )}
+            </h2>
+            <div className="project-control">
               <Popover
-                className='project-description'
-                placement="bottomLeft"
-                content={description}
+                  title={
+                    group && `${group.name} (${!!group ? groupUsers.length : 0})`
+                  }
+                  placement="bottom"
+                  content={popContent}
               >
-                {this.getProjectNameSpan(project)}
-              </Popover>
-            )}
-          </h2>
-          <div className="project-control">
-            <Popover
-              title={
-                group && `${group.name} (${!!group ? groupUsers.length : 0})`
-              }
-              placement="bottom"
-              content={popContent}
-            >
               <span
-                style={{ cursor: 'pointer' }}
-                onClick={(e) => this.onClickGroup(group.id)}
+                  style={{cursor: 'pointer'}}
+                  onClick={(e) => this.onClickGroup(group.id)}
               >
                 <Badge
-                  count={!!group ? groupUsers.length : 0}
-                  style={{
-                    fontSize: '9px',
-                    color: '#006633',
-                    backgroundColor: '#e6fff2',
-                  }}
+                    count={!!group ? groupUsers.length : 0}
+                    style={{
+                      fontSize: '9px',
+                      color: '#006633',
+                      backgroundColor: '#e6fff2',
+                    }}
                 >
-                  <TeamOutlined style={{ fontSize: '21px' }} />
+                  <TeamOutlined style={{fontSize: '21px'}}/>
                 </Badge>
               </span>
-            </Popover>
-            <ShowProjectHistory />
-            {createContent}
-            {editContent}
-            {deleteContent}
-            {projectItemsByUser}
-            {projectItemsByOrder}
+              </Popover>
+              <ShowProjectHistory/>
+              {createContent}
+              {editContent}
+              {deleteContent}
+              {projectItemsByUser}
+              {projectItemsByOrder}
+            </div>
           </div>
+          {this.getProjectLabels()}
+          <BackTop/>
+          <div className="project-content">{projectContent}</div>
         </div>
-        {this.getProjectLabels()}
-        <BackTop />
-        <div className="project-content">{projectContent}</div>
-      </div>
     );
   }
 

@@ -4,8 +4,6 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
-import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,20 +33,15 @@ public class StepController {
 
     protected static final String STEP_SET_EXCLUDED_SELECTIONS_ROUTE = "api/steps/{stepId}/setExcludedSelections";
 
-    private final CategoryDaoJpa categoryDaoJpa;
-
     private final StepDaoJpa stepDaoJpa;
 
     private final UserDaoJpa userDaoJpa;
 
     @Autowired
     public StepController(
-        CategoryDaoJpa categoryDaoJpa,
         StepDaoJpa stepDaoJpa,
-        UserDaoJpa userDaoJpa,
-        SelectionDaoJpa selectionDaoJpa
+        UserDaoJpa userDaoJpa
     ) {
-        this.categoryDaoJpa = categoryDaoJpa;
         this.stepDaoJpa = stepDaoJpa;
         this.userDaoJpa = userDaoJpa;
     }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class CategoryDaoJpa {
@@ -58,12 +58,23 @@ public class CategoryDaoJpa {
         if (category == null) {
             throw new ResourceNotFoundException("Category with id " + id + " doesn't exist");
         }
+        sortChoicesForCategory(category);
         return category;
+    }
+
+    private void sortChoicesForCategory(Category category) {
+        if (category.getChoiceOrder() == null || category.getChoices() == null) {
+            return;
+        }
+        List<Long> choiceIdOrder = category.getChoiceOrderById();
+        category.getChoices().sort(Comparator.comparingInt(a -> choiceIdOrder.indexOf(a.getId())));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll();
+        categories.forEach(this::sortChoicesForCategory);
+        return categories;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -84,6 +95,7 @@ public class CategoryDaoJpa {
         Category category = this.getById(categoryId);
         List<Choice> choices = choiceDaoJpa.getChoicesById(choicesIds);
         category.setChoices(choices);
+        category.setChoiceOrder(choicesIds);
         this.save(category);
     }
 
@@ -96,11 +108,13 @@ public class CategoryDaoJpa {
         category.setForumId(forumId);
         category.setDescription(description);
         category.setImage(image);
-        Step step = null;
-        if (nextStepId != null) {
-            step = stepDaoJpa.getById(nextStepId);
+        if (nextStepId == null) {
+            category.setNextStep(null);
+        } else if (nextStepId > 0) {
+            // negative means no change
+            Step step = stepDaoJpa.getById(nextStepId);
+            category.setNextStep(step);
         }
-        category.setNextStep(step);
         save(category);
     }
 }

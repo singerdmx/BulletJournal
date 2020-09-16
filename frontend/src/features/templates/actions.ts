@@ -1,5 +1,5 @@
 import {actions} from './reducer';
-import {Category} from "./interface";
+import {Category, NextStep} from "./interface";
 
 export const getCategories = () => actions.getCategories({});
 
@@ -34,8 +34,8 @@ export const updateCategoryRelations = (categories: Category[]) => actions.updat
 
 export const deleteCategory = (id: number) => actions.deleteCategory({id: id});
 
-export const setCategoryChoices = (id: number, choices: number[]) => actions.setChoices({
-    categoryId: id,
+export const setCategoryChoices = (id: number, choices: number[]) => actions.setCategoryChoices({
+    id: id,
     choices: choices
 });
 
@@ -73,3 +73,37 @@ export const updateStep = (stepId: number, name: string, nextStepId: number | un
 
 export const deleteStep = (stepId: number) => actions.deleteStep({stepId: stepId});
 
+export const getNextStep = (stepId: number, selections: number[], first?: boolean) =>
+    actions.getNextStep({stepId: stepId, selections: selections, first: first});
+
+export const setStepChoices = (id: number, choices: number[]) => actions.setStepChoices({
+    id: id,
+    choices: choices
+});
+
+export const nextStepReceived = (nextStep: NextStep | undefined) => actions.nextStepReceived({step: nextStep});
+
+export const createRule = (name: string, priority: number, connectedStepId: number,
+                           ruleExpression: string, categoryId?: number, stepId?: number) => actions.createRule({
+    name: name,
+    priority: priority,
+    connectedStepId: connectedStepId,
+    ruleExpression: ruleExpression,
+    stepId: stepId,
+    categoryId: categoryId
+});
+
+export const deleteRule = (ruleId: number, ruleType: string) => actions.removeRule({ruleId: ruleId, ruleType: ruleType});
+
+export const getSampleTasks = (filter: string) => actions.getSampleTasks({filter: filter});
+
+export const addSampleTask = (name: string, content: string, metadata: string) =>
+    actions.addSampleTask({name: name, content: content, metadata: metadata});
+
+export const getSampleTask = (sampleTaskId: number) => actions.getSampleTask({sampleTaskId: sampleTaskId});
+
+export const removeSampleTask = (sampleTaskId: number) =>
+    actions.removeSampleTask({taskId: sampleTaskId});
+
+export const updateSampleTask = (sampleTaskId: number, name: string, content: string, metadata: string) =>
+    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, content: content, metadata: metadata});

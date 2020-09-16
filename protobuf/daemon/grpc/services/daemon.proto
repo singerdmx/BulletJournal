@@ -4,6 +4,7 @@ package services;
 
 import "daemon/grpc/types/join_group_events.proto";
 import "daemon/grpc/types/subscribe_notification.proto";
+import "daemon/grpc/types/health.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services";
@@ -26,5 +27,12 @@ service Daemon {
           post: "/daemon"
           body: "*"
      };
+  }
+
+  // Serve rpc / rest call to health check
+  rpc HealthCheck (types.HealthCheckRequest) returns (types.HealthCheckResponse) {
+    option (google.api.http) = {
+          get: "/daemon/healthcheck"
+    };
   }
 }

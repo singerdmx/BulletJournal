@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {deleteCategory, getCategory, setCategoryChoices, updateCategory} from "../../features/templates/actions";
+import {
+    deleteCategory,
+    deleteRule,
+    getCategory,
+    setCategoryChoices,
+    updateCategory
+} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
-import {BackTop, Button, Col, Divider, Popover, Row, Tooltip, Typography} from "antd";
+import {BackTop, Button, Col, Divider, Popover, Row, Tag, Tooltip, Typography} from "antd";
 import {DeleteFilled, DeleteTwoTone, TagOutlined} from "@ant-design/icons/lib";
 import ColorPicker from "../../utils/color-picker/ColorPickr";
 import {icons} from "../../assets/icons";
@@ -12,6 +18,8 @@ import './categories.styles.less'
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import AdminChoiceElem from "./admin-choice-elem";
 import AdminChoices from "./admin-choices";
+import {Container} from "react-floating-action-button";
+import AddRule from "../../components/modals/templates/add-rule.component";
 
 const {Title, Text} = Typography;
 
@@ -24,10 +32,11 @@ type AdminCategoryProps = {
                      color?: string, forumId?: number,
                      image?: string, nextStepId?: number) => void;
     setCategoryChoices: (id: number, choices: number[]) => void;
+    deleteRule: (ruleId: number, ruleType: string) => void;
 }
 
 const AdminCategoryPage: React.FC<AdminCategoryProps> = (
-    {category, getCategory, deleteCategory, updateCategory, setCategoryChoices}) => {
+    {category, getCategory, deleteCategory, updateCategory, setCategoryChoices, deleteRule}) => {
     const history = useHistory();
     const [formUpdateLabelIcon, setFormUpdateLabelIcon] = useState(
         <TagOutlined/>
@@ -109,6 +118,12 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             input ? parseInt(input) : undefined, category.image, category.nextStepId);
     }
 
+    const nextStepIdChange = (input: any) => {
+        console.log(input);
+        updateCategory(category.id, category.name, category.description, category.icon, category.color,
+            category.forumId, category.image, input ? parseInt(input) : undefined);
+    }
+
     const imageChange = (input: any) => {
         console.log(input);
         updateCategory(category.id, category.name, category.description, category.icon, category.color,
@@ -126,7 +141,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
 
     const addChoice = (category: Category, id: number) => {
         const choices = category.choices.map(c => c.id);
-        choices.unshift(id);
+        choices.push(id);
         setCategoryChoices(category.id, choices);
     }
 
@@ -148,6 +163,9 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <br/>
             <Text editable={{onChange: forumIdChange}}>{`${category.forumId ? category.forumId : 'forumId'}`}</Text>
             <br/>
+            <Text
+                editable={{onChange: nextStepIdChange}}>{`${category.nextStepId ? category.nextStepId : 'nextStepId'}`}</Text>
+            <br/>
             <Text editable={{onChange: imageChange}}>{`${category.image ? category.image : 'Image URL'}`}</Text>
         </div>
         <div>
@@ -164,7 +182,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <h3>Choices</h3>
             {category.choices.map(c => {
                 return <div>
-                    <AdminChoiceElem choice={c} />
+                    <AdminChoiceElem choice={c}/>
                     {' '}
                     <Tooltip title='Remove Choice'>
                         <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>
@@ -181,12 +199,27 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             </div>
             <Divider/>
             <div>
+                <h3>Rules</h3>
+                {category && category.rules && category.rules.map(rule => {
+                    return <div><span>
+                        <Tag>{rule.ruleExpression}</Tag> [{rule.name}] (Priority: {rule.priority}, ID: {rule.id})</span>
+                        {' '} <span style={{cursor: 'pointer', color: 'lightBlue'}} onClick={() => history.push(`/admin/steps/${rule.connectedStep.id}`)}>
+                            Step: {rule.connectedStep.name} ({rule.connectedStep.id})</span>
+                        <DeleteTwoTone onClick={() => deleteRule(rule.id, 'CATEGORY_RULE')}/>
+                    </div>
+                })}
+            </div>
+            <Divider/>
+            <div>
                 {category.choices.length > 0 && (
                     <Button type='primary'
                             onClick={() => history.push(`/admin/categories/${categoryId}/steps`)}>
                         Go to Steps
                     </Button>)}
             </div>
+            <Container>
+                <AddRule step={undefined} category={category}/>
+            </Container>
         </div>
     </div>
 }
@@ -199,5 +232,6 @@ export default connect(mapStateToProps, {
     getCategory,
     deleteCategory,
     updateCategory,
-    setCategoryChoices
+    setCategoryChoices,
+    deleteRule
 })(AdminCategoryPage);

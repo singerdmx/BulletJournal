@@ -1,0 +1,1 @@
+alter table template.categories add choice_order text;

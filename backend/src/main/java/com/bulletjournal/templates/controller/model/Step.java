@@ -15,8 +15,6 @@ public class Step {
 
     private List<Rule> rules = new ArrayList<>();
 
-    private Step nextStep;
-
     public Step() {
     }
 
@@ -25,17 +23,11 @@ public class Step {
         this.name = name;
     }
 
-    public Step(Long id, String name, List<Choice> choices) {
+    public Step(Long id, String name, List<Choice> choices, List<Rule> rules) {
         this.id = id;
         this.name = name;
         this.choices = choices;
-    }
-
-    public Step(Long id, String name, List<Choice> choices, Step nextStep) {
-        this.id = id;
-        this.name = name;
-        this.choices = choices;
-        this.nextStep = nextStep;
+        this.rules = rules;
     }
 
     public List<Rule> getStepRules() {
@@ -44,14 +36,6 @@ public class Step {
 
     public void setStepRules(List<Rule> rules) {
         this.rules = rules;
-    }
-
-    public Step getNextStep() {
-        return nextStep;
-    }
-
-    public void setNextStep(Step nextStep) {
-        this.nextStep = nextStep;
     }
 
     public Long getId() {

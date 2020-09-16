@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Entity
@@ -29,6 +30,9 @@ public class Choice extends NamedModel {
     @Column(name = "multiple", nullable = false)
     private boolean multiple;
 
+    @Column(name = "instructionIncluded", nullable = false)
+    private boolean instructionIncluded;
+
     @ManyToMany(targetEntity = Step.class, mappedBy = "choices", fetch = FetchType.LAZY)
     private List<Step> steps = new ArrayList<>();
 
@@ -38,6 +42,14 @@ public class Choice extends NamedModel {
     public Choice(String name, boolean multiple) {
         setName(name);
         this.multiple = multiple;
+        // set instructionIncluded false as default
+        this.instructionIncluded = false;
+    }
+
+    public Choice(String name, boolean multiple, boolean instructionIncluded) {
+        setName(name);
+        this.multiple = multiple;
+        this.instructionIncluded = instructionIncluded;
     }
 
     public Choice(List<Selection> selections, boolean multiple, String name) {
@@ -94,8 +106,31 @@ public class Choice extends NamedModel {
         this.multiple = multiple;
     }
 
+    public boolean isInstructionIncluded() {
+        return instructionIncluded;
+    }
+
+    public void setInstructionIncluded(boolean instructionIncluded) {
+        this.instructionIncluded = instructionIncluded;
+    }
+
     public com.bulletjournal.templates.controller.model.Choice toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Choice(getId(), getName(), isMultiple(),
-                getSelections().stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
+        return new com.bulletjournal.templates.controller.model.Choice(getId(), getName(), isMultiple(), isInstructionIncluded(),
+                getSelections().stream()
+                        .map(Selection::toPresentationModel)
+                        .collect(Collectors.toList()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Choice choice = (Choice) o;
+        return Objects.equals(getId(), choice.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

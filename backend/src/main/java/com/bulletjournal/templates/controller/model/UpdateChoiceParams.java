@@ -5,6 +5,8 @@ public class UpdateChoiceParams {
 
     private boolean multiple;
 
+    private boolean instructionIncluded;
+
     public UpdateChoiceParams() {
     }
 
@@ -22,5 +24,13 @@ public class UpdateChoiceParams {
 
     public void setMultiple(boolean multiple) {
         this.multiple = multiple;
+    }
+
+    public boolean isInstructionIncluded() {
+        return instructionIncluded;
+    }
+
+    public void setInstructionIncluded(boolean instructionIncluded) {
+        this.instructionIncluded = instructionIncluded;
     }
 }

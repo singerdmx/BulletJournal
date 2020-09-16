@@ -43,9 +43,50 @@
           "Daemon"
         ]
       }
+    },
+    "/daemon/healthcheck": {
+      "get": {
+        "summary": "Serve rpc / rest call to health check",
+        "operationId": "Daemon_HealthCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/typesHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "service",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Daemon"
+        ]
+      }
     }
   },
   "definitions": {
+    "HealthCheckResponseServingStatus": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "SERVING",
+        "NOT_SERVING",
+        "SERVICE_UNKNOWN"
+      ],
+      "default": "UNKNOWN"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -126,6 +167,14 @@
         }
       }
     },
+    "typesHealthCheckResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/HealthCheckResponseServingStatus"
+        }
+      }
+    },
     "typesJoinGroupEvent": {
       "type": "object",
       "properties": {
@@ -162,6 +211,9 @@
     "typesStreamMessage": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "message": {
           "type": "string"
         }

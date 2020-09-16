@@ -5,6 +5,8 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +19,7 @@ public class Step extends NamedModel {
     @SequenceGenerator(name = "step_generator", sequenceName = "template.step_sequence", initialValue = 8000, allocationSize = 10)
     private Long id;
 
-    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
     @JoinTable(name = "choices_steps", schema = "template",
             joinColumns = {
                     @JoinColumn(name = "step_id", referencedColumnName = "id",
@@ -25,14 +27,14 @@ public class Step extends NamedModel {
             inverseJoinColumns = {
                     @JoinColumn(name = "choice_id", referencedColumnName = "id",
                             nullable = false, updatable = false)})
-    private List<Choice> choices = new ArrayList<>();
+    private List<Choice> choices;
 
     @Type(type = "long-array")
     @Column(
             name = "excluded_selections",
             columnDefinition = "bigint[]"
     )
-    private Long[] excludedSelections = new Long[0];
+    private Long[] excludedSelections;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "next_step", referencedColumnName = "id")
@@ -51,6 +53,9 @@ public class Step extends NamedModel {
                             nullable = false, updatable = false)})
     private List<SampleTask> sampleTasks = new ArrayList<>();
 
+    @Column(name = "choice_order")
+    private String choiceOrder;
+
     public Step(String name) {
         super.setName(name);
     }
@@ -59,7 +64,30 @@ public class Step extends NamedModel {
 
     }
 
+    public String getChoiceOrder() {
+        return choiceOrder;
+    }
+
+    public void setChoiceOrder(String choiceOrder) {
+        this.choiceOrder = choiceOrder;
+    }
+
+    public void setChoiceOrder(List<Long> choicesIds) {
+        this.choiceOrder = choicesIds
+                .stream().distinct().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
+    }
+
+    public List<Long> getChoiceOrderById() {
+        if (choiceOrder == null || choiceOrder.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(choiceOrder.split(",")).map(Long::parseLong).collect(Collectors.toList());
+    }
+
     public List<StepRule> getStepRules() {
+        if (stepRules == null) {
+            return Collections.emptyList();
+        }
         return stepRules;
     }
 
@@ -76,19 +104,26 @@ public class Step extends NamedModel {
     }
 
     public List<Choice> getChoices() {
+        if (choices == null) {
+            return Collections.emptyList();
+        }
+        choices = choices.stream().distinct().collect(Collectors.toList());
         return choices;
     }
 
     public void setChoices(List<Choice> choices) {
-        this.choices = choices;
+        this.choices = choices.stream().distinct().collect(Collectors.toList());
     }
 
-    public Long[] getExcludedSelections() {
-        return excludedSelections;
+    public List<Long> getExcludedSelections() {
+        if (this.excludedSelections == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(this.excludedSelections);
     }
 
-    public void setExcludedSelections(Long[] excludedSelections) {
-        this.excludedSelections = excludedSelections;
+    public void setExcludedSelections(List<Long> excludedSelections) {
+        this.excludedSelections = excludedSelections == null ? null : excludedSelections.toArray(new Long[0]);
     }
 
     @Override
@@ -101,12 +136,9 @@ public class Step extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Step toPresentationModel() {
-        if (nextStep == null) {
-            return new com.bulletjournal.templates.controller.model.Step(id, getName(),
-                    choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
-        }
         return new com.bulletjournal.templates.controller.model.Step(id, getName(),
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()), nextStep.toPresentationModel());
+                getChoices().stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
+                getStepRules().stream().map(StepRule::toPresentationModel).collect(Collectors.toList()));
     }
 
     public void clone(Step step) {

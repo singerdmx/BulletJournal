@@ -14,23 +14,19 @@ public class Rule {
 
     private Step step;
 
+    private Step connectedStep;
+
     public Rule() {
     }
 
-    public Rule(Long id, String name, Integer priority, String ruleExpression, Category category) {
+    public Rule(Long id, String name, Integer priority, String ruleExpression, Category category, Step step, Step connectedStep) {
         this.id = id;
         this.name = name;
         this.priority = priority;
         this.ruleExpression = ruleExpression;
         this.category = category;
-    }
-
-    public Rule(Long id, String name, Integer priority, String ruleExpression, Step step) {
-        this.id = id;
-        this.name = name;
-        this.priority = priority;
-        this.ruleExpression = ruleExpression;
         this.step = step;
+        this.connectedStep = connectedStep;
     }
 
     public Long getId() {
@@ -49,12 +45,12 @@ public class Rule {
         this.name = name;
     }
 
-    public Integer getOrder() {
+    public Integer getPriority() {
         return priority;
     }
 
-    public void setOrder(Integer order) {
-        this.priority = order;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     public String getRuleExpression() {
@@ -79,5 +75,13 @@ public class Rule {
 
     public void setStep(Step step) {
         this.step = step;
+    }
+
+    public Step getConnectedStep() {
+        return connectedStep;
+    }
+
+    public void setConnectedStep(Step connectedStep) {
+        this.connectedStep = connectedStep;
     }
 }

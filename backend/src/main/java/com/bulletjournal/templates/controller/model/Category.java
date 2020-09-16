@@ -3,6 +3,7 @@ package com.bulletjournal.templates.controller.model;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,13 +26,19 @@ public class Category {
 
     private List<Choice> choices = new ArrayList<>();
 
-    private Step nextStep;
+    private List<Rule> rules = new ArrayList<>();
+
+    private Long nextStepId;
 
     @Expose
     private List<Category> subCategories = new ArrayList<>();
 
     public Category() {
 
+    }
+
+    public Category(Long id, String name) {
+        this(id, name, null, Collections.emptyList());
     }
 
     public Category(Long id, String name, String description, List<Category> subCategories) {
@@ -62,19 +69,8 @@ public class Category {
         this.choices = choices;
     }
 
-    public Category(Long id, String name, String description, String icon, String color, Long forumId, String image, List<Choice> choices, Step nextStep) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.icon = icon;
-        this.color = color;
-        this.forumId = forumId;
-        this.image = image;
-        this.choices = choices;
-        this.nextStep = nextStep;
-    }
-
-    public Category(Long id, String name, String description, String icon, String color, Long forumId, List<Category> subCategories, String image, List<Choice> choices, Step nextStep) {
+    public Category(Long id, String name, String description, String icon, String color,
+                    Long forumId, List<Category> subCategories, String image, List<Choice> choices, List<Rule> rules, Long nextStepId) {
         this.id = id;
         this.name = name;
         this.subCategories = subCategories;
@@ -84,15 +80,24 @@ public class Category {
         this.forumId = forumId;
         this.image = image;
         this.choices = choices;
-        this.nextStep = nextStep;
+        this.rules = rules;
+        this.nextStepId = nextStepId;
     }
 
-    public Step getNextStep() {
-        return nextStep;
+    public Long getNextStepId() {
+        return nextStepId;
     }
 
-    public void setNextStep(Step nextStep) {
-        this.nextStep = nextStep;
+    public void setNextStepId(Long nextStepId) {
+        this.nextStepId = nextStepId;
+    }
+
+    public List<Rule> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<Rule> rules) {
+        this.rules = rules;
     }
 
     public String getIcon() {

@@ -12,5 +12,6 @@ message SubscribeNotification {
 }
 
 message StreamMessage {
-  string message = 1;
+  string id = 1;
+  string message = 2;
 }

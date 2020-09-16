@@ -10,9 +10,10 @@ export const getRule = (ruleId: number, ruleType: string) => {
 }
 
 export const createRule = (
-    name: string, ruleExpression: string, priority: number, stepId?: number, categoryId?: number) => {
+    name: string, connectedStepId: number, ruleExpression: string, priority: number, stepId?: number, categoryId?: number) => {
     const postBody = JSON.stringify({
         name: name,
+        connectedStepId: connectedStepId,
         ruleExpression: ruleExpression,
         priority: priority,
         stepId: stepId,
@@ -41,8 +42,9 @@ export const updateRule = (ruleId: number, name?: string,
         });
 }
 
-export const deleteRule = (ruleId: number) => {
-    return doDelete(`/api/rules/${ruleId}`)
+export const deleteRule = (ruleId: number, ruleType: string) => {
+    // ruleType is CATEGORY_RULE or STEP_RULE
+    return doDelete(`/api/rules/${ruleId}?ruleType=${ruleType}`)
         .then(res => res)
         .catch((err) => {
             throw Error(err.message);

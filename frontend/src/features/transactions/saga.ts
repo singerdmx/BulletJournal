@@ -468,11 +468,16 @@ function* transactionContentsUpdate(
         contents: contents,
       })
     );
-    yield put(updateTargetContent(contents[0]));
-
+    if (contents && contents.length > 0) {
+      yield put(updateTargetContent(contents[0]));
+    } else {
+      yield put(updateTargetContent(undefined));
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
+    } else if (error.message === '404') {
+      console.log(`transaction ${action.payload.transactionId} not found`);
     } else {
       yield call(
           message.error,

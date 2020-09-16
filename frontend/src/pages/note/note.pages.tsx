@@ -5,7 +5,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 // features
 //actions
-import {deleteNote, getNote, updateNoteContents, deleteContent, noteReceived} from '../../features/notes/actions';
+import {deleteNote, getNote, updateNoteContents, deleteContent} from '../../features/notes/actions';
 
 import {IState} from '../../store';
 // components
@@ -42,7 +42,6 @@ interface NotePageHandler {
     setDisplayMore: (displayMore: boolean) => void;
     setDisplayRevision: (displayRevision: boolean) => void;
     deleteContent: (noteId: number, contentId: number) => void;
-    noteReceived: (note: Note | undefined) => void;
     getProject: (projectId: number) => void;
 }
 
@@ -62,7 +61,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     // hook history in router
     const history = useHistory();
     const {myself, note, project, deleteNote, contents, content, getNote, updateNoteContents,
-        setDisplayMore, setDisplayRevision, deleteContent, noteReceived, getProject} = props;
+        setDisplayMore, setDisplayRevision, deleteContent, getProject} = props;
     // get id of note from router
     const {noteId} = useParams();
     // state control drawer displaying
@@ -240,6 +239,5 @@ export default connect(mapStateToProps, {
     deleteContent,
     setDisplayMore,
     setDisplayRevision,
-    noteReceived,
     getProject
 })(NotePage);

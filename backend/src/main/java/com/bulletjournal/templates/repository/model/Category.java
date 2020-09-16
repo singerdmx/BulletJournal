@@ -3,9 +3,7 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -36,7 +34,7 @@ public class Category extends NamedModel {
     @JoinColumn(name = "next_step", referencedColumnName = "id")
     private Step nextStep;
 
-    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(targetEntity = Choice.class, fetch = FetchType.LAZY)
     @JoinTable(name = "choices_categories", schema = "template",
             joinColumns = {
                     @JoinColumn(name = "category_id", referencedColumnName = "id",
@@ -44,7 +42,13 @@ public class Category extends NamedModel {
             inverseJoinColumns = {
                     @JoinColumn(name = "choice_id", referencedColumnName = "id",
                             nullable = false, updatable = false)})
-    private List<Choice> choices = new ArrayList<>();
+    private List<Choice> choices;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<CategoryRule> categoryRules;
+
+    @Column(name = "choice_order")
+    private String choiceOrder;
 
     public Category() {
 
@@ -60,6 +64,37 @@ public class Category extends NamedModel {
         this.nextStep = nextStep;
     }
 
+    public String getChoiceOrder() {
+        return choiceOrder;
+    }
+
+    public void setChoiceOrder(String choiceOrder) {
+        this.choiceOrder = choiceOrder;
+    }
+
+    public void setChoiceOrder(List<Long> choicesIds) {
+        this.choiceOrder = choicesIds
+                .stream().distinct().map(choicesId -> Long.toString(choicesId)).collect(Collectors.joining(","));
+    }
+
+    public List<Long> getChoiceOrderById() {
+        if (choiceOrder == null || choiceOrder.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(choiceOrder.split(",")).map(Long::parseLong).collect(Collectors.toList());
+    }
+
+    public List<CategoryRule> getCategoryRules() {
+        if (categoryRules == null) {
+            return Collections.emptyList();
+        }
+        return categoryRules;
+    }
+
+    public void setCategoryRules(List<CategoryRule> categoryRules) {
+        this.categoryRules = categoryRules;
+    }
+
     public Step getNextStep() {
         return nextStep;
     }
@@ -69,11 +104,15 @@ public class Category extends NamedModel {
     }
 
     public List<Choice> getChoices() {
+        if (choices == null) {
+            return Collections.emptyList();
+        }
+        choices = choices.stream().distinct().collect(Collectors.toList());
         return choices;
     }
 
     public void setChoices(List<Choice> choices) {
-        this.choices = choices;
+        this.choices = choices.stream().distinct().collect(Collectors.toList());
     }
 
     public String getImage() {
@@ -145,13 +184,10 @@ public class Category extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.Category toPresentationModel() {
-        if (nextStep == null) {
-            return new com.bulletjournal.templates.controller.model.Category(
-                    id, getName(), description, icon, color, forumId, image,
-                    choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()));
-        }
         return new com.bulletjournal.templates.controller.model.Category(
-                id, getName(), description, icon, color, forumId, image,
-                choices.stream().map(Choice::toPresentationModel).collect(Collectors.toList()), nextStep.toPresentationModel());
+                id, getName(), description, icon, color, forumId, Collections.emptyList(), image,
+                getChoices().stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
+                getCategoryRules().stream().map(CategoryRule::toPresentationModel).collect(Collectors.toList()),
+                nextStep == null ? null : nextStep.getId());
     }
 }

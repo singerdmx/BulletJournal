@@ -3,29 +3,57 @@ import {message} from 'antd';
 import {PayloadAction} from 'redux-starter-kit';
 import {
   actions as templatesActions,
-  AddCategoryAction, AddChoiceAction, AddSelectionAction,
-  DeleteCategoryAction, DeleteChoiceAction, DeleteSelectionAction,
-  GetCategoriesAction, GetCategoryAction, GetChoiceAction, GetChoicesAction, SetChoicesAction, UpdateCategoryAction,
-  UpdateCategoryRelationsAction, UpdateChoiceAction, UpdateSelectionAction, GetStepsAction, CreateStepAction,
-  GetStepAction, DeleteStepAction
+  AddCategoryAction,
+  AddChoiceAction,
+  AddSelectionAction,
+  DeleteCategoryAction,
+  DeleteChoiceAction,
+  DeleteSelectionAction,
+  GetCategoriesAction,
+  GetCategoryAction,
+  GetChoiceAction,
+  GetChoicesAction,
+  SetChoicesAction,
+  UpdateCategoryAction,
+  UpdateCategoryRelationsAction,
+  UpdateChoiceAction,
+  UpdateSelectionAction,
+  GetStepsAction,
+  CreateStepAction,
+  GetStepAction,
+  DeleteStepAction,
+  GetNextStepAction,
+  AddRuleAction,
+  RemoveRuleAction,
+  GetSampleTasksAction,
+  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction
 } from './reducer';
 import {
   createCategory,
   deleteCategory,
   getCategories,
-  getCategory,
   putCategories,
   putCategory,
+  getCategory,
   updateChoicesForCategory
 } from '../../apis/templates/categoryApis';
 import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, Selection, Step, Steps} from './interface';
+import {Category, Choice, NextStep, Rule, SampleTask, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import {getSteps, createStep, getStep, deleteStep} from '../../apis/templates/stepApis';
+import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
+import {
+  createSampleTask,
+  deleteSampleTask,
+  fetchSampleTask,
+  getNext,
+  getSampleTasksByFilter, putSampleTask
+} from "../../apis/templates/workflowApis";
+import {createRule, deleteRule} from "../../apis/templates/ruleApis";
+import {reloadReceived} from "../myself/actions";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -33,7 +61,11 @@ function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
     console.log(data)
     yield put(templatesActions.categoriesReceived({categories: data}));
   } catch (error) {
-    yield call(message.error, `fetchCategories Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `fetchCategories Error Received: ${error}`);
+    }
   }
 }
 
@@ -43,7 +75,11 @@ function* fetchChoices(action: PayloadAction<GetChoicesAction>) {
     console.log(data)
     yield put(templatesActions.choicesReceived({choices: data}));
   } catch (error) {
-    yield call(message.error, `fetchChoices Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `fetchChoices Error Received: ${error}`);
+    }
   }
 }
 
@@ -64,7 +100,11 @@ function* fetchChoice(action: PayloadAction<GetChoiceAction>) {
     console.log(choices)
     yield put(templatesActions.choicesReceived({choices: choices}));
   } catch (error) {
-    yield call(message.error, `fetchChoices Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `fetchChoices Error Received: ${error}`);
+    }
   }
 }
 
@@ -74,8 +114,13 @@ function* fetchCategory(action: PayloadAction<GetCategoryAction>) {
     const data: Category = yield call(getCategory, categoryId);
     console.log(data)
     yield put(templatesActions.categoryReceived({category: data}));
+    yield put(templatesActions.nextStepReceived({step: undefined}));
   } catch (error) {
-    yield call(message.error, `fetchCategory Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `fetchCategory Error Received: ${error}`);
+    }
   }
 }
 
@@ -87,7 +132,11 @@ function* addCategory(action: PayloadAction<AddCategoryAction>) {
     const data: Category[] = yield call(getCategories);
     yield put(templatesActions.categoriesReceived({categories: data}));
   } catch (error) {
-    yield call(message.error, `addCategory Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `addCategory Error Received: ${error}`);
+    }
   }
 }
 
@@ -98,7 +147,11 @@ function* updateCategory(action: PayloadAction<UpdateCategoryAction>) {
         categoryId, name, description, icon, color, forumId, image, nextStepId);
     yield put(templatesActions.categoryReceived({category: data}));
   } catch (error) {
-    yield call(message.error, `updateCategory Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateCategory Error Received: ${error}`);
+    }
   }
 }
 
@@ -108,7 +161,11 @@ function* removeCategory(action: PayloadAction<DeleteCategoryAction>) {
     const data: Category[] = yield call(deleteCategory, id);
     yield put(templatesActions.categoriesReceived({categories: data}));
   } catch (error) {
-    yield call(message.error, `removeCategory Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeCategory Error Received: ${error}`);
+    }
   }
 }
 
@@ -118,18 +175,41 @@ function* updateCategories(action: PayloadAction<UpdateCategoryRelationsAction>)
     const data: Category[] = yield call(putCategories, categories);
     yield put(templatesActions.categoriesReceived({categories: data}));
   } catch (error) {
-    yield call(message.error, `updateCategories Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateCategories Error Received: ${error}`);
+    }
   }
 }
 
-function* setChoices(action: PayloadAction<SetChoicesAction>) {
+function* setCategoryChoices(action: PayloadAction<SetChoicesAction>) {
   try {
-    const {categoryId, choices} = action.payload;
-    const data: Category = yield call(updateChoicesForCategory, categoryId, choices);
+    const {id, choices} = action.payload;
+    const data: Category = yield call(updateChoicesForCategory, id, choices);
     console.log(data)
     yield put(templatesActions.categoryReceived({category: data}));
   } catch (error) {
-    yield call(message.error, `setChoices Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `setCategoryChoices Error Received: ${error}`);
+    }
+  }
+}
+
+function* setStepChoices(action: PayloadAction<SetChoicesAction>) {
+  try {
+    const {id, choices} = action.payload;
+    const data: Step = yield call(updateChoicesForStep, id, choices);
+    console.log(data)
+    yield put(templatesActions.stepReceived({step: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `setStepChoices Error Received: ${error}`);
+    }
   }
 }
 
@@ -142,7 +222,11 @@ function* addChoice(action: PayloadAction<AddChoiceAction>) {
     console.log(choices)
     yield put(templatesActions.choicesReceived({choices: choices}));
   } catch (error) {
-    yield call(message.error, `addChoice Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `addChoice Error Received: ${error}`);
+    }
   }
 }
 
@@ -152,7 +236,11 @@ function* removeChoice(action: PayloadAction<DeleteChoiceAction>) {
     const data: Choice[] = yield call(deleteChoice, id);
     yield put(templatesActions.choicesReceived({choices: data}));
   } catch (error) {
-    yield call(message.error, `removeChoice Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeChoice Error Received: ${error}`);
+    }
   }
 }
 
@@ -165,7 +253,11 @@ function* addSelection(action: PayloadAction<AddSelectionAction>) {
     console.log(choices)
     yield put(templatesActions.choicesReceived({choices: choices}));
   } catch (error) {
-    yield call(message.error, `addSelection Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `addSelection Error Received: ${error}`);
+    }
   }
 }
 
@@ -177,7 +269,11 @@ function* removeSelection(action: PayloadAction<DeleteSelectionAction>) {
     console.log(choices)
     yield put(templatesActions.choicesReceived({choices: choices}));
   } catch (error) {
-    yield call(message.error, `removeSelection Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeSelection Error Received: ${error}`);
+    }
   }
 }
 
@@ -190,7 +286,11 @@ function* putChoice(action: PayloadAction<UpdateChoiceAction>) {
     console.log(choices)
     yield put(templatesActions.choicesReceived({choices: choices}));
   } catch (error) {
-    yield call(message.error, `putChoice Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `putChoice Error Received: ${error}`);
+    }
   }
 }
 
@@ -203,7 +303,11 @@ function* putSelection(action: PayloadAction<UpdateSelectionAction>) {
     console.log(choices)
     yield put(templatesActions.choicesReceived({choices: choices}));
   } catch (error) {
-    yield call(message.error, `putSelection Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `putSelection Error Received: ${error}`);
+    }
   }
 }
 
@@ -213,7 +317,11 @@ function* fetchSteps(action: PayloadAction<GetStepsAction>) {
     console.log(data)
     yield put(templatesActions.stepsReceived({steps: data.steps}));
   } catch (error) {
-    yield call(message.error, `fetchSteps Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `fetchSteps Error Received: ${error}`);
+    }
   }
 }
 
@@ -225,7 +333,11 @@ function* addStep(action: PayloadAction<CreateStepAction>) {
     const data: Steps = yield call(getSteps);
     yield put(templatesActions.stepsReceived({steps: data.steps}));
   } catch (error) {
-    yield call(message.error, `addStep Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `addStep Error Received: ${error}`);
+    }
   }
 }
 
@@ -236,7 +348,11 @@ function* fetchStep(action: PayloadAction<GetStepAction>) {
     console.log(data)
     yield put(templatesActions.stepReceived({step: data}));
   } catch (error) {
-    yield call(message.error, `fetchStep Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `fetchStep Error Received: ${error}`);
+    }
   }
 }
 
@@ -247,7 +363,133 @@ function* removeStep(action: PayloadAction<DeleteStepAction>) {
     const data: Steps = yield call(getSteps);
     yield put(templatesActions.stepsReceived({steps: data.steps}));
   } catch (error) {
-    yield call(message.error, `removeStep Error Received: ${error}`);
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeStep Error Received: ${error}`);
+    }
+  }
+}
+
+function* getNextStep(action: PayloadAction<GetNextStepAction>) {
+  try {
+    const {stepId, selections, first} = action.payload;
+    const nextStep: NextStep = yield call(getNext, stepId, selections, first);
+    yield put(templatesActions.nextStepReceived({step: nextStep}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getNextStep Error Received: ${error}`);
+    }
+  }
+}
+
+function* addRule(action: PayloadAction<AddRuleAction>) {
+  try {
+    const {name, priority, connectedStepId, ruleExpression, categoryId, stepId} = action.payload;
+    const data: Rule = yield call(createRule, name, connectedStepId, ruleExpression, priority, stepId, categoryId);
+    console.log(data)
+    if (stepId) {
+      yield put(templatesActions.getStep({stepId: stepId}));
+    }
+    if (categoryId) {
+      yield put(templatesActions.getCategory({categoryId: categoryId}));
+    }
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `addRule Error Received: ${error}`);
+    }
+  }
+}
+
+function* removeRule(action: PayloadAction<RemoveRuleAction>) {
+  try {
+    const {ruleId, ruleType} = action.payload;
+    yield call(deleteRule, ruleId, ruleType);
+    const state: IState = yield select();
+    if (ruleType === 'CATEGORY_RULE') {
+      yield put(templatesActions.getCategory({categoryId: state.templates.category!.id}));
+    } else {
+      yield put(templatesActions.getStep({stepId: state.templates.step!.id}));
+    }
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeRule Error Received: ${error}`);
+    }
+  }
+}
+
+function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
+  try {
+    const {filter} = action.payload;
+    const data : SampleTask[] = yield call(getSampleTasksByFilter, filter);
+    yield put(templatesActions.sampleTasksReceived({tasks: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getSampleTasks Error Received: ${error}`);
+    }
+  }
+}
+
+function* addSampleTask(action: PayloadAction<AddSampleTaskAction>) {
+  try {
+    const {name, content, metadata} = action.payload;
+    yield call(createSampleTask, name, content, metadata);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `addSampleTask Error Received: ${error}`);
+    }
+  }
+}
+
+function* getSampleTask(action: PayloadAction<GetSampleTaskAction>) {
+  try {
+    const {sampleTaskId} = action.payload;
+    const data : SampleTask = yield call(fetchSampleTask, sampleTaskId);
+    yield put(templatesActions.sampleTaskReceived({task: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getSampleTask Error Received: ${error}`);
+    }
+  }
+}
+
+function* removeSampleTask(action: PayloadAction<RemoveSampleTaskAction>) {
+  try {
+    const {taskId} = action.payload;
+    yield call(deleteSampleTask, taskId);
+    yield put(templatesActions.sampleTaskReceived({task: undefined}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeSampleTask Error Received: ${error}`);
+    }
+  }
+}
+
+function* updateSampleTask(action: PayloadAction<UpdateSampleTaskAction>) {
+  try {
+    const {sampleTaskId, name, content, metadata} = action.payload;
+    const data : SampleTask = yield call(putSampleTask, sampleTaskId, name, content, metadata);
+    yield put(templatesActions.sampleTaskReceived({task: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateSampleTask Error Received: ${error}`);
+    }
   }
 }
 
@@ -262,7 +504,8 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.deleteChoice.type, removeChoice),
     yield takeLatest(templatesActions.updateCategory.type, updateCategory),
     yield takeLatest(templatesActions.getCategory.type, fetchCategory),
-    yield takeLatest(templatesActions.setChoices.type, setChoices),
+    yield takeLatest(templatesActions.setCategoryChoices.type, setCategoryChoices),
+    yield takeLatest(templatesActions.setStepChoices.type, setStepChoices),
     yield takeLatest(templatesActions.addChoice.type, addChoice),
     yield takeLatest(templatesActions.updateChoice.type, putChoice),
     yield takeLatest(templatesActions.addSelection.type, addSelection),
@@ -272,5 +515,13 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getStep.type, fetchStep),
     yield takeLatest(templatesActions.createStep.type, addStep),
     yield takeLatest(templatesActions.deleteStep.type, removeStep),
+    yield takeLatest(templatesActions.getNextStep.type, getNextStep),
+    yield takeLatest(templatesActions.createRule.type, addRule),
+    yield takeLatest(templatesActions.removeRule.type, removeRule),
+    yield takeLatest(templatesActions.getSampleTasks.type, getSampleTasks),
+    yield takeLatest(templatesActions.addSampleTask.type, addSampleTask),
+    yield takeLatest(templatesActions.getSampleTask.type, getSampleTask),
+    yield takeLatest(templatesActions.removeSampleTask.type, removeSampleTask),
+    yield takeLatest(templatesActions.updateSampleTask.type, updateSampleTask),
   ])
 }

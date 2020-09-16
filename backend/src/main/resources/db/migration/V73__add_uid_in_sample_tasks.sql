@@ -1,0 +1,1 @@
+alter table template.sample_tasks add uid varchar(500);

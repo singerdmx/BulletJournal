@@ -9,11 +9,13 @@ export interface Category {
     nextStepId?: number;
     subCategories: Category[];
     choices: Choice[];
+    rules: Rule[];
 }
 
 export interface Choice {
     id: number;
     name: string;
+    instructionIncluded: boolean;
     multiple: boolean;
     selections: Selection[];
     categories: Category[];
@@ -31,7 +33,8 @@ export interface Step {
     name: string;
     choices: Choice[];
     excludedSelections: Selection[];
-    nextStep: Step | undefined;
+    rules: Rule[];
+    nextStepId?: number;
 }
 
 export interface Steps {
@@ -44,6 +47,20 @@ export interface Rule {
     name: string;
     priority: number;
     ruleExpression: string;
-    category: Category;
+    category?: Category;
+    step?: Step;
+    connectedStep: Step;
+}
+
+export interface NextStep {
     step: Step;
+}
+
+export interface SampleTask {
+    id: number;
+    name: string;
+    content: string;
+    metadata: string;
+    uid: string;
+    steps: Step[];
 }

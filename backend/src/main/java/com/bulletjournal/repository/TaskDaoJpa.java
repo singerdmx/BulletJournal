@@ -462,6 +462,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         task.setName(createTaskParams.getName());
         task.setTimezone(createTaskParams.getTimezone());
         task.setDuration(createTaskParams.getDuration());
+        if (createTaskParams.hasDuration() && createTaskParams.getDuration() <= 0) {
+            task.setDuration(null);
+        }
         task.setAssignees(createTaskParams.getAssignees());
         task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
         if (createTaskParams.getLabels() != null && !createTaskParams.getLabels().isEmpty()) {
@@ -561,6 +564,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         DaoHelper.updateIfPresent(updateTaskParams.hasTimezone(), timezone, task::setTimezone);
         DaoHelper.updateIfPresent(updateTaskParams.hasDuration(), updateTaskParams.getDuration(), task::setDuration);
+        if (updateTaskParams.hasDuration() && updateTaskParams.getDuration() <= 0) {
+            task.setDuration(null);
+        }
 
         if (updateTaskParams.hasTimezone()) {
             updateCompletedSlotsWithTimezone(task, timezone);

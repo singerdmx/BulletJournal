@@ -1,7 +1,7 @@
 import {User} from "../features/group/interface";
 import {ProjectItem} from "../features/myBuJo/interface";
 
-const isSubsequence = (longS: string, shortS: string) => {
+export const isSubsequence = (longS: string, shortS: string) => {
     if (shortS.length === 0) {
         return true;
     }

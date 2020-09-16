@@ -11,10 +11,10 @@ import java.util.List;
 public class RuleExpressionTest {
     @Test
     public void test() {
-        String expectedJson = "{\"rule\":[{\"choiceId\":1,\"condition\":\"CONTAINS\",\"selectionIds\":[1,2,3]},{\"choiceId\":2,\"condition\":\"CONTAINS\",\"selectionIds\":[4,5,6]}],\"logicOperator\":\"AND\"}";
+        String expectedJson = "{\"rule\":[{\"condition\":\"CONTAINS\",\"selectionIds\":[1,2,3]},{\"condition\":\"CONTAINS\",\"selectionIds\":[4,5,6]}],\"logicOperator\":\"AND\"}";
         List<RuleExpression.Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(new RuleExpression.Criteria(1L, RuleExpression.Condition.CONTAINS, Arrays.asList(1L, 2L, 3L)));
-        criteriaList.add(new RuleExpression.Criteria(2L, RuleExpression.Condition.CONTAINS, Arrays.asList(4L, 5L, 6L)));
+        criteriaList.add(new RuleExpression.Criteria(RuleExpression.Condition.CONTAINS, Arrays.asList(1L, 2L, 3L)));
+        criteriaList.add(new RuleExpression.Criteria(RuleExpression.Condition.CONTAINS, Arrays.asList(4L, 5L, 6L)));
 
         RuleExpression ruleExpression = new RuleExpression(criteriaList, RuleExpression.LogicOperator.AND);
         Assert.assertEquals(expectedJson, new Gson().toJson(ruleExpression));

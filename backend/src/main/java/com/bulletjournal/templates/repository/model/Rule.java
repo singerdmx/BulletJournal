@@ -9,7 +9,7 @@ import javax.persistence.*;
 @MappedSuperclass
 public abstract class Rule extends NamedModel {
 
-    @Column(name = "priority")
+    @Column(name = "priority", nullable = false)
     private Integer priority;
 
     @Column(name = "rule_expression")

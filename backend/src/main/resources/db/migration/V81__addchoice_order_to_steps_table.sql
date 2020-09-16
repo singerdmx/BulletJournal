@@ -1,0 +1,1 @@
+alter table template.steps add choice_order text;

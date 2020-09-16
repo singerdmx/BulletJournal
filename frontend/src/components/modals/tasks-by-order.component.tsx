@@ -161,7 +161,7 @@ const TasksByOrder: React.FC<TasksByOrderProps> = (props) => {
   };
   return (
     <Modal
-      title={'Task(s) ordered by due date time'}
+      title={'Task(s) ordered by due date'}
       visible={visible}
       onCancel={props.onCancel}
       footer={false}

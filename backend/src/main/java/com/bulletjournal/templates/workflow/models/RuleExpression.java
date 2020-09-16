@@ -36,22 +36,12 @@ public class RuleExpression {
     }
 
     public static class Criteria {
-        private Long choiceId;
         private Condition condition;
         private List<Long> selectionIds;
 
-        public Criteria(Long choiceId, Condition condition, List<Long> selectionIds) {
-            this.choiceId = choiceId;
+        public Criteria(Condition condition, List<Long> selectionIds) {
             this.condition = condition;
             this.selectionIds = selectionIds;
-        }
-
-        public Long getChoiceId() {
-            return choiceId;
-        }
-
-        public void setChoiceId(Long choiceId) {
-            this.choiceId = choiceId;
         }
 
         public Condition getCondition() {

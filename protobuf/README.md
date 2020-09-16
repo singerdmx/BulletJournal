@@ -4,6 +4,8 @@ Run the following to install protobuf and protoc-gen-go
 ```
 brew install protobuf
 go get -u github.com/golang/protobuf/protoc-gen-go
+go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 ```
 Generate/update daemon grpc server go code should you updated its proto files
 ```

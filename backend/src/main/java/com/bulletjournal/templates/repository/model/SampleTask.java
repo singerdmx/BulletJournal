@@ -24,6 +24,9 @@ public class SampleTask extends NamedModel {
     @Column(name = "metadata")
     private String metadata;
 
+    @Column(name = "uid")
+    private String uid;
+
     @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "steps_sample_tasks", schema = "template",
             joinColumns = {
@@ -41,6 +44,14 @@ public class SampleTask extends NamedModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getContent() {
@@ -68,6 +79,12 @@ public class SampleTask extends NamedModel {
     }
 
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.SampleTask(id, getName(), content, metadata, steps.stream().map(Step::toPresentationModel).collect(Collectors.toList()));
+        return new com.bulletjournal.templates.controller.model.SampleTask(
+            id,
+            getName(),
+            content,
+            metadata,
+            steps.stream().map(Step::toPresentationModel).collect(Collectors.toList()),
+            uid);
     }
 }

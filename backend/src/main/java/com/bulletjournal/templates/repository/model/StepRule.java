@@ -36,6 +36,8 @@ public class StepRule extends Rule {
     }
 
     public com.bulletjournal.templates.controller.model.Rule toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(), step.toPresentationModel());
+        return new com.bulletjournal.templates.controller.model.Rule(id, getName(), getPriority(), getRuleExpression(),
+                null, new com.bulletjournal.templates.controller.model.Step(getId(), getName()),
+                new com.bulletjournal.templates.controller.model.Step(getConnectedStep().getId(), getConnectedStep().getName()));
     }
 }

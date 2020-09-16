@@ -48,3 +48,14 @@ export const deleteStep = (stepId: number) => {
             throw Error(err.message);
         });
 }
+
+export const updateChoicesForStep = (stepId: number, choicesIds: number[]) => {
+    const putBody = JSON.stringify(choicesIds);
+    return doPut(`/api/steps/${stepId}/setChoices`, putBody)
+        .then(res => res.json())
+        .catch(
+            (err) => {
+                throw Error(err.message);
+            }
+        );
+};

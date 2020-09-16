@@ -11,6 +11,11 @@ services:
         condition: service_started
       database:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://daemon:9091/daemon/healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   cache:
     image: redis
@@ -50,6 +55,8 @@ services:
       - $HOME/docker/volumes/log:/var/log
     depends_on:
       database:
+        condition: service_healthy
+      daemon:
         condition: service_healthy
     # Remove lines below to enable spring boot container
     command: "true"

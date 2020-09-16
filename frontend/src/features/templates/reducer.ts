@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
-import {Category, Choice, Step} from './interface';
+import {Category, Choice, NextStep, Rule, SampleTask, Step} from './interface';
 
 export type GetStepsAction = {};
 
@@ -24,6 +24,16 @@ export type StepsAction = {
 
 export type StepAction = {
     step: Step;
+};
+
+export type NextStepAction = {
+    step: NextStep | undefined;
+};
+
+export type GetNextStepAction = {
+    stepId: number;
+    selections: number[];
+    first?: boolean;
 };
 
 export type DeleteStepAction = {
@@ -92,7 +102,7 @@ export type UpdateCategoryRelationsAction = {
 };
 
 export type SetChoicesAction = {
-    categoryId: number;
+    id: number;
     choices: number[];
 };
 
@@ -117,12 +127,67 @@ export type UpdateSelectionAction = {
     text: string;
 };
 
+export type RuleAction = {
+    rule: Rule;
+};
+
+export type AddRuleAction = {
+    name: string;
+    priority: number;
+    connectedStepId: number;
+    ruleExpression: string;
+    categoryId?: number;
+    stepId?: number;
+};
+
+export type RemoveRuleAction = {
+    ruleId: number;
+    ruleType: string;
+};
+
+export type RemoveSampleTaskAction = {
+    taskId: number;
+};
+
+export type GetSampleTasksAction = {
+    filter: string;
+};
+
+export type SampleTasksAction = {
+    tasks: SampleTask[];
+};
+
+export type SampleTaskAction = {
+    task: SampleTask | undefined;
+};
+
+export type AddSampleTaskAction = {
+    name: string;
+    content: string;
+    metadata: string;
+};
+
+export type UpdateSampleTaskAction = {
+    sampleTaskId: number;
+    name: string;
+    content: string;
+    metadata: string;
+};
+
+export type GetSampleTaskAction = {
+    sampleTaskId: number;
+};
+
 let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
     choices: [] as Choice[],
     steps: [] as Step[],
-    step: undefined as Step | undefined
+    step: undefined as Step | undefined,
+    nextStep: undefined as NextStep | undefined,
+    rule: undefined as Rule | undefined,
+    sampleTasks: [] as SampleTask[],
+    sampleTask: undefined as SampleTask | undefined,
 };
 
 const slice = createSlice({
@@ -150,7 +215,8 @@ const slice = createSlice({
         deleteCategory: (state, action: PayloadAction<DeleteCategoryAction>) => state,
         deleteChoice: (state, action: PayloadAction<DeleteChoiceAction>) => state,
         updateCategoryRelations: (state, action: PayloadAction<UpdateCategoryRelationsAction>) => state,
-        setChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
+        setCategoryChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
+        setStepChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
         addChoice: (state, action: PayloadAction<AddChoiceAction>) => state,
         updateChoice: (state, action: PayloadAction<UpdateChoiceAction>) => state,
         addSelection: (state, action: PayloadAction<AddSelectionAction>) => state,
@@ -161,6 +227,10 @@ const slice = createSlice({
             const {steps} = action.payload;
             state.steps = steps;
         },
+        nextStepReceived: (state, action: PayloadAction<NextStepAction>) => {
+            const {step} = action.payload;
+            state.nextStep = step;
+        },
         getStep: (state, action: PayloadAction<GetStepAction>) => state,
         stepReceived: (state, action: PayloadAction<StepAction>) => {
             const {step} = action.payload;
@@ -169,6 +239,26 @@ const slice = createSlice({
         createStep: (state, action: PayloadAction<CreateStepAction>) => state,
         updateStep: (state, action: PayloadAction<UpdateStepAction>) => state,
         deleteStep: (state, action: PayloadAction<DeleteStepAction>) => state,
+        getNextStep: (state, action: PayloadAction<GetNextStepAction>) => state,
+        ruleReceived: (state, action: PayloadAction<RuleAction>) => {
+            const {rule} = action.payload;
+            state.rule = rule;
+        },
+        createRule: (state, action: PayloadAction<AddRuleAction>) => state,
+        removeRule: (state, action: PayloadAction<RemoveRuleAction>) => state,
+        sampleTasksReceived: (state, action: PayloadAction<SampleTasksAction>) => {
+            const {tasks} = action.payload;
+            state.sampleTasks = tasks;
+        },
+        getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
+        addSampleTask: (state, action: PayloadAction<AddSampleTaskAction>) => state,
+        updateSampleTask: (state, action: PayloadAction<UpdateSampleTaskAction>) => state,
+        getSampleTask: (state, action: PayloadAction<GetSampleTaskAction>) => state,
+        sampleTaskReceived: (state, action: PayloadAction<SampleTaskAction>) => {
+            const {task} = action.payload;
+            state.sampleTask = task;
+        },
+        removeSampleTask: (state, action: PayloadAction<RemoveSampleTaskAction>) => state,
     },
 });
 
