@@ -1,7 +1,9 @@
 package com.bulletjournal.templates.controller.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Step {
 
@@ -14,6 +16,8 @@ public class Step {
     private List<Selection> excludedSelections = new ArrayList<>();
 
     private List<Rule> rules = new ArrayList<>();
+
+    private Map<Selection, List<SampleTask>> sampleTasks = new HashMap<>();
 
     public Step() {
     }
@@ -68,5 +72,13 @@ public class Step {
 
     public void setExcludedSelections(List<Selection> excludedSelections) {
         this.excludedSelections = excludedSelections;
+    }
+
+    public Map<Selection, List<SampleTask>> getSampleTasks() {
+        return sampleTasks;
+    }
+
+    public void setSampleTasks(Map<Selection, List<SampleTask>> sampleTasks) {
+        this.sampleTasks = sampleTasks;
     }
 }
