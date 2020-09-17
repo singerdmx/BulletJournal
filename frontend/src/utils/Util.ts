@@ -2,6 +2,8 @@ import {User} from "../features/group/interface";
 import {ProjectItem} from "../features/myBuJo/interface";
 
 export const isSubsequence = (longS: string, shortS: string) => {
+    longS = longS.toLowerCase();
+    shortS = shortS.toLowerCase();
     if (shortS.length === 0) {
         return true;
     }
