@@ -7,7 +7,7 @@ import {getCategory, getNextStep, nextStepReceived} from "../../features/templat
 import {Category, Choice, NextStep, Step} from "../../features/templates/interface";
 import {Button, Card, Empty, Select} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
+import {CloseSquareTwoTone, LikeTwoTone, UpCircleTwoTone} from "@ant-design/icons";
 
 const {Meta} = Card;
 const {Option} = Select;
@@ -16,7 +16,7 @@ type StepsProps = {
     category: Category | undefined;
     nextStep: NextStep | undefined;
     getCategory: (categoryId: number) => void;
-    getNextStep: (stepId: number, selections: number[], first?: boolean) => void;
+    getNextStep: (stepId: number, selections: number[], prevSelections: number[], first?: boolean) => void;
     nextStepReceived: (nextStep: NextStep | undefined) => void;
 };
 
@@ -42,6 +42,10 @@ const StepsPage: React.FC<StepsProps> = (
             if (existingSteps.length > 0 && existingSteps[0].id !== category.id) {
                 localStorage.removeItem(STEPS);
                 localStorage.removeItem(SELECTIONS);
+            } else {
+                const selections = getSelections();
+                const curStep = getCurrentStep();
+                setShowConfirmButton(curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0));
             }
         }
     }, [category]);
@@ -55,6 +59,7 @@ const StepsPage: React.FC<StepsProps> = (
     }, [nextStep]);
 
     const [curSelections, setCurSelections] = useState<any>({});
+    const [showConfirmButton, setShowConfirmButton] = useState(false);
 
     if (!category) {
         return <Empty/>
@@ -103,13 +108,7 @@ const StepsPage: React.FC<StepsProps> = (
         setSelections(selections);
 
         const curStep = getCurrentStep();
-        if (curStep.choices.every(c => selections[c.id])) {
-            let selected: number[] = [];
-            curStep.choices.forEach(c => {
-                selected = selected.concat(selections[c.id]);
-            });
-            getNextStep(curStep.id, selected, getSteps().length === 1);
-        }
+        setShowConfirmButton(curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0));
     }
 
     const onFilterChoices = (inputValue: string, option: any) => {
@@ -161,6 +160,7 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const goBack = () => {
+        setShowConfirmButton(false);
         const steps: Step[] = getSteps();
         const selections = getSelections();
         steps[steps.length - 1].choices.forEach(c => {
@@ -175,6 +175,25 @@ const StepsPage: React.FC<StepsProps> = (
         nextStepReceived(undefined);
     }
 
+    const onConfirmNext = () => {
+        const selections = getSelections();
+        const curStep = getCurrentStep();
+        let selected: number[] = [];
+        curStep.choices.forEach(c => {
+            selected = selected.concat(selections[c.id]);
+        });
+
+        let prevSelections = [] as number[];
+
+        Object.keys(selections).forEach((k) => {
+            if (!curStep.choices.map(c => c.id).includes(parseInt(k)) && selections[k]) {
+                prevSelections = prevSelections.concat(selections[k]);
+            }
+        });
+        console.log(prevSelections)
+        getNextStep(curStep.id, selected, prevSelections, getSteps().length === 1);
+    }
+
     const getStepsDiv = () => {
         if (!category || category.choices.length === 0) {
             return null;
@@ -182,8 +201,9 @@ const StepsPage: React.FC<StepsProps> = (
 
         const existingSteps = getSteps();
         if (existingSteps.length > 0) {
+            const curStep = getCurrentStep();
             return <div className='choices-card'>
-                {((nextStep && nextStep.step) || getSteps().length > 1) && <div className='go-back'>
+                {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
                     <Button
                         onClick={goBack}
                         style={{color: '#4ddbff'}} shape="round"
@@ -192,10 +212,18 @@ const StepsPage: React.FC<StepsProps> = (
                     </Button>
                 </div>}
                 <div>
-                    {getCurrentStep().choices.map(choice => {
+                    {curStep.choices.map(choice => {
                         return renderChoice(choice);
                     })}
                 </div>
+                {showConfirmButton && <div className='confirm-button'>
+                    <Button
+                        onClick={onConfirmNext}
+                        style={{color: '#4ddbff'}} shape="round"
+                        icon={<LikeTwoTone />} size='large'>
+                        Confirm
+                    </Button>
+                </div>}
             </div>
         }
 

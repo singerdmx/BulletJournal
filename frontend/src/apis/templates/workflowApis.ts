@@ -1,8 +1,11 @@
 import {doDelete, doFetch, doPost, doPut} from '../api-helper';
 
-export const getNext = (stepId: number, selections: number[], first?: boolean) => {
+export const getNext = (stepId: number, selections: number[], prevSelections: number[], first?: boolean) => {
     let url = `/api/public/steps/${stepId}/next?`;
     url += selections.map(s => `selections=${s}`).join('&');
+    if (prevSelections.length > 0) {
+        url += '&' + prevSelections.map(s => `prevSelections=${s}`).join('&');
+    }
     if (first) {
         url += '&first=true';
     }

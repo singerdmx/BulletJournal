@@ -373,8 +373,8 @@ function* removeStep(action: PayloadAction<DeleteStepAction>) {
 
 function* getNextStep(action: PayloadAction<GetNextStepAction>) {
   try {
-    const {stepId, selections, first} = action.payload;
-    const nextStep: NextStep = yield call(getNext, stepId, selections, first);
+    const {stepId, selections, prevSelections, first} = action.payload;
+    const nextStep: NextStep = yield call(getNext, stepId, selections, prevSelections, first);
     yield put(templatesActions.nextStepReceived({step: nextStep}));
   } catch (error) {
     if (error.message === 'reload') {

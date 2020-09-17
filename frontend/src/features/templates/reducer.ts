@@ -33,6 +33,7 @@ export type NextStepAction = {
 export type GetNextStepAction = {
     stepId: number;
     selections: number[];
+    prevSelections: number[];
     first?: boolean;
 };
 

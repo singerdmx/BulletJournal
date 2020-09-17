@@ -53,6 +53,7 @@ public class WorkflowController {
     public NextStep getNext(
             @NotNull @PathVariable Long stepId,
             @NotNull @RequestParam List<Long> selections,
+            @NotNull @RequestParam(required = false) List<Long> prevSelections,
             @NotNull @RequestParam(required = false, defaultValue = "false") boolean first
     ) {
         if (first) {
