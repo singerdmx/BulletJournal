@@ -56,11 +56,25 @@ public class WorkflowController {
             @NotNull @RequestParam(required = false) List<Long> prevSelections,
             @NotNull @RequestParam(required = false, defaultValue = "false") boolean first
     ) {
+        NextStep nextStep;
         if (first) {
-            return checkIfSelectionsMatchCategoryRules(stepId, selections);
+            nextStep = checkIfSelectionsMatchCategoryRules(stepId, selections);
         } else {
-            return checkIfSelectionsMatchStepRules(stepId, selections);
+            nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
+            if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
+                // assume final step, try to get sample tasks using prevSelections
+                nextStep.setTasks(getSampleTasksForFinalStep(nextStep.getStep(), prevSelections));
+            }
         }
+
+        return nextStep;
+    }
+
+    private List<SampleTask> getSampleTasksForFinalStep(
+            com.bulletjournal.templates.controller.model.Step step, List<Long> prevSelections) {
+        // get task rules
+        // find choice combo if there is selection combo in any task rule
+        return null;
     }
 
     private NextStep checkIfSelectionsMatchCategoryRules(Long stepId, List<Long> selections) {

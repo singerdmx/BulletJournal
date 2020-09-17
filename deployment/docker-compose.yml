@@ -18,6 +18,8 @@ services:
     container_name: react_app
     ports:
       - "3000:3000"
+    volumes:
+      - /tmp:/tmp
     depends_on:
       - controller
 
