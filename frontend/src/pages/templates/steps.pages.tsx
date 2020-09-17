@@ -38,6 +38,11 @@ const StepsPage: React.FC<StepsProps> = (
         document.title = 'Bullet Journal - Steps';
         if (category) {
             document.title = category.name;
+            const existingSteps = getSteps();
+            if (existingSteps.length > 0 && existingSteps[0].id !== category.id) {
+                localStorage.removeItem(STEPS);
+                localStorage.removeItem(SELECTIONS);
+            }
         }
     }, [category]);
 
@@ -87,7 +92,7 @@ const StepsPage: React.FC<StepsProps> = (
         return selections;
     }
 
-    const setSelections = (selections : any) => {
+    const setSelections = (selections: any) => {
         setCurSelections(selections);
         localStorage.setItem(SELECTIONS, JSON.stringify(selections));
     }
@@ -156,7 +161,7 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const goBack = () => {
-        const steps : Step[] = getSteps();
+        const steps: Step[] = getSteps();
         const selections = getSelections();
         steps[steps.length - 1].choices.forEach(c => {
             selections[c.id] = null;
@@ -177,26 +182,21 @@ const StepsPage: React.FC<StepsProps> = (
 
         const existingSteps = getSteps();
         if (existingSteps.length > 0) {
-            if (existingSteps[0].id !== category.id) {
-                localStorage.removeItem(STEPS);
-                localStorage.removeItem(SELECTIONS);
-            } else {
-                return <div className='choices-card'>
-                    {((nextStep && nextStep.step) || getSteps().length > 1) && <div className='go-back'>
-                        <Button
-                            onClick={goBack}
-                            style={{color: '#4ddbff'}} shape="round"
-                            icon={<UpCircleTwoTone />} size='large'>
-                            Go Back
-                        </Button>
-                    </div>}
-                    <div>
-                        {getCurrentStep().choices.map(choice => {
-                            return renderChoice(choice);
-                        })}
-                    </div>
+            return <div className='choices-card'>
+                {((nextStep && nextStep.step) || getSteps().length > 1) && <div className='go-back'>
+                    <Button
+                        onClick={goBack}
+                        style={{color: '#4ddbff'}} shape="round"
+                        icon={<UpCircleTwoTone/>} size='large'>
+                        Go Back
+                    </Button>
+                </div>}
+                <div>
+                    {getCurrentStep().choices.map(choice => {
+                        return renderChoice(choice);
+                    })}
                 </div>
-            }
+            </div>
         }
 
         const steps: Step[] = [{...category, excludedSelections: []}];

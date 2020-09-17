@@ -440,8 +440,8 @@ function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
 
 function* addSampleTask(action: PayloadAction<AddSampleTaskAction>) {
   try {
-    const {name, content, metadata} = action.payload;
-    yield call(createSampleTask, name, content, metadata);
+    const {name, uid, content, metadata} = action.payload;
+    yield call(createSampleTask, name, uid, content, metadata);
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -481,8 +481,8 @@ function* removeSampleTask(action: PayloadAction<RemoveSampleTaskAction>) {
 
 function* updateSampleTask(action: PayloadAction<UpdateSampleTaskAction>) {
   try {
-    const {sampleTaskId, name, content, metadata} = action.payload;
-    const data : SampleTask = yield call(putSampleTask, sampleTaskId, name, content, metadata);
+    const {sampleTaskId, name, uid, content, metadata} = action.payload;
+    const data : SampleTask = yield call(putSampleTask, sampleTaskId, name, uid, content, metadata);
     yield put(templatesActions.sampleTaskReceived({task: data}));
   } catch (error) {
     if (error.message === 'reload') {

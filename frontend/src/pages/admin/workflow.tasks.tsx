@@ -86,7 +86,7 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             message.error('No task selected');
             return;
         }
-        
+
     }
 
     return (

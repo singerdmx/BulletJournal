@@ -13,7 +13,7 @@ type SampleTaskProps = {
     sampleTask: undefined | SampleTask;
     getSampleTask: (sampleTaskId: number) => void;
     removeSampleTask: (sampleTaskId: number) => void;
-    updateSampleTask: (sampleTaskId: number, name: string, content: string, metadata: string) => void;
+    updateSampleTask: (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) => void;
 };
 
 const SampleTaskPage: React.FC<SampleTaskProps> = (
@@ -40,7 +40,11 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
 
     const nameChange = (input: any) => {
         console.log(input);
-        updateSampleTask(sampleTask.id, input, sampleTask.content, sampleTask.metadata);
+        if (!input) {
+            message.error('name cannot be empty');
+            return;
+        }
+        updateSampleTask(sampleTask.id, input, sampleTask.uid, sampleTask.content, sampleTask.metadata);
     }
 
     const metadataChange = (input: any) => {
@@ -49,7 +53,16 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
             message.error('metadata cannot be empty');
             return;
         }
-        updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.content, input);
+        updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, input);
+    }
+
+    const uidChange = (input: any) => {
+        console.log(input);
+        if (!input) {
+            message.error('uid cannot be empty');
+            return;
+        }
+        updateSampleTask(sampleTask.id, sampleTask.name, input, sampleTask.content, sampleTask.metadata);
     }
 
     return (
@@ -60,6 +73,8 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
                 <Title editable={{onChange: nameChange}}>{sampleTask.name}</Title>
                 <Tag><Text
                     editable={{onChange: metadataChange}}>{sampleTask.metadata}</Text></Tag>
+                (<Text
+                editable={{onChange: uidChange}}>{sampleTask.uid}</Text>)
             </div>
         </div>
     );

@@ -21,9 +21,10 @@ export const getSampleTasksByFilter = (filter: string) => {
         });
 }
 
-export const createSampleTask = (name: string, content: string, metadata: string) => {
+export const createSampleTask = (name: string, uid: string, content: string, metadata: string) => {
     const postBody = JSON.stringify({
         name: name,
+        uid: uid,
         content: content,
         metadata: metadata
     });
@@ -50,9 +51,10 @@ export const deleteSampleTask = (sampleTaskId: number) => {
         });
 }
 
-export const putSampleTask = (sampleTaskId: number, name: string, content: string, metadata: string) => {
+export const putSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) => {
     const putBody = JSON.stringify({
         name: name,
+        uid: uid,
         content: content,
         metadata: metadata
     });

@@ -1,6 +1,5 @@
 package com.bulletjournal.templates.controller.model;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
@@ -13,9 +12,9 @@ public class CategorySteps {
         Rule: rule (can be null)
         Step: to
      */
-    List<Triple<Step, Rule, Step>> connections = new ArrayList<>();
+    private List<Triple<Step, Rule, Step>> connections = new ArrayList<>();
 
-    Pair<Step, List<SampleTask>> finalStep;
+    private List<Step> finalSteps; // contains Map<Selection, List<SampleTask>>
 
     public List<Triple<Step, Rule, Step>> getConnections() {
         return connections;
@@ -25,11 +24,11 @@ public class CategorySteps {
         this.connections = connections;
     }
 
-    public Pair<Step, List<SampleTask>> getFinalStep() {
-        return finalStep;
+    public List<Step> getFinalSteps() {
+        return finalSteps;
     }
 
-    public void setFinalStep(Pair<Step, List<SampleTask>> finalStep) {
-        this.finalStep = finalStep;
+    public void setFinalSteps(List<Step> finalSteps) {
+        this.finalSteps = finalSteps;
     }
 }

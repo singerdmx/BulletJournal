@@ -163,6 +163,7 @@ export type SampleTaskAction = {
 
 export type AddSampleTaskAction = {
     name: string;
+    uid: string;
     content: string;
     metadata: string;
 };
@@ -170,6 +171,7 @@ export type AddSampleTaskAction = {
 export type UpdateSampleTaskAction = {
     sampleTaskId: number;
     name: string;
+    uid: string;
     content: string;
     metadata: string;
 };

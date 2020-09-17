@@ -6,7 +6,7 @@ import {Button as FloatButton, darkColors, lightColors} from "react-floating-act
 import {addSampleTask} from "../../../features/templates/actions";
 
 type AddSampleTaskProps = {
-    addSampleTask: (name: string, content: string, metadata: string) => void;
+    addSampleTask: (name: string, uid: string, content: string, metadata: string) => void;
 };
 
 const AddSampleTask: React.FC<AddSampleTaskProps> = (props) => {
@@ -15,7 +15,7 @@ const AddSampleTask: React.FC<AddSampleTaskProps> = (props) => {
     const [visible, setVisible] = useState(false);
 
     const createTask = (values: any) => {
-        addSampleTask(values.name, '', values.metadata);
+        addSampleTask(values.name, values.uid, '', values.metadata);
         setVisible(false);
     };
 
@@ -53,8 +53,14 @@ const AddSampleTask: React.FC<AddSampleTaskProps> = (props) => {
                         <Input placeholder='Enter Sample Task Name' allowClear/>
                     </Form.Item>
                     <Form.Item
-                        name='metadata'
+                        name='uid'
                         rules={[{required: true, message: 'Metadata must be between 1 and 30 characters', min: 1, max: 30}]}
+                    >
+                        <Input placeholder='Enter UID' allowClear/>
+                    </Form.Item>
+                    <Form.Item
+                        name='metadata'
+                        rules={[{required: true, message: 'Metadata must be between 1 and 3000 characters', min: 1, max: 3000}]}
                     >
                         <Input placeholder='Enter Metadata' allowClear/>
                     </Form.Item>

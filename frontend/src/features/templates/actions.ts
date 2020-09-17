@@ -97,13 +97,13 @@ export const deleteRule = (ruleId: number, ruleType: string) => actions.removeRu
 
 export const getSampleTasks = (filter: string) => actions.getSampleTasks({filter: filter});
 
-export const addSampleTask = (name: string, content: string, metadata: string) =>
-    actions.addSampleTask({name: name, content: content, metadata: metadata});
+export const addSampleTask = (name: string, uid: string, content: string, metadata: string) =>
+    actions.addSampleTask({name: name, uid: uid, content: content, metadata: metadata});
 
 export const getSampleTask = (sampleTaskId: number) => actions.getSampleTask({sampleTaskId: sampleTaskId});
 
 export const removeSampleTask = (sampleTaskId: number) =>
     actions.removeSampleTask({taskId: sampleTaskId});
 
-export const updateSampleTask = (sampleTaskId: number, name: string, content: string, metadata: string) =>
-    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, content: content, metadata: metadata});
+export const updateSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) =>
+    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, uid: uid, content: content, metadata: metadata});
