@@ -8,6 +8,8 @@ public class UpdateSampleTaskParams {
 
     private String metadata;
 
+    private String uid;
+
     public String getName() {
         return name;
     }
@@ -32,4 +34,11 @@ public class UpdateSampleTaskParams {
         this.metadata = metadata;
     }
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 }

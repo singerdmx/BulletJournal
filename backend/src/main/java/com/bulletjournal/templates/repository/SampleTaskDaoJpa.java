@@ -51,6 +51,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setName(updateSampleTaskParams.getName());
         sampleTask.setContent(updateSampleTaskParams.getContent());
         sampleTask.setMetadata(updateSampleTaskParams.getMetadata());
+        sampleTask.setUid(updateSampleTaskParams.getUid());
         return sampleTaskRepository.save(sampleTask);
     }
 
