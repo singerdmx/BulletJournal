@@ -34,7 +34,7 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
         getSteps();
     }, []);
     const [targetStep, setTargetStep] = useState<Step | undefined>(undefined);
-    const [targetSelection, setTargetSelection] = useState<Selection | undefined>(undefined);
+    const [targetSelections, setTargetSelections] = useState<Selection[]>([]);
     const [tasks, setTasks] = useState<SampleTask[]>([]);
     const [checked, setChecked] = useState([] as number[]);
     const [selectionFilter, setSelectionFilter] = useState('');
@@ -89,6 +89,15 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
 
     }
 
+    const onClickSelection = (selection: Selection) => {
+        if (targetSelections.map(s => s.id).includes(selection.id)) {
+            setTargetSelections(targetSelections.filter(s => s.id !== selection.id));
+            return;
+        }
+
+        setTargetSelections(targetSelections.concat([selection]));
+    }
+
     return (
         <div>
             <div>
@@ -110,9 +119,9 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
                 <div>
                     <b>Target Step:</b> {targetStep ? targetStep.name : 'None'}
                     {'   '}
-                    <b>Target Selection:</b> {targetSelection ? targetSelection.text : 'None'}
+                    <b>Target Selection:</b> {targetSelections.length > 0 ? targetSelections.map(s => s.text).join(', ') : 'None'}
                     {' '}
-                    {targetStep && targetSelection && <Button type='primary' onClick={() => linkTasks()}>
+                    {targetStep && targetSelections.length > 0 && <Button type='primary' onClick={() => linkTasks()}>
                         Link Tasks to Selection
                     </Button>}
                 </div>
@@ -129,7 +138,7 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
                                     {choice.selections.filter((s) => !selectionFilter || isSubsequence(s.text, selectionFilter))
                                         .map(selection => {
                                             return <span style={{cursor: 'pointer'}}
-                                                         onClick={() => setTargetSelection(selection)}>
+                                                         onClick={() => onClickSelection(selection)}>
                                             {selection.text} ({selection.id}){'  '}
                                         </span>
                                         })}

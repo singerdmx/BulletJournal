@@ -44,7 +44,6 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
     const [formUpdateLabelIconString, setFormUpdateLabelIconString] = useState(
         'TagOutlined'
     );
-    const [choiceId, setChoiceId] = useState(0);
     const {categoryId} = useParams();
     useEffect(() => {
         if (categoryId) {

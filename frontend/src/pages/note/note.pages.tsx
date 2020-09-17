@@ -27,7 +27,6 @@ import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-
 import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content, ProjectItem} from "../../features/myBuJo/interface";
-import {Note} from "../../features/notes/interface";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 
