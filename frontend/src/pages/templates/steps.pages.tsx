@@ -146,7 +146,7 @@ const StepsPage: React.FC<StepsProps> = (
                     onChange={(e) => onChoiceChange(e, choice)}
                     placeholder={choice.name}
                     value={getChoiceValue(choice)}
-                    style={{padding: '3px', minWidth: '60%'}}
+                    style={{padding: '3px', minWidth: choice.multiple ? '50%' : '5%'}}
                     allowClear>
                 {choice.selections.map(selection => {
                     return <Option key={selection.text} value={selection.id}>{selection.text}</Option>
