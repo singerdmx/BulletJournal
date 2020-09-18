@@ -59,7 +59,8 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             setTasks(sampleTasks);
             return;
         }
-        setTasks(tasks.filter(t => isSubsequence(t.metadata, s)));
+        console.log(sampleTasks);
+        setTasks(sampleTasks.filter(t => t.metadata.toLowerCase().includes(s.toLowerCase())));
     }
 
     const onFilterSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
