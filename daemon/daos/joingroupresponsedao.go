@@ -3,8 +3,8 @@ package daos
 import (
 	"context"
 	"encoding/json"
-	"github.com/singerdmx/BulletJournal/daemon/daos/models"
 	log "github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/models"
 	"time"
 
 	"github.com/go-redis/redis/v8"

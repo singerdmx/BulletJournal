@@ -2,7 +2,7 @@ package main
 
 // Basic imports
 import (
-	"github.com/singerdmx/BulletJournal/daemon/daos/models"
+	"github.com/singerdmx/BulletJournal/daemon/models"
 	"github.com/singerdmx/BulletJournal/daemon/services"
 	"log"
 	"testing"

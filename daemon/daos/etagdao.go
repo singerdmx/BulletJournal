@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	"github.com/singerdmx/BulletJournal/daemon/daos/models"
 	log "github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/models"
 )
 
 const (

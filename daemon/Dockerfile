@@ -13,6 +13,7 @@ COPY utils utils
 COPY daos daos
 COPY logging logging
 COPY middleware middleware
+COPY models models
 COPY services services
 COPY go.mod .
 COPY Makefile .

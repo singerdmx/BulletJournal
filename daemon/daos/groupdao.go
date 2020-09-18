@@ -3,8 +3,8 @@ package daos
 import (
 	"context"
 	"github.com/singerdmx/BulletJournal/daemon/clients"
-	"github.com/singerdmx/BulletJournal/daemon/daos/models"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/models"
 )
 
 type GroupDao struct {
