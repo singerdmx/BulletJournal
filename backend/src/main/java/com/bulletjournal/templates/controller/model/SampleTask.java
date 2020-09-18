@@ -39,7 +39,7 @@ public class SampleTask {
         String dueDate,
         String dueTime,
         Timestamp availableBefore,
-        int reminderBeforeTask
+        Integer reminderBeforeTask
     ) {
         this.id = id;
         this.name = name;
