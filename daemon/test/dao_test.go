@@ -214,6 +214,7 @@ func (suite *DaoTestSuite) SetupTest() {
 	suite.RestAuditables = cleaner.CountForTable("auditables")
 	suite.RestPublicProjectItems = cleaner.CountForTable("public_project_items")
 	suite.RestNotifications = cleaner.CountForTable("notifications")
+	//TODO clean up DB after test
 }
 
 // All methods that begin with "Test" are run as tests within a
