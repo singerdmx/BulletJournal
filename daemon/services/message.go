@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/mailjet/mailjet-apiv3-go"
 	"github.com/singerdmx/BulletJournal/daemon/clients"
-	"github.com/singerdmx/BulletJournal/daemon/daos/models"
+	"github.com/singerdmx/BulletJournal/daemon/daos"
 	"strconv"
 )
 
@@ -19,7 +19,7 @@ func GetUrl(uuid uint64, action string) string {
 
 // Send join group invitation email to users
 func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
-	var g models.Group // TODO: query group from db
+	group := daos.GetGroupDao().FindGroup(groupId)
 	acceptUrl := GetUrl(uid, Accept)
 	declineUrl := GetUrl(uid, Decline)
 	messagesInfo := []mailjet.InfoMessagesV31{
@@ -34,7 +34,7 @@ func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 					Name:  username,
 				},
 			},
-			Subject:  "You are invited to Group " + g.Name + " by " + g.Owner,
+			Subject:  "You are invited to Group " + group.Name + " by " + group.Owner,
 			TextPart: "Dear " + username + ",",
 			HTMLPart: "Welcome to BulletJournal!\n\nClick the following link to confirm and activate your new account:\n<a href=\"" + acceptUrl + "\">Accept</a><br /><a href=\"" + declineUrl + "\">Decline</a>\n\nIf the above link is not clickable, try copying and pasting it into the address bar of your web browser.",
 		},

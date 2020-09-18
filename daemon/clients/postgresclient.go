@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	dbClient PostgresClient
-	dbConfig PostgreConfig
+	dbClient *PostgresClient
+	dbConfig *PostgreConfig
 )
 
 type PostgresClient struct {
@@ -50,18 +50,25 @@ func (p *PostgresClient) SetClient(db *gorm.DB) {
 	}
 }
 
-func (p *PostgresClient) PostgreClient() *PostgresClient {
-	if p.log == nil {
-		p.SetLogger()
+func (p *PostgresClient) GetClient() *gorm.DB {
+	if p.db == nil {
+		p.log.Fatal("failed to get database client")
+	}
+	return p.db
+}
+
+func GetPostgresClient() *PostgresClient {
+	if dbClient.log == nil {
+		dbClient.SetLogger()
 	}
 	if dbClient.db == nil {
 		dbConfig.InitDB()
 		if db, err := gorm.Open(postgres.Open(dbConfig.GetDSN()), &gorm.Config{}); err != nil {
-			p.log.Error(err)
+			dbClient.log.Error(err)
 			return nil
 		} else {
-			p.SetClient(db)
+			dbClient.SetClient(db)
 		}
 	}
-	return p
+	return dbClient
 }
