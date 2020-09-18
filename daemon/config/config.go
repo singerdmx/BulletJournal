@@ -26,6 +26,7 @@ type Config struct {
 	Password               string
 	Database               string
 	DBPort                 string
+	RedisPort              string
 	RPCPort                string
 	HttpPort               string
 	Host                   string
@@ -69,6 +70,10 @@ func Validate(c *Config) bool {
 	if c.DBPort == "" {
 		valid = false
 		_ = fmt.Errorf("database port is missing from config")
+	}
+	if c.RedisPort == "" {
+		valid = false
+		_ = fmt.Errorf("redis port is missing from config")
 	}
 	if c.HttpPort == "" {
 		valid = false
@@ -149,6 +154,7 @@ func PrintConfig() {
 	fmt.Printf("Database:%s%s\n", tab, serviceConfig.Database)
 	fmt.Printf("Database Port:%s%s\n", tab, serviceConfig.DBPort)
 	fmt.Printf("RPC Port:%s%s\n", tab, serviceConfig.RPCPort)
+	fmt.Printf("Redis Port:%s%s\n", tab, serviceConfig.RedisPort)
 	fmt.Printf("HTTP Port:%s%s\n", tab, serviceConfig.HttpPort)
 	fmt.Printf("Host:%s\t%s\n", tab, serviceConfig.Host)
 	fmt.Printf("DB Driver:%s%s\n", tab, serviceConfig.DBDriver)
