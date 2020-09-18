@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/logging"
-	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/model"
+	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/models"
 	"upper.io/db.v3"
 	"upper.io/db.v3/postgresql"
 )

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/singerdmx/BulletJournal/daemon/middleware"
-	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/model"
+	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/models"
 	services2 "github.com/singerdmx/BulletJournal/daemon/services"
 	"google.golang.org/grpc/metadata"
 	"net"

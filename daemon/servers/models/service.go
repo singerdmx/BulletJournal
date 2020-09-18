@@ -1,4 +1,4 @@
-package model
+package models
 
 type DaemonStreamingService struct {
 	ServiceName string
