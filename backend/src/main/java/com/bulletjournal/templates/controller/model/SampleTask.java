@@ -35,7 +35,11 @@ public class SampleTask {
         String content,
         String metadata,
         List<Step> steps,
-        String uid
+        String uid,
+        String dueDate,
+        String dueTime,
+        Timestamp availableBefore,
+        int reminderBeforeTask
     ) {
         this.id = id;
         this.name = name;
@@ -43,6 +47,10 @@ public class SampleTask {
         this.metadata = metadata;
         this.steps = steps;
         this.uid = uid;
+        this.dueDate = dueDate;
+        this.dueTime = dueTime;
+        this.availableBefore = availableBefore;
+        this.reminderBeforeTask = reminderBeforeTask;
     }
 
     public String getUid() {
