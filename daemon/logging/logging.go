@@ -86,7 +86,7 @@ func InitLogging(env *string) {
 	if *env == "prod" {
 		config = GetLoggerConfig(false, true, Info, true, true, Info, true, "./tmp/daemon-prod.log")
 	} else {
-		config = GetLoggerConfig(true, true, Debug, false, true, Info, false, "./tmp/daemon-dev.log")
+		config = GetLoggerConfig(true, true, Debug, false, false, Info, false, "./tmp/daemon-dev.log")
 	}
 
 	err := newLogger(config)
