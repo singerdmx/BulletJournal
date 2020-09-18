@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/singerdmx/BulletJournal/daemon/middleware"
 	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/model"
+	services2 "github.com/singerdmx/BulletJournal/daemon/services"
 	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
-	"github.com/singerdmx/BulletJournal/daemon/dao"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	uid "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
@@ -33,9 +33,7 @@ const (
 	reminderServiceName string = "reminder"
 )
 
-var (
-	log logging.Logger
-)
+var log logging.Logger
 
 // server should implement services.UnimplementedDaemonServer's methods
 type server struct {
@@ -186,7 +184,7 @@ func main() {
 
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
-	cleaner := dao.Cleaner{
+	cleaner := services2.Cleaner{
 		Service: cleanerService,
 		Settings: postgresql.ConnectionURL{
 			Host:     daemonRpc.serviceConfig.Host + ":" + daemonRpc.serviceConfig.DBPort,

@@ -2,13 +2,12 @@ package main
 
 // Basic imports
 import (
+	"github.com/singerdmx/BulletJournal/daemon/services"
 	"log"
 	"testing"
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/config"
-	"github.com/singerdmx/BulletJournal/daemon/dao"
-	models "github.com/singerdmx/BulletJournal/daemon/dao"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -65,7 +64,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	log.Printf("In seedDataForTesting, start inserting notifications")
 
 	//Insert notifications that is valid for clean
-	_, err = notificationCollection.Insert(models.Notification{
+	_, err = notificationCollection.Insert(services.Notification{
 		ID:         0,
 		CreatedAt:  t2,
 		UpdatedAt:  t2,
@@ -83,7 +82,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert notifications that is not valid for clean
-	_, err = notificationCollection.Insert(models.Notification{
+	_, err = notificationCollection.Insert(services.Notification{
 		ID:         1,
 		CreatedAt:  t3,
 		UpdatedAt:  t3,
@@ -101,7 +100,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 	log.Printf("In seedDataForTesting, start inserting auditables")
 	//Insert notifications that not valid for clean
-	_, err = notificationCollection.Insert(models.Notification{
+	_, err = notificationCollection.Insert(services.Notification{
 		ID:         2,
 		CreatedAt:  t,
 		UpdatedAt:  t,
@@ -119,7 +118,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert auditables that not valid for clean
-	_, err = auditableCollection.Insert(models.Auditable{
+	_, err = auditableCollection.Insert(services.Auditable{
 		ID:            2,
 		CreatedAt:     t,
 		UpdatedAt:     t,
@@ -135,7 +134,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert auditables that is valid for clean
-	_, err = auditableCollection.Insert(models.Auditable{
+	_, err = auditableCollection.Insert(services.Auditable{
 		ID:            3,
 		CreatedAt:     t2,
 		UpdatedAt:     t2,
@@ -151,7 +150,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert auditables that is not valid for clean
-	_, err = auditableCollection.Insert(models.Auditable{
+	_, err = auditableCollection.Insert(services.Auditable{
 		ID:            4,
 		CreatedAt:     t3,
 		UpdatedAt:     t3,
@@ -167,7 +166,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert public_project_items not valid for clean
-	_, err = publicProjectItemCollection.Insert(models.PublicProjectItem{
+	_, err = publicProjectItemCollection.Insert(services.PublicProjectItem{
 		ID:             1,
 		CreatedAt:      t,
 		UpdatedAt:      t,
@@ -181,7 +180,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert public_project_items valid for clean
-	_, err = publicProjectItemCollection.Insert(models.PublicProjectItem{
+	_, err = publicProjectItemCollection.Insert(services.PublicProjectItem{
 		ID:             2,
 		CreatedAt:      t2,
 		UpdatedAt:      t2,
@@ -201,7 +200,7 @@ func (suite *DaoTestSuite) SetupTest() {
 	config.InitConfig()
 	logging.InitLogging(config.GetEnv())
 	serviceConfig := config.GetConfig()
-	cleaner := dao.Cleaner{
+	cleaner := services.Cleaner{
 		Settings: postgresql.ConnectionURL{
 			Host:     serviceConfig.Host + ":" + serviceConfig.DBPort,
 			Database: serviceConfig.Database,
