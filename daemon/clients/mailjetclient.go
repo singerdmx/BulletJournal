@@ -46,5 +46,5 @@ func GetMailClient() (*mailjet.Client, error) {
 type MailjetClientError struct {}
 
 func (e *MailjetClientError) Error() string {
-	return fmt.Sprintf("mailjet retrival error")
+	return fmt.Sprintf("mailjet client retrival error")
 }
