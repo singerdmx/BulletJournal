@@ -9,7 +9,10 @@ WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
 COPY servers servers
 COPY config config
 COPY utils utils
-COPY daos dao
+COPY daos daos
+COPY services services
+COPY middleware middleware
+COPY clients clients
 COPY logging logging
 COPY go.mod .
 COPY Makefile .
