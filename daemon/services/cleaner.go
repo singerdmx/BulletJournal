@@ -1,10 +1,10 @@
 package services
 
 import (
+	"github.com/singerdmx/BulletJournal/daemon/daos/models"
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/logging"
-	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/models"
 	"upper.io/db.v3"
 	"upper.io/db.v3/postgresql"
 )
@@ -14,62 +14,10 @@ var log logging.Logger
 //Cleaner ...
 type Cleaner struct {
 	Settings postgresql.ConnectionURL
-	Service  daemonservices.DaemonStreamingService
+	Service  Streaming
 }
 
-//Auditable ...Map to table name auditables
-type Auditable struct {
-	ID            uint      `db:"id"`
-	CreatedAt     time.Time `db:"created_at"`
-	UpdatedAt     time.Time `db:"updated_at"`
-	Activity      string    `db:"activity"`
-	Originator    string    `db:"originator"`
-	ProjectID     uint      `db:"project_id"`
-	ActivityTime  time.Time `db:"activity_time"`
-	Action        uint      `db:"action"`
-	ProjectItemID uint      `db:"project_item_id"`
-}
-
-//GoogleCalendarProject ...Map to table name google_calendar_projects
-type GoogleCalendarProject struct {
-	ID         uint      `db:"id"`
-	CreatedAt  time.Time `db:"created_at"`
-	UpdatedAt  time.Time `db:"updated_at"`
-	Channel    string    `db:"channel"`
-	ChannelID  uint      `db:"channel_id"`
-	ProjectID  uint      `db:"project_id"`
-	Token      string    `db:"token"`
-	Owner      string    `db:"owner"`
-	Expiration time.Time `db:"expiration"`
-}
-
-//Notification ...Map to table name notifications
-type Notification struct {
-	ID         uint      `db:"id"`
-	CreatedAt  time.Time `db:"created_at"`
-	UpdatedAt  time.Time `db:"updated_at"`
-	Actions    string    `db:"actions"`
-	Content    string    `db:"content"`
-	ContentID  uint      `db:"content_id"`
-	Link       string    `db:"link"`
-	Originator string    `db:"originator"`
-	TargetUser string    `db:"target_user"`
-	Title      string    `db:"title"`
-	Type       string    `db:"type"`
-}
-
-//PublicProjectItem ...Map to table name public_project_items
-type PublicProjectItem struct {
-	ID             uint      `db:"id"`
-	CreatedAt      time.Time `db:"created_at"`
-	UpdatedAt      time.Time `db:"updated_at"`
-	ExpirationTime time.Time `db:"expiration_time"`
-	Username       string    `db:"username"`
-	NoteID         uint      `db:"note_id"`
-	TaskID         uint      `db:"task_id"`
-}
-
-func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []GoogleCalendarProject {
+func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []models.GoogleCalendarProject {
 	sess, err := postgresql.Open(c.Settings)
 	if err != nil {
 		log.Fatal(err)
@@ -82,7 +30,7 @@ func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []GoogleCa
 		"expiration <": t,
 	}
 
-	var googleCalendarProjects []GoogleCalendarProject
+	var googleCalendarProjects []models.GoogleCalendarProject
 	err = sess.Collection(tableName).Find(expirationTimeBeforeCond).All(&googleCalendarProjects)
 	if err != nil {
 		log.Fatal(err)
@@ -123,7 +71,7 @@ func (c *Cleaner) renewExpiringGoogleCalendarWatch() {
 	googleCalendarProjects := c.getExpiringGoogleCalendarProjects("google_calendar_projects")
 	for _, googleCalendarProject := range googleCalendarProjects {
 		log.Printf("%q (ID: %d)\n", googleCalendarProject.Owner, googleCalendarProject.ID)
-		c.Service.ServiceChannel <- &daemonservices.ServiceMessage{Message: googleCalendarProject.ProjectID}
+		c.Service.ServiceChannel <- &StreamingMessage{Message: googleCalendarProject.ProjectID}
 	}
 }
 

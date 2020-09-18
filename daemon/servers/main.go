@@ -3,8 +3,7 @@ package main
 import (
 	"context"
 	"github.com/singerdmx/BulletJournal/daemon/middleware"
-	daemonservices "github.com/singerdmx/BulletJournal/daemon/servers/models"
-	services2 "github.com/singerdmx/BulletJournal/daemon/services"
+	daemon "github.com/singerdmx/BulletJournal/daemon/services"
 	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
@@ -38,7 +37,7 @@ var log logging.Logger
 // server should implement services.UnimplementedDaemonServer's methods
 type server struct {
 	serviceConfig *config.Config
-	subscriptions map[string][]daemonservices.DaemonStreamingService
+	subscriptions map[string][]daemon.Streaming
 }
 
 // HealthCheck implements the rest endpoint healthcheck -> rpc
@@ -77,12 +76,12 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 		// Prevent requests with the same subscribe.Id from new subscriptions
 		delete(s.subscriptions, subscribe.Id)
 		// Keep the subscription session alive
-		var fanInChannel chan *daemonservices.ServiceMessage
+		var fanInChannel chan *daemon.StreamingMessage
 		for _, service := range daemonServices {
 			if service.ServiceName == fanInServiceName {
 				fanInChannel = service.ServiceChannel
 			} else {
-				go func(service daemonservices.DaemonStreamingService) {
+				go func(service daemon.Streaming) {
 					for message := range service.ServiceChannel {
 						message.ServiceName = service.ServiceName
 						log.Printf("Preparing streaming: %v to subscription: %s", message, subscribe.String())
@@ -134,12 +133,12 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
-	fanInService := daemonservices.DaemonStreamingService{ServiceName: fanInServiceName, ServiceChannel: make(chan *daemonservices.ServiceMessage, 100)}
-	cleanerService := daemonservices.DaemonStreamingService{ServiceName: cleanerServiceName, ServiceChannel: make(chan *daemonservices.ServiceMessage, 100)}
-	reminderService := daemonservices.DaemonStreamingService{ServiceName: reminderServiceName, ServiceChannel: make(chan *daemonservices.ServiceMessage, 100)}
+	fanInService := daemon.Streaming{ServiceName: fanInServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	cleanerService := daemon.Streaming{ServiceName: cleanerServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	reminderService := daemon.Streaming{ServiceName: reminderServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
 	daemonRpc := &server{
 		serviceConfig: config.GetConfig(),
-		subscriptions: map[string][]daemonservices.DaemonStreamingService{bulletJournalId: {fanInService, cleanerService, reminderService}},
+		subscriptions: map[string][]daemon.Streaming{bulletJournalId: {fanInService, cleanerService, reminderService}},
 	}
 
 	rpcPort := ":" + daemonRpc.serviceConfig.RPCPort
@@ -150,7 +149,7 @@ func main() {
 	rpcServer := grpc.NewServer()
 	services.RegisterDaemonServer(rpcServer, daemonRpc)
 
-	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher), )
+	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher))
 	endpoint := daemonRpc.serviceConfig.Host + rpcPort
 	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
@@ -184,7 +183,7 @@ func main() {
 
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
-	cleaner := services2.Cleaner{
+	cleaner := daemon.Cleaner{
 		Service: cleanerService,
 		Settings: postgresql.ConnectionURL{
 			Host:     daemonRpc.serviceConfig.Host + ":" + daemonRpc.serviceConfig.DBPort,

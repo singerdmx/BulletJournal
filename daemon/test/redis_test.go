@@ -141,7 +141,7 @@ func (suite *RedisTestSuite) SetupTest() {
 
 // All methods that begin with "Test" are run as tests within a
 // suite.
-func (suite *RedisTestSuite) TestExample() {
+func (suite *RedisTestSuite) TestRedis() {
 	// assert.Equal(suite.T(), "PONG", suite.Pong)
 	// assert.Equal(suite.T(), uint64(1), *suite.RestPublicProjectItems)
 	// assert.Equal(suite.T(), uint64(2), *suite.RestNotifications)
