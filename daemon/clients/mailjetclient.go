@@ -25,10 +25,10 @@ func GetUrl(uuid uint64, action string) string {
 }
 
 // Send join group invitation email to users
-func SendJoinGroupEmail(username, email string, groupId, notificationId uint64) {
+func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 	g := Group{groupId, "g1", "X"} // TODO: query group from db
-	acceptUrl := GetUrl(notificationId, Accept)
-	declineUrl := GetUrl(notificationId, Decline)
+	acceptUrl := GetUrl(uid, Accept)
+	declineUrl := GetUrl(uid, Decline)
 	serviceConfig := *config.GetConfig()
 	mailjetClient := mailjet.NewMailjetClient(os.Getenv(serviceConfig.ApiKeyPublic), os.Getenv(serviceConfig.ApiKeyPrivate))
 	messagesInfo := []mailjet.InfoMessagesV31{
