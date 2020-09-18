@@ -1,5 +1,6 @@
 package com.bulletjournal.templates.controller.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,14 @@ public class SampleTask {
     private String metadata;
 
     private String uid;
+
+    private String dueDate;
+
+    private String dueTime;
+
+    private Timestamp availableBefore;
+
+    private Integer reminderBeforeTask;
 
     private List<Step> steps = new ArrayList<>();
 
@@ -74,6 +83,38 @@ public class SampleTask {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public String getDueTime() {
+        return dueTime;
+    }
+
+    public void setDueTime(String dueTime) {
+        this.dueTime = dueTime;
+    }
+
+    public Timestamp getAvailableBefore() {
+        return availableBefore;
+    }
+
+    public void setAvailableBefore(Timestamp availableBefore) {
+        this.availableBefore = availableBefore;
+    }
+
+    public Integer getReminderBeforeTask() {
+        return reminderBeforeTask;
+    }
+
+    public void setReminderBeforeTask(Integer reminderBeforeTask) {
+        this.reminderBeforeTask = reminderBeforeTask;
     }
 
     public List<Step> getSteps() {

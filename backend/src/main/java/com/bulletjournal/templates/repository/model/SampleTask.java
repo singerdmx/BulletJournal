@@ -28,6 +28,12 @@ public class SampleTask extends NamedModel {
     @Column(name = "uid")
     private String uid;
 
+    @Column(name = "due_date", length = 15)
+    private String dueDate; // "yyyy-MM-dd"
+
+    @Column(name = "due_time", length = 10)
+    private String dueTime; // "HH-mm"
+
     @Column(name = "available_before")
     private Timestamp availableBefore;
 
@@ -76,6 +82,22 @@ public class SampleTask extends NamedModel {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public String getDueTime() {
+        return dueTime;
+    }
+
+    public void setDueTime(String dueTime) {
+        this.dueTime = dueTime;
     }
 
     public Timestamp getAvailableBefore() {
