@@ -2,13 +2,13 @@ package models
 
 type EtagType int
 
-//Spefic constant definition for EtagType
+//Specific constant definition for EtagType
 const (
-	NOTIFICATION        EtagType = iota
-	GROUP               EtagType = iota
-	USER_GROUP          EtagType = iota
-	NOTIFICATION_DELETE EtagType = iota
-	GROUP_DELETE        EtagType = iota
+	NotificationType EtagType = iota
+	GroupType
+	UserGroupType
+	NotificationDeleteType
+	GroupDeleteType
 )
 
 type Etag struct {
