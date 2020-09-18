@@ -26,7 +26,7 @@ func (m *MailjetClient) SetMailjetClient(publicKey string, privateKey string) {
 	}
 }
 
-func (m *MailjetClient) Initialize() {
+func (m *MailjetClient) NewClient() {
 	serviceConfig := *config.GetConfig()
 	mailjetClient.SetLogger()
 	mailjetClient.SetMailjetClient(os.Getenv(serviceConfig.ApiKeyPublic), os.Getenv(serviceConfig.ApiKeyPrivate))
@@ -34,8 +34,11 @@ func (m *MailjetClient) Initialize() {
 
 func GetMailClient() (*mailjet.Client, error) {
 	if mailjetClient.client == nil {
-		mailjetClient.log.Errorf("failed to get mailjet client")
-		return nil, &MailjetClientError{}
+		mailjetClient.NewClient()
+		if mailjetClient.client == nil {
+			mailjetClient.log.Errorf("failed to get mailjet client")
+			return nil, &MailjetClientError{}
+		}
 	}
 	return mailjetClient.client, nil
 }

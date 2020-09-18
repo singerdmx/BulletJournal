@@ -23,7 +23,7 @@ func (g *GroupDao) SetClient() {
 	g.pgc = clients.GetPostgresClient()
 }
 
-func (g *GroupDao) Initialize () {
+func (g *GroupDao) NewGroupDao() {
 	if g.log == nil {
 		g.SetLogger()
 	}
@@ -40,7 +40,7 @@ func (g *GroupDao) FindGroup(groupId uint64) *models.Group {
 
 func GetGroupDao() *GroupDao {
 	if groupDao.pgc == nil || groupDao.log == nil {
-		groupDao.Initialize()
+		groupDao.NewGroupDao()
 	}
 	return groupDao
 }

@@ -25,7 +25,7 @@ type PostgreConfig struct {
 	password string
 }
 
-func (p *PostgreConfig) InitDB() {
+func (p *PostgreConfig) NewDB() {
 	serviceConfig := config.GetConfig()
 	p = &PostgreConfig{
 		serviceConfig.Host,
@@ -62,7 +62,7 @@ func GetPostgresClient() *PostgresClient {
 		dbClient.SetLogger()
 	}
 	if dbClient.db == nil {
-		dbConfig.InitDB()
+		dbConfig.NewDB()
 		if db, err := gorm.Open(postgres.Open(dbConfig.GetDSN()), &gorm.Config{}); err != nil {
 			dbClient.log.Error(err)
 			return nil
