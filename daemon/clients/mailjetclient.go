@@ -4,54 +4,44 @@ import (
 	"fmt"
 	"github.com/mailjet/mailjet-apiv3-go"
 	"github.com/singerdmx/BulletJournal/daemon/config"
-	"log"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"os"
-	"strconv"
 )
 
-type Group struct {
-	Id    uint64
-	Name  string
-	Owner string
+type MailjetClient struct {
+	client *mailjet.Client
+	log    logging.Logger
 }
 
-const (
-	Accept  string = "accept"
-	Decline string = "decline"
-)
+var mailjetClient MailjetClient
 
-func GetUrl(uuid uint64, action string) string {
-	return "https://bulletjournal.us/public/notifications/" + strconv.FormatUint(uuid, 10) + "/answer?action=" + action
+func (m *MailjetClient) SetLogger() {
+	m.log = *logging.GetLogger()
 }
 
-// Send join group invitation email to users
-func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
-	g := Group{groupId, "g1", "X"} // TODO: query group from db
-	acceptUrl := GetUrl(uid, Accept)
-	declineUrl := GetUrl(uid, Decline)
+func (m *MailjetClient) SetMailjetClient(publicKey string, privateKey string) {
+	m.client = mailjet.NewMailjetClient(publicKey, privateKey)
+	if m.client == nil {
+		m.log.Errorf("failed to set mailjet client")
+	}
+}
+
+func (m *MailjetClient) Initialize() {
 	serviceConfig := *config.GetConfig()
-	mailjetClient := mailjet.NewMailjetClient(os.Getenv(serviceConfig.ApiKeyPublic), os.Getenv(serviceConfig.ApiKeyPrivate))
-	messagesInfo := []mailjet.InfoMessagesV31{
-		{
-			From: &mailjet.RecipientV31{
-				Email: "bulletjournal1024@hotmail.com",
-				Name:  "Bullet Journal",
-			},
-			To: &mailjet.RecipientsV31{
-				mailjet.RecipientV31{
-					Email: email,
-					Name:  username,
-				},
-			},
-			Subject:  "You are invited to Group " + g.Name + " by " + g.Owner,
-			TextPart: "Dear " + username + ",",
-			HTMLPart: "Welcome to BulletJournal!\n\nClick the following link to confirm and activate your new account:\n<a href=\"" + acceptUrl + "\">Accept</a><br /><a href=\"" + declineUrl + "\">Decline</a>\n\nIf the above link is not clickable, try copying and pasting it into the address bar of your web browser.",
-		},
+	mailjetClient.SetLogger()
+	mailjetClient.SetMailjetClient(os.Getenv(serviceConfig.ApiKeyPublic), os.Getenv(serviceConfig.ApiKeyPrivate))
+}
+
+func GetMailClient() (*mailjet.Client, error) {
+	if mailjetClient.client == nil {
+		mailjetClient.log.Errorf("failed to get mailjet client")
+		return nil, &MailjetClientError{}
 	}
-	messages := mailjet.MessagesV31{Info: messagesInfo}
-	res, err := mailjetClient.SendMailV31(&messages)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Data: %+v\n", res)
+	return mailjetClient.client, nil
+}
+
+type MailjetClientError struct {}
+
+func (e *MailjetClientError) Error() string {
+	return fmt.Sprintf("mailjet retrival error")
 }

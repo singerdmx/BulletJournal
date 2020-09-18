@@ -123,7 +123,7 @@ func (suite *RedisTestSuite) SetupTest() {
 			DB:       0,  // use default DB
 		},
 	}
-	client := rc.GetClient()
+	client := rc.RedisClient()
 	etagDao := &daos.EtagDao{Ctx: ctx, Rdb: client}
 	//Check health of redis connection
 	testRedisClient(etagDao, suite)

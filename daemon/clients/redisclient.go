@@ -12,6 +12,6 @@ type RedisClient struct {
 	Settings redis.Options
 }
 
-func (rc *RedisClient) GetClient() *redis.Client {
+func (rc *RedisClient) RedisClient() *redis.Client {
 	return redis.NewClient(&rc.Settings)
 }
