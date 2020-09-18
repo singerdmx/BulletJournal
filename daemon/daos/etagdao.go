@@ -8,14 +8,12 @@ import (
 	"github.com/go-redis/redis/v8"
 
 	"github.com/singerdmx/BulletJournal/daemon/daos/models"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
+	log "github.com/singerdmx/BulletJournal/daemon/logging"
 )
 
-var log logging.Logger
-
 const (
-	Prefix     string        = "Etag"
-	timeToLive time.Duration = 3600000 * time.Millisecond
+	EtagPrefix     string = "Etag"
+	EtagTimeToLive        = 3600000 * time.Millisecond
 )
 
 type EtagDao struct {
@@ -24,14 +22,14 @@ type EtagDao struct {
 }
 
 func (e *EtagDao) SingleCache(etag *models.Etag) {
-	key := Prefix + ":" + etag.Index
+	key := EtagPrefix + ":" + etag.Index
 	b, err := json.Marshal(etag)
 	if err != nil {
 		log.Errorf("Etag encoding failed with %v", err)
 		return
 	}
 
-	err = e.Rdb.Set(e.Ctx, key, string(b), timeToLive).Err()
+	err = e.Rdb.Set(e.Ctx, key, string(b), EtagTimeToLive).Err()
 	if err != nil {
 		log.Errorf("Etag stored failed with %v", err)
 		panic(err)
@@ -46,13 +44,13 @@ func (e *EtagDao) BatchCache(etags []*models.Etag) {
 			log.Errorf("Etag [%v] encoding failed with %v", etag.Index, err)
 			continue
 		}
-		values = append(values, Prefix+":"+etag.Index, string(encoded))
+		values = append(values, EtagPrefix+":"+etag.Index, string(encoded))
 	}
 	e.Rdb.MSet(e.Ctx, values)
 }
 
 func (e *EtagDao) FindEtagByIndex(index string) *models.Etag {
-	key := Prefix + ":" + index
+	key := EtagPrefix + ":" + index
 	res, err := e.Rdb.Get(e.Ctx, key).Result()
 	if err != nil {
 		log.Errorf("Etag retrieval failed with %v", err)
@@ -73,13 +71,13 @@ func (e *EtagDao) FindEtagByUserName(username string, eType models.EtagType) *mo
 
 func (e *EtagDao) DeleteEtagByUserName(username string) {
 	for i := 0; i < 5; i++ {
-		key := Prefix + ":" + username + "@" + models.EtagType(i).String()
+		key := EtagPrefix + ":" + username + "@" + models.EtagType(i).String()
 		e.DeleteByKey(key)
 	}
 }
 
 func (e *EtagDao) DeleteEtagByUserNameAndEtagType(username string, eType models.EtagType) {
-	key := Prefix + ":" + username + "@" + eType.String()
+	key := EtagPrefix + ":" + username + "@" + eType.String()
 	e.DeleteByKey(key)
 }
 
