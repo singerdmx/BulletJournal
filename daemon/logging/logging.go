@@ -166,10 +166,13 @@ func newZapLogger(config Configuration) (*Logger, error) {
 		logger = logger.WithOptions(zap.Development(), zap.AddStacktrace(zapcore.WarnLevel))
 	}
 
+	_ = zap.ReplaceGlobals(logger)
+
 	return &Logger{
 		sugaredLogger: logger.Sugar(),
 	}, nil
 }
+
 
 func (l *Logger) Debug(v ...interface{}) {
 	l.sugaredLogger.Debug(v)
@@ -249,4 +252,32 @@ func (l *Logger) WithContext(ctx context.Context) {
 			l.sugaredLogger = l.sugaredLogger.With(zap.String(SessionIDKey, ctxSessionId))
 		}
 	}
+}
+
+func Debugf(format string, args ...interface{}) {
+	logger.sugaredLogger.Debugf(format, args...)
+}
+
+func Infof(format string, args ...interface{}) {
+	logger.sugaredLogger.Infof(format, args...)
+}
+
+func Printf(format string, args ...interface{}) {
+	logger.sugaredLogger.Infof(format, args...)
+}
+
+func Warnf(format string, args ...interface{}) {
+	logger.sugaredLogger.Warnf(format, args...)
+}
+
+func Errorf(format string, args ...interface{}) {
+	logger.sugaredLogger.Errorf(format, args...)
+}
+
+func Fatalf(format string, args ...interface{}) {
+	logger.sugaredLogger.Fatalf(format, args...)
+}
+
+func Panicf(format string, args ...interface{}) {
+	logger.sugaredLogger.Fatalf(format, args...)
 }
