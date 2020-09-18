@@ -102,7 +102,7 @@ func Validate(c *Config) bool {
 	return valid
 }
 
-func init() {
+func InitConfig() {
 	isProd := flag.Bool("prod", false, "set config to production env")
 	isDev := flag.Bool("dev", false, "set config to development env")
 	flag.Parse()
@@ -138,7 +138,6 @@ func SetConfig(configName string) {
 	if err != nil {
 		log.Fatalf("could not decode config into struct: %v", err)
 	}
-
 }
 
 func PrintConfig() {
