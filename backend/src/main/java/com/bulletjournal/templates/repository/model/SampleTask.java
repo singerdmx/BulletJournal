@@ -3,6 +3,7 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,13 @@ public class SampleTask extends NamedModel {
 
     @Column(name = "uid")
     private String uid;
+
+    @Column(name = "available_before")
+    private Timestamp availableBefore;
+
+    // reminder before task
+    @Column(name = "reminder_before_task")
+    private Integer reminderBeforeTask;
 
     @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "steps_sample_tasks", schema = "template",
@@ -68,6 +76,22 @@ public class SampleTask extends NamedModel {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public Timestamp getAvailableBefore() {
+        return availableBefore;
+    }
+
+    public void setAvailableBefore(Timestamp availableBefore) {
+        this.availableBefore = availableBefore;
+    }
+
+    public Integer getReminderBeforeTask() {
+        return reminderBeforeTask;
+    }
+
+    public void setReminderBeforeTask(Integer reminderBeforeTask) {
+        this.reminderBeforeTask = reminderBeforeTask;
     }
 
     public List<Step> getSteps() {
