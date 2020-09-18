@@ -39,7 +39,7 @@ func testRedisClient(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 
 func testSingleCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 	var username string = "gaaralmn"
-	var etype models.EtagType = 1
+	var etype models.EtagType = models.NotificationType
 	var etagname string = "etag_sample"
 	etag := models.GenerateEtag(username, etype, etagname)
 	etagDao.SingleCache(etag)
