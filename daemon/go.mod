@@ -14,5 +14,7 @@ require (
 	go.uber.org/zap v1.16.0
 	google.golang.org/grpc v1.31.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gorm.io/driver/postgres v1.0.0
+	gorm.io/gorm v1.20.1
 	upper.io/db.v3 v3.7.1+incompatible
 )
