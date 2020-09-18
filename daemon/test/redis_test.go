@@ -4,7 +4,9 @@ package main
 import (
 	"context"
 	"github.com/singerdmx/BulletJournal/daemon/clients"
+	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/daos/models"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"log"
 	"strconv"
 	"testing"
@@ -38,9 +40,9 @@ func testRedisClient(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 }
 
 func testSingleCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
-	var username string = "gaaralmn"
-	var etype models.EtagType = models.NotificationType
-	var etagname string = "etag_sample"
+	var username = "gaaralmn"
+	var etype = models.NotificationType
+	var etagname = "etag_sample"
 	etag := models.GenerateEtag(username, etype, etagname)
 	etagDao.SingleCache(etag)
 	etag2 := etagDao.FindEtagByUserName(username, etype)
@@ -51,8 +53,8 @@ func testSingleCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 }
 
 func testBatchCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
-	var username string = "gaaralmn"
-	var etagname string = "etag_sample"
+	var username = "gaaralmn"
+	var etagname = "etag_sample"
 	var etags []*models.Etag
 	for i := 0; i < 5; i++ {
 		suffix := "_" + strconv.Itoa(i)
@@ -70,9 +72,9 @@ func testBatchCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 }
 
 func testDeleteByKey(etagDao *daos.EtagDao, suite *RedisTestSuite) {
-	var username string = "gaaralmn"
-	var etype models.EtagType = 1
-	var etagname string = "etag_sample"
+	var username = "gaaralmn"
+	var etype = models.NotificationType
+	var etagname = "etag_sample"
 	etag := models.GenerateEtag(username, etype, etagname)
 	etagDao.SingleCache(etag)
 	etagDao.DeleteEtagByUserNameAndEtagType(username, etype)
@@ -83,8 +85,8 @@ func testDeleteByKey(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 }
 
 func testDeleteByUserName(etagDao *daos.EtagDao, suite *RedisTestSuite) {
-	var username string = "gaaralmn"
-	var etagname string = "etag_sample"
+	var username = "gaaralmn"
+	var etagname = "etag_sample"
 	var etags []*models.Etag
 	for i := 0; i < 5; i++ {
 		suffix := "_" + strconv.Itoa(i)
@@ -110,9 +112,13 @@ func testDeleteByUserName(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
 func (suite *RedisTestSuite) SetupTest() {
+	config.InitConfig()
+	logging.InitLogging(config.GetEnv())
+	serviceConfig := config.GetConfig()
+
 	rc := clients.RedisClient{
 		Settings: redis.Options{
-			Addr:     "localhost:6379",
+			Addr:     serviceConfig.Host + ":" + serviceConfig.RedisPort,
 			Password: "", // no password set
 			DB:       0,  // use default DB
 		},
