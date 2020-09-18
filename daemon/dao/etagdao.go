@@ -32,23 +32,41 @@ func (e *EtagDao) SingleCache(etag *Etag) {
 }
 
 func (e *EtagDao) BatchCache(etags []*Etag) {
+	var values []string
 	for _, etag := range etags {
-		e.SingleCache(etag)
+		json, _ := json.Marshal(etag)
+		values = append(values, Prefix+":"+etag.Index, string(json))
 	}
+	e.Rdb.MSet(e.Ctx, values)
 }
 
 func (e *EtagDao) FindEtagByIndex(index string) *Etag {
 	key := Prefix + ":" + index
 	res, err := e.Rdb.Get(e.Ctx, key).Result()
 	if err != nil {
-		panic(err)
+		return nil
 	}
 	var etag Etag
 	json.Unmarshal([]byte(res), &etag)
-	// fmt.Println("etag: ", etag)
 	return &etag
 }
 
 func (e *EtagDao) FindEtagByUserName(username string, eType EtagType) *Etag {
 	return e.FindEtagByIndex(username + "@" + eType.String())
+}
+
+func (e *EtagDao) DeleteEtagByUserName(username string) {
+	for i := 0; i < 5; i++ {
+		key := Prefix + ":" + username + "@" + EtagType(i).String()
+		e.DeleteByKey(key)
+	}
+}
+
+func (e *EtagDao) DeleteEtagByUserNameAndEtagType(username string, eType EtagType) {
+	key := Prefix + ":" + username + "@" + eType.String()
+	e.DeleteByKey(key)
+}
+
+func (e *EtagDao) DeleteByKey(key string) {
+	e.Rdb.Del(e.Ctx, key)
 }
