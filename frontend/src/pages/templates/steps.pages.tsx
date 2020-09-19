@@ -7,7 +7,7 @@ import {getCategory, getNextStep, nextStepReceived} from "../../features/templat
 import {Category, Choice, NextStep, Step} from "../../features/templates/interface";
 import {Button, Card, Empty, Select} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {CloseSquareTwoTone, LikeTwoTone, UpCircleTwoTone} from "@ant-design/icons";
+import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
 
 const {Meta} = Card;
 const {Option} = Select;
@@ -221,8 +221,7 @@ const StepsPage: React.FC<StepsProps> = (
                 {showConfirmButton && <div className='confirm-button'>
                     <Button
                         onClick={onConfirmNext}
-                        style={{color: '#4ddbff'}} shape="round"
-                        icon={<LikeTwoTone />} size='large'>
+                        style={{color: '#4ddbff'}} shape="round">
                         Confirm
                     </Button>
                 </div>}
