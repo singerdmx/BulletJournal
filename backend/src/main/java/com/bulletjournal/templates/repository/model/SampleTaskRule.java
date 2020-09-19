@@ -4,26 +4,30 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "sample_task_rules", schema = "template")
-public class SampleTaskRule extends TaskRule {
+public class SampleTaskRule implements Serializable {
     @Id
-    @GeneratedValue(generator = "sample_task_rule_generator")
-    @SequenceGenerator(name = "sample_task_rule_generator", sequenceName = "template.sample_task_rule_sequence", initialValue = 100, allocationSize = 2)
-    private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "step_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Step step;
 
+    @Id
     @Column(name = "selection_combo", nullable = false)
     private String selectionCombo;
 
-    @Override
-    public Long getId() {
-        return id;
+    @Column(name = "task_ids", nullable = false)
+    private String taskIds;
+
+    public String getTaskIds() {
+        return taskIds;
+    }
+
+    public void setTaskIds(String taskIds) {
+        this.taskIds = taskIds;
     }
 
     public Step getStep() {
