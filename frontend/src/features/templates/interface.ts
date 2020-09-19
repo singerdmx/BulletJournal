@@ -54,6 +54,8 @@ export interface Rule {
 
 export interface NextStep {
     step: Step;
+    sampleTasks: SampleTask[];
+    scrollId: string;
 }
 
 export interface SampleTask {

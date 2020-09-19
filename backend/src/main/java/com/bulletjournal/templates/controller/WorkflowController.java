@@ -5,7 +5,6 @@ import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.RuleDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
 import com.bulletjournal.templates.repository.model.Category;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class WorkflowController {
 
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
+    public static final String PUBLIC_SAMPLE_TASKS_ROUTE = "/api/public/sampleTasks";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
@@ -37,9 +38,6 @@ public class WorkflowController {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
-
-    @Autowired
-    private RuleDaoJpa ruleDaoJpa;
 
     @Autowired
     private CategoryDaoJpa categoryDaoJpa;
@@ -63,18 +61,27 @@ public class WorkflowController {
             nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
             if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
                 // assume final step, try to get sample tasks using prevSelections
-                nextStep.setTasks(getSampleTasksForFinalStep(nextStep.getStep(), prevSelections));
+                List<SampleTask> sampleTasks = getSampleTasksForFinalStep(nextStep.getStep(), prevSelections);
+                // store in redis and generate scrollId
+                // setSampleTasks with the first 10 tasks
+                nextStep.setScrollId("scrollId");
+                nextStep.setSampleTasks(sampleTasks);
             }
         }
 
         return nextStep;
     }
 
+    @GetMapping(PUBLIC_SAMPLE_TASKS_ROUTE)
+    public List<SampleTask> getSampleTasks(@RequestParam String scrollId) {
+        return new ArrayList<>();
+    }
+
     private List<SampleTask> getSampleTasksForFinalStep(
             com.bulletjournal.templates.controller.model.Step step, List<Long> prevSelections) {
         // get task rules
         // find choice combo if there is selection combo in any task rule
-        return null;
+        return new ArrayList<>();
     }
 
     private NextStep checkIfSelectionsMatchCategoryRules(Long stepId, List<Long> selections) {

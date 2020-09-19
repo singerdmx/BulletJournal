@@ -10,6 +10,8 @@ public class NextStep {
 
     private List<SampleTask> sampleTasks = new ArrayList<>();
 
+    private String scrollId;
+
     public Step getStep() {
         return step;
     }
@@ -18,11 +20,19 @@ public class NextStep {
         this.step = step;
     }
 
-    public List<SampleTask> getTasks() {
+    public List<SampleTask> getSampleTasks() {
         return sampleTasks;
     }
 
-    public void setTasks(List<SampleTask> sampleTasks) {
+    public void setSampleTasks(List<SampleTask> sampleTasks) {
         this.sampleTasks = sampleTasks;
+    }
+
+    public String getScrollId() {
+        return scrollId;
+    }
+
+    public void setScrollId(String scrollId) {
+        this.scrollId = scrollId;
     }
 }
