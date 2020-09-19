@@ -165,7 +165,9 @@ public class LeetCodeAnalyzer {
                         topicStrings.add(topic.get("name").toString());
                         algorithmTopics.add(topic.get("name").toString());
                     }
-                    sampleTask.setMetadata(question.get("difficulty") + "," + String.join("|", topicStrings));
+                    if (!topicStrings.isEmpty()) {
+                        sampleTask.setMetadata(question.get("difficulty") + "," + String.join("|", topicStrings));
+                    }
                 }
                 if (!mapForContent.containsKey(questionFrontendId)) {
                     mapForContent.put(questionFrontendId, new ArrayList<>());
