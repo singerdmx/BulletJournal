@@ -1,10 +1,14 @@
 package com.bulletjournal.templates.resourcefinder;
 
+import com.bulletjournal.templates.repository.SelectionRepository;
 import com.bulletjournal.templates.repository.model.SampleTask;
+import com.bulletjournal.templates.repository.model.Selection;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -33,8 +37,10 @@ public class LeetCodeAnalyzer {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
+    @Autowired
+    private SelectionRepository selectionRepository;
+
     @Test
-    @Ignore
     public void testCompany() throws IOException {
         List<String> companyNames = readCompanyNamesFromLeetCode("./src/test/resources/leetcode-companies.html");
         File file = new File("./src/main/resources/db/migration/V84__replace_companies.sql");
@@ -48,6 +54,9 @@ public class LeetCodeAnalyzer {
             bw.newLine();
         }
         bw.close();
+
+        List<Selection> selections = selectionRepository.getAllByChoiceId(13L);
+        Assert.assertEquals(selections.size(), companyNames.size());
     }
 
     private List<String> readCompanyNamesFromLeetCode(String file) throws IOException {
