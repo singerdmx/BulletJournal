@@ -7,13 +7,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 
 @MappedSuperclass
-public abstract class Rule extends NamedModel {
-
-    @Column(name = "priority", nullable = false)
-    private Integer priority;
-
-    @Column(name = "rule_expression")
-    private String ruleExpression;
+public abstract class Rule extends RuleModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "connected_step_id", nullable = false)
@@ -21,22 +15,6 @@ public abstract class Rule extends NamedModel {
     private Step connectedStep;
 
     public Rule() {
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    public String getRuleExpression() {
-        return ruleExpression;
-    }
-
-    public void setRuleExpression(String ruleExpression) {
-        this.ruleExpression = ruleExpression;
     }
 
     public Step getConnectedStep() {
