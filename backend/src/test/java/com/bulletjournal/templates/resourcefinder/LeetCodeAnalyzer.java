@@ -145,7 +145,7 @@ public class LeetCodeAnalyzer {
         Map<String, List<String>> questionIdCompanyMap = new HashMap<>();
         for (String company : companies) {
             HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.add("Cookie", "");
+            requestHeaders.add("Cookie", "LEETCODE_SESSION=SESSION_ID; Max-Age=31449600; Path=/; secure");
             requestHeaders.add("content-type", "application/json");
             String query = "{\"operationName\":\"getCompanyTag\",\"variables\":{\"slug\":\"*****\"},\"query\":\"query getCompanyTag($slug: String!) {\\n  companyTag(slug: $slug) {\\n    name\\n    translatedName\\n    frequencies\\n    questions {\\n      ...questionFields\\n      __typename\\n    }\\n    __typename\\n  }\\n  favoritesLists {\\n    publicFavorites {\\n      ...favoriteFields\\n      __typename\\n    }\\n    privateFavorites {\\n      ...favoriteFields\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\\nfragment favoriteFields on FavoriteNode {\\n  idHash\\n  id\\n  name\\n  isPublicFavorite\\n  viewCount\\n  creator\\n  isWatched\\n  questions {\\n    questionId\\n    title\\n    titleSlug\\n    __typename\\n  }\\n  __typename\\n}\\n\\nfragment questionFields on QuestionNode {\\n  status\\n  questionId\\n  questionFrontendId\\n  title\\n  titleSlug\\n  translatedTitle\\n  stats\\n  difficulty\\n  isPaidOnly\\n  topicTags {\\n    name\\n    translatedName\\n    slug\\n    __typename\\n  }\\n  frequencyTimePeriod\\n  __typename\\n}\\n\"}".replace("*****", company);
             LinkedHashMap dataMap = (LinkedHashMap) ((LinkedHashMap) requestLeetCode(requestHeaders, query).getBody().get("data")).get("companyTag");
@@ -185,7 +185,7 @@ public class LeetCodeAnalyzer {
                     mapForContent.get(questionFrontendId).add(companyName + " (1 year)");
                 } else if ((int) question.get("frequencyTimePeriod") == 1) {
                     mapForContent.get(questionFrontendId).add(companyName + " (6 months)");
-                    frequencyTimePeriodList.add("#");
+                    frequencyTimePeriodList.add("####");
 
                 }
                 questionIdCompanyMap.get(questionFrontendId).add(companyName + "frequencytimeperiod" + String.join("", frequencyTimePeriodList));
