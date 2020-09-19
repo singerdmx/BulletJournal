@@ -14,7 +14,7 @@ public class CategorySteps {
      */
     private List<Triple<Step, Rule, Step>> connections = new ArrayList<>();
 
-    private List<Step> finalSteps; // contains Map<Selection, List<SampleTask>>
+    private List<Step> finalSteps; // contains Map<SelectionCombo, List<SampleTask>>
 
     public List<Triple<Step, Rule, Step>> getConnections() {
         return connections;

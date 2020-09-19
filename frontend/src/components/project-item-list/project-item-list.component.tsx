@@ -12,6 +12,8 @@ import ProjectModelItems from '../project-item/project-model-items.component';
 import { ProjectItemUIType } from "../../features/project/constants";
 import TimeZoneAgnosticBigCalendar from '../../utils/react-big-calendar/calendar-wrapper';
 import { RouteComponentProps, withRouter } from "react-router";
+import {TaskView} from "../../features/tasks/interface";
+import {TransactionView} from "../../features/transactions/interface";
 
 type PathProps = RouteComponentProps;
 
@@ -36,12 +38,9 @@ type ProjectItemCalendarState = {
   calendarDate: Date;
 };
 
-let format = {
+const format = {
   eventTimeRangeFormat: (event: any) => {
-    if (moment(event.start).format("hh:mm:ss") === moment(event.end).format("hh:mm:ss")) {
-      return moment(event.end).format("hh:mm A")
-    }
-    return moment(event.start).format("hh:mm A") + ' — ' + moment(event.end).format("hh:mm A")
+    return null;
   }
 }
 
@@ -68,6 +67,27 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
     }
   }
 
+  getTaskTimeString = (task: TaskView) => {
+    if (!task.startTime) {
+      return '';
+    }
+    if (task.startTime === task.endTime || !task.endTime) {
+      return ' ' + moment(task.startTime).format("hh:mm A");
+    }
+
+    if (task.endTime - task.startTime >= 86400000) {
+      return '';
+    }
+    return ' ' + moment(task.startTime).format("hh:mm A") + ' - ' + moment(task.endTime).format("hh:mm A");
+  }
+
+  getTransactionTimeString = (transaction: TransactionView) => {
+    if (!transaction.paymentTime) {
+      return '';
+    }
+    return ' ' + moment(transaction.paymentTime).format("hh:mm A");
+  }
+
   processCalendarEvents = () => {
     let calendarEvents: any[] = [];
     this.props.projectItems.forEach((item, index) => {
@@ -75,7 +95,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
         if (task.startTime && task.endTime) {
           calendarEvents.push({
             id: task.id,
-            title: task.name,
+            title: task.name + this.getTaskTimeString(task),
             start: new Date(task.startTime),
             end: new Date(task.endTime),
             resource: `/task/${task.id}`,
@@ -85,7 +105,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
       item.transactions.forEach((transaction, index) => {
         calendarEvents.push({
           id: transaction.id,
-          title: transaction.name,
+          title: transaction.name + this.getTransactionTimeString(transaction),
           start: new Date(transaction.paymentTime),
           end: new Date(transaction.paymentTime),
           resource: `/transaction/${transaction.id}`

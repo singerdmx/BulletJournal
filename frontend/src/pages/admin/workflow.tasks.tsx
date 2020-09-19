@@ -48,13 +48,14 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             message.error('Input is empty');
             return;
         }
-
+        setChecked([]);
         getSampleTasks(value);
     }
 
     const onFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const s = e.target.value;
         console.log(s);
+        setChecked([]);
         if (!s) {
             setTasks(sampleTasks);
             return;
@@ -87,7 +88,7 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             message.error('No task selected');
             return;
         }
-
+        setChecked([]);
     }
 
     const onClickSelection = (selection: Selection) => {
