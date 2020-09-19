@@ -65,7 +65,7 @@ export const getStep = (stepId: number) => actions.getStep({stepId: stepId});
 
 export const createStep = (name: string, nextStepId: number | undefined) => actions.createStep({name: name, nextStepId: nextStepId});
 
-export const updateStep = (stepId: number, name: string, nextStepId: number | undefined) => actions.createStep({
+export const updateStep = (stepId: number, name: string, nextStepId: number | undefined) => actions.updateStep({
     stepId: stepId, 
     name: name, 
     nextStepId: nextStepId

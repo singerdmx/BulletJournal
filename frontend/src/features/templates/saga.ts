@@ -26,7 +26,7 @@ import {
   AddRuleAction,
   RemoveRuleAction,
   GetSampleTasksAction,
-  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction, CloneStepAction
+  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction, CloneStepAction, UpdateStepAction
 } from './reducer';
 import {
   createCategory,
@@ -44,7 +44,7 @@ import {
 import {Category, Choice, NextStep, Rule, SampleTask, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep, cloneStep} from '../../apis/templates/stepApis';
+import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep, cloneStep, putStep} from '../../apis/templates/stepApis';
 import {
   createSampleTask,
   deleteSampleTask,
@@ -151,6 +151,20 @@ function* updateCategory(action: PayloadAction<UpdateCategoryAction>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `updateCategory Error Received: ${error}`);
+    }
+  }
+}
+
+function* updateStep(action: PayloadAction<UpdateStepAction>) {
+  try {
+    const {stepId, name, nextStepId} = action.payload;
+    const data: Step = yield call(putStep, stepId, name, nextStepId);
+    yield put(templatesActions.stepReceived({step: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateStep Error Received: ${error}`);
     }
   }
 }
@@ -519,6 +533,7 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.deleteCategory.type, removeCategory),
     yield takeLatest(templatesActions.deleteChoice.type, removeChoice),
     yield takeLatest(templatesActions.updateCategory.type, updateCategory),
+    yield takeLatest(templatesActions.updateStep.type, updateStep),
     yield takeLatest(templatesActions.getCategory.type, fetchCategory),
     yield takeLatest(templatesActions.setCategoryChoices.type, setCategoryChoices),
     yield takeLatest(templatesActions.setStepChoices.type, setStepChoices),

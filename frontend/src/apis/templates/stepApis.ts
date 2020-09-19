@@ -29,7 +29,7 @@ export const createStep = (
         });
 }
 
-export const updateStep = (stepId: number, name?: string, nextStepId?: number) => {
+export const putStep = (stepId: number, name?: string, nextStepId?: number) => {
     const putBody = JSON.stringify({
         name: name,
         nextStepId: nextStepId
