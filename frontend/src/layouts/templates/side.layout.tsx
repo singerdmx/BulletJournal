@@ -53,7 +53,7 @@ const SideLayout: React.FC<SiderProps> = (
                         className='adsbygoogle'
                         style={{display: 'block'}}
                         data-ad-client='ca-pub-8783793954376932'
-                        data-ad-slot='1070434431'
+                        data-ad-slot='1085969972'
                         data-ad-format='auto'
                         data-full-width-responsive='true'
                     ></ins>
