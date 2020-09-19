@@ -26,7 +26,7 @@ import {
   AddRuleAction,
   RemoveRuleAction,
   GetSampleTasksAction,
-  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction
+  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction, CloneStepAction
 } from './reducer';
 import {
   createCategory,
@@ -44,7 +44,7 @@ import {
 import {Category, Choice, NextStep, Rule, SampleTask, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
+import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep, cloneStep} from '../../apis/templates/stepApis';
 import {
   createSampleTask,
   deleteSampleTask,
@@ -341,6 +341,22 @@ function* addStep(action: PayloadAction<CreateStepAction>) {
   }
 }
 
+function* copyStep(action: PayloadAction<CloneStepAction>) {
+  try {
+    console.log(action.payload)
+    const {stepId} = action.payload;
+    yield call(cloneStep, stepId);
+    const data: Steps = yield call(getSteps);
+    yield put(templatesActions.stepsReceived({steps: data.steps}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `cloneStep Error Received: ${error}`);
+    }
+  }
+}
+
 function* fetchStep(action: PayloadAction<GetStepAction>) {
   try {
     const {stepId} = action.payload;
@@ -523,5 +539,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getSampleTask.type, getSampleTask),
     yield takeLatest(templatesActions.removeSampleTask.type, removeSampleTask),
     yield takeLatest(templatesActions.updateSampleTask.type, updateSampleTask),
+    yield takeLatest(templatesActions.copyStep.type, copyStep),
   ])
 }

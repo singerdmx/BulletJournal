@@ -41,6 +41,10 @@ export type DeleteStepAction = {
     stepId: number;
 };
 
+export type CloneStepAction = {
+    stepId: number;
+};
+
 export type GetCategoriesAction = {};
 
 export type GetChoicesAction = {};
@@ -262,6 +266,7 @@ const slice = createSlice({
             state.sampleTask = task;
         },
         removeSampleTask: (state, action: PayloadAction<RemoveSampleTaskAction>) => state,
+        copyStep: (state, action: PayloadAction<CloneStepAction>) => state,
     },
 });
 

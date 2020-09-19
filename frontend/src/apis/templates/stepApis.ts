@@ -59,3 +59,11 @@ export const updateChoicesForStep = (stepId: number, choicesIds: number[]) => {
             }
         );
 };
+
+export const cloneStep = (stepId: number) => {
+    return doPost(`/api/steps/${stepId}/clone`)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}
