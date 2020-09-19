@@ -195,7 +195,7 @@ public class LeetCodeAnalyzer {
             Thread.sleep(10000);
         }
         questionIdSampleTaskMap.forEach((questionId, sampleTask) -> {
-            sampleTask.setMetadata("LEETCODE," + sampleTask.getMetadata() + "," + String.join("|", questionIdCompanyMap.get(questionId)));
+            sampleTask.setMetadata("LEETCODE_ALGORITHM," + sampleTask.getMetadata() + "," + String.join("|", questionIdCompanyMap.get(questionId)));
         });
         return questionIdSampleTaskMap;
     }
