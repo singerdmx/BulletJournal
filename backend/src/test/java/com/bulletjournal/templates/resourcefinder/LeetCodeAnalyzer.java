@@ -155,7 +155,6 @@ public class LeetCodeAnalyzer {
                 String questionFrontendId = question.get("questionFrontendId").toString();
                 if (!questionIdSampleTaskMap.containsKey(questionFrontendId)) {
                     SampleTask sampleTask = new SampleTask();
-                    questionIdSampleTaskMap.put(questionFrontendId, sampleTask);
                     sampleTask.setUid(questionFrontendId);
                     sampleTask.setName(questionFrontendId + " " + question.get("title").toString().replace("'", "''"));
                     sampleTask.setContent("https://leetcode.com/problems/" + question.get("titleSlug") + "/");
@@ -167,6 +166,7 @@ public class LeetCodeAnalyzer {
                     }
                     if (!topicStrings.isEmpty()) {
                         sampleTask.setMetadata(question.get("difficulty") + "," + String.join("|", topicStrings));
+                        questionIdSampleTaskMap.put(questionFrontendId, sampleTask);
                     }
                 }
                 if (!mapForContent.containsKey(questionFrontendId)) {
@@ -188,7 +188,6 @@ public class LeetCodeAnalyzer {
                 } else if ((int) question.get("frequencyTimePeriod") == 1) {
                     mapForContent.get(questionFrontendId).add(companyName + " (6 months)");
                     frequencyTimePeriodList.add("####");
-
                 }
                 questionIdCompanyMap.get(questionFrontendId).add(companyName + "frequencytimeperiod" + String.join("", frequencyTimePeriodList));
             });
