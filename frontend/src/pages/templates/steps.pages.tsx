@@ -45,7 +45,9 @@ const StepsPage: React.FC<StepsProps> = (
             } else {
                 const selections = getSelections();
                 const curStep = getCurrentStep();
-                setShowConfirmButton(curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0));
+                if (curStep) {
+                    setShowConfirmButton(curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0));
+                }
             }
         }
     }, [category]);
