@@ -24,8 +24,6 @@ public class SampleTask {
 
     private Integer reminderBeforeTask;
 
-    private List<Step> steps = new ArrayList<>();
-
     public SampleTask() {
     }
 
@@ -34,7 +32,6 @@ public class SampleTask {
         String name,
         String content,
         String metadata,
-        List<Step> steps,
         String uid,
         String dueDate,
         String dueTime,
@@ -45,7 +42,6 @@ public class SampleTask {
         this.name = name;
         this.content = content;
         this.metadata = metadata;
-        this.steps = steps;
         this.uid = uid;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -125,11 +121,4 @@ public class SampleTask {
         this.reminderBeforeTask = reminderBeforeTask;
     }
 
-    public List<Step> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
-    }
 }

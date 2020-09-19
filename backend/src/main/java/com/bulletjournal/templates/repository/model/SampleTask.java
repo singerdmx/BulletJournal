@@ -51,16 +51,6 @@ public class SampleTask extends NamedModel {
     @Column(name = "reminder_before_task")
     private Integer reminderBeforeTask;
 
-    @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "steps_sample_tasks", schema = "template",
-            joinColumns = {
-                    @JoinColumn(name = "sample_task_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)},
-            inverseJoinColumns = {
-                    @JoinColumn(name = "step_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)})
-    private List<Step> steps = new ArrayList<>();
-
     @Override
     public Long getId() {
         return id;
@@ -126,21 +116,12 @@ public class SampleTask extends NamedModel {
         this.reminderBeforeTask = reminderBeforeTask;
     }
 
-    public List<Step> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
-    }
-
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.SampleTask(
                 id,
                 getName(),
                 content,
                 metadata,
-                steps.stream().map(Step::toPresentationModel).collect(Collectors.toList()),
                 uid,
                 dueDate,
                 dueTime,

@@ -1,3 +1,5 @@
+DROP TABLE template.steps_sample_tasks;
+
 CREATE TABLE if not exists template.sample_task_rules (
     task_ids text NOT NULL,
     step_id bigint NOT NULL REFERENCES template.steps,
