@@ -209,7 +209,7 @@ const StepsPage: React.FC<StepsProps> = (
                     <Button
                         onClick={goBack}
                         style={{color: '#4ddbff'}} shape="round"
-                        icon={<UpCircleTwoTone/>} size='large'>
+                        icon={<UpCircleTwoTone/>}>
                         Go Back
                     </Button>
                 </div>}
@@ -222,7 +222,7 @@ const StepsPage: React.FC<StepsProps> = (
                     <Button
                         onClick={onConfirmNext}
                         style={{color: '#4ddbff'}} shape="round">
-                        Confirm
+                        Next
                     </Button>
                 </div>}
             </div>
