@@ -69,6 +69,21 @@ public class LeetCodeAnalyzer {
             }
         }
         System.out.println(set);
+        // Topic
+        List<Selection> selections = this.selectionRepository.findAll();
+        for (long i = 1000L; i < 1040L; i++) {
+            final long id = i;
+            Selection selection = selections.stream().filter(s -> s.getId().equals(id)).findFirst().get();
+            set.clear();
+            for (com.bulletjournal.templates.controller.model.SampleTask task : l) {
+                if (task.getMetadata().split(",")[2].contains(selection.getText())) {
+                    set.add(task.getId());
+                }
+            }
+            String s = set.toString();
+            System.out.println("('" + s.substring(1, s.length() - 1) + "', 11, '" + selection.getId() + "'),");
+        }
+
     }
 
     @Test
