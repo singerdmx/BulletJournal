@@ -2,7 +2,6 @@ package com.bulletjournal.templates.resourcefinder;
 
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.templates.controller.WorkflowController;
-import com.bulletjournal.templates.controller.model.NextStep;
 import com.bulletjournal.templates.repository.SelectionRepository;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.Selection;
@@ -48,7 +47,7 @@ public class LeetCodeAnalyzer {
     @Autowired
     private SelectionRepository selectionRepository;
 
-    private static final Map<Integer, String> frequencies = ImmutableMap.of(
+    private static final Map<Integer, String> FREQUENCIES = ImmutableMap.of(
             261, "####",
             262, "###",
             263, "##",
@@ -101,7 +100,7 @@ public class LeetCodeAnalyzer {
                 set.clear();
                 for (com.bulletjournal.templates.controller.model.SampleTask task : l) {
                     if (task.getMetadata().split(",")[3]
-                            .contains(selection.getText() + "frequencytimeperiod" + frequencies.get(j))) {
+                            .contains(selection.getText() + "frequencytimeperiod" + FREQUENCIES.get(j))) {
                         set.add(task.getId());
                     }
                 }
