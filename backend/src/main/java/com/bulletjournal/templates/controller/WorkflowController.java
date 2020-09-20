@@ -4,14 +4,12 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
-import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
-import com.bulletjournal.templates.repository.SelectionDaoJpa;
-import com.bulletjournal.templates.repository.StepDaoJpa;
+import com.bulletjournal.templates.repository.*;
 import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.CategoryRule;
 import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.repository.model.StepRule;
+import com.bulletjournal.templates.repository.model.SampleTaskRule;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.google.gson.Gson;
 import org.slf4j.MDC;
@@ -46,6 +44,9 @@ public class WorkflowController {
 
     @Autowired
     private SelectionDaoJpa selectionDaoJpa;
+
+    @Autowired
+    private SampleTaskRuleRepository sampleTaskRuleRepository;
 
     private static final Gson GSON = new Gson();
 
@@ -84,7 +85,13 @@ public class WorkflowController {
             com.bulletjournal.templates.controller.model.Step step,
             List<Long> selections,
             List<Long> prevSelections) {
-        List<Long> allSelectionIds = new ArrayList<>(selections);
+        if (selections == null) {
+            selections = Collections.emptyList();
+        }
+        if (prevSelections == null) {
+            prevSelections = Collections.emptyList();
+        }
+        Set<Long> allSelectionIds = new HashSet<>(selections);
         allSelectionIds.addAll(prevSelections);
         List<com.bulletjournal.templates.repository.model.Selection> allSelections =
                 this.selectionDaoJpa.getSelectionsById(allSelectionIds);
@@ -94,8 +101,14 @@ public class WorkflowController {
         allSelections.forEach(s -> allChoices.computeIfAbsent(s.getChoice().getId(), k -> new ArrayList<>()).add(s));
 
         // get task rules
-        // find choice combo if there is selection combo in any task rule
+        List<SampleTaskRule> rules = this.sampleTaskRuleRepository
+                .findAllByStep(this.stepDaoJpa.getById(step.getId()));
+        rules = rules.stream().filter(rule -> rule
+                .getSelectionIds().stream().allMatch(s -> allSelectionIds.contains(s)))
+                .collect(Collectors.toList());
 
+        // find choice combo if there is selection combo in any task rule
+        List<Set<Long>> choiceCombo = new ArrayList<>();
 
         return new ArrayList<>();
     }

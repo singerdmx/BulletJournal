@@ -1,10 +1,15 @@
 package com.bulletjournal.templates.repository.model;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "sample_task_rules", schema = "template")
@@ -45,5 +50,23 @@ public class SampleTaskRule implements Serializable {
 
     public void setSelectionCombo(String selectionCombo) {
         this.selectionCombo = selectionCombo;
+    }
+
+    public List<Long> getSelectionIds() {
+        if (StringUtils.isBlank(this.selectionCombo)) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(this.selectionCombo.split(","))
+                .map(s -> Long.parseLong(s)).collect(Collectors.toList());
+    }
+
+    public List<Long> getSampleTaskIds() {
+        if (StringUtils.isBlank(this.taskIds)) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(this.taskIds.split(","))
+                .map(t -> Long.parseLong(t)).collect(Collectors.toList());
     }
 }

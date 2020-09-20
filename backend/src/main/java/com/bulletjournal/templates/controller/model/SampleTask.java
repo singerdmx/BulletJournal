@@ -1,8 +1,6 @@
 package com.bulletjournal.templates.controller.model;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SampleTask {
 
