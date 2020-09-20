@@ -95,6 +95,8 @@ public class WorkflowController {
         allSelectionIds.addAll(prevSelections);
         List<com.bulletjournal.templates.repository.model.Selection> allSelections =
                 this.selectionDaoJpa.getSelectionsById(allSelectionIds);
+        Map<Long, com.bulletjournal.templates.repository.model.Selection> selectionMap = allSelections.stream()
+                .collect(Collectors.toMap(com.bulletjournal.templates.repository.model.Selection::getId, s -> s));
 
         // choice id -> its selections
         Map<Long, List<com.bulletjournal.templates.repository.model.Selection>> allChoices = new HashMap<>();
@@ -110,9 +112,46 @@ public class WorkflowController {
         Map<String, SampleTaskRule> ruleMap = rules.stream()
                 .collect(Collectors.toMap(SampleTaskRule::getSelectionCombo, r -> r));
 
+        // resulting sample task ids
+        Set<Long> result = new HashSet<>();
         // find choice combo if there is selection combo in any task rule
-        List<Set<Long>> choiceCombo = new ArrayList<>();
+        for (SampleTaskRule rule : rules) {
+            if (rule.getSelectionIds().size() < 2) {
+                continue;
+            }
+            Set<Long> choiceIds = new HashSet<>();
+            rule.getSelectionIds().forEach(s -> choiceIds.add(selectionMap.get(s).getChoice().getId()));
+            if (choiceIds.size() < 2) {
+                continue;
+            }
+            // union for choice combo
+            result.addAll(rule.getSampleTaskIds());
+            allSelectionIds.removeAll(rule.getSampleTaskIds());
 
+            rule.getSelectionIds().forEach(s -> {
+                Long k = selectionMap.get(s).getChoice().getId();
+                allChoices.get(k).remove(s);
+                if (allChoices.get(k).isEmpty()) {
+                    allChoices.remove(k);
+                }
+            });
+
+            ruleMap.remove(rule.getSelectionCombo());
+        }
+
+        for (List<com.bulletjournal.templates.repository.model.Selection> selected : allChoices.values()) {
+            Set<Long> tmpResult = new HashSet<>();
+            for (com.bulletjournal.templates.repository.model.Selection selection : selected) {
+                // Selections in one choice => union of List<SampleTask>
+                SampleTaskRule r = ruleMap.remove(Long.toString(selection.getId()));
+                tmpResult.addAll(r.getSampleTaskIds());
+            }
+
+            // Selections between choices => intersection of List<SampleTask>
+            result.retainAll(tmpResult);
+        }
+
+        // result -> sampleTaskDaoJpa batch get -> toPresentation
         return new ArrayList<>();
     }
 

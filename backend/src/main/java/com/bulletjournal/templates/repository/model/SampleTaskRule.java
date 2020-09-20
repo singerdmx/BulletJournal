@@ -1,15 +1,13 @@
 package com.bulletjournal.templates.repository.model;
 
+import com.bulletjournal.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "sample_task_rules", schema = "template")
@@ -50,25 +48,17 @@ public class SampleTaskRule implements Serializable {
 
     public void setSelectionCombo(String selectionCombo) {
         if (StringUtils.isNotBlank(selectionCombo)) {
-            selectionCombo = StringUtils.join(convert(selectionCombo), ",");
+            selectionCombo = StringUtils.join(StringUtil.convertNumArray(selectionCombo), ",");
         }
         this.selectionCombo = selectionCombo;
     }
 
     public List<Long> getSelectionIds() {
-        return convert(this.selectionCombo);
+        return StringUtil.convertNumArray(this.selectionCombo);
     }
 
     public List<Long> getSampleTaskIds() {
-        return convert(this.taskIds);
+        return StringUtil.convertNumArray(this.taskIds);
     }
 
-    private List<Long> convert(String numArray) {
-        if (StringUtils.isBlank(numArray)) {
-            return Collections.emptyList();
-        }
-
-        return Arrays.stream(numArray.split(","))
-                .map(t -> Long.parseLong(t)).sorted().collect(Collectors.toList());
-    }
 }
