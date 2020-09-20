@@ -1,5 +1,8 @@
 package com.bulletjournal.templates.resourcefinder;
 
+import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.templates.controller.WorkflowController;
+import com.bulletjournal.templates.controller.model.NextStep;
 import com.bulletjournal.templates.repository.SelectionRepository;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.Selection;
@@ -11,26 +14,30 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class LeetCodeAnalyzer {
     private final TestRestTemplate restTemplate = new TestRestTemplate();
-
+    private static final String USER = "BulletJournal"; // with admin role
+    private static final String ROOT_URL = "http://localhost:";
     private static final String MATCHESSTRING = "href=\"/company/";
     private static final String MATCHESSTRING2 = "<span class=\"text-sm text-gray\">";
+    @LocalServerPort
+    int randomServerPort;
 
     @Before
     public void setup() {
@@ -39,6 +46,30 @@ public class LeetCodeAnalyzer {
 
     @Autowired
     private SelectionRepository selectionRepository;
+
+    @Test
+    @Ignore
+    public void linkTasksToSelection() {
+        String url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + WorkflowController.SAMPLE_TASK_BY_METADATA)
+                .queryParam("filter", "LEETCODE_ALGORITHM")
+                .toUriString();
+        ResponseEntity<com.bulletjournal.templates.controller.model.SampleTask[]> response = this.restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                com.bulletjournal.templates.controller.model.SampleTask[].class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<com.bulletjournal.templates.controller.model.SampleTask> l = Arrays.asList(response.getBody());
+        // Difficulty
+        Set<Long> set = new TreeSet<>();
+        for (com.bulletjournal.templates.controller.model.SampleTask task : l) {
+            if (task.getMetadata().split(",")[1].equals("Hard")) {
+                set.add(task.getId());
+            }
+        }
+        System.out.println(set);
+    }
 
     @Test
     public void testCompany() throws IOException {
