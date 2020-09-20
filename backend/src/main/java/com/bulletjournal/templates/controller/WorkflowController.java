@@ -107,6 +107,9 @@ public class WorkflowController {
                 .getSelectionIds().stream().allMatch(s -> allSelectionIds.contains(s)))
                 .collect(Collectors.toList());
 
+        Map<String, SampleTaskRule> ruleMap = rules.stream()
+                .collect(Collectors.toMap(SampleTaskRule::getSelectionCombo, r -> r));
+
         // find choice combo if there is selection combo in any task rule
         List<Set<Long>> choiceCombo = new ArrayList<>();
 

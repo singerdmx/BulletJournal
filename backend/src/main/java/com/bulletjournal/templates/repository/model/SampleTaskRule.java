@@ -49,24 +49,26 @@ public class SampleTaskRule implements Serializable {
     }
 
     public void setSelectionCombo(String selectionCombo) {
+        if (StringUtils.isNotBlank(selectionCombo)) {
+            selectionCombo = StringUtils.join(convert(selectionCombo), ",");
+        }
         this.selectionCombo = selectionCombo;
     }
 
     public List<Long> getSelectionIds() {
-        if (StringUtils.isBlank(this.selectionCombo)) {
-            return Collections.emptyList();
-        }
-
-        return Arrays.stream(this.selectionCombo.split(","))
-                .map(s -> Long.parseLong(s)).collect(Collectors.toList());
+        return convert(this.selectionCombo);
     }
 
     public List<Long> getSampleTaskIds() {
-        if (StringUtils.isBlank(this.taskIds)) {
+        return convert(this.taskIds);
+    }
+
+    private List<Long> convert(String numArray) {
+        if (StringUtils.isBlank(numArray)) {
             return Collections.emptyList();
         }
 
-        return Arrays.stream(this.taskIds.split(","))
-                .map(t -> Long.parseLong(t)).collect(Collectors.toList());
+        return Arrays.stream(numArray.split(","))
+                .map(t -> Long.parseLong(t)).sorted().collect(Collectors.toList());
     }
 }
