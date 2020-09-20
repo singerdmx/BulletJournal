@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "sample_task_rules", schema = "template")
+@IdClass(SampleTaskRuleId.class)
 public class SampleTaskRule implements Serializable {
     @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
