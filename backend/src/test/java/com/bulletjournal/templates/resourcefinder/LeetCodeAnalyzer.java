@@ -6,6 +6,7 @@ import com.bulletjournal.templates.controller.model.NextStep;
 import com.bulletjournal.templates.repository.SelectionRepository;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.Selection;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -47,6 +48,13 @@ public class LeetCodeAnalyzer {
     @Autowired
     private SelectionRepository selectionRepository;
 
+    private static final Map<Integer, String> frequencies = ImmutableMap.of(
+            261, "####",
+            262, "###",
+            263, "##",
+            264, "#"
+    );
+
     @Test
     @Ignore
     public void linkTasksToSelection() {
@@ -68,7 +76,7 @@ public class LeetCodeAnalyzer {
                 set.add(task.getId());
             }
         }
-        System.out.println(set);
+        // System.out.println(set);
         // Topic
         List<Selection> selections = this.selectionRepository.findAll();
         for (long i = 1000L; i < 1040L; i++) {
@@ -81,9 +89,29 @@ public class LeetCodeAnalyzer {
                 }
             }
             String s = set.toString();
-            System.out.println("('" + s.substring(1, s.length() - 1) + "', 11, '" + selection.getId() + "'),");
+            // System.out.println("('" + s.substring(1, s.length() - 1) + "', 11, '" + selection.getId() + "'),");
         }
 
+        // Company
+        // frequencytimeperiod#
+        for (long i = 300L; i < 536L; i++) {
+            final long id = i;
+            Selection selection = selections.stream().filter(s -> s.getId().equals(id)).findFirst().get();
+            for (int j = 261; j < 265; j++) {
+                set.clear();
+                for (com.bulletjournal.templates.controller.model.SampleTask task : l) {
+                    if (task.getMetadata().split(",")[3]
+                            .contains(selection.getText() + "frequencytimeperiod" + frequencies.get(j))) {
+                        set.add(task.getId());
+                    }
+                }
+                if (!set.isEmpty()) {
+                    String s = set.toString();
+                    System.out.println("('" + s.substring(1, s.length() - 1) + "', 11, '" + j + "," +
+                            selection.getId() + "'),");
+                }
+            }
+        }
     }
 
     @Test

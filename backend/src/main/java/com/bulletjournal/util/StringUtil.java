@@ -14,6 +14,6 @@ public class StringUtil {
         }
 
         return Arrays.stream(numArray.split(","))
-                .map(t -> Long.parseLong(t)).sorted().collect(Collectors.toList());
+                .map(t -> Long.parseLong(t.trim())).sorted().collect(Collectors.toList());
     }
 }
