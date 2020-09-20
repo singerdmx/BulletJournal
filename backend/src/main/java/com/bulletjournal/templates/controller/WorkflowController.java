@@ -6,6 +6,7 @@ import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
 import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.CategoryRule;
@@ -19,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,6 +44,9 @@ public class WorkflowController {
     @Autowired
     private StepDaoJpa stepDaoJpa;
 
+    @Autowired
+    private SelectionDaoJpa selectionDaoJpa;
+
     private static final Gson GSON = new Gson();
 
     @GetMapping(NEXT_STEP_ROUTE)
@@ -61,7 +63,8 @@ public class WorkflowController {
             nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
             if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
                 // assume final step, try to get sample tasks using prevSelections
-                List<SampleTask> sampleTasks = getSampleTasksForFinalStep(nextStep.getStep(), prevSelections);
+                List<SampleTask> sampleTasks = getSampleTasksForFinalStep(
+                        nextStep.getStep(), selections, prevSelections);
                 // store in redis and generate scrollId
                 // setSampleTasks with the first 10 tasks
                 nextStep.setScrollId("scrollId");
@@ -78,9 +81,22 @@ public class WorkflowController {
     }
 
     private List<SampleTask> getSampleTasksForFinalStep(
-            com.bulletjournal.templates.controller.model.Step step, List<Long> prevSelections) {
+            com.bulletjournal.templates.controller.model.Step step,
+            List<Long> selections,
+            List<Long> prevSelections) {
+        List<Long> allSelectionIds = new ArrayList<>(selections);
+        allSelectionIds.addAll(prevSelections);
+        List<com.bulletjournal.templates.repository.model.Selection> allSelections =
+                this.selectionDaoJpa.getSelectionsById(allSelectionIds);
+
+        // choice id -> its selections
+        Map<Long, List<com.bulletjournal.templates.repository.model.Selection>> allChoices = new HashMap<>();
+        allSelections.forEach(s -> allChoices.computeIfAbsent(s.getChoice().getId(), k -> new ArrayList<>()).add(s));
+
         // get task rules
         // find choice combo if there is selection combo in any task rule
+
+
         return new ArrayList<>();
     }
 

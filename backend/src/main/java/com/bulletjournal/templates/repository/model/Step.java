@@ -135,6 +135,6 @@ public class Step extends NamedModel {
         setName(step.getName());
         setNextStep(step.getNextStep());
         setExcludedSelections(step.getExcludedSelections());
-        getChoices().addAll(step.getChoices());
+        setChoices(step.getChoices());
     }
 }
