@@ -61,6 +61,10 @@ export type CategoriesAction = {
     categories: Category[];
 };
 
+export type LoadingNextStepAction = {
+    loading: boolean;
+};
+
 export type ChoicesAction = {
     choices: Choice[];
 };
@@ -186,6 +190,7 @@ export type GetSampleTaskAction = {
 };
 
 let initialState = {
+    loadingNextStep: false,
     categories: [] as Category[],
     category: undefined as Category | undefined,
     choices: [] as Choice[],
@@ -201,6 +206,10 @@ const slice = createSlice({
     name: 'templates',
     initialState,
     reducers: {
+        loadingNextStepReceived: (state, action: PayloadAction<LoadingNextStepAction>) => {
+            const {loading} = action.payload;
+            state.loadingNextStep = loading;
+        },
         categoriesReceived: (state, action: PayloadAction<CategoriesAction>) => {
             const {categories} = action.payload;
             state.categories = categories;

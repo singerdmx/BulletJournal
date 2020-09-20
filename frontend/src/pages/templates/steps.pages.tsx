@@ -8,11 +8,13 @@ import {Category, Choice, NextStep, Step} from "../../features/templates/interfa
 import {Button, Card, Empty, Select} from "antd";
 import {isSubsequence} from "../../utils/Util";
 import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
+import ReactLoading from "react-loading";
 
 const {Meta} = Card;
 const {Option} = Select;
 
 type StepsProps = {
+    loadingNextStep: boolean;
     category: Category | undefined;
     nextStep: NextStep | undefined;
     getCategory: (categoryId: number) => void;
@@ -24,7 +26,7 @@ export const STEPS = 'steps';
 export const SELECTIONS = 'selections';
 
 const StepsPage: React.FC<StepsProps> = (
-    {category, nextStep, getCategory, getNextStep, nextStepReceived}
+    {loadingNextStep, category, nextStep, getCategory, getNextStep, nextStepReceived}
 ) => {
     const {categoryId} = useParams();
 
@@ -184,6 +186,7 @@ const StepsPage: React.FC<StepsProps> = (
         curStep.choices.forEach(c => {
             selected = selected.concat(selections[c.id]);
         });
+        console.log(selected);
 
         let prevSelections = [] as number[];
 
@@ -192,7 +195,7 @@ const StepsPage: React.FC<StepsProps> = (
                 prevSelections = prevSelections.concat(selections[k]);
             }
         });
-        console.log(prevSelections)
+        console.log(prevSelections);
         getNextStep(curStep.id, selected, prevSelections, getSteps().length === 1);
     }
 
@@ -225,6 +228,9 @@ const StepsPage: React.FC<StepsProps> = (
                         Next
                     </Button>
                 </div>}
+                <div className='confirm-button'>
+                    {loadingNextStep && <ReactLoading type="bubbles" color="#0984e3"/>}
+                </div>
             </div>
         }
 
@@ -262,6 +268,7 @@ const StepsPage: React.FC<StepsProps> = (
 const mapStateToProps = (state: IState) => ({
     category: state.templates.category,
     nextStep: state.templates.nextStep,
+    loadingNextStep: state.templates.loadingNextStep,
 });
 
 export default connect(mapStateToProps, {

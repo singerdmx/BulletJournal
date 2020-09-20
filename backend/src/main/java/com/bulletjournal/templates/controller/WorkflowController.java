@@ -144,7 +144,9 @@ public class WorkflowController {
             for (com.bulletjournal.templates.repository.model.Selection selection : selected) {
                 // Selections in one choice => union of List<SampleTask>
                 SampleTaskRule r = ruleMap.remove(Long.toString(selection.getId()));
-                tmpResult.addAll(r.getSampleTaskIds());
+                if (r != null) {
+                    tmpResult.addAll(r.getSampleTaskIds());
+                }
             }
 
             // Selections between choices => intersection of List<SampleTask>

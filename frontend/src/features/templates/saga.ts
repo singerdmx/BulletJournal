@@ -402,6 +402,7 @@ function* removeStep(action: PayloadAction<DeleteStepAction>) {
 }
 
 function* getNextStep(action: PayloadAction<GetNextStepAction>) {
+  yield put(templatesActions.loadingNextStepReceived({loading: true}));
   try {
     const {stepId, selections, prevSelections, first} = action.payload;
     const nextStep: NextStep = yield call(getNext, stepId, selections, prevSelections, first);
@@ -413,6 +414,7 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
       yield call(message.error, `getNextStep Error Received: ${error}`);
     }
   }
+  yield put(templatesActions.loadingNextStepReceived({loading: false}));
 }
 
 function* addRule(action: PayloadAction<AddRuleAction>) {
