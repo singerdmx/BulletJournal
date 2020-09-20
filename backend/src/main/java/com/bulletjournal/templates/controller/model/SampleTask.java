@@ -20,8 +20,6 @@ public class SampleTask {
 
     private Timestamp availableBefore;
 
-    private Integer reminderBeforeTask;
-
     public SampleTask() {
     }
 
@@ -33,8 +31,7 @@ public class SampleTask {
         String uid,
         String dueDate,
         String dueTime,
-        Timestamp availableBefore,
-        Integer reminderBeforeTask
+        Timestamp availableBefore
     ) {
         this.id = id;
         this.name = name;
@@ -44,7 +41,6 @@ public class SampleTask {
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.availableBefore = availableBefore;
-        this.reminderBeforeTask = reminderBeforeTask;
     }
 
     public String getUid() {
@@ -109,14 +105,6 @@ public class SampleTask {
 
     public void setAvailableBefore(Timestamp availableBefore) {
         this.availableBefore = availableBefore;
-    }
-
-    public Integer getReminderBeforeTask() {
-        return reminderBeforeTask;
-    }
-
-    public void setReminderBeforeTask(Integer reminderBeforeTask) {
-        this.reminderBeforeTask = reminderBeforeTask;
     }
 
 }

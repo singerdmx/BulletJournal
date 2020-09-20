@@ -34,10 +34,6 @@ public class SampleTask extends NamedModel {
     @Column(name = "available_before")
     private Timestamp availableBefore;
 
-    // reminder before task
-    @Column(name = "reminder_before_task")
-    private Integer reminderBeforeTask;
-
     @Override
     public Long getId() {
         return id;
@@ -95,14 +91,6 @@ public class SampleTask extends NamedModel {
         this.availableBefore = availableBefore;
     }
 
-    public Integer getReminderBeforeTask() {
-        return reminderBeforeTask;
-    }
-
-    public void setReminderBeforeTask(Integer reminderBeforeTask) {
-        this.reminderBeforeTask = reminderBeforeTask;
-    }
-
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.SampleTask(
                 id,
@@ -112,7 +100,6 @@ public class SampleTask extends NamedModel {
                 uid,
                 dueDate,
                 dueTime,
-                availableBefore,
-                reminderBeforeTask);
+                availableBefore);
     }
 }
