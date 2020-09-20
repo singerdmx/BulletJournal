@@ -1,10 +1,9 @@
-package services
+package service
 
 import (
 	"fmt"
 	"github.com/mailjet/mailjet-apiv3-go"
-	"github.com/singerdmx/BulletJournal/daemon/clients"
-	"github.com/singerdmx/BulletJournal/daemon/daos"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"strconv"
 )
 
@@ -19,7 +18,7 @@ func GetUrl(uuid uint64, action string) string {
 
 // Send join group invitation email to users
 func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
-	group := daos.GetGroupDao().FindGroup(groupId)
+	group := persistence.GetGroupDao().FindGroup(groupId)
 	acceptUrl := GetUrl(uid, Accept)
 	declineUrl := GetUrl(uid, Decline)
 	messagesInfo := []mailjet.InfoMessagesV31{
@@ -41,7 +40,7 @@ func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 	}
 
 	messages := mailjet.MessagesV31{Info: messagesInfo}
-	if client, err := clients.GetMailClient(); err != nil {
+	if client, err := persistence.GetMailClient(); err != nil {
 		log.Fatal(err)
 	} else {
 		if res, err := client.SendMailV31(&messages); err != nil {

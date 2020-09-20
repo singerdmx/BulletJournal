@@ -1,4 +1,4 @@
-package daos
+package persistence
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"github.com/go-redis/redis/v8"
 
 	log "github.com/singerdmx/BulletJournal/daemon/logging"
-	"github.com/singerdmx/BulletJournal/daemon/models"
 )
 
 const (
@@ -21,7 +20,7 @@ type EtagDao struct {
 	Rdb *redis.Client
 }
 
-func (e *EtagDao) SingleCache(etag *models.Etag) {
+func (e *EtagDao) SingleCache(etag *Etag) {
 	key := EtagPrefix + ":" + etag.Index
 	b, err := json.Marshal(etag)
 	if err != nil {
@@ -36,7 +35,7 @@ func (e *EtagDao) SingleCache(etag *models.Etag) {
 	}
 }
 
-func (e *EtagDao) BatchCache(etags []*models.Etag) {
+func (e *EtagDao) BatchCache(etags []*Etag) {
 	var values []string
 	for _, etag := range etags {
 		encoded, err := json.Marshal(etag)
@@ -49,14 +48,14 @@ func (e *EtagDao) BatchCache(etags []*models.Etag) {
 	e.Rdb.MSet(e.Ctx, values)
 }
 
-func (e *EtagDao) FindEtagByIndex(index string) *models.Etag {
+func (e *EtagDao) FindEtagByIndex(index string) *Etag {
 	key := EtagPrefix + ":" + index
 	res, err := e.Rdb.Get(e.Ctx, key).Result()
 	if err != nil {
 		log.Errorf("Etag retrieval failed with %v", err)
 		return nil
 	}
-	var etag models.Etag
+	var etag Etag
 	err = json.Unmarshal([]byte(res), &etag)
 	if err != nil {
 		log.Errorf("Etag decoding failed with %v", err)
@@ -65,18 +64,18 @@ func (e *EtagDao) FindEtagByIndex(index string) *models.Etag {
 	return &etag
 }
 
-func (e *EtagDao) FindEtagByUserName(username string, eType models.EtagType) *models.Etag {
+func (e *EtagDao) FindEtagByUserName(username string, eType EtagType) *Etag {
 	return e.FindEtagByIndex(username + "@" + eType.String())
 }
 
 func (e *EtagDao) DeleteEtagByUserName(username string) {
 	for i := 0; i < 5; i++ {
-		key := EtagPrefix + ":" + username + "@" + models.EtagType(i).String()
+		key := EtagPrefix + ":" + username + "@" + EtagType(i).String()
 		e.DeleteByKey(key)
 	}
 }
 
-func (e *EtagDao) DeleteEtagByUserNameAndEtagType(username string, eType models.EtagType) {
+func (e *EtagDao) DeleteEtagByUserNameAndEtagType(username string, eType EtagType) {
 	key := EtagPrefix + ":" + username + "@" + eType.String()
 	e.DeleteByKey(key)
 }

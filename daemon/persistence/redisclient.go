@@ -1,4 +1,4 @@
-package clients
+package persistence
 
 import (
 	"github.com/go-redis/redis/v8"

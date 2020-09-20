@@ -1,4 +1,4 @@
-package models
+package persistence
 
 type EtagType int
 

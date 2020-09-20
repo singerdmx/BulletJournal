@@ -6,15 +6,14 @@ FROM golang:1.15-alpine as builder
 WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
 
 # Copy 
-COPY servers servers
+COPY cmd cmd
 COPY clients clients
 COPY config config
 COPY utils utils
-COPY daos daos
+COPY persistence daos
 COPY logging logging
 COPY middleware middleware
-COPY models models
-COPY services services
+COPY service services
 COPY go.mod .
 COPY Makefile .
 

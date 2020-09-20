@@ -4,7 +4,7 @@ TARGET ?= target
 
 .PHONY: daemon-server
 daemon-server:
-	GOOS=${GOOS} GOARCH=${GOARCH} go build -mod=vendor -o ${TARGET}/daemon-server servers/main.go
+	GOOS=${GOOS} GOARCH=${GOARCH} go build -mod=vendor -o ${TARGET}/daemon-server cmd/server/main.go
 	chmod a+x ${TARGET}/daemon-server
 
 .PHONY: clean

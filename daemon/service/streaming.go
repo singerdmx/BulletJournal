@@ -1,4 +1,4 @@
-package services
+package service
 
 type Streaming struct {
 	ServiceName string

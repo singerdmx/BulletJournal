@@ -1,4 +1,4 @@
-package clients
+package persistence
 
 import (
 	"fmt"

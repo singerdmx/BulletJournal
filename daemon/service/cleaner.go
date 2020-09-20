@@ -1,7 +1,7 @@
-package services
+package service
 
 import (
-	"github.com/singerdmx/BulletJournal/daemon/models"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/logging"
@@ -17,7 +17,7 @@ type Cleaner struct {
 	Service  Streaming
 }
 
-func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []models.GoogleCalendarProject {
+func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []persistence.GoogleCalendarProject {
 	sess, err := postgresql.Open(c.Settings)
 	if err != nil {
 		log.Fatal(err)
@@ -30,7 +30,7 @@ func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []models.G
 		"expiration <": t,
 	}
 
-	var googleCalendarProjects []models.GoogleCalendarProject
+	var googleCalendarProjects []persistence.GoogleCalendarProject
 	err = sess.Collection(tableName).Find(expirationTimeBeforeCond).All(&googleCalendarProjects)
 	if err != nil {
 		log.Fatal(err)

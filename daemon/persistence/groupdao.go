@@ -1,15 +1,13 @@
-package daos
+package persistence
 
 import (
 	"context"
-	"github.com/singerdmx/BulletJournal/daemon/clients"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
-	"github.com/singerdmx/BulletJournal/daemon/models"
 )
 
 type GroupDao struct {
 	Ctx context.Context
-	pgc *clients.PostgresClient
+	pgc *PostgresClient
 	log *logging.Logger
 }
 
@@ -20,7 +18,7 @@ func (g *GroupDao) SetLogger() {
 }
 
 func (g *GroupDao) SetClient() {
-	g.pgc = clients.GetPostgresClient()
+	g.pgc = GetPostgresClient()
 }
 
 func (g *GroupDao) NewGroupDao() {
@@ -32,8 +30,8 @@ func (g *GroupDao) NewGroupDao() {
 	}
 }
 
-func (g *GroupDao) FindGroup(groupId uint64) *models.Group {
-	var group *models.Group
+func (g *GroupDao) FindGroup(groupId uint64) *Group {
+	var group *Group
 	g.pgc.GetClient().Where("id = ?", groupId).First(&group)
 	return group
 }
@@ -45,6 +43,6 @@ func GetGroupDao() *GroupDao {
 	return groupDao
 }
 
-func Find(groupId uint64) *models.Group {
+func Find(groupId uint64) *Group {
 	return GetGroupDao().FindGroup(groupId)
 }

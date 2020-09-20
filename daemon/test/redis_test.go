@@ -3,15 +3,13 @@ package main
 // Basic imports
 import (
 	"context"
-	"github.com/singerdmx/BulletJournal/daemon/clients"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
-	"github.com/singerdmx/BulletJournal/daemon/models"
 	"log"
 	"strconv"
 	"testing"
 
-	"github.com/singerdmx/BulletJournal/daemon/daos"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +26,7 @@ type RedisTestSuite struct {
 	Pong string
 }
 
-func testRedisClient(etagDao *daos.EtagDao, suite *RedisTestSuite) {
+func testRedisClient(etagDao *persistence.EtagDao, suite *RedisTestSuite) {
 	pong, err := etagDao.Rdb.Ping(etagDao.Ctx).Result()
 	if err != nil {
 		return
@@ -39,11 +37,11 @@ func testRedisClient(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 	etagDao.Rdb.FlushAll(etagDao.Ctx)
 }
 
-func testSingleCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
+func testSingleCache(etagDao *persistence.EtagDao, suite *RedisTestSuite) {
 	var username = "gaaralmn"
-	var etype = models.NotificationType
+	var etype = persistence.NotificationType
 	var etagname = "etag_sample"
-	etag := models.GenerateEtag(username, etype, etagname)
+	etag := persistence.GenerateEtag(username, etype, etagname)
 	etagDao.SingleCache(etag)
 	etag2 := etagDao.FindEtagByUserName(username, etype)
 	log.Println("etag2: ", etag2)
@@ -52,13 +50,13 @@ func testSingleCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 	etagDao.Rdb.FlushAll(etagDao.Ctx)
 }
 
-func testBatchCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
+func testBatchCache(etagDao *persistence.EtagDao, suite *RedisTestSuite) {
 	var username = "gaaralmn"
 	var etagname = "etag_sample"
-	var etags []*models.Etag
+	var etags []*persistence.Etag
 	for i := 0; i < 5; i++ {
 		suffix := "_" + strconv.Itoa(i)
-		etags = append(etags, models.GenerateEtag(username+suffix, models.EtagType(i), etagname+suffix))
+		etags = append(etags, persistence.GenerateEtag(username+suffix, persistence.EtagType(i), etagname+suffix))
 	}
 	etagDao.BatchCache(etags)
 	//Validate persisted data
@@ -71,26 +69,26 @@ func testBatchCache(etagDao *daos.EtagDao, suite *RedisTestSuite) {
 	etagDao.Rdb.FlushAll(etagDao.Ctx)
 }
 
-func testDeleteByKey(etagDao *daos.EtagDao, suite *RedisTestSuite) {
+func testDeleteByKey(etagDao *persistence.EtagDao, suite *RedisTestSuite) {
 	var username = "gaaralmn"
-	var etype = models.NotificationType
+	var etype = persistence.NotificationType
 	var etagname = "etag_sample"
-	etag := models.GenerateEtag(username, etype, etagname)
+	etag := persistence.GenerateEtag(username, etype, etagname)
 	etagDao.SingleCache(etag)
 	etagDao.DeleteEtagByUserNameAndEtagType(username, etype)
 	etag2 := etagDao.FindEtagByUserName(username, etype)
-	assert.Equal(suite.T(), etag2, (*models.Etag)(nil))
+	assert.Equal(suite.T(), etag2, (*persistence.Etag)(nil))
 
 	etagDao.Rdb.FlushAll(etagDao.Ctx)
 }
 
-func testDeleteByUserName(etagDao *daos.EtagDao, suite *RedisTestSuite) {
+func testDeleteByUserName(etagDao *persistence.EtagDao, suite *RedisTestSuite) {
 	var username = "gaaralmn"
 	var etagname = "etag_sample"
-	var etags []*models.Etag
+	var etags []*persistence.Etag
 	for i := 0; i < 5; i++ {
 		suffix := "_" + strconv.Itoa(i)
-		etags = append(etags, models.GenerateEtag(username, models.EtagType(i), etagname+suffix))
+		etags = append(etags, persistence.GenerateEtag(username, persistence.EtagType(i), etagname+suffix))
 	}
 	etagDao.BatchCache(etags)
 
@@ -116,7 +114,7 @@ func (suite *RedisTestSuite) SetupTest() {
 	logging.InitLogging(config.GetEnv())
 	serviceConfig := config.GetConfig()
 
-	rc := clients.RedisClient{
+	rc := persistence.RedisClient{
 		Settings: redis.Options{
 			Addr:     serviceConfig.Host + ":" + serviceConfig.RedisPort,
 			Password: "", // no password set
@@ -124,7 +122,7 @@ func (suite *RedisTestSuite) SetupTest() {
 		},
 	}
 	client := rc.RedisClient()
-	etagDao := &daos.EtagDao{Ctx: ctx, Rdb: client}
+	etagDao := &persistence.EtagDao{Ctx: ctx, Rdb: client}
 	//Check health of redis connection
 	testRedisClient(etagDao, suite)
 	//Test persisting single entity

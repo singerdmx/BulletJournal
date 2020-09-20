@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/singerdmx/BulletJournal/daemon/middleware"
-	daemon "github.com/singerdmx/BulletJournal/daemon/services"
+	daemon "github.com/singerdmx/BulletJournal/daemon/service"
 	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
@@ -116,13 +116,11 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 	return nil
 }
 
-func init() {
+func main() {
+
 	config.InitConfig()
 	logging.InitLogging(config.GetEnv())
 	log = *logging.GetLogger()
-}
-
-func main() {
 
 	ctx := context.Background()
 	log.WithContext(ctx)
