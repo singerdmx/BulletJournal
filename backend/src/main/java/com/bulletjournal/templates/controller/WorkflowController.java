@@ -98,17 +98,32 @@ public class WorkflowController {
         Map<Long, com.bulletjournal.templates.repository.model.Selection> selectionMap = allSelections.stream()
                 .collect(Collectors.toMap(com.bulletjournal.templates.repository.model.Selection::getId, s -> s));
 
-        // choice id -> its selections
-        Map<Long, List<com.bulletjournal.templates.repository.model.Selection>> allChoices = new HashMap<>();
-        allSelections.forEach(s -> allChoices.computeIfAbsent(s.getChoice().getId(), k -> new ArrayList<>()).add(s));
-
         // get task rules
         List<SampleTaskRule> rules = this.sampleTaskRuleRepository
                 .findAllByStep(this.stepDaoJpa.getById(step.getId()));
+        // filter rules so that only selections related rules are left
         rules = rules.stream().filter(rule -> rule
                 .getSelectionIds().stream().allMatch(s -> allSelectionIds.contains(s)))
                 .collect(Collectors.toList());
 
+        // some choices are not applicable such as Intensity or 'Computer Science Category'
+        Set<Long> applicableChoices = new HashSet<>();
+        rules.forEach(rule -> rule.getSelectionIds()
+                .forEach(s -> {
+                    Long choiceId = selectionMap.get(s).getChoice().getId();
+                    if (!applicableChoices.contains(choiceId)) {
+                        applicableChoices.add(choiceId);
+                    }
+                }));
+
+        // choice id -> its selections
+        Map<Long, List<com.bulletjournal.templates.repository.model.Selection>> allChoices = new HashMap<>();
+        allSelections.forEach(s -> {
+            Long choiceId = s.getChoice().getId();
+            if (applicableChoices.contains(choiceId)) {
+                allChoices.computeIfAbsent(choiceId, k -> new ArrayList<>()).add(s);
+            }
+        });
         Map<String, SampleTaskRule> ruleMap = rules.stream()
                 .collect(Collectors.toMap(SampleTaskRule::getSelectionCombo, r -> r));
 
@@ -126,17 +141,8 @@ public class WorkflowController {
             }
             // union for choice combo
             result.addAll(rule.getSampleTaskIds());
-            allSelectionIds.removeAll(rule.getSampleTaskIds());
 
-            rule.getSelectionIds().forEach(s -> {
-                Long k = selectionMap.get(s).getChoice().getId();
-                allChoices.get(k).remove(s);
-                if (allChoices.get(k).isEmpty()) {
-                    allChoices.remove(k);
-                }
-            });
-
-            ruleMap.remove(rule.getSelectionCombo());
+            choiceIds.forEach(choiceId -> allChoices.remove(choiceId));
         }
 
         for (List<com.bulletjournal.templates.repository.model.Selection> selected : allChoices.values()) {
