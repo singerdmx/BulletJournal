@@ -18,24 +18,34 @@ import {Label} from "../../features/label/interface";
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import {ReminderBeforeTaskText} from "../../components/settings/reducer";
 import {QuestionCircleTwoTone} from "@ant-design/icons";
+import {Category} from "../../features/templates/interface";
+import {zones} from "../../components/settings/constants";
+import {importTasks} from "../../features/templates/actions";
+import {getSelections} from "./steps.pages";
 
 const {Option} = Select;
 
 type StepsImportTasksProps = {
     myself: string;
+    timezone: string;
     labelOptions: Label[];
     before: number;
+    category: Category | undefined;
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
+    importTasks: (selections: number[], categoryId: number,
+                   projectId: number, assignees: string[],
+                   reminderBefore: number, labels: number[],
+                   startDate?: string, timezone?: string) => void;
 };
 
 const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     {
         myself, labelOptions, ownedProjects, sharedProjects, group,
-        before, getGroup, labelsUpdate
+        timezone, category, before, getGroup, labelsUpdate, importTasks
     }
 ) => {
     const history = useHistory();
@@ -43,8 +53,9 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     const [projectId, setProjectId] = useState(-1);
     const [assignees, setAssignees] = useState<string[]>([]);
     const [labels, setLabels] = useState<number[]>([]);
-    const [startDate, setStartDate] = useState(undefined);
-    const [reminderBefore, setReminderBefore] = useState(before);
+    const [startDate, setStartDate] = useState<string>('');
+    const [targetTimezone, setTargetTimezone] = useState('');
+    const [reminderBefore, setReminderBefore] = useState<number | undefined>(undefined);
     const [subscribed, setSubscribed] = useState(true);
 
     function reset(project: Project) {
@@ -90,13 +101,33 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         setReminderBefore(value);
     }
 
-    const onChangeStartDate = (value: any) => {
+    const onChangeStartDate = (date: any, dateString: any) => {
+        console.log(dateString);
+        setStartDate(dateString);
+    }
+
+    const onChangeTimezone = (value: any) => {
         console.log(value);
-        setStartDate(value);
+        setTargetTimezone(value);
     }
 
     const onChangeSubscribed = (value: any) => {
         setSubscribed(value.target.checked);
+    }
+
+    const onClickImport = () => {
+        const selections = getSelections();
+        let curSelections = [] as number[];
+
+        Object.keys(selections).forEach((k) => {
+            curSelections = curSelections.concat(selections[k]);
+        });
+
+        if (category) {
+            importTasks(curSelections, category.id, projectId, assignees,
+                reminderBefore === undefined ? before : reminderBefore, labels,
+                startDate, targetTimezone ? targetTimezone : timezone);
+        }
     }
 
     const getUserSelections = () => {
@@ -225,17 +256,33 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                 All
             </Button>
         </div>
-        <div className='choice-card'>
+        {category && category.needStartDate && <div className='choice-card'>
             <span>When to start showing these events on your calendar (optional)</span>
-        </div>
-        <div className='choice-card'>
+        </div>}
+        {category && category.needStartDate && <div className='choice-card'>
             <DatePicker
                 allowClear={true}
                 onChange={onChangeStartDate}
                 style={{width: '180px', padding: '5px'}}
                 placeholder="Start Date"
             />
-        </div>
+        </div>}
+        {category && category.needStartDate && <div className='choice-card'>
+            <Select
+                showSearch={true}
+                onChange={onChangeTimezone}
+                placeholder="Select Time Zone"
+                defaultValue={timezone ? timezone : ''}
+            >
+                {zones.map((zone: string, index: number) => (
+                    <Option key={zone} value={zone}>
+                        <Tooltip title={zone} placement="right">
+                            {<span>{zone}</span>}
+                        </Tooltip>
+                    </Option>
+                ))}
+            </Select>
+        </div>}
         <div className='choice-card'>
             <span>When to remind yourself before event happens</span>
         </div>
@@ -255,6 +302,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         </div>
         <div className='choice-card'>
             <Button
+                onClick={onClickImport}
                 style={{color: '#4ddbff', margin: '3px'}} shape="round">
                 Import
             </Button>
@@ -274,11 +322,14 @@ const mapStateToProps = (state: IState) => ({
     sharedProjects: state.project.shared,
     group: state.group.group,
     myself: state.myself.username,
+    timezone: state.settings.timezone,
     labelOptions: state.label.labelOptions,
     before: state.settings.before,
+    category: state.templates.category,
 });
 
 export default connect(mapStateToProps, {
     getGroup,
-    labelsUpdate
+    labelsUpdate,
+    importTasks
 })(StepsImportTasksPage);

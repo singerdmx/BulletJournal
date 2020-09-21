@@ -32,7 +32,7 @@ import {
   UpdateSampleTaskAction,
   CloneStepAction,
   UpdateStepAction,
-  GetSampleTasksByScrollIdAction
+  GetSampleTasksByScrollIdAction, ImportTasksAction
 } from './reducer';
 import {
   createCategory,
@@ -409,6 +409,10 @@ function* removeStep(action: PayloadAction<DeleteStepAction>) {
 }
 
 function* getNextStep(action: PayloadAction<GetNextStepAction>) {
+  const state: IState = yield select();
+  if (state.templates.loadingNextStep) {
+    return;
+  }
   yield put(templatesActions.loadingNextStepReceived({loading: true}));
   try {
     const {stepId, selections, prevSelections, first} = action.payload;
@@ -426,6 +430,25 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `getNextStep Error Received: ${error}`);
+    }
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: false}));
+}
+
+function* importTasks(action: PayloadAction<ImportTasksAction>) {
+  const state: IState = yield select();
+  if (state.templates.loadingNextStep) {
+    return;
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: true}));
+  try {
+    const {categoryId, projectId, assignees, reminderBefore, selections, labels, startDate, timezone} = action.payload;
+    console.log(action.payload);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `importTasks Error Received: ${error}`);
     }
   }
   yield put(templatesActions.loadingNextStepReceived({loading: false}));
@@ -593,5 +616,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.updateSampleTask.type, updateSampleTask),
     yield takeLatest(templatesActions.copyStep.type, copyStep),
     yield takeLatest(templatesActions.getSampleTasksByScrollId.type, getSampleTasksByScrollId),
+    yield takeLatest(templatesActions.importTasks.type, importTasks),
   ])
 }

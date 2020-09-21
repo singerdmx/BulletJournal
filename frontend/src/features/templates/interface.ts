@@ -9,7 +9,8 @@ export interface Category {
     nextStepId?: number;
     subCategories: Category[];
     choices: Choice[];
-    rules: Rule[];
+    rules: Rule[]
+    needStartDate: boolean;
 }
 
 export interface Choice {

@@ -42,6 +42,12 @@ export const STEPS = 'steps';
 export const SELECTIONS = 'selections';
 export const SAMPLE_TASKS = 'sampleTasks';
 
+export const getSelections = () => {
+    const selectionsText = localStorage.getItem(SELECTIONS);
+    const selections: any = selectionsText ? JSON.parse(selectionsText) : {};
+    return selections;
+}
+
 const StepsPage: React.FC<StepsProps> = (
     {
         loadingNextStep, sampleTasks, category, scrollId,
@@ -121,12 +127,6 @@ const StepsPage: React.FC<StepsProps> = (
         return steps[steps.length - 1];
     }
 
-    const getSelections = () => {
-        const selectionsText = localStorage.getItem(SELECTIONS);
-        const selections: any = selectionsText ? JSON.parse(selectionsText) : {};
-        return selections;
-    }
-
     const setSelections = (selections: any) => {
         setCurSelections(selections);
         localStorage.setItem(SELECTIONS, JSON.stringify(selections));
@@ -192,6 +192,7 @@ const StepsPage: React.FC<StepsProps> = (
     const goBack = () => {
         setShowConfirmButton(false);
         setShowImportTasksCard(false);
+        setShowApplyButton(true);
         const steps: Step[] = getSteps();
         const selections = getSelections();
         steps[steps.length - 1].choices.forEach(c => {

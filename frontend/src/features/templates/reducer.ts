@@ -37,6 +37,17 @@ export type GetNextStepAction = {
     first?: boolean;
 };
 
+export type ImportTasksAction = {
+    selections: number[];
+    categoryId: number;
+    projectId: number;
+    assignees: string[];
+    reminderBefore: number;
+    labels: number[];
+    startDate?: string;
+    timezone?: string;
+};
+
 export type DeleteStepAction = {
     stepId: number;
 };
@@ -284,6 +295,7 @@ const slice = createSlice({
         removeSampleTask: (state, action: PayloadAction<RemoveSampleTaskAction>) => state,
         copyStep: (state, action: PayloadAction<CloneStepAction>) => state,
         getSampleTasksByScrollId: (state, action: PayloadAction<GetSampleTasksByScrollIdAction>) => state,
+        importTasks: (state, action: PayloadAction<ImportTasksAction>) => state,
     },
 });
 
