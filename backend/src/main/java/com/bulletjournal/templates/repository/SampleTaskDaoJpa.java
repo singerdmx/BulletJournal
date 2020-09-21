@@ -39,6 +39,11 @@ public class SampleTaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<SampleTask> findAllById(Iterable<Long> ids) {
+        return sampleTaskRepository.findAllById(ids);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<SampleTask> findSampleTasksByMetadataFilter(String metadataFilter) {
         if (TextUtils.isBlank(metadataFilter)) {
             return sampleTaskRepository.findAll();

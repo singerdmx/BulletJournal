@@ -160,7 +160,7 @@ public class WorkflowController {
         }
 
         // result -> sampleTaskDaoJpa batch get -> toPresentation
-        return new ArrayList<>();
+        return sampleTaskDaoJpa.findAllById(result).stream().map(e -> e.toPresentationModel()).collect(Collectors.toList());
     }
 
     private NextStep checkIfSelectionsMatchCategoryRules(Long stepId, List<Long> selections) {
