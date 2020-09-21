@@ -5,6 +5,13 @@ package types;
 option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types";
 
 message JoinGroupResponse {
-    string Uid = 1;
-    string Username = 2;
+    string uid = 1;
+    ActionEnum action = 2;
+}
+
+enum ActionEnum {
+    // ACCEPT means 0
+    ACCEPT = 0;
+    // DECLINE means 1
+    DECLINE = 1;
 }

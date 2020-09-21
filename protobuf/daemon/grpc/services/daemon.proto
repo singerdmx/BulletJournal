@@ -4,6 +4,7 @@ package services;
 
 import "daemon/grpc/types/join_group_events.proto";
 import "daemon/grpc/types/subscribe_notification.proto";
+import "daemon/grpc/types/join_group_response.proto";
 import "daemon/grpc/types/health.proto";
 import "google/api/annotations.proto";
 
@@ -22,9 +23,9 @@ service Daemon {
   rpc SubscribeNotification (types.SubscribeNotification) returns (stream types.StreamMessage) {}
 
   // Serve rest call
-  rpc Rest (types.JoinGroupEvents) returns (types.ReplyMessage) {
+  rpc HandleJoinGroupResponse (types.JoinGroupResponse) returns (types.ReplyMessage) {
      option (google.api.http) = {
-          post: "/daemon"
+          post: "/dae/public/notifications/{uid}/{action}"
           body: "*"
      };
   }
