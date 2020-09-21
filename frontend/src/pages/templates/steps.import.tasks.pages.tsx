@@ -152,13 +152,16 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
             <Result
                 status="warning"
                 title="Please Create a Project"
-                subTitle="You need a TODO BuJo to save these tasks into it"
+                subTitle="You need a TODO BuJo to save these events into it"
                 extra={<AddProject history={history} mode={'singular'}/>}
             />
         </div>
     }
 
     return <div className='choices-card'>
+        <div className='choice-card'>
+            <span>Project (BuJo) to save these events into</span>
+        </div>
         <div className='choice-card'>
             <Select
                 style={{padding: '3px', minWidth: '40%'}}
@@ -188,7 +191,13 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
             </Select>
         </div>
         <div className='choice-card'>
+            <span>Users that will be notified for event occurrence</span>
+        </div>
+        <div className='choice-card'>
             {getUserSelections()}
+        </div>
+        <div className='choice-card'>
+            <span>Attach labels to these events</span>
         </div>
         <div className='choice-card'>
             <Select
@@ -217,6 +226,9 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
             </Button>
         </div>
         <div className='choice-card'>
+            <span>When to start showing these events on your calendar (optional)</span>
+        </div>
+        <div className='choice-card'>
             <DatePicker
                 allowClear={true}
                 onChange={onChangeStartDate}
@@ -225,11 +237,14 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
             />
         </div>
         <div className='choice-card'>
+            <span>When to remind yourself before event happens</span>
+        </div>
+        <div className='choice-card'>
             <Select
                 defaultValue={ReminderBeforeTaskText[before]}
                 style={{width: '180px', padding: '5px'}}
                 onChange={onChangeReminderBefore}
-                placeholder="Reminder Before Task"
+                placeholder="Reminder Before Event"
             >
                 {ReminderBeforeTaskText.map((b: string, index: number) => (
                     <Option key={index} value={index}>

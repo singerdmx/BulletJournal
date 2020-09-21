@@ -89,6 +89,7 @@ const StepsPage: React.FC<StepsProps> = (
     const [curSelections, setCurSelections] = useState<any>({});
     const [showConfirmButton, setShowConfirmButton] = useState(false);
     const [showImportTasksCard, setShowImportTasksCard] = useState(false);
+    const [showApplyButton, setShowApplyButton] = useState(true);
 
     if (!category) {
         return <Empty/>
@@ -236,6 +237,7 @@ const StepsPage: React.FC<StepsProps> = (
         if (loginCookie) {
             updateProjects();
             updateExpandedMyself(true);
+            setShowApplyButton(false);
         }
     }
 
@@ -308,7 +310,7 @@ const StepsPage: React.FC<StepsProps> = (
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             More
                         </Button>}
-                        {getSampleTasks().length > 0 && <Button
+                        {getSampleTasks().length > 0 && showApplyButton && <Button
                             onClick={onApplySampleTasks}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Apply
