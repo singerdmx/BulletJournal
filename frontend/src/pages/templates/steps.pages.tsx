@@ -11,7 +11,7 @@ import {
     sampleTasksReceived
 } from "../../features/templates/actions";
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, Result, Select, Tag} from "antd";
+import {Button, Card, Empty, Result, Select} from "antd";
 import {isSubsequence} from "../../utils/Util";
 import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
 import ReactLoading from "react-loading";

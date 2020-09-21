@@ -544,8 +544,13 @@ function* getSampleTasksByScrollId(action: PayloadAction<GetSampleTasksByScrollI
     const {scrollId} = action.payload;
     const data : SampleTasks = yield call(fetchSampleTasksByScrollId, scrollId);
     const state: IState = yield select();
-    const tasks = state.templates.sampleTasks;
+    let tasks = state.templates.sampleTasks;
+    tasks = tasks.concat(data.sampleTasks);
     yield put(templatesActions.sampleTasksReceived({tasks: tasks.concat(data.sampleTasks), scrollId: data.scrollId}));
+    localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+      sampleTasks: tasks,
+      scrollId: data.scrollId
+    }));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
