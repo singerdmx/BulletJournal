@@ -164,6 +164,7 @@ export type GetSampleTasksAction = {
 
 export type SampleTasksAction = {
     tasks: SampleTask[];
+    scrollId: string;
 };
 
 export type SampleTaskAction = {
@@ -185,12 +186,17 @@ export type UpdateSampleTaskAction = {
     metadata: string;
 };
 
+export type GetSampleTasksByScrollIdAction = {
+    scrollId: string;
+};
+
 export type GetSampleTaskAction = {
     sampleTaskId: number;
 };
 
 let initialState = {
     loadingNextStep: false,
+    scrollId: '',
     categories: [] as Category[],
     category: undefined as Category | undefined,
     choices: [] as Choice[],
@@ -263,8 +269,9 @@ const slice = createSlice({
         createRule: (state, action: PayloadAction<AddRuleAction>) => state,
         removeRule: (state, action: PayloadAction<RemoveRuleAction>) => state,
         sampleTasksReceived: (state, action: PayloadAction<SampleTasksAction>) => {
-            const {tasks} = action.payload;
+            const {tasks, scrollId} = action.payload;
             state.sampleTasks = tasks;
+            state.scrollId = scrollId;
         },
         getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
         addSampleTask: (state, action: PayloadAction<AddSampleTaskAction>) => state,
@@ -276,6 +283,7 @@ const slice = createSlice({
         },
         removeSampleTask: (state, action: PayloadAction<RemoveSampleTaskAction>) => state,
         copyStep: (state, action: PayloadAction<CloneStepAction>) => state,
+        getSampleTasksByScrollId: (state, action: PayloadAction<GetSampleTasksByScrollIdAction>) => state,
     },
 });
 

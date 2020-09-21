@@ -26,7 +26,13 @@ import {
   AddRuleAction,
   RemoveRuleAction,
   GetSampleTasksAction,
-  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction, CloneStepAction, UpdateStepAction
+  AddSampleTaskAction,
+  GetSampleTaskAction,
+  RemoveSampleTaskAction,
+  UpdateSampleTaskAction,
+  CloneStepAction,
+  UpdateStepAction,
+  GetSampleTasksByScrollIdAction
 } from './reducer';
 import {
   createCategory,
@@ -41,14 +47,14 @@ import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, NextStep, Rule, SampleTask, Selection, Step, Steps} from './interface';
+import {Category, Choice, NextStep, Rule, SampleTask, SampleTasks, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
 import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep, cloneStep, putStep} from '../../apis/templates/stepApis';
 import {
   createSampleTask,
   deleteSampleTask,
-  fetchSampleTask,
+  fetchSampleTask, fetchSampleTasksByScrollId,
   getNext,
   getSampleTasksByFilter, putSampleTask
 } from "../../apis/templates/workflowApis";
@@ -407,6 +413,9 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
     const {stepId, selections, prevSelections, first} = action.payload;
     const nextStep: NextStep = yield call(getNext, stepId, selections, prevSelections, first);
     yield put(templatesActions.nextStepReceived({step: nextStep}));
+    if (nextStep.sampleTasks) {
+      yield put(templatesActions.sampleTasksReceived({tasks: nextStep.sampleTasks, scrollId: nextStep.scrollId}));
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -460,7 +469,7 @@ function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
   try {
     const {filter} = action.payload;
     const data : SampleTask[] = yield call(getSampleTasksByFilter, filter);
-    yield put(templatesActions.sampleTasksReceived({tasks: data}));
+    yield put(templatesActions.sampleTasksReceived({tasks: data, scrollId: ''}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -525,6 +534,22 @@ function* updateSampleTask(action: PayloadAction<UpdateSampleTaskAction>) {
   }
 }
 
+function* getSampleTasksByScrollId(action: PayloadAction<GetSampleTasksByScrollIdAction>) {
+  try {
+    const {scrollId} = action.payload;
+    const data : SampleTasks = yield call(fetchSampleTasksByScrollId, scrollId);
+    const state: IState = yield select();
+    const tasks = state.templates.sampleTasks;
+    yield put(templatesActions.sampleTasksReceived({tasks: tasks.concat(data.sampleTasks), scrollId: data.scrollId}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getSampleTasksByScrollId Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -557,5 +582,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.removeSampleTask.type, removeSampleTask),
     yield takeLatest(templatesActions.updateSampleTask.type, updateSampleTask),
     yield takeLatest(templatesActions.copyStep.type, copyStep),
+    yield takeLatest(templatesActions.getSampleTasksByScrollId.type, getSampleTasksByScrollId),
   ])
 }

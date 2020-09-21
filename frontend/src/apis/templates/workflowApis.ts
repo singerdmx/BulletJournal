@@ -16,7 +16,7 @@ export const getNext = (stepId: number, selections: number[], prevSelections: nu
         });
 }
 
-export const getSampleTasks = (scrollId: string) => {
+export const fetchSampleTasksByScrollId = (scrollId: string) => {
     return doFetch('/api/public/sampleTasks')
         .then((res) => res.json())
         .catch((err) => {

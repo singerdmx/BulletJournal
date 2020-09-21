@@ -109,3 +109,5 @@ export const updateSampleTask = (sampleTaskId: number, name: string, uid: string
     actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, uid: uid, content: content, metadata: metadata});
 
 export const cloneStep = (stepId: number) => actions.copyStep({stepId: stepId});
+
+export const getSampleTasksByScrollId = (scrollId: string) => actions.getSampleTasksByScrollId({scrollId: scrollId});

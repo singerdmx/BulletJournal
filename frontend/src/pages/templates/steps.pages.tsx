@@ -3,9 +3,9 @@ import './steps.styles.less';
 import {useParams} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getCategory, getNextStep, nextStepReceived} from "../../features/templates/actions";
-import {Category, Choice, NextStep, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, Select} from "antd";
+import {getCategory, getNextStep, getSampleTasksByScrollId, nextStepReceived} from "../../features/templates/actions";
+import {Category, Choice, NextStep, SampleTask, Step} from "../../features/templates/interface";
+import {Button, Card, Empty, Select, Tag} from "antd";
 import {isSubsequence} from "../../utils/Util";
 import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
 import ReactLoading from "react-loading";
@@ -15,18 +15,22 @@ const {Option} = Select;
 
 type StepsProps = {
     loadingNextStep: boolean;
+    sampleTasks: SampleTask[];
+    scrollId: string;
     category: Category | undefined;
     nextStep: NextStep | undefined;
     getCategory: (categoryId: number) => void;
     getNextStep: (stepId: number, selections: number[], prevSelections: number[], first?: boolean) => void;
     nextStepReceived: (nextStep: NextStep | undefined) => void;
+    getSampleTasksByScrollId: (scrollId: string) => void;
 };
 
 export const STEPS = 'steps';
 export const SELECTIONS = 'selections';
 
 const StepsPage: React.FC<StepsProps> = (
-    {loadingNextStep, category, nextStep, getCategory, getNextStep, nextStepReceived}
+    {loadingNextStep, sampleTasks, category, scrollId,
+        nextStep, getCategory, getNextStep, nextStepReceived, getSampleTasksByScrollId}
 ) => {
     const {categoryId} = useParams();
 
@@ -59,6 +63,9 @@ const StepsPage: React.FC<StepsProps> = (
             const steps = getSteps();
             steps.push(nextStep.step);
             localStorage.setItem(STEPS, JSON.stringify(steps));
+            if (nextStep.step.choices.length === 0) {
+                setShowConfirmButton(false);
+            }
         }
     }, [nextStep]);
 
@@ -221,13 +228,28 @@ const StepsPage: React.FC<StepsProps> = (
                         return renderChoice(choice);
                     })}
                 </div>
-                {showConfirmButton && <div className='confirm-button'>
-                    <Button
-                        onClick={onConfirmNext}
-                        style={{color: '#4ddbff'}} shape="round">
-                        Next
-                    </Button>
+                {sampleTasks.length > 0 && <div>
+                    {sampleTasks.map((sampleTask) => {
+                        return <Tag color='blue'>{sampleTask.name}</Tag>
+                    })}
                 </div>}
+                <div className='confirm-button'>
+                    {showConfirmButton && curStep.choices.length > 0 && <Button
+                        onClick={onConfirmNext}
+                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                        Next
+                    </Button>}
+                    {sampleTasks.length > 0 && <Button
+                        onClick={onConfirmNext}
+                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                        Apply
+                    </Button>}
+                    {scrollId && <Button
+                        onClick={onConfirmNext}
+                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                        Load More
+                    </Button>}
+                </div>
                 <div className='confirm-button'>
                     {loadingNextStep && <ReactLoading type="bubbles" color="#0984e3"/>}
                 </div>
@@ -268,11 +290,14 @@ const StepsPage: React.FC<StepsProps> = (
 const mapStateToProps = (state: IState) => ({
     category: state.templates.category,
     nextStep: state.templates.nextStep,
+    sampleTasks: state.templates.sampleTasks,
+    scrollId: state.templates.scrollId,
     loadingNextStep: state.templates.loadingNextStep,
 });
 
 export default connect(mapStateToProps, {
     getCategory,
     getNextStep,
-    nextStepReceived
+    nextStepReceived,
+    getSampleTasksByScrollId
 })(StepsPage);

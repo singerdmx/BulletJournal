@@ -77,8 +77,8 @@ public class WorkflowController {
     }
 
     @GetMapping(PUBLIC_SAMPLE_TASKS_ROUTE)
-    public List<SampleTask> getSampleTasks(@RequestParam String scrollId) {
-        return new ArrayList<>();
+    public SampleTasks getSampleTasks(@RequestParam String scrollId) {
+        return new SampleTasks();
     }
 
     private List<SampleTask> getSampleTasksForFinalStep(

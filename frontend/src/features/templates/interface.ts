@@ -66,3 +66,8 @@ export interface SampleTask {
     uid: string;
     steps: Step[];
 }
+
+export interface SampleTasks {
+    sampleTasks: SampleTask[];
+    scrollId: string;
+}
