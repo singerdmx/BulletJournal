@@ -3,7 +3,7 @@ import './steps.styles.less';
 import {useHistory} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {Avatar, Button, DatePicker, Result, Select, Tooltip} from "antd";
+import {Avatar, Button, Checkbox, DatePicker, Result, Select, Tooltip} from "antd";
 import {Project, ProjectsWithOwner} from "../../features/project/interface";
 import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pages";
 import {ProjectType} from "../../features/project/constants";
@@ -17,6 +17,7 @@ import {labelsUpdate} from "../../features/label/actions";
 import {Label} from "../../features/label/interface";
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import {ReminderBeforeTaskText} from "../../components/settings/reducer";
+import {QuestionCircleTwoTone} from "@ant-design/icons";
 
 const {Option} = Select;
 
@@ -42,6 +43,9 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     const [projectId, setProjectId] = useState(-1);
     const [assignees, setAssignees] = useState<string[]>([]);
     const [labels, setLabels] = useState([]);
+    const [startDate, setStartDate] = useState(undefined);
+    const [reminderBefore, setReminderBefore] = useState(before);
+    const [subscribed, setSubscribed] = useState(true);
 
     function reset(project: Project) {
         setProjectId(project.id);
@@ -80,6 +84,19 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
 
     const onChangeLabels = (value: any) => {
         setLabels(value);
+    }
+
+    const onChangeReminderBefore = (value: any) => {
+        setReminderBefore(value);
+    }
+
+    const onChangeStartDate = (value: any) => {
+        console.log(value);
+        setStartDate(value);
+    }
+
+    const onChangeSubscribed = (value: any) => {
+        setSubscribed(value.target.checked);
     }
 
     const getUserSelections = () => {
@@ -167,7 +184,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         <Select
             mode="multiple"
             placeholder='Labels'
-            style={{ width: '50%' }}
+            style={{width: '50%'}}
             value={labels}
             onChange={onChangeLabels}
             filterOption={(e, t) => onFilterLabel(e, t)}
@@ -184,12 +201,14 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         </Select>
         <DatePicker
             allowClear={true}
-            style={{ width: '30%' }}
+            onChange={onChangeStartDate}
+            style={{width: '30%'}}
             placeholder="Start Date"
         />
         <Select
             defaultValue={ReminderBeforeTaskText[before]}
             style={{width: '180px'}}
+            onChange={onChangeReminderBefore}
             placeholder="Reminder Before Task"
         >
             {ReminderBeforeTaskText.map((b: string, index: number) => (
@@ -199,11 +218,15 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
             ))}
         </Select>
 
-        <div>
-            <Button
-                style={{color: '#4ddbff', margin: '3px'}} shape="round">
-                Import
-            </Button>
+        <Button
+            style={{color: '#4ddbff', margin: '3px'}} shape="round">
+            Import
+        </Button>
+        <div className='subscribe-updates'>
+            <Checkbox checked={subscribed} onChange={onChangeSubscribed}>Subscribe to future updates</Checkbox>
+            <Tooltip title='New events will be added into your BuJo automatically'>
+                <QuestionCircleTwoTone />
+            </Tooltip>
         </div>
     </div>
 
