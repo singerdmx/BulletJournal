@@ -31,7 +31,7 @@ public class CategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Category create(String name, String description, String icon, String color, Long forumId, String image, Long nextStepId) {
+    public Category create(String name, String description, String icon, String color, Long forumId, String image, Long nextStepId, Boolean needStartDate) {
         if (categoryRepository.getByName(name) != null) {
             throw new ResourceAlreadyExistException("Category with name " + name + " already exists.");
         }
@@ -39,7 +39,7 @@ public class CategoryDaoJpa {
         if (nextStepId != null) {
             step = stepDaoJpa.getById(nextStepId);
         }
-        Category category = new Category(name, description, icon, color, forumId, image, step);
+        Category category = new Category(name, description, icon, color, forumId, image, step, needStartDate);
         return categoryRepository.save(category);
     }
 
@@ -100,7 +100,7 @@ public class CategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateCategory(Long categoryId, String name, String icon, String color, Long forumId, String description, String image, Long nextStepId) {
+    public void updateCategory(Long categoryId, String name, String icon, String color, Long forumId, String description, String image, Long nextStepId, Boolean needStartDate) {
         Category category = getById(categoryId);
         category.setName(name);
         category.setIcon(icon);
@@ -108,6 +108,7 @@ public class CategoryDaoJpa {
         category.setForumId(forumId);
         category.setDescription(description);
         category.setImage(image);
+        category.setNeedStartDate(needStartDate);
         if (nextStepId == null) {
             category.setNextStep(null);
         } else if (nextStepId > 0) {

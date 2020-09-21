@@ -20,13 +20,25 @@ public class CreateCategoryParams {
 
     private Long nextStepId;
 
-    public CreateCategoryParams(@NotNull String name, @NotNull String description) {
+    @NotNull
+    private Boolean needStartDate;
+
+    public CreateCategoryParams(@NotNull String name, @NotNull String description, @NotNull Boolean needStartDate) {
         this.name = name;
         this.description = description;
+        this.needStartDate = needStartDate;
     }
 
     public CreateCategoryParams() {
 
+    }
+
+    public Boolean getNeedStartDate() {
+        return needStartDate;
+    }
+
+    public void setNeedStartDate(Boolean needStartDate) {
+        this.needStartDate = needStartDate;
     }
 
     public Long getNextStepId() {

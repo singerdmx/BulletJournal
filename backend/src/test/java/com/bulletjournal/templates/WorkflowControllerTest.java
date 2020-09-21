@@ -62,6 +62,7 @@ public class WorkflowControllerTest {
         CreateCategoryParams createCategoryParams = new CreateCategoryParams();
         createCategoryParams.setNextStepId(step1.getId());
         createCategoryParams.setName("category1");
+        createCategoryParams.setNeedStartDate(false);
         Category category = createCategory(createCategoryParams);
         CreateRuleParams createRuleParams2 = new CreateRuleParams();
         createRuleParams2.setName("rule2");
