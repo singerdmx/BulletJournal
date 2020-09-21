@@ -185,6 +185,7 @@ const StepsPage: React.FC<StepsProps> = (
 
     const goBack = () => {
         setShowConfirmButton(false);
+        setShowImportTasksCard(false);
         const steps: Step[] = getSteps();
         const selections = getSelections();
         steps[steps.length - 1].choices.forEach(c => {
@@ -263,6 +264,20 @@ const StepsPage: React.FC<StepsProps> = (
         return [];
     }
 
+    const getScrollId = () => {
+        if (scrollId) {
+            return scrollId;
+        }
+
+        const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
+        if (sampleTasksText) {
+            const data : SampleTasks = JSON.parse(sampleTasksText);
+            return data.scrollId;
+        }
+
+        return '';
+    }
+
     const getStepsDiv = () => {
         if (!category || category.choices.length === 0) {
             return null;
@@ -289,9 +304,9 @@ const StepsPage: React.FC<StepsProps> = (
                     </div>
                     {getSampleTasks().length > 0 && <div className='sample-tasks'>
                         {getSampleTasks().map((sampleTask: SampleTask) => {
-                            return <span className='sample-task'>
-                                <Tag color='blue'>{sampleTask.name}</Tag>
-                            </span>
+                            return <div className='sample-task'>
+                               {sampleTask.name}
+                            </div>
                         })}
                     </div>}
                     <div className='confirm-button'>
@@ -300,7 +315,7 @@ const StepsPage: React.FC<StepsProps> = (
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Next
                         </Button>}
-                        {scrollId && <Button
+                        {getScrollId() && <Button
                             onClick={onScrollNext}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             More
