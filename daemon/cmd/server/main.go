@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
 	"github.com/singerdmx/BulletJournal/daemon/middleware"
-	daemon "github.com/singerdmx/BulletJournal/daemon/service"
 	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"

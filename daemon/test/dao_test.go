@@ -2,8 +2,8 @@ package main
 
 // Basic imports
 import (
+	"github.com/singerdmx/BulletJournal/daemon/api/service"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
-	"github.com/singerdmx/BulletJournal/daemon/service"
 	"log"
 	"testing"
 	"time"
