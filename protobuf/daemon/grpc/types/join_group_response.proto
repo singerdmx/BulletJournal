@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package types;
+
+option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types";
+
+message JoinGroupResponse {
+    string Uid = 1;
+    string Username = 2;
+}
