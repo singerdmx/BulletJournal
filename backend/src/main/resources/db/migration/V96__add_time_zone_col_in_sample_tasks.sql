@@ -1,0 +1,1 @@
+alter table template.sample_tasks add time_zone varchar(100);

@@ -10,6 +10,8 @@ public class UpdateSampleTaskParams {
 
     private String uid;
 
+    private String timeZone;
+
     public String getName() {
         return name;
     }
@@ -32,6 +34,14 @@ public class UpdateSampleTaskParams {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public String getUid() {

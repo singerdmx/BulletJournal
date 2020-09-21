@@ -12,6 +12,8 @@ public class SampleTask {
 
     private String metadata;
 
+    private String timeZone;
+
     private String uid;
 
     private String dueDate;
@@ -31,7 +33,8 @@ public class SampleTask {
         String uid,
         String dueDate,
         String dueTime,
-        Timestamp availableBefore
+        Timestamp availableBefore,
+        String timeZone
     ) {
         this.id = id;
         this.name = name;
@@ -41,6 +44,7 @@ public class SampleTask {
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.availableBefore = availableBefore;
+        this.timeZone = timeZone;
     }
 
     public String getUid() {
@@ -57,6 +61,14 @@ public class SampleTask {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public String getName() {

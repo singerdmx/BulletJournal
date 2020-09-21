@@ -34,6 +34,9 @@ public class SampleTask extends NamedModel {
     @Column(name = "available_before")
     private Timestamp availableBefore;
 
+    @Column(name = "time_zone")
+    private String timeZone;
+
     @Override
     public Long getId() {
         return id;
@@ -53,6 +56,14 @@ public class SampleTask extends NamedModel {
 
     public String getContent() {
         return content;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public void setContent(String content) {
@@ -100,6 +111,8 @@ public class SampleTask extends NamedModel {
                 uid,
                 dueDate,
                 dueTime,
-                availableBefore);
+                availableBefore,
+                timeZone
+            );
     }
 }

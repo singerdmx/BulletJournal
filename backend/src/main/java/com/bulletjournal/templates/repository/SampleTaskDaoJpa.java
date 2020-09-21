@@ -25,6 +25,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setMetadata(createSampleTaskParams.getMetadata());
         sampleTask.setName(createSampleTaskParams.getName());
         sampleTask.setUid(createSampleTaskParams.getUid());
+        sampleTask.setTimeZone(createSampleTaskParams.getTimeZone());
         return sampleTaskRepository.save(sampleTask);
     }
 
@@ -52,6 +53,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setContent(updateSampleTaskParams.getContent());
         sampleTask.setMetadata(updateSampleTaskParams.getMetadata());
         sampleTask.setUid(updateSampleTaskParams.getUid());
+        sampleTask.setTimeZone(updateSampleTaskParams.getTimeZone());
         return sampleTaskRepository.save(sampleTask);
     }
 
