@@ -18,6 +18,7 @@ import ReactLoading from "react-loading";
 import {getCookie} from "../../index";
 import StepsImportTasksPage from "./steps.import.tasks.pages";
 import {updateProjects} from "../../features/project/actions";
+import {updateExpandedMyself} from "../../features/myself/actions";
 
 const {Meta} = Card;
 const {Option} = Select;
@@ -34,6 +35,7 @@ type StepsProps = {
     nextStepReceived: (nextStep: NextStep | undefined) => void;
     sampleTasksReceived: (sampleTasks: SampleTask[], scrollId: string) => void;
     getSampleTasksByScrollId: (scrollId: string) => void;
+    updateExpandedMyself: (updateSettings: boolean) => void;
 };
 
 export const STEPS = 'steps';
@@ -44,7 +46,7 @@ const StepsPage: React.FC<StepsProps> = (
     {
         loadingNextStep, sampleTasks, category, scrollId,
         nextStep, getCategory, getNextStep, nextStepReceived, sampleTasksReceived,
-        updateProjects, getSampleTasksByScrollId,
+        updateProjects, updateExpandedMyself, getSampleTasksByScrollId,
     }
 ) => {
     const {categoryId} = useParams();
@@ -233,6 +235,7 @@ const StepsPage: React.FC<StepsProps> = (
         const loginCookie = getCookie('__discourse_proxy');
         if (loginCookie) {
             updateProjects();
+            updateExpandedMyself(true);
         }
     }
 
@@ -368,6 +371,7 @@ export default connect(mapStateToProps, {
     getNextStep,
     nextStepReceived,
     updateProjects,
+    updateExpandedMyself,
     sampleTasksReceived,
     getSampleTasksByScrollId,
 })(StepsPage);
