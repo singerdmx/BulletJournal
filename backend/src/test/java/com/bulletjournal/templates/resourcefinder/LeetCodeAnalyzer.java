@@ -176,8 +176,7 @@ public class LeetCodeAnalyzer {
         Map<String, SampleTask> dataMap = getDataForCompany(companies, mapForContent, algorithmTopics);
         String contentTemplate = "{\"delta\":{\"ops\":[{\"attributes\":{\"bold\":true},\"insert\":\"DIFFICULTY\"},DELTA_COMPANIES" +
                 "{\"insert\":\"Link: \"},{\"attributes\":{\"link\":\"PROBLEM_LINK\"},\"insert\":\"PROBLEM_LINK\"}," +
-                "{\"insert\":\"\\n\"}]},\"mdelta\":[{\"attributes\":{\"b\":true},\"insert\":\"DIFFICULTY\"},M_COMPANIES{\"insert\":\"Link: \"}," +
-                "{\"attributes\":{\"a\":\"PROBLEM_LINK\"},\"insert\":\"PROBLEM_LINK\"},{\"insert\":\"\\n\"}]," +
+                "{\"insert\":\"\\n\"}]}," +
                 "\"###html###\":\"<p><strong>DIFFICULTY</strong></p><ul>HTML_COMPANIES</ul><p>Link: <a href=\\\"PROBLEM_LINK\\\" rel=\\\"noopener noreferrer\\\" target=\\\"_blank\\\">PROBLEM_LINK</a></p>\"}";
         for (SampleTask sampleTask : dataMap.values()) {
             String difficulty = mapForContent.get(sampleTask.getUid()).get(0);

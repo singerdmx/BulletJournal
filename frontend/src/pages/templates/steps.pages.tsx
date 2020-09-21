@@ -239,15 +239,15 @@ const StepsPage: React.FC<StepsProps> = (
                         style={{color: '#4ddbff', margin: '3px'}} shape="round">
                         Next
                     </Button>}
+                    {scrollId && <Button
+                        onClick={onConfirmNext}
+                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                        More
+                    </Button>}
                     {sampleTasks.length > 0 && <Button
                         onClick={onConfirmNext}
                         style={{color: '#4ddbff', margin: '3px'}} shape="round">
                         Apply
-                    </Button>}
-                    {scrollId && <Button
-                        onClick={onConfirmNext}
-                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
-                        Load More
                     </Button>}
                 </div>
                 <div className='confirm-button'>
