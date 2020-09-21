@@ -4,8 +4,14 @@ package com.bulletjournal.controller;
 import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.repository.TaskContentRepository;
+import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.models.TaskContent;
+import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,8 +35,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Tests {@link TaskController}
@@ -51,6 +56,15 @@ public class TaskControllerTest {
     private ContentRevisionConfig revisionConfig;
     private final TestRestTemplate restTemplate = new TestRestTemplate();
     private RequestParams requestParams;
+
+    @Autowired
+    private SampleTaskDaoJpa sampleTaskDaoJpa;
+
+    @Autowired
+    private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private TaskContentRepository taskContentRepository;
 
     @Before
     public void setup() {
@@ -191,6 +205,28 @@ public class TaskControllerTest {
         assertEquals(4, taskStatistics.getCompleted());
         assertEquals(1, taskStatistics.getUncompleted());
         assertEquals(users.size(), taskStatistics.getUserTaskStatistics().size());
+    }
+
+    @Test
+    public void testCreateTaskFromSampleTask() throws Exception {
+        Long projectId = 1L;
+        Long sampleTaskId = 1L;
+        String owner = "Scarlet";
+        Integer reminderBeforeTask = 1;
+        List<String> assignees = Arrays.asList("Xavier", "Scarlet");
+        String recurrenceRule = "DTSTART:20200825T070000ZRRULE:FREQ=WEEKLY;BYDAY=TU;INTERVAL=1";
+        String timeZone = "America/Los_Angeles";
+
+        SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
+        sampleTask.setTimeZone(timeZone);
+        com.bulletjournal.repository.models.Task task
+            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees, recurrenceRule);
+        assertNotNull(task);
+        assertEquals(owner, task.getOwner());
+        assertTrue(assignees.size() == task.getAssignees().size() && assignees.containsAll(task.getAssignees()));
+        assertEquals(recurrenceRule, task.getRecurrenceRule());
+        TaskContent content = Iterables.getOnlyElement(taskContentRepository.findTaskContentByTask(task));
+        assertNotNull(content);
     }
 
     private TaskStatistics getTaskStatistics(List<Long> projectIds, String timezone, String startTime, String endTime) {
