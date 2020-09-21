@@ -42,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -447,16 +446,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String owner,
         SampleTask sampleTask,
         Integer reminderBeforeTask,
-        @NotNull List<String> assignees,
-        @NotNull String recurrenceRule
+        List<String> assignees
     ) {
         Preconditions.checkNotNull(assignees);
-        Preconditions.checkNotNull(recurrenceRule);
         CreateTaskParams params = sampleTaskToCreateTaskParams(
             sampleTask,
             reminderBeforeTask,
-            assignees,
-            recurrenceRule
+            assignees
         );
         Task task = create(projectId, owner, params);
         if (StringUtils.isNotEmpty(sampleTask.getContent())) {
@@ -1033,8 +1029,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     private CreateTaskParams sampleTaskToCreateTaskParams(
         SampleTask sampleTask,
         Integer reminderBeforeTask,
-        List<String> assignees,
-        String recurrenceRule
+        List<String> assignees
     ) {
         return new CreateTaskParams(
                 sampleTask.getName(),
@@ -1044,7 +1039,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 reminderBeforeTask == null ? null : new ReminderSetting(null, null, reminderBeforeTask),
                 assignees,
                 sampleTask.getTimeZone(),
-                recurrenceRule
+                null
         );
     }
 }

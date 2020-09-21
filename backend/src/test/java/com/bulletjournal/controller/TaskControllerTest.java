@@ -214,17 +214,15 @@ public class TaskControllerTest {
         String owner = "Scarlet";
         Integer reminderBeforeTask = 1;
         List<String> assignees = Arrays.asList("Xavier", "Scarlet");
-        String recurrenceRule = "DTSTART:20200825T070000ZRRULE:FREQ=WEEKLY;BYDAY=TU;INTERVAL=1";
         String timeZone = "America/Los_Angeles";
 
         SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
         sampleTask.setTimeZone(timeZone);
         com.bulletjournal.repository.models.Task task
-            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees, recurrenceRule);
+            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees);
         assertNotNull(task);
         assertEquals(owner, task.getOwner());
         assertTrue(assignees.size() == task.getAssignees().size() && assignees.containsAll(task.getAssignees()));
-        assertEquals(recurrenceRule, task.getRecurrenceRule());
         TaskContent content = Iterables.getOnlyElement(taskContentRepository.findTaskContentByTask(task));
         assertNotNull(content);
     }
