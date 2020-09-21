@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './steps.styles.less';
-import {useHistory, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {
@@ -11,16 +11,12 @@ import {
     sampleTasksReceived
 } from "../../features/templates/actions";
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
-import {Avatar, Button, Card, Empty, Result, Select, Tooltip} from "antd";
+import {Button, Card, Empty, Select} from "antd";
 import {isSubsequence} from "../../utils/Util";
 import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
 import ReactLoading from "react-loading";
 import {getCookie} from "../../index";
-import {Project, ProjectsWithOwner} from "../../features/project/interface";
-import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pages";
-import {ProjectType} from "../../features/project/constants";
-import AddProject from "../../components/modals/add-project.component";
-import {iconMapper} from "../../components/side-menu/side-menu.component";
+import StepsImportTasksPage from "./steps.import.tasks.pages";
 import {updateProjects} from "../../features/project/actions";
 
 const {Meta} = Card;
@@ -29,8 +25,6 @@ const {Option} = Select;
 type StepsProps = {
     loadingNextStep: boolean;
     sampleTasks: SampleTask[];
-    ownedProjects: Project[];
-    sharedProjects: ProjectsWithOwner[];
     scrollId: string;
     category: Category | undefined;
     nextStep: NextStep | undefined;
@@ -50,24 +44,16 @@ const StepsPage: React.FC<StepsProps> = (
     {
         loadingNextStep, sampleTasks, category, scrollId,
         nextStep, getCategory, getNextStep, nextStepReceived, sampleTasksReceived,
-        ownedProjects, sharedProjects, getSampleTasksByScrollId, updateProjects
+        updateProjects, getSampleTasksByScrollId,
     }
 ) => {
-    const history = useHistory();
     const {categoryId} = useParams();
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [projectId, setProjectId] = useState(-1);
 
     useEffect(() => {
         if (categoryId) {
             getCategory(parseInt(categoryId));
         }
     }, [categoryId]);
-
-    useEffect(() => {
-        if (projects && projects[0]) setProjectId(projects[0].id);
-        else setProjectId(-1);
-    }, [projects]);
 
     useEffect(() => {
         document.title = 'Bullet Journal - Steps';
@@ -97,17 +83,6 @@ const StepsPage: React.FC<StepsProps> = (
             }
         }
     }, [nextStep]);
-
-    useEffect(() => {
-        setProjects([]);
-        setProjects(flattenOwnedProject(ownedProjects, projects));
-        setProjects(flattenSharedProject(sharedProjects, projects));
-        setProjects(
-            projects.filter((p) => {
-                return p.projectType === ProjectType.TODO && !p.shared;
-            })
-        );
-    }, [ownedProjects, sharedProjects]);
 
     const [curSelections, setCurSelections] = useState<any>({});
     const [showConfirmButton, setShowConfirmButton] = useState(false);
@@ -261,67 +236,6 @@ const StepsPage: React.FC<StepsProps> = (
         }
     }
 
-    const onGoSignIn = () => {
-        window.location.href = 'https://bulletjournal.us';
-    }
-
-    const getLoginRequirePage = () => {
-        return <Result
-            status="warning"
-            title="Please Sign In"
-            subTitle="You need a Bullet Journal account to save these tasks into your own project (BuJo)"
-            extra={
-                <Button type="primary" key="sign-in" onClick={onGoSignIn}>
-                    Go to Bullet Journal Sign In Page
-                </Button>
-            }
-        />
-    }
-
-    const getImportTasksPage = () => {
-        if (projects.length === 0) {
-            return <div className='import-tasks-page'>
-                <Result
-                    status="warning"
-                    title="Please Create a Project"
-                    subTitle="You need a TODO BuJo to save these tasks into it"
-                    extra={<AddProject history={history} mode={'singular'}/>}
-                />
-            </div>
-        }
-
-        return <div className='import-tasks-page'>
-            <Tooltip title="Choose BuJo" placement="topLeft">
-                <Select
-                    style={{ width: '85%' }}
-                    placeholder="Choose BuJo"
-                    value={projectId}
-                    onChange={(value: any) => {
-                        setProjectId(value);
-                    }}
-                >
-                    {projects.map((project) => {
-                        return (
-                            <Option value={project.id} key={project.id}>
-                                <Tooltip
-                                    title={`${project.name} (Group ${project.group.name})`}
-                                    placement="right"
-                                >
-                    <span>
-                      <Avatar size="small" src={project.owner.avatar} />
-                        &nbsp; {iconMapper[project.projectType]}
-                        &nbsp; <strong>{project.name}</strong>
-                        &nbsp; (Group <strong>{project.group.name}</strong>)
-                    </span>
-                                </Tooltip>
-                            </Option>
-                        );
-                    })}
-                </Select>
-            </Tooltip>
-        </div>
-    }
-
     const getSampleTasks = () => {
         if (sampleTasks && sampleTasks.length > 0) {
             return sampleTasks;
@@ -329,7 +243,7 @@ const StepsPage: React.FC<StepsProps> = (
 
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
-            const data : SampleTasks = JSON.parse(sampleTasksText);
+            const data: SampleTasks = JSON.parse(sampleTasksText);
             return data.sampleTasks;
         }
 
@@ -343,7 +257,7 @@ const StepsPage: React.FC<StepsProps> = (
 
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
-            const data : SampleTasks = JSON.parse(sampleTasksText);
+            const data: SampleTasks = JSON.parse(sampleTasksText);
             return data.scrollId;
         }
 
@@ -358,7 +272,6 @@ const StepsPage: React.FC<StepsProps> = (
         const existingSteps = getSteps();
         if (existingSteps.length > 0) {
             const curStep = getCurrentStep();
-            const loginCookie = getCookie('__discourse_proxy');
             return <div>
                 <div className='choices-card'>
                     {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
@@ -377,7 +290,7 @@ const StepsPage: React.FC<StepsProps> = (
                     {getSampleTasks().length > 0 && <div className='sample-tasks'>
                         {getSampleTasks().map((sampleTask: SampleTask) => {
                             return <div className='sample-task'>
-                               {sampleTask.name}
+                                {sampleTask.name}
                             </div>
                         })}
                     </div>}
@@ -404,7 +317,7 @@ const StepsPage: React.FC<StepsProps> = (
                 </div>
                 {showImportTasksCard && <>
                     <div className='import-card'>
-                        {!loginCookie ? getLoginRequirePage() : getImportTasksPage()}
+                        <StepsImportTasksPage/>
                     </div>
                 </>
                 }
@@ -448,15 +361,13 @@ const mapStateToProps = (state: IState) => ({
     sampleTasks: state.templates.sampleTasks,
     scrollId: state.templates.scrollId,
     loadingNextStep: state.templates.loadingNextStep,
-    ownedProjects: state.project.owned,
-    sharedProjects: state.project.shared,
 });
 
 export default connect(mapStateToProps, {
     getCategory,
     getNextStep,
     nextStepReceived,
+    updateProjects,
     sampleTasksReceived,
     getSampleTasksByScrollId,
-    updateProjects
 })(StepsPage);
