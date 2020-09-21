@@ -42,7 +42,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     const [projects, setProjects] = useState<Project[]>([]);
     const [projectId, setProjectId] = useState(-1);
     const [assignees, setAssignees] = useState<string[]>([]);
-    const [labels, setLabels] = useState([]);
+    const [labels, setLabels] = useState<number[]>([]);
     const [startDate, setStartDate] = useState(undefined);
     const [reminderBefore, setReminderBefore] = useState(before);
     const [subscribed, setSubscribed] = useState(true);
@@ -104,24 +104,31 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
             return null;
         }
         return (
-            <Select
-                mode="multiple"
-                onChange={onChangeAssignees}
-                filterOption={(e, t) => onFilterAssignees(e, t)}
-                value={assignees}
-                style={{width: '50%'}}
-            >
-                {group.users
-                    .filter((u) => u.accepted)
-                    .map((user) => {
-                        return (
-                            <Option value={user.name} key={user.alias}>
-                                <Avatar size="small" src={user.avatar}/>
-                                &nbsp;&nbsp; <strong>{user.alias}</strong>
-                            </Option>
-                        );
-                    })}
-            </Select>
+            <>
+                <Select
+                    mode="multiple"
+                    allowClear={true}
+                    onChange={onChangeAssignees}
+                    filterOption={(e, t) => onFilterAssignees(e, t)}
+                    value={assignees}
+                    style={{padding: '3px', minWidth: '50%'}}
+                >
+                    {group.users
+                        .filter((u) => u.accepted)
+                        .map((user) => {
+                            return (
+                                <Option value={user.name} key={user.alias}>
+                                    <Avatar size="small" src={user.avatar}/>
+                                    &nbsp;&nbsp; <strong>{user.alias}</strong>
+                                </Option>
+                            );
+                        })}
+                </Select>
+                <Button
+                    onClick={() => setAssignees(group!.users.map(u => u.name))}
+                    style={{color: '#4ddbff'}} shape="round" size='small'>
+                    All
+                </Button></>
         );
     };
 
@@ -151,10 +158,10 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         </div>
     }
 
-    return <div className='import-tasks-page'>
-        <Tooltip title="Choose BuJo" placement="topLeft">
+    return <div className='choices-card'>
+        <div className='choice-card'>
             <Select
-                style={{width: '85%'}}
+                style={{padding: '3px', minWidth: '40%'}}
                 placeholder="Choose BuJo"
                 value={projectId}
                 onChange={(value: any) => {
@@ -179,53 +186,68 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                     );
                 })}
             </Select>
-        </Tooltip>
-        {getUserSelections()}
-        <Select
-            mode="multiple"
-            placeholder='Labels'
-            style={{width: '50%'}}
-            value={labels}
-            onChange={onChangeLabels}
-            filterOption={(e, t) => onFilterLabel(e, t)}
-        >
-            {labelOptions &&
-            labelOptions.length &&
-            labelOptions.map((l) => {
-                return (
-                    <Option value={l.id} key={l.value}>
-                        {getIcon(l.icon)} &nbsp;{l.value}
+        </div>
+        <div className='choice-card'>
+            {getUserSelections()}
+        </div>
+        <div className='choice-card'>
+            <Select
+                mode="multiple"
+                placeholder='Labels'
+                allowClear={true}
+                style={{padding: '3px', minWidth: '50%'}}
+                value={labels}
+                onChange={onChangeLabels}
+                filterOption={(e, t) => onFilterLabel(e, t)}
+            >
+                {labelOptions &&
+                labelOptions.length &&
+                labelOptions.map((l) => {
+                    return (
+                        <Option value={l.id} key={l.value}>
+                            {getIcon(l.icon)} &nbsp;{l.value}
+                        </Option>
+                    );
+                })}
+            </Select>
+            <Button
+                onClick={() => setLabels(labelOptions.map(l => l.id))}
+                style={{color: '#4ddbff'}} shape="round" size='small'>
+                All
+            </Button>
+        </div>
+        <div className='choice-card'>
+            <DatePicker
+                allowClear={true}
+                onChange={onChangeStartDate}
+                style={{width: '180px', padding: '5px'}}
+                placeholder="Start Date"
+            />
+        </div>
+        <div className='choice-card'>
+            <Select
+                defaultValue={ReminderBeforeTaskText[before]}
+                style={{width: '180px', padding: '5px'}}
+                onChange={onChangeReminderBefore}
+                placeholder="Reminder Before Task"
+            >
+                {ReminderBeforeTaskText.map((b: string, index: number) => (
+                    <Option key={index} value={index}>
+                        {b}
                     </Option>
-                );
-            })}
-        </Select>
-        <DatePicker
-            allowClear={true}
-            onChange={onChangeStartDate}
-            style={{width: '30%'}}
-            placeholder="Start Date"
-        />
-        <Select
-            defaultValue={ReminderBeforeTaskText[before]}
-            style={{width: '180px'}}
-            onChange={onChangeReminderBefore}
-            placeholder="Reminder Before Task"
-        >
-            {ReminderBeforeTaskText.map((b: string, index: number) => (
-                <Option key={index} value={index}>
-                    {b}
-                </Option>
-            ))}
-        </Select>
-
-        <Button
-            style={{color: '#4ddbff', margin: '3px'}} shape="round">
-            Import
-        </Button>
+                ))}
+            </Select>
+        </div>
+        <div className='choice-card'>
+            <Button
+                style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                Import
+            </Button>
+        </div>
         <div className='subscribe-updates'>
             <Checkbox checked={subscribed} onChange={onChangeSubscribed}>Subscribe to future updates</Checkbox>
             <Tooltip title='New events will be added into your BuJo automatically'>
-                <QuestionCircleTwoTone />
+                <QuestionCircleTwoTone/>
             </Tooltip>
         </div>
     </div>
