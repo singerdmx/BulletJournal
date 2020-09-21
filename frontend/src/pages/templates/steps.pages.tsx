@@ -3,12 +3,19 @@ import './steps.styles.less';
 import {useParams} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getCategory, getNextStep, getSampleTasksByScrollId, nextStepReceived} from "../../features/templates/actions";
-import {Category, Choice, NextStep, SampleTask, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, Select, Tag} from "antd";
+import {
+    getCategory,
+    getNextStep,
+    getSampleTasksByScrollId,
+    nextStepReceived,
+    sampleTasksReceived
+} from "../../features/templates/actions";
+import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
+import {Button, Card, Empty, Result, Select, Tag} from "antd";
 import {isSubsequence} from "../../utils/Util";
 import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
 import ReactLoading from "react-loading";
+import {getCookie} from "../../index";
 
 const {Meta} = Card;
 const {Option} = Select;
@@ -22,15 +29,20 @@ type StepsProps = {
     getCategory: (categoryId: number) => void;
     getNextStep: (stepId: number, selections: number[], prevSelections: number[], first?: boolean) => void;
     nextStepReceived: (nextStep: NextStep | undefined) => void;
+    sampleTasksReceived: (sampleTasks: SampleTask[], scrollId: string) => void;
     getSampleTasksByScrollId: (scrollId: string) => void;
 };
 
 export const STEPS = 'steps';
 export const SELECTIONS = 'selections';
+export const SAMPLE_TASKS = 'sampleTasks';
 
 const StepsPage: React.FC<StepsProps> = (
-    {loadingNextStep, sampleTasks, category, scrollId,
-        nextStep, getCategory, getNextStep, nextStepReceived, getSampleTasksByScrollId}
+    {
+        loadingNextStep, sampleTasks, category, scrollId,
+        nextStep, getCategory, getNextStep, nextStepReceived, sampleTasksReceived,
+        getSampleTasksByScrollId
+    }
 ) => {
     const {categoryId} = useParams();
 
@@ -71,6 +83,7 @@ const StepsPage: React.FC<StepsProps> = (
 
     const [curSelections, setCurSelections] = useState<any>({});
     const [showConfirmButton, setShowConfirmButton] = useState(false);
+    const [showImportTasksCard, setShowImportTasksCard] = useState(false);
 
     if (!category) {
         return <Empty/>
@@ -184,6 +197,8 @@ const StepsPage: React.FC<StepsProps> = (
         setSelections(selections);
         localStorage.setItem(STEPS, JSON.stringify(steps));
         nextStepReceived(undefined);
+        sampleTasksReceived([], '');
+        localStorage.removeItem(SAMPLE_TASKS);
     }
 
     const onConfirmNext = () => {
@@ -206,6 +221,48 @@ const StepsPage: React.FC<StepsProps> = (
         getNextStep(curStep.id, selected, prevSelections, getSteps().length === 1);
     }
 
+    const onScrollNext = () => {
+    }
+
+    const onApplySampleTasks = () => {
+        setShowImportTasksCard(true);
+    }
+
+    const onGoSignIn = () => {
+        window.location.href = 'https://bulletjournal.us';
+    }
+
+    const getLoginRequirePage = () => {
+        return <Result
+            status="warning"
+            title="Please Sign In"
+            subTitle="You need a Bullet Journal account to save these tasks into your own project (BuJo)"
+            extra={
+                <Button type="primary" key="sign-in" onClick={onGoSignIn}>
+                    Go to Bullet Journal Sign In Page
+                </Button>
+            }
+        />
+    }
+
+    const getImportTasksPage = () => {
+        return <div></div>
+    }
+
+    const getSampleTasks = () => {
+        if (sampleTasks && sampleTasks.length > 0) {
+            return sampleTasks;
+        }
+
+        const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
+        if (sampleTasksText) {
+            const data : SampleTasks = JSON.parse(sampleTasksText);
+            return data.sampleTasks;
+        }
+
+        return [];
+    }
+
     const getStepsDiv = () => {
         if (!category || category.choices.length === 0) {
             return null;
@@ -214,45 +271,56 @@ const StepsPage: React.FC<StepsProps> = (
         const existingSteps = getSteps();
         if (existingSteps.length > 0) {
             const curStep = getCurrentStep();
-            return <div className='choices-card'>
-                {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
-                    <Button
-                        onClick={goBack}
-                        style={{color: '#4ddbff'}} shape="round"
-                        icon={<UpCircleTwoTone/>}>
-                        Go Back
-                    </Button>
-                </div>}
-                <div>
-                    {curStep.choices.map(choice => {
-                        return renderChoice(choice);
-                    })}
+            const loginCookie = getCookie('__discourse_proxy');
+            return <div>
+                <div className='choices-card'>
+                    {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
+                        <Button
+                            onClick={goBack}
+                            style={{color: '#4ddbff'}} shape="round"
+                            icon={<UpCircleTwoTone/>}>
+                            Go Back
+                        </Button>
+                    </div>}
+                    <div>
+                        {curStep.choices.map(choice => {
+                            return renderChoice(choice);
+                        })}
+                    </div>
+                    {getSampleTasks().length > 0 && <div className='sample-tasks'>
+                        {getSampleTasks().map((sampleTask: SampleTask) => {
+                            return <span className='sample-task'>
+                                <Tag color='blue'>{sampleTask.name}</Tag>
+                            </span>
+                        })}
+                    </div>}
+                    <div className='confirm-button'>
+                        {showConfirmButton && curStep.choices.length > 0 && <Button
+                            onClick={onConfirmNext}
+                            style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                            Next
+                        </Button>}
+                        {scrollId && <Button
+                            onClick={onScrollNext}
+                            style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                            More
+                        </Button>}
+                        {getSampleTasks().length > 0 && <Button
+                            onClick={onApplySampleTasks}
+                            style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                            Apply
+                        </Button>}
+                    </div>
+                    <div className='confirm-button'>
+                        {loadingNextStep && <ReactLoading type="bubbles" color="#0984e3"/>}
+                    </div>
                 </div>
-                {sampleTasks.length > 0 && <div>
-                    {sampleTasks.map((sampleTask) => {
-                        return <Tag color='blue'>{sampleTask.name}</Tag>
-                    })}
-                </div>}
-                <div className='confirm-button'>
-                    {showConfirmButton && curStep.choices.length > 0 && <Button
-                        onClick={onConfirmNext}
-                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
-                        Next
-                    </Button>}
-                    {scrollId && <Button
-                        onClick={onConfirmNext}
-                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
-                        More
-                    </Button>}
-                    {sampleTasks.length > 0 && <Button
-                        onClick={onConfirmNext}
-                        style={{color: '#4ddbff', margin: '3px'}} shape="round">
-                        Apply
-                    </Button>}
-                </div>
-                <div className='confirm-button'>
-                    {loadingNextStep && <ReactLoading type="bubbles" color="#0984e3"/>}
-                </div>
+                {showImportTasksCard && <>
+                    <div className='import-card'>
+                        {!loginCookie ? getLoginRequirePage() : getImportTasksPage()}
+                    </div>
+                </>
+                }
             </div>
         }
 
@@ -299,5 +367,6 @@ export default connect(mapStateToProps, {
     getCategory,
     getNextStep,
     nextStepReceived,
+    sampleTasksReceived,
     getSampleTasksByScrollId
 })(StepsPage);

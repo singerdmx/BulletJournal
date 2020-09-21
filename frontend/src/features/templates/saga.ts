@@ -60,6 +60,7 @@ import {
 } from "../../apis/templates/workflowApis";
 import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 import {reloadReceived} from "../myself/actions";
+import {SAMPLE_TASKS} from "../../pages/templates/steps.pages";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -415,6 +416,10 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
     yield put(templatesActions.nextStepReceived({step: nextStep}));
     if (nextStep.sampleTasks) {
       yield put(templatesActions.sampleTasksReceived({tasks: nextStep.sampleTasks, scrollId: nextStep.scrollId}));
+      localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+        sampleTasks: nextStep.sampleTasks,
+        scrollId: nextStep.scrollId
+      }));
     }
   } catch (error) {
     if (error.message === 'reload') {

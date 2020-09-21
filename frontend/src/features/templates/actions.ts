@@ -1,5 +1,5 @@
 import {actions} from './reducer';
-import {Category, NextStep} from "./interface";
+import {Category, NextStep, SampleTask} from "./interface";
 
 export const getCategories = () => actions.getCategories({});
 
@@ -82,6 +82,9 @@ export const setStepChoices = (id: number, choices: number[]) => actions.setStep
 });
 
 export const nextStepReceived = (nextStep: NextStep | undefined) => actions.nextStepReceived({step: nextStep});
+
+export const sampleTasksReceived = (sampleTasks: SampleTask[], scrollId: string) =>
+    actions.sampleTasksReceived({tasks: sampleTasks, scrollId: scrollId});
 
 export const createRule = (name: string, priority: number, connectedStepId: number,
                            ruleExpression: string, categoryId?: number, stepId?: number) => actions.createRule({
