@@ -17,11 +17,12 @@ export const addCategory = (
     });
 
 export const updateCategory = (
-    categoryId: number, name: string, description?: string, icon?: string,
+    categoryId: number, name: string, needStartDate: boolean, description?: string, icon?: string,
     color?: string, forumId?: number, image?: string, nextStepId?: number) =>
     actions.updateCategory({
         categoryId: categoryId,
         name: name,
+        needStartDate: needStartDate,
         description: description,
         icon: icon,
         color: color,

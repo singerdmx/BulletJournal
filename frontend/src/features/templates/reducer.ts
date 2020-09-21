@@ -97,6 +97,7 @@ export type AddCategoryAction = {
 export type UpdateCategoryAction = {
     categoryId: number;
     name: string;
+    needStartDate: boolean;
     description?: string;
     icon?: string;
     color?: string;

@@ -27,7 +27,8 @@ export const createCategory = (
         color: color,
         forumId: forumId,
         image: image,
-        nextStepId: nextStepId
+        nextStepId: nextStepId,
+        needStartDate: false,
     });
     return doPost('/api/categories', postBody)
         .then(res => res.json())
@@ -37,10 +38,11 @@ export const createCategory = (
 }
 
 export const putCategory = (
-    categoryId: number, name: string, description?: string, icon?: string,
+    categoryId: number, name: string, needStartDate: boolean, description?: string, icon?: string,
     color?: string, forumId?: number, image?: string, nextStepId?: number) => {
     const putBody = JSON.stringify({
         name: name,
+        needStartDate: needStartDate,
         description: description,
         icon: icon,
         color: color,
