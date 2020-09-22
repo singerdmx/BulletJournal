@@ -87,12 +87,8 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     }, [ownedProjects, sharedProjects]);
 
     const onGoSignIn = () => {
-        const userAgent = window.navigator.userAgent.toLowerCase();
-        if (userAgent.includes('mobile')) {
-
-        } else {
-            window.location.href = 'https://bulletjournal.us';
-        }
+        window.location.href = 'https://bulletjournal.us/sso_login' + window.location.pathname +
+            window.location.search + window.location.hash;
     }
 
     const onChangeAssignees = (value: any) => {
