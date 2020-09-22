@@ -81,6 +81,9 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
     deleteTask,
     deleteCompletedTask,
   } = props;
+
+  const history = useHistory();
+
   if (isComplete) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -116,16 +119,36 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
     }
   };
 
+  const getCompleteButton = () => {
+    if (completeOnlyOccurrence || !task.recurrenceRule) {
+      return <div
+          onClick={() => handleCompleteTaskClick()}
+          className="popover-control-item"
+      >
+        <span>Complete</span>
+        <CheckCircleTwoTone twoToneColor="#52c41a"/>
+      </div>;
+    }
+
+    return <Popconfirm
+        title="One Time Only or All Events"
+        okText="Series"
+        cancelText="Occurrence"
+        onConfirm={() => handleCompleteTaskClick()}
+        onCancel={() => history.push('/bujo/today')}
+        placement="bottom"
+    >
+      <div className="popover-control-item">
+        <span>Complete</span>
+        <CheckCircleTwoTone twoToneColor="#52c41a"/>
+      </div>
+    </Popconfirm>
+  }
+
   if (inModal === true) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div
-          onClick={() => handleCompleteTaskClick()}
-          className="popover-control-item"
-        >
-          <span>Complete</span>
-          <CheckCircleTwoTone twoToneColor="#52c41a" />
-        </div>
+        {getCompleteButton()}
         <Popconfirm
           title="Are you sure?"
           okText="Yes"
@@ -144,36 +167,30 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{display: 'flex', flexDirection: 'column'}}>
       <EditTask task={task} mode="div" type={type}/>
       <MoveProjectItem
-        type={ProjectType.TODO}
-        projectItemId={task.id}
-        mode="div"
+          type={ProjectType.TODO}
+          projectItemId={task.id}
+          mode="div"
       />
       <ShareProjectItem
-        type={ProjectType.TODO}
-        projectItemId={task.id}
-        mode="div"
+          type={ProjectType.TODO}
+          projectItemId={task.id}
+          mode="div"
       />
-      <div
-        onClick={() => handleCompleteTaskClick()}
-        className="popover-control-item"
-      >
-        <span>Complete</span>
-        <CheckCircleTwoTone twoToneColor="#52c41a" />
-      </div>
+      {getCompleteButton()}
       <Popconfirm
-        title="Are you sure?"
-        okText="Yes"
-        cancelText="No"
-        onConfirm={() => deleteTask(task.id, type)}
-        className="group-setting"
-        placement="bottom"
+          title="Are you sure?"
+          okText="Yes"
+          cancelText="No"
+          onConfirm={() => deleteTask(task.id, type)}
+          className="group-setting"
+          placement="bottom"
       >
         <div className="popover-control-item">
           <span>Delete</span>
-          <DeleteTwoTone twoToneColor="#f5222d" />
+          <DeleteTwoTone twoToneColor="#f5222d"/>
         </div>
       </Popconfirm>
     </div>
