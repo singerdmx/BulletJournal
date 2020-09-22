@@ -4,7 +4,9 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
-import com.bulletjournal.templates.repository.*;
+import com.bulletjournal.templates.repository.CategoryDaoJpa;
+import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import com.bulletjournal.templates.repository.StepDaoJpa;
 import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.CategoryRule;
 import com.bulletjournal.templates.repository.model.Step;
@@ -18,7 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,6 +29,7 @@ public class WorkflowController {
 
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
     public static final String PUBLIC_SAMPLE_TASKS_ROUTE = "/api/public/sampleTasks";
+    public static final String PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE = "/api/public/sampleTasks/import";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
@@ -61,8 +65,10 @@ public class WorkflowController {
             nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
             if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
                 // assume final step, try to get sample tasks using prevSelections
-                List<SampleTask> sampleTasks = this.ruleEngine.getSampleTasksForFinalStep(
-                        nextStep.getStep(), selections, prevSelections);
+                List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
+                        this.ruleEngine.getSampleTasksForFinalStep(
+                                nextStep.getStep().getId(), selections, prevSelections))
+                        .stream().map(e -> e.toPresentationModel()).collect(Collectors.toList());
                 // store in redis and generate scrollId
                 // setSampleTasks with the first 10 tasks
                 nextStep.setScrollId("scrollId");
@@ -168,6 +174,13 @@ public class WorkflowController {
                 return true;
         }
         return false;
+    }
+
+
+    @PostMapping(PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE)
+    public void importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.ruleEngine.importTasks(username, importTasksParams);
     }
 
     @PostMapping(SAMPLE_TASKS_ROUTE)
