@@ -18,6 +18,7 @@ public class ImportTasksParams {
     private Integer reminderBefore;
     @NotNull
     private List<Long> labels;
+    private boolean subscribed;
     private String startDate;
     private String timezone;
 
@@ -91,5 +92,13 @@ public class ImportTasksParams {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public boolean isSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
     }
 }

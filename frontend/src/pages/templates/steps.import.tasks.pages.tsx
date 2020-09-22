@@ -39,7 +39,7 @@ type StepsImportTasksProps = {
     labelsUpdate: (projectId: number | undefined) => void;
     importTasks: (sampleTasks: number[], selections: number[], categoryId: number,
                   projectId: number, assignees: string[],
-                  reminderBefore: number, labels: number[],
+                  reminderBefore: number, labels: number[], subscribed: boolean,
                   startDate?: string, timezone?: string) => void;
 };
 
@@ -127,7 +127,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
 
         if (category) {
             importTasks(sampleTasks.map(s => s.id), curSelections, category.id, projectId, assignees,
-                reminderBefore === undefined ? before : reminderBefore, labels,
+                reminderBefore === undefined ? before : reminderBefore, labels, subscribed,
                 startDate, targetTimezone ? targetTimezone : timezone);
         }
     }

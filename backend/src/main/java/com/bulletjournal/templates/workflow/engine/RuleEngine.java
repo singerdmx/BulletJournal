@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.workflow.engine;
 
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
@@ -12,6 +13,7 @@ import com.bulletjournal.templates.repository.StepDaoJpa;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.SampleTaskRule;
 import com.bulletjournal.templates.repository.model.Selection;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +25,13 @@ import java.util.stream.Collectors;
 @Component
 public class RuleEngine {
 
-    private static final long INTENSITY_CHOICE_ID = 17;
+    private static final Map<Long, Integer> DEFAULT_INTENSITY_SELECTIONS = ImmutableMap.of(
+            247L, 2, // Low -> twice a day
+            248L, 4, // Medium -> 4 times a day
+            249L, 8); // Hard -> 8 times a day
+
+    // category id -> INTENSITY_SELECTIONS
+    private static final Map<Long, Map<Long, Integer>> CATEGORY_INTENSITY_SELECTIONS =  ImmutableMap.of();
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -44,14 +52,13 @@ public class RuleEngine {
     private TaskDaoJpa taskDaoJpa;
 
     public void importTasks(String requester, ImportTasksParams importTasksParams) {
-        List<Selection> selections =
-                this.selectionDaoJpa.getSelectionsById(importTasksParams.getSelections());
         List<SampleTask> sampleTasks = sampleTaskDaoJpa
                 .findAllById(importTasksParams.getSampleTasks());
         // if there is any sample task that does not have due date, we need to set due date for it
-        boolean needTimingArrangement = sampleTasks.stream().anyMatch(t -> StringUtils.isBlank(t.getDueDate()));
+        List<SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
+                .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
-        if (needTimingArrangement) {
+        if (!tasksNeedTimingArrangement.isEmpty()) {
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
@@ -66,9 +73,24 @@ public class RuleEngine {
                 User user = this.userDaoJpa.getByName(requester);
                 timezone = user.getTimezone();
             }
+
+            int frequency = getTimesOneDay(importTasksParams.getSelections(), importTasksParams.getCategoryId());
         }
 
 //        this.taskDaoJpa.createTaskFromSampleTask();
+
+        if (importTasksParams.isSubscribed()) {
+            // for subscription, merge with its existing selections
+            System.out.println(importTasksParams);
+        }
+    }
+
+    private int getTimesOneDay(List<Long> selections, long categoryId) {
+        Map<Long, Integer> frequencyMap = CATEGORY_INTENSITY_SELECTIONS
+                .getOrDefault(categoryId, DEFAULT_INTENSITY_SELECTIONS);
+        long selectionId = selections.stream().filter(s -> frequencyMap.containsKey(s)).findFirst().orElseThrow(
+                () -> new BadRequestException("Selections missing intensity"));
+        return frequencyMap.get(selectionId);
     }
 
     public Set<Long> getSampleTasksForFinalStep(long stepId,

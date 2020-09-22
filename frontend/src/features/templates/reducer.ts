@@ -45,6 +45,7 @@ export type ImportTasksAction = {
     assignees: string[];
     reminderBefore: number;
     labels: number[];
+    subscribed: boolean;
     startDate?: string;
     timezone?: string;
 };
