@@ -59,6 +59,7 @@ public class RuleEngine {
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
         if (!tasksNeedTimingArrangement.isEmpty()) {
+            tasksNeedTimingArrangement.sort(Comparator.comparing(SampleTask::getUid));
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
