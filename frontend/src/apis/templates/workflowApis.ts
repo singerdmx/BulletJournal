@@ -16,8 +16,8 @@ export const getNext = (stepId: number, selections: number[], prevSelections: nu
         });
 }
 
-export const fetchSampleTasksByScrollId = (scrollId: string) => {
-    return doFetch('/api/public/sampleTasks')
+export const fetchSampleTasksByScrollId = (scrollId: string, pageSize: number) => {
+    return doFetch(`/api/public/sampleTasks?scrollId=${scrollId}&pageSize=${pageSize}`)
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);

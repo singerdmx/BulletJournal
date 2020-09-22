@@ -80,7 +80,7 @@ public class WorkflowController {
     }
 
     @GetMapping(PUBLIC_SAMPLE_TASKS_ROUTE)
-    public SampleTasks getSampleTasks(@RequestParam String scrollId) {
+    public SampleTasks getSampleTasks(@RequestParam String scrollId, @NotNull @RequestParam Integer pageSize) {
         return new SampleTasks();
     }
 

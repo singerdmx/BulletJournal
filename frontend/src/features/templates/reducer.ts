@@ -202,6 +202,7 @@ export type UpdateSampleTaskAction = {
 
 export type GetSampleTasksByScrollIdAction = {
     scrollId: string;
+    pageSize: number;
 };
 
 export type GetSampleTaskAction = {

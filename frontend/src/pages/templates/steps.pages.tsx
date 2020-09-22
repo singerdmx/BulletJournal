@@ -34,7 +34,7 @@ type StepsProps = {
     getNextStep: (stepId: number, selections: number[], prevSelections: number[], first?: boolean) => void;
     nextStepReceived: (nextStep: NextStep | undefined) => void;
     sampleTasksReceived: (sampleTasks: SampleTask[], scrollId: string) => void;
-    getSampleTasksByScrollId: (scrollId: string) => void;
+    getSampleTasksByScrollId: (scrollId: string, pageSize: number) => void;
     updateExpandedMyself: (updateSettings: boolean) => void;
 };
 
@@ -230,7 +230,8 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const onScrollNext = () => {
-        getSampleTasksByScrollId(scrollId);
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        getSampleTasksByScrollId(scrollId, userAgent.includes('mobile') ? 10 : 20);
     }
 
     const onApplySampleTasks = () => {

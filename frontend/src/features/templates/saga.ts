@@ -569,8 +569,8 @@ function* getSampleTasksByScrollId(action: PayloadAction<GetSampleTasksByScrollI
   }
   yield put(templatesActions.loadingNextStepReceived({loading: true}));
   try {
-    const {scrollId} = action.payload;
-    const data : SampleTasks = yield call(fetchSampleTasksByScrollId, scrollId);
+    const {scrollId, pageSize} = action.payload;
+    const data : SampleTasks = yield call(fetchSampleTasksByScrollId, scrollId, pageSize);
     const state: IState = yield select();
     let tasks = state.templates.sampleTasks;
     tasks = tasks.concat(data.sampleTasks);
