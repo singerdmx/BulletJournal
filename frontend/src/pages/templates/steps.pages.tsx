@@ -230,6 +230,7 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const onScrollNext = () => {
+        getSampleTasksByScrollId(scrollId);
     }
 
     const onApplySampleTasks = () => {

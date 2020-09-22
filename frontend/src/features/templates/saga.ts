@@ -563,6 +563,11 @@ function* updateSampleTask(action: PayloadAction<UpdateSampleTaskAction>) {
 }
 
 function* getSampleTasksByScrollId(action: PayloadAction<GetSampleTasksByScrollIdAction>) {
+  const state: IState = yield select();
+  if (state.templates.loadingNextStep) {
+    return;
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: true}));
   try {
     const {scrollId} = action.payload;
     const data : SampleTasks = yield call(fetchSampleTasksByScrollId, scrollId);
@@ -581,6 +586,7 @@ function* getSampleTasksByScrollId(action: PayloadAction<GetSampleTasksByScrollI
       yield call(message.error, `getSampleTasksByScrollId Error Received: ${error}`);
     }
   }
+  yield put(templatesActions.loadingNextStepReceived({loading: false}));
 }
 
 export default function* TemplatesSagas() {
