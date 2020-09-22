@@ -38,6 +38,7 @@ export type GetNextStepAction = {
 };
 
 export type ImportTasksAction = {
+    sampleTasks: number[];
     selections: number[];
     categoryId: number;
     projectId: number;

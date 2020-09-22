@@ -18,7 +18,7 @@ import {Label} from "../../features/label/interface";
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import {ReminderBeforeTaskText} from "../../components/settings/reducer";
 import {QuestionCircleTwoTone} from "@ant-design/icons";
-import {Category} from "../../features/templates/interface";
+import {Category, SampleTask} from "../../features/templates/interface";
 import {zones} from "../../components/settings/constants";
 import {importTasks} from "../../features/templates/actions";
 import {getSelections} from "./steps.pages";
@@ -33,10 +33,11 @@ type StepsImportTasksProps = {
     category: Category | undefined;
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
+    sampleTasks: SampleTask[];
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
-    importTasks: (selections: number[], categoryId: number,
+    importTasks: (sampleTasks: number[], selections: number[], categoryId: number,
                    projectId: number, assignees: string[],
                    reminderBefore: number, labels: number[],
                    startDate?: string, timezone?: string) => void;
@@ -45,7 +46,7 @@ type StepsImportTasksProps = {
 const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     {
         myself, labelOptions, ownedProjects, sharedProjects, group,
-        timezone, category, before, getGroup, labelsUpdate, importTasks
+        sampleTasks, timezone, category, before, getGroup, labelsUpdate, importTasks
     }
 ) => {
     const history = useHistory();
@@ -124,7 +125,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         });
 
         if (category) {
-            importTasks(curSelections, category.id, projectId, assignees,
+            importTasks(sampleTasks.map(s => s.id), curSelections, category.id, projectId, assignees,
                 reminderBefore === undefined ? before : reminderBefore, labels,
                 startDate, targetTimezone ? targetTimezone : timezone);
         }
@@ -326,6 +327,7 @@ const mapStateToProps = (state: IState) => ({
     labelOptions: state.label.labelOptions,
     before: state.settings.before,
     category: state.templates.category,
+    sampleTasks: state.templates.sampleTasks,
 });
 
 export default connect(mapStateToProps, {
