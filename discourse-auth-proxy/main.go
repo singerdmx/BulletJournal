@@ -40,6 +40,7 @@ const homePage = "/home/index.html"
 const tokenPage = "/tokens/"
 const tokenForCookieUrl = "/api/tokens/"
 const guestUsername = "Guest"
+const ssoLoginUrlPrefix = "sso_login"
 var guestToken string = ""
 
 func main() {
@@ -412,13 +413,16 @@ func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 		tokenCache.Add(token, cookieValue)
 		tokenMutex.Unlock()
 	}
+	if strings.HasPrefix(returnUrl, ssoLoginUrlPrefix) {
+		returnUrl = strings.TrimPrefix(returnUrl, ssoLoginUrlPrefix)
+	}
 
 	// works around weird safari stuff
 	fmt.Fprintf(w, "<html><head></head><body><script>window.location = '%v'</script></body>", returnUrl)
 }
 
 func isMobile(r *http.Request) bool {
-	if strings.HasPrefix(r.RequestURI, "/api") {
+	if strings.HasPrefix(r.RequestURI, "/api") || strings.HasPrefix(r.RequestURI, ssoLoginUrlPrefix){
 		return false
 	}
 	header := strings.ToLower(r.Header.Get("User-Agent"))
