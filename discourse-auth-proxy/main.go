@@ -415,6 +415,7 @@ func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 	}
 	if strings.HasPrefix(returnUrl, ssoLoginUrlPrefix) {
 		returnUrl = strings.TrimPrefix(returnUrl, ssoLoginUrlPrefix)
+		logger.Printf("returnUrl %s after trimmed", returnUrl)
 	}
 
 	// works around weird safari stuff
