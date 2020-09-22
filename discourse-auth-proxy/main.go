@@ -40,7 +40,7 @@ const homePage = "/home/index.html"
 const tokenPage = "/tokens/"
 const tokenForCookieUrl = "/api/tokens/"
 const guestUsername = "Guest"
-const ssoLoginUrlPrefix = "sso_login"
+const ssoLoginUrlPrefix = "/sso_login"
 var guestToken string = ""
 
 func main() {
