@@ -88,7 +88,7 @@ func InitLogging() {
 		EnableFile:        true,
 		FileLevel:         Info,
 		FileJSONFormat:    true,
-		FileLocation:      "/var/log/auth-proxy",
+		FileLocation:      "/var/log/auth-proxy.log",
 	}
 
 	err := newLogger(config)
@@ -149,7 +149,7 @@ func newZapLogger(config Configuration) (*Logger, error) {
 		level := getZapLevel(config.FileLevel)
 		writer := zapcore.AddSync(&lumberjack.Logger{
 			Filename:   config.FileLocation,
-			MaxSize:    100,
+			MaxSize:    50,
 			MaxBackups: 2,
 			MaxAge:     28,
 			Compress:   true,
@@ -161,7 +161,7 @@ func newZapLogger(config Configuration) (*Logger, error) {
 	combinedCore := zapcore.NewTee(cores...)
 
 	logger := zap.New(combinedCore,
-		zap.AddCallerSkip(3),
+		zap.AddCallerSkip(2),
 		zap.AddCaller(),
 	)
 	if config.DevEnv {
@@ -252,4 +252,3 @@ func (l *Logger) WithContext(ctx context.Context) {
 		}
 	}
 }
-
