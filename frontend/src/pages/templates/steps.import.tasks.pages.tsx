@@ -278,6 +278,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         {category && category.needStartDate && <div className='choice-card'>
             <Select
                 showSearch={true}
+                style={{minWidth: '180px', padding: '5px'}}
                 onChange={onChangeTimezone}
                 placeholder="Select Time Zone"
                 defaultValue={timezone ? timezone : ''}
