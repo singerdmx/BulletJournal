@@ -38,9 +38,9 @@ type StepsImportTasksProps = {
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
     importTasks: (sampleTasks: number[], selections: number[], categoryId: number,
-                   projectId: number, assignees: string[],
-                   reminderBefore: number, labels: number[],
-                   startDate?: string, timezone?: string) => void;
+                  projectId: number, assignees: string[],
+                  reminderBefore: number, labels: number[],
+                  startDate?: string, timezone?: string) => void;
 };
 
 const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
@@ -87,7 +87,12 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     }, [ownedProjects, sharedProjects]);
 
     const onGoSignIn = () => {
-        window.location.href = 'https://bulletjournal.us';
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        if (userAgent.includes('mobile')) {
+
+        } else {
+            window.location.href = 'https://bulletjournal.us';
+        }
     }
 
     const onChangeAssignees = (value: any) => {
@@ -167,26 +172,32 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     const loginCookie = getCookie('__discourse_proxy');
 
     if (!loginCookie) {
-        return <Result
-            status="warning"
-            title="Please Sign In"
-            subTitle="You need a Bullet Journal account to save these tasks into your own project (BuJo)"
-            extra={
-                <Button type="primary" key="sign-in" onClick={onGoSignIn}>
-                    Go to Bullet Journal Sign In Page
-                </Button>
-            }
-        />
+        return <div className='choices-card'>
+            <div className='choice-card'>
+                <Result
+                    status="warning"
+                    title="Please Sign In"
+                    subTitle="You need a Bullet Journal account to save these tasks into your own project (BuJo)"
+                    extra={
+                        <Button type="primary" key="sign-in" onClick={onGoSignIn}>
+                            Go to Bullet Journal Sign In Page
+                        </Button>
+                    }
+                />
+            </div>
+        </div>
     }
 
     if (projects.length === 0) {
-        return <div className='import-tasks-page'>
-            <Result
-                status="warning"
-                title="Please Create a Project"
-                subTitle="You need a TODO BuJo to save these events into it"
-                extra={<AddProject history={history} mode={'singular'}/>}
-            />
+        return <div className='choices-card'>
+            <div className='choice-card'>
+                <Result
+                    status="warning"
+                    title="Create Project"
+                    subTitle="You need a TODO BuJo to save these events into it"
+                    extra={<AddProject history={history} mode={'button'}/>}
+                />
+            </div>
         </div>
     }
 

@@ -8,7 +8,7 @@ export const createProjectByName = (
   groupId: number,
   name: string,
   projectType: ProjectType,
-  history: History<History.PoorMansUnknown>
+  history: History<History.PoorMansUnknown> | undefined
 ) =>
   actions.createProject({
     description: description,

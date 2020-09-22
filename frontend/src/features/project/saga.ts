@@ -104,7 +104,9 @@ function* addProject(action: PayloadAction<ProjectCreateAction>) {
     );
     yield put(projectActions.projectReceived({ project: data }));
     yield put(projectActions.projectsUpdate({}));
-    history.push(`/projects/${data.id}`);
+    if (history) {
+      history.push(`/projects/${data.id}`);
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

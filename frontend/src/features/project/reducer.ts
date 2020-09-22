@@ -22,7 +22,7 @@ export type ProjectCreateAction = {
   groupId: number;
   name: string;
   projectType: ProjectType;
-  history: History<History.PoorMansUnknown>;
+  history: History<History.PoorMansUnknown> | undefined;
 };
 
 export type UpdateSharedProjectsOrderAction = {
