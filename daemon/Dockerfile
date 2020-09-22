@@ -12,7 +12,7 @@ COPY config config
 COPY utils utils
 COPY persistence daos
 COPY logging logging
-COPY middleware middleware
+COPY api/middleware middleware
 COPY api/service services
 COPY go.mod .
 COPY Makefile .
