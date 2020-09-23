@@ -75,3 +75,16 @@ export const putSampleTask = (sampleTaskId: number, name: string, uid: string, c
             throw Error(err.message);
         });
 }
+
+export const upsertSampleTaskRule = (stepId: number, selectionCombo: string, taskIds: string) => {
+    const postBody = JSON.stringify({
+        stepId: stepId,
+        selectionCombo: selectionCombo,
+        taskIds: taskIds
+    });
+    return doPost('/api/sampleTaskRules', postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}
