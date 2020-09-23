@@ -326,7 +326,10 @@ const StepsPage: React.FC<StepsProps> = (
                 </div>
                 {showImportTasksCard && <>
                     <div className='import-card'>
-                        <StepsImportTasksPage/>
+                        <StepsImportTasksPage hideImportTasksCard={() => {
+                            setShowImportTasksCard(false);
+                            setShowApplyButton(true);
+                        }}/>
                     </div>
                 </>
                 }

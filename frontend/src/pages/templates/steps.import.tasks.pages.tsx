@@ -37,6 +37,7 @@ type StepsImportTasksProps = {
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
+    hideImportTasksCard: () => void;
     importTasks: (postOp: Function,
                   sampleTasks: number[], selections: number[], categoryId: number,
                   projectId: number, assignees: string[],
@@ -47,7 +48,8 @@ type StepsImportTasksProps = {
 const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     {
         myself, labelOptions, ownedProjects, sharedProjects, group,
-        sampleTasks, timezone, category, before, getGroup, labelsUpdate, importTasks
+        sampleTasks, timezone, category, before, getGroup, labelsUpdate,
+        importTasks, hideImportTasksCard
     }
 ) => {
     const history = useHistory();
@@ -129,7 +131,9 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         if (category) {
             importTasks(() => {
                     const userAgent = window.navigator.userAgent.toLowerCase();
-                    if (!userAgent.includes('mobile')) {
+                    if (userAgent.includes('mobile')) {
+                        hideImportTasksCard();
+                    } else {
                         window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
                     }
                 }, sampleTasks.map(s => s.id), curSelections, category.id,
