@@ -83,27 +83,7 @@ public class RuleEngine {
 //        this.taskDaoJpa.createTaskFromSampleTask();
 
         if (importTasksParams.isSubscribed()) {
-            UserCategoryKey userCategoryKey = new UserCategoryKey();
-            userCategoryKey.setCategoryId(importTasksParams.getCategoryId());
-            userCategoryKey.setUserId(user.getId());
-            UserCategory userCategory;
-            if (!this.userCategoryDaoJpa.checkExist(userCategoryKey)) {
-                userCategory = new UserCategory();
-                if (importTasksParams.getSelections() != null) {
-                    userCategory.setSelections(importTasksParams.getSelections().stream().distinct().map(Object::toString).collect(Collectors.joining(",")));
-                }
-                userCategory.setCategory(this.categoryDaoJpa.getById(importTasksParams.getCategoryId()));
-                userCategory.setUser(user);
-                userCategory.setUserCategoryKey(userCategoryKey);
-            } else {
-                userCategory = this.userCategoryDaoJpa.getUserCategoryByKey(userCategoryKey);
-                Set<String> selectionSet = userCategory.getSelectionIds().stream().map(Object::toString).collect(Collectors.toSet());
-                if (importTasksParams.getSelections() != null) {
-                    selectionSet.addAll(importTasksParams.getSelections().stream().map(Object::toString).collect(Collectors.toList()));
-                }
-                userCategory.setSelections(String.join(",", selectionSet));
-            }
-            this.userCategoryDaoJpa.save(userCategory);
+            this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams);
         }
     }
 

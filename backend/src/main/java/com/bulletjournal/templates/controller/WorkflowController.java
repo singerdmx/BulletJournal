@@ -183,7 +183,6 @@ public class WorkflowController {
         return false;
     }
 
-
     @PostMapping(PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE)
     public void importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);

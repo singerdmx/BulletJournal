@@ -5,7 +5,9 @@ import com.bulletjournal.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users_categories", schema = "template")
@@ -70,5 +72,15 @@ public class UserCategory {
             selections = StringUtils.join(StringUtil.convertNumArray(selections), ",");
         }
         this.selections = selections;
+    }
+
+    public void setSelections(Set<String> selections) {
+        if (selections == null) {
+            this.selections = "";
+            return;
+        }
+        List<String> selectionList = new ArrayList<>(selections);
+        selectionList.sort((a, b) -> (int) (Long.parseLong(a) - Long.parseLong(b)));
+        this.selections = String.join(",", selectionList);
     }
 }
