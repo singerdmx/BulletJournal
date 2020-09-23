@@ -71,6 +71,7 @@ const StepsPage: React.FC<StepsProps> = (
             if (existingSteps.length > 0 && existingSteps[0].id !== category.id) {
                 localStorage.removeItem(STEPS);
                 localStorage.removeItem(SELECTIONS);
+                localStorage.removeItem(SAMPLE_TASKS);
             } else {
                 const selections = getSelections();
                 const curStep = getCurrentStep();

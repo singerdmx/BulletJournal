@@ -12,7 +12,7 @@ import getThemeColorVars from './utils/theme';
 import './styles/main.less';
 import {connect} from 'react-redux';
 import {IState} from './store';
-import {SELECTIONS, STEPS} from "./pages/templates/steps.pages";
+import {SAMPLE_TASKS, SELECTIONS, STEPS} from "./pages/templates/steps.pages";
 
 export const Loading = () => (
     <div className="loading">
@@ -53,6 +53,7 @@ const App: React.FC<RootProps> = (
     if (reload) {
       localStorage.removeItem(STEPS);
       localStorage.removeItem(SELECTIONS);
+      localStorage.removeItem(SAMPLE_TASKS);
       window.location.reload();
     }
   }, [reload]);
