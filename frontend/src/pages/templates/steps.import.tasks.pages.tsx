@@ -58,8 +58,8 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     const [assignees, setAssignees] = useState<string[]>([]);
     const [labels, setLabels] = useState<number[]>([]);
     const [startDate, setStartDate] = useState<string>('');
-    const [targetTimezone, setTargetTimezone] = useState('');
-    const [reminderBefore, setReminderBefore] = useState<number | undefined>(undefined);
+    const [targetTimezone, setTargetTimezone] = useState(timezone);
+    const [reminderBefore, setReminderBefore] = useState<number | undefined>(before);
     const [subscribed, setSubscribed] = useState(true);
 
     const reset = (project: Project) => {

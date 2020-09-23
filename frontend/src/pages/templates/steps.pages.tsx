@@ -65,6 +65,10 @@ const StepsPage: React.FC<StepsProps> = (
     useEffect(() => {
         if (categoryId) {
             getCategory(parseInt(categoryId));
+            const loginCookie = getCookie('__discourse_proxy');
+            if (loginCookie) {
+                updateExpandedMyself(true);
+            }
         }
     }, [categoryId]);
 
@@ -253,7 +257,6 @@ const StepsPage: React.FC<StepsProps> = (
         const loginCookie = getCookie('__discourse_proxy');
         if (loginCookie) {
             updateProjects();
-            updateExpandedMyself(true);
             setShowApplyButton(false);
         }
     }
