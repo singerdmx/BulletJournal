@@ -24,6 +24,7 @@ const {Meta} = Card;
 const {Option} = Select;
 
 type StepsProps = {
+    reload: boolean;
     loadingNextStep: boolean;
     sampleTasks: SampleTask[];
     scrollId: string;
@@ -55,7 +56,7 @@ export const isMobile = () => {
 
 const StepsPage: React.FC<StepsProps> = (
     {
-        loadingNextStep, sampleTasks, category, scrollId,
+        reload, loadingNextStep, sampleTasks, category, scrollId,
         nextStep, getCategory, getNextStep, nextStepReceived, sampleTasksReceived,
         updateProjects, updateExpandedMyself, getSampleTasksByScrollId,
     }
@@ -71,6 +72,15 @@ const StepsPage: React.FC<StepsProps> = (
             }
         }
     }, [categoryId]);
+
+    useEffect(() => {
+        if (reload) {
+            localStorage.removeItem(STEPS);
+            localStorage.removeItem(SELECTIONS);
+            localStorage.removeItem(SAMPLE_TASKS);
+            window.location.reload();
+        }
+    }, [reload]);
 
     useEffect(() => {
         document.title = 'Bullet Journal - Steps';
@@ -384,6 +394,7 @@ const StepsPage: React.FC<StepsProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
+    reload: state.myself.reload,
     category: state.templates.category,
     nextStep: state.templates.nextStep,
     sampleTasks: state.templates.sampleTasks,

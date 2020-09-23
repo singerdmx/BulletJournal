@@ -26,6 +26,24 @@ public class SampleTaskRule implements Serializable {
     @Column(name = "task_ids", nullable = false)
     private String taskIds;
 
+    @Transient
+    private Long stepId;
+
+    public SampleTaskRule() {
+    }
+
+    public SampleTaskRule(Step step, String selectionCombo, String taskIds) {
+        this.step = step;
+        this.selectionCombo = selectionCombo;
+        this.taskIds = taskIds;
+    }
+
+    public SampleTaskRule(String taskIds, Long stepId, String selectionCombo) {
+        this.stepId = stepId;
+        this.selectionCombo = selectionCombo;
+        this.taskIds = taskIds;
+    }
+
     public String getTaskIds() {
         return taskIds;
     }
@@ -61,4 +79,8 @@ public class SampleTaskRule implements Serializable {
         return StringUtil.convertNumArray(this.taskIds);
     }
 
+    public com.bulletjournal.templates.controller.model.SampleTaskRule toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.SampleTaskRule(step.toPresentationModel(),
+                selectionCombo, taskIds);
+    }
 }

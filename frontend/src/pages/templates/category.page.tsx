@@ -8,18 +8,30 @@ import {getCategory} from "../../features/templates/actions";
 import {useHistory, useParams} from 'react-router-dom';
 import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
 import {renderCategory} from "./categories.page";
+import {SAMPLE_TASKS, SELECTIONS, STEPS} from "./steps.pages";
 
 type CategoryProps = {
+    reload: boolean;
     category: Category | undefined;
     getCategory: (categoryId: number) => void;
 };
 
 const CategoryPage: React.FC<CategoryProps> = (
     {
+        reload,
         getCategory,
         category,
     }) => {
     const {categoryId} = useParams();
+
+    useEffect(() => {
+        if (reload) {
+            localStorage.removeItem(STEPS);
+            localStorage.removeItem(SELECTIONS);
+            localStorage.removeItem(SAMPLE_TASKS);
+            window.location.reload();
+        }
+    }, [reload]);
 
     useEffect(() => {
         if (categoryId) {
@@ -52,6 +64,7 @@ const CategoryPage: React.FC<CategoryProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
+    reload: state.myself.reload,
     category: state.templates.category
 });
 

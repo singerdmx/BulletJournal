@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import "./category.styles.less";
 import {Divider} from 'antd';
 import {Category} from '../../features/templates/interface';
@@ -6,8 +6,10 @@ import {connect} from 'react-redux';
 import {IState} from '../../store';
 import {useHistory} from 'react-router-dom';
 import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
+import {SAMPLE_TASKS, SELECTIONS, STEPS} from "./steps.pages";
 
 type CategoryProps = {
+    reload: boolean;
     categories: Category[];
 };
 
@@ -30,10 +32,20 @@ export const renderCategory = (c: Category, history: any) => {
 
 const CategoriesPage: React.FC<CategoryProps> = (
     {
+        reload,
         categories
     }) => {
     const history = useHistory();
 
+    useEffect(() => {
+        if (reload) {
+            localStorage.removeItem(STEPS);
+            localStorage.removeItem(SELECTIONS);
+            localStorage.removeItem(SAMPLE_TASKS);
+            window.location.reload();
+        }
+    }, [reload]);
+    
     return (
         <div className='template-content'>
             <div>
@@ -56,6 +68,7 @@ const CategoriesPage: React.FC<CategoryProps> = (
 }
 
 const mapStateToProps = (state: IState) => ({
+    reload: state.myself.reload,
     categories: state.templates.categories,
 });
 

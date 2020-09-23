@@ -32,7 +32,7 @@ import {
   UpdateSampleTaskAction,
   CloneStepAction,
   UpdateStepAction,
-  GetSampleTasksByScrollIdAction, ImportTasksAction
+  GetSampleTasksByScrollIdAction, ImportTasksAction, SetSampleTaskRuleAction
 } from './reducer';
 import {
   createCategory,
@@ -56,7 +56,7 @@ import {
   deleteSampleTask,
   fetchSampleTask, fetchSampleTasksByScrollId,
   getNext,
-  getSampleTasksByFilter, putSampleTask
+  getSampleTasksByFilter, putSampleTask, upsertSampleTaskRule
 } from "../../apis/templates/workflowApis";
 import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 import {reloadReceived} from "../myself/actions";
@@ -591,6 +591,19 @@ function* getSampleTasksByScrollId(action: PayloadAction<GetSampleTasksByScrollI
   yield put(templatesActions.loadingNextStepReceived({loading: false}));
 }
 
+function* setSampleTaskRule(action: PayloadAction<SetSampleTaskRuleAction>) {
+  try {
+    const {taskIds, selectionCombo, stepId} = action.payload;
+    yield call(upsertSampleTaskRule, stepId, selectionCombo, taskIds);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `setSampleTaskRule Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -625,5 +638,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.copyStep.type, copyStep),
     yield takeLatest(templatesActions.getSampleTasksByScrollId.type, getSampleTasksByScrollId),
     yield takeLatest(templatesActions.importTasks.type, importTasks),
+    yield takeLatest(templatesActions.setSampleTaskRule.type, setSampleTaskRule),
   ])
 }

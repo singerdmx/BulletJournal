@@ -211,6 +211,12 @@ export type GetSampleTaskAction = {
     sampleTaskId: number;
 };
 
+export type SetSampleTaskRuleAction = {
+    stepId: number;
+    selectionCombo: string;
+    taskIds: string;
+};
+
 let initialState = {
     loadingNextStep: false,
     scrollId: '',
@@ -302,6 +308,7 @@ const slice = createSlice({
         copyStep: (state, action: PayloadAction<CloneStepAction>) => state,
         getSampleTasksByScrollId: (state, action: PayloadAction<GetSampleTasksByScrollIdAction>) => state,
         importTasks: (state, action: PayloadAction<ImportTasksAction>) => state,
+        setSampleTaskRule: (state, action: PayloadAction<SetSampleTaskRuleAction>) => state,
     },
 });
 

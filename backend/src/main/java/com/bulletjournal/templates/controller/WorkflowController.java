@@ -4,13 +4,15 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
+import com.bulletjournal.templates.controller.model.SampleTask;
+import com.bulletjournal.templates.controller.model.SampleTaskRule;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import com.bulletjournal.templates.repository.SampleTaskRuleDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
+import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.repository.model.Category;
-import com.bulletjournal.templates.repository.model.CategoryRule;
 import com.bulletjournal.templates.repository.model.Step;
-import com.bulletjournal.templates.repository.model.StepRule;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.google.gson.Gson;
@@ -33,9 +35,13 @@ public class WorkflowController {
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
+    public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRules";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
+
+    @Autowired
+    private SampleTaskRuleDaoJpa sampleTaskRuleDaoJpa;
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -214,6 +220,20 @@ public class WorkflowController {
     public void deleteSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         validateRequester();
         sampleTaskDaoJpa.deleteSampleTaskById(sampleTaskId);
+    }
+
+    @PostMapping(SAMPLE_TASK_RULE_ROUTE)
+    public SampleTaskRule upsertSampleTaskRule(@Valid @RequestBody UpsertSampleTaskRuleParams upsertSampleTaskRuleParams) {
+        validateRequester();
+        return sampleTaskRuleDaoJpa.upsert(upsertSampleTaskRuleParams.getStepId(),
+                upsertSampleTaskRuleParams.getSelectionCombo(),
+                upsertSampleTaskRuleParams.getTaskIds()).toPresentationModel();
+    }
+
+    @DeleteMapping(SAMPLE_TASK_RULE_ROUTE)
+    public void deleteSampleTask(@Valid @RequestBody DeleteSampleTaskRuleParams deleteSampleTaskRuleParams) {
+        validateRequester();
+        sampleTaskRuleDaoJpa.deleteById(deleteSampleTaskRuleParams.getStepId(), deleteSampleTaskRuleParams.getSelectionCombo());
     }
 
     private void validateRequester() {
