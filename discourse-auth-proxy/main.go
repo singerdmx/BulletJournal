@@ -337,7 +337,8 @@ func shouldByPass(r *http.Request) bool {
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/channel/notifications") ||
 		strings.HasSuffix(r.RequestURI, "/manifest.json") ||
-		strings.HasSuffix(r.RequestURI, ".ico")
+		strings.HasSuffix(r.RequestURI, ".ico") ||
+		strings.HasSuffix(r.RequestURI, ".less")
 }
 
 func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
