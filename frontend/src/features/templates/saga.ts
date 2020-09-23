@@ -32,7 +32,7 @@ import {
   UpdateSampleTaskAction,
   CloneStepAction,
   UpdateStepAction,
-  GetSampleTasksByScrollIdAction, ImportTasksAction, SetSampleTaskRuleAction
+  GetSampleTasksByScrollIdAction, ImportTasksAction, SetSampleTaskRuleAction, RemoveSampleTaskRuleAction
 } from './reducer';
 import {
   createCategory,
@@ -53,7 +53,7 @@ import {IState} from "../../store";
 import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep, cloneStep, putStep} from '../../apis/templates/stepApis';
 import {
   createSampleTask,
-  deleteSampleTask,
+  deleteSampleTask, deleteSampleTaskRule,
   fetchSampleTask, fetchSampleTasksByScrollId,
   getNext,
   getSampleTasksByFilter, putSampleTask, upsertSampleTaskRule
@@ -604,6 +604,19 @@ function* setSampleTaskRule(action: PayloadAction<SetSampleTaskRuleAction>) {
   }
 }
 
+function* removeSampleTaskRule(action: PayloadAction<RemoveSampleTaskRuleAction>) {
+  try {
+    const {selectionCombo, stepId} = action.payload;
+    yield call(deleteSampleTaskRule, stepId, selectionCombo);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeSampleTaskRule Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -639,5 +652,6 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getSampleTasksByScrollId.type, getSampleTasksByScrollId),
     yield takeLatest(templatesActions.importTasks.type, importTasks),
     yield takeLatest(templatesActions.setSampleTaskRule.type, setSampleTaskRule),
+    yield takeLatest(templatesActions.removeSampleTaskRule.type, removeSampleTaskRule),
   ])
 }

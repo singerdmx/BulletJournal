@@ -217,6 +217,11 @@ export type SetSampleTaskRuleAction = {
     taskIds: string;
 };
 
+export type RemoveSampleTaskRuleAction = {
+    stepId: number;
+    selectionCombo: string;
+};
+
 let initialState = {
     loadingNextStep: false,
     scrollId: '',
@@ -309,6 +314,7 @@ const slice = createSlice({
         getSampleTasksByScrollId: (state, action: PayloadAction<GetSampleTasksByScrollIdAction>) => state,
         importTasks: (state, action: PayloadAction<ImportTasksAction>) => state,
         setSampleTaskRule: (state, action: PayloadAction<SetSampleTaskRuleAction>) => state,
+        removeSampleTaskRule: (state, action: PayloadAction<RemoveSampleTaskRuleAction>) => state,
     },
 });
 
