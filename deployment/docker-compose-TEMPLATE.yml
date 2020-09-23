@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   auth-proxy:
-    image: xcode1024/auth-proxy:v68
+    image: xcode1024/auth-proxy:v69
     container_name: auth-proxy
     ports:
       - "80:80"
