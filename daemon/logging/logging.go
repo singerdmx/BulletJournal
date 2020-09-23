@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	RequestIDKey string = "requestID"
-	SessionIDKey string = "sessionID"
+	RequestIDKey string = "Request-ID"
+	SessionIDKey string = "Session-ID"
 )
 
 var (

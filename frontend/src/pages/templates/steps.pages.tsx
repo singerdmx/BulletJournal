@@ -11,9 +11,9 @@ import {
     sampleTasksReceived
 } from "../../features/templates/actions";
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, Select} from "antd";
+import {Button, Card, Empty, notification, Select} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {CloseSquareTwoTone, UpCircleTwoTone} from "@ant-design/icons";
+import {CloseSquareTwoTone, ExclamationCircleFilled, UpCircleTwoTone} from "@ant-design/icons";
 import ReactLoading from "react-loading";
 import {getCookie} from "../../index";
 import StepsImportTasksPage from "./steps.import.tasks.pages";
@@ -48,6 +48,11 @@ export const getSelections = () => {
     return selections;
 }
 
+export const isMobile = () => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return userAgent.includes('mobile');
+}
+
 const StepsPage: React.FC<StepsProps> = (
     {
         loadingNextStep, sampleTasks, category, scrollId,
@@ -60,6 +65,10 @@ const StepsPage: React.FC<StepsProps> = (
     useEffect(() => {
         if (categoryId) {
             getCategory(parseInt(categoryId));
+            const loginCookie = getCookie('__discourse_proxy');
+            if (loginCookie) {
+                updateExpandedMyself(true);
+            }
         }
     }, [categoryId]);
 
@@ -213,6 +222,15 @@ const StepsPage: React.FC<StepsProps> = (
     const onConfirmNext = () => {
         const selections = getSelections();
         const curStep = getCurrentStep();
+        if (!curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0)) {
+            notification.open({
+                placement: 'bottomRight',
+                message: 'Make Selection',
+                description: 'Make sure there is no missing place',
+                icon: <ExclamationCircleFilled style={{ color: 'red' }} />,
+            });
+            return;
+        }
         let selected: number[] = [];
         curStep.choices.forEach(c => {
             selected = selected.concat(selections[c.id]);
@@ -231,8 +249,7 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const onScrollNext = () => {
-        const userAgent = window.navigator.userAgent.toLowerCase();
-        getSampleTasksByScrollId(scrollId, userAgent.includes('mobile') ? 10 : 20);
+        getSampleTasksByScrollId(scrollId, isMobile() ? 10 : 20);
     }
 
     const onApplySampleTasks = () => {
@@ -240,7 +257,6 @@ const StepsPage: React.FC<StepsProps> = (
         const loginCookie = getCookie('__discourse_proxy');
         if (loginCookie) {
             updateProjects();
-            updateExpandedMyself(true);
             setShowApplyButton(false);
         }
     }
@@ -304,7 +320,7 @@ const StepsPage: React.FC<StepsProps> = (
                         })}
                     </div>}
                     <div className='confirm-button'>
-                        {showConfirmButton && curStep.choices.length > 0 && <Button
+                        {(isMobile() || showConfirmButton) && curStep.choices.length > 0 && <Button
                             onClick={onConfirmNext}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Next
@@ -326,7 +342,10 @@ const StepsPage: React.FC<StepsProps> = (
                 </div>
                 {showImportTasksCard && <>
                     <div className='import-card'>
-                        <StepsImportTasksPage/>
+                        <StepsImportTasksPage hideImportTasksCard={() => {
+                            setShowImportTasksCard(false);
+                            setShowApplyButton(true);
+                        }}/>
                     </div>
                 </>
                 }

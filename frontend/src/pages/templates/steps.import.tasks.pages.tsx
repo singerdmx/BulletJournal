@@ -3,7 +3,7 @@ import './steps.styles.less';
 import {useHistory} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {Avatar, Button, Checkbox, DatePicker, Result, Select, Tooltip} from "antd";
+import {Avatar, Button, Checkbox, DatePicker, notification, Result, Select, Tooltip} from "antd";
 import {Project, ProjectsWithOwner} from "../../features/project/interface";
 import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pages";
 import {ProjectType} from "../../features/project/constants";
@@ -17,11 +17,11 @@ import {labelsUpdate} from "../../features/label/actions";
 import {Label} from "../../features/label/interface";
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import {ReminderBeforeTaskText} from "../../components/settings/reducer";
-import {QuestionCircleTwoTone} from "@ant-design/icons";
+import {QuestionCircleTwoTone, SmileOutlined} from "@ant-design/icons";
 import {Category, SampleTask} from "../../features/templates/interface";
 import {zones} from "../../components/settings/constants";
 import {importTasks} from "../../features/templates/actions";
-import {getSelections} from "./steps.pages";
+import {getSelections, isMobile} from "./steps.pages";
 
 const {Option} = Select;
 
@@ -37,7 +37,9 @@ type StepsImportTasksProps = {
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
-    importTasks: (sampleTasks: number[], selections: number[], categoryId: number,
+    hideImportTasksCard: () => void;
+    importTasks: (postOp: Function,
+                  sampleTasks: number[], selections: number[], categoryId: number,
                   projectId: number, assignees: string[],
                   reminderBefore: number, labels: number[], subscribed: boolean,
                   startDate?: string, timezone?: string) => void;
@@ -46,7 +48,8 @@ type StepsImportTasksProps = {
 const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     {
         myself, labelOptions, ownedProjects, sharedProjects, group,
-        sampleTasks, timezone, category, before, getGroup, labelsUpdate, importTasks
+        sampleTasks, timezone, category, before, getGroup, labelsUpdate,
+        importTasks, hideImportTasksCard
     }
 ) => {
     const history = useHistory();
@@ -55,17 +58,32 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     const [assignees, setAssignees] = useState<string[]>([]);
     const [labels, setLabels] = useState<number[]>([]);
     const [startDate, setStartDate] = useState<string>('');
-    const [targetTimezone, setTargetTimezone] = useState('');
-    const [reminderBefore, setReminderBefore] = useState<number | undefined>(undefined);
+    const [targetTimezone, setTargetTimezone] = useState(timezone);
+    const [reminderBefore, setReminderBefore] = useState<number | undefined>(before);
     const [subscribed, setSubscribed] = useState(true);
 
-    function reset(project: Project) {
+    const reset = (project: Project) => {
         setProjectId(project.id);
         getGroup(project.group.id);
         labelsUpdate(project.id);
         setAssignees([myself]);
+        setTargetTimezone(timezone);
+        setReminderBefore(before);
+        setSubscribed(true);
         setLabels([]);
     }
+
+    useEffect(() => {
+        setAssignees([myself]);
+    }, [myself]);
+
+    useEffect(() => {
+        setTargetTimezone(timezone);
+    }, [timezone]);
+
+    useEffect(() => {
+        setReminderBefore(before);
+    }, [before]);
 
     useEffect(() => {
         if (projects && projects[0]) {
@@ -126,7 +144,20 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         });
 
         if (category) {
-            importTasks(sampleTasks.map(s => s.id), curSelections, category.id, projectId, assignees,
+            importTasks(() => {
+                    notification.open({
+                        placement: 'bottomRight',
+                        message: 'Events successfully imported',
+                        description: 'Please go to your BuJo to view them',
+                        icon: <SmileOutlined style={{ color: '#4ddbff' }} />,
+                    });
+                    if (isMobile()) {
+                        hideImportTasksCard();
+                    } else {
+                        window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
+                    }
+                }, sampleTasks.map(s => s.id), curSelections, category.id,
+                projectId, assignees,
                 reminderBefore === undefined ? before : reminderBefore, labels, subscribed,
                 startDate, targetTimezone ? targetTimezone : timezone);
         }

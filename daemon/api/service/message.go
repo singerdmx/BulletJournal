@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/mailjet/mailjet-apiv3-go"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"strconv"
@@ -12,15 +11,25 @@ const (
 	Decline = "decline"
 )
 
+type MessageService struct {
+	groupDao   *persistence.GroupDao
+	mailClient *persistence.MailjetClient
+}
+
 func GetUrl(uuid uint64, action string) string {
 	return "https://bulletjournal.us/public/notifications/" + strconv.FormatUint(uuid, 10) + "/answer?action=" + action
 }
 
 // Send join group invitation email to users
-func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
+func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 	group := persistence.GetGroupDao().FindGroup(groupId)
+	if group == nil {
+		log.Fatalf("cannot find group with group id %v", groupId)
+		return
+	}
 	acceptUrl := GetUrl(uid, Accept)
 	declineUrl := GetUrl(uid, Decline)
+	
 	messagesInfo := []mailjet.InfoMessagesV31{
 		{
 			From: &mailjet.RecipientV31{
@@ -46,7 +55,7 @@ func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 		if res, err := client.SendMailV31(&messages); err != nil {
 			log.Fatal(err)
 		} else {
-			fmt.Printf("Data: %+v\n", res)
+			log.Printf("Data: %+v\n", res)
 		}
 	}
 }

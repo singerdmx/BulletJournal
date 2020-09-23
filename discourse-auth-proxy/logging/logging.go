@@ -167,6 +167,7 @@ func newZapLogger(config Configuration) (*Logger, error) {
 	if config.DevEnv {
 		logger = logger.WithOptions(zap.Development(), zap.AddStacktrace(zapcore.WarnLevel))
 	}
+	zap.ReplaceGlobals(logger)
 
 	return &Logger{
 		sugaredLogger: logger.Sugar(),

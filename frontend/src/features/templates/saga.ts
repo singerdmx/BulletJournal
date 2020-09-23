@@ -442,8 +442,10 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
   }
   yield put(templatesActions.loadingNextStepReceived({loading: true}));
   try {
-    const {categoryId, projectId, assignees, reminderBefore, sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
+    const {postOp, categoryId, projectId, assignees, reminderBefore,
+      sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
     console.log(action.payload);
+    postOp();
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

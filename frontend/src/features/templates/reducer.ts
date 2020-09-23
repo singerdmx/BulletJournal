@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {Category, Choice, NextStep, Rule, SampleTask, Step} from './interface';
+import {History} from "history";
 
 export type GetStepsAction = {};
 
@@ -38,6 +39,7 @@ export type GetNextStepAction = {
 };
 
 export type ImportTasksAction = {
+    postOp: Function;
     sampleTasks: number[];
     selections: number[];
     categoryId: number;
