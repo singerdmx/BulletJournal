@@ -119,10 +119,19 @@ type IPORecord struct {
 }
 
 
-func fetchInfo() []IPORecord {
+
+func fetchInfo(int initYear, int initMonth) []IPORecord {
 	client := resty.New()
 
 	year, month, _:= time.Now().Date()
+
+	if initYear != nil {
+		year = initYear
+	}
+
+	if initMonth != nil {
+		month = initMonth
+	}
 
 	var date string
 
