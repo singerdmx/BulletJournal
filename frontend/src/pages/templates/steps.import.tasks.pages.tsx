@@ -3,7 +3,7 @@ import './steps.styles.less';
 import {useHistory} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {Avatar, Button, Checkbox, DatePicker, Result, Select, Tooltip} from "antd";
+import {Avatar, Button, Checkbox, DatePicker, message, Result, Select, Tooltip} from "antd";
 import {Project, ProjectsWithOwner} from "../../features/project/interface";
 import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pages";
 import {ProjectType} from "../../features/project/constants";
@@ -37,7 +37,7 @@ type StepsImportTasksProps = {
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
-    importTasks: (isMobile: boolean, window: Window,
+    importTasks: (postOp: Function,
                   sampleTasks: number[], selections: number[], categoryId: number,
                   projectId: number, assignees: string[],
                   reminderBefore: number, labels: number[], subscribed: boolean,
@@ -127,8 +127,12 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         });
 
         if (category) {
-            const userAgent = window.navigator.userAgent.toLowerCase();
-            importTasks(userAgent.includes('mobile'), window, sampleTasks.map(s => s.id), curSelections, category.id,
+            importTasks(() => {
+                    const userAgent = window.navigator.userAgent.toLowerCase();
+                    if (!userAgent.includes('mobile')) {
+                        window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
+                    }
+                }, sampleTasks.map(s => s.id), curSelections, category.id,
                 projectId, assignees,
                 reminderBefore === undefined ? before : reminderBefore, labels, subscribed,
                 startDate, targetTimezone ? targetTimezone : timezone);

@@ -39,8 +39,7 @@ export type GetNextStepAction = {
 };
 
 export type ImportTasksAction = {
-    isMobile: boolean;
-    window: Window;
+    postOp: Function;
     sampleTasks: number[];
     selections: number[];
     categoryId: number;

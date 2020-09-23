@@ -442,15 +442,12 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
   }
   yield put(templatesActions.loadingNextStepReceived({loading: true}));
   try {
-    const {isMobile, window, categoryId, projectId, assignees, reminderBefore,
+    const {postOp, categoryId, projectId, assignees, reminderBefore,
       sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
     console.log(action.payload);
-
     yield call(message.success, 'Events are successfully imported into your BuJo.' +
         ' Please go to your BuJo to view them.');
-    if (!isMobile) {
-      window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
-    }
+    postOp();
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
