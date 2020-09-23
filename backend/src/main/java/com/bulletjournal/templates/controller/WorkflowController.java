@@ -36,6 +36,7 @@ public class WorkflowController {
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
+    public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -222,7 +223,7 @@ public class WorkflowController {
         sampleTaskDaoJpa.deleteSampleTaskById(sampleTaskId);
     }
 
-    @PostMapping(SAMPLE_TASK_RULE_ROUTE)
+    @PostMapping(SAMPLE_TASKS_RULE_ROUTE)
     public SampleTaskRule upsertSampleTaskRule(@Valid @RequestBody UpsertSampleTaskRuleParams upsertSampleTaskRuleParams) {
         validateRequester();
         return sampleTaskRuleDaoJpa.upsert(upsertSampleTaskRuleParams.getStepId(),
@@ -231,7 +232,7 @@ public class WorkflowController {
     }
 
     @DeleteMapping(SAMPLE_TASK_RULE_ROUTE)
-    public void deleteSampleTask(@RequestParam(value = "stepId") Long stepId,
+    public void deleteSampleTaskRule(@RequestParam(value = "stepId") Long stepId,
                                  @RequestParam(value = "selectionCombo") String selectionCombo) {
         validateRequester();
         sampleTaskRuleDaoJpa.deleteById(stepId, selectionCombo);

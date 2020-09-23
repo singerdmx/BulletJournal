@@ -88,3 +88,11 @@ export const upsertSampleTaskRule = (stepId: number, selectionCombo: string, tas
             throw Error(err.message);
         });
 }
+
+export const deleteSampleTaskRule = (stepId: number, selectionCombo: string) => {
+    return doDelete(`/api/sampleTaskRules?stepId=${stepId}&selectionCombo=${selectionCombo}`)
+        .then(res => res)
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
