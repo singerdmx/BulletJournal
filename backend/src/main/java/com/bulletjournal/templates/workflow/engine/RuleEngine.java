@@ -59,6 +59,8 @@ public class RuleEngine {
         List<SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
+        User user = this.userDaoJpa.getByName(requester);
+
         if (!tasksNeedTimingArrangement.isEmpty()) {
             tasksNeedTimingArrangement.sort(Comparator.comparing(SampleTask::getUid));
             // calculate start date
@@ -72,7 +74,6 @@ public class RuleEngine {
 
             String timezone = importTasksParams.getTimezone();
             if (StringUtils.isBlank(timezone)) {
-                User user = this.userDaoJpa.getByName(requester);
                 timezone = user.getTimezone();
             }
 
@@ -82,7 +83,6 @@ public class RuleEngine {
 //        this.taskDaoJpa.createTaskFromSampleTask();
 
         if (importTasksParams.isSubscribed()) {
-            User user = this.userDaoJpa.getByName(requester);
             UserCategoryKey userCategoryKey = new UserCategoryKey();
             userCategoryKey.setCategoryId(importTasksParams.getCategoryId());
             userCategoryKey.setUserId(user.getId());
@@ -97,8 +97,7 @@ public class RuleEngine {
                 userCategory.setUserCategoryKey(userCategoryKey);
             } else {
                 userCategory = this.userCategoryDaoJpa.getUserCategoryByKey(userCategoryKey);
-                String selections = userCategory.getSelections();
-                Set<String> selectionSet = Arrays.stream(selections.split(",")).collect(Collectors.toSet());
+                Set<String> selectionSet = userCategory.getSelections().stream().map(Object::toString).collect(Collectors.toSet());
                 if (importTasksParams.getSelections() != null) {
                     selectionSet.addAll(importTasksParams.getSelections().stream().map(Object::toString).collect(Collectors.toList()));
                 }

@@ -1,8 +1,11 @@
 package com.bulletjournal.templates.repository.model;
 
 import com.bulletjournal.repository.models.User;
+import com.bulletjournal.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "users_categories", schema = "template")
@@ -51,18 +54,14 @@ public class UserCategory {
         this.category = category;
     }
 
-    public String getSelections() {
-        if (selections == null) {
-            return "";
-        }
-        return selections;
+    public List<Long> getSelections() {
+        return StringUtil.convertNumArray(this.selections);
     }
 
     public void setSelections(String selections) {
-        if (selections == null) {
-            this.selections = "";
-        } else {
-            this.selections = selections;
+        if (StringUtils.isNotBlank(selections)) {
+            selections = StringUtils.join(StringUtil.convertNumArray(selections), ",");
         }
+        this.selections = selections;
     }
 }
