@@ -37,7 +37,8 @@ type StepsImportTasksProps = {
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
-    importTasks: (sampleTasks: number[], selections: number[], categoryId: number,
+    importTasks: (isMobile: boolean, window: Window,
+                  sampleTasks: number[], selections: number[], categoryId: number,
                   projectId: number, assignees: string[],
                   reminderBefore: number, labels: number[], subscribed: boolean,
                   startDate?: string, timezone?: string) => void;
@@ -126,7 +127,9 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         });
 
         if (category) {
-            importTasks(sampleTasks.map(s => s.id), curSelections, category.id, projectId, assignees,
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            importTasks(userAgent.includes('mobile'), window, sampleTasks.map(s => s.id), curSelections, category.id,
+                projectId, assignees,
                 reminderBefore === undefined ? before : reminderBefore, labels, subscribed,
                 startDate, targetTimezone ? targetTimezone : timezone);
         }
