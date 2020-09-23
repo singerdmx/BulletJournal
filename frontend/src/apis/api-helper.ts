@@ -1,7 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import versions from './versions.json';
-
-const version = versions['version'];
+import {version} from "./versions";
 
 export function doFetch(endpoint: string, etag: any = undefined) {
   if (process.env.REACT_APP_ENV === 'debug') {
@@ -23,6 +21,7 @@ export function doFetch(endpoint: string, etag: any = undefined) {
     if (reload && reload === 'true') {
       throw Error('reload');
     }
+    console.log(`current version is ${version}`);
     const v = res.headers.get('version');
     if (v && v !== version) {
       console.log(`current version is ${version} and server version is ${v}`);
