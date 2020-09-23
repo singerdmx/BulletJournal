@@ -3,7 +3,7 @@ import './workflow.styles.less';
 import {Button, Checkbox, Collapse, Divider, Input, message, Tag, Tooltip} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getSampleTasks, getSteps} from "../../features/templates/actions";
+import {getSampleTasks, getSteps, setSampleTaskRule} from "../../features/templates/actions";
 import {SampleTask, Selection, Step} from "../../features/templates/interface";
 import Search from "antd/es/input/Search";
 import {CheckCircleTwoTone, CheckSquareTwoTone, CloseCircleTwoTone, FilterOutlined} from "@ant-design/icons";
@@ -19,6 +19,7 @@ type WorkflowPageProps = {
     sampleTasks: SampleTask[];
     getSteps: () => void;
     getSampleTasks: (filter: string) => void;
+    setSampleTaskRule: (stepId: number, selectionCombo: string, taskIds: string) => void;
 };
 
 const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
@@ -26,7 +27,8 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
         steps,
         sampleTasks,
         getSteps,
-        getSampleTasks
+        getSampleTasks,
+        setSampleTaskRule
     }) => {
     const history = useHistory();
 
@@ -55,13 +57,11 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
 
     const onFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const s = e.target.value;
-        console.log(s);
         setChecked([]);
         if (!s) {
             setTasks(sampleTasks);
             return;
         }
-        console.log(sampleTasks);
         setTasks(sampleTasks.filter(t => t.metadata.toLowerCase().includes(s.toLowerCase())));
     }
 
@@ -90,8 +90,20 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             return;
         }
 
+        if (!targetFinalStep) {
+            message.error('No targetFinalStep selected');
+            return;
+        }
+
+        if (targetSelections.length === 0) {
+            message.error('No target Selections selected');
+            return;
+        }
+
         console.log(targetSelections.toString());
+        setSampleTaskRule(targetFinalStep.id, targetSelections.map(s => s.id).join(','), checked.join(','));
         setChecked([]);
+        message.success('Successfully linked');
     }
 
     const onClickSelection = (selection: Selection) => {
@@ -209,5 +221,6 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
     getSteps,
-    getSampleTasks
+    getSampleTasks,
+    setSampleTaskRule
 })(AdminWorkflowTasks);

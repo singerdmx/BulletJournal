@@ -125,3 +125,6 @@ export const importTasks = (postOp: Function,
     postOp: postOp, sampleTasks: sampleTasks, selections: selections, categoryId: categoryId,
     projectId: projectId, assignees: assignees,
     reminderBefore: reminderBefore, labels: labels, subscribed: subscribed, startDate: startDate, timezone: timezone});
+
+export const setSampleTaskRule = (stepId: number, selectionCombo: string, taskIds: string) =>
+    actions.setSampleTaskRule({stepId: stepId, selectionCombo: selectionCombo, taskIds: taskIds});
