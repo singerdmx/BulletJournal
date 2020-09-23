@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/mailjet/mailjet-apiv3-go"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"strconv"
@@ -50,7 +49,7 @@ func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 		if res, err := client.SendMailV31(&messages); err != nil {
 			log.Fatal(err)
 		} else {
-			fmt.Printf("Data: %+v\n", res)
+			log.Printf("Data: %+v\n", res)
 		}
 	}
 }
