@@ -15,7 +15,9 @@ const TemplateEvents: React.FC<TemplateEventsProps> = (props) => {
                          alt="Templates"/>
                 </a>
             </div>
-            <Empty/>
+            <div className='events-card'>
+                <Empty/>
+            </div>
         </div>
     );
 };

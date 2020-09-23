@@ -6,7 +6,7 @@ type TemplateSubscriptionsProps = {};
 
 const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (props) => {
     return (
-        <div>
+        <div className='events-card'>
             <Empty/>
         </div>
     );
