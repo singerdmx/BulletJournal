@@ -106,7 +106,7 @@ func main() {
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasPrefix(r.RequestURI, "/api/system/updates") {
+		if strings.HasPrefix(r.RequestURI, "/api/system/updates") {
 			logger.Printf("Request %s %s", r.Host, r.URL)
 		}
 		if r.Host == "home.bulletjournal.us" {
