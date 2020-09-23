@@ -106,9 +106,12 @@ func main() {
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.RequestURI, "/api/system/updates") {
+		if !strings.HasPrefix(r.URL.Path, "/api/system/updates") {
+			logger.Printf("[Debug] [1] RequestURL %s", r.URL.Path)
 			logger.Printf("Request %s %s", r.Host, r.URL)
 		}
+
+		logger.Printf("[Debug] [2] RequestURL %s", r.URL.Path)
 		if r.Host == "home.bulletjournal.us" {
 			logger.Printf("Port 443: Redirect to 80: %s", r.RequestURI)
 			http.Redirect(w, r, "http://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
