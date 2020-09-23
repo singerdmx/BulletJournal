@@ -445,8 +445,6 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
     const {postOp, categoryId, projectId, assignees, reminderBefore,
       sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
     console.log(action.payload);
-    yield call(message.success, 'Events are successfully imported into your BuJo.' +
-        ' Please go to your BuJo to view them.');
     postOp();
   } catch (error) {
     if (error.message === 'reload') {
