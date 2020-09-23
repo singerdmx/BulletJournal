@@ -33,13 +33,16 @@ const TemplatesPage: React.FC<TemplatesProps> = (
             setCollapsed(true);
             setWidth(collapsedSiderWidth);
         }
+    }, []);
+
+    useEffect(() => {
         if (reload) {
             localStorage.removeItem(STEPS);
             localStorage.removeItem(SELECTIONS);
             localStorage.removeItem(SAMPLE_TASKS);
             window.location.reload();
         }
-    }, []);
+    }, [reload]);
 
     const expandedSiderWidth = 240;
     const collapsedSiderWidth = 55;
