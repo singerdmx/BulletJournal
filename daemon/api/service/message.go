@@ -19,6 +19,10 @@ func GetUrl(uuid uint64, action string) string {
 // Send join group invitation email to users
 func SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 	group := persistence.GetGroupDao().FindGroup(groupId)
+	if group == nil {
+		log.Fatalf("cannot find group with group id %v", groupId)
+		return
+	}
 	acceptUrl := GetUrl(uid, Accept)
 	declineUrl := GetUrl(uid, Decline)
 	messagesInfo := []mailjet.InfoMessagesV31{
