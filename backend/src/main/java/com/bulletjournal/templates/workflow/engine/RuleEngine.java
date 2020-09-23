@@ -97,7 +97,7 @@ public class RuleEngine {
                 userCategory.setUserCategoryKey(userCategoryKey);
             } else {
                 userCategory = this.userCategoryDaoJpa.getUserCategoryByKey(userCategoryKey);
-                Set<String> selectionSet = userCategory.getSelections().stream().map(Object::toString).collect(Collectors.toSet());
+                Set<String> selectionSet = userCategory.getSelectionIds().stream().map(Object::toString).collect(Collectors.toSet());
                 if (importTasksParams.getSelections() != null) {
                     selectionSet.addAll(importTasksParams.getSelections().stream().map(Object::toString).collect(Collectors.toList()));
                 }

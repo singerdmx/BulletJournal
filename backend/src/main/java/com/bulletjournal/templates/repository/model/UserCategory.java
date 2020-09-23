@@ -54,7 +54,14 @@ public class UserCategory {
         this.category = category;
     }
 
-    public List<Long> getSelections() {
+    public String getSelections() {
+        if (this.selections == null) {
+            this.selections = "";
+        }
+        return this.selections;
+    }
+
+    public List<Long> getSelectionIds() {
         return StringUtil.convertNumArray(this.selections);
     }
 
