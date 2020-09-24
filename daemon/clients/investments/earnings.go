@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/pkg/errors"
 	"fmt"
+	"regexp"
 )
 
 type EarningClient struct {
@@ -42,26 +44,40 @@ type EarningData struct {
 }
 
 const (
-	earningClientName = "Earnings"
+	earningsClientName = "earnings"
+	earningsDefaultPageSize = 500
+	earningsDefaultImportance = 0
 )
 
 func NewEarningsClient() (*EarningClient, error) {
 	c := EarningClient{
-		NewRequester(earningClientName),
+		NewRequester(earningsClientName),
 	}
 	return &c, nil
 }
 
-//TODO: Passin parameters instead of raw url
-func (c *EarningClient) fetchEarnings() (em *Earnings, err error) {
-	url := "https://www.benzinga.com/services/webapps/calendar/earnings?tpagesize=500&parameters[date]=2020-09-22&parameters[date_from]=&parameters[date_to]=&parameters[importance]=0"
+func (c *EarningClient) fetchEarnings(date string) (em *Earnings, err error) {
+	baseURL := "https://www.benzinga.com/services/webapps/calendar/earnings"
+	timeRegex := regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
+	match := timeRegex.FindStringSubmatch(date)
+	if len(match) == 0 {
+		return nil, errors.New(fmt.Sprintf("invalid date for earnings parameter %+v", date))
+	}
+
+	url := fmt.Sprintf("%s?tpagesize=%+v&parameters[date]=%d&parameters[importance]+%d", baseURL, earningsDefaultPageSize, date, earningsDefaultImportance)
 	resp, err := c.requester.RequestREST("GET", url, nil, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "sending request failed")
+	}
+	if resp.StatusCode != 200 {
+		log.Error("Earnings request Status Code: %+v", resp.StatusCode)
+		return nil, errors.Wrap(err, fmt.Sprintf("Invalid response status code: %+v", resp.StatusCode))
+	}
 	content := resp.Body
 	earnings := Earnings{}
 	if err := json.Unmarshal(content, &earnings); err != nil {
-		// unknown
-		return nil, err
+		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body)))
 	}
-	fmt.Println(earnings)
 	return &earnings, nil
 }
+
