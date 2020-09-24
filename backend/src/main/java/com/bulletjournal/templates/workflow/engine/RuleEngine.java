@@ -6,23 +6,18 @@ import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.ImportTasksParams;
-import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
-import com.bulletjournal.templates.repository.SampleTaskRuleRepository;
-import com.bulletjournal.templates.repository.SelectionDaoJpa;
-import com.bulletjournal.templates.repository.StepDaoJpa;
-import com.bulletjournal.templates.repository.model.SampleTask;
-import com.bulletjournal.templates.repository.model.SampleTaskRule;
-import com.bulletjournal.templates.repository.model.Selection;
+import com.bulletjournal.templates.repository.*;
+import com.bulletjournal.templates.repository.model.*;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class RuleEngine {
 
     private static final Map<Long, Integer> DEFAULT_INTENSITY_SELECTIONS = ImmutableMap.of(
@@ -51,12 +46,20 @@ public class RuleEngine {
     @Autowired
     private TaskDaoJpa taskDaoJpa;
 
+    @Autowired
+    private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private CategoryDaoJpa categoryDaoJpa;
+
     public void importTasks(String requester, ImportTasksParams importTasksParams) {
         List<SampleTask> sampleTasks = sampleTaskDaoJpa
                 .findAllById(importTasksParams.getSampleTasks());
         // if there is any sample task that does not have due date, we need to set due date for it
         List<SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
+
+        User user = this.userDaoJpa.getByName(requester);
 
         if (!tasksNeedTimingArrangement.isEmpty()) {
             tasksNeedTimingArrangement.sort(Comparator.comparing(SampleTask::getUid));
@@ -71,7 +74,6 @@ public class RuleEngine {
 
             String timezone = importTasksParams.getTimezone();
             if (StringUtils.isBlank(timezone)) {
-                User user = this.userDaoJpa.getByName(requester);
                 timezone = user.getTimezone();
             }
 
@@ -81,8 +83,7 @@ public class RuleEngine {
 //        this.taskDaoJpa.createTaskFromSampleTask();
 
         if (importTasksParams.isSubscribed()) {
-            // for subscription, merge with its existing selections
-            System.out.println(importTasksParams);
+            this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());
         }
     }
 

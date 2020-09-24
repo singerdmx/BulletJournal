@@ -260,6 +260,9 @@ const StepsPage: React.FC<StepsProps> = (
 
     const onScrollNext = () => {
         getSampleTasksByScrollId(scrollId, isMobile() ? 10 : 20);
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 300);
     }
 
     const onApplySampleTasks = () => {
@@ -269,6 +272,9 @@ const StepsPage: React.FC<StepsProps> = (
             updateProjects();
             setShowApplyButton(false);
         }
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 100);
     }
 
     const getSampleTasks = () => {

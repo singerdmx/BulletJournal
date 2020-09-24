@@ -128,3 +128,6 @@ export const importTasks = (postOp: Function,
 
 export const setSampleTaskRule = (stepId: number, selectionCombo: string, taskIds: string) =>
     actions.setSampleTaskRule({stepId: stepId, selectionCombo: selectionCombo, taskIds: taskIds});
+
+export const removeSampleTaskRule = (stepId: number, selectionCombo: string) => actions.removeSampleTaskRule({
+    stepId: stepId, selectionCombo: selectionCombo});

@@ -446,13 +446,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String owner,
         SampleTask sampleTask,
         Integer reminderBeforeTask,
-        List<String> assignees
+        List<String> assignees,
+        List<Long> labels
     ) {
         Preconditions.checkNotNull(assignees);
         CreateTaskParams params = sampleTaskToCreateTaskParams(
             sampleTask,
             reminderBeforeTask,
-            assignees
+            assignees,
+            labels
         );
         Task task = create(projectId, owner, params);
         if (StringUtils.isNotEmpty(sampleTask.getContent())) {
@@ -1029,17 +1031,19 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     private CreateTaskParams sampleTaskToCreateTaskParams(
         SampleTask sampleTask,
         Integer reminderBeforeTask,
-        List<String> assignees
+        List<String> assignees,
+        List<Long> labels
     ) {
         return new CreateTaskParams(
-                sampleTask.getName(),
-                sampleTask.getDueDate(),
-                sampleTask.getDueTime(),
-                null,
-                reminderBeforeTask == null ? null : new ReminderSetting(null, null, reminderBeforeTask),
-                assignees,
-                sampleTask.getTimeZone(),
-                null
+            sampleTask.getName(),
+            sampleTask.getDueDate(),
+            sampleTask.getDueTime(),
+            null,
+            reminderBeforeTask == null ? null : new ReminderSetting(null, null, reminderBeforeTask),
+            assignees,
+            sampleTask.getTimeZone(),
+            null,
+            labels
         );
     }
 }

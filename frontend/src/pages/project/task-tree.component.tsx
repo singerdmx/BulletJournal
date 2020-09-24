@@ -318,7 +318,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       updateCompletedTasks(project.id);
     }
     showCompletedTask();
-    window.scrollTo(0, document.body.scrollHeight);
+    setTimeout(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    }, 300);
   };
 
   const createContent = () => {
