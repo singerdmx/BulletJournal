@@ -108,6 +108,7 @@ public class WorkflowController {
         }
         if (tasks.size() <= pageSize) {
             sampleTasks.setSampleTasks(tasks);
+            CACHE.remove(scrollId);
             return sampleTasks;
         }
         String newScrollId = UUID.randomUUID().toString();
