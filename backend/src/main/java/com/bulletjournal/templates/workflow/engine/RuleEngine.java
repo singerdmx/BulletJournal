@@ -83,7 +83,7 @@ public class RuleEngine {
 //        this.taskDaoJpa.createTaskFromSampleTask();
 
         if (importTasksParams.isSubscribed()) {
-            this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams);
+            this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());
         }
     }
 
