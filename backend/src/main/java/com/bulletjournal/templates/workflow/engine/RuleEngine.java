@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,7 +62,7 @@ public class RuleEngine {
         User user = this.userDaoJpa.getByName(requester);
 
         if (!tasksNeedTimingArrangement.isEmpty()) {
-            tasksNeedTimingArrangement.sort(Comparator.comparing(com.bulletjournal.templates.controller.model.SampleTask::getUid));
+            tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid())));
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
@@ -79,16 +78,14 @@ public class RuleEngine {
             }
             int frequency = getTimesOneDay(importTasksParams.getSelections(), importTasksParams.getCategoryId());
             int startIndex = 0;
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
             int numOfDay = 0;
             while (startIndex < tasksNeedTimingArrangement.size()) {
                 ZonedDateTime startTime = startDay.plusHours(21).plusDays(numOfDay++);
                 for (int i = 0; i < frequency && startIndex < tasksNeedTimingArrangement.size(); startIndex++, i++) {
                     com.bulletjournal.templates.controller.model.SampleTask sampleTask = tasksNeedTimingArrangement.get(startIndex);
-                    System.out.println(startTime.format(dateFormatter));
-                    sampleTask.setDueDate(startTime.format(dateFormatter));
-                    sampleTask.setDueTime(startTime.format(timeFormatter));
+                    System.out.println(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
+                    sampleTask.setDueDate(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
+                    sampleTask.setDueTime(startTime.format(ZonedDateTimeHelper.TIME_FORMATTER));
                     sampleTask.setTimeZone(timezone);
                     startTime = startTime.minusHours(1);
                 }
