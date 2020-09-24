@@ -219,7 +219,7 @@ public class TaskControllerTest {
         SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
         sampleTask.setTimeZone(timeZone);
         com.bulletjournal.repository.models.Task task
-            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees);
+            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees, new ArrayList<>());
         assertNotNull(task);
         assertEquals(owner, task.getOwner());
         assertTrue(assignees.size() == task.getAssignees().size() && assignees.containsAll(task.getAssignees()));
