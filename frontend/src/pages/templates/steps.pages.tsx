@@ -272,6 +272,9 @@ const StepsPage: React.FC<StepsProps> = (
             updateProjects();
             setShowApplyButton(false);
         }
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 100);
     }
 
     const getSampleTasks = () => {
