@@ -10,7 +10,7 @@ import {
 } from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category} from "../../features/templates/interface";
-import {BackTop, Button, Col, Divider, Popover, Row, Tag, Tooltip, Typography} from "antd";
+import {BackTop, Button, Checkbox, Col, Divider, Popover, Row, Tag, Tooltip, Typography} from "antd";
 import {DeleteFilled, DeleteTwoTone, TagOutlined} from "@ant-design/icons/lib";
 import ColorPicker from "../../utils/color-picker/ColorPickr";
 import {icons} from "../../assets/icons";
@@ -27,7 +27,7 @@ type AdminCategoryProps = {
     category: Category | undefined;
     deleteCategory: (id: number) => void;
     getCategory: (categoryId: number) => void;
-    updateCategory: (categoryId: number, name: string,
+    updateCategory: (categoryId: number, name: string, needStartDate: boolean,
                      description?: string, icon?: string,
                      color?: string, forumId?: number,
                      image?: string, nextStepId?: number) => void;
@@ -95,42 +95,42 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
 
     const changeColorHandler = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, category.description, category.icon,
+        updateCategory(category.id, category.name, category.needStartDate, category.description, category.icon,
             input.color, category.forumId, category.image, category.nextStepId);
     }
 
     const nameChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, input, category.description, category.icon,
+        updateCategory(category.id, input, category.needStartDate, category.description, category.icon,
             category.color, category.forumId, category.image, category.nextStepId);
     }
 
     const descriptionChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, input, category.icon,
+        updateCategory(category.id, category.name, category.needStartDate, input, category.icon,
             category.color, category.forumId, category.image, category.nextStepId);
     }
 
     const forumIdChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, category.description, category.icon, category.color,
+        updateCategory(category.id, category.name, category.needStartDate, category.description, category.icon, category.color,
             input ? parseInt(input) : undefined, category.image, category.nextStepId);
     }
 
     const nextStepIdChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, category.description, category.icon, category.color,
+        updateCategory(category.id, category.name, category.needStartDate, category.description, category.icon, category.color,
             category.forumId, category.image, input ? parseInt(input) : undefined);
     }
 
     const imageChange = (input: any) => {
         console.log(input);
-        updateCategory(category.id, category.name, category.description, category.icon, category.color,
+        updateCategory(category.id, category.name, category.needStartDate, category.description, category.icon, category.color,
             category.forumId, input, category.nextStepId);
     }
 
     const iconChange = (input: any) => {
-        updateCategory(category.id, category.name, category.description, input,
+        updateCategory(category.id, category.name, category.needStartDate, category.description, input,
             category.color, category.forumId, category.image, category.nextStepId);
     }
 
@@ -142,6 +142,12 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
         const choices = category.choices.map(c => c.id);
         choices.push(id);
         setCategoryChoices(category.id, choices);
+    }
+
+    const onChangeNeedStartDate = (value: any) => {
+        console.log(value.target.checked);
+        updateCategory(category.id, category.name, value.target.checked, category.description, category.icon, category.color,
+            category.forumId, category.image, category.nextStepId);
     }
 
     return <div className='admin-categories-page'>
@@ -166,6 +172,8 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
                 editable={{onChange: nextStepIdChange}}>{`${category.nextStepId ? category.nextStepId : 'nextStepId'}`}</Text>
             <br/>
             <Text editable={{onChange: imageChange}}>{`${category.image ? category.image : 'Image URL'}`}</Text>
+            <br/>
+            <Checkbox checked={category.needStartDate} onChange={onChangeNeedStartDate}>Need Start Date</Checkbox>
         </div>
         <div>
             {category.image && <img src={category.image} width='300px' style={{padding: '10px'}}/>}

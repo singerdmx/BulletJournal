@@ -9,7 +9,8 @@ export interface Category {
     nextStepId?: number;
     subCategories: Category[];
     choices: Choice[];
-    rules: Rule[];
+    rules: Rule[]
+    needStartDate: boolean;
 }
 
 export interface Choice {
@@ -54,6 +55,8 @@ export interface Rule {
 
 export interface NextStep {
     step: Step;
+    sampleTasks: SampleTask[];
+    scrollId: string;
 }
 
 export interface SampleTask {
@@ -63,4 +66,9 @@ export interface SampleTask {
     metadata: string;
     uid: string;
     steps: Step[];
+}
+
+export interface SampleTasks {
+    sampleTasks: SampleTask[];
+    scrollId: string;
 }

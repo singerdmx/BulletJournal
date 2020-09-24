@@ -2,13 +2,13 @@ package main
 
 // Basic imports
 import (
+	"github.com/singerdmx/BulletJournal/daemon/api/service"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"log"
 	"testing"
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/config"
-	"github.com/singerdmx/BulletJournal/daemon/dao"
-	models "github.com/singerdmx/BulletJournal/daemon/dao"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -65,7 +65,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	log.Printf("In seedDataForTesting, start inserting notifications")
 
 	//Insert notifications that is valid for clean
-	_, err = notificationCollection.Insert(models.Notification{
+	_, err = notificationCollection.Insert(persistence.Notification{
 		ID:         0,
 		CreatedAt:  t2,
 		UpdatedAt:  t2,
@@ -83,7 +83,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert notifications that is not valid for clean
-	_, err = notificationCollection.Insert(models.Notification{
+	_, err = notificationCollection.Insert(persistence.Notification{
 		ID:         1,
 		CreatedAt:  t3,
 		UpdatedAt:  t3,
@@ -101,7 +101,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 	log.Printf("In seedDataForTesting, start inserting auditables")
 	//Insert notifications that not valid for clean
-	_, err = notificationCollection.Insert(models.Notification{
+	_, err = notificationCollection.Insert(persistence.Notification{
 		ID:         2,
 		CreatedAt:  t,
 		UpdatedAt:  t,
@@ -119,7 +119,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert auditables that not valid for clean
-	_, err = auditableCollection.Insert(models.Auditable{
+	_, err = auditableCollection.Insert(persistence.Auditable{
 		ID:            2,
 		CreatedAt:     t,
 		UpdatedAt:     t,
@@ -135,7 +135,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert auditables that is valid for clean
-	_, err = auditableCollection.Insert(models.Auditable{
+	_, err = auditableCollection.Insert(persistence.Auditable{
 		ID:            3,
 		CreatedAt:     t2,
 		UpdatedAt:     t2,
@@ -151,7 +151,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert auditables that is not valid for clean
-	_, err = auditableCollection.Insert(models.Auditable{
+	_, err = auditableCollection.Insert(persistence.Auditable{
 		ID:            4,
 		CreatedAt:     t3,
 		UpdatedAt:     t3,
@@ -167,7 +167,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert public_project_items not valid for clean
-	_, err = publicProjectItemCollection.Insert(models.PublicProjectItem{
+	_, err = publicProjectItemCollection.Insert(persistence.PublicProjectItem{
 		ID:             1,
 		CreatedAt:      t,
 		UpdatedAt:      t,
@@ -181,7 +181,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	}
 
 	//Insert public_project_items valid for clean
-	_, err = publicProjectItemCollection.Insert(models.PublicProjectItem{
+	_, err = publicProjectItemCollection.Insert(persistence.PublicProjectItem{
 		ID:             2,
 		CreatedAt:      t2,
 		UpdatedAt:      t2,
@@ -198,10 +198,10 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
 func (suite *DaoTestSuite) SetupTest() {
+	config.InitConfig()
 	logging.InitLogging(config.GetEnv())
 	serviceConfig := config.GetConfig()
-	cleaner := dao.Cleaner{
-		Receiver: nil,
+	cleaner := service.Cleaner{
 		Settings: postgresql.ConnectionURL{
 			Host:     serviceConfig.Host + ":" + serviceConfig.DBPort,
 			Database: serviceConfig.Database,
@@ -219,7 +219,7 @@ func (suite *DaoTestSuite) SetupTest() {
 
 // All methods that begin with "Test" are run as tests within a
 // suite.
-func (suite *DaoTestSuite) TestExample() {
+func (suite *DaoTestSuite) TestDao() {
 	assert.Equal(suite.T(), uint64(2), *suite.RestAuditables)
 	assert.Equal(suite.T(), uint64(1), *suite.RestPublicProjectItems)
 	assert.Equal(suite.T(), uint64(2), *suite.RestNotifications)

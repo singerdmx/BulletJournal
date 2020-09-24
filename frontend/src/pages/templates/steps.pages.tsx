@@ -3,36 +3,84 @@ import './steps.styles.less';
 import {useParams} from "react-router-dom";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getCategory, getNextStep, nextStepReceived} from "../../features/templates/actions";
-import {Category, Choice, NextStep, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, Select} from "antd";
+import {
+    getCategory,
+    getNextStep,
+    getSampleTasksByScrollId,
+    nextStepReceived,
+    sampleTasksReceived
+} from "../../features/templates/actions";
+import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
+import {Button, Card, Empty, notification, Select} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {CloseSquareTwoTone, LikeTwoTone, UpCircleTwoTone} from "@ant-design/icons";
+import {CloseSquareTwoTone, ExclamationCircleFilled, UpCircleTwoTone} from "@ant-design/icons";
+import ReactLoading from "react-loading";
+import {getCookie} from "../../index";
+import StepsImportTasksPage from "./steps.import.tasks.pages";
+import {updateProjects} from "../../features/project/actions";
+import {updateExpandedMyself} from "../../features/myself/actions";
 
 const {Meta} = Card;
 const {Option} = Select;
 
 type StepsProps = {
+    reload: boolean;
+    loadingNextStep: boolean;
+    sampleTasks: SampleTask[];
+    scrollId: string;
     category: Category | undefined;
     nextStep: NextStep | undefined;
+    updateProjects: () => void;
     getCategory: (categoryId: number) => void;
     getNextStep: (stepId: number, selections: number[], prevSelections: number[], first?: boolean) => void;
     nextStepReceived: (nextStep: NextStep | undefined) => void;
+    sampleTasksReceived: (sampleTasks: SampleTask[], scrollId: string) => void;
+    getSampleTasksByScrollId: (scrollId: string, pageSize: number) => void;
+    updateExpandedMyself: (updateSettings: boolean) => void;
 };
 
 export const STEPS = 'steps';
 export const SELECTIONS = 'selections';
+export const SAMPLE_TASKS = 'sampleTasks';
+
+export const getSelections = () => {
+    const selectionsText = localStorage.getItem(SELECTIONS);
+    const selections: any = selectionsText ? JSON.parse(selectionsText) : {};
+    return selections;
+}
+
+export const isMobile = () => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return userAgent.includes('mobile');
+}
 
 const StepsPage: React.FC<StepsProps> = (
-    {category, nextStep, getCategory, getNextStep, nextStepReceived}
+    {
+        reload, loadingNextStep, sampleTasks, category, scrollId,
+        nextStep, getCategory, getNextStep, nextStepReceived, sampleTasksReceived,
+        updateProjects, updateExpandedMyself, getSampleTasksByScrollId,
+    }
 ) => {
     const {categoryId} = useParams();
 
     useEffect(() => {
         if (categoryId) {
             getCategory(parseInt(categoryId));
+            const loginCookie = getCookie('__discourse_proxy');
+            if (loginCookie) {
+                updateExpandedMyself(true);
+            }
         }
     }, [categoryId]);
+
+    useEffect(() => {
+        if (reload) {
+            localStorage.removeItem(STEPS);
+            localStorage.removeItem(SELECTIONS);
+            localStorage.removeItem(SAMPLE_TASKS);
+            window.location.reload();
+        }
+    }, [reload]);
 
     useEffect(() => {
         document.title = 'Bullet Journal - Steps';
@@ -42,10 +90,13 @@ const StepsPage: React.FC<StepsProps> = (
             if (existingSteps.length > 0 && existingSteps[0].id !== category.id) {
                 localStorage.removeItem(STEPS);
                 localStorage.removeItem(SELECTIONS);
+                localStorage.removeItem(SAMPLE_TASKS);
             } else {
                 const selections = getSelections();
                 const curStep = getCurrentStep();
-                setShowConfirmButton(curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0));
+                if (curStep) {
+                    setShowConfirmButton(curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0));
+                }
             }
         }
     }, [category]);
@@ -55,11 +106,16 @@ const StepsPage: React.FC<StepsProps> = (
             const steps = getSteps();
             steps.push(nextStep.step);
             localStorage.setItem(STEPS, JSON.stringify(steps));
+            if (nextStep.step.choices.length === 0) {
+                setShowConfirmButton(false);
+            }
         }
     }, [nextStep]);
 
     const [curSelections, setCurSelections] = useState<any>({});
     const [showConfirmButton, setShowConfirmButton] = useState(false);
+    const [showImportTasksCard, setShowImportTasksCard] = useState(false);
+    const [showApplyButton, setShowApplyButton] = useState(true);
 
     if (!category) {
         return <Empty/>
@@ -89,12 +145,6 @@ const StepsPage: React.FC<StepsProps> = (
         }
         const steps = getSteps();
         return steps[steps.length - 1];
-    }
-
-    const getSelections = () => {
-        const selectionsText = localStorage.getItem(SELECTIONS);
-        const selections: any = selectionsText ? JSON.parse(selectionsText) : {};
-        return selections;
     }
 
     const setSelections = (selections: any) => {
@@ -161,6 +211,8 @@ const StepsPage: React.FC<StepsProps> = (
 
     const goBack = () => {
         setShowConfirmButton(false);
+        setShowImportTasksCard(false);
+        setShowApplyButton(true);
         const steps: Step[] = getSteps();
         const selections = getSelections();
         steps[steps.length - 1].choices.forEach(c => {
@@ -173,15 +225,27 @@ const StepsPage: React.FC<StepsProps> = (
         setSelections(selections);
         localStorage.setItem(STEPS, JSON.stringify(steps));
         nextStepReceived(undefined);
+        sampleTasksReceived([], '');
+        localStorage.removeItem(SAMPLE_TASKS);
     }
 
     const onConfirmNext = () => {
         const selections = getSelections();
         const curStep = getCurrentStep();
+        if (!curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0)) {
+            notification.open({
+                placement: 'bottomRight',
+                message: 'Make Selection',
+                description: 'Make sure there is no missing place',
+                icon: <ExclamationCircleFilled style={{ color: 'red' }} />,
+            });
+            return;
+        }
         let selected: number[] = [];
         curStep.choices.forEach(c => {
             selected = selected.concat(selections[c.id]);
         });
+        console.log(selected);
 
         let prevSelections = [] as number[];
 
@@ -190,8 +254,52 @@ const StepsPage: React.FC<StepsProps> = (
                 prevSelections = prevSelections.concat(selections[k]);
             }
         });
-        console.log(prevSelections)
+        console.log(prevSelections);
         getNextStep(curStep.id, selected, prevSelections, getSteps().length === 1);
+    }
+
+    const onScrollNext = () => {
+        getSampleTasksByScrollId(scrollId, isMobile() ? 10 : 20);
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 300);
+    }
+
+    const onApplySampleTasks = () => {
+        setShowImportTasksCard(true);
+        const loginCookie = getCookie('__discourse_proxy');
+        if (loginCookie) {
+            updateProjects();
+            setShowApplyButton(false);
+        }
+    }
+
+    const getSampleTasks = () => {
+        if (sampleTasks && sampleTasks.length > 0) {
+            return sampleTasks;
+        }
+
+        const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
+        if (sampleTasksText) {
+            const data: SampleTasks = JSON.parse(sampleTasksText);
+            return data.sampleTasks;
+        }
+
+        return [];
+    }
+
+    const getScrollId = () => {
+        if (scrollId) {
+            return scrollId;
+        }
+
+        const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
+        if (sampleTasksText) {
+            const data: SampleTasks = JSON.parse(sampleTasksText);
+            return data.scrollId;
+        }
+
+        return '';
     }
 
     const getStepsDiv = () => {
@@ -202,28 +310,58 @@ const StepsPage: React.FC<StepsProps> = (
         const existingSteps = getSteps();
         if (existingSteps.length > 0) {
             const curStep = getCurrentStep();
-            return <div className='choices-card'>
-                {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
-                    <Button
-                        onClick={goBack}
-                        style={{color: '#4ddbff'}} shape="round"
-                        icon={<UpCircleTwoTone/>} size='large'>
-                        Go Back
-                    </Button>
-                </div>}
-                <div>
-                    {curStep.choices.map(choice => {
-                        return renderChoice(choice);
-                    })}
+            return <div>
+                <div className='choices-card'>
+                    {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
+                        <Button
+                            onClick={goBack}
+                            style={{color: '#4ddbff'}} shape="round"
+                            icon={<UpCircleTwoTone/>}>
+                            Go Back
+                        </Button>
+                    </div>}
+                    <div>
+                        {curStep.choices.map(choice => {
+                            return renderChoice(choice);
+                        })}
+                    </div>
+                    {getSampleTasks().length > 0 && <div className='sample-tasks'>
+                        {getSampleTasks().map((sampleTask: SampleTask) => {
+                            return <div className='sample-task'>
+                                {sampleTask.name}
+                            </div>
+                        })}
+                    </div>}
+                    <div className='confirm-button'>
+                        {(isMobile() || showConfirmButton) && curStep.choices.length > 0 && <Button
+                            onClick={onConfirmNext}
+                            style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                            Next
+                        </Button>}
+                        {getScrollId() && <Button
+                            onClick={onScrollNext}
+                            style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                            More
+                        </Button>}
+                        {getSampleTasks().length > 0 && showApplyButton && <Button
+                            onClick={onApplySampleTasks}
+                            style={{color: '#4ddbff', margin: '3px'}} shape="round">
+                            Apply
+                        </Button>}
+                    </div>
+                    <div className='confirm-button'>
+                        {loadingNextStep && <ReactLoading type="bubbles" color="#0984e3"/>}
+                    </div>
                 </div>
-                {showConfirmButton && <div className='confirm-button'>
-                    <Button
-                        onClick={onConfirmNext}
-                        style={{color: '#4ddbff'}} shape="round"
-                        icon={<LikeTwoTone />} size='large'>
-                        Confirm
-                    </Button>
-                </div>}
+                {showImportTasksCard && <>
+                    <div className='import-card'>
+                        <StepsImportTasksPage hideImportTasksCard={() => {
+                            setShowImportTasksCard(false);
+                            setShowApplyButton(true);
+                        }}/>
+                    </div>
+                </>
+                }
             </div>
         }
 
@@ -259,12 +397,20 @@ const StepsPage: React.FC<StepsProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
+    reload: state.myself.reload,
     category: state.templates.category,
     nextStep: state.templates.nextStep,
+    sampleTasks: state.templates.sampleTasks,
+    scrollId: state.templates.scrollId,
+    loadingNextStep: state.templates.loadingNextStep,
 });
 
 export default connect(mapStateToProps, {
     getCategory,
     getNextStep,
-    nextStepReceived
+    nextStepReceived,
+    updateProjects,
+    updateExpandedMyself,
+    sampleTasksReceived,
+    getSampleTasksByScrollId,
 })(StepsPage);

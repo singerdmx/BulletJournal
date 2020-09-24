@@ -9,10 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -58,7 +55,7 @@ public class SelectionDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Selection> getSelectionsById(List<Long> ids) {
+    public List<Selection> getSelectionsById(Collection<Long> ids) {
         if (ids.isEmpty()) {
             return Collections.emptyList();
         }

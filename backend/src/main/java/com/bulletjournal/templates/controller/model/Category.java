@@ -30,6 +30,8 @@ public class Category {
 
     private Long nextStepId;
 
+    private Boolean needStartDate;
+
     @Expose
     private List<Category> subCategories = new ArrayList<>();
 
@@ -70,7 +72,7 @@ public class Category {
     }
 
     public Category(Long id, String name, String description, String icon, String color,
-                    Long forumId, List<Category> subCategories, String image, List<Choice> choices, List<Rule> rules, Long nextStepId) {
+                    Long forumId, List<Category> subCategories, String image, List<Choice> choices, List<Rule> rules, Long nextStepId, Boolean needStartDate) {
         this.id = id;
         this.name = name;
         this.subCategories = subCategories;
@@ -82,6 +84,15 @@ public class Category {
         this.choices = choices;
         this.rules = rules;
         this.nextStepId = nextStepId;
+        this.needStartDate = needStartDate;
+    }
+
+    public Boolean getNeedStartDate() {
+        return needStartDate;
+    }
+
+    public void setNeedStartDate(Boolean needStartDate) {
+        this.needStartDate = needStartDate;
     }
 
     public Long getNextStepId() {

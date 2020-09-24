@@ -7,7 +7,7 @@ import {Category} from "./features/templates/interface";
 import FooterLayout from "./layouts/footer/footer.layout";
 import SideLayout from './layouts/templates/side.layout';
 import ContentLayout from './layouts/templates/content.layout';
-import {SELECTIONS, STEPS} from "./pages/templates/steps.pages";
+import {SAMPLE_TASKS, SELECTIONS, STEPS} from "./pages/templates/steps.pages";
 
 
 type TemplatesProps = {
@@ -33,12 +33,16 @@ const TemplatesPage: React.FC<TemplatesProps> = (
             setCollapsed(true);
             setWidth(collapsedSiderWidth);
         }
+    }, []);
+
+    useEffect(() => {
         if (reload) {
             localStorage.removeItem(STEPS);
             localStorage.removeItem(SELECTIONS);
+            localStorage.removeItem(SAMPLE_TASKS);
             window.location.reload();
         }
-    }, []);
+    }, [reload]);
 
     const expandedSiderWidth = 240;
     const collapsedSiderWidth = 55;

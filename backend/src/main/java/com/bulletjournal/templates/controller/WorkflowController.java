@@ -4,14 +4,16 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
+import com.bulletjournal.templates.controller.model.SampleTask;
+import com.bulletjournal.templates.controller.model.SampleTaskRule;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.RuleDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
+import com.bulletjournal.templates.repository.SampleTaskRuleDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
+import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.repository.model.Category;
-import com.bulletjournal.templates.repository.model.CategoryRule;
 import com.bulletjournal.templates.repository.model.Step;
-import com.bulletjournal.templates.repository.model.StepRule;
+import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.google.gson.Gson;
 import org.slf4j.MDC;
@@ -22,24 +24,31 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
 public class WorkflowController {
 
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
+    public static final String PUBLIC_SAMPLE_TASKS_ROUTE = "/api/public/sampleTasks";
+    public static final String PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE = "/api/public/sampleTasks/import";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
+    public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
+    public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
 
     @Autowired
-    private UserDaoJpa userDaoJpa;
+    private SampleTaskRuleDaoJpa sampleTaskRuleDaoJpa;
 
     @Autowired
-    private RuleDaoJpa ruleDaoJpa;
+    private UserDaoJpa userDaoJpa;
 
     @Autowired
     private CategoryDaoJpa categoryDaoJpa;
@@ -47,7 +56,12 @@ public class WorkflowController {
     @Autowired
     private StepDaoJpa stepDaoJpa;
 
+    @Autowired
+    private RuleEngine ruleEngine;
+
     private static final Gson GSON = new Gson();
+
+    private static final Map<String, List<SampleTask>> CACHE = new ConcurrentHashMap<String, List<SampleTask>>();
 
     @GetMapping(NEXT_STEP_ROUTE)
     public NextStep getNext(
@@ -63,18 +77,45 @@ public class WorkflowController {
             nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
             if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
                 // assume final step, try to get sample tasks using prevSelections
-                nextStep.setTasks(getSampleTasksForFinalStep(nextStep.getStep(), prevSelections));
+                List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
+                        this.ruleEngine.getSampleTasksForFinalStep(
+                                nextStep.getStep().getId(), selections, prevSelections))
+                        .stream().map(e -> e.toPresentationModel()).collect(Collectors.toList());
+                // store in redis and generate scrollId
+                // setSampleTasks with the first 10 tasks
+                if (sampleTasks.size() <= 10) {
+                    nextStep.setScrollId("");
+                    nextStep.setSampleTasks(sampleTasks);
+                    return nextStep;
+                }
+                String scrollId = UUID.randomUUID().toString();
+                nextStep.setScrollId(scrollId);
+                nextStep.setSampleTasks(sampleTasks.subList(0, 10));
+                CACHE.put(scrollId, sampleTasks.subList(10, sampleTasks.size()));
             }
         }
 
         return nextStep;
     }
 
-    private List<SampleTask> getSampleTasksForFinalStep(
-            com.bulletjournal.templates.controller.model.Step step, List<Long> prevSelections) {
-        // get task rules
-        // find choice combo if there is selection combo in any task rule
-        return null;
+    @GetMapping(PUBLIC_SAMPLE_TASKS_ROUTE)
+    public SampleTasks getSampleTasks(@RequestParam String scrollId, @NotNull @RequestParam Integer pageSize) {
+        List<SampleTask> tasks = CACHE.get(scrollId);
+        SampleTasks sampleTasks = new SampleTasks();
+        sampleTasks.setScrollId("");
+        if (tasks == null) {
+            return sampleTasks;
+        }
+        if (tasks.size() <= pageSize) {
+            sampleTasks.setSampleTasks(tasks);
+            CACHE.remove(scrollId);
+            return sampleTasks;
+        }
+        String newScrollId = UUID.randomUUID().toString();
+        sampleTasks.setScrollId(newScrollId);
+        sampleTasks.setSampleTasks(tasks.subList(0, pageSize));
+        CACHE.put(newScrollId, tasks.subList(pageSize, tasks.size()));
+        return sampleTasks;
     }
 
     private NextStep checkIfSelectionsMatchCategoryRules(Long stepId, List<Long> selections) {
@@ -169,6 +210,12 @@ public class WorkflowController {
         return false;
     }
 
+    @PostMapping(PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE)
+    public void importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.ruleEngine.importTasks(username, importTasksParams);
+    }
+
     @PostMapping(SAMPLE_TASKS_ROUTE)
     public SampleTask createSampleTask(@Valid @RequestBody CreateSampleTaskParams createSampleTaskParams) {
         validateRequester();
@@ -200,6 +247,21 @@ public class WorkflowController {
     public void deleteSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         validateRequester();
         sampleTaskDaoJpa.deleteSampleTaskById(sampleTaskId);
+    }
+
+    @PostMapping(SAMPLE_TASKS_RULE_ROUTE)
+    public SampleTaskRule upsertSampleTaskRule(@Valid @RequestBody UpsertSampleTaskRuleParams upsertSampleTaskRuleParams) {
+        validateRequester();
+        return sampleTaskRuleDaoJpa.upsert(upsertSampleTaskRuleParams.getStepId(),
+                upsertSampleTaskRuleParams.getSelectionCombo(),
+                upsertSampleTaskRuleParams.getTaskIds()).toPresentationModel();
+    }
+
+    @DeleteMapping(SAMPLE_TASK_RULE_ROUTE)
+    public void deleteSampleTaskRule(@RequestParam(value = "stepId") Long stepId,
+                                 @RequestParam(value = "selectionCombo") String selectionCombo) {
+        validateRequester();
+        sampleTaskRuleDaoJpa.deleteById(stepId, selectionCombo);
     }
 
     private void validateRequester() {

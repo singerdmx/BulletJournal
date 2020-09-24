@@ -23,6 +23,14 @@ public abstract class Rule extends NamedModel {
     public Rule() {
     }
 
+    public Step getConnectedStep() {
+        return connectedStep;
+    }
+
+    public void setConnectedStep(Step connectedStep) {
+        this.connectedStep = connectedStep;
+    }
+
     public Integer getPriority() {
         return priority;
     }
@@ -37,14 +45,6 @@ public abstract class Rule extends NamedModel {
 
     public void setRuleExpression(String ruleExpression) {
         this.ruleExpression = ruleExpression;
-    }
-
-    public Step getConnectedStep() {
-        return connectedStep;
-    }
-
-    public void setConnectedStep(Step connectedStep) {
-        this.connectedStep = connectedStep;
     }
 
     public void clone(Rule rule) {

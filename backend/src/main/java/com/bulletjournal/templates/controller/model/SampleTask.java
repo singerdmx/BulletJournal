@@ -1,7 +1,6 @@
 package com.bulletjournal.templates.controller.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Timestamp;
 
 public class SampleTask {
 
@@ -13,9 +12,15 @@ public class SampleTask {
 
     private String metadata;
 
+    private String timeZone;
+
     private String uid;
 
-    private List<Step> steps = new ArrayList<>();
+    private String dueDate;
+
+    private String dueTime;
+
+    private Timestamp availableBefore;
 
     public SampleTask() {
     }
@@ -25,15 +30,21 @@ public class SampleTask {
         String name,
         String content,
         String metadata,
-        List<Step> steps,
-        String uid
+        String uid,
+        String dueDate,
+        String dueTime,
+        Timestamp availableBefore,
+        String timeZone
     ) {
         this.id = id;
         this.name = name;
         this.content = content;
         this.metadata = metadata;
-        this.steps = steps;
         this.uid = uid;
+        this.dueDate = dueDate;
+        this.dueTime = dueTime;
+        this.availableBefore = availableBefore;
+        this.timeZone = timeZone;
     }
 
     public String getUid() {
@@ -50,6 +61,14 @@ public class SampleTask {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public String getName() {
@@ -76,11 +95,28 @@ public class SampleTask {
         this.metadata = metadata;
     }
 
-    public List<Step> getSteps() {
-        return steps;
+    public String getDueDate() {
+        return dueDate;
     }
 
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
     }
+
+    public String getDueTime() {
+        return dueTime;
+    }
+
+    public void setDueTime(String dueTime) {
+        this.dueTime = dueTime;
+    }
+
+    public Timestamp getAvailableBefore() {
+        return availableBefore;
+    }
+
+    public void setAvailableBefore(Timestamp availableBefore) {
+        this.availableBefore = availableBefore;
+    }
+
 }

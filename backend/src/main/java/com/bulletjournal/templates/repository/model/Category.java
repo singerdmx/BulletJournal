@@ -50,11 +50,14 @@ public class Category extends NamedModel {
     @Column(name = "choice_order")
     private String choiceOrder;
 
+    @Column(name = "need_start_date", nullable = false, columnDefinition = "boolean default false")
+    private Boolean needStartDate;
+
     public Category() {
 
     }
 
-    public Category(String name, String description, String icon, String color, Long forumId, String image, Step nextStep) {
+    public Category(String name, String description, String icon, String color, Long forumId, String image, Step nextStep, Boolean needStartDate) {
         setName(name);
         this.description = description;
         this.icon = icon;
@@ -62,6 +65,15 @@ public class Category extends NamedModel {
         this.forumId = forumId;
         this.image = image;
         this.nextStep = nextStep;
+        this.needStartDate = needStartDate;
+    }
+
+    public Boolean getNeedStartDate() {
+        return needStartDate;
+    }
+
+    public void setNeedStartDate(Boolean needStartDate) {
+        this.needStartDate = needStartDate;
     }
 
     public String getChoiceOrder() {
@@ -188,6 +200,6 @@ public class Category extends NamedModel {
                 id, getName(), description, icon, color, forumId, Collections.emptyList(), image,
                 getChoices().stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
                 getCategoryRules().stream().map(CategoryRule::toPresentationModel).collect(Collectors.toList()),
-                nextStep == null ? null : nextStep.getId());
+                nextStep == null ? null : nextStep.getId(), needStartDate);
     }
 }

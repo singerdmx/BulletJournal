@@ -194,7 +194,7 @@ public class CategoryControllerTest {
             = this.restTemplate.exchange(
             ROOT_URL + randomServerPort + CategoryController.CATEGORIES_ROUTE,
             HttpMethod.POST,
-            TestHelpers.actAsOtherUser(new CreateCategoryParams(name, CATEGORY_DESCRIPTION), USER),
+            TestHelpers.actAsOtherUser(new CreateCategoryParams(name, CATEGORY_DESCRIPTION, false), USER),
             com.bulletjournal.templates.controller.model.Category.class);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
         return response.getBody();
@@ -286,7 +286,7 @@ public class CategoryControllerTest {
     private void addCategories() {
         int i = 0;
         for (String name : CATEGORY_NAMES) {
-            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION, ICONS[0], COLORS[0], null, null, null);
+            Category category =  categoryDaoJpa.create(name, CATEGORY_DESCRIPTION, ICONS[0], COLORS[0], null, null, null, false);
             categories.add(category);
             categoriesIds[i] = category.getId();
             i++;

@@ -26,7 +26,13 @@ import {
   AddRuleAction,
   RemoveRuleAction,
   GetSampleTasksAction,
-  AddSampleTaskAction, GetSampleTaskAction, RemoveSampleTaskAction, UpdateSampleTaskAction
+  AddSampleTaskAction,
+  GetSampleTaskAction,
+  RemoveSampleTaskAction,
+  UpdateSampleTaskAction,
+  CloneStepAction,
+  UpdateStepAction,
+  GetSampleTasksByScrollIdAction, ImportTasksAction, SetSampleTaskRuleAction, RemoveSampleTaskRuleAction
 } from './reducer';
 import {
   createCategory,
@@ -41,19 +47,20 @@ import {
   createChoice, deleteChoice, getChoice,
   getChoices, updateChoice
 } from '../../apis/templates/choiceApis';
-import {Category, Choice, NextStep, Rule, SampleTask, Selection, Step, Steps} from './interface';
+import {Category, Choice, NextStep, Rule, SampleTask, SampleTasks, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep} from '../../apis/templates/stepApis';
+import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep, cloneStep, putStep} from '../../apis/templates/stepApis';
 import {
   createSampleTask,
-  deleteSampleTask,
-  fetchSampleTask,
+  deleteSampleTask, deleteSampleTaskRule,
+  fetchSampleTask, fetchSampleTasksByScrollId,
   getNext,
-  getSampleTasksByFilter, putSampleTask
+  getSampleTasksByFilter, putSampleTask, upsertSampleTaskRule
 } from "../../apis/templates/workflowApis";
 import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 import {reloadReceived} from "../myself/actions";
+import {SAMPLE_TASKS} from "../../pages/templates/steps.pages";
 
 function* fetchCategories(action: PayloadAction<GetCategoriesAction>) {
   try {
@@ -142,15 +149,29 @@ function* addCategory(action: PayloadAction<AddCategoryAction>) {
 
 function* updateCategory(action: PayloadAction<UpdateCategoryAction>) {
   try {
-    const {categoryId, name, description, icon, color, forumId, image, nextStepId} = action.payload;
+    const {categoryId, name, needStartDate, description, icon, color, forumId, image, nextStepId} = action.payload;
     const data: Category = yield call(putCategory,
-        categoryId, name, description, icon, color, forumId, image, nextStepId);
+        categoryId, name, needStartDate, description, icon, color, forumId, image, nextStepId);
     yield put(templatesActions.categoryReceived({category: data}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `updateCategory Error Received: ${error}`);
+    }
+  }
+}
+
+function* updateStep(action: PayloadAction<UpdateStepAction>) {
+  try {
+    const {stepId, name, nextStepId} = action.payload;
+    const data: Step = yield call(putStep, stepId, name, nextStepId);
+    yield put(templatesActions.stepReceived({step: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `updateStep Error Received: ${error}`);
     }
   }
 }
@@ -341,6 +362,22 @@ function* addStep(action: PayloadAction<CreateStepAction>) {
   }
 }
 
+function* copyStep(action: PayloadAction<CloneStepAction>) {
+  try {
+    console.log(action.payload)
+    const {stepId} = action.payload;
+    yield call(cloneStep, stepId);
+    const data: Steps = yield call(getSteps);
+    yield put(templatesActions.stepsReceived({steps: data.steps}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `cloneStep Error Received: ${error}`);
+    }
+  }
+}
+
 function* fetchStep(action: PayloadAction<GetStepAction>) {
   try {
     const {stepId} = action.payload;
@@ -372,10 +409,22 @@ function* removeStep(action: PayloadAction<DeleteStepAction>) {
 }
 
 function* getNextStep(action: PayloadAction<GetNextStepAction>) {
+  const state: IState = yield select();
+  if (state.templates.loadingNextStep) {
+    return;
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: true}));
   try {
     const {stepId, selections, prevSelections, first} = action.payload;
     const nextStep: NextStep = yield call(getNext, stepId, selections, prevSelections, first);
     yield put(templatesActions.nextStepReceived({step: nextStep}));
+    if (nextStep.sampleTasks) {
+      yield put(templatesActions.sampleTasksReceived({tasks: nextStep.sampleTasks, scrollId: nextStep.scrollId}));
+      localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+        sampleTasks: nextStep.sampleTasks,
+        scrollId: nextStep.scrollId
+      }));
+    }
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -383,6 +432,28 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
       yield call(message.error, `getNextStep Error Received: ${error}`);
     }
   }
+  yield put(templatesActions.loadingNextStepReceived({loading: false}));
+}
+
+function* importTasks(action: PayloadAction<ImportTasksAction>) {
+  const state: IState = yield select();
+  if (state.templates.loadingNextStep) {
+    return;
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: true}));
+  try {
+    const {postOp, categoryId, projectId, assignees, reminderBefore,
+      sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
+    console.log(action.payload);
+    postOp();
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `importTasks Error Received: ${error}`);
+    }
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: false}));
 }
 
 function* addRule(action: PayloadAction<AddRuleAction>) {
@@ -428,7 +499,7 @@ function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
   try {
     const {filter} = action.payload;
     const data : SampleTask[] = yield call(getSampleTasksByFilter, filter);
-    yield put(templatesActions.sampleTasksReceived({tasks: data}));
+    yield put(templatesActions.sampleTasksReceived({tasks: data, scrollId: ''}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -493,6 +564,59 @@ function* updateSampleTask(action: PayloadAction<UpdateSampleTaskAction>) {
   }
 }
 
+function* getSampleTasksByScrollId(action: PayloadAction<GetSampleTasksByScrollIdAction>) {
+  const state: IState = yield select();
+  if (state.templates.loadingNextStep) {
+    return;
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: true}));
+  try {
+    const {scrollId, pageSize} = action.payload;
+    const data : SampleTasks = yield call(fetchSampleTasksByScrollId, scrollId, pageSize);
+    const state: IState = yield select();
+    let tasks = state.templates.sampleTasks;
+    tasks = tasks.concat(data.sampleTasks);
+    yield put(templatesActions.sampleTasksReceived({tasks: tasks.concat(data.sampleTasks), scrollId: data.scrollId}));
+    localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+      sampleTasks: tasks,
+      scrollId: data.scrollId
+    }));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getSampleTasksByScrollId Error Received: ${error}`);
+    }
+  }
+  yield put(templatesActions.loadingNextStepReceived({loading: false}));
+}
+
+function* setSampleTaskRule(action: PayloadAction<SetSampleTaskRuleAction>) {
+  try {
+    const {taskIds, selectionCombo, stepId} = action.payload;
+    yield call(upsertSampleTaskRule, stepId, selectionCombo, taskIds);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `setSampleTaskRule Error Received: ${error}`);
+    }
+  }
+}
+
+function* removeSampleTaskRule(action: PayloadAction<RemoveSampleTaskRuleAction>) {
+  try {
+    const {selectionCombo, stepId} = action.payload;
+    yield call(deleteSampleTaskRule, stepId, selectionCombo);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `removeSampleTaskRule Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* TemplatesSagas() {
   yield all([
     yield takeLatest(templatesActions.getCategories.type, fetchCategories),
@@ -503,6 +627,7 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.deleteCategory.type, removeCategory),
     yield takeLatest(templatesActions.deleteChoice.type, removeChoice),
     yield takeLatest(templatesActions.updateCategory.type, updateCategory),
+    yield takeLatest(templatesActions.updateStep.type, updateStep),
     yield takeLatest(templatesActions.getCategory.type, fetchCategory),
     yield takeLatest(templatesActions.setCategoryChoices.type, setCategoryChoices),
     yield takeLatest(templatesActions.setStepChoices.type, setStepChoices),
@@ -523,5 +648,10 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getSampleTask.type, getSampleTask),
     yield takeLatest(templatesActions.removeSampleTask.type, removeSampleTask),
     yield takeLatest(templatesActions.updateSampleTask.type, updateSampleTask),
+    yield takeLatest(templatesActions.copyStep.type, copyStep),
+    yield takeLatest(templatesActions.getSampleTasksByScrollId.type, getSampleTasksByScrollId),
+    yield takeLatest(templatesActions.importTasks.type, importTasks),
+    yield takeLatest(templatesActions.setSampleTaskRule.type, setSampleTaskRule),
+    yield takeLatest(templatesActions.removeSampleTaskRule.type, removeSampleTaskRule),
   ])
 }

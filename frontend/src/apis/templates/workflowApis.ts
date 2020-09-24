@@ -16,6 +16,14 @@ export const getNext = (stepId: number, selections: number[], prevSelections: nu
         });
 }
 
+export const fetchSampleTasksByScrollId = (scrollId: string, pageSize: number) => {
+    return doFetch(`/api/public/sampleTasks?scrollId=${scrollId}&pageSize=${pageSize}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
 export const getSampleTasksByFilter = (filter: string) => {
     return doFetch(`/api/sampleTasks?filter=${filter}`)
         .then((res) => res.json())
@@ -64,6 +72,27 @@ export const putSampleTask = (sampleTaskId: number, name: string, uid: string, c
     return doPut(`/api/sampleTasks/${sampleTaskId}`, putBody)
         .then(res => res.json())
         .catch(err => {
+            throw Error(err.message);
+        });
+}
+
+export const upsertSampleTaskRule = (stepId: number, selectionCombo: string, taskIds: string) => {
+    const postBody = JSON.stringify({
+        stepId: stepId,
+        selectionCombo: selectionCombo,
+        taskIds: taskIds
+    });
+    return doPost('/api/sampleTaskRules', postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}
+
+export const deleteSampleTaskRule = (stepId: number, selectionCombo: string) => {
+    return doDelete(`/api/sampleTaskRules?stepId=${stepId}&selectionCombo=${selectionCombo}`)
+        .then(res => res)
+        .catch((err) => {
             throw Error(err.message);
         });
 }

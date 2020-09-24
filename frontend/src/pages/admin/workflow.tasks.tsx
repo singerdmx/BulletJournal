@@ -3,10 +3,10 @@ import './workflow.styles.less';
 import {Button, Checkbox, Collapse, Divider, Input, message, Tag, Tooltip} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getSampleTasks, getSteps} from "../../features/templates/actions";
+import {getSampleTasks, getSteps, setSampleTaskRule} from "../../features/templates/actions";
 import {SampleTask, Selection, Step} from "../../features/templates/interface";
 import Search from "antd/es/input/Search";
-import {CheckCircleTwoTone, CloseCircleTwoTone, FilterOutlined} from "@ant-design/icons";
+import {CheckCircleTwoTone, CheckSquareTwoTone, CloseCircleTwoTone, FilterOutlined} from "@ant-design/icons";
 import {useHistory} from "react-router-dom";
 import {Container} from "react-floating-action-button";
 import AddSampleTask from "../../components/modals/templates/add-sample-task.component";
@@ -19,6 +19,7 @@ type WorkflowPageProps = {
     sampleTasks: SampleTask[];
     getSteps: () => void;
     getSampleTasks: (filter: string) => void;
+    setSampleTaskRule: (stepId: number, selectionCombo: string, taskIds: string) => void;
 };
 
 const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
@@ -26,14 +27,16 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
         steps,
         sampleTasks,
         getSteps,
-        getSampleTasks
+        getSampleTasks,
+        setSampleTaskRule
     }) => {
     const history = useHistory();
 
     useEffect(() => {
         getSteps();
     }, []);
-    const [targetStep, setTargetStep] = useState<Step | undefined>(undefined);
+    const [targetFinalStep, setTargetFinalStep] = useState<Step | undefined>(undefined);
+    const [targetChoiceStep, setTargetChoiceStep] = useState<Step | undefined>(undefined);
     const [targetSelections, setTargetSelections] = useState<Selection[]>([]);
     const [tasks, setTasks] = useState<SampleTask[]>([]);
     const [checked, setChecked] = useState([] as number[]);
@@ -48,18 +51,17 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             message.error('Input is empty');
             return;
         }
-
+        setChecked([]);
         getSampleTasks(value);
     }
 
     const onFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const s = e.target.value;
-        console.log(s);
+        setChecked([]);
         if (!s) {
             setTasks(sampleTasks);
             return;
         }
-        console.log(sampleTasks);
         setTasks(sampleTasks.filter(t => t.metadata.toLowerCase().includes(s.toLowerCase())));
     }
 
@@ -88,6 +90,20 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             return;
         }
 
+        if (!targetFinalStep) {
+            message.error('No targetFinalStep selected');
+            return;
+        }
+
+        if (targetSelections.length === 0) {
+            message.error('No target Selections selected');
+            return;
+        }
+
+        console.log(targetSelections.toString());
+        setSampleTaskRule(targetFinalStep.id, targetSelections.map(s => s.id).join(','), checked.join(','));
+        setChecked([]);
+        message.success('Successfully linked');
     }
 
     const onClickSelection = (selection: Selection) => {
@@ -109,7 +125,17 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
                                     <span style={{cursor: 'pointer', padding: '5px'}}
                                           onClick={() => history.push(`/admin/steps/${s.id}`)}>{s.name} ({s.id})
                                     </span>
-                            <CheckCircleTwoTone onClick={() => setTargetStep(s)}/>
+                            <Tooltip title='Select Target Final Step'>
+                                <CheckCircleTwoTone onClick={() => setTargetFinalStep(s)}/>
+                            </Tooltip>
+                            <Tooltip title='Select Target Choice Step'>
+                                <CheckSquareTwoTone
+                                    onClick={() => {
+                                    setTargetSelections([]);
+                                    setSelectionFilter('');
+                                    setTargetChoiceStep(s);
+                                }}/>
+                            </Tooltip>
                         </div>
 
                     );
@@ -118,23 +144,25 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
             <Divider/>
             <div>
                 <div>
-                    <b>Target Step:</b> {targetStep ? targetStep.name : 'None'}
+                    <b>Target Final Step:</b> {targetFinalStep ? targetFinalStep.name : 'None'}
                     {'   '}
-                    <b>Target Selection:</b> {targetSelections.length > 0 ? targetSelections.map(s => s.text).join(', ') : 'None'}
+                    <b>Target
+                        Selection:</b> {targetSelections.length > 0 ? targetSelections.map(s => s.text).join(', ') : 'None'}
                     {' '}
-                    {targetStep && targetSelections.length > 0 && <Button type='primary' onClick={() => linkTasks()}>
+                    {targetFinalStep && targetSelections.length > 0 &&
+                    <Button type='primary' onClick={() => linkTasks()}>
                         Link Tasks to Selection
                     </Button>}
                 </div>
-                {targetStep && <div>
+                {targetChoiceStep && <div>
                     <Divider/>
-                    <h3>Choices</h3>
+                    <h3>{targetChoiceStep ? `Step ${targetChoiceStep.name} Choices` : 'Choices'}</h3>
                     <Input onChange={(e) => onFilterSelection(e)}
                            style={{width: '40%', padding: '5px', margin: '5px'}} placeholder="Filter Selection"
                            prefix={<FilterOutlined/>}></Input>
                     <Collapse defaultActiveKey={[]}>
                         {
-                            targetStep.choices.map((choice, i) => {
+                            targetChoiceStep && targetChoiceStep.choices.map((choice, i) => {
                                 return <Panel header={choice.name} key={i}>
                                     {choice.selections.filter((s) => !selectionFilter || isSubsequence(s.text, selectionFilter))
                                         .map(selection => {
@@ -193,5 +221,6 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
     getSteps,
-    getSampleTasks
+    getSampleTasks,
+    setSampleTaskRule
 })(AdminWorkflowTasks);

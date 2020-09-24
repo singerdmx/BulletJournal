@@ -4,9 +4,6 @@ import com.bulletjournal.repository.models.NamedModel;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "sample_tasks", schema = "template")
@@ -28,22 +25,17 @@ public class SampleTask extends NamedModel {
     @Column(name = "uid")
     private String uid;
 
+    @Column(name = "due_date", length = 15)
+    private String dueDate; // "yyyy-MM-dd"
+
+    @Column(name = "due_time", length = 10)
+    private String dueTime; // "HH-mm"
+
     @Column(name = "available_before")
     private Timestamp availableBefore;
 
-    // reminder before task
-    @Column(name = "reminder_before_task")
-    private Integer reminderBeforeTask;
-
-    @ManyToMany(targetEntity = Step.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "steps_sample_tasks", schema = "template",
-            joinColumns = {
-                    @JoinColumn(name = "sample_task_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)},
-            inverseJoinColumns = {
-                    @JoinColumn(name = "step_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)})
-    private List<Step> steps = new ArrayList<>();
+    @Column(name = "time_zone")
+    private String timeZone;
 
     @Override
     public Long getId() {
@@ -66,6 +58,14 @@ public class SampleTask extends NamedModel {
         return content;
     }
 
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
     public void setContent(String content) {
         this.content = content;
     }
@@ -78,6 +78,22 @@ public class SampleTask extends NamedModel {
         this.metadata = metadata;
     }
 
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public String getDueTime() {
+        return dueTime;
+    }
+
+    public void setDueTime(String dueTime) {
+        this.dueTime = dueTime;
+    }
+
     public Timestamp getAvailableBefore() {
         return availableBefore;
     }
@@ -86,29 +102,17 @@ public class SampleTask extends NamedModel {
         this.availableBefore = availableBefore;
     }
 
-    public Integer getReminderBeforeTask() {
-        return reminderBeforeTask;
-    }
-
-    public void setReminderBeforeTask(Integer reminderBeforeTask) {
-        this.reminderBeforeTask = reminderBeforeTask;
-    }
-
-    public List<Step> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
-    }
-
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.SampleTask(
-            id,
-            getName(),
-            content,
-            metadata,
-            steps.stream().map(Step::toPresentationModel).collect(Collectors.toList()),
-            uid);
+                id,
+                getName(),
+                content,
+                metadata,
+                uid,
+                dueDate,
+                dueTime,
+                availableBefore,
+                timeZone
+            );
     }
 }

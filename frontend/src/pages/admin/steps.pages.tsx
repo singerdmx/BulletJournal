@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {getCategory, getSteps, deleteStep} from "../../features/templates/actions";
+import {getCategory, getSteps, deleteStep, cloneStep} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category, Step} from "../../features/templates/interface";
 import {BackTop, Typography} from "antd";
@@ -16,11 +16,12 @@ type AdminStepsProps = {
     steps: Step[];
     getCategory: (categoryId: number) => void;
     getSteps: () => void;
-    deleteStep: (stepId: number) => void
+    deleteStep: (stepId: number) => void;
+    cloneStep: (stepId: number) => void;
 }
 
 const AdminStepsPage: React.FC<AdminStepsProps> = (
-    {category, steps, getCategory, getSteps, deleteStep}) => {
+    {category, steps, getCategory, getSteps, deleteStep, cloneStep}) => {
     const history = useHistory();
     const {categoryId} = useParams();
 
@@ -46,6 +47,7 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
                               onClick={() => history.push(`/admin/steps/${s.id}`)}>{s.name} ({s.id}) 
                         </span>
                         <button onClick={() => deleteStep(s.id)}>Delete Step</button>
+                        <button onClick={() => cloneStep(s.id)}>Clone Step</button>
                     </div>
                     
                 );
@@ -63,5 +65,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getCategory, getSteps, deleteStep
+    getCategory, getSteps, deleteStep, cloneStep
 })(AdminStepsPage);

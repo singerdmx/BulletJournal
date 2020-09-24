@@ -11,10 +11,10 @@
     "application/json"
   ],
   "paths": {
-    "/daemon": {
+    "/dae/public/notifications/{uid}/{action}": {
       "post": {
         "summary": "Serve rest call",
-        "operationId": "Daemon_Rest",
+        "operationId": "Daemon_HandleJoinGroupResponse",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -31,11 +31,27 @@
         },
         "parameters": [
           {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "ACCEPT",
+              "DECLINE"
+            ]
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/typesJoinGroupEvents"
+              "$ref": "#/definitions/typesJoinGroupResponse"
             }
           }
         ],
@@ -145,6 +161,15 @@
         }
       }
     },
+    "typesActionEnum": {
+      "type": "string",
+      "enum": [
+        "ACCEPT",
+        "DECLINE"
+      ],
+      "default": "ACCEPT",
+      "title": "- ACCEPT: ACCEPT means 0\n - DECLINE: DECLINE means 1"
+    },
     "typesEvent": {
       "type": "object",
       "properties": {
@@ -189,14 +214,14 @@
         }
       }
     },
-    "typesJoinGroupEvents": {
+    "typesJoinGroupResponse": {
       "type": "object",
       "properties": {
-        "joinGroupEvents": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/typesJoinGroupEvent"
-          }
+        "uid": {
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/definitions/typesActionEnum"
         }
       }
     },

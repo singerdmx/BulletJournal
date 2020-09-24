@@ -20,6 +20,8 @@ import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.bulletjournal.templates.repository.model.SampleTask;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -436,6 +438,27 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         fillReminderRecordTaskMap(reminderRecordTaskMap, recurringTasks, startTime, endTime);
 
         return reminderRecordTaskMap;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Task createTaskFromSampleTask(
+        Long projectId,
+        String owner,
+        SampleTask sampleTask,
+        Integer reminderBeforeTask,
+        List<String> assignees
+    ) {
+        Preconditions.checkNotNull(assignees);
+        CreateTaskParams params = sampleTaskToCreateTaskParams(
+            sampleTask,
+            reminderBeforeTask,
+            assignees
+        );
+        Task task = create(projectId, owner, params);
+        if (StringUtils.isNotEmpty(sampleTask.getContent())) {
+            addContent(task.getId(), owner, new TaskContent(sampleTask.getContent()));
+        }
+        return task;
     }
 
     /**
@@ -1001,5 +1024,22 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         } else {
             return taskRepository.findTaskWithProjectId(projectIds);
         }
+    }
+
+    private CreateTaskParams sampleTaskToCreateTaskParams(
+        SampleTask sampleTask,
+        Integer reminderBeforeTask,
+        List<String> assignees
+    ) {
+        return new CreateTaskParams(
+                sampleTask.getName(),
+                sampleTask.getDueDate(),
+                sampleTask.getDueTime(),
+                null,
+                reminderBeforeTask == null ? null : new ReminderSetting(null, null, reminderBeforeTask),
+                assignees,
+                sampleTask.getTimeZone(),
+                null
+        );
     }
 }

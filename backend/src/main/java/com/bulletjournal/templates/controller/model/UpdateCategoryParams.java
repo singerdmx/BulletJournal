@@ -1,5 +1,7 @@
 package com.bulletjournal.templates.controller.model;
 
+import javax.validation.constraints.NotNull;
+
 public class UpdateCategoryParams {
     private String name;
 
@@ -14,6 +16,17 @@ public class UpdateCategoryParams {
     private String image;
 
     private Long nextStepId;
+
+    @NotNull
+    private Boolean needStartDate;
+
+    public Boolean getNeedStartDate() {
+        return needStartDate;
+    }
+
+    public void setNeedStartDate(Boolean needStartDate) {
+        this.needStartDate = needStartDate;
+    }
 
     public Long getNextStepId() {
         return nextStepId;

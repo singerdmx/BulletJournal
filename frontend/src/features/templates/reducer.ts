@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {Category, Choice, NextStep, Rule, SampleTask, Step} from './interface';
+import {History} from "history";
 
 export type GetStepsAction = {};
 
@@ -37,7 +38,25 @@ export type GetNextStepAction = {
     first?: boolean;
 };
 
+export type ImportTasksAction = {
+    postOp: Function;
+    sampleTasks: number[];
+    selections: number[];
+    categoryId: number;
+    projectId: number;
+    assignees: string[];
+    reminderBefore: number;
+    labels: number[];
+    subscribed: boolean;
+    startDate?: string;
+    timezone?: string;
+};
+
 export type DeleteStepAction = {
+    stepId: number;
+};
+
+export type CloneStepAction = {
     stepId: number;
 };
 
@@ -55,6 +74,10 @@ export type GetCategoryAction = {
 
 export type CategoriesAction = {
     categories: Category[];
+};
+
+export type LoadingNextStepAction = {
+    loading: boolean;
 };
 
 export type ChoicesAction = {
@@ -78,6 +101,7 @@ export type AddCategoryAction = {
 export type UpdateCategoryAction = {
     categoryId: number;
     name: string;
+    needStartDate: boolean;
     description?: string;
     icon?: string;
     color?: string;
@@ -156,6 +180,7 @@ export type GetSampleTasksAction = {
 
 export type SampleTasksAction = {
     tasks: SampleTask[];
+    scrollId: string;
 };
 
 export type SampleTaskAction = {
@@ -177,11 +202,29 @@ export type UpdateSampleTaskAction = {
     metadata: string;
 };
 
+export type GetSampleTasksByScrollIdAction = {
+    scrollId: string;
+    pageSize: number;
+};
+
 export type GetSampleTaskAction = {
     sampleTaskId: number;
 };
 
+export type SetSampleTaskRuleAction = {
+    stepId: number;
+    selectionCombo: string;
+    taskIds: string;
+};
+
+export type RemoveSampleTaskRuleAction = {
+    stepId: number;
+    selectionCombo: string;
+};
+
 let initialState = {
+    loadingNextStep: false,
+    scrollId: '',
     categories: [] as Category[],
     category: undefined as Category | undefined,
     choices: [] as Choice[],
@@ -197,6 +240,10 @@ const slice = createSlice({
     name: 'templates',
     initialState,
     reducers: {
+        loadingNextStepReceived: (state, action: PayloadAction<LoadingNextStepAction>) => {
+            const {loading} = action.payload;
+            state.loadingNextStep = loading;
+        },
         categoriesReceived: (state, action: PayloadAction<CategoriesAction>) => {
             const {categories} = action.payload;
             state.categories = categories;
@@ -250,8 +297,9 @@ const slice = createSlice({
         createRule: (state, action: PayloadAction<AddRuleAction>) => state,
         removeRule: (state, action: PayloadAction<RemoveRuleAction>) => state,
         sampleTasksReceived: (state, action: PayloadAction<SampleTasksAction>) => {
-            const {tasks} = action.payload;
+            const {tasks, scrollId} = action.payload;
             state.sampleTasks = tasks;
+            state.scrollId = scrollId;
         },
         getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
         addSampleTask: (state, action: PayloadAction<AddSampleTaskAction>) => state,
@@ -262,6 +310,11 @@ const slice = createSlice({
             state.sampleTask = task;
         },
         removeSampleTask: (state, action: PayloadAction<RemoveSampleTaskAction>) => state,
+        copyStep: (state, action: PayloadAction<CloneStepAction>) => state,
+        getSampleTasksByScrollId: (state, action: PayloadAction<GetSampleTasksByScrollIdAction>) => state,
+        importTasks: (state, action: PayloadAction<ImportTasksAction>) => state,
+        setSampleTaskRule: (state, action: PayloadAction<SetSampleTaskRuleAction>) => state,
+        removeSampleTaskRule: (state, action: PayloadAction<RemoveSampleTaskRuleAction>) => state,
     },
 });
 

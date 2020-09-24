@@ -38,7 +38,7 @@ const PublicNotificationsPage: React.FC<PublicNotificationsProps> = (props) => {
     console.log(`/dae/public/notifications/${id}/answer?action=${action}`);
     setTimeout(() => {
       handleAnswer(id, action);
-    }, 3000)
+    }, 3000);
   }
 
   const fullHeight = global.window.innerHeight;

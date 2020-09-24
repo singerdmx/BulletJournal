@@ -26,6 +26,7 @@ type Config struct {
 	Password               string
 	Database               string
 	DBPort                 string
+	RedisPort              string
 	RPCPort                string
 	HttpPort               string
 	Host                   string
@@ -70,6 +71,10 @@ func Validate(c *Config) bool {
 		valid = false
 		_ = fmt.Errorf("database port is missing from config")
 	}
+	if c.RedisPort == "" {
+		valid = false
+		_ = fmt.Errorf("redis port is missing from config")
+	}
 	if c.HttpPort == "" {
 		valid = false
 		_ = fmt.Errorf("http port is missing from config")
@@ -102,7 +107,7 @@ func Validate(c *Config) bool {
 	return valid
 }
 
-func init() {
+func InitConfig() {
 	isProd := flag.Bool("prod", false, "set config to production env")
 	isDev := flag.Bool("dev", false, "set config to development env")
 	flag.Parse()
@@ -138,7 +143,6 @@ func SetConfig(configName string) {
 	if err != nil {
 		log.Fatalf("could not decode config into struct: %v", err)
 	}
-
 }
 
 func PrintConfig() {
@@ -150,6 +154,7 @@ func PrintConfig() {
 	fmt.Printf("Database:%s%s\n", tab, serviceConfig.Database)
 	fmt.Printf("Database Port:%s%s\n", tab, serviceConfig.DBPort)
 	fmt.Printf("RPC Port:%s%s\n", tab, serviceConfig.RPCPort)
+	fmt.Printf("Redis Port:%s%s\n", tab, serviceConfig.RedisPort)
 	fmt.Printf("HTTP Port:%s%s\n", tab, serviceConfig.HttpPort)
 	fmt.Printf("Host:%s\t%s\n", tab, serviceConfig.Host)
 	fmt.Printf("DB Driver:%s%s\n", tab, serviceConfig.DBDriver)

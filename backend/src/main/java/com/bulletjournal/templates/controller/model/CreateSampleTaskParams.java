@@ -6,6 +6,8 @@ public class CreateSampleTaskParams {
 
     private String content;
 
+    private String timeZone;
+
     private String metadata;
 
     private String uid;
@@ -32,6 +34,14 @@ public class CreateSampleTaskParams {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public String getUid() {

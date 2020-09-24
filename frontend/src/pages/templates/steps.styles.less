@@ -40,6 +40,40 @@ div.choices-card {
     width: 95%;
     border-radius: 8px;
     padding: 3px;
+
+    & span {
+      color: #4ddbff;
+    }
+  }
+  div.sample-tasks {
+    align-items: self-start;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    div.sample-task {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      width: 100%;
+      border-radius: 5px;
+      padding: 3px;
+      margin: 3px;
+      max-width: 200px;
+      word-wrap: break-word;
+      background-color: #b8f1ed;
+      min-height: 65px;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+  }
+
+  div.import-card {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 3px;
   }
 }
 
@@ -48,6 +82,7 @@ div.go-back {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  margin-left: -5%;
   padding-top: 8px;
 }
 
@@ -56,8 +91,8 @@ div.confirm-button {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  margin-left: -5%;
+  padding: 8px;
 }
 
 div.coming-soon {
@@ -74,4 +109,14 @@ div.coming-soon {
     border-radius: 10px;
   }
 
+}
+
+div.subscribe-updates {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 8px;
+  margin-left: -5px;
 }

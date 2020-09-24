@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {deleteStep, getStep, setStepChoices} from "../../features/templates/actions";
+import {deleteStep, getStep, setStepChoices, updateStep} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Step} from "../../features/templates/interface";
 import {BackTop, Button, Divider, InputNumber, Tooltip, Typography} from "antd";
@@ -19,10 +19,11 @@ type AdminStepProps = {
     getStep: (stepId: number) => void;
     deleteStep: (stepId: number) => void;
     setStepChoices: (id: number, choices: number[]) => void;
+    updateStep: (stepId: number, name: string, nextStepId: number | undefined) => void;
 }
 
 const AdminStepPage: React.FC<AdminStepProps> = (
-    {step, getStep, deleteStep, setStepChoices}) => {
+    {step, getStep, deleteStep, setStepChoices, updateStep}) => {
     const history = useHistory();
     const {stepId} = useParams();
 
@@ -55,10 +56,15 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         
     }
 
+    const nameChange = (input: any) => {
+        console.log(input);
+        updateStep(step.id, input, step.nextStepId);
+    }
+
     return <div className='steps-page'>
         <BackTop/>
         <div><DeleteFilled onClick={handleDelete}/></div>
-        <h2>{step.name}</h2>
+        <Title editable={{onChange: nameChange}}>{step.name}</Title>
         <div></div>
         <Divider/>
         <h3>Choices</h3>
@@ -103,5 +109,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getStep, deleteStep, setStepChoices
+    getStep, deleteStep, setStepChoices, updateStep
 })(AdminStepPage);

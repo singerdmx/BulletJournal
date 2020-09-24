@@ -38,8 +38,10 @@ var (
 const cookieName = "__discourse_proxy"
 const homePage = "/home/index.html"
 const tokenPage = "/tokens/"
+const systemUpdateRoute = "/api/system/updates"
 const tokenForCookieUrl = "/api/tokens/"
 const guestUsername = "Guest"
+const ssoLoginUrlPrefix = "/sso_login"
 var guestToken string = ""
 
 func main() {
@@ -105,9 +107,10 @@ func main() {
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasPrefix(r.URL.Path, "/api/system/updates") {
+		if !strings.HasPrefix(r.URL.Path, systemUpdateRoute) {
 			logger.Printf("Request %s %s", r.Host, r.URL)
 		}
+
 		if r.Host == "home.bulletjournal.us" {
 			logger.Printf("Port 443: Redirect to 80: %s", r.RequestURI)
 			http.Redirect(w, r, "http://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
@@ -237,7 +240,9 @@ func redirectIfNoCookie(handler http.Handler, r *http.Request, w http.ResponseWr
 }
 
 func forwardToNginx(handler http.Handler, r *http.Request, w http.ResponseWriter, username string, groups string) {
-	logger.Printf("%s %s, %s", r.Header.Get("request-id"), username, r.RequestURI)
+	if !strings.HasPrefix(r.URL.Path, systemUpdateRoute) {
+		logger.Printf("%s %s, %s", r.Header.Get("request-id"), username, r.RequestURI)
+	}
 	r.Header.Set(config.UsernameHeader, username)
 	r.Header.Set(config.GroupsHeader, groups)
 	handler.ServeHTTP(w, r)
@@ -336,7 +341,10 @@ func shouldByPass(r *http.Request) bool {
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/oauth2_basic/callback") ||
 		strings.HasPrefix(r.RequestURI, "/api/calendar/google/channel/notifications") ||
 		strings.HasSuffix(r.RequestURI, "/manifest.json") ||
-		strings.HasSuffix(r.RequestURI, ".ico")
+		strings.HasSuffix(r.RequestURI, ".ico") ||
+		strings.HasSuffix(r.RequestURI, ".less") ||
+		strings.HasSuffix(r.RequestURI, ".css") ||
+		strings.HasSuffix(r.RequestURI, ".js")
 }
 
 func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
@@ -412,13 +420,17 @@ func handleSSOReturn(sso string, fail func(format string, v ...interface{}),
 		tokenCache.Add(token, cookieValue)
 		tokenMutex.Unlock()
 	}
+	if strings.HasPrefix(returnUrl, ssoLoginUrlPrefix) {
+		returnUrl = strings.TrimPrefix(returnUrl, ssoLoginUrlPrefix)
+		logger.Printf("returnUrl %s after trimmed", returnUrl)
+	}
 
 	// works around weird safari stuff
 	fmt.Fprintf(w, "<html><head></head><body><script>window.location = '%v'</script></body>", returnUrl)
 }
 
 func isMobile(r *http.Request) bool {
-	if strings.HasPrefix(r.RequestURI, "/api") {
+	if strings.HasPrefix(r.RequestURI, "/api") || strings.HasPrefix(r.RequestURI, ssoLoginUrlPrefix){
 		return false
 	}
 	header := strings.ToLower(r.Header.Get("User-Agent"))

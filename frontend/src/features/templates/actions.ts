@@ -1,5 +1,5 @@
 import {actions} from './reducer';
-import {Category, NextStep} from "./interface";
+import {Category, NextStep, SampleTask} from "./interface";
 
 export const getCategories = () => actions.getCategories({});
 
@@ -17,11 +17,12 @@ export const addCategory = (
     });
 
 export const updateCategory = (
-    categoryId: number, name: string, description?: string, icon?: string,
+    categoryId: number, name: string, needStartDate: boolean, description?: string, icon?: string,
     color?: string, forumId?: number, image?: string, nextStepId?: number) =>
     actions.updateCategory({
         categoryId: categoryId,
         name: name,
+        needStartDate: needStartDate,
         description: description,
         icon: icon,
         color: color,
@@ -65,7 +66,7 @@ export const getStep = (stepId: number) => actions.getStep({stepId: stepId});
 
 export const createStep = (name: string, nextStepId: number | undefined) => actions.createStep({name: name, nextStepId: nextStepId});
 
-export const updateStep = (stepId: number, name: string, nextStepId: number | undefined) => actions.createStep({
+export const updateStep = (stepId: number, name: string, nextStepId: number | undefined) => actions.updateStep({
     stepId: stepId, 
     name: name, 
     nextStepId: nextStepId
@@ -82,6 +83,9 @@ export const setStepChoices = (id: number, choices: number[]) => actions.setStep
 });
 
 export const nextStepReceived = (nextStep: NextStep | undefined) => actions.nextStepReceived({step: nextStep});
+
+export const sampleTasksReceived = (sampleTasks: SampleTask[], scrollId: string) =>
+    actions.sampleTasksReceived({tasks: sampleTasks, scrollId: scrollId});
 
 export const createRule = (name: string, priority: number, connectedStepId: number,
                            ruleExpression: string, categoryId?: number, stepId?: number) => actions.createRule({
@@ -107,3 +111,23 @@ export const removeSampleTask = (sampleTaskId: number) =>
 
 export const updateSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) =>
     actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, uid: uid, content: content, metadata: metadata});
+
+export const cloneStep = (stepId: number) => actions.copyStep({stepId: stepId});
+
+export const getSampleTasksByScrollId = (scrollId: string, pageSize: number) => actions.getSampleTasksByScrollId({
+    scrollId: scrollId, pageSize: pageSize});
+
+export const importTasks = (postOp: Function,
+                            sampleTasks: number[], selections: number[], categoryId: number,
+                            projectId: number, assignees: string[],
+                            reminderBefore: number, labels: number[], subscribed: boolean,
+                            startDate?: string, timezone?: string) => actions.importTasks({
+    postOp: postOp, sampleTasks: sampleTasks, selections: selections, categoryId: categoryId,
+    projectId: projectId, assignees: assignees,
+    reminderBefore: reminderBefore, labels: labels, subscribed: subscribed, startDate: startDate, timezone: timezone});
+
+export const setSampleTaskRule = (stepId: number, selectionCombo: string, taskIds: string) =>
+    actions.setSampleTaskRule({stepId: stepId, selectionCombo: selectionCombo, taskIds: taskIds});
+
+export const removeSampleTaskRule = (stepId: number, selectionCombo: string) => actions.removeSampleTaskRule({
+    stepId: stepId, selectionCombo: selectionCombo});

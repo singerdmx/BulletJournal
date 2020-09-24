@@ -82,7 +82,7 @@ public class CategoryController {
     @PostMapping(CATEGORIES_ROUTE)
     public Category createCategory(@Valid @RequestBody CreateCategoryParams params) {
         validateRequester();
-        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId(), params.getImage(), params.getNextStepId()).toPresentationModel();
+        return this.categoryDaoJpa.create(params.getName(), params.getDescription(), params.getIcon(), params.getColor(), params.getForumId(), params.getImage(), params.getNextStepId(), params.getNeedStartDate()).toPresentationModel();
     }
 
     @PutMapping(CATEGORIES_ROUTE)
@@ -107,7 +107,8 @@ public class CategoryController {
         categoryDaoJpa.updateCategory(categoryId, updateCategoryParams.getName(),
                 updateCategoryParams.getIcon(), updateCategoryParams.getColor(),
                 updateCategoryParams.getForumId(), updateCategoryParams.getDescription(),
-                updateCategoryParams.getImage(), updateCategoryParams.getNextStepId());
+                updateCategoryParams.getImage(), updateCategoryParams.getNextStepId(),
+                updateCategoryParams.getNeedStartDate());
         return getCategory(categoryId);
     }
 
@@ -123,6 +124,7 @@ public class CategoryController {
                 category.setChoices(categoryFromDb.getChoices());
                 category.setNextStepId(categoryFromDb.getNextStepId());
                 category.setRules(categoryFromDb.getRules());
+                category.setNeedStartDate(categoryFromDb.getNeedStartDate());
                 return category;
             }
             category.getSubCategories().forEach(deque::offer);
