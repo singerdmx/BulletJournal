@@ -117,12 +117,12 @@ export const cloneStep = (stepId: number) => actions.copyStep({stepId: stepId});
 export const getSampleTasksByScrollId = (scrollId: string, pageSize: number) => actions.getSampleTasksByScrollId({
     scrollId: scrollId, pageSize: pageSize});
 
-export const importTasks = (postOp: Function,
+export const importTasks = (postOp: Function, timeoutOp: Function,
                             sampleTasks: number[], selections: number[], categoryId: number,
                             projectId: number, assignees: string[],
                             reminderBefore: number, labels: number[], subscribed: boolean,
                             startDate?: string, timezone?: string) => actions.importTasks({
-    postOp: postOp, sampleTasks: sampleTasks, selections: selections, categoryId: categoryId,
+    postOp: postOp, timeoutOp: timeoutOp, sampleTasks: sampleTasks, selections: selections, categoryId: categoryId,
     projectId: projectId, assignees: assignees,
     reminderBefore: reminderBefore, labels: labels, subscribed: subscribed, startDate: startDate, timezone: timezone});
 

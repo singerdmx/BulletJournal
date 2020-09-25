@@ -440,9 +440,9 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
     return;
   }
   yield put(templatesActions.loadingNextStepReceived({loading: true}));
+  const {postOp, timeoutOp, categoryId, projectId, assignees, reminderBefore,
+    sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
   try {
-    const {postOp, categoryId, projectId, assignees, reminderBefore,
-      sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
     const data: SampleTask[] = yield call(importSampleTasks, sampleTasks, selections, categoryId,
         projectId, assignees, state.templates.scrollId, reminderBefore, labels, subscribed, startDate, timezone);
     yield put(templatesActions.sampleTasksReceived({tasks: data, scrollId: ''}));
@@ -454,6 +454,8 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
+    } else if (error.message === '504') {
+      timeoutOp();
     } else {
       yield call(message.error, `importTasks Error Received: ${error}`);
     }

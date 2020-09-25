@@ -40,6 +40,7 @@ export type GetNextStepAction = {
 
 export type ImportTasksAction = {
     postOp: Function;
+    timeoutOp: Function;
     sampleTasks: number[];
     selections: number[];
     categoryId: number;

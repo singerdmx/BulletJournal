@@ -41,7 +41,7 @@ type StepsImportTasksProps = {
     labelsUpdate: (projectId: number | undefined) => void;
     sampleTasksReceived: (sampleTasks: SampleTask[], scrollId: string) => void;
     hideImportTasksCard: () => void;
-    importTasks: (postOp: Function,
+    importTasks: (postOp: Function, timeoutOp: Function,
                   sampleTasks: number[], selections: number[], categoryId: number,
                   projectId: number, assignees: string[],
                   reminderBefore: number, labels: number[], subscribed: boolean,
@@ -176,7 +176,25 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                             window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
                         }, 5000);
                     }
-                }, getSampleTasks().map(s => s.id), curSelections, category.id,
+                },
+                () => {
+                    notification.open({
+                        placement: 'bottomRight',
+                        message: 'We are still working on importing these events',
+                        description: 'Please go to your BuJo later to view them',
+                        icon: <SmileOutlined style={{color: '#4ddbff'}}/>,
+                    });
+                    if (isMobile()) {
+                        setTimeout(() => {
+                            window.location.href = `${window.location.protocol}//${window.location.host}/public/templates`;
+                        }, 5000);
+                    } else {
+                        setTimeout(() => {
+                            window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
+                        }, 5000);
+                    }
+                },
+                getSampleTasks().map(s => s.id), curSelections, category.id,
                 projectId, assignees,
                 reminderBefore === undefined ? before : reminderBefore, labels, subscribed,
                 startDate, targetTimezone ? targetTimezone : timezone);

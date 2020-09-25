@@ -255,7 +255,6 @@ const StepsPage: React.FC<StepsProps> = (
         curStep.choices.forEach(c => {
             selected = selected.concat(selections[c.id]);
         });
-        console.log(selected);
 
         let prevSelections = [] as number[];
 
@@ -264,7 +263,6 @@ const StepsPage: React.FC<StepsProps> = (
                 prevSelections = prevSelections.concat(selections[k]);
             }
         });
-        console.log(prevSelections);
         getNextStep(curStep.id, selected, prevSelections, getSteps().length === 1);
     }
 
