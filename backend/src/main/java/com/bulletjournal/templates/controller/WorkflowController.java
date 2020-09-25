@@ -212,14 +212,14 @@ public class WorkflowController {
     }
 
     @PostMapping(PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE)
-    public void importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
+    public List<SampleTask> importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String scrollId = importTasksParams.getScrollId();
         if (StringUtils.isNotBlank(scrollId)) {
             importTasksParams.getSampleTasks().addAll(
                     CACHE.remove(scrollId).stream().map(t -> t.getId()).collect(Collectors.toList()));
         }
-        this.ruleEngine.importTasks(username, importTasksParams);
+        return this.ruleEngine.importTasks(username, importTasksParams);
     }
 
     @PostMapping(SAMPLE_TASKS_ROUTE)
