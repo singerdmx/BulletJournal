@@ -295,26 +295,13 @@ const StepsPage: React.FC<StepsProps> = (
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
             const data: SampleTasks = JSON.parse(sampleTasksText);
-            sampleTasksReceived(data.sampleTasks, data.scrollId);
+            if (data.sampleTasks && data.sampleTasks.length > 0) {
+                sampleTasksReceived(data.sampleTasks, data.scrollId ? data.scrollId : '');
+            }
             return data.sampleTasks;
         }
 
         return [];
-    }
-
-    const getScrollId = () => {
-        if (scrollId) {
-            return scrollId;
-        }
-
-        const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
-        if (sampleTasksText) {
-            const data: SampleTasks = JSON.parse(sampleTasksText);
-            sampleTasksReceived(data.sampleTasks, data.scrollId);
-            return data.scrollId;
-        }
-
-        return '';
     }
 
     const onRemoveTask = (id: number) => {
@@ -334,6 +321,7 @@ const StepsPage: React.FC<StepsProps> = (
         const existingSteps = getSteps();
         if (existingSteps.length > 0) {
             const curStep = getCurrentStep();
+            const tasks = getSampleTasks();
             return <div>
                 <div className='choices-card'>
                     {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
@@ -349,8 +337,8 @@ const StepsPage: React.FC<StepsProps> = (
                             return renderChoice(choice);
                         })}
                     </div>
-                    {getSampleTasks().length > 0 && <div className='sample-tasks'>
-                        {getSampleTasks().map((sampleTask: SampleTask) => {
+                    {tasks.length > 0 && <div className='sample-tasks'>
+                        {tasks.map((sampleTask: SampleTask) => {
                             return <div className='sample-task'>
                                 <div className='remove-task-icon'>
                                     <Tooltip title='Remove this'>
@@ -367,12 +355,12 @@ const StepsPage: React.FC<StepsProps> = (
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Next
                         </Button>}
-                        {getScrollId() && <Button
+                        {scrollId && <Button
                             onClick={onScrollNext}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             More
                         </Button>}
-                        {getSampleTasks().length > 0 && showApplyButton && <Button
+                        {tasks.length > 0 && showApplyButton && <Button
                             onClick={onApplySampleTasks}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Apply

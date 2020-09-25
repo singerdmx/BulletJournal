@@ -119,7 +119,6 @@ function* fetchCategory(action: PayloadAction<GetCategoryAction>) {
   try {
     const {categoryId} = action.payload;
     const data: Category = yield call(getCategory, categoryId);
-    console.log(data)
     yield put(templatesActions.categoryReceived({category: data}));
     yield put(templatesActions.nextStepReceived({step: undefined}));
   } catch (error) {
@@ -418,7 +417,7 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
     const {stepId, selections, prevSelections, first} = action.payload;
     const nextStep: NextStep = yield call(getNext, stepId, selections, prevSelections, first);
     yield put(templatesActions.nextStepReceived({step: nextStep}));
-    if (nextStep.sampleTasks) {
+    if (nextStep.sampleTasks && nextStep.sampleTasks.length > 0) {
       yield put(templatesActions.sampleTasksReceived({tasks: nextStep.sampleTasks, scrollId: nextStep.scrollId}));
       localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
         sampleTasks: nextStep.sampleTasks,
