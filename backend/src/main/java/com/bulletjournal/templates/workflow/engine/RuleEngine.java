@@ -64,20 +64,20 @@ public class RuleEngine {
 
         User user = this.userDaoJpa.getByName(requester);
 
+        String timezone = importTasksParams.getTimezone();
+        if (StringUtils.isBlank(timezone)) {
+            timezone = user.getTimezone();
+        }
         if (!tasksNeedTimingArrangement.isEmpty()) {
             tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid())));
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
                 startDay = ZonedDateTimeHelper.getStartTime(
-                        importTasksParams.getStartDate(), null, importTasksParams.getTimezone());
+                        importTasksParams.getStartDate(), null, timezone);
             } else {
-                startDay = ZonedDateTime.now().plusDays(1);
-            }
-
-            String timezone = importTasksParams.getTimezone();
-            if (StringUtils.isBlank(timezone)) {
-                timezone = user.getTimezone();
+                startDay = ZonedDateTimeHelper.getStartTime(
+                        ZonedDateTime.now().plusDays(1).format(ZonedDateTimeHelper.DATE_FORMATTER), null, timezone);
             }
             int frequency = getTimesOneDay(importTasksParams.getSelections(), importTasksParams.getCategoryId());
             int startIndex = 0;
@@ -86,7 +86,6 @@ public class RuleEngine {
                 ZonedDateTime startTime = startDay.plusHours(21).plusDays(numOfDay++);
                 for (int i = 0; i < frequency && startIndex < tasksNeedTimingArrangement.size(); startIndex++, i++) {
                     com.bulletjournal.templates.controller.model.SampleTask sampleTask = tasksNeedTimingArrangement.get(startIndex);
-                    System.out.println(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
                     sampleTask.setDueDate(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
                     sampleTask.setDueTime(startTime.format(ZonedDateTimeHelper.TIME_FORMATTER));
                     sampleTask.setTimeZone(timezone);
