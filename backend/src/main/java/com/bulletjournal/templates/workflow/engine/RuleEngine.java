@@ -94,9 +94,7 @@ public class RuleEngine {
             }
         }
 
-        tasksNeedTimingArrangement.forEach(sampleTask -> {
-            this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, sampleTask, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
-        });
+        this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, tasksNeedTimingArrangement, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
 
         if (importTasksParams.isSubscribed()) {
             this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());

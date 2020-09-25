@@ -216,13 +216,15 @@ public class TaskControllerTest {
         String timeZone = "America/Los_Angeles";
 
         com.bulletjournal.templates.controller.model.SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel();
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = new ArrayList<>();
+        sampleTasks.add(sampleTask);
         sampleTask.setTimeZone(timeZone);
-        com.bulletjournal.repository.models.Task task
-            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees, new ArrayList<>());
-        assertNotNull(task);
-        assertEquals(owner, task.getOwner());
-        assertTrue(assignees.size() == task.getAssignees().size() && assignees.containsAll(task.getAssignees()));
-        TaskContent content = Iterables.getOnlyElement(taskContentRepository.findTaskContentByTask(task));
+        List<com.bulletjournal.repository.models.Task> tasks
+            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTasks, reminderBeforeTask, assignees, new ArrayList<>());
+        assertNotNull(tasks.get(0));
+        assertEquals(owner, tasks.get(0).getOwner());
+        assertTrue(assignees.size() == tasks.get(0).getAssignees().size() && assignees.containsAll(tasks.get(0).getAssignees()));
+        TaskContent content = Iterables.getOnlyElement(taskContentRepository.findTaskContentByTask(tasks.get(0)));
         assertNotNull(content);
     }
 

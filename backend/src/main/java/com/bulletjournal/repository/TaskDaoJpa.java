@@ -440,26 +440,28 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task createTaskFromSampleTask(
+    public List<Task> createTaskFromSampleTask(
         Long projectId,
         String owner,
-        com.bulletjournal.templates.controller.model.SampleTask sampleTask,
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
         Integer reminderBeforeTask,
         List<String> assignees,
         List<Long> labels
     ) {
         Preconditions.checkNotNull(assignees);
-        CreateTaskParams params = sampleTaskToCreateTaskParams(
-            sampleTask,
-            reminderBeforeTask,
-            assignees,
-            labels
-        );
-        Task task = create(projectId, owner, params);
-        if (StringUtils.isNotEmpty(sampleTask.getContent())) {
-            addContent(task.getId(), owner, new TaskContent(sampleTask.getContent()));
-        }
-        return task;
+        List<CreateTaskParams> createTaskParams = new ArrayList<>();
+        sampleTasks.forEach(sampleTask -> {
+            createTaskParams.add(sampleTaskToCreateTaskParams(
+                    sampleTask,
+                    reminderBeforeTask,
+                    assignees,
+                    labels)
+            );
+        });
+        List<Task> tasks = create(projectId, owner, createTaskParams);
+        addContent(tasks.stream().map(Task::getId).collect(Collectors.toList()), tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList()),
+                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()));
+        return tasks;
     }
 
     /**
