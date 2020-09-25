@@ -35,7 +35,7 @@ public class WorkflowController {
 
     public static final String NEXT_STEP_ROUTE = "/api/public/steps/{stepId}/next";
     public static final String PUBLIC_SAMPLE_TASKS_ROUTE = "/api/public/sampleTasks";
-    public static final String PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE = "/api/public/sampleTasks/import";
+    public static final String SAMPLE_TASKS_IMPORT_ROUTE = "/api/sampleTasks/import";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
@@ -211,7 +211,7 @@ public class WorkflowController {
         return false;
     }
 
-    @PostMapping(PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE)
+    @PostMapping(SAMPLE_TASKS_IMPORT_ROUTE)
     public List<SampleTask> importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String scrollId = importTasksParams.getScrollId();
