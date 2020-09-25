@@ -163,7 +163,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             populateContent(owner, content, projectItem);
             batch.add(content);
         }
-        this.getContentJpaRepository().saveAll(batch);
+        if (!batch.isEmpty()) {
+            this.getContentJpaRepository().saveAll(batch);
+        }
 
         if (contents.size() <= CONTENT_BATCH_SIZE) {
             return;
