@@ -28,6 +28,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -38,6 +40,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     private static final Gson GSON = new Gson();
+
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Autowired
     protected LabelDaoJpa labelDaoJpa;
@@ -150,7 +155,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.sharedProjectItemDaoJpa.deleteSharedProjectItemWithUser(projectItem, requester);
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> List<Pair<ContentModel, T>> addContent(List<T> projectItems, List<String> owners, List<K> contents) {
         for (int i = 0; i < contents.size(); i++) {
             K content = contents.get(i);
@@ -158,8 +162,31 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             T projectItem = projectItems.get(i);
             populateContent(owner, content, projectItem);
         }
-        this.getContentJpaRepository().saveAll(contents);
-        return contents.stream().map(content -> Pair.of((ContentModel) content, (T) content.getProjectItem())).collect(Collectors.toList());
+        List<K> batch = new ArrayList<>();
+        List<K> result = new ArrayList<>();
+        for (K content : contents) {
+            batch.add(content);
+            if (batch.size() == 50) {
+                result.addAll(this.getContentJpaRepository().saveAll(batch));
+                batch.clear();
+                entityManager.flush();
+                entityManager.clear();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        if (!batch.isEmpty()) {
+            result.addAll(this.getContentJpaRepository().saveAll(batch));
+            entityManager.flush();
+            entityManager.clear();
+        }
+
+        return result.stream()
+                .map(content -> Pair.of((ContentModel) content, (T) content.getProjectItem()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

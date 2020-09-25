@@ -44,6 +44,7 @@ import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Repository
@@ -297,9 +298,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 ZonedDateTimeHelper.toDBTimestamp(startTime), ZonedDateTimeHelper.toDBTimestamp(endTime), projectIds);
         tasks = tasks.stream().filter(t -> {
             if (Objects.isNull(t.getRecurrenceRule())) {
-                LOGGER.error("Recurring Task with Due DateTime.");
                 return true;
             }
+            LOGGER.error("Recurring Task {} with Due DateTime.", t.getId());
             return false;
         }).collect(Collectors.toList());
 
@@ -439,7 +440,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return reminderRecordTaskMap;
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> createTaskFromSampleTask(
         Long projectId,
         String owner,
@@ -450,17 +450,17 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     ) {
         Preconditions.checkNotNull(assignees);
         List<CreateTaskParams> createTaskParams = new ArrayList<>();
-        sampleTasks.forEach(sampleTask -> {
-            createTaskParams.add(sampleTaskToCreateTaskParams(
-                    sampleTask,
-                    reminderBeforeTask,
-                    assignees,
-                    labels)
-            );
-        });
+        sampleTasks.forEach(sampleTask -> createTaskParams.add(sampleTaskToCreateTaskParams(
+                sampleTask,
+                reminderBeforeTask,
+                assignees,
+                labels)
+        ));
         List<Task> tasks = create(projectId, owner, createTaskParams);
-        addContent(tasks, tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList()),
-                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()));
+        // TODO: use notification service
+        CompletableFuture.runAsync(() -> addContent(tasks, tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList()),
+                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList())));
+
         return tasks;
     }
 
@@ -482,7 +482,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository.saveAndFlush(task);
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> create(Long projectId, String owner, List<CreateTaskParams> createTaskParamsList) {
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
@@ -491,7 +490,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<Task> tasks = createTaskParamsList.stream()
                 .map(createTaskParams -> generateTask(owner, project, createTaskParams)).collect(Collectors.toList());
 
-        return this.taskRepository.saveAll(tasks);
+        List<Task> batch = new ArrayList<>();
+        List<Task> result = new ArrayList<>();
+        for (Task task : tasks) {
+            batch.add(task);
+            if (batch.size() == 200) {
+                result.addAll(this.taskRepository.saveAll(batch));
+                batch.clear();
+                entityManager.flush();
+                entityManager.clear();
+            }
+        }
+        if (!batch.isEmpty()) {
+            result.addAll(this.taskRepository.saveAll(batch));
+            entityManager.flush();
+            entityManager.clear();
+        }
+        return result;
     }
 
     private Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
