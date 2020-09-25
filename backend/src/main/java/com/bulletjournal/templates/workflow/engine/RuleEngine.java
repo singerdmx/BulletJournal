@@ -12,6 +12,8 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -52,11 +54,12 @@ public class RuleEngine {
     @Autowired
     private CategoryDaoJpa categoryDaoJpa;
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void importTasks(String requester, ImportTasksParams importTasksParams) {
         List<SampleTask> sampleTasks = sampleTaskDaoJpa
                 .findAllById(importTasksParams.getSampleTasks());
         // if there is any sample task that does not have due date, we need to set due date for it
-        List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream().map(sampleTask -> sampleTask.toPresentationModel())
+        List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream().map(SampleTask::toPresentationModel)
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
         User user = this.userDaoJpa.getByName(requester);
@@ -92,7 +95,9 @@ public class RuleEngine {
             }
         }
 
-//        this.taskDaoJpa.createTaskFromSampleTask();
+        tasksNeedTimingArrangement.forEach(sampleTask -> {
+            this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, sampleTask, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
+        });
 
         if (importTasksParams.isSubscribed()) {
             this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());

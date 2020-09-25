@@ -8,7 +8,6 @@ import com.bulletjournal.repository.TaskContentRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.TaskContent;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
-import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -216,7 +215,7 @@ public class TaskControllerTest {
         List<String> assignees = Arrays.asList("Xavier", "Scarlet");
         String timeZone = "America/Los_Angeles";
 
-        SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
+        com.bulletjournal.templates.controller.model.SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel();
         sampleTask.setTimeZone(timeZone);
         com.bulletjournal.repository.models.Task task
             = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees, new ArrayList<>());

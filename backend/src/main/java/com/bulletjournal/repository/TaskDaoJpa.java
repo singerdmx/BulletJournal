@@ -20,7 +20,6 @@ import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.bulletjournal.templates.repository.model.SampleTask;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -444,7 +443,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public Task createTaskFromSampleTask(
         Long projectId,
         String owner,
-        SampleTask sampleTask,
+        com.bulletjournal.templates.controller.model.SampleTask sampleTask,
         Integer reminderBeforeTask,
         List<String> assignees,
         List<Long> labels
@@ -1029,7 +1028,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     private CreateTaskParams sampleTaskToCreateTaskParams(
-        SampleTask sampleTask,
+        com.bulletjournal.templates.controller.model.SampleTask sampleTask,
         Integer reminderBeforeTask,
         List<String> assignees,
         List<Long> labels
