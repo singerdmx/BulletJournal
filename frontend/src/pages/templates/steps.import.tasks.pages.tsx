@@ -18,10 +18,10 @@ import {Label} from "../../features/label/interface";
 import {getIcon} from "../../components/draggable-labels/draggable-label-list.component";
 import {ReminderBeforeTaskText} from "../../components/settings/reducer";
 import {QuestionCircleTwoTone, SmileOutlined} from "@ant-design/icons";
-import {Category, SampleTask} from "../../features/templates/interface";
+import {Category, SampleTask, SampleTasks} from "../../features/templates/interface";
 import {zones} from "../../components/settings/constants";
 import {importTasks} from "../../features/templates/actions";
-import {getSelections, isMobile} from "./steps.pages";
+import {getSelections, isMobile, SAMPLE_TASKS} from "./steps.pages";
 
 const {Option} = Select;
 
@@ -135,6 +135,20 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         setSubscribed(value.target.checked);
     }
 
+    const getSampleTasks = () => {
+        if (sampleTasks && sampleTasks.length > 0) {
+            return sampleTasks;
+        }
+
+        const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
+        if (sampleTasksText) {
+            const data: SampleTasks = JSON.parse(sampleTasksText);
+            return data.sampleTasks;
+        }
+
+        return [];
+    }
+
     const onClickImport = () => {
         const selections = getSelections();
         let curSelections = [] as number[];
@@ -156,7 +170,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                     } else {
                         window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
                     }
-                }, sampleTasks.map(s => s.id), curSelections, category.id,
+                }, getSampleTasks().map(s => s.id), curSelections, category.id,
                 projectId, assignees,
                 reminderBefore === undefined ? before : reminderBefore, labels, subscribed,
                 startDate, targetTimezone ? targetTimezone : timezone);

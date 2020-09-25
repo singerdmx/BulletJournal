@@ -96,3 +96,26 @@ export const deleteSampleTaskRule = (stepId: number, selectionCombo: string) => 
             throw Error(err.message);
         });
 }
+
+export const importSampleTasks = (sampleTasks: number[], selections: number[], categoryId: number,
+                                  projectId: number, assignees: string[],
+                                  reminderBefore: number, labels: number[], subscribed: boolean,
+                                  startDate?: string, timezone?: string) => {
+    const postBody = JSON.stringify({
+        sampleTasks: sampleTasks,
+        selections: selections,
+        categoryId: categoryId,
+        projectId: projectId,
+        assignees: assignees,
+        reminderBefore: reminderBefore,
+        labels: labels,
+        subscribed: subscribed,
+        startDate: startDate,
+        timezone: timezone
+    });
+    return doPost('/api/public/sampleTasks/import', postBody)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err.message);
+        });
+}

@@ -56,13 +56,13 @@ public class RuleEngine {
         List<SampleTask> sampleTasks = sampleTaskDaoJpa
                 .findAllById(importTasksParams.getSampleTasks());
         // if there is any sample task that does not have due date, we need to set due date for it
-        List<SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
+        List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream().map(sampleTask -> sampleTask.toPresentationModel())
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
         User user = this.userDaoJpa.getByName(requester);
 
         if (!tasksNeedTimingArrangement.isEmpty()) {
-            tasksNeedTimingArrangement.sort(Comparator.comparing(SampleTask::getUid));
+            tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid())));
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
@@ -76,8 +76,20 @@ public class RuleEngine {
             if (StringUtils.isBlank(timezone)) {
                 timezone = user.getTimezone();
             }
-
             int frequency = getTimesOneDay(importTasksParams.getSelections(), importTasksParams.getCategoryId());
+            int startIndex = 0;
+            int numOfDay = 0;
+            while (startIndex < tasksNeedTimingArrangement.size()) {
+                ZonedDateTime startTime = startDay.plusHours(21).plusDays(numOfDay++);
+                for (int i = 0; i < frequency && startIndex < tasksNeedTimingArrangement.size(); startIndex++, i++) {
+                    com.bulletjournal.templates.controller.model.SampleTask sampleTask = tasksNeedTimingArrangement.get(startIndex);
+                    System.out.println(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
+                    sampleTask.setDueDate(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
+                    sampleTask.setDueTime(startTime.format(ZonedDateTimeHelper.TIME_FORMATTER));
+                    sampleTask.setTimeZone(timezone);
+                    startTime = startTime.minusHours(1);
+                }
+            }
         }
 
 //        this.taskDaoJpa.createTaskFromSampleTask();
