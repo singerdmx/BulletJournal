@@ -56,7 +56,7 @@ import {
   deleteSampleTask, deleteSampleTaskRule,
   fetchSampleTask, fetchSampleTasksByScrollId,
   getNext,
-  getSampleTasksByFilter, putSampleTask, upsertSampleTaskRule
+  getSampleTasksByFilter, importSampleTasks, putSampleTask, upsertSampleTaskRule
 } from "../../apis/templates/workflowApis";
 import {createRule, deleteRule} from "../../apis/templates/ruleApis";
 import {reloadReceived} from "../myself/actions";
@@ -444,7 +444,8 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
   try {
     const {postOp, categoryId, projectId, assignees, reminderBefore,
       sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
-    console.log(action.payload);
+    yield call(importSampleTasks, sampleTasks, selections, categoryId,
+        projectId, assignees, reminderBefore, labels, subscribed, startDate, timezone);
     postOp();
   } catch (error) {
     if (error.message === 'reload') {
