@@ -472,11 +472,28 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
-        createTaskParams.selfClean();
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
+        Task task = generateTask(owner, project, createTaskParams);
+        return this.taskRepository.saveAndFlush(task);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> create(Long projectId, String owner, List<CreateTaskParams> createTaskParamsList) {
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
+        if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
+            throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
+        }
+        List<Task> tasks = createTaskParamsList.stream()
+                .map(createTaskParams -> generateTask(owner, project, createTaskParams)).collect(Collectors.toList());
+
+        return this.taskRepository.saveAll(tasks);
+    }
+
+    private Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
+        createTaskParams.selfClean();
 
         Task task = new Task();
         task.setProject(project);
@@ -501,7 +518,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
                 createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
-        return this.taskRepository.saveAndFlush(task);
+        return task;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

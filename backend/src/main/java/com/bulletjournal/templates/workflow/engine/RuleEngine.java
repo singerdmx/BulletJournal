@@ -56,11 +56,11 @@ public class RuleEngine {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(String requester, ImportTasksParams importTasksParams) {
-        List<SampleTask> sampleTasks = sampleTaskDaoJpa
-                .findAllById(importTasksParams.getSampleTasks());
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = sampleTaskDaoJpa
+                .findAllById(importTasksParams.getSampleTasks()).stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
         // if there is any sample task that does not have due date, we need to set due date for it
-        List<SampleTask> filteredSampleTasks = sampleTasks.stream().filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
-        List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = filteredSampleTasks.stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
+        List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
+                .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
         User user = this.userDaoJpa.getByName(requester);
 
@@ -101,7 +101,8 @@ public class RuleEngine {
         if (importTasksParams.isSubscribed()) {
             this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());
         }
-        return tasksNeedTimingArrangement;
+
+        return sampleTasks;
     }
 
     private int getTimesOneDay(List<Long> selections, long categoryId) {
