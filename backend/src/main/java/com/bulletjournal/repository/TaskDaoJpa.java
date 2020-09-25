@@ -459,7 +459,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             );
         });
         List<Task> tasks = create(projectId, owner, createTaskParams);
-        addContent(tasks.stream().map(Task::getId).collect(Collectors.toList()), tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList()),
+        addContent(tasks, tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList()),
                 sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()));
         return tasks;
     }
