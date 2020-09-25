@@ -91,6 +91,7 @@ const StepsPage: React.FC<StepsProps> = (
                 localStorage.removeItem(STEPS);
                 localStorage.removeItem(SELECTIONS);
                 localStorage.removeItem(SAMPLE_TASKS);
+                sampleTasksReceived([], '');
             } else {
                 const selections = getSelections();
                 const curStep = getCurrentStep();

@@ -16,6 +16,7 @@ import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -213,6 +214,11 @@ public class WorkflowController {
     @PostMapping(PUBLIC_SAMPLE_TASKS_IMPORT_ROUTE)
     public void importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        String scrollId = importTasksParams.getScrollId();
+        if (StringUtils.isNotBlank(scrollId)) {
+            importTasksParams.getSampleTasks().addAll(
+                    CACHE.remove(scrollId).stream().map(t -> t.getId()).collect(Collectors.toList()));
+        }
         this.ruleEngine.importTasks(username, importTasksParams);
     }
 

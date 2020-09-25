@@ -445,7 +445,7 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
     const {postOp, categoryId, projectId, assignees, reminderBefore,
       sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
     yield call(importSampleTasks, sampleTasks, selections, categoryId,
-        projectId, assignees, reminderBefore, labels, subscribed, startDate, timezone);
+        projectId, assignees, state.templates.scrollId, reminderBefore, labels, subscribed, startDate, timezone);
     postOp();
   } catch (error) {
     if (error.message === 'reload') {
