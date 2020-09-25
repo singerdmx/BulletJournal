@@ -115,7 +115,7 @@ export const importSampleTasks = (sampleTasks: number[], selections: number[], c
         timezone: timezone
     });
     return doPost('/api/public/sampleTasks/import', postBody)
-        .then(res => res)
+        .then(res => res.json())
         .catch(err => {
             throw Error(err.message);
         });

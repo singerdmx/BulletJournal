@@ -444,8 +444,13 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
   try {
     const {postOp, categoryId, projectId, assignees, reminderBefore,
       sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
-    yield call(importSampleTasks, sampleTasks, selections, categoryId,
+    const data: SampleTask[] = yield call(importSampleTasks, sampleTasks, selections, categoryId,
         projectId, assignees, state.templates.scrollId, reminderBefore, labels, subscribed, startDate, timezone);
+    yield put(templatesActions.sampleTasksReceived({tasks: data, scrollId: ''}));
+    localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+      sampleTasks: data,
+      scrollId: ''
+    }));
     postOp();
   } catch (error) {
     if (error.message === 'reload') {
@@ -501,6 +506,10 @@ function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
     const {filter} = action.payload;
     const data : SampleTask[] = yield call(getSampleTasksByFilter, filter);
     yield put(templatesActions.sampleTasksReceived({tasks: data, scrollId: ''}));
+    localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+      sampleTasks: data,
+      scrollId: ''
+    }));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
