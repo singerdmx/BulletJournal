@@ -151,16 +151,12 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> List<Pair<ContentModel, T>> addContent(List<Long> projectItemIds, List<String> owners, List<K> contents) {
+    public <T extends ProjectItemModel> List<Pair<ContentModel, T>> addContent(List<T> projectItems, List<String> owners, List<K> contents) {
         for (int i = 0; i < contents.size(); i++) {
             K content = contents.get(i);
-            Long projectItemId = projectItemIds.get(i);
             String owner = owners.get(i);
-            T projectItem = getProjectItem(projectItemId, owner);
-            content.setProjectItem(projectItem);
-            content.setOwner(owner);
-            content.setText(DeltaConverter.supplementContentText(content.getText()));
-            updateRevision(content, owner, content.getText(), content.getText());
+            T projectItem = projectItems.get(i);
+            populateContent(owner, content, projectItem);
         }
         this.getContentJpaRepository().saveAll(contents);
         return contents.stream().map(content -> Pair.of((ContentModel) content, (T) content.getProjectItem())).collect(Collectors.toList());
@@ -169,12 +165,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Pair<ContentModel, T> addContent(Long projectItemId, String owner, K content) {
         T projectItem = getProjectItem(projectItemId, owner);
+        populateContent(owner, content, projectItem);
+        this.getContentJpaRepository().save(content);
+        return Pair.of(content, projectItem);
+    }
+
+    private <T extends ProjectItemModel> void populateContent(String owner, K content, T projectItem) {
         content.setProjectItem(projectItem);
         content.setOwner(owner);
         content.setText(DeltaConverter.supplementContentText(content.getText()));
         updateRevision(content, owner, content.getText(), content.getText());
-        this.getContentJpaRepository().save(content);
-        return Pair.of(content, projectItem);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
