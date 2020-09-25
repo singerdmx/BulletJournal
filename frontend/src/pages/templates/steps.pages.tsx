@@ -11,9 +11,15 @@ import {
     sampleTasksReceived
 } from "../../features/templates/actions";
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, notification, Select} from "antd";
+import {Button, Card, Empty, notification, Select, Tooltip} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {CloseSquareTwoTone, ExclamationCircleFilled, UpCircleTwoTone} from "@ant-design/icons";
+import {
+    CloseCircleTwoTone,
+    CloseOutlined,
+    CloseSquareTwoTone,
+    ExclamationCircleFilled,
+    UpCircleTwoTone
+} from "@ant-design/icons";
 import ReactLoading from "react-loading";
 import {getCookie} from "../../index";
 import StepsImportTasksPage from "./steps.import.tasks.pages";
@@ -221,9 +227,11 @@ const StepsPage: React.FC<StepsProps> = (
             selections[c.id] = null;
         });
         steps.pop();
-        steps[steps.length - 1].choices.forEach(c => {
-            selections[c.id] = null;
-        });
+        if (steps[steps.length - 1]) {
+            steps[steps.length - 1].choices.forEach(c => {
+                selections[c.id] = null;
+            });
+        }
         setSelections(selections);
         localStorage.setItem(STEPS, JSON.stringify(steps));
         nextStepReceived(undefined);
@@ -287,6 +295,7 @@ const StepsPage: React.FC<StepsProps> = (
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
             const data: SampleTasks = JSON.parse(sampleTasksText);
+            sampleTasksReceived(data.sampleTasks, data.scrollId);
             return data.sampleTasks;
         }
 
@@ -301,10 +310,20 @@ const StepsPage: React.FC<StepsProps> = (
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
             const data: SampleTasks = JSON.parse(sampleTasksText);
+            sampleTasksReceived(data.sampleTasks, data.scrollId);
             return data.scrollId;
         }
 
         return '';
+    }
+
+    const onRemoveTask = (id: number) => {
+        const data = sampleTasks.filter(t => t.id !== id);
+        sampleTasksReceived(data, scrollId);
+        localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+            sampleTasks: data,
+            scrollId: scrollId
+        }));
     }
 
     const getStepsDiv = () => {
@@ -333,6 +352,11 @@ const StepsPage: React.FC<StepsProps> = (
                     {getSampleTasks().length > 0 && <div className='sample-tasks'>
                         {getSampleTasks().map((sampleTask: SampleTask) => {
                             return <div className='sample-task'>
+                                <div className='remove-task-icon'>
+                                    <Tooltip title='Remove this'>
+                                        <CloseOutlined onClick={() => onRemoveTask(sampleTask.id)}/>
+                                    </Tooltip>
+                                </div>
                                 {sampleTask.name}
                             </div>
                         })}

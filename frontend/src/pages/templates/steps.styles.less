@@ -32,6 +32,7 @@
 div.choices-card {
   border-radius: 8px;
   background-color: #e6faff;
+
   div.choice-card {
     align-items: center;
     display: flex;
@@ -45,12 +46,28 @@ div.choices-card {
       color: #4ddbff;
     }
   }
+
   div.sample-tasks {
     align-items: self-start;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
+
     div.sample-task {
+      div.remove-task-icon {
+        position: absolute;
+        right: 12px;
+        top: -4px;
+
+        & span {
+          & svg {
+            width: 8px !important;
+            height: 8px !important;
+          }
+        }
+      }
+
+      position: relative;
       align-items: center;
       display: flex;
       flex-wrap: wrap;

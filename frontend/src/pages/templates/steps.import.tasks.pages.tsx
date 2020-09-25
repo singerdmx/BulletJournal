@@ -20,7 +20,7 @@ import {ReminderBeforeTaskText} from "../../components/settings/reducer";
 import {QuestionCircleTwoTone, SmileOutlined} from "@ant-design/icons";
 import {Category, SampleTask, SampleTasks} from "../../features/templates/interface";
 import {zones} from "../../components/settings/constants";
-import {importTasks} from "../../features/templates/actions";
+import {importTasks, sampleTasksReceived} from "../../features/templates/actions";
 import {getSelections, isMobile, SAMPLE_TASKS} from "./steps.pages";
 
 const {Option} = Select;
@@ -37,6 +37,7 @@ type StepsImportTasksProps = {
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
+    sampleTasksReceived: (sampleTasks: SampleTask[], scrollId: string) => void;
     hideImportTasksCard: () => void;
     importTasks: (postOp: Function,
                   sampleTasks: number[], selections: number[], categoryId: number,
@@ -49,7 +50,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     {
         myself, labelOptions, ownedProjects, sharedProjects, group,
         sampleTasks, timezone, category, before, getGroup, labelsUpdate,
-        importTasks, hideImportTasksCard
+        importTasks, hideImportTasksCard, sampleTasksReceived
     }
 ) => {
     const history = useHistory();
@@ -143,6 +144,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
             const data: SampleTasks = JSON.parse(sampleTasksText);
+            sampleTasksReceived(data.sampleTasks, data.scrollId);
             return data.sampleTasks;
         }
 
@@ -386,5 +388,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
     getGroup,
     labelsUpdate,
-    importTasks
+    importTasks,
+    sampleTasksReceived
 })(StepsImportTasksPage);
