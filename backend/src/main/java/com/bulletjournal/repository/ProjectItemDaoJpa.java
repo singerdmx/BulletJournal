@@ -156,24 +156,25 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     public <T extends ProjectItemModel> void addContent(List<T> projectItems, List<String> owners, List<K> contents) {
+        List<K> batch = new ArrayList<>();
+
         for (int i = 0; i < contents.size(); i++) {
             K content = contents.get(i);
             String owner = owners.get(i);
             T projectItem = projectItems.get(i);
             populateContent(owner, content, projectItem);
-        }
-        List<K> batch = new ArrayList<>();
-        for (K content : contents) {
             batch.add(content);
             if (batch.size() == 50) {
                 batch.clear();
                 entityManager.flush();
                 entityManager.clear();
+                this.getContentJpaRepository().saveAll(batch);
             }
         }
         if (!batch.isEmpty()) {
             entityManager.flush();
             entityManager.clear();
+            this.getContentJpaRepository().saveAll(batch);
         }
     }
 
