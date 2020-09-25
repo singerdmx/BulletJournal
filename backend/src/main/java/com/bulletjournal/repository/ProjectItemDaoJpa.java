@@ -155,7 +155,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.sharedProjectItemDaoJpa.deleteSharedProjectItemWithUser(projectItem, requester);
     }
 
-    public <T extends ProjectItemModel> List<Pair<ContentModel, T>> addContent(List<T> projectItems, List<String> owners, List<K> contents) {
+    public <T extends ProjectItemModel> void addContent(List<T> projectItems, List<String> owners, List<K> contents) {
         for (int i = 0; i < contents.size(); i++) {
             K content = contents.get(i);
             String owner = owners.get(i);
@@ -163,30 +163,18 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             populateContent(owner, content, projectItem);
         }
         List<K> batch = new ArrayList<>();
-        List<K> result = new ArrayList<>();
         for (K content : contents) {
             batch.add(content);
             if (batch.size() == 50) {
-                result.addAll(this.getContentJpaRepository().saveAll(batch));
                 batch.clear();
                 entityManager.flush();
                 entityManager.clear();
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
             }
         }
         if (!batch.isEmpty()) {
-            result.addAll(this.getContentJpaRepository().saveAll(batch));
             entityManager.flush();
             entityManager.clear();
         }
-
-        return result.stream()
-                .map(content -> Pair.of((ContentModel) content, (T) content.getProjectItem()))
-                .collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
