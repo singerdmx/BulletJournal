@@ -28,12 +28,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
@@ -41,8 +40,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     private static final Gson GSON = new Gson();
 
-    @PersistenceContext
-    EntityManager entityManager;
+    private static final int CONTENT_BATCH_SIZE = 50;
 
     @Autowired
     protected LabelDaoJpa labelDaoJpa;
@@ -157,25 +155,24 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     public <T extends ProjectItemModel> void addContent(List<T> projectItems, List<String> owners, List<K> contents) {
         List<K> batch = new ArrayList<>();
-
-        for (int i = 0; i < contents.size(); i++) {
+        int maxSize = Math.min(contents.size(), CONTENT_BATCH_SIZE);
+        for (int i = 0; i < maxSize; i++) {
             K content = contents.get(i);
             String owner = owners.get(i);
             T projectItem = projectItems.get(i);
             populateContent(owner, content, projectItem);
             batch.add(content);
-            if (batch.size() == 50) {
-                this.getContentJpaRepository().saveAll(batch);
-                entityManager.flush();
-                entityManager.clear();
-                batch.clear();
-            }
         }
-        if (!batch.isEmpty()) {
-            this.getContentJpaRepository().saveAll(batch);
-            entityManager.flush();
-            entityManager.clear();
+        this.getContentJpaRepository().saveAll(batch);
+
+        if (contents.size() <= CONTENT_BATCH_SIZE) {
+            return;
         }
+
+        CompletableFuture.runAsync(() -> addContent(
+                projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size() - 1),
+                owners.subList(CONTENT_BATCH_SIZE, owners.size() - 1),
+                contents.subList(CONTENT_BATCH_SIZE, contents.size() - 1)));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
