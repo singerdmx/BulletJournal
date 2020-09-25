@@ -165,16 +165,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             populateContent(owner, content, projectItem);
             batch.add(content);
             if (batch.size() == 50) {
-                batch.clear();
+                this.getContentJpaRepository().saveAll(batch);
                 entityManager.flush();
                 entityManager.clear();
-                this.getContentJpaRepository().saveAll(batch);
+                batch.clear();
             }
         }
         if (!batch.isEmpty()) {
+            this.getContentJpaRepository().saveAll(batch);
             entityManager.flush();
             entityManager.clear();
-            this.getContentJpaRepository().saveAll(batch);
         }
     }
 
