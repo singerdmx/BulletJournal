@@ -109,7 +109,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
                     <Tag>{rule.ruleExpression}</Tag> [{rule.name}] (Priority: {rule.priority}, ID: {rule.id})</span>
                     {' '} <span style={{cursor: 'pointer', color: 'lightBlue'}} onClick={() => history.push(`/admin/steps/${rule.connectedStep.id}`)}>
                         Step: {rule.connectedStep.name} ({rule.connectedStep.id})</span>
-                    <DeleteTwoTone onClick={() => deleteRule(rule.id, 'CATEGORY_RULE')}/>
+                    <DeleteTwoTone onClick={() => deleteRule(rule.id, 'STEP_RULE')}/>
                 </div>
             })}
         </div>
