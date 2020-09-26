@@ -1,30 +1,36 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.Role;
-import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.controller.models.UserPointActivity;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.SampleProjectsCreation;
 import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.models.Group;
-import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Set;
 
 @Repository
 public class UserDaoJpa {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private UserRepository userRepository;
@@ -44,8 +50,9 @@ public class UserDaoJpa {
     @Autowired
     private UserPointActivityDaoJpa userPointActivityDaoJpa;
 
+    @Lazy
     @Autowired
-    private ProjectRepository projectRepository;
+    private NotificationService notificationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
@@ -70,18 +77,14 @@ public class UserDaoJpa {
         group.setDefaultGroup(true);
         group = this.groupRepository.save(group);
 
-        Project project = new Project();
-        project.setOwner(name);
-        project.setName("TODO List");
-        project.setType(ProjectType.TODO.getValue());
-        project.setGroup(group);
-        this.projectRepository.save(project);
-
         user.addGroup(group);
         this.userGroupRepository.save(new UserGroup(user, group, true));
         this.labelDaoJpa.createDefaultLabels(name);
         user = this.userRepository.save(user);
         this.firstTimeUserRepository.save(new FirstTimeUser(user.getName()));
+
+        this.entityManager.flush();
+        this.notificationService.createSampleProjects(new SampleProjectsCreation(name, group));
         return user;
     }
 

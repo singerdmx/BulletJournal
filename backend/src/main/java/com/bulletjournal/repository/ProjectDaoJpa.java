@@ -10,6 +10,7 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.SampleProjectsCreation;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
@@ -20,6 +21,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ProjectDaoJpa {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectDaoJpa.class);
     private static final Gson GSON = new Gson();
     @Autowired
     private ProjectRepository projectRepository;
@@ -191,6 +194,17 @@ public class ProjectDaoJpa {
             events.add(event);
         }
         return events;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void createSampleProjects(SampleProjectsCreation sampleProjectsCreation) {
+        Project project = new Project();
+        project.setOwner(sampleProjectsCreation.getUsername());
+        project.setName("TODO List");
+        project.setType(ProjectType.TODO.getValue());
+        project.setGroup(sampleProjectsCreation.getGroup());
+        project = this.projectRepository.save(project);
+        LOGGER.info("Sample project {} created for user {}", project.getId(), sampleProjectsCreation.getUsername());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
