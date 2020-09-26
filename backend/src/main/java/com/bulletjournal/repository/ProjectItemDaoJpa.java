@@ -32,7 +32,6 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
