@@ -13,6 +13,7 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
+import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.Project;
@@ -44,7 +45,6 @@ import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Repository
@@ -457,9 +457,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 labels)
         ));
         List<Task> tasks = create(projectId, owner, createTaskParams);
-        // TODO: use notification service
-        CompletableFuture.runAsync(() -> addContent(tasks, tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList()),
-                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList())));
+
+        this.notificationService.addContentBatch(new ContentBatch(
+                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()),
+                tasks,
+                tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList())));
 
         return tasks;
     }

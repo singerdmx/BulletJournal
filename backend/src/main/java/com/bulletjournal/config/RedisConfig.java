@@ -11,7 +11,9 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 
 @Configuration
-@EnableRedisRepositories(basePackages = "com.bulletjournal.redis", enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
+@EnableRedisRepositories(
+    basePackages = {"com.bulletjournal.redis", "com.bulletjournal.templates.redis"},
+    enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 public class RedisConfig {
 
     @Autowired

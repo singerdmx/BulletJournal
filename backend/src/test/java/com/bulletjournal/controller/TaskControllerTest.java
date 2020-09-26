@@ -6,11 +6,9 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.repository.TaskContentRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.models.TaskContent;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -207,6 +206,7 @@ public class TaskControllerTest {
     }
 
     @Test
+    @Transactional
     public void testCreateTaskFromSampleTask() throws Exception {
         Long projectId = 1L;
         Long sampleTaskId = 1L;
@@ -224,8 +224,6 @@ public class TaskControllerTest {
         assertNotNull(tasks.get(0));
         assertEquals(owner, tasks.get(0).getOwner());
         assertTrue(assignees.size() == tasks.get(0).getAssignees().size() && assignees.containsAll(tasks.get(0).getAssignees()));
-        TaskContent content = Iterables.getOnlyElement(taskContentRepository.findTaskContentByTask(tasks.get(0)));
-        assertNotNull(content);
     }
 
     private TaskStatistics getTaskStatistics(List<Long> projectIds, String timezone, String startTime, String endTime) {

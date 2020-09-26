@@ -114,7 +114,7 @@ export const importSampleTasks = (sampleTasks: number[], selections: number[], c
         startDate: startDate,
         timezone: timezone
     });
-    return doPost('/api/public/sampleTasks/import', postBody)
+    return doPost('/api/sampleTasks/import', postBody)
         .then(res => res.json())
         .catch(err => {
             throw Error(err.message);

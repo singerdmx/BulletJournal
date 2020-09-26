@@ -32,7 +32,6 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
@@ -59,7 +58,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
-    private NotificationService notificationService;
+    protected NotificationService notificationService;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -163,16 +162,19 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             populateContent(owner, content, projectItem);
             batch.add(content);
         }
-        this.getContentJpaRepository().saveAll(batch);
+        if (!batch.isEmpty()) {
+            this.getContentJpaRepository().saveAll(batch);
+        }
 
         if (contents.size() <= CONTENT_BATCH_SIZE) {
             return;
         }
 
-        CompletableFuture.runAsync(() -> addContent(
-                projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size() - 1),
-                owners.subList(CONTENT_BATCH_SIZE, owners.size() - 1),
-                contents.subList(CONTENT_BATCH_SIZE, contents.size() - 1)));
+        ContentBatch left = new ContentBatch(
+                contents.subList(CONTENT_BATCH_SIZE, contents.size()),
+                projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size()),
+                owners.subList(CONTENT_BATCH_SIZE, owners.size()));
+        this.notificationService.addContentBatch(left);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
