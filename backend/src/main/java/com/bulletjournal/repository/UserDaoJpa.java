@@ -1,6 +1,7 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.Role;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.Theme;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.controller.models.UserPointActivity;
@@ -9,6 +10,7 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.models.Group;
+import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
@@ -42,6 +44,9 @@ public class UserDaoJpa {
     @Autowired
     private UserPointActivityDaoJpa userPointActivityDaoJpa;
 
+    @Autowired
+    private ProjectRepository projectRepository;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
         User existingUser = this.userRepository.findByName(name);
@@ -64,6 +69,13 @@ public class UserDaoJpa {
         group.setOwner(name);
         group.setDefaultGroup(true);
         group = this.groupRepository.save(group);
+
+        Project project = new Project();
+        project.setOwner(name);
+        project.setName("TODO List");
+        project.setType(ProjectType.TODO.getValue());
+        project.setGroup(group);
+        this.projectRepository.save(project);
 
         user.addGroup(group);
         this.userGroupRepository.save(new UserGroup(user, group, true));

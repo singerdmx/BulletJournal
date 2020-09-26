@@ -40,7 +40,7 @@ public class WorkflowController {
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
     public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
-    public static final String CATEGORY_STEPS_ROUTE = "/api/categorySteps/{categoryId}";
+    public static final String CATEGORY_STEPS_ROUTE = "/api/categories/{categoryId}/steps";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
