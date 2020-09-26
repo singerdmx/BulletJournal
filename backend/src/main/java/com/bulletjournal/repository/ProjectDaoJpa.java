@@ -187,23 +187,23 @@ public class ProjectDaoJpa {
     public void createSampleProjects(SampleProjectsCreation sampleProjectsCreation) {
         CreateProjectParams sampleTodoProjectParams =
                 new CreateProjectParams("TODO List", ProjectType.TODO,
-                        "This is a TODO List. You can manage your tasks in it.",
+                        "Manage your tasks here",
                         sampleProjectsCreation.getGroup().getId());
         Project todoProject = this.create(sampleTodoProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
         LOGGER.info("Sample todo list project {} created for user {}", todoProject.getId(),
                 sampleProjectsCreation.getUsername());
 
         CreateProjectParams sampleNoteProjectParams =
-                new CreateProjectParams("Note sample", ProjectType.NOTE,
-                        "This is a Note sample. You can manage your notes in it.",
+                new CreateProjectParams("Notes", ProjectType.NOTE,
+                        "Add your notes here",
                         sampleProjectsCreation.getGroup().getId());
         Project noteProject = this.create(sampleNoteProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
         LOGGER.info("Sample note project {} created for user {}", noteProject.getId(),
                 sampleProjectsCreation.getUsername());
 
         CreateProjectParams sampleLedgerProjectParams =
-                new CreateProjectParams("Ledger sample", ProjectType.LEDGER,
-                        "This is a Ledger sample. You can manage your transactions in it.",
+                new CreateProjectParams("Ledger", ProjectType.LEDGER,
+                        "Track your transactions here",
                         sampleProjectsCreation.getGroup().getId());
         Project ledgerProject = this.create(sampleLedgerProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
         LOGGER.info("Sample ledger project {} created for user {}", ledgerProject.getId(),
