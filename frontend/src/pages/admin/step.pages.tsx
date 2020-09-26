@@ -1,10 +1,10 @@
 import React, {useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {deleteStep, getStep, setStepChoices, updateStep} from "../../features/templates/actions";
+import {deleteStep, getStep, setStepChoices, updateStep, deleteRule} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Step} from "../../features/templates/interface";
-import {BackTop, Button, Divider, InputNumber, Tooltip, Typography} from "antd";
+import {BackTop, Button, Divider, InputNumber, Tooltip, Typography, Tag} from "antd";
 import './steps.styles.less'
 import {DeleteFilled, DeleteTwoTone} from "@ant-design/icons";
 import AdminChoiceElem from "./admin-choice-elem";
@@ -101,6 +101,18 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <Container>
             <AddRule step={step} category={undefined}/>
         </Container>
+        <Divider/>
+        <div>
+            <h3>Rules</h3>
+            {step && step.rules && step.rules.map(rule => {
+                return <div><span>
+                    <Tag>{rule.ruleExpression}</Tag> [{rule.name}] (Priority: {rule.priority}, ID: {rule.id})</span>
+                    {' '} <span style={{cursor: 'pointer', color: 'lightBlue'}} onClick={() => history.push(`/admin/steps/${rule.connectedStep.id}`)}>
+                        Step: {rule.connectedStep.name} ({rule.connectedStep.id})</span>
+                    <DeleteTwoTone onClick={() => deleteRule(rule.id, 'CATEGORY_RULE')}/>
+                </div>
+            })}
+        </div>
     </div>
 }
 
