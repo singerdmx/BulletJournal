@@ -13,6 +13,7 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
+import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.Project;
@@ -20,7 +21,6 @@ import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.bulletjournal.templates.repository.model.SampleTask;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -298,9 +298,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 ZonedDateTimeHelper.toDBTimestamp(startTime), ZonedDateTimeHelper.toDBTimestamp(endTime), projectIds);
         tasks = tasks.stream().filter(t -> {
             if (Objects.isNull(t.getRecurrenceRule())) {
-                LOGGER.error("Recurring Task with Due DateTime.");
                 return true;
             }
+            LOGGER.error("Recurring Task {} with Due DateTime.", t.getId());
             return false;
         }).collect(Collectors.toList());
 
@@ -440,27 +440,30 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return reminderRecordTaskMap;
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Task createTaskFromSampleTask(
+    public List<Task> createTaskFromSampleTask(
         Long projectId,
         String owner,
-        SampleTask sampleTask,
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
         Integer reminderBeforeTask,
         List<String> assignees,
         List<Long> labels
     ) {
         Preconditions.checkNotNull(assignees);
-        CreateTaskParams params = sampleTaskToCreateTaskParams(
-            sampleTask,
-            reminderBeforeTask,
-            assignees,
-            labels
-        );
-        Task task = create(projectId, owner, params);
-        if (StringUtils.isNotEmpty(sampleTask.getContent())) {
-            addContent(task.getId(), owner, new TaskContent(sampleTask.getContent()));
-        }
-        return task;
+        List<CreateTaskParams> createTaskParams = new ArrayList<>();
+        sampleTasks.forEach(sampleTask -> createTaskParams.add(sampleTaskToCreateTaskParams(
+                sampleTask,
+                reminderBeforeTask,
+                assignees,
+                labels)
+        ));
+        List<Task> tasks = create(projectId, owner, createTaskParams);
+
+        this.notificationService.addContentBatch(new ContentBatch(
+                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()),
+                tasks,
+                tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList())));
+
+        return tasks;
     }
 
     /**
@@ -473,11 +476,43 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Task create(Long projectId, String owner, CreateTaskParams createTaskParams) {
-        createTaskParams.selfClean();
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
+        Task task = generateTask(owner, project, createTaskParams);
+        return this.taskRepository.saveAndFlush(task);
+    }
+
+    public List<Task> create(Long projectId, String owner, List<CreateTaskParams> createTaskParamsList) {
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
+        if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
+            throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
+        }
+        List<Task> tasks = createTaskParamsList.stream()
+                .map(createTaskParams -> generateTask(owner, project, createTaskParams)).collect(Collectors.toList());
+
+        List<Task> batch = new ArrayList<>();
+        List<Task> result = new ArrayList<>();
+        for (Task task : tasks) {
+            batch.add(task);
+            if (batch.size() == 200) {
+                result.addAll(this.taskRepository.saveAll(batch));
+                batch.clear();
+                entityManager.flush();
+                entityManager.clear();
+            }
+        }
+        if (!batch.isEmpty()) {
+            result.addAll(this.taskRepository.saveAll(batch));
+            entityManager.flush();
+            entityManager.clear();
+        }
+        return result;
+    }
+
+    private Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
+        createTaskParams.selfClean();
 
         Task task = new Task();
         task.setProject(project);
@@ -502,7 +537,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
                 createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
-        return this.taskRepository.saveAndFlush(task);
+        return task;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -1029,7 +1064,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     private CreateTaskParams sampleTaskToCreateTaskParams(
-        SampleTask sampleTask,
+        com.bulletjournal.templates.controller.model.SampleTask sampleTask,
         Integer reminderBeforeTask,
         List<String> assignees,
         List<Long> labels

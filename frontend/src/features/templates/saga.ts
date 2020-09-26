@@ -119,7 +119,6 @@ function* fetchCategory(action: PayloadAction<GetCategoryAction>) {
   try {
     const {categoryId} = action.payload;
     const data: Category = yield call(getCategory, categoryId);
-    console.log(data)
     yield put(templatesActions.categoryReceived({category: data}));
     yield put(templatesActions.nextStepReceived({step: undefined}));
   } catch (error) {
@@ -418,7 +417,7 @@ function* getNextStep(action: PayloadAction<GetNextStepAction>) {
     const {stepId, selections, prevSelections, first} = action.payload;
     const nextStep: NextStep = yield call(getNext, stepId, selections, prevSelections, first);
     yield put(templatesActions.nextStepReceived({step: nextStep}));
-    if (nextStep.sampleTasks) {
+    if (nextStep.sampleTasks && nextStep.sampleTasks.length > 0) {
       yield put(templatesActions.sampleTasksReceived({tasks: nextStep.sampleTasks, scrollId: nextStep.scrollId}));
       localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
         sampleTasks: nextStep.sampleTasks,
@@ -441,15 +440,22 @@ function* importTasks(action: PayloadAction<ImportTasksAction>) {
     return;
   }
   yield put(templatesActions.loadingNextStepReceived({loading: true}));
+  const {postOp, timeoutOp, categoryId, projectId, assignees, reminderBefore,
+    sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
   try {
-    const {postOp, categoryId, projectId, assignees, reminderBefore,
-      sampleTasks, selections, labels, subscribed, startDate, timezone} = action.payload;
-    yield call(importSampleTasks, sampleTasks, selections, categoryId,
-        projectId, assignees, reminderBefore, labels, subscribed, startDate, timezone);
+    const data: SampleTask[] = yield call(importSampleTasks, sampleTasks, selections, categoryId,
+        projectId, assignees, state.templates.scrollId, reminderBefore, labels, subscribed, startDate, timezone);
+    yield put(templatesActions.sampleTasksReceived({tasks: data, scrollId: ''}));
+    localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+      sampleTasks: data,
+      scrollId: ''
+    }));
     postOp();
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
+    } else if (error.message === '504') {
+      timeoutOp();
     } else {
       yield call(message.error, `importTasks Error Received: ${error}`);
     }
@@ -501,6 +507,10 @@ function* getSampleTasks(action: PayloadAction<GetSampleTasksAction>) {
     const {filter} = action.payload;
     const data : SampleTask[] = yield call(getSampleTasksByFilter, filter);
     yield put(templatesActions.sampleTasksReceived({tasks: data, scrollId: ''}));
+    localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+      sampleTasks: data,
+      scrollId: ''
+    }));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

@@ -98,7 +98,7 @@ export const deleteSampleTaskRule = (stepId: number, selectionCombo: string) => 
 }
 
 export const importSampleTasks = (sampleTasks: number[], selections: number[], categoryId: number,
-                                  projectId: number, assignees: string[],
+                                  projectId: number, assignees: string[], scrollId: string,
                                   reminderBefore: number, labels: number[], subscribed: boolean,
                                   startDate?: string, timezone?: string) => {
     const postBody = JSON.stringify({
@@ -107,14 +107,15 @@ export const importSampleTasks = (sampleTasks: number[], selections: number[], c
         categoryId: categoryId,
         projectId: projectId,
         assignees: assignees,
+        scrollId: scrollId,
         reminderBefore: reminderBefore,
         labels: labels,
         subscribed: subscribed,
         startDate: startDate,
         timezone: timezone
     });
-    return doPost('/api/public/sampleTasks/import', postBody)
-        .then(res => res)
+    return doPost('/api/sampleTasks/import', postBody)
+        .then(res => res.json())
         .catch(err => {
             throw Error(err.message);
         });

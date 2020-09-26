@@ -20,12 +20,14 @@ import {ReminderBeforeTaskText} from "../../components/settings/reducer";
 import {QuestionCircleTwoTone, SmileOutlined} from "@ant-design/icons";
 import {Category, SampleTask, SampleTasks} from "../../features/templates/interface";
 import {zones} from "../../components/settings/constants";
-import {importTasks} from "../../features/templates/actions";
+import {importTasks, sampleTasksReceived} from "../../features/templates/actions";
 import {getSelections, isMobile, SAMPLE_TASKS} from "./steps.pages";
+import ReactLoading from "react-loading";
 
 const {Option} = Select;
 
 type StepsImportTasksProps = {
+    loadingNextStep: boolean;
     myself: string;
     timezone: string;
     labelOptions: Label[];
@@ -37,8 +39,9 @@ type StepsImportTasksProps = {
     group: Group | undefined;
     getGroup: (groupId: number) => void;
     labelsUpdate: (projectId: number | undefined) => void;
+    sampleTasksReceived: (sampleTasks: SampleTask[], scrollId: string) => void;
     hideImportTasksCard: () => void;
-    importTasks: (postOp: Function,
+    importTasks: (postOp: Function, timeoutOp: Function,
                   sampleTasks: number[], selections: number[], categoryId: number,
                   projectId: number, assignees: string[],
                   reminderBefore: number, labels: number[], subscribed: boolean,
@@ -47,9 +50,9 @@ type StepsImportTasksProps = {
 
 const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
     {
-        myself, labelOptions, ownedProjects, sharedProjects, group,
+        loadingNextStep, myself, labelOptions, ownedProjects, sharedProjects, group,
         sampleTasks, timezone, category, before, getGroup, labelsUpdate,
-        importTasks, hideImportTasksCard
+        importTasks, hideImportTasksCard, sampleTasksReceived
     }
 ) => {
     const history = useHistory();
@@ -143,6 +146,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
             const data: SampleTasks = JSON.parse(sampleTasksText);
+            sampleTasksReceived(data.sampleTasks, data.scrollId);
             return data.sampleTasks;
         }
 
@@ -168,13 +172,34 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                     if (isMobile()) {
                         hideImportTasksCard();
                     } else {
-                        window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
+                        setTimeout(() => {
+                            window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
+                        }, 5000);
                     }
-                }, getSampleTasks().map(s => s.id), curSelections, category.id,
+                },
+                () => {
+                    notification.open({
+                        placement: 'bottomRight',
+                        message: 'We are still working on importing these events',
+                        description: 'Please go to your BuJo later to view them',
+                        icon: <SmileOutlined style={{color: '#4ddbff'}}/>,
+                    });
+                    if (isMobile()) {
+                        setTimeout(() => {
+                            window.location.href = `${window.location.protocol}//${window.location.host}/public/templates`;
+                        }, 5000);
+                    } else {
+                        setTimeout(() => {
+                            window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
+                        }, 5000);
+                    }
+                },
+                getSampleTasks().map(s => s.id), curSelections, category.id,
                 projectId, assignees,
                 reminderBefore === undefined ? before : reminderBefore, labels, subscribed,
                 startDate, targetTimezone ? targetTimezone : timezone);
         }
+        window.scrollTo(0, document.body.scrollHeight);
     }
 
     const getUserSelections = () => {
@@ -361,6 +386,9 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                 Import
             </Button>
         </div>
+        <div className='confirm-button'>
+            {loadingNextStep && <ReactLoading type="bubbles" color="#0984e3"/>}
+        </div>
         <div className='subscribe-updates'>
             <Checkbox checked={subscribed} onChange={onChangeSubscribed}>Subscribe to future updates</Checkbox>
             <Tooltip title='New events will be added into your BuJo automatically'>
@@ -372,6 +400,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
+    loadingNextStep: state.templates.loadingNextStep,
     ownedProjects: state.project.owned,
     sharedProjects: state.project.shared,
     group: state.group.group,
@@ -386,5 +415,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
     getGroup,
     labelsUpdate,
-    importTasks
+    importTasks,
+    sampleTasksReceived
 })(StepsImportTasksPage);

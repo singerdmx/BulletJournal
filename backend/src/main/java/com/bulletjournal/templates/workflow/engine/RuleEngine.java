@@ -12,6 +12,8 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -52,29 +54,30 @@ public class RuleEngine {
     @Autowired
     private CategoryDaoJpa categoryDaoJpa;
 
-    public void importTasks(String requester, ImportTasksParams importTasksParams) {
-        List<SampleTask> sampleTasks = sampleTaskDaoJpa
-                .findAllById(importTasksParams.getSampleTasks());
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(String requester, ImportTasksParams importTasksParams) {
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = sampleTaskDaoJpa
+                .findAllById(importTasksParams.getSampleTasks()).stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
         // if there is any sample task that does not have due date, we need to set due date for it
-        List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream().map(sampleTask -> sampleTask.toPresentationModel())
+        List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
         User user = this.userDaoJpa.getByName(requester);
 
+        String timezone = importTasksParams.getTimezone();
+        if (StringUtils.isBlank(timezone)) {
+            timezone = user.getTimezone();
+        }
         if (!tasksNeedTimingArrangement.isEmpty()) {
             tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid())));
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
                 startDay = ZonedDateTimeHelper.getStartTime(
-                        importTasksParams.getStartDate(), null, importTasksParams.getTimezone());
+                        importTasksParams.getStartDate(), null, timezone);
             } else {
-                startDay = ZonedDateTime.now().plusDays(1);
-            }
-
-            String timezone = importTasksParams.getTimezone();
-            if (StringUtils.isBlank(timezone)) {
-                timezone = user.getTimezone();
+                startDay = ZonedDateTimeHelper.getStartTime(
+                        ZonedDateTime.now().plusDays(1).format(ZonedDateTimeHelper.DATE_FORMATTER), null, timezone);
             }
             int frequency = getTimesOneDay(importTasksParams.getSelections(), importTasksParams.getCategoryId());
             int startIndex = 0;
@@ -83,7 +86,6 @@ public class RuleEngine {
                 ZonedDateTime startTime = startDay.plusHours(21).plusDays(numOfDay++);
                 for (int i = 0; i < frequency && startIndex < tasksNeedTimingArrangement.size(); startIndex++, i++) {
                     com.bulletjournal.templates.controller.model.SampleTask sampleTask = tasksNeedTimingArrangement.get(startIndex);
-                    System.out.println(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
                     sampleTask.setDueDate(startTime.format(ZonedDateTimeHelper.DATE_FORMATTER));
                     sampleTask.setDueTime(startTime.format(ZonedDateTimeHelper.TIME_FORMATTER));
                     sampleTask.setTimeZone(timezone);
@@ -92,11 +94,13 @@ public class RuleEngine {
             }
         }
 
-//        this.taskDaoJpa.createTaskFromSampleTask();
+        this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, tasksNeedTimingArrangement, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
 
         if (importTasksParams.isSubscribed()) {
             this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());
         }
+
+        return sampleTasks;
     }
 
     private int getTimesOneDay(List<Long> selections, long categoryId) {

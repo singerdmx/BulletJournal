@@ -11,9 +11,15 @@ import {
     sampleTasksReceived
 } from "../../features/templates/actions";
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, notification, Select} from "antd";
+import {Button, Card, Empty, notification, Select, Tooltip} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {CloseSquareTwoTone, ExclamationCircleFilled, UpCircleTwoTone} from "@ant-design/icons";
+import {
+    CloseCircleTwoTone,
+    CloseOutlined,
+    CloseSquareTwoTone,
+    ExclamationCircleFilled,
+    UpCircleTwoTone
+} from "@ant-design/icons";
 import ReactLoading from "react-loading";
 import {getCookie} from "../../index";
 import StepsImportTasksPage from "./steps.import.tasks.pages";
@@ -91,6 +97,7 @@ const StepsPage: React.FC<StepsProps> = (
                 localStorage.removeItem(STEPS);
                 localStorage.removeItem(SELECTIONS);
                 localStorage.removeItem(SAMPLE_TASKS);
+                sampleTasksReceived([], '');
             } else {
                 const selections = getSelections();
                 const curStep = getCurrentStep();
@@ -220,9 +227,11 @@ const StepsPage: React.FC<StepsProps> = (
             selections[c.id] = null;
         });
         steps.pop();
-        steps[steps.length - 1].choices.forEach(c => {
-            selections[c.id] = null;
-        });
+        if (steps[steps.length - 1]) {
+            steps[steps.length - 1].choices.forEach(c => {
+                selections[c.id] = null;
+            });
+        }
         setSelections(selections);
         localStorage.setItem(STEPS, JSON.stringify(steps));
         nextStepReceived(undefined);
@@ -246,7 +255,6 @@ const StepsPage: React.FC<StepsProps> = (
         curStep.choices.forEach(c => {
             selected = selected.concat(selections[c.id]);
         });
-        console.log(selected);
 
         let prevSelections = [] as number[];
 
@@ -255,7 +263,6 @@ const StepsPage: React.FC<StepsProps> = (
                 prevSelections = prevSelections.concat(selections[k]);
             }
         });
-        console.log(prevSelections);
         getNextStep(curStep.id, selected, prevSelections, getSteps().length === 1);
     }
 
@@ -286,24 +293,22 @@ const StepsPage: React.FC<StepsProps> = (
         const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
         if (sampleTasksText) {
             const data: SampleTasks = JSON.parse(sampleTasksText);
+            if (data.sampleTasks && data.sampleTasks.length > 0) {
+                sampleTasksReceived(data.sampleTasks, data.scrollId ? data.scrollId : '');
+            }
             return data.sampleTasks;
         }
 
         return [];
     }
 
-    const getScrollId = () => {
-        if (scrollId) {
-            return scrollId;
-        }
-
-        const sampleTasksText = localStorage.getItem(SAMPLE_TASKS);
-        if (sampleTasksText) {
-            const data: SampleTasks = JSON.parse(sampleTasksText);
-            return data.scrollId;
-        }
-
-        return '';
+    const onRemoveTask = (id: number) => {
+        const data = sampleTasks.filter(t => t.id !== id);
+        sampleTasksReceived(data, scrollId);
+        localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
+            sampleTasks: data,
+            scrollId: scrollId
+        }));
     }
 
     const getStepsDiv = () => {
@@ -314,6 +319,7 @@ const StepsPage: React.FC<StepsProps> = (
         const existingSteps = getSteps();
         if (existingSteps.length > 0) {
             const curStep = getCurrentStep();
+            const tasks = getSampleTasks();
             return <div>
                 <div className='choices-card'>
                     {((nextStep && nextStep.step) || existingSteps.length > 1) && <div className='go-back'>
@@ -329,9 +335,14 @@ const StepsPage: React.FC<StepsProps> = (
                             return renderChoice(choice);
                         })}
                     </div>
-                    {getSampleTasks().length > 0 && <div className='sample-tasks'>
-                        {getSampleTasks().map((sampleTask: SampleTask) => {
+                    {tasks.length > 0 && <div className='sample-tasks'>
+                        {tasks.map((sampleTask: SampleTask) => {
                             return <div className='sample-task'>
+                                <div className='remove-task-icon'>
+                                    <Tooltip title='Remove this'>
+                                        <CloseOutlined onClick={() => onRemoveTask(sampleTask.id)}/>
+                                    </Tooltip>
+                                </div>
                                 {sampleTask.name}
                             </div>
                         })}
@@ -342,12 +353,12 @@ const StepsPage: React.FC<StepsProps> = (
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Next
                         </Button>}
-                        {getScrollId() && <Button
+                        {scrollId && <Button
                             onClick={onScrollNext}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             More
                         </Button>}
-                        {getSampleTasks().length > 0 && showApplyButton && <Button
+                        {tasks.length > 0 && showApplyButton && <Button
                             onClick={onApplySampleTasks}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Apply

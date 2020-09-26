@@ -21,6 +21,7 @@ public class ImportTasksParams {
     private boolean subscribed;
     private String startDate;
     private String timezone;
+    private String scrollId;
 
     public List<Long> getSampleTasks() {
         return sampleTasks;
@@ -100,5 +101,13 @@ public class ImportTasksParams {
 
     public void setSubscribed(boolean subscribed) {
         this.subscribed = subscribed;
+    }
+
+    public String getScrollId() {
+        return scrollId;
+    }
+
+    public void setScrollId(String scrollId) {
+        this.scrollId = scrollId;
     }
 }

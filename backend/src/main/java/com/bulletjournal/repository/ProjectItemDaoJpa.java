@@ -39,6 +39,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     private static final Gson GSON = new Gson();
 
+    private static final int CONTENT_BATCH_SIZE = 50;
+
     @Autowired
     protected LabelDaoJpa labelDaoJpa;
     @Autowired
@@ -56,7 +58,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
-    private NotificationService notificationService;
+    protected NotificationService notificationService;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -150,15 +152,44 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.sharedProjectItemDaoJpa.deleteSharedProjectItemWithUser(projectItem, requester);
     }
 
+    public <T extends ProjectItemModel> void addContent(List<T> projectItems, List<String> owners, List<K> contents) {
+        List<K> batch = new ArrayList<>();
+        int maxSize = Math.min(contents.size(), CONTENT_BATCH_SIZE);
+        for (int i = 0; i < maxSize; i++) {
+            K content = contents.get(i);
+            String owner = owners.get(i);
+            T projectItem = projectItems.get(i);
+            populateContent(owner, content, projectItem);
+            batch.add(content);
+        }
+        if (!batch.isEmpty()) {
+            this.getContentJpaRepository().saveAll(batch);
+        }
+
+        if (contents.size() <= CONTENT_BATCH_SIZE) {
+            return;
+        }
+
+        ContentBatch left = new ContentBatch(
+                contents.subList(CONTENT_BATCH_SIZE, contents.size()),
+                projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size()),
+                owners.subList(CONTENT_BATCH_SIZE, owners.size()));
+        this.notificationService.addContentBatch(left);
+    }
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Pair<ContentModel, T> addContent(Long projectItemId, String owner, K content) {
         T projectItem = getProjectItem(projectItemId, owner);
+        populateContent(owner, content, projectItem);
+        this.getContentJpaRepository().save(content);
+        return Pair.of(content, projectItem);
+    }
+
+    private <T extends ProjectItemModel> void populateContent(String owner, K content, T projectItem) {
         content.setProjectItem(projectItem);
         content.setOwner(owner);
         content.setText(DeltaConverter.supplementContentText(content.getText()));
         updateRevision(content, owner, content.getText(), content.getText());
-        this.getContentJpaRepository().save(content);
-        return Pair.of(content, projectItem);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

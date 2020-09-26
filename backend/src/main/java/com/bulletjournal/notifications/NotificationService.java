@@ -6,6 +6,7 @@ import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
+import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,15 @@ public class NotificationService {
 
     @Autowired
     @Lazy
-    Reminder reminder;
+    private Reminder reminder;
 
     @Autowired
-    public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa, SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
+    @Lazy
+    private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa,
+                               SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
         this.notificationDaoJpa = notificationDaoJpa;
         this.auditableDaoJpa = auditableDaoJpa;
         this.searchIndexDaoJpa = searchIndexDaoJpa;
@@ -93,6 +99,14 @@ public class NotificationService {
         this.eventQueue.offer(etagEvent);
     }
 
+    public void addContentBatch(ContentBatch contentBatch) {
+        LOGGER.info("Received contentBatch: " + contentBatch);
+        if (contentBatch == null) {
+            return;
+        }
+        this.eventQueue.offer(contentBatch);
+    }
+
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Object> events = new ArrayList<>();
@@ -114,6 +128,7 @@ public class NotificationService {
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
             List<Remindable> remindables = new ArrayList<>();
+            List<ContentBatch> contentBatchs = new ArrayList<>();
             events.forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
@@ -125,6 +140,8 @@ public class NotificationService {
                     etagEvents.add((EtagEvent) e);
                 } else if (e instanceof Remindable) {
                     remindables.add((Remindable) e);
+                } else if (e instanceof ContentBatch) {
+                    contentBatchs.add((ContentBatch) e);
                 }
             });
             try {
@@ -159,6 +176,15 @@ public class NotificationService {
             try {
                 if (!remindables.isEmpty()) {
                     this.reminder.generateTaskReminder(remindables.stream().map(e -> e.getTask()).collect(Collectors.toList()));
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on Reminder", ex);
+            }
+
+            try {
+                // batch contents is only for tasks
+                for (ContentBatch batch : contentBatchs) {
+                    this.taskDaoJpa.addContent(batch.getProjectItems(), batch.getOwners(), batch.getContents());
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on Reminder", ex);

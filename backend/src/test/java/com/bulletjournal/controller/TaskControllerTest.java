@@ -6,12 +6,9 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.repository.TaskContentRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.models.TaskContent;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
-import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -208,6 +206,7 @@ public class TaskControllerTest {
     }
 
     @Test
+    @Transactional
     public void testCreateTaskFromSampleTask() throws Exception {
         Long projectId = 1L;
         Long sampleTaskId = 1L;
@@ -216,15 +215,15 @@ public class TaskControllerTest {
         List<String> assignees = Arrays.asList("Xavier", "Scarlet");
         String timeZone = "America/Los_Angeles";
 
-        SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
+        com.bulletjournal.templates.controller.model.SampleTask sampleTask = sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel();
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = new ArrayList<>();
+        sampleTasks.add(sampleTask);
         sampleTask.setTimeZone(timeZone);
-        com.bulletjournal.repository.models.Task task
-            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTask, reminderBeforeTask, assignees, new ArrayList<>());
-        assertNotNull(task);
-        assertEquals(owner, task.getOwner());
-        assertTrue(assignees.size() == task.getAssignees().size() && assignees.containsAll(task.getAssignees()));
-        TaskContent content = Iterables.getOnlyElement(taskContentRepository.findTaskContentByTask(task));
-        assertNotNull(content);
+        List<com.bulletjournal.repository.models.Task> tasks
+            = taskDaoJpa.createTaskFromSampleTask(projectId, owner, sampleTasks, reminderBeforeTask, assignees, new ArrayList<>());
+        assertNotNull(tasks.get(0));
+        assertEquals(owner, tasks.get(0).getOwner());
+        assertTrue(assignees.size() == tasks.get(0).getAssignees().size() && assignees.containsAll(tasks.get(0).getAssignees()));
     }
 
     private TaskStatistics getTaskStatistics(List<Long> projectIds, String timezone, String startTime, String endTime) {
