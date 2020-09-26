@@ -4,15 +4,15 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
-import com.bulletjournal.templates.controller.model.SampleTask;
-import com.bulletjournal.templates.controller.model.SampleTaskRule;
+import com.bulletjournal.templates.redis.RedisSampleTasksRepository;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskRuleDaoJpa;
 import com.bulletjournal.templates.repository.StepDaoJpa;
-import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.repository.model.Category;
+import com.bulletjournal.templates.repository.model.CategoryRule;
 import com.bulletjournal.templates.repository.model.Step;
+import com.bulletjournal.templates.repository.model.StepRule;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.google.gson.Gson;
@@ -25,9 +25,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -58,11 +57,12 @@ public class WorkflowController {
     private StepDaoJpa stepDaoJpa;
 
     @Autowired
+    private RedisSampleTasksRepository sampleTasksRedisCache;
+
+    @Autowired
     private RuleEngine ruleEngine;
 
     private static final Gson GSON = new Gson();
-
-    private static final Map<String, List<SampleTask>> CACHE = new ConcurrentHashMap<String, List<SampleTask>>();
 
     @GetMapping(NEXT_STEP_ROUTE)
     public NextStep getNext(
@@ -92,7 +92,7 @@ public class WorkflowController {
                 String scrollId = UUID.randomUUID().toString();
                 nextStep.setScrollId(scrollId);
                 nextStep.setSampleTasks(sampleTasks.subList(0, 10));
-                CACHE.put(scrollId, sampleTasks.subList(10, sampleTasks.size()));
+                sampleTasksRedisCache.save(new SampleTasks(scrollId, sampleTasks.subList(10, sampleTasks.size())));
             }
         }
 
@@ -101,7 +101,11 @@ public class WorkflowController {
 
     @GetMapping(PUBLIC_SAMPLE_TASKS_ROUTE)
     public SampleTasks getSampleTasks(@RequestParam String scrollId, @NotNull @RequestParam Integer pageSize) {
-        List<SampleTask> tasks = CACHE.get(scrollId);
+        List<SampleTask> tasks = null;
+        Optional<SampleTasks> cachedSampleTasks = sampleTasksRedisCache.findById(scrollId);
+        if (cachedSampleTasks.isPresent()) {
+            tasks = cachedSampleTasks.get().getSampleTasks();
+        }
         SampleTasks sampleTasks = new SampleTasks();
         sampleTasks.setScrollId("");
         if (tasks == null) {
@@ -109,13 +113,13 @@ public class WorkflowController {
         }
         if (tasks.size() <= pageSize) {
             sampleTasks.setSampleTasks(tasks);
-            CACHE.remove(scrollId);
+            sampleTasksRedisCache.deleteById(scrollId);
             return sampleTasks;
         }
         String newScrollId = UUID.randomUUID().toString();
         sampleTasks.setScrollId(newScrollId);
         sampleTasks.setSampleTasks(tasks.subList(0, pageSize));
-        CACHE.put(newScrollId, tasks.subList(pageSize, tasks.size()));
+        sampleTasksRedisCache.save(new SampleTasks(newScrollId, tasks.subList(pageSize, tasks.size())));
         return sampleTasks;
     }
 
@@ -216,8 +220,12 @@ public class WorkflowController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String scrollId = importTasksParams.getScrollId();
         if (StringUtils.isNotBlank(scrollId)) {
-            importTasksParams.getSampleTasks().addAll(
-                    CACHE.remove(scrollId).stream().map(t -> t.getId()).collect(Collectors.toList()));
+            Optional<SampleTasks> cachedSampleTasks = sampleTasksRedisCache.findById(scrollId);
+            cachedSampleTasks.ifPresent(sampleTasks -> {
+                importTasksParams.getSampleTasks().addAll(
+                    sampleTasks.getSampleTasks().stream().map(SampleTask::getId).collect(Collectors.toList()));
+                sampleTasksRedisCache.deleteById(scrollId);
+            });
         }
         return this.ruleEngine.importTasks(username, importTasksParams);
     }
