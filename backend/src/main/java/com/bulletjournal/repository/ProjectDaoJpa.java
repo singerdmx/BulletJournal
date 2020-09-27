@@ -10,6 +10,7 @@ import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.SampleProjectsCreation;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
@@ -20,6 +21,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ProjectDaoJpa {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectDaoJpa.class);
     private static final Gson GSON = new Gson();
     @Autowired
     private ProjectRepository projectRepository;
@@ -178,6 +181,33 @@ public class ProjectDaoJpa {
         project = this.projectRepository.save(project);
         events.addAll(generateEvents(group, owner, project));
         return project;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void createSampleProjects(SampleProjectsCreation sampleProjectsCreation) {
+        CreateProjectParams sampleTodoProjectParams =
+                new CreateProjectParams("TODO List", ProjectType.TODO,
+                        "Manage your tasks here",
+                        sampleProjectsCreation.getGroup().getId());
+        Project todoProject = this.create(sampleTodoProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
+        LOGGER.info("Sample todo list project {} created for user {}", todoProject.getId(),
+                sampleProjectsCreation.getUsername());
+
+        CreateProjectParams sampleNoteProjectParams =
+                new CreateProjectParams("Notes", ProjectType.NOTE,
+                        "Add your notes here",
+                        sampleProjectsCreation.getGroup().getId());
+        Project noteProject = this.create(sampleNoteProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
+        LOGGER.info("Sample note project {} created for user {}", noteProject.getId(),
+                sampleProjectsCreation.getUsername());
+
+        CreateProjectParams sampleLedgerProjectParams =
+                new CreateProjectParams("Ledger", ProjectType.LEDGER,
+                        "Track your transactions here",
+                        sampleProjectsCreation.getGroup().getId());
+        Project ledgerProject = this.create(sampleLedgerProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
+        LOGGER.info("Sample ledger project {} created for user {}", ledgerProject.getId(),
+                sampleProjectsCreation.getUsername());
     }
 
     private List<Event> generateEvents(Group group, String requester, Project project) {

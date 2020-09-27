@@ -141,6 +141,7 @@ export type UpdateChoiceAction = {
     id: number;
     name: string;
     multiple: boolean;
+    instructionIncluded: boolean;
 };
 
 export type AddSelectionAction = {

@@ -250,7 +250,6 @@ public class GroupDaoJpa implements Etaggable {
         return group;
     }
 
-    @Deprecated
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Event> removeUserGroups(
             String requester,

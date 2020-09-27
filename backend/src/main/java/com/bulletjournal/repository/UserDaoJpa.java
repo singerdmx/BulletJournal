@@ -6,6 +6,8 @@ import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.controller.models.UserPointActivity;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.SampleProjectsCreation;
 import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.models.Group;
@@ -14,15 +16,21 @@ import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Set;
 
 @Repository
 public class UserDaoJpa {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private UserRepository userRepository;
@@ -41,6 +49,10 @@ public class UserDaoJpa {
 
     @Autowired
     private UserPointActivityDaoJpa userPointActivityDaoJpa;
+
+    @Lazy
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public User create(String name, String timezone) {
@@ -70,6 +82,9 @@ public class UserDaoJpa {
         this.labelDaoJpa.createDefaultLabels(name);
         user = this.userRepository.save(user);
         this.firstTimeUserRepository.save(new FirstTimeUser(user.getName()));
+
+        this.entityManager.flush();
+        this.notificationService.createSampleProjects(new SampleProjectsCreation(name, group));
         return user;
     }
 

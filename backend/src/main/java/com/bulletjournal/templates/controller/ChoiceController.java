@@ -3,6 +3,7 @@ package com.bulletjournal.templates.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.repository.models.NamedModel;
 import com.bulletjournal.templates.controller.model.Choice;
 import com.bulletjournal.templates.controller.model.CreateChoiceParams;
 import com.bulletjournal.templates.controller.model.UpdateChoiceParams;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +40,10 @@ public class ChoiceController {
 
     @GetMapping(PUBLIC_CHOICES_ROUTE)
     public List<Choice> getChoices() {
-        return choiceDaoJpa.getAllChoices().stream().map(
-                com.bulletjournal.templates.repository.model.Choice::toPresentationModel).collect(
-                Collectors.toList());
+        return choiceDaoJpa.getAllChoices().stream()
+                .sorted(Comparator.comparing(NamedModel::getName))
+                .map(com.bulletjournal.templates.repository.model.Choice::toPresentationModel)
+                .collect(Collectors.toList());
     }
 
     @GetMapping(PUBLIC_CHOICE_ROUTE)

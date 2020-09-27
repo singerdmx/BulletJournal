@@ -508,17 +508,6 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
       );
     }
 
-    let description = null;
-    if (project && project.description) {
-      description = (
-          <div className="project-description">
-            {project.description.split('\n').map((s, key) => {
-              return <p key={key}>{s}</p>;
-            })}
-          </div>
-      );
-    }
-
     const group = getGroupByProject(this.props.groups, project);
     let groupUsers = group ? group.users : [];
     if (project && project.shared) {
@@ -548,42 +537,19 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
       );
     }
 
-    return (
-        <div
-            className={`project ${
-                project.projectType === ProjectType.LEDGER && 'ledger'
-            }`}
-        >
-          <Tooltip
-              placement="top"
-              title={project.owner.alias}
-              className="project-avatar"
-          >
-          <span>
-            <Avatar size="large" src={project.owner.avatar}/>
-          </span>
-          </Tooltip>
-          <div className="project-header">
-            <h2>
-              {!description && this.getProjectNameSpan(project)}
-              {description && (
-                  <Popover
-                      className='project-description'
-                      placement="bottomLeft"
-                      content={description}
-                  >
-                    {this.getProjectNameSpan(project)}
-                  </Popover>
-              )}
-            </h2>
-            <div className="project-control">
-              <Popover
-                  title={
-                    group && `${group.name} (${!!group ? groupUsers.length : 0})`
-                  }
-                  placement="bottom"
-                  content={popContent}
-              >
+    let projectHeader = (
+        <div className="project-header">
+          <h2>
+            {this.getProjectNameSpan(project)}
+          </h2>
+          <div className="project-control">
+            <Popover
+                title={
+                  group && `${group.name} (${!!group ? groupUsers.length : 0})`
+                }
+                placement="bottom"
+                content={popContent}
+            >
               <span
                   style={{cursor: 'pointer'}}
                   onClick={(e) => this.onClickGroup(group.id)}
@@ -599,15 +565,46 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
                   <TeamOutlined style={{fontSize: '21px'}}/>
                 </Badge>
               </span>
-              </Popover>
-              <ShowProjectHistory/>
-              {createContent}
-              {editContent}
-              {deleteContent}
-              {projectItemsByUser}
-              {projectItemsByOrder}
-            </div>
+            </Popover>
+            <ShowProjectHistory/>
+            {createContent}
+            {editContent}
+            {deleteContent}
+            {projectItemsByUser}
+            {projectItemsByOrder}
           </div>
+        </div>
+    );
+
+    if (project.description) {
+      projectHeader = <Popover
+          placement="bottom"
+          content={<div className="project-description">
+            {project.description.split('\n').map((s, key) => {
+              return <p key={key}>{s}</p>;
+            })}
+          </div>}
+      >
+        {projectHeader}
+      </Popover>
+    }
+
+    return (
+        <div
+            className={`project ${
+                project.projectType === ProjectType.LEDGER && 'ledger'
+            }`}
+        >
+          <Tooltip
+              placement="top"
+              title={project.owner.alias}
+              className="project-avatar"
+          >
+          <span>
+            <Avatar size="large" src={project.owner.avatar}/>
+          </span>
+          </Tooltip>
+          {projectHeader}
           {this.getProjectLabels()}
           <BackTop/>
           <div className="project-content">{projectContent}</div>

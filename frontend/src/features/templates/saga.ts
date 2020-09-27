@@ -299,8 +299,8 @@ function* removeSelection(action: PayloadAction<DeleteSelectionAction>) {
 
 function* putChoice(action: PayloadAction<UpdateChoiceAction>) {
   try {
-    const {id, name, multiple} = action.payload;
-    const data: Choice = yield call(updateChoice, id, name, multiple);
+    const {id, name, multiple, instructionIncluded} = action.payload;
+    const data: Choice = yield call(updateChoice, id, name, multiple, instructionIncluded);
     console.log(data)
     const choices: Choice[] = yield call(getChoices);
     console.log(choices)
