@@ -15,12 +15,7 @@
       },
       "value": {
         "type": "text",
-        "analyzer": "standard", 
-        "fields": {
-          "keyword": {
-            "type": "keyword"
-          }
-        }
+        "analyzer": "standard"
       },
       "parentId": {
         "type": "keyword"
