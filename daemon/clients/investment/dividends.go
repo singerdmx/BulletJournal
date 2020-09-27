@@ -74,5 +74,22 @@ func fetchDivideneds() (*DividendsData, error) {
 		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
 	}
 
+	for i:= range(data) {
+		target := data[i]
+		item := persistence.SampleTask{
+			CreatedAt: time.Now,
+			UpdatedAt: time.Now,
+			MetaData: "DIVIDENDS_RECORD",
+			Content: "",
+			Name: target.Name,
+			Uid: target.ID,
+			AvailableBefore: target.Date,
+			ReminderBeforeTask: 0,
+			DueDate: "",			
+			DueTime: ""
+		}
+		sampleTaskDao.Upsert(&item)
+	}
+
 	return &data, nil
 }
