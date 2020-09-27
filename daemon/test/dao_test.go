@@ -3,7 +3,7 @@ package main
 // Basic imports
 import (
 	"github.com/singerdmx/BulletJournal/daemon/api/service"
-	"github.com/singerdmx/BulletJournal/daemon/persistence"
+	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
 	"log"
 	"testing"
 	"time"
@@ -55,6 +55,13 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	if err != nil {
 		log.Fatalf("Truncate(): %q\n", err)
 	}
+
+	sampleTasksCollection := sess.Collection("template.sample_tasks")
+	err = sampleTasksCollection.Truncate()
+	if err != nil {
+		log.Fatalf("Truncate(): %q\n", err)
+	}
+
 	// googleCalendarProjectCollection := sess.Collection("google_calendar_projects")
 	//Clean up table before testing
 
@@ -193,7 +200,41 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	if err != nil {
 		log.Fatalf("Inserting public_project_items with err %v", err)
 	}
+
+	_, err = sampleTasksCollection.Insert(persistence.SampleTask{
+			ID:					1,
+			CreatedAt:			t2,
+			UpdatedAt:			t2,
+			MetaData:			"IPO",
+			Content:			"Test Content",
+			Name:				"Test Name",
+			Uid:				"1000",
+			AvailableBefore:	t2,
+			ReminderBeforeTask: 1,
+			DueDate:			"2020-02-20",
+			DueTime: 			"",
+	}) 
+	if err != nil {
+		log.Fatalf("Inserting sampleTask item failed with err %v", err)
+	}
 }
+
+func upsertTest() {
+	item := persistence.SampleTask {
+			CreatedAt: time.Now(), 
+			UpdatedAt: time.Now(),
+			MetaData: "INVESTMENT_IPO_RECORD",
+			Content: "",
+			Name: "",
+			Uid: "",
+			AvailableBefore: time.Now(),
+			ReminderBeforeTask: 0,
+			DueDate: "",			
+			DueTime: "",		
+	}
+	persistence.GetSampleTaskDao().Upsert(&item)
+}
+
 
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
