@@ -42,7 +42,7 @@ public class UserCategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateUserCategory(User user, Long categoryId, List<Long> selections) {
+    public void updateUserCategory(User user, Long categoryId, List<Long> selections, Long projectId) {
         UserCategoryKey userCategoryKey = new UserCategoryKey();
         userCategoryKey.setCategoryId(categoryId);
         userCategoryKey.setUserId(user.getId());

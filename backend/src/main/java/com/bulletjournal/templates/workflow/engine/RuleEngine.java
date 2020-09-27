@@ -97,7 +97,8 @@ public class RuleEngine {
         this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, tasksNeedTimingArrangement, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
 
         if (importTasksParams.isSubscribed()) {
-            this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());
+            this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(),
+                    importTasksParams.getSelections(), importTasksParams.getProjectId());
         }
 
         return sampleTasks;
