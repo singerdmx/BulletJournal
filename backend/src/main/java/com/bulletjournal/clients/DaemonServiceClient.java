@@ -97,7 +97,7 @@ public class DaemonServiceClient {
             @Override
             public void onError(Throwable t) {
                 Status status = Status.fromThrowable(t);
-                LOGGER.error("RenewGoogleCalendarWatch server side error: {}", status);
+                LOGGER.error("subscribeNotification server side error: {}", status);
                 long wait = 10000L;
                 LOGGER.info("Will retry subscribing to daemon server again in {}s", wait / 1000);
                 try {
@@ -111,7 +111,7 @@ public class DaemonServiceClient {
 
             @Override
             public void onCompleted() {
-                LOGGER.info("Stopped receiving GoogleCalendarProjectId");
+                LOGGER.info("Stopped receiving subscribeNotification");
             }
         };
     }
