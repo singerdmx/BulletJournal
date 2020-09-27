@@ -62,6 +62,7 @@ public class UserCategoryDaoJpa {
             userCategory.setCategory(this.categoryDaoJpa.getById(categoryId));
             userCategory.setUser(user);
             userCategory.setUserCategoryKey(userCategoryKey);
+            userCategory.setProject(project);
         } else {
             userCategory = getUserCategoryByKey(userCategoryKey);
             Set<String> selectionSet = userCategory.getSelectionIds().stream().map(Object::toString).collect(Collectors.toSet());
