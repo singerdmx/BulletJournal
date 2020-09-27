@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/go-resty/resty/v2"
 
-	"github.com/singerdmx/BulletJournal/daemon/persistence"
+	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
 
 )
 

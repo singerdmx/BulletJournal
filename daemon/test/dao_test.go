@@ -3,7 +3,7 @@ package main
 // Basic imports
 import (
 	"github.com/singerdmx/BulletJournal/daemon/api/service"
-	"github.com/singerdmx/BulletJournal/daemon/persistence"
+	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
 	"log"
 	"testing"
 	"time"
@@ -217,6 +217,22 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 	if err != nil {
 		log.Fatalf("Inserting sampleTask item failed with err %v", err)
 	}
+}
+
+func upsertTest() {
+	item := persistence.SampleTask {
+			CreatedAt: time.Now(), 
+			UpdatedAt: time.Now(),
+			MetaData: "INVESTMENT_IPO_RECORD",
+			Content: "",
+			Name: "",
+			Uid: "",
+			AvailableBefore: time.Now(),
+			ReminderBeforeTask: 0,
+			DueDate: "",			
+			DueTime: "",		
+	}
+	persistence.GetSampleTaskDao().Upsert(&item)
 }
 
 
