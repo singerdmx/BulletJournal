@@ -94,10 +94,10 @@ func fetchIPO() (*IPOData, error) {
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
-			AvailableBefore: target.Date,
+			AvailableBefore: target.PricingDate,
 			ReminderBeforeTask: 0,
-			DueDate: "",			
-			DueTime: ""			
+			DueDate: target.PricingDate,			
+			DueTime: ""	
 		}
 		sampleTaskDao.Upsert(&item)
 	}
