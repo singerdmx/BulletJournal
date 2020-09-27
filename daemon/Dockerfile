@@ -10,7 +10,7 @@ COPY cmd cmd
 COPY clients clients
 COPY config config
 COPY utils utils
-COPY persistence daos
+COPY persistence persistence
 COPY logging logging
 COPY api api
 COPY go.mod .

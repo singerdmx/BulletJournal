@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
-	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
-	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
 	"os"
@@ -13,6 +10,10 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
+	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
@@ -53,7 +54,7 @@ func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEv
 }
 
 // Rest implements the Rest rest->rpc endpoint of services.DaemonServer
-func (s *server) Rest(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
+func (s *server) HandleJoinGroupResponse(ctx context.Context, request *types.JoinGroupResponse) (*types.ReplyMessage, error) {
 	if meta, ok := metadata.FromIncomingContext(ctx); ok {
 		if requestId, ok := meta[strings.ToLower(middleware.RequestIDKey)]; ok {
 			log.Printf(middleware.RequestIDKey+": %v", requestId[0])
