@@ -29,6 +29,11 @@ public class UserCategory {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToOne(targetEntity = SelectionMetadataKeyword.class)
+    @MapsId("metadata_keyword")
+    @JoinColumn(name = "metadata_keyword")
+    private SelectionMetadataKeyword metadataKeyword;
+
     @Column(name = "selections")
     private String selections;
 
@@ -70,6 +75,14 @@ public class UserCategory {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public SelectionMetadataKeyword getMetadataKeyword() {
+        return metadataKeyword;
+    }
+
+    public void setMetadataKeyword(SelectionMetadataKeyword metadataKeyword) {
+        this.metadataKeyword = metadataKeyword;
     }
 
     public String getSelections() {

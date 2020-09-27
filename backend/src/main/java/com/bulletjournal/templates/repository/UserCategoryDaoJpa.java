@@ -26,6 +26,9 @@ public class UserCategoryDaoJpa {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private SelectionMetadataKeywordRepository selectionMetadataKeywordRepository;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void save(UserCategory userCategory) {
         if (userCategory != null) {
@@ -50,9 +53,8 @@ public class UserCategoryDaoJpa {
     public void updateUserCategory(User user, Long categoryId, List<Long> selections, Long projectId) {
         Project project = this.projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException(
                 "Project " + projectId + " not found"));
-        UserCategoryKey userCategoryKey = new UserCategoryKey();
-        userCategoryKey.setCategoryId(categoryId);
-        userCategoryKey.setUserId(user.getId());
+        UserCategoryKey userCategoryKey = new UserCategoryKey(
+                user.getId(), categoryId, "LEETCODE_ALGORITHM");
         UserCategory userCategory;
         if (!checkExist(userCategoryKey)) {
             userCategory = new UserCategory();
@@ -63,6 +65,9 @@ public class UserCategoryDaoJpa {
             userCategory.setUser(user);
             userCategory.setUserCategoryKey(userCategoryKey);
             userCategory.setProject(project);
+            userCategory.setMetadataKeyword(
+                    selectionMetadataKeywordRepository.findById("LEETCODE_ALGORITHM")
+                            .orElseThrow(() -> new ResourceNotFoundException("LEETCODE_ALGORITHM not found")));
         } else {
             userCategory = getUserCategoryByKey(userCategoryKey);
             Set<String> selectionSet = userCategory.getSelectionIds().stream().map(Object::toString).collect(Collectors.toSet());
