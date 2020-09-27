@@ -48,10 +48,11 @@ export const addChoice = (name: string, multiple: boolean) => actions.addChoice(
 
 export const deleteChoice = (id: number) => actions.deleteChoice({id: id});
 
-export const updateChoice = (id: number, name: string, multiple: boolean) => actions.updateChoice({
+export const updateChoice = (id: number, name: string, multiple: boolean, instructionIncluded: boolean) => actions.updateChoice({
     id: id,
     name: name,
-    multiple: multiple
+    multiple: multiple,
+    instructionIncluded: instructionIncluded
 });
 
 export const addSelection = (choiceId: number, text: string) => actions.addSelection({choiceId: choiceId, text: text});

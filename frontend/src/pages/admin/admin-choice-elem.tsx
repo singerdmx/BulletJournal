@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './admin-choice.styles.less';
 import {Choice} from "../../features/templates/interface";
-import {Button, Divider, Modal, Radio, Typography} from "antd";
+import {Button, Checkbox, Divider, Empty, Modal, Radio, Typography} from "antd";
 import {DeleteFilled} from "@ant-design/icons";
 import {connect} from "react-redux";
 import {
@@ -19,7 +19,7 @@ type ChoiceProps = {
     choice: Choice;
     deleteChoice: (id: number) => void;
     deleteSelection: (id: number) => void;
-    updateChoice: (id: number, name: string, multiple: boolean) => void;
+    updateChoice: (id: number, name: string, multiple: boolean, instructionIncluded: boolean) => void;
     updateSelection: (id: number, text: string) => void;
     getChoice: (choiceId: number) => void;
 };
@@ -50,7 +50,7 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
 
     const nameChange = (input: any) => {
         console.log(input);
-        updateChoice(choice.id, input, choice.multiple);
+        updateChoice(choice.id, input, choice.multiple, choice.instructionIncluded);
     }
 
     const selectionTextChange = (e: string, id: number) => {
@@ -64,7 +64,13 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
 
     const choiceMultipleChange = (input: any) => {
         console.log(input)
-        updateChoice(choice.id, choice.name, input.target.value);
+        updateChoice(choice.id, choice.name, input.target.value, choice.instructionIncluded);
+        setVisible(false);
+    }
+
+    const onChangeInstructionIncluded = (value: any) => {
+        console.log(value.target.checked);
+        updateChoice(choice.id, choice.name, choice.multiple, value.target.checked);
         setVisible(false);
     }
 
@@ -85,6 +91,9 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                             <Radio value={true}>Multiple Selections</Radio>
                             <Radio value={false}>Single Selection</Radio>
                         </Radio.Group>
+                        <Checkbox checked={choice.instructionIncluded} onChange={onChangeInstructionIncluded}>
+                            Includes Instruction
+                        </Checkbox>
                     </div>
                     <Divider/>
                     <div className='choices-popup'>
@@ -96,12 +105,23 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                     <Divider/>
                     <div>
                         <h3>Associated Categories</h3>
-                        {choice.categories.map(category => {
+                        {choice.categories.length > 0 && choice.categories.map(category => {
                             return <span style={{cursor: 'pointer', padding: '5px', backgroundColor: `${category.color}`}}
                                          onClick={() => history.push(`/admin/categories/${category.id}`)}>
                                 {category.name} ({category.id})
                             </span>
                         })}
+                        {choice.categories.length === 0 && <Empty/>}
+                    </div>
+                    <div>
+                        <h3>Associated Steps</h3>
+                        {choice.steps.length > 0 && choice.steps.map(step => {
+                            return <span style={{cursor: 'pointer', padding: '5px'}}
+                                         onClick={() => history.push(`/admin/steps/${step.id}`)}>
+                                {step.name} ({step.id})
+                            </span>
+                        })}
+                        {choice.steps.length === 0 && <Empty/>}
                     </div>
                 </div>
             </Modal>
