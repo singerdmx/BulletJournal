@@ -7,7 +7,8 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
+
 )
 
 type IPOData struct {
