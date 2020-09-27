@@ -90,7 +90,7 @@ func fetchIPO() (*IPOData, error) {
 		item := persistence.SampleTask{
 			CreatedAt: time.Now, 
 			UpdatedAt: time.Now,
-			MetaData: "IPO_RECORD",
+			MetaData: "INVESTMENT_IPO_RECORD",
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,

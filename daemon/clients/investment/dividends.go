@@ -79,7 +79,7 @@ func fetchDivideneds() (*DividendsData, error) {
 		item := persistence.SampleTask{
 			CreatedAt: time.Now,
 			UpdatedAt: time.Now,
-			MetaData: "DIVIDENDS_RECORD",
+			MetaData: "INVESTMENT_DIVIDENDS_RECORD",
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
