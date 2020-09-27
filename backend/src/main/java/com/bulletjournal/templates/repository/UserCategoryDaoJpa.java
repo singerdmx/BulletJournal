@@ -1,5 +1,8 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.repository.ProjectRepository;
+import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.repository.model.UserCategory;
 import com.bulletjournal.templates.repository.model.UserCategoryKey;
@@ -20,6 +23,8 @@ public class UserCategoryDaoJpa {
     @Autowired
     private CategoryDaoJpa categoryDaoJpa;
 
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void save(UserCategory userCategory) {
@@ -43,6 +48,8 @@ public class UserCategoryDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateUserCategory(User user, Long categoryId, List<Long> selections, Long projectId) {
+        Project project = this.projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException(
+                "Project " + projectId + " not found"));
         UserCategoryKey userCategoryKey = new UserCategoryKey();
         userCategoryKey.setCategoryId(categoryId);
         userCategoryKey.setUserId(user.getId());
