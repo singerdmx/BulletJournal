@@ -36,7 +36,7 @@ import { User } from '../../features/group/interface';
 import {
   DeleteOutlined,
   FormOutlined,
-  CloseCircleOutlined,
+  CloseCircleOutlined, DatabaseOutlined,
 } from '@ant-design/icons';
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {useHistory} from "react-router-dom";
@@ -176,6 +176,13 @@ const AdminPage: React.FC<AdminProps> = (props) => {
   return (
     <div className='admin-page'>
       <Container>
+        <FloatButton
+            tooltip="Metadata"
+            onClick={() => history.push(`/admin/metadata`)}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+        >
+          <DatabaseOutlined />
+        </FloatButton>
         <FloatButton
             tooltip="Categories"
             onClick={() => history.push(`/admin/categories`)}
