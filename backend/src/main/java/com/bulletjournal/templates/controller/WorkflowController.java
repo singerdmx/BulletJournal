@@ -69,12 +69,13 @@ public class WorkflowController {
     @GetMapping(SUBSCRIBED_CATEGORIES_ROUTE)
     public List<SubscribedCategory> getUserSubscribedCategories() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-        return userCategoryDaoJpa.getUserCategoriesByUserName(requester).stream()
+        List<SubscribedCategory> result = userCategoryDaoJpa.getUserCategoriesByUserName(requester).stream()
                 .map(uc -> new SubscribedCategory(
                     uc.getCategory().toSimplePresentationModel(),
                     uc.getMetadataKeyword().getSelection().toPresentationModel(),
                     uc.getProject().toPresentationModel())
                 ).collect(Collectors.toList());
+        return result;
     }
 
     @GetMapping(NEXT_STEP_ROUTE)

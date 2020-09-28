@@ -9,9 +9,36 @@ public class SubscribedCategory {
 
     private Project project;
 
+    public SubscribedCategory() {
+    }
+
     public SubscribedCategory(Category category, Selection selection, Project project) {
         this.category = category;
         this.selection = selection;
+        this.project = project;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Selection getSelection() {
+        return selection;
+    }
+
+    public void setSelection(Selection selection) {
+        this.selection = selection;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
         this.project = project;
     }
 
