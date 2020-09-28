@@ -10,7 +10,7 @@ type SampleTask struct {
 	Content				string 		`db:"content"`
 	Name				string		`db:"name"`
 	Uid					string		`db:"uid"`
-	AvailableBefore		string 	    `db:"available_before"`	// TODO
+	AvailableBefore		time.Time 	`db:"available_before"`
 	ReminderBeforeTask 	int 		`db:"reminder_before_task"`
 	DueDate				string		`db:"due_date"`
 	DueTime 			string		`db:"due_time"`
