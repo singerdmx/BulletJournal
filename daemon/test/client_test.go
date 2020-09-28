@@ -14,15 +14,18 @@ type ClientTestSuite struct {
 }
 
 // Fetched ipo is not nil
-func testIPOClientFetchInfo(t *testing.T) {
+func TestIPOClientFetchInfo(t *testing.T) {
 	data, err := investment.FetchIPO()
 	assert.Nil(t, err)
 	assert.NotNil(t, data)
 }
 
 // Fetched dividend is not nil
-func testDividendFetchInfo(t *testing.T) {
+func TestDividendFetchInfo(t *testing.T) {
 	data, err := investment.FetchDividends()
 	assert.Nil(t, err)
 	assert.NotNil(t, data)
+}
+
+func (c *ClientTestSuite) TestClients() {
 }
