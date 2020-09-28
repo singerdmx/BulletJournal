@@ -22,6 +22,8 @@ public class SampleTask {
 
     private Timestamp availableBefore;
 
+    private Choice choice;
+
     public SampleTask() {
     }
 
@@ -119,4 +121,11 @@ public class SampleTask {
         this.availableBefore = availableBefore;
     }
 
+    public Choice getChoice() {
+        return choice;
+    }
+
+    public void setChoice(Choice choice) {
+        this.choice = choice;
+    }
 }

@@ -9,6 +9,7 @@ import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.redis.RedisSampleTasksRepository;
 import com.bulletjournal.templates.repository.*;
 import com.bulletjournal.templates.repository.model.Category;
+import com.bulletjournal.templates.repository.model.Choice;
 import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
@@ -256,7 +257,14 @@ public class WorkflowController {
     @GetMapping(SAMPLE_TASK_ROUTE)
     public SampleTask getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         validateRequester();
-        return sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel();
+        com.bulletjournal.templates.repository.model.SampleTask sampleTask =
+                this.sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
+        SampleTask result = sampleTask.toPresentationModel();
+        Choice choice = this.sampleTaskDaoJpa.getSampleTaskChoice(sampleTask);
+        if (choice != null) {
+            result.setChoice(choice.toPresentationModel());
+        }
+        return result;
     }
 
     @GetMapping(SAMPLE_TASK_BY_METADATA)

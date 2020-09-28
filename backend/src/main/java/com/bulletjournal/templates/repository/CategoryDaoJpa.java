@@ -125,11 +125,11 @@ public class CategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public CategorySteps getCategorySteps(Long catetoryId) {
-        CategorySteps categorieSteps = new CategorySteps();
+    public CategorySteps getCategorySteps(Long categoryId) {
+        CategorySteps categorySteps = new CategorySteps();
         List<Triple<com.bulletjournal.templates.controller.model.Step, Rule, com.bulletjournal.templates.controller.model.Step>> connections = new ArrayList<>();
 
-        List<CategoryRule> categoryRules = categoryRepository.getById(catetoryId).getCategoryRules();
+        List<CategoryRule> categoryRules = categoryRepository.getById(categoryId).getCategoryRules();
         Queue<Step> bfsQueue = categoryRules.stream().map(com.bulletjournal.templates.repository.model.Rule::getConnectedStep)
                 .collect(Collectors.toCollection(LinkedList::new));
         int size = bfsQueue.size();
@@ -157,8 +157,8 @@ public class CategoryDaoJpa {
             }
         }
 
-        categorieSteps.setConnections(connections);
+        categorySteps.setConnections(connections);
 
-        return categorieSteps;
+        return categorySteps;
     }
 }
