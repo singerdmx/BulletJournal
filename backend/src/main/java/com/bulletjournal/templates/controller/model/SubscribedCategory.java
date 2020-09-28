@@ -1,7 +1,6 @@
 package com.bulletjournal.templates.controller.model;
 
 import com.bulletjournal.controller.models.Project;
-import com.google.gson.annotations.Expose;
 
 public class SubscribedCategory {
     private Category category;
