@@ -37,6 +37,9 @@ public class SampleTask extends NamedModel {
     @Column(name = "time_zone")
     private String timeZone;
 
+    @Column
+    private boolean pending;
+
     @Override
     public Long getId() {
         return id;
@@ -100,6 +103,14 @@ public class SampleTask extends NamedModel {
 
     public void setAvailableBefore(Timestamp availableBefore) {
         this.availableBefore = availableBefore;
+    }
+
+    public boolean isPending() {
+        return pending;
+    }
+
+    public void setPending(boolean pending) {
+        this.pending = pending;
     }
 
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
