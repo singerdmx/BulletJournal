@@ -5,10 +5,7 @@ import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.redis.RedisSampleTasksRepository;
-import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
-import com.bulletjournal.templates.repository.SampleTaskRuleDaoJpa;
-import com.bulletjournal.templates.repository.StepDaoJpa;
+import com.bulletjournal.templates.repository.*;
 import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.CategoryRule;
 import com.bulletjournal.templates.repository.model.Step;
@@ -41,6 +38,7 @@ public class WorkflowController {
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
     public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
     public static final String CATEGORY_STEPS_ROUTE = "/api/categories/{categoryId}/steps";
+    public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -63,7 +61,20 @@ public class WorkflowController {
     @Autowired
     private RuleEngine ruleEngine;
 
+    @Autowired
+    private UserCategoryDaoJpa userCategoryDaoJpa;
+
     private static final Gson GSON = new Gson();
+
+    @GetMapping(SUBSCRIBED_CATEGORIES_ROUTE)
+    public List<SubscribedCategory> getUserSubscribedCategories(@NotNull @PathVariable String username) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        return userCategoryDaoJpa.getUserCategoriesByUserName(requester).stream()
+                .map(uc -> new SubscribedCategory(
+                    uc.getCategory().toSimplePresentationModel(),
+                    uc.getMetadataKeyword().getSelection().toPresentationModel(),
+                    uc.getProject().toPresentationModel())).collect(Collectors.toList());
+    }
 
     @GetMapping(NEXT_STEP_ROUTE)
     public NextStep getNext(

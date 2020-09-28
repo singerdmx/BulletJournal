@@ -2,21 +2,27 @@ package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.ProjectRepository;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.repository.model.UserCategory;
 import com.bulletjournal.templates.repository.model.UserCategoryKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
 public class UserCategoryDaoJpa {
+    private static Logger LOGGER = LoggerFactory.getLogger(UserCategoryDaoJpa.class);
+
     @Autowired
     private UserCategoryRepository userCategoryRepository;
 
@@ -29,10 +35,24 @@ public class UserCategoryDaoJpa {
     @Autowired
     private SelectionMetadataKeywordRepository selectionMetadataKeywordRepository;
 
+    @Autowired
+    private UserDaoJpa userDaoJpa;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void save(UserCategory userCategory) {
         if (userCategory != null) {
             userCategoryRepository.save(userCategory);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<UserCategory> getUserCategoriesByUserName(String username) {
+        try {
+            User user = userDaoJpa.getByName(username);
+            return userCategoryRepository.getAllByUser(user);
+        } catch (ResourceNotFoundException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 
