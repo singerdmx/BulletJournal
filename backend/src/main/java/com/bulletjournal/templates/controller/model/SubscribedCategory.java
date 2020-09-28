@@ -2,19 +2,21 @@ package com.bulletjournal.templates.controller.model;
 
 import com.bulletjournal.controller.models.Project;
 
+import java.util.List;
+
 public class SubscribedCategory {
     private Category category;
 
-    private Selection selection;
+    private List<Selection> selections;
 
     private Project project;
 
     public SubscribedCategory() {
     }
 
-    public SubscribedCategory(Category category, Selection selection, Project project) {
+    public SubscribedCategory(Category category, List<Selection> selections, Project project) {
         this.category = category;
-        this.selection = selection;
+        this.selections = selections;
         this.project = project;
     }
 
@@ -26,12 +28,12 @@ public class SubscribedCategory {
         this.category = category;
     }
 
-    public Selection getSelection() {
-        return selection;
+    public List<Selection> getSelections() {
+        return selections;
     }
 
-    public void setSelection(Selection selection) {
-        this.selection = selection;
+    public void setSelections(List<Selection> selections) {
+        this.selections = selections;
     }
 
     public Project getProject() {
@@ -40,14 +42,5 @@ public class SubscribedCategory {
 
     public void setProject(Project project) {
         this.project = project;
-    }
-
-    @Override
-    public String toString() {
-        return "SubscribedCategory{" +
-            ", category=" + category +
-            ", selection=" + selection +
-            ", project=" + project +
-            '}';
     }
 }

@@ -12,6 +12,7 @@ import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.repository.model.StepRule;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -72,7 +73,7 @@ public class WorkflowController {
         List<SubscribedCategory> result = userCategoryDaoJpa.getUserCategoriesByUserName(requester).stream()
                 .map(uc -> new SubscribedCategory(
                     uc.getCategory().toSimplePresentationModel(),
-                    uc.getMetadataKeyword().getSelection().toPresentationModel(),
+                    ImmutableList.of(uc.getMetadataKeyword().getSelection().toPresentationModel()),
                     uc.getProject().toPresentationModel())
                 ).collect(Collectors.toList());
         return result;
