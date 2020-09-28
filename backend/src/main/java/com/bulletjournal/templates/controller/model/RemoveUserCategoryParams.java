@@ -5,44 +5,32 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class RemoveUserCategoryParams {
-  @NotNull private Long categoryId;
+  @NotNull
+  private Long categoryId;
 
   @NotBlank
-  @Size(min = 1, max = 100)
-  private String username;
-
-  @NotBlank
-  String metadataKeyword;
+  private Long selectionId;
 
   public RemoveUserCategoryParams() {}
 
-  public RemoveUserCategoryParams(Long categoryId, String username, String metadataKeyword) {
+  public RemoveUserCategoryParams(Long categoryId, Long selectionId) {
     this.categoryId = categoryId;
-    this.username = username;
-    this.metadataKeyword = metadataKeyword;
+    this.selectionId = selectionId;
   }
 
   public Long getCategoryId() {
     return categoryId;
   }
 
-  public String getMetadataKeyword() {
-    return metadataKeyword;
-  }
-
-  public void setMetadataKeyword(String metadataKeyword) {
-    this.metadataKeyword = metadataKeyword;
-  }
-
   public void setCategoryId(Long categoryId) {
     this.categoryId = categoryId;
   }
 
-  public String getUsername() {
-    return username;
+  public Long getSelectionId() {
+    return selectionId;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setSelectionId(Long selectionId) {
+    this.selectionId = selectionId;
   }
 }

@@ -6,6 +6,8 @@ import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.RemoveUserFromGroupEvent;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.RemoveUserCategoryParams;
+import com.bulletjournal.templates.repository.SelectionDaoJpa;
+import com.bulletjournal.templates.repository.SelectionMetadataKeywordDaoJpa;
 import com.bulletjournal.templates.repository.UserCategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.UserCategory;
 import com.bulletjournal.templates.repository.model.UserCategoryKey;
@@ -32,10 +34,15 @@ public class UserCategoryController {
   @Autowired
   private UserDaoJpa userDaoJpa;
 
+  @Autowired
+  private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
+
   @PostMapping(REMOVE_USER_CATEGORY_ROUTE)
   public UserCategory removeUserCategory(
       @Valid @PathVariable RemoveUserCategoryParams removeUserCategoryParams) {
     String username = MDC.get(UserClient.USER_NAME_KEY);
+    Long categoryId = removeUserCategoryParams.getCategoryId();
+    Long selectionId = removeUserCategoryParams.getSelectionId();
     List<Event> events =
         this.userCategoryDaoJpa.removeUserCategories(
             username, ImmutableList.of(removeUserCategoryParams));
@@ -48,7 +55,7 @@ public class UserCategoryController {
     return userCategoryDaoJpa.getUserCategoryByKey(
         new UserCategoryKey(
             userDaoJpa.getByName(username).getId(),
-            removeUserCategoryParams.getCategoryId(),
-            removeUserCategoryParams.getMetadataKeyword()));
+            categoryId,
+            selectionMetadataKeywordDaoJpa.getKeywordsBySelections(ImmutableList.of(selectionId)).get(0)));
   }
 }
