@@ -209,7 +209,7 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 			Content:			"Test Content",
 			Name:				"Test Name",
 			Uid:				"1000",
-			AvailableBefore:	t2,
+			AvailableBefore:	t2.String(),
 			ReminderBeforeTask: 1,
 			DueDate:			"2020-02-20",
 			DueTime: 			"",
