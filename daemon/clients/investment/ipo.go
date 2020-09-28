@@ -7,7 +7,10 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
+
+	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
+
 )
 
 type IPOData struct {
@@ -35,6 +38,10 @@ type IPO struct {
 	UnderwriterQuietExpirationDate string        `json:"underwriter_quiet_expiration_date"`
 	Notes                          string        `json:"notes"`
 	Updated                        int           `json:"updated"`
+}
+
+type persistenceService {
+	sampleTaskDao	*persistence.sampleTaskDao
 }
 
 func fetchIPO() (*IPOData, error) {
@@ -76,6 +83,23 @@ func fetchIPO() (*IPOData, error) {
 
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+	}
+
+	for i := range(data) {
+		target := data[i]
+		item := persistence.SampleTask{
+			CreatedAt: time.Now, 
+			UpdatedAt: time.Now,
+			MetaData: "INVESTMENT_IPO_RECORD",
+			Content: "",
+			Name: target.Name,
+			Uid: target.ID,
+			AvailableBefore: target.PricingDate,
+			ReminderBeforeTask: 0,
+			DueDate: target.PricingDate,			
+			DueTime: ""	
+		}
+		sampleTaskDao.Upsert(&item)
 	}
 
 	return &data, nil

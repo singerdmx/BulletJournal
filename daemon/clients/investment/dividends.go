@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 )
 
 type DividendsData struct {
@@ -72,6 +72,23 @@ func fetchDivideneds() (*DividendsData, error) {
 
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+	}
+
+	for i:= range(data) {
+		target := data[i]
+		item := persistence.SampleTask{
+			CreatedAt: time.Now,
+			UpdatedAt: time.Now,
+			MetaData: "INVESTMENT_DIVIDENDS_RECORD",
+			Content: "",
+			Name: target.Name,
+			Uid: target.ID,
+			AvailableBefore: target.Date,
+			ReminderBeforeTask: 0,
+			DueDate: "",			
+			DueTime: ""
+		}
+		sampleTaskDao.Upsert(&item)
 	}
 
 	return &data, nil

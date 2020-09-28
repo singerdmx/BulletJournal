@@ -1,8 +1,11 @@
 package com.bulletjournal.templates.repository.model;
 
+import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,8 +29,18 @@ public class UserCategory {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToOne(targetEntity = SelectionMetadataKeyword.class)
+    @MapsId("metadata_keyword")
+    @JoinColumn(name = "metadata_keyword")
+    private SelectionMetadataKeyword metadataKeyword;
+
     @Column(name = "selections")
     private String selections;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "project_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Project project;
 
     public UserCategory() {
     }
@@ -54,6 +67,22 @@ public class UserCategory {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public SelectionMetadataKeyword getMetadataKeyword() {
+        return metadataKeyword;
+    }
+
+    public void setMetadataKeyword(SelectionMetadataKeyword metadataKeyword) {
+        this.metadataKeyword = metadataKeyword;
     }
 
     public String getSelections() {
