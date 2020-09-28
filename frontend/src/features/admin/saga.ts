@@ -10,7 +10,7 @@ import {
   LockUserAndIPAction,
   ChangePointsAction,
   SetPointsAction,
-  GetUserInfoAction,
+  GetUserInfoAction, GetCategoryStepsAction,
 } from './reducer';
 import {
   setRole,
@@ -22,7 +22,8 @@ import {
   fetchUserInfo,
   setPoints,
 } from '../../apis/adminApis';
-import { UserInfo } from './interface';
+import {CategorySteps, UserInfo} from './interface';
+import {fetchCategorySteps} from "../../apis/templates/workflowApis";
 
 function* setUserRole(action: PayloadAction<setRoleAction>) {
   try {
@@ -139,6 +140,18 @@ function* lockUsersAndIPs(action: PayloadAction<LockUserAndIPAction>) {
   }
 }
 
+function* getCategorySteps(action: PayloadAction<GetCategoryStepsAction>) {
+  const { categoryId } = action.payload;
+  console.log(categoryId)
+  try {
+    const data : CategorySteps = yield call(fetchCategorySteps, categoryId);
+    console.log(data);
+    yield put(adminActions.categoryStepsReceived({categorySteps: data}));
+  } catch (error) {
+    yield call(message.error, `getCategorySteps Error Received: ${error}`);
+  }
+}
+
 export default function* AdminSagas() {
   yield all([
     yield takeLatest(adminActions.setRole.type, setUserRole),
@@ -150,6 +163,7 @@ export default function* AdminSagas() {
        ),
     yield takeLatest(adminActions.unlockUserandIP.type, unlockUsersAndIPs),
     yield takeLatest(adminActions.lockUserandIP.type, lockUsersAndIPs),
-    yield takeLatest(adminActions.getUserInfo.type, getUserInfo)
+    yield takeLatest(adminActions.getUserInfo.type, getUserInfo),
+    yield takeLatest(adminActions.getCategorySteps.type, getCategorySteps),
   ])
 }

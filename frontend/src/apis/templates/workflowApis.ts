@@ -128,3 +128,11 @@ export const getUserSubscribedCategories = () => {
             throw Error(err.message);
         });
 }
+
+export const fetchCategorySteps = (categoryId: number) => {
+    return doFetch(`/api/categories/${categoryId}/steps`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
