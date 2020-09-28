@@ -4,14 +4,10 @@ import com.bulletjournal.controller.models.Project;
 import com.google.gson.annotations.Expose;
 
 public class SubscribedCategory {
-
-    @Expose
     private Category category;
 
-    @Expose
     private Selection selection;
 
-    @Expose
     private Project project;
 
     public SubscribedCategory(Category category, Selection selection, Project project) {

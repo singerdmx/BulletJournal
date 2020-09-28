@@ -67,13 +67,14 @@ public class WorkflowController {
     private static final Gson GSON = new Gson();
 
     @GetMapping(SUBSCRIBED_CATEGORIES_ROUTE)
-    public List<SubscribedCategory> getUserSubscribedCategories(@NotNull @PathVariable String username) {
+    public List<SubscribedCategory> getUserSubscribedCategories() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         return userCategoryDaoJpa.getUserCategoriesByUserName(requester).stream()
                 .map(uc -> new SubscribedCategory(
                     uc.getCategory().toSimplePresentationModel(),
                     uc.getMetadataKeyword().getSelection().toPresentationModel(),
-                    uc.getProject().toPresentationModel())).collect(Collectors.toList());
+                    uc.getProject().toPresentationModel())
+                ).collect(Collectors.toList());
     }
 
     @GetMapping(NEXT_STEP_ROUTE)

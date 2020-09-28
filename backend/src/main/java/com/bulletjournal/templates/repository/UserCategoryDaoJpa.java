@@ -47,13 +47,8 @@ public class UserCategoryDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<UserCategory> getUserCategoriesByUserName(String username) {
-        try {
-            User user = userDaoJpa.getByName(username);
-            return userCategoryRepository.getAllByUser(user);
-        } catch (ResourceNotFoundException e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
+        User user = userDaoJpa.getByName(username);
+        return userCategoryRepository.getAllByUser(user);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
