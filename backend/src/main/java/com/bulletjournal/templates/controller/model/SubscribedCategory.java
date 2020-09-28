@@ -2,6 +2,7 @@ package com.bulletjournal.templates.controller.model;
 
 import com.bulletjournal.controller.models.Project;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SubscribedCategory {
@@ -9,15 +10,15 @@ public class SubscribedCategory {
 
     private List<Selection> selections;
 
-    private Project project;
+    private List<Project> projects;
 
     public SubscribedCategory() {
     }
 
-    public SubscribedCategory(Category category, List<Selection> selections, Project project) {
+    public SubscribedCategory(Category category, List<Selection> selections, List<Project> projects) {
         this.category = category;
         this.selections = selections;
-        this.project = project;
+        this.projects = projects;
     }
 
     public Category getCategory() {
@@ -36,11 +37,25 @@ public class SubscribedCategory {
         this.selections = selections;
     }
 
-    public Project getProject() {
-        return project;
+    public List<Project> getProjects() {
+        return projects;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
+
+    public void addSelection(Selection selection) {
+        if (selections == null) {
+            selections = new ArrayList<>();
+        }
+        selections.add(selection);
+    }
+
+    public void addProject(Project project) {
+        if (projects == null) {
+            projects = new ArrayList<>();
+        }
+        projects.add(project);
     }
 }
