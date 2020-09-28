@@ -120,3 +120,11 @@ export const importSampleTasks = (sampleTasks: number[], selections: number[], c
             throw Error(err.message);
         });
 }
+
+export const getUserSubscribedCategories = () => {
+    return doFetch('/api/subscribedCategories')
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
