@@ -8,9 +8,9 @@ import java.util.List;
 public class SubscribedCategory {
     private Category category;
 
-    private List<Selection> selections;
+    private List<Selection> selections = new ArrayList<>();
 
-    private List<Project> projects;
+    private List<Project> projects = new ArrayList<>();
 
     public SubscribedCategory() {
     }
