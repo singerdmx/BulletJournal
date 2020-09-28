@@ -2,8 +2,8 @@ package investment
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"regexp"
 )
 

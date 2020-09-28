@@ -1,8 +1,8 @@
 package persistence
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 )

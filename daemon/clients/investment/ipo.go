@@ -1,16 +1,15 @@
-package main
+package investment
 
 import (
-	"fmt"
-	"time"
 	"encoding/json"
+	"fmt"
 	"strconv"
+	"time"
 
-	"github.com/pkg/errors"
 	"github.com/go-resty/resty/v2"
+	"github.com/pkg/errors"
 
-	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
-
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
 
 type IPOData struct {
@@ -40,11 +39,9 @@ type IPO struct {
 	Updated                        int           `json:"updated"`
 }
 
-type persistenceService {
-	sampleTaskDao	*persistence.sampleTaskDao
-}
-
 func fetchIPO() (*IPOData, error) {
+	sampleTaskDao := persistence.GetSampleTaskDao()
+
 	client := resty.New()
 	year, month, _:= time.Now().Date()
 
@@ -85,11 +82,11 @@ func fetchIPO() (*IPOData, error) {
 		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
 	}
 
-	for i := range(data) {
-		target := data[i]
+	for i := range data.IPO {
+		target := data.IPO[i]
 		item := persistence.SampleTask{
-			CreatedAt: time.Now, 
-			UpdatedAt: time.Now,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 			MetaData: "INVESTMENT_IPO_RECORD",
 			Content: "",
 			Name: target.Name,
@@ -97,7 +94,7 @@ func fetchIPO() (*IPOData, error) {
 			AvailableBefore: target.PricingDate,
 			ReminderBeforeTask: 0,
 			DueDate: target.PricingDate,			
-			DueTime: ""	
+			DueTime: "",
 		}
 		sampleTaskDao.Upsert(&item)
 	}

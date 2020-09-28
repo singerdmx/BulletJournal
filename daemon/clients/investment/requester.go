@@ -1,12 +1,12 @@
 package investment
 
 import (
+	"github.com/pkg/errors"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
-	"github.com/pkg/errors"
 )
 
 var log logging.Logger
