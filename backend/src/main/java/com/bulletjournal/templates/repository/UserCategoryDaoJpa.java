@@ -1,11 +1,15 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.ProjectRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
+import com.bulletjournal.templates.repository.model.Category;
+import com.bulletjournal.templates.controller.model.RemoveUserCategoryParams;
 import com.bulletjournal.templates.repository.model.UserCategory;
 import com.bulletjournal.templates.repository.model.UserCategoryKey;
 import org.slf4j.Logger;
@@ -15,7 +19,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +43,9 @@ public class UserCategoryDaoJpa {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void save(UserCategory userCategory) {
@@ -98,5 +107,40 @@ public class UserCategoryDaoJpa {
             userCategory.setSelections(selectionSet);
         }
         save(userCategory);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Event> removeUserCategories(
+            String requester,
+            List<RemoveUserCategoryParams> RemoveUserCategoriesParams) {
+
+        List<Event> events = new ArrayList<>();
+        for (RemoveUserCategoryParams removeUserCategoryParams : RemoveUserCategoriesParams) {
+            String username = removeUserCategoryParams.getUsername();
+            String metadataKeyword = removeUserCategoryParams.getMetadataKeyword();
+
+            // TODO: Need to check if authorization is needed here.
+//            if (!username.equals(requester)) {
+//                throw new UnAuthorizedException("UnAuthorized to remove other's subscription.");
+//            }
+
+            Long categoryId = removeUserCategoryParams.getCategoryId();
+            Category category = this.categoryRepository.getById(categoryId);
+            if (category == null) {
+                throw new ResourceNotFoundException("Category with id " + categoryId + " doesn't exist");
+            }
+
+            User user = this.userDaoJpa.getByName(username);
+            UserCategoryKey userCategoryKey = new UserCategoryKey(user.getId(), categoryId, metadataKeyword);
+            UserCategory userCategory = this.userCategoryRepository.findById(userCategoryKey)
+                    .orElseThrow(() -> new ResourceNotFoundException("UserCategory not found"));
+
+            this.userCategoryRepository.delete(userCategory);
+
+            if (!Objects.equals(requester, username)) { // do not notify on leaving group
+                events.add(new Event(username, categoryId, category.getName()));
+            }
+        }
+        return events;
     }
 }
