@@ -298,7 +298,7 @@ public class WorkflowController {
     @GetMapping(CATEGORY_STEPS_ROUTE)
     public CategorySteps getCategorySteps(@NotNull @PathVariable Long categoryId) {
         validateRequester();
-        return null;
+        return categoryDaoJpa.getCategorySteps(categoryId);
     }
 
     private void validateRequester() {
