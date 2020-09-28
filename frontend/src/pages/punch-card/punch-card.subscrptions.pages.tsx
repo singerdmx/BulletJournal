@@ -6,7 +6,6 @@ import {connect} from "react-redux";
 import {getSubscribedCategories} from "../../features/myself/actions";
 import {SubscribedCategory} from "../../features/myself/interface";
 import {renderCategory} from "../templates/categories.page";
-import {useHistory} from "react-router-dom";
 import '../templates/category.styles.less';
 
 type TemplateSubscriptionsProps = {
