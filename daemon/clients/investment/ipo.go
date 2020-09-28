@@ -97,7 +97,7 @@ func FetchIPO() (*IPOData, error) {
 			DueDate: target.PricingDate,			
 			DueTime: "",
 		}
-		ps.sampleTaskDao.Upsert(&item)
+		sampleTaskDao.Upsert(&item)
 	}
 
 	return &data, nil
