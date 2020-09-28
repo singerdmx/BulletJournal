@@ -1,16 +1,13 @@
 package main
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/singerdmx/BulletJournal/daemon/clients"
+	"github.com/singerdmx/BulletJournal/daemon/clients/investment"
 )
-
-var ctx = context.Background()
 
 type ClientTestSuite struct {
 	suite.Suite
@@ -18,12 +15,14 @@ type ClientTestSuite struct {
 
 // Fetched ipo is not nil
 func testIPOClientFetchInfo(t *testing.T) {
-	data := clients.investment.ipo.fetchIPO()
+	data, err := investment.FetchIPO()
+	assert.Nil(t, err)
 	assert.NotNil(t, data)
 }
 
 // Fetched dividend is not nil
 func testDividendFetchInfo(t *testing.T) {
-	data := clients.investment.dividends.fetchDividends()
+	data, err := investment.FetchDividends()
+	assert.Nil(t, err)
 	assert.NotNil(t, data)
 }

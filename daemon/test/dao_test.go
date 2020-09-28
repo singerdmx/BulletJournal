@@ -227,7 +227,7 @@ func upsertTest() {
 			Content: "",
 			Name: "",
 			Uid: "",
-			AvailableBefore: time.Now(),
+			AvailableBefore: time.Now().String(), //TODO
 			ReminderBeforeTask: 0,
 			DueDate: "",			
 			DueTime: "",		

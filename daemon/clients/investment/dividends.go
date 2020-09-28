@@ -35,7 +35,7 @@ type Dividends struct {
 	Updated        int    `json:"updated"`
 }
 
-func fetchDivideneds() (*DividendsData, error) {
+func FetchDividends() (*DividendsData, error) {
 	sampleTaskDao := persistence.GetSampleTaskDao()
 
 	client := resty.New()
@@ -87,7 +87,7 @@ func fetchDivideneds() (*DividendsData, error) {
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
-			AvailableBefore: target.Date,
+			AvailableBefore: target.Date, //TODO
 			ReminderBeforeTask: 0,
 			DueDate: "",			
 			DueTime: "",

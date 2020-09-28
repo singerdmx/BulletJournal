@@ -39,7 +39,7 @@ type IPO struct {
 	Updated                        int           `json:"updated"`
 }
 
-func fetchIPO() (*IPOData, error) {
+func FetchIPO() (*IPOData, error) {
 	sampleTaskDao := persistence.GetSampleTaskDao()
 
 	client := resty.New()
@@ -91,7 +91,7 @@ func fetchIPO() (*IPOData, error) {
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
-			AvailableBefore: target.PricingDate,
+			AvailableBefore: target.Date, // TODO
 			ReminderBeforeTask: 0,
 			DueDate: target.PricingDate,			
 			DueTime: "",
