@@ -92,7 +92,7 @@ func FetchDividends() (*DividendsData, error) {
 			DueDate: "",			
 			DueTime: "",
 		}
-		sampleTaskDao.Upsert(&item)
+		ps.sampleTaskDao.Upsert(&item)
 	}
 
 	return &data, nil

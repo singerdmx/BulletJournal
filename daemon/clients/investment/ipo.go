@@ -63,18 +63,19 @@ func FetchIPO() (*IPOData, error) {
 	case 2:
 		dateto = datebase + "-28"
 	case 4, 6, 9 , 11:
-		dateto = datebase + "-30" 
+		dateto = datebase + "-30"
 	default:
 		dateto = datebase + "-31"
 	}
 
 	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", datefrom, dateto)
 	resp, err := client.R().
-	Get(url)
+		Get(url)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "sending request failed!")
 	}
+
 
 	var data IPOData
 
@@ -96,7 +97,7 @@ func FetchIPO() (*IPOData, error) {
 			DueDate: target.PricingDate,			
 			DueTime: "",
 		}
-		sampleTaskDao.Upsert(&item)
+		ps.sampleTaskDao.Upsert(&item)
 	}
 
 	return &data, nil
