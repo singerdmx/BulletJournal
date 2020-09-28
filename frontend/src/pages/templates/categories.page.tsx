@@ -14,7 +14,11 @@ type CategoryProps = {
 };
 
 const handleOnClickCategory = (categoryId: number, history: any) => {
-    history.push(`/categories/${categoryId}/steps`);
+    if (history) {
+        history.push(`/categories/${categoryId}/steps`);
+    } else {
+        window.location.href = `${window.location.protocol}//${window.location.host}/public/templates#/categories/${categoryId}/steps`;
+    }
 }
 
 export const renderCategory = (c: Category, history: any) => {

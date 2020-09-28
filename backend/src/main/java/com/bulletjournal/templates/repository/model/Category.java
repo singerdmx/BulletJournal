@@ -202,4 +202,11 @@ public class Category extends NamedModel {
                 getCategoryRules().stream().map(CategoryRule::toPresentationModel).collect(Collectors.toList()),
                 nextStep == null ? null : nextStep.getId(), needStartDate);
     }
+
+    public com.bulletjournal.templates.controller.model.Category toSimplePresentationModel() {
+        return new com.bulletjournal.templates.controller.model.Category(
+            id, getName(), description, icon, color, forumId, Collections.emptyList(), image,
+            Collections.emptyList(), Collections.emptyList(), null, needStartDate
+        );
+    }
 }
