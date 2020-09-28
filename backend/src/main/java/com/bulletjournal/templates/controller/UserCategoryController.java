@@ -57,5 +57,7 @@ public class UserCategoryController {
             userDaoJpa.getByName(username).getId(),
             categoryId,
             selectionMetadataKeywordDaoJpa.getKeywordsBySelections(ImmutableList.of(selectionId)).get(0)));
+            removeUserCategoryParams.getCategoryId(),
+            removeUserCategoryParams.getMetadataKeyword()));
   }
 }
